@@ -1,0 +1,61 @@
+name: Aggiungi giocatore
+description: Inserisci un giocatore nel database CourtWatch
+title: "[Giocatore] "
+body:
+  - type: markdown
+    attributes:
+      value: "Compila i dati pubblici del giocatore. Non inserire password o credenziali dei portali."
+  - type: input
+    id: name
+    attributes:
+      label: Nome e cognome
+      placeholder: Martina Danesi
+    validations:
+      required: true
+  - type: input
+    id: birth_year
+    attributes:
+      label: Anno di nascita
+      placeholder: "2009"
+  - type: input
+    id: club
+    attributes:
+      label: Circolo
+      placeholder: Tennis Club Lecco
+    validations:
+      required: true
+  - type: dropdown
+    id: circuits
+    attributes:
+      label: Circuiti
+      multiple: true
+      options:
+        - FITP
+        - Tennis Europe
+        - ITF
+    validations:
+      required: true
+  - type: input
+    id: fitp_id
+    attributes:
+      label: ID FITP
+  - type: input
+    id: te_id
+    attributes:
+      label: ID Tennis Europe
+  - type: input
+    id: world_id
+    attributes:
+      label: World Tennis ID
+  - type: input
+    id: tennis_talker
+    attributes:
+      label: Profilo TennisTalker
+      placeholder: https://www.tennistalker.it/giocatore/...
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Autorizzazione
+      options:
+        - label: Confermo di avere l’autorizzazione del giocatore o di chi ne esercita la responsabilità.
+          required: true
