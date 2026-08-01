@@ -10,32 +10,23 @@ permissions:
 jobs:
   sync:
     if: startsWith(github.event.issue.title, '[Giocatore]')
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with: {ref: main}
-      - name: Build players.json
+      - name: Build official players database
         env: {GH_TOKEN: "${{ github.token }}"}
         run: |
           gh issue list --state open --limit 500 --json number,title,body,url > /tmp/player-issues.json
           node <<'NODE'
-          const fs=require('fs');const seed=JSON.parse(fs.readFileSync('players-notion.json','utf8')).players||[],issues=JSON.parse(fs.readFileSync('/tmp/player-issues.json','utf8')).filter(i=>i.title.startsWith('[Giocatore]'));function field(body,label){const marker=`### ${label}\n\n`,at=body.indexOf(marker);if(at<0)return'';const rest=body.slice(at+marker.length),end=rest.search(/\n\n### /),value=(end<0?rest:rest.slice(0,end)).trim();return value==='_No response_'?'':value}function slug(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}function tournaments(text){return text.split('\n').map(x=>x.replace(/^[-*]\s*/,'').trim()).filter(Boolean).map(line=>{const[name,startDate,endDate,url]=line.split('|').map(x=>x.trim());return{name,startDate:startDate||'',endDate:endDate||'',url:url||''}})}const issuePlayers=issues.map(i=>{const name=field(i.body,'Nome e cognome'),parts=name.trim().split(/\s+/);return{id:slug(name),name,aliases:[name.toUpperCase(),[...parts].reverse().join(' ').toUpperCase()],birthYear:field(i.body,'Anno di nascita'),club:field(i.body,'Circolo'),circuits:field(i.body,'Circuiti').split(/\n|,/).map(x=>x.replace(/^[-*]\s*/,'').trim()).filter(Boolean),fitpId:field(i.body,'ID FITP'),tennisEuropeId:field(i.body,'ID Tennis Europe'),worldTennisId:field(i.body,'World Tennis ID'),tennisTalkerUrl:field(i.body,'Profilo TennisTalker'),confirmedPublicTournaments:tournaments(field(i.body,'Tornei pubblici confermati')),recordUrl:i.url}}).filter(p=>p.name);const map=new Map(seed.map(p=>[p.id,p]));for(const p of issuePlayers){const b=map.get(p.id)||{};map.set(p.id,{...b,...p,club:p.club||b.club||'',circuits:p.circuits.length?p.circuits:(b.circuits||[]),tennisTalkerUrl:p.tennisTalkerUrl||b.tennisTalkerUrl||'',confirmedPublicTournaments:p.confirmedPublicTournaments.length?p.confirmedPublicTournaments:(b.confirmedPublicTournaments||[])})}const players=[...map.values()].sort((a,b)=>a.name.localeCompare(b.name,'it'));fs.writeFileSync('players.json',JSON.stringify({players},null,2)+'\n');
+          const fs=require('fs'),seed=JSON.parse(fs.readFileSync('players-notion.json','utf8')).players||[],issues=JSON.parse(fs.readFileSync('/tmp/player-issues.json','utf8')).filter(i=>i.title.startsWith('[Giocatore]'));function field(body,label){const marker=`### ${label}\n\n`,at=body.indexOf(marker);if(at<0)return'';const rest=body.slice(at+marker.length),end=rest.search(/\n\n### /),v=(end<0?rest:rest.slice(0,end)).trim();return v==='_No response_'?'':v}function slug(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}function tournaments(text){return text.split('\n').map(x=>x.replace(/^[-*]\s*/,'').trim()).filter(Boolean).map(line=>{const[name,startDate,endDate,url]=line.split('|').map(x=>x.trim());return{name,startDate:startDate||'',endDate:endDate||'',url:url||''}})}const issuePlayers=issues.map(i=>{const name=field(i.body,'Nome e cognome'),parts=name.trim().split(/\s+/),circuits=field(i.body,'Circuiti').split(/\n|,/).map(x=>x.replace(/^[-*]\s*/,'').trim()).filter(Boolean);return{id:slug(name),name,aliases:[name.toUpperCase(),[...parts].reverse().join(' ').toUpperCase()],birthYear:field(i.body,'Anno di nascita'),club:field(i.body,'Circolo'),circuits,fitpId:field(i.body,'ID FITP'),tennisEuropeId:field(i.body,'ID Tennis Europe'),worldTennisId:field(i.body,'World Tennis ID'),confirmedOfficialTournaments:tournaments(field(i.body,'Tornei ufficiali confermati')),recordUrl:i.url}}).filter(p=>p.name);const map=new Map(seed.map(p=>[p.id,p]));for(const p of issuePlayers){const b=map.get(p.id)||{};map.set(p.id,{...b,...p,club:p.club||b.club||'',circuits:p.circuits.length?p.circuits:(b.circuits||[]),officialUrls:b.officialUrls||{fitp:['https://www.fitp.it/Tornei/Ricerca-tornei'],tennisEurope:[],itf:[]},confirmedOfficialTournaments:p.confirmedOfficialTournaments.length?p.confirmedOfficialTournaments:(b.confirmedOfficialTournaments||[])})}fs.writeFileSync('players.json',JSON.stringify({players:[...map.values()].sort((a,b)=>a.name.localeCompare(b.name,'it'))},null,2)+'\n');
           NODE
-      - run: node merge-confirmed.mjs
-      - name: Save database and live data
+      - name: Save official player configuration
         run: |
-          if ! git diff --quiet -- players.json data.json; then
+          if ! git diff --quiet -- players.json; then
             git config user.name "courtwatch-bot"
             git config user.email "courtwatch-bot@users.noreply.github.com"
-            git add players.json data.json
-            git commit -m "Sync monitored players database"
+            git add players.json
+            git commit -m "Sync official Court Watch players"
             git push
           fi
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with: {path: .}
-      - id: deployment
-        uses: actions/deploy-pages@v4
