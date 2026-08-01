@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [players.json, monitor.mjs, package.json, package-lock.json, .github/workflows/public-monitor.yml]
+    paths: [players.json, monitor.mjs, merge-confirmed.mjs, package.json, package-lock.json, .github/workflows/public-monitor.yml]
   schedule:
     - cron: '7,37 * * * *'
 permissions:
@@ -19,6 +19,7 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run monitor
+      - run: node merge-confirmed.mjs
       - run: |
           if git diff --quiet -- data.json; then exit 0; fi
           git config user.name "courtwatch-bot"
