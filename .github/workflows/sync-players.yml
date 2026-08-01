@@ -5,9 +5,14 @@ on:
 permissions:
   contents: write
   issues: read
+  pages: write
+  id-token: write
 jobs:
   sync:
     if: startsWith(github.event.issue.title, '[Giocatore]')
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,11 +24,18 @@ jobs:
           node <<'NODE'
           const fs=require('fs');const issues=JSON.parse(fs.readFileSync('/tmp/player-issues.json','utf8')).filter(i=>i.title.startsWith('[Giocatore]'));function field(body,label){const marker=`### ${label}\n\n`,at=body.indexOf(marker);if(at<0)return'';const rest=body.slice(at+marker.length),end=rest.search(/\n\n### /),value=(end<0?rest:rest.slice(0,end)).trim();return value==='_No response_'?'':value}function slug(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}function tournaments(text){return text.split('\n').map(x=>x.replace(/^[-*]\s*/,'').trim()).filter(Boolean).map(line=>{const[name,startDate,endDate,url]=line.split('|').map(x=>x.trim());return{name,startDate:startDate||'',endDate:endDate||'',url:url||''}})}const players=issues.map(i=>{const name=field(i.body,'Nome e cognome'),parts=name.trim().split(/\s+/);return{id:slug(name),name,aliases:[name.toUpperCase(),[...parts].reverse().join(' ').toUpperCase()],birthYear:field(i.body,'Anno di nascita'),club:field(i.body,'Circolo'),circuits:field(i.body,'Circuiti').split(/\n|,/).map(x=>x.replace(/^[-*]\s*/,'').trim()).filter(Boolean),fitpId:field(i.body,'ID FITP'),tennisEuropeId:field(i.body,'ID Tennis Europe'),worldTennisId:field(i.body,'World Tennis ID'),tennisTalkerUrl:field(i.body,'Profilo TennisTalker'),privateItfEntries:field(i.body,'Iscrizioni ITF private confermate'),confirmedPublicTournaments:tournaments(field(i.body,'Tornei pubblici confermati')),recordUrl:i.url}}).filter(p=>p.name).sort((a,b)=>a.name.localeCompare(b.name,'it'));fs.writeFileSync('players.json',JSON.stringify({players},null,2)+'\n');
           NODE
-      - name: Save database
+      - run: node merge-confirmed.mjs
+      - name: Save database and live data
         run: |
-          if git diff --quiet -- players.json; then exit 0; fi
-          git config user.name "courtwatch-bot"
-          git config user.email "courtwatch-bot@users.noreply.github.com"
-          git add players.json
-          git commit -m "Sync monitored players database"
-          git push
+          if ! git diff --quiet -- players.json data.json; then
+            git config user.name "courtwatch-bot"
+            git config user.email "courtwatch-bot@users.noreply.github.com"
+            git add players.json data.json
+            git commit -m "Sync monitored players database"
+            git push
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: {path: .}
+      - id: deployment
+        uses: actions/deploy-pages@v4

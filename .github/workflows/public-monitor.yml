@@ -8,8 +8,13 @@ on:
     - cron: '7,37 * * * *'
 permissions:
   contents: write
+  pages: write
+  id-token: write
 jobs:
   monitor:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -21,9 +26,15 @@ jobs:
       - run: npm run monitor
       - run: node merge-confirmed.mjs
       - run: |
-          if git diff --quiet -- data.json; then exit 0; fi
-          git config user.name "courtwatch-bot"
-          git config user.email "courtwatch-bot@users.noreply.github.com"
-          git add data.json
-          git commit -m "Update public tennis findings"
-          git push
+          if ! git diff --quiet -- data.json; then
+            git config user.name "courtwatch-bot"
+            git config user.email "courtwatch-bot@users.noreply.github.com"
+            git add data.json
+            git commit -m "Update public tennis findings"
+            git push
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: {path: .}
+      - id: deployment
+        uses: actions/deploy-pages@v4
