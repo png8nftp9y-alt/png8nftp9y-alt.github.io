@@ -1,5 +1,5 @@
 name: Aggiungi giocatore
-description: Inserisci un giocatore nel database CourtWatch
+description: Inserisci un giocatore nel database Court Watch
 title: "[Giocatore] "
 body:
   - type: markdown
@@ -15,14 +15,12 @@ body:
   - type: input
     id: club
     attributes: {label: Circolo, placeholder: Tennis Club Lecco}
-    validations: {required: true}
   - type: dropdown
     id: circuits
     attributes:
       label: Circuiti
       multiple: true
       options: [FITP, Tennis Europe, ITF]
-    validations: {required: true}
   - type: input
     id: fitp_id
     attributes: {label: ID FITP}
@@ -35,21 +33,15 @@ body:
   - type: input
     id: tennis_talker
     attributes: {label: Profilo TennisTalker, placeholder: "https://www.tennistalker.it/giocatore/..."}
-  - type: input
-    id: private_itf_entries
-    attributes:
-      label: Iscrizioni ITF private confermate
-      description: Inserisci solo il numero o intervallo noto, per esempio 2-3. Non inserire credenziali.
-      placeholder: 2-3
   - type: textarea
     id: confirmed_public
     attributes:
       label: Tornei pubblici confermati
-      description: "Una riga per torneo: Nome | data inizio AAAA-MM-GG | data fine | URL pubblico"
+      description: "Una riga per torneo realmente verificato: Nome | data inizio AAAA-MM-GG | data fine | URL pubblico"
   - type: checkboxes
     id: consent
     attributes:
       label: Autorizzazione
       options:
-        - label: Confermo di avere l’autorizzazione del giocatore o di chi ne esercita la responsabilità.
+        - label: Confermo di avere l’autorizzazione necessaria.
           required: true
