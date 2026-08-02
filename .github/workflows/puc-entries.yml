@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [players.json, puc-entries.mjs, .github/workflows/puc-entries.yml]
+    paths: [players.json, puc-entries-v2.mjs, .github/workflows/puc-entries.yml]
   schedule:
     - cron: '17 */3 * * *'
 permissions: { contents: write }
@@ -11,12 +11,13 @@ concurrency: { group: court-watch-puc-entries, cancel-in-progress: false }
 jobs:
   entries:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: node puc-entries.mjs
+      - run: node --check puc-entries-v2.mjs
+      - run: node puc-entries-v2.mjs
       - run: |
           git config user.name 'courtwatch-bot'
           git config user.email 'courtwatch-bot@users.noreply.github.com'
