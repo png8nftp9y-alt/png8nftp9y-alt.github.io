@@ -5,13 +5,13 @@ on:
     branches: [main]
     paths: [puc-monitor.mjs, .github/workflows/puc-fast.yml]
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/15 * * * *'
 permissions:
   contents: write
   issues: write
 concurrency:
   group: court-watch-puc
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   puc:
     runs-on: ubuntu-latest
