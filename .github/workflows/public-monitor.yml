@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [players.json, monitor.mjs, package.json, package-lock.json, .github/workflows/public-monitor.yml]
+    paths: [players.json, monitor.mjs, courtwatch-cleanup.mjs, .github/workflows/public-monitor.yml]
   schedule:
     - cron: '*/15 * * * *'
 permissions: {contents: write,issues: write,pages: write,id-token: write}
@@ -22,19 +22,28 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get update -qq && sudo apt-get install -y poppler-utils
-      - name: Scan FITP, Tennis Europe and ITF
+      - name: Scan and validate official portals
         run: |
+          node build-surname-aliases.mjs
           sed -i 's/seen.size < 45/seen.size < 35/g; s/waitForTimeout(5000)/waitForTimeout(1500)/g; s/item.depth < 2/item.depth < 1/g' monitor.mjs
           npm run monitor
           node merge-confirmed.mjs
+          node courtwatch-cleanup.mjs
+      - name: Notify Federico
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),a=JSON.parse(fs.readFileSync('alerts.json','utf8'));if(!a.notifications?.length)process.exit(0);fs.writeFileSync('/tmp/alert.md',['@png8nftp9y-alt **nuovo aggiornamento Court Watch**','',...a.notifications.map(n=>`- **${n.playerName}** — ${n.message}`)].join('\n'));
+          NODE
+          if [ -s /tmp/alert.md ]; then gh issue comment 7 --body-file /tmp/alert.md; fi
       - name: Save updates
         run: |
           git checkout -- monitor.mjs
-          if ! git diff --quiet -- data.json alerts.json; then
+          if ! git diff --quiet -- data.json alerts.json players.json cleanup-report.json; then
             git config user.name 'courtwatch-bot'
             git config user.email 'courtwatch-bot@users.noreply.github.com'
-            git add data.json alerts.json
-            git commit -m 'Update official tournament schedules'
+            git add data.json alerts.json players.json cleanup-report.json
+            git commit -m 'Update validated official tournament schedules'
             git pull --rebase origin main
             git push
           fi

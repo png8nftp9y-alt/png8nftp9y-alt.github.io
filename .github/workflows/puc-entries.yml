@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [players.json, puc-entries-v2.mjs, .github/workflows/puc-entries.yml]
+    paths: [players.json, puc-entries-v2.mjs, courtwatch-cleanup.mjs, .github/workflows/puc-entries.yml]
   schedule:
     - cron: '17 */3 * * *'
 permissions: { contents: write }
@@ -17,9 +17,12 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - run: node --check puc-entries-v2.mjs
-      - run: node puc-entries-v2.mjs
+      - run: |
+          node build-surname-aliases.mjs
+          node puc-entries-v2.mjs
+          node courtwatch-cleanup.mjs
       - run: |
           git config user.name 'courtwatch-bot'
           git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add data.json puc-entries.json
-          if ! git diff --cached --quiet; then git commit -m 'Update official FITP entries'; git pull --rebase origin main; git push; fi
+          git add data.json players.json puc-entries.json cleanup-report.json
+          if ! git diff --cached --quiet; then git commit -m 'Update validated official FITP entries'; git pull --rebase origin main; git push; fi
