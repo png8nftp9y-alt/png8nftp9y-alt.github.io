@@ -24,16 +24,13 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-
       - name: Mark scanner start
         run: date -u +%FT%TZ > puc-run-start.txt
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-
-      - name: Install and scan PUC
+      - name: Install and run validated scanner
         id: scan
         continue-on-error: true
         shell: bash
@@ -45,31 +42,13 @@ jobs:
           npx playwright install --with-deps chromium 2>&1 | tee -a puc-diagnostics.log
           sudo apt-get update 2>&1 | tee -a puc-diagnostics.log
           sudo apt-get install -y poppler-utils 2>&1 | tee -a puc-diagnostics.log
-          python3 - <<'PY' 2>&1 | tee -a puc-diagnostics.log
-          from pathlib import Path
-          p=Path('puc-monitor.mjs')
-          s=p.read_text()
-          marker="try{await page.goto("
-          start=s.find(marker)
-          if start < 0:
-              raise SystemExit('page.goto marker not found')
-          end=s.find("\n", start)
-          if end < 0:
-              end=len(s)
-          fixed="try{await page.goto('https:'+'//www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000});diagnostics.searchLoaded=true}catch(e){diagnostics.errors.push('Apertura ricerca: '+e.message)}"
-          s=s[:start]+fixed+s[end:]
-          p.write_text(s)
-          print('Runtime PUC URL repaired')
-          PY
           node --check puc-monitor.mjs 2>&1 | tee -a puc-diagnostics.log
           node puc-monitor.mjs 2>&1 | tee -a puc-diagnostics.log
-
       - name: Save diagnostics and data
         if: always()
         shell: bash
         run: |
           test -f puc-diagnostics.log || echo "Scanner stopped before log creation" > puc-diagnostics.log
-          git checkout -- puc-monitor.mjs 2>/dev/null || true
           git config user.name "courtwatch-bot"
           git config user.email "courtwatch-bot@users.noreply.github.com"
           git add -f puc-run-start.txt puc-diagnostics.log data.json alerts.json 2>/dev/null || true
@@ -78,7 +57,6 @@ jobs:
             git pull --rebase origin main
             git push
           fi
-
       - name: Publish new alerts
         if: always()
         continue-on-error: true
