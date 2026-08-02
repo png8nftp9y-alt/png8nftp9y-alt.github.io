@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-02T20:20:26.642Z",
+  "generatedAt": "2026-08-02T20:33:01.362Z",
   "mode": "official-portals-vercel",
   "players": [
     {
@@ -255,50 +255,9 @@
       "status": "upcoming",
       "entryStatus": "Verifica ITF in corso",
       "entryPosition": null
-    },
-    {
-      "key": "official|martina-danesi|j30 cuneo|2026-08-10",
-      "playerId": "martina-danesi",
-      "playerName": "Martina Danesi",
-      "name": "J30 Cuneo",
-      "location": "Luogo da pubblicare",
-      "sourceId": "itf",
-      "sourceName": "ITF",
-      "url": "https://www.itftennis.com/en/tournament/j30-cuneo/ita/2026/j-j30-ita-2026-002/",
-      "startDate": "2026-08-10",
-      "endDate": "2026-08-15",
-      "status": "upcoming"
     }
   ],
   "matches": [
-    {
-      "key": "brallo|2026-08-02|matilde-mainetti",
-      "playerId": "matilde-mainetti",
-      "playerName": "Matilde Mainetti",
-      "tournamentName": "Junior Next Gen Italia — Centro Estivo FITP Brallo",
-      "location": "Brallo di Pregola (PV)",
-      "date": "2026-08-02",
-      "time": null,
-      "court": null,
-      "opponent": null,
-      "url": "https://www.fitp.it/Tornei/Ricerca-tornei",
-      "sourceId": "fitp-puc",
-      "status": "scheduled"
-    },
-    {
-      "key": "brallo|2026-08-03|filippo-vitali",
-      "playerId": "filippo-vitali",
-      "playerName": "Filippo Vitali",
-      "tournamentName": "Junior Next Gen Italia — Centro Estivo FITP Brallo",
-      "location": "Brallo di Pregola (PV)",
-      "date": "2026-08-03",
-      "time": null,
-      "court": null,
-      "opponent": null,
-      "url": "https://www.fitp.it/Tornei/Ricerca-tornei",
-      "sourceId": "fitp-puc",
-      "status": "scheduled"
-    },
     {
       "key": "brallo|2026-08-04|gregorio-puccio",
       "playerId": "gregorio-puccio",
@@ -344,8 +303,9 @@
       "url": "8E872D3D-oraridigioco_20260803.pdf",
       "sourceId": "fitp-puc",
       "sourceName": "P.U.C. FITP",
-      "status": "scheduled",
-      "verifiedAt": "2026-08-02T19:50:29.748Z"
+      "status": "conditional",
+      "verifiedAt": "2026-08-02T19:50:29.748Z",
+      "condition": "Solo se vince l’incontro del 2 agosto"
     }
   ],
   "entryStatuses": [
@@ -547,5 +507,27 @@
     "competitionsChecked": 0,
     "found": [],
     "errors": []
+  },
+  "cleanup": {
+    "lastRun": "2026-08-02T20:33:01.362Z",
+    "removed": [
+      {
+        "type": "tournament-duplicate",
+        "player": "Martina Danesi",
+        "name": "J30 Cuneo"
+      },
+      {
+        "type": "match",
+        "player": "Matilde Mainetti",
+        "date": "2026-08-02",
+        "reason": "Orario non confermato"
+      },
+      {
+        "type": "match",
+        "player": "Filippo Vitali",
+        "date": "2026-08-03",
+        "reason": "Vitali non gioca il singolare"
+      }
+    ]
   }
 }
