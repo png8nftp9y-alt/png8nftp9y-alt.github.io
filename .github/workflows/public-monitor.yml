@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [players.json, monitor.mjs, merge-confirmed.mjs, package.json, package-lock.json, notifications.js, .github/workflows/public-monitor.yml]
+    paths: [players.json, monitor.mjs, puc-monitor.mjs, merge-confirmed.mjs, package.json, package-lock.json, notifications.js, .github/workflows/public-monitor.yml]
   schedule:
     - cron: '*/5 * * * *'
 permissions:
@@ -17,7 +17,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,11 +25,12 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get update && sudo apt-get install -y poppler-utils
-      - name: Run fast official-source scan
+      - name: Scan official portals
         run: |
           sed -i 's/seen.size < 45/seen.size < 12/g; s/waitForTimeout(5000)/waitForTimeout(1500)/g; s/item.depth < 2/item.depth < 1/g' monitor.mjs
           npm run monitor
-      - run: node merge-confirmed.mjs
+          node puc-monitor.mjs
+          node merge-confirmed.mjs
       - name: Send Court Watch alerts
         env:
           GH_TOKEN: ${{ github.token }}
