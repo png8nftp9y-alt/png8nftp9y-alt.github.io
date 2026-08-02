@@ -25,7 +25,7 @@ jobs:
       - run: npm ci
       - name: Repair compressed URL and validate scanner
         run: |
-          sed -i "s#page.goto('{{https://www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000}}})#page.goto('https://www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000})#" puc-monitor.mjs
+          sed -i "/try{await page.goto(/c\\ try{await page.goto('https:'+'//www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000});diagnostics.searchLoaded=true}catch(e){diagnostics.errors.push('Apertura ricerca: '+e.message)}" puc-monitor.mjs
           node --check puc-monitor.mjs
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get update && sudo apt-get install -y poppler-utils

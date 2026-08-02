@@ -29,7 +29,7 @@ jobs:
         run: |
           sed -i 's/seen.size < 45/seen.size < 12/g; s/waitForTimeout(5000)/waitForTimeout(1500)/g; s/item.depth < 2/item.depth < 1/g' monitor.mjs
           npm run monitor
-          sed -i "s#page.goto('{{https://www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000}}})#page.goto('https://www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000})#" puc-monitor.mjs
+          sed -i "/try{await page.goto(/c\\ try{await page.goto('https:'+'//www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000});diagnostics.searchLoaded=true}catch(e){diagnostics.errors.push('Apertura ricerca: '+e.message)}" puc-monitor.mjs
           node puc-monitor.mjs
           node merge-confirmed.mjs
       - name: Send Court Watch alerts
