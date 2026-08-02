@@ -1,1000 +1,564 @@
 {
-  "generatedAt": "2026-08-02T21:16:39.041Z",
-  "topKeys": [
-    "Discipline",
-    "CompetitionUid",
-    "CompetitionId",
-    "Description",
-    "TennisClub",
-    "From",
-    "To",
-    "Municipality",
-    "Province",
-    "Cap",
-    "Address",
-    "impianti",
-    "CategoryAge",
-    "Ranking",
-    "Gender",
-    "ScoreReduction",
-    "ConclusionIntermediateSection",
-    "TotalPrizePool",
-    "IntermediateSectionPrizePool",
-    "CompetitionDirector",
-    "CompetitionOfficer",
-    "Tournaments",
-    "Status",
-    "OnLineSubscriptions",
-    "EnablePreferences"
-  ],
-  "competitionId": 62831,
-  "tournaments": [
+  "generatedAt": "2026-08-02T21:18:56.099Z",
+  "tournament": {
+    "id": 174661,
+    "uid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
+    "section": {
+      "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+      "TournamentId": 174661,
+      "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687",
+      "SectionDescription": "SFU14_Tabellone iniziale 4.6-3.5",
+      "SectionType": "Tabellone intermedio",
+      "NumberOfTeam": 13,
+      "HasWinner": false,
+      "IsIntermediateSection": true,
+      "SectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687",
+      "TournamentMatches": null,
+      "IsGroup": 0,
+      "GroupsMatchSingle": null,
+      "GroupsMatchDouble": null
+    }
+  },
+  "probes": [
     {
-      "description": "Singolare Femminile Under 14",
-      "tournamentId": 174661,
-      "tournamentUid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
-      "participantCount": 37,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 2,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174661,
-              "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687",
-              "SectionDescription": "SFU14_Tabellone iniziale 4.6-3.5",
-              "SectionType": "Tabellone intermedio",
-              "NumberOfTeam": 13,
-              "HasWinner": false,
-              "IsIntermediateSection": true,
-              "SectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          },
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174661,
-              "SectionId": "66D6D3BB-A06D-451F-9071-CBC90FA2F9E5",
-              "SectionDescription": "SFU14_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 24,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "66D6D3BB-A06D-451F-9071-CBC90FA2F9E5",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione/dettaglio",
+      "body": {
+        "competitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentId": 174661,
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174661,
-          "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687",
-          "SectionDescription": "SFU14_Tabellone iniziale 4.6-3.5",
-          "SectionType": "Tabellone intermedio",
-          "NumberOfTeam": 13,
-          "HasWinner": false,
-          "IsIntermediateSection": true,
-          "SectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        },
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174661,
-          "SectionId": "66D6D3BB-A06D-451F-9071-CBC90FA2F9E5",
-          "SectionDescription": "SFU14_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 24,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "66D6D3BB-A06D-451F-9071-CBC90FA2F9E5",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Singolare Femminile Under 10",
-      "tournamentId": 174662,
-      "tournamentUid": "BB5009CB-14D4-499F-A7F8-703B2D04E98D",
-      "participantCount": 15,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 1,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174662,
-              "SectionId": "48445186-DCCE-4B0D-8C5E-656CF61B332D",
-              "SectionDescription": "SFU10_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 15,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "48445186-DCCE-4B0D-8C5E-656CF61B332D",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione/dettaglio",
+      "body": {
+        "competitionUid": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentUid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174662,
-          "SectionId": "48445186-DCCE-4B0D-8C5E-656CF61B332D",
-          "SectionDescription": "SFU10_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 15,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "48445186-DCCE-4B0D-8C5E-656CF61B332D",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Singolare Femminile Under 12",
-      "tournamentId": 174663,
-      "tournamentUid": "756DAE2E-5B59-4602-BE59-3F5FFFC56962",
-      "participantCount": 38,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 2,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174663,
-              "SectionId": "5BA52FA7-6BE4-4AC4-8DAA-B72E22071DC1",
-              "SectionDescription": "SFU12_Tabellone iniziale_N.C.-4.1",
-              "SectionType": "Tabellone intermedio",
-              "NumberOfTeam": 19,
-              "HasWinner": false,
-              "IsIntermediateSection": true,
-              "SectionCode": "5BA52FA7-6BE4-4AC4-8DAA-B72E22071DC1",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          },
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174663,
-              "SectionId": "1F228A56-0A98-41B8-9120-9B37FEABB754",
-              "SectionDescription": "SFU12_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 19,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "1F228A56-0A98-41B8-9120-9B37FEABB754",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione/dettaglio",
+      "body": {
+        "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "TournamentId": 174661,
+        "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174663,
-          "SectionId": "5BA52FA7-6BE4-4AC4-8DAA-B72E22071DC1",
-          "SectionDescription": "SFU12_Tabellone iniziale_N.C.-4.1",
-          "SectionType": "Tabellone intermedio",
-          "NumberOfTeam": 19,
-          "HasWinner": false,
-          "IsIntermediateSection": true,
-          "SectionCode": "5BA52FA7-6BE4-4AC4-8DAA-B72E22071DC1",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        },
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174663,
-          "SectionId": "1F228A56-0A98-41B8-9120-9B37FEABB754",
-          "SectionDescription": "SFU12_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 19,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "1F228A56-0A98-41B8-9120-9B37FEABB754",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Singolare Maschile Under 10",
-      "tournamentId": 174664,
-      "tournamentUid": "9598927E-258C-4B8F-B100-81B60E41D44A",
-      "participantCount": 38,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 2,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174664,
-              "SectionId": "3860470D-DF2F-427E-BC71-D71F48767B11",
-              "SectionDescription": "SMU10_Tabellone iniziale U9",
-              "SectionType": "Tabellone intermedio",
-              "NumberOfTeam": 7,
-              "HasWinner": false,
-              "IsIntermediateSection": true,
-              "SectionCode": "3860470D-DF2F-427E-BC71-D71F48767B11",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          },
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174664,
-              "SectionId": "B9B3E368-2720-4DC7-9B60-021992E3C1A7",
-              "SectionDescription": "SMU10_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 31,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "B9B3E368-2720-4DC7-9B60-021992E3C1A7",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione/dettaglio",
+      "body": {
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174664,
-          "SectionId": "3860470D-DF2F-427E-BC71-D71F48767B11",
-          "SectionDescription": "SMU10_Tabellone iniziale U9",
-          "SectionType": "Tabellone intermedio",
-          "NumberOfTeam": 7,
-          "HasWinner": false,
-          "IsIntermediateSection": true,
-          "SectionCode": "3860470D-DF2F-427E-BC71-D71F48767B11",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        },
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174664,
-          "SectionId": "B9B3E368-2720-4DC7-9B60-021992E3C1A7",
-          "SectionDescription": "SMU10_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 31,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "B9B3E368-2720-4DC7-9B60-021992E3C1A7",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Singolare Maschile Under 12",
-      "tournamentId": 174665,
-      "tournamentUid": "E44C4504-C159-478E-9DB6-A8CCCDB53F6A",
-      "participantCount": 44,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 2,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174665,
-              "SectionId": "9E90B8DD-9757-4B22-98B0-CC3E8DEB9BE4",
-              "SectionDescription": "SMU12_Tabellone iniziale N.C.-4.1",
-              "SectionType": "Tabellone intermedio",
-              "NumberOfTeam": 26,
-              "HasWinner": false,
-              "IsIntermediateSection": true,
-              "SectionCode": "9E90B8DD-9757-4B22-98B0-CC3E8DEB9BE4",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          },
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174665,
-              "SectionId": "2BE891C6-1297-4D0B-9579-E61774EE0667",
-              "SectionDescription": "SMU12_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 18,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "2BE891C6-1297-4D0B-9579-E61774EE0667",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione/dettaglio",
+      "body": {
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174665,
-          "SectionId": "9E90B8DD-9757-4B22-98B0-CC3E8DEB9BE4",
-          "SectionDescription": "SMU12_Tabellone iniziale N.C.-4.1",
-          "SectionType": "Tabellone intermedio",
-          "NumberOfTeam": 26,
-          "HasWinner": false,
-          "IsIntermediateSection": true,
-          "SectionCode": "9E90B8DD-9757-4B22-98B0-CC3E8DEB9BE4",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        },
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174665,
-          "SectionId": "2BE891C6-1297-4D0B-9579-E61774EE0667",
-          "SectionDescription": "SMU12_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 18,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "2BE891C6-1297-4D0B-9579-E61774EE0667",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Singolare Maschile Under 14",
-      "tournamentId": 174666,
-      "tournamentUid": "7258E251-737F-423B-8501-3913BDAD8104",
-      "participantCount": 63,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 2,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174666,
-              "SectionId": "1F89D12A-9E2B-4155-AECD-A2950E9AFD75",
-              "SectionDescription": "SMU14_Tabellone iniziale 4.4-3.4",
-              "SectionType": "Tabellone intermedio",
-              "NumberOfTeam": 22,
-              "HasWinner": false,
-              "IsIntermediateSection": true,
-              "SectionCode": "1F89D12A-9E2B-4155-AECD-A2950E9AFD75",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          },
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174666,
-              "SectionId": "8A1562C0-FB40-44E0-BD5A-8C5C49AF5949",
-              "SectionDescription": "SMU14_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 41,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "8A1562C0-FB40-44E0-BD5A-8C5C49AF5949",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione/dettaglio",
+      "body": {
+        "sectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174666,
-          "SectionId": "1F89D12A-9E2B-4155-AECD-A2950E9AFD75",
-          "SectionDescription": "SMU14_Tabellone iniziale 4.4-3.4",
-          "SectionType": "Tabellone intermedio",
-          "NumberOfTeam": 22,
-          "HasWinner": false,
-          "IsIntermediateSection": true,
-          "SectionCode": "1F89D12A-9E2B-4155-AECD-A2950E9AFD75",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        },
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174666,
-          "SectionId": "8A1562C0-FB40-44E0-BD5A-8C5C49AF5949",
-          "SectionDescription": "SMU14_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 41,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "8A1562C0-FB40-44E0-BD5A-8C5C49AF5949",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Doppio Femminile Under 10",
-      "tournamentId": 174667,
-      "tournamentUid": "FF84F938-140E-4DA6-AB17-456E3E7AE2F5",
-      "participantCount": 12,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 1,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174667,
-              "SectionId": "14EAA9D7-398C-44DE-A57C-2A3914A21BE3",
-              "SectionDescription": "DFU10_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 12,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "14EAA9D7-398C-44DE-A57C-2A3914A21BE3",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione",
+      "body": {
+        "competitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentId": 174661,
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174667,
-          "SectionId": "14EAA9D7-398C-44DE-A57C-2A3914A21BE3",
-          "SectionDescription": "DFU10_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 12,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "14EAA9D7-398C-44DE-A57C-2A3914A21BE3",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Doppio Femminile Under 12",
-      "tournamentId": 174668,
-      "tournamentUid": "A1825E03-86E8-45CC-A0C3-B38EAF81DE89",
-      "participantCount": 28,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 1,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174668,
-              "SectionId": "1CA513EC-F0F7-4534-9030-9250626F096E",
-              "SectionDescription": "DFU12_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 28,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "1CA513EC-F0F7-4534-9030-9250626F096E",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione",
+      "body": {
+        "competitionUid": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentUid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174668,
-          "SectionId": "1CA513EC-F0F7-4534-9030-9250626F096E",
-          "SectionDescription": "DFU12_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 28,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "1CA513EC-F0F7-4534-9030-9250626F096E",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Doppio Maschile Under 10",
-      "tournamentId": 174669,
-      "tournamentUid": "9AC410BB-2C0E-4DFE-843F-583DE7F39D6D",
-      "participantCount": 24,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 1,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174669,
-              "SectionId": "7E5FC7E8-94E4-47C1-BCDE-939F9C7A1DC3",
-              "SectionDescription": "DMU10_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 24,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "7E5FC7E8-94E4-47C1-BCDE-939F9C7A1DC3",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione",
+      "body": {
+        "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "TournamentId": 174661,
+        "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174669,
-          "SectionId": "7E5FC7E8-94E4-47C1-BCDE-939F9C7A1DC3",
-          "SectionDescription": "DMU10_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 24,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "7E5FC7E8-94E4-47C1-BCDE-939F9C7A1DC3",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Doppio Maschile Under 12",
-      "tournamentId": 174670,
-      "tournamentUid": "3765B121-29C9-45F7-BE0F-19A34BC35CB6",
-      "participantCount": 30,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 1,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174670,
-              "SectionId": "C304325D-A59F-4656-8FD7-8D60B6EB9512",
-              "SectionDescription": "DMU12_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 30,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "C304325D-A59F-4656-8FD7-8D60B6EB9512",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione",
+      "body": {
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174670,
-          "SectionId": "C304325D-A59F-4656-8FD7-8D60B6EB9512",
-          "SectionDescription": "DMU12_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 30,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "C304325D-A59F-4656-8FD7-8D60B6EB9512",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Doppio Maschile Under 14",
-      "tournamentId": 174671,
-      "tournamentUid": "87133BE2-7280-4E65-9394-BDE86F2C65BC",
-      "participantCount": 44,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 1,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174671,
-              "SectionId": "B63ED551-0ACC-4688-A166-C7E4B93C1319",
-              "SectionDescription": "DMU14_Tabellone finale",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 44,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "B63ED551-0ACC-4688-A166-C7E4B93C1319",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione",
+      "body": {
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174671,
-          "SectionId": "B63ED551-0ACC-4688-A166-C7E4B93C1319",
-          "SectionDescription": "DMU14_Tabellone finale",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 44,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "B63ED551-0ACC-4688-A166-C7E4B93C1319",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
     },
     {
-      "description": "Doppio Femminile Under 14",
-      "tournamentId": 174672,
-      "tournamentUid": "9994F413-7E75-4158-8E93-1CB43A4CCE8A",
-      "participantCount": 22,
-      "sectionsInspection": {
-        "type": "array",
-        "length": 1,
-        "sample": [
-          {
-            "type": "object",
-            "keys": [
-              "CompetitionId",
-              "TournamentId",
-              "SectionId",
-              "SectionDescription",
-              "SectionType",
-              "NumberOfTeam",
-              "HasWinner",
-              "IsIntermediateSection",
-              "SectionCode",
-              "TournamentMatches",
-              "IsGroup",
-              "GroupsMatchSingle",
-              "GroupsMatchDouble"
-            ],
-            "sample": {
-              "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-              "TournamentId": 174672,
-              "SectionId": "3AD832DA-A5A5-4B92-A3EF-8406F3F7F085",
-              "SectionDescription": "DFU14",
-              "SectionType": "Tabellone finale",
-              "NumberOfTeam": 22,
-              "HasWinner": true,
-              "IsIntermediateSection": false,
-              "SectionCode": "3AD832DA-A5A5-4B92-A3EF-8406F3F7F085",
-              "TournamentMatches": null,
-              "IsGroup": 0,
-              "GroupsMatchSingle": null
-            }
-          }
-        ]
+      "path": "/api/v3/puc/competizione/sezione",
+      "body": {
+        "sectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
       },
-      "sectionsRaw": [
-        {
-          "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
-          "TournamentId": 174672,
-          "SectionId": "3AD832DA-A5A5-4B92-A3EF-8406F3F7F085",
-          "SectionDescription": "DFU14",
-          "SectionType": "Tabellone finale",
-          "NumberOfTeam": 22,
-          "HasWinner": true,
-          "IsIntermediateSection": false,
-          "SectionCode": "3AD832DA-A5A5-4B92-A3EF-8406F3F7F085",
-          "TournamentMatches": null,
-          "IsGroup": 0,
-          "GroupsMatchSingle": null,
-          "GroupsMatchDouble": null
-        }
-      ]
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/dettaglio",
+      "body": {
+        "competitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentId": 174661,
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/dettaglio",
+      "body": {
+        "competitionUid": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentUid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/dettaglio",
+      "body": {
+        "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "TournamentId": 174661,
+        "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/dettaglio",
+      "body": {
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/dettaglio",
+      "body": {
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/dettaglio",
+      "body": {
+        "sectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone",
+      "body": {
+        "competitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentId": 174661,
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone",
+      "body": {
+        "competitionUid": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentUid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone",
+      "body": {
+        "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "TournamentId": 174661,
+        "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone",
+      "body": {
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone",
+      "body": {
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone",
+      "body": {
+        "sectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/tabellone/dettaglio",
+      "body": {
+        "competitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentId": 174661,
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/tabellone/dettaglio",
+      "body": {
+        "competitionUid": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentUid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/tabellone/dettaglio",
+      "body": {
+        "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "TournamentId": 174661,
+        "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/tabellone/dettaglio",
+      "body": {
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/tabellone/dettaglio",
+      "body": {
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/tabellone/dettaglio",
+      "body": {
+        "sectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v2/puc/competizione/sezione/dettaglio",
+      "body": {
+        "competitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentId": 174661,
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v2/puc/competizione/sezione/dettaglio",
+      "body": {
+        "competitionUid": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentUid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v2/puc/competizione/sezione/dettaglio",
+      "body": {
+        "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "TournamentId": 174661,
+        "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v2/puc/competizione/sezione/dettaglio",
+      "body": {
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v2/puc/competizione/sezione/dettaglio",
+      "body": {
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v2/puc/competizione/sezione/dettaglio",
+      "body": {
+        "sectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/incontri/list",
+      "body": {
+        "competitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentId": 174661,
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/incontri/list",
+      "body": {
+        "competitionUid": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentUid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/incontri/list",
+      "body": {
+        "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "TournamentId": 174661,
+        "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/incontri/list",
+      "body": {
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/incontri/list",
+      "body": {
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/incontri/list",
+      "body": {
+        "sectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/sezione/incontri",
+      "body": {
+        "competitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentId": 174661,
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/sezione/incontri",
+      "body": {
+        "competitionUid": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentUid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/sezione/incontri",
+      "body": {
+        "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "TournamentId": 174661,
+        "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/sezione/incontri",
+      "body": {
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/sezione/incontri",
+      "body": {
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/sezione/incontri",
+      "body": {
+        "sectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/list",
+      "body": {
+        "competitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentId": 174661,
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/list",
+      "body": {
+        "competitionUid": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "tournamentUid": "C267D0A7-FDB9-4D7B-ADFE-C28CE05B477D",
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/list",
+      "body": {
+        "CompetitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
+        "TournamentId": 174661,
+        "SectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/list",
+      "body": {
+        "sectionId": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/list",
+      "body": {
+        "sectionUid": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
+    },
+    {
+      "path": "/api/v3/puc/competizione/tabellone/list",
+      "body": {
+        "sectionCode": "F33C5E2E-51A9-4716-A5AA-86C29D369687"
+      },
+      "status": 404,
+      "contentType": null,
+      "text": ""
     }
   ]
 }
