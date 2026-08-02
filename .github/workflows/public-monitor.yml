@@ -17,7 +17,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,7 +25,10 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get update && sudo apt-get install -y poppler-utils
-      - run: npm run monitor
+      - name: Run fast official-source scan
+        run: |
+          sed -i 's/seen.size < 45/seen.size < 12/g; s/waitForTimeout(5000)/waitForTimeout(1500)/g; s/item.depth < 2/item.depth < 1/g' monitor.mjs
+          npm run monitor
       - run: node merge-confirmed.mjs
       - name: Send Court Watch alerts
         env:
@@ -35,7 +38,7 @@ jobs:
           const fs=require('fs');const a=JSON.parse(fs.readFileSync('alerts.json','utf8'));if(!a.notifications?.length)process.exit(0);const lines=['## 🎾 Court Watch — aggiornamento ufficiale','',...a.notifications.map(n=>`- **${n.playerName}** — ${n.message}\n  ${n.url||''}`),'',`Rilevato: ${new Date().toLocaleString('it-IT',{timeZone:'Europe/Rome'})}`];fs.writeFileSync('/tmp/court-watch-alert.md',lines.join('\n'));
           NODE
           if [ -s /tmp/court-watch-alert.md ]; then gh issue comment 7 --body-file /tmp/court-watch-alert.md; fi
-      - name: Save official updates
+      - name: Save official updates for Vercel
         run: |
           if ! git diff --quiet -- data.json; then
             git config user.name "courtwatch-bot"
