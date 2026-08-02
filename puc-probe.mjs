@@ -6,5 +6,7 @@ if(!response.ok)throw new Error(`PucSearch script HTTP ${response.status}`);
 const source=await response.text(),strings=[],paths=[];
 for(const match of source.matchAll(/(["'`])([^"'`\r\n]{3,300})\1/g)){const value=match[2].replace(/\\\//g,'/');if(/puc|compet|torne|search|ricerca|api|loadmore|filter/i.test(value))strings.push(value)}
 for(const match of source.matchAll(/\/(?:[A-Za-z0-9_.?=&${}-]+\/){0,8}[A-Za-z0-9_.?=&${}-]*(?:Puc|Compet|Torne|Search|Ricerca|Load)[A-Za-z0-9_./?=&${}-]*/gi))paths.push(match[0]);
-const result={fetchedAt:new Date().toISOString(),url,bytes:Buffer.byteLength(source),sha256:crypto.createHash('sha256').update(source).digest('hex'),strings:[...new Set(strings)].slice(0,500),paths:[...new Set(paths)].slice(0,500)};
-await fs.writeFile('puc-script-endpoints.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify({bytes:result.bytes,strings:result.strings.length,paths:result.paths.length},null,2));
+const contexts={};
+for(const term of['/api/v3/tornei/puc/list','dp-fit-test-function.azurewebsites.net/api/v3/integration/puc/list','PucSearch','loadMore']){const found=[];let at=0;while((at=source.indexOf(term,at))>=0&&found.length<8){found.push(source.slice(Math.max(0,at-3500),Math.min(source.length,at+3500)));at+=term.length}contexts[term]=found;}
+const result={fetchedAt:new Date().toISOString(),url,bytes:Buffer.byteLength(source),sha256:crypto.createHash('sha256').update(source).digest('hex'),strings:[...new Set(strings)].slice(0,500),paths:[...new Set(paths)].slice(0,500),contexts};
+await fs.writeFile('puc-script-endpoints.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify({bytes:result.bytes,strings:result.strings.length,paths:result.paths.length,contexts:Object.fromEntries(Object.entries(contexts).map(([k,v])=>[k,v.length]))},null,2));
