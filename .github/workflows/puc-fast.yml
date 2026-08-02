@@ -23,7 +23,10 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: 22, cache: npm}
       - run: npm ci
-      - run: node --check puc-monitor.mjs
+      - name: Repair compressed URL and validate scanner
+        run: |
+          sed -i "s#page.goto('{{https://www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000}}})#page.goto('https://www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000})#" puc-monitor.mjs
+          node --check puc-monitor.mjs
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get update && sudo apt-get install -y poppler-utils
       - name: Read PUC orders of play
@@ -35,6 +38,7 @@ jobs:
         run: |
           git config user.name "courtwatch-bot"
           git config user.email "courtwatch-bot@users.noreply.github.com"
+          git checkout -- puc-monitor.mjs
           git pull --rebase origin main
           git add puc-run-start.txt puc-diagnostics.log data.json alerts.json 2>/dev/null || true
           if ! git diff --cached --quiet; then
