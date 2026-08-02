@@ -15,27 +15,34 @@ concurrency:
 jobs:
   puc:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
+      - name: Mark scanner start
+        run: date -u +%FT%TZ > puc-run-start.txt
       - uses: actions/setup-node@v4
         with: {node-version: 22, cache: npm}
       - run: npm ci
+      - run: node --check puc-monitor.mjs
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get update && sudo apt-get install -y poppler-utils
       - name: Read PUC orders of play
-        run: node puc-monitor.mjs
-      - name: Save PUC schedules
+        id: scan
+        continue-on-error: true
+        run: node puc-monitor.mjs > puc-diagnostics.log 2>&1
+      - name: Save scanner output
+        if: always()
         run: |
           git config user.name "courtwatch-bot"
           git config user.email "courtwatch-bot@users.noreply.github.com"
-          git add data.json alerts.json
+          git pull --rebase origin main
+          git add puc-run-start.txt puc-diagnostics.log data.json alerts.json 2>/dev/null || true
           if ! git diff --cached --quiet; then
-            git commit -m "Update FITP PUC match times"
-            git pull --rebase origin main
+            git commit -m "Record FITP PUC scanner result"
             git push
           fi
       - name: Publish new alerts
+        if: steps.scan.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
