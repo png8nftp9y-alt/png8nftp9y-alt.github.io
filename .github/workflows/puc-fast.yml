@@ -25,26 +25,32 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+      - name: Mark scanner start
+        run: |
+          date -u +%FT%TZ > puc-run-start.txt
+          echo "Court Watch P.U.C. run: $(date -u +%FT%TZ)" > puc-diagnostics.log
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - name: Install browser and PDF tools
+        continue-on-error: true
         run: |
-          npm ci
-          npx playwright install --with-deps chromium
-          sudo apt-get update
-          sudo apt-get install -y poppler-utils
+          npm ci 2>&1 | tee -a puc-diagnostics.log
+          npx playwright install --with-deps chromium 2>&1 | tee -a puc-diagnostics.log
+          sudo apt-get update 2>&1 | tee -a puc-diagnostics.log
+          sudo apt-get install -y poppler-utils 2>&1 | tee -a puc-diagnostics.log
       - name: Discover official P.U.C. documents
+        if: always()
         continue-on-error: true
         run: |
-          date -u +%FT%TZ > puc-run-start.txt
-          node --check puc-downloader.mjs
-          node puc-downloader.mjs 2>&1 | tee puc-diagnostics.log
+          node --check puc-downloader.mjs 2>&1 | tee -a puc-diagnostics.log
+          node puc-downloader.mjs 2>&1 | tee -a puc-diagnostics.log
       - name: Import downloaded orders of play
+        if: always()
         continue-on-error: true
         run: |
-          node --check puc-importer.mjs
+          node --check puc-importer.mjs 2>&1 | tee -a puc-diagnostics.log
           node puc-importer.mjs --inbox puc-inbox --data data.json --players players.json --alerts alerts.json 2>&1 | tee -a puc-diagnostics.log
       - name: Remove processed binary files
         if: always()
@@ -52,7 +58,6 @@ jobs:
       - name: Save Court Watch updates
         if: always()
         run: |
-          test -f puc-diagnostics.log || echo 'Scanner stopped before log creation' > puc-diagnostics.log
           git config user.name 'courtwatch-bot'
           git config user.email 'courtwatch-bot@users.noreply.github.com'
           git add -A puc-inbox puc-run-start.txt puc-diagnostics.log puc-discovery.json data.json alerts.json 2>/dev/null || true
