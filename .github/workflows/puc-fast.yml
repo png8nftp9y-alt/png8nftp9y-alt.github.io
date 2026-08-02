@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths: [puc-direct.mjs, puc-importer.mjs, puc-authoritative-fix.mjs, puc-enrich-current.mjs, courtwatch-cleanup.mjs, .github/workflows/puc-fast.yml]
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '*/5 * * * *'
 permissions: {contents: write,issues: write}
 concurrency: {group: court-watch-puc-fast,cancel-in-progress: false}
 jobs:
