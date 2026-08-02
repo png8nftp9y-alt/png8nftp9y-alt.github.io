@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [puc-direct.mjs, puc-importer.mjs, puc-authoritative-fix.mjs, courtwatch-cleanup.mjs, .github/workflows/puc-fast.yml]
+    paths: [puc-direct.mjs, puc-importer.mjs, puc-authoritative-fix.mjs, puc-enrich-current.mjs, courtwatch-cleanup.mjs, .github/workflows/puc-fast.yml]
   schedule:
     - cron: '*/15 * * * *'
-permissions: { contents: write, issues: write }
-concurrency: { group: court-watch-puc-fast, cancel-in-progress: false }
+permissions: {contents: write,issues: write}
+concurrency: {group: court-watch-puc-fast,cancel-in-progress: false}
 jobs:
   puc:
     runs-on: ubuntu-latest
@@ -15,20 +15,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 22 }
+        with: {node-version: 22}
       - run: sudo apt-get update -qq && sudo apt-get install -y poppler-utils
       - run: node build-surname-aliases.mjs
       - name: Download official P.U.C. documents
         run: |
           date -u +%FT%TZ > puc-run-start.txt
           node puc-direct.mjs 2>&1 | tee puc-diagnostics.log
-      - name: Import and validate schedules
+      - name: Import, enrich and validate schedules
         run: |
           node puc-importer.mjs --inbox puc-inbox --data data.json --players players.json --alerts alerts.json 2>&1 | tee -a puc-diagnostics.log
           node puc-authoritative-fix.mjs
+          node puc-enrich-current.mjs
           node courtwatch-cleanup.mjs
       - name: Notify Federico
-        env: { GH_TOKEN: "${{ github.token }}" }
+        env: {GH_TOKEN: "${{ github.token }}"}
         run: |
           node <<'NODE'
           const fs=require('fs'),a=JSON.parse(fs.readFileSync('alerts.json','utf8'));if(!a.notifications?.length)process.exit(0);fs.writeFileSync('/tmp/alert.md',['@png8nftp9y-alt **nuovo aggiornamento Court Watch**','',...a.notifications.map(n=>`- **${n.playerName}** — ${n.message}`)].join('\n'));
