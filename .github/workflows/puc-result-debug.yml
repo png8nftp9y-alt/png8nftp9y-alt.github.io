@@ -1,0 +1,21 @@
+name: Inspect official FITP result data
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [puc-result-debug.mjs, .github/workflows/puc-result-debug.yml]
+permissions: {contents: write}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node puc-result-debug.mjs
+      - run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add puc-detail-62831.json puc-detail-summary.json
+          if ! git diff --cached --quiet; then git commit -m 'Capture official FITP result structure'; git pull --rebase origin main; git push; fi
