@@ -1,0 +1,24 @@
+name: Inspect official FITP draws
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [puc-draw-debug.mjs, .github/workflows/puc-draw-debug.yml]
+permissions: {contents: write}
+concurrency: {group: court-watch-draw-debug,cancel-in-progress: true}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22,cache: npm}
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: node puc-draw-debug.mjs
+      - run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add puc-draw-network.json puc-draw-page.txt
+          if ! git diff --cached --quiet; then git commit -m 'Capture official FITP draw results'; git pull --rebase origin main; git push; fi
