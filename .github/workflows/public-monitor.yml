@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [players.json, monitor.mjs, courtwatch-cleanup.mjs, .github/workflows/public-monitor.yml]
+    paths: [players.json, monitor.mjs, te-profile-pool.json, te-profile-sync.mjs, courtwatch-cleanup.mjs, .github/workflows/public-monitor.yml]
   schedule:
     - cron: '*/15 * * * *'
 permissions: {contents: write,issues: write,pages: write,id-token: write}
@@ -14,7 +14,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,6 +22,8 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get update -qq && sudo apt-get install -y poppler-utils
+      - name: Associate Tennis Europe profiles
+        run: node te-profile-sync.mjs
       - name: Scan and validate official portals
         run: |
           node build-surname-aliases.mjs
@@ -39,11 +41,11 @@ jobs:
       - name: Save updates
         run: |
           git checkout -- monitor.mjs
-          if ! git diff --quiet -- data.json alerts.json players.json cleanup-report.json; then
+          if ! git diff --quiet -- data.json alerts.json players.json cleanup-report.json te-profile-sync.json; then
             git config user.name 'courtwatch-bot'
             git config user.email 'courtwatch-bot@users.noreply.github.com'
-            git add data.json alerts.json players.json cleanup-report.json
-            git commit -m 'Update validated official tournament schedules'
+            git add data.json alerts.json players.json cleanup-report.json te-profile-sync.json
+            git commit -m 'Sync Tennis Europe player profiles'
             git pull --rebase origin main
             git push
           fi
