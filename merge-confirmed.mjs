@@ -1,18 +1,5 @@
-import fs from 'node:fs/promises';
-const playersDb = JSON.parse(await fs.readFile('players.json','utf8')).players || [];
-const data = JSON.parse(await fs.readFile('data.json','utf8'));
-const db = new Map(playersDb.map(p => [p.id,p]));
-data.players = (data.players || []).map(p => ({ ...db.get(p.id), ...p }));
-for (const p of playersDb) if (!data.players.some(x => x.id === p.id)) data.players.push({ ...p, findingCount: 0 });
-const today = new Date().toISOString().slice(0,10);
-const norm = v => (v || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
-const candidates = [...(data.tournaments || [])];
-for (const p of playersDb) for (const t of p.confirmedPublicTournaments || []) candidates.push({ key: `${p.id}|confirmed|${t.name}`, playerId: p.id, playerName: p.name, name: t.name, circuit: (t.url || '').includes('itftennis.com') ? 'ITF pubblico' : 'FITP pubblico', url: t.url || null, startDate: t.startDate || null, endDate: t.endDate || null, status: t.endDate && t.endDate < today ? 'finished' : t.startDate && t.startDate > today ? 'upcoming' : 'active', lastSeen: new Date().toISOString(), evidence: 'Confermato da fonte pubblica' });
-const unique = new Map();
-for (const t of candidates) {
-  const signature = `${t.playerId}|${norm(t.name)}|${t.startDate || ''}|${t.endDate || ''}`;
-  const prior = unique.get(signature);
-  if (!prior || String(t.evidence || '').includes('Iscrizione programmata')) unique.set(signature, t);
-}
-data.tournaments = [...unique.values()];
-await fs.writeFile('data.json', JSON.stringify(data,null,2) + '\n');
+import fs from'node:fs/promises';
+const players=JSON.parse(await fs.readFile('players.json','utf8')).players||[],data=JSON.parse(await fs.readFile('data.json','utf8'));
+const allowed=/^https:\/\/(?:www\.)?(?:fitp\.it|te\.tournamentsoftware\.com|itftennis\.com)\//i;
+for(const p of players)for(const t of p.confirmedOfficialTournaments||[]){if(!t?.name||!allowed.test(t.url||''))continue;const sourceId=/itftennis/i.test(t.url)?'itf':/tournamentsoftware/i.test(t.url)?'tennis-europe':'fitp-puc',sourceName=sourceId==='itf'?'ITF':sourceId==='tennis-europe'?'Tennis Europe':'P.U.C. FITP',key=`official|${p.id}|${t.name.toLowerCase()}|${t.startDate||''}`;if(!(data.tournaments||[]).some(x=>x.key===key))(data.tournaments||=[]).push({key,playerId:p.id,playerName:p.name,name:t.name,location:t.location||'Luogo da pubblicare',sourceId,sourceName,url:t.url,startDate:t.startDate||null,endDate:t.endDate||t.startDate||null,status:(t.startDate&&t.startDate>new Date().toISOString().slice(0,10))?'upcoming':'active'})}
+data.tournaments=(data.tournaments||[]).filter(t=>['fitp-puc','tennis-europe','itf'].includes(t.sourceId));data.matches=(data.matches||[]).filter(m=>['fitp-puc','tennis-europe','itf'].includes(m.sourceId));await fs.writeFile('data.json',JSON.stringify(data,null,2)+'\n');
