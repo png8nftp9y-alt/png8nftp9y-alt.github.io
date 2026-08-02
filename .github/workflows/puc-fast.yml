@@ -1,31 +1,48 @@
 name: Fast FITP PUC schedule scan
+
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [puc-monitor.mjs, .github/workflows/puc-fast.yml]
+    paths:
+      - puc-monitor.mjs
+      - .github/workflows/puc-fast.yml
   schedule:
     - cron: '*/15 * * * *'
+
 permissions:
   contents: write
   issues: write
+
 concurrency:
   group: court-watch-puc
   cancel-in-progress: false
+
 jobs:
   puc:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Mark scanner start
         run: date -u +%FT%TZ > puc-run-start.txt
       - uses: actions/setup-node@v4
-        with: {node-version: 22, cache: npm}
+        with:
+          node-version: 22
+          cache: npm
       - run: npm ci
-      - name: Repair compressed URL and validate scanner
+      - name: Prepare valid scanner source
         run: |
-          sed -i "/try{await page.goto(/c\\ try{await page.goto('https:'+'//www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000});diagnostics.searchLoaded=true}catch(e){diagnostics.errors.push('Apertura ricerca: '+e.message)}" puc-monitor.mjs
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('puc-monitor.mjs')
+          s=p.read_text()
+          bad="try{await page.goto('{{https://www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000}}});"
+          good="try{await page.goto('https:'+'//www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000});"
+          if bad not in s:
+              raise SystemExit('Expected compressed URL line not found')
+          p.write_text(s.replace(bad,good))
+          PY
           node --check puc-monitor.mjs
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get update && sudo apt-get install -y poppler-utils
@@ -33,12 +50,12 @@ jobs:
         id: scan
         continue-on-error: true
         run: node puc-monitor.mjs > puc-diagnostics.log 2>&1
-      - name: Save scanner output
+      - name: Restore scanner and save diagnostics
         if: always()
         run: |
+          git checkout -- puc-monitor.mjs
           git config user.name "courtwatch-bot"
           git config user.email "courtwatch-bot@users.noreply.github.com"
-          git checkout -- puc-monitor.mjs
           git pull --rebase origin main
           git add puc-run-start.txt puc-diagnostics.log data.json alerts.json 2>/dev/null || true
           if ! git diff --cached --quiet; then
