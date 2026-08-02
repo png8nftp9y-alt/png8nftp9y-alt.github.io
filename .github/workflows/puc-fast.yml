@@ -7,6 +7,7 @@ on:
     paths:
       - puc-downloader.mjs
       - puc-importer.mjs
+      - puc-probe.mjs
       - .github/workflows/puc-fast.yml
   schedule:
     - cron: '*/15 * * * *'
@@ -44,6 +45,8 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
+          node --check puc-probe.mjs 2>&1 | tee -a puc-diagnostics.log
+          node puc-probe.mjs 2>&1 | tee -a puc-diagnostics.log
           node --check puc-downloader.mjs 2>&1 | tee -a puc-diagnostics.log
           node puc-downloader.mjs 2>&1 | tee -a puc-diagnostics.log
       - name: Import downloaded orders of play
@@ -60,7 +63,7 @@ jobs:
         run: |
           git config user.name 'courtwatch-bot'
           git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add -A puc-inbox puc-run-start.txt puc-diagnostics.log puc-discovery.json data.json alerts.json 2>/dev/null || true
+          git add -A puc-inbox puc-run-start.txt puc-diagnostics.log puc-discovery.json puc-script-endpoints.json data.json alerts.json 2>/dev/null || true
           if ! git diff --cached --quiet; then
             git commit -m 'Import FITP P.U.C. schedules'
             git pull --rebase origin main
