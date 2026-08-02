@@ -1,0 +1,24 @@
+name: Discover FITP tournament entries
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [players.json, puc-entries.mjs, .github/workflows/puc-entries.yml]
+  schedule:
+    - cron: '17 */3 * * *'
+permissions: { contents: write }
+concurrency: { group: court-watch-data, cancel-in-progress: false }
+jobs:
+  entries:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node puc-entries.mjs
+      - run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add data.json puc-entries.json
+          if ! git diff --cached --quiet; then git commit -m 'Update official FITP entries'; git pull --rebase origin main; git push; fi

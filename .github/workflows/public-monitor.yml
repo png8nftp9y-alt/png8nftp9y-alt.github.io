@@ -3,51 +3,39 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [players.json, monitor.mjs, puc-monitor.mjs, merge-confirmed.mjs, package.json, package-lock.json, notifications.js, .github/workflows/public-monitor.yml]
+    paths: [players.json, monitor.mjs, package.json, package-lock.json, .github/workflows/public-monitor.yml]
   schedule:
     - cron: '*/15 * * * *'
-permissions:
-  contents: write
-  issues: write
-  pages: write
-  id-token: write
+permissions: {contents: write,issues: write,pages: write,id-token: write}
+concurrency: {group: court-watch-data,cancel-in-progress: false}
 jobs:
   monitor:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: {node-version: 22, cache: npm}
+        with: {node-version: 22,cache: npm}
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: sudo apt-get update && sudo apt-get install -y poppler-utils
-      - name: Scan official portals
+      - run: sudo apt-get update -qq && sudo apt-get install -y poppler-utils
+      - name: Scan FITP, Tennis Europe and ITF
         run: |
-          sed -i 's/seen.size < 45/seen.size < 12/g; s/waitForTimeout(5000)/waitForTimeout(1500)/g; s/item.depth < 2/item.depth < 1/g' monitor.mjs
+          sed -i 's/seen.size < 45/seen.size < 35/g; s/waitForTimeout(5000)/waitForTimeout(1500)/g; s/item.depth < 2/item.depth < 1/g' monitor.mjs
           npm run monitor
-          sed -i "/try{await page.goto(/c\\ try{await page.goto('https:'+'//www.fitp.it/Tornei/Ricerca-tornei',{waitUntil:'domcontentloaded',timeout:60000});diagnostics.searchLoaded=true}catch(e){diagnostics.errors.push('Apertura ricerca: '+e.message)}" puc-monitor.mjs
-          node puc-monitor.mjs
           node merge-confirmed.mjs
-      - name: Send Court Watch alerts
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Save updates
         run: |
-          node <<'NODE'
-          const fs=require('fs');const a=JSON.parse(fs.readFileSync('alerts.json','utf8'));if(!a.notifications?.length)process.exit(0);const lines=['## 🎾 Court Watch — aggiornamento ufficiale','',...a.notifications.map(n=>`- **${n.playerName}** — ${n.message}\n  ${n.url||''}`),'',`Rilevato: ${new Date().toLocaleString('it-IT',{timeZone:'Europe/Rome'})}`];fs.writeFileSync('/tmp/court-watch-alert.md',lines.join('\n'));
-          NODE
-          if [ -s /tmp/court-watch-alert.md ]; then gh issue comment 7 --body-file /tmp/court-watch-alert.md; fi
-      - name: Save official updates for Vercel
-        run: |
-          git checkout -- monitor.mjs puc-monitor.mjs
-          if ! git diff --quiet -- data.json; then
-            git config user.name "courtwatch-bot"
-            git config user.email "courtwatch-bot@users.noreply.github.com"
-            git add data.json
-            git commit -m "Update official tournament schedules"
+          git checkout -- monitor.mjs
+          if ! git diff --quiet -- data.json alerts.json; then
+            git config user.name 'courtwatch-bot'
+            git config user.email 'courtwatch-bot@users.noreply.github.com'
+            git add data.json alerts.json
+            git commit -m 'Update official tournament schedules'
+            git pull --rebase origin main
             git push
           fi
       - uses: actions/configure-pages@v5
