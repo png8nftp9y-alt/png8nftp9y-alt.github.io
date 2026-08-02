@@ -5,7 +5,8 @@ on:
   push:
     branches: [main]
     paths:
-      - puc-monitor.mjs
+      - puc-downloader.mjs
+      - puc-importer.mjs
       - .github/workflows/puc-fast.yml
   schedule:
     - cron: '*/15 * * * *'
@@ -24,36 +25,39 @@ jobs:
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-      - name: Mark scanner start
-        run: date -u +%FT%TZ > puc-run-start.txt
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-      - name: Install and run validated scanner
-        id: scan
+      - name: Install browser and PDF tools
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+      - name: Discover official P.U.C. documents
         continue-on-error: true
-        shell: bash
         run: |
-          set -o pipefail
-          : > puc-diagnostics.log
-          echo "Court Watch PUC run: $(date -u +%FT%TZ)" | tee -a puc-diagnostics.log
-          npm ci 2>&1 | tee -a puc-diagnostics.log
-          npx playwright install --with-deps chromium 2>&1 | tee -a puc-diagnostics.log
-          sudo apt-get update 2>&1 | tee -a puc-diagnostics.log
-          sudo apt-get install -y poppler-utils 2>&1 | tee -a puc-diagnostics.log
-          node --check puc-monitor.mjs 2>&1 | tee -a puc-diagnostics.log
-          node puc-monitor.mjs 2>&1 | tee -a puc-diagnostics.log
-      - name: Save diagnostics and data
+          date -u +%FT%TZ > puc-run-start.txt
+          node --check puc-downloader.mjs
+          node puc-downloader.mjs 2>&1 | tee puc-diagnostics.log
+      - name: Import downloaded orders of play
+        continue-on-error: true
+        run: |
+          node --check puc-importer.mjs
+          node puc-importer.mjs --inbox puc-inbox --data data.json --players players.json --alerts alerts.json 2>&1 | tee -a puc-diagnostics.log
+      - name: Remove processed binary files
         if: always()
-        shell: bash
+        run: find puc-inbox -type f -iname '*.pdf' -delete 2>/dev/null || true
+      - name: Save Court Watch updates
+        if: always()
         run: |
-          test -f puc-diagnostics.log || echo "Scanner stopped before log creation" > puc-diagnostics.log
-          git config user.name "courtwatch-bot"
-          git config user.email "courtwatch-bot@users.noreply.github.com"
-          git add -f puc-run-start.txt puc-diagnostics.log data.json alerts.json 2>/dev/null || true
+          test -f puc-diagnostics.log || echo 'Scanner stopped before log creation' > puc-diagnostics.log
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add -A puc-inbox puc-run-start.txt puc-diagnostics.log puc-discovery.json data.json alerts.json 2>/dev/null || true
           if ! git diff --cached --quiet; then
-            git commit -m "Record FITP PUC scanner result"
+            git commit -m 'Import FITP P.U.C. schedules'
             git pull --rebase origin main
             git push
           fi
@@ -64,6 +68,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           node <<'NODE'
-          const fs=require('fs');if(!fs.existsSync('alerts.json'))process.exit(0);const a=JSON.parse(fs.readFileSync('alerts.json','utf8'));if(!a.notifications?.length)process.exit(0);fs.writeFileSync('/tmp/puc.md',['## 🎾 Aggiornamento P.U.C. FITP','',...a.notifications.map(n=>`- **${n.playerName}** — ${n.message}\n  ${n.url||''}`)].join('\n'));
+          const fs=require('fs');
+          if(!fs.existsSync('alerts.json')) process.exit(0);
+          const a=JSON.parse(fs.readFileSync('alerts.json','utf8'));
+          if(!a.notifications?.length) process.exit(0);
+          fs.writeFileSync('/tmp/puc.md',['## 🎾 Aggiornamento P.U.C. FITP','',...a.notifications.map(n=>`- **${n.playerName}** — ${n.message}\n  ${n.url||''}`)].join('\n'));
           NODE
           if [ -s /tmp/puc.md ]; then gh issue comment 7 --body-file /tmp/puc.md; fi
