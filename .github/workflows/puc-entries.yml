@@ -7,7 +7,7 @@ on:
   schedule:
     - cron: '17 */3 * * *'
 permissions: { contents: write }
-concurrency: { group: court-watch-data, cancel-in-progress: false }
+concurrency: { group: court-watch-puc-entries, cancel-in-progress: false }
 jobs:
   entries:
     runs-on: ubuntu-latest
