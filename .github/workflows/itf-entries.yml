@@ -1,0 +1,25 @@
+name: Sync all ITF junior acceptance lists
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [itf-entries.mjs, players.json, .github/workflows/itf-entries.yml]
+  schedule:
+    - cron: '*/5 * * * *'
+permissions: {contents: write}
+concurrency: {group: court-watch-itf-entries,cancel-in-progress: true}
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node --check itf-entries.mjs && node itf-entries.mjs
+      - run: node courtwatch-finalize.mjs
+      - run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add data.json itf-sync.json
+          if ! git diff --cached --quiet; then git commit -m 'Sync complete ITF junior acceptance lists'; git pull --rebase origin main; git push; fi
