@@ -1,0 +1,29 @@
+name: Court Watch live source refresh
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/live-source-refresh.yml]
+  schedule:
+    - cron: '*/5 * * * *'
+permissions: {contents: write}
+concurrency: {group: live-source-refresh,cancel-in-progress: false}
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: |
+          node courtwatch-live-hotfix-v2.mjs
+          node puc-results.mjs
+          node courtwatch-finalize.mjs
+      - run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add data.json alerts.json puc-results.json live-hotfix-v2.json
+          git commit -m 'Refresh Court Watch live source' || exit 0
+          git pull --rebase origin main
+          git push
