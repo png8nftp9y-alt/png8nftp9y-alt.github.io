@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [puc-results.mjs, .github/workflows/puc-results.yml]
+    paths: [puc-results.mjs, puc-opponent-meta.mjs, courtwatch-finalize.mjs, .github/workflows/puc-results.yml]
   schedule:
     - cron: '*/5 * * * *'
 permissions: {contents: write,issues: write}
@@ -16,8 +16,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: 22}
-      - run: node --check puc-results.mjs
-      - run: node puc-results.mjs
+      - run: node --check puc-results.mjs && node --check puc-opponent-meta.mjs && node --check courtwatch-finalize.mjs
+      - run: |
+          node puc-results.mjs
+          node puc-opponent-meta.mjs
+          node courtwatch-finalize.mjs
       - name: Notify verified changes
         env: {GH_TOKEN: "${{ github.token }}"}
         run: |
