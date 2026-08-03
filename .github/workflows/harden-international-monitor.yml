@@ -1,0 +1,20 @@
+name: Harden international portal matching
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [harden-international-monitor.mjs, .github/workflows/harden-international-monitor.yml]
+permissions: {contents: write}
+jobs:
+  harden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node harden-international-monitor.mjs && node --check monitor.mjs
+      - run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add monitor.mjs
+          if ! git diff --cached --quiet; then git commit -m 'Require exact international player matches'; git pull --rebase origin main; git push; fi
