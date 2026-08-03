@@ -3,8 +3,7 @@ name: Court Watch live source refresh
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - '.github/workflows/live-source-refresh.yml'
   schedule:
@@ -32,20 +31,27 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Refresh official data
+      - name: Refresh and capture diagnostics
+        shell: bash
         run: |
-          node courtwatch-live-hotfix-v2.mjs
-          node puc-results.mjs
-          node courtwatch-finalize.mjs
+          set +e
+          : > live-refresh.log
+          echo "started=$(date -u +%FT%TZ)" >> live-refresh.log
+          node courtwatch-live-hotfix-v2.mjs >> live-refresh.log 2>&1
+          HOTFIX=$?
+          node puc-results.mjs >> live-refresh.log 2>&1
+          RESULTS=$?
+          node courtwatch-finalize.mjs >> live-refresh.log 2>&1
+          FINALIZE=$?
+          echo "hotfix=$HOTFIX results=$RESULTS finalize=$FINALIZE" >> live-refresh.log
+          node -e "const fs=require('fs');fs.writeFileSync('live-refresh-heartbeat.json',JSON.stringify({status:process.argv.slice(1).every(x=>x==='0')?'complete':'partial',at:new Date().toISOString(),hotfix:Number(process.argv[1]),results:Number(process.argv[2]),finalize:Number(process.argv[3])},null,2)+'\n')" "$HOTFIX" "$RESULTS" "$FINALIZE"
+          exit 0
 
-      - name: Record heartbeat
-        run: |
-          node -e "require('fs').writeFileSync('live-refresh-heartbeat.json', JSON.stringify({status:'complete',at:new Date().toISOString(),source:'github-actions'}, null, 2)+'\n')"
-
-      - name: Publish refreshed data
+      - name: Publish data and diagnostics
+        shell: bash
         run: |
           git config user.name "courtwatch-bot"
           git config user.email "courtwatch-bot@users.noreply.github.com"
-          git add data.json alerts.json puc-results.json live-hotfix-v2.json live-refresh-heartbeat.json
+          git add data.json alerts.json puc-results.json live-hotfix-v2.json live-refresh-heartbeat.json live-refresh.log
           git commit -m "Refresh Court Watch live data" || exit 0
           git push origin HEAD:main
