@@ -1,0 +1,22 @@
+name: Repair Tennis Europe scanner
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [repair-te-scanner.mjs, .github/workflows/repair-te-scanner.yml]
+permissions: {contents: write}
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node repair-te-scanner.mjs && node --check te-entries.mjs
+      - run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add te-entries.mjs
+          git commit -m 'Repair Tennis Europe scanner URL construction'
+          git pull --rebase origin main
+          git push
