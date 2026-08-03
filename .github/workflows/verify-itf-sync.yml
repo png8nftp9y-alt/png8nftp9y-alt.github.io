@@ -1,0 +1,32 @@
+name: Verify complete ITF synchronization
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [.github/workflows/verify-itf-sync.yml]
+permissions: {contents: write}
+concurrency: {group: verify-itf-sync,cancel-in-progress: true}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - name: Execute and capture
+        run: |
+          set +e
+          node --check itf-entries.mjs > itf-verification.log 2>&1
+          CHECK=$?
+          if [ $CHECK -eq 0 ]; then node itf-entries.mjs >> itf-verification.log 2>&1; RUN=$?; else RUN=$CHECK; fi
+          echo "exit=$RUN" >> itf-verification.log
+          node courtwatch-finalize.mjs >> itf-verification.log 2>&1 || true
+      - name: Save verification
+        if: always()
+        run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add itf-verification.log
+          [ -f itf-sync.json ] && git add itf-sync.json data.json
+          if ! git diff --cached --quiet; then git commit -m 'Verify complete ITF synchronization'; git pull --rebase origin main; git push; fi
