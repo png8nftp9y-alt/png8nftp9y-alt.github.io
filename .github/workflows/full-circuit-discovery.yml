@@ -1,0 +1,49 @@
+name: Court Watch full circuit discovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/full-circuit-discovery.yml'
+      - 'apply-coverage-live.mjs'
+      - 'former-players.json'
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: court-watch-full-discovery
+  cancel-in-progress: true
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: 'npm'}
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Scan FITP, Tennis Europe and ITF from 20 June
+        shell: bash
+        run: |
+          set +e
+          : > full-discovery.log
+          node apply-coverage-live.mjs >> full-discovery.log 2>&1; PATCH=$?
+          node run-with-former.mjs puc-entries-fast.mjs >> full-discovery.log 2>&1; FITP=$?
+          node run-with-former.mjs te-entries.mjs >> full-discovery.log 2>&1; TE=$?
+          node run-with-former.mjs itf-entries.mjs >> full-discovery.log 2>&1; ITF=$?
+          node run-with-former.mjs puc-results.mjs >> full-discovery.log 2>&1; RESULTS=$?
+          node run-with-former.mjs puc-opponent-meta.mjs >> full-discovery.log 2>&1; CLUBS=$?
+          node puc-conditional-reconcile.mjs >> full-discovery.log 2>&1; CONDITIONAL=$?
+          node run-with-former.mjs courtwatch-finalize.mjs >> full-discovery.log 2>&1; FINALIZE=$?
+          node -e "require('fs').writeFileSync('full-discovery-heartbeat.json',JSON.stringify({at:new Date().toISOString(),coverageFrom:'2026-06-20',patch:+process.argv[1],fitp:+process.argv[2],tennisEurope:+process.argv[3],itf:+process.argv[4],results:+process.argv[5],clubs:+process.argv[6],conditional:+process.argv[7],finalize:+process.argv[8]},null,2)+'\n')" "$PATCH" "$FITP" "$TE" "$ITF" "$RESULTS" "$CLUBS" "$CONDITIONAL" "$FINALIZE"
+          exit 0
+      - name: Publish discovery
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json alerts.json puc-results.json puc-entries.json te-entries.json itf-sync.json live-hotfix-v2.json conditional-reconciliation.json puc-opponent-clubs.json full-discovery-heartbeat.json full-discovery.log puc-entries-fast.mjs te-entries.mjs itf-entries.mjs
+          git commit -m 'Discover Court Watch tournaments across all circuits' || exit 0
+          git push origin HEAD:main

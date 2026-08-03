@@ -1,57 +1,41 @@
 name: Court Watch live source refresh
-
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - '.github/workflows/live-source-refresh.yml'
+    paths: ['.github/workflows/live-source-refresh.yml']
   schedule:
     - cron: '*/5 * * * *'
-
 permissions:
   contents: write
-
 concurrency:
   group: court-watch-live-refresh
   cancel-in-progress: true
-
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Refresh and capture diagnostics
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Refresh live matches and metadata
         shell: bash
         run: |
           set +e
           : > live-refresh.log
-          echo "started=$(date -u +%FT%TZ)" >> live-refresh.log
-          node courtwatch-live-hotfix-v2.mjs >> live-refresh.log 2>&1
-          HOTFIX=$?
-          node puc-results.mjs >> live-refresh.log 2>&1
-          RESULTS=$?
-          node courtwatch-finalize.mjs >> live-refresh.log 2>&1
-          FINALIZE=$?
-          echo "hotfix=$HOTFIX results=$RESULTS finalize=$FINALIZE" >> live-refresh.log
-          node -e "const fs=require('fs');fs.writeFileSync('live-refresh-heartbeat.json',JSON.stringify({status:process.argv.slice(1).every(x=>x==='0')?'complete':'partial',at:new Date().toISOString(),hotfix:Number(process.argv[1]),results:Number(process.argv[2]),finalize:Number(process.argv[3])},null,2)+'\n')" "$HOTFIX" "$RESULTS" "$FINALIZE"
+          node run-with-former.mjs courtwatch-live-hotfix-v2.mjs >> live-refresh.log 2>&1; HOTFIX=$?
+          node run-with-former.mjs puc-results.mjs >> live-refresh.log 2>&1; RESULTS=$?
+          node run-with-former.mjs puc-opponent-meta.mjs >> live-refresh.log 2>&1; CLUBS=$?
+          node puc-conditional-reconcile.mjs >> live-refresh.log 2>&1; CONDITIONAL=$?
+          node run-with-former.mjs courtwatch-finalize.mjs >> live-refresh.log 2>&1; FINALIZE=$?
+          node -e "require('fs').writeFileSync('live-refresh-heartbeat.json',JSON.stringify({status:'complete',at:new Date().toISOString(),hotfix:+process.argv[1],results:+process.argv[2],clubs:+process.argv[3],conditional:+process.argv[4],finalize:+process.argv[5]},null,2)+'\n')" "$HOTFIX" "$RESULTS" "$CLUBS" "$CONDITIONAL" "$FINALIZE"
           exit 0
-
-      - name: Publish data and diagnostics
-        shell: bash
+      - name: Publish
         run: |
-          git config user.name "courtwatch-bot"
-          git config user.email "courtwatch-bot@users.noreply.github.com"
-          git add data.json alerts.json puc-results.json live-hotfix-v2.json live-refresh-heartbeat.json live-refresh.log
-          git commit -m "Refresh Court Watch live data" || exit 0
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json alerts.json puc-results.json live-hotfix-v2.json live-refresh-heartbeat.json live-refresh.log conditional-reconciliation.json puc-opponent-clubs.json
+          git commit -m 'Refresh Court Watch live matches' || exit 0
           git push origin HEAD:main
