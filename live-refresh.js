@@ -1,0 +1,1 @@
+(()=>{const refresh=()=>{if(typeof load==='function')load()};setInterval(refresh,30000);addEventListener('focus',refresh);addEventListener('pageshow',refresh);addEventListener('online',refresh);addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});})();
