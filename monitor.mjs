@@ -25,8 +25,6 @@ for (const p of players) {
     const source = sources.find(s => s.id === id);
     for (const url of urls || []) if (url && !source.seeds.includes(url)) source.seeds.push(url);
   }
-  sources.find(s => s.id === 'tennis-europe').seeds.push('https://te.tournamentsoftware.com/find/player?q=' + encodeURIComponent(p.name));
-  sources.find(s => s.id === 'itf').seeds.push('https://www.itftennis.com/en/search/?q=' + encodeURIComponent(p.name));
 }
 for (const t of previous.tournaments || []) {
   const source = sources.find(s => s.id === t.sourceId);
@@ -52,7 +50,7 @@ function extractTimes(text) {
 function extractEntry(text) {
   let status = null;
   if (/main draw|tabellone principale|\bmd\b/i.test(text)) status = 'Main draw';
-  else if (/qualifying|qualification|qualificazioni|\bquali\b|\bq\b/i.test(text)) status = 'Qualifying';
+  else if (/qualifying|qualification|qualificazioni|\bquali\b/i.test(text)) status = 'Qualifying';
   else if (/alternates?|alternate list|riserve|\balt\b/i.test(text)) status = 'Alternates';
   const position = text.match(/(?:position|posizione|alternate|alt\.?|number|numero)[^0-9]{0,18}(\d{1,3})/i)?.[1] || null;
   return { status, position };
@@ -75,7 +73,8 @@ function processDocument(source, url, title, rawText) {
   const textUpper = upper(text);
   for (const player of players) {
     let index = -1;
-    for (const alias of player.aliases || [player.name]) { index = textUpper.indexOf(upper(alias)); if (index >= 0) break; }
+    const exactAliases = source.id === 'fitp-puc' ? (player.aliases || [player.name]) : [player.name,...(player.aliases||[])].filter(a=>String(a).trim().split(/\s+/).length>1);
+    for (const alias of exactAliases) { index = textUpper.indexOf(upper(alias)); if (index >= 0) break; }
     if (index < 0) continue;
     const context = normalize(text.slice(Math.max(0, index - 800), index + 1800));
     const contextDates = extractDates(context);
