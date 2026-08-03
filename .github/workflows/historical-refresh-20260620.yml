@@ -1,0 +1,36 @@
+name: Historical refresh from 20 June 2026
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [extend-coverage-20260620.mjs, .github/workflows/historical-refresh-20260620.yml]
+permissions: {contents: write}
+concurrency: {group: historical-refresh-20260620,cancel-in-progress: true}
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22,cache: npm}
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: node extend-coverage-20260620.mjs
+      - run: node --check puc-entries-fast.mjs && node --check itf-entries.mjs && node --check te-entries.mjs
+      - run: node puc-entries-fast.mjs > historical-refresh.log 2>&1
+      - run: node itf-entries.mjs >> historical-refresh.log 2>&1 || true
+      - run: node te-entries.mjs >> historical-refresh.log 2>&1 || true
+      - run: node puc-results.mjs >> historical-refresh.log 2>&1 || true
+      - run: node courtwatch-finalize.mjs >> historical-refresh.log 2>&1
+      - name: Save sources and refreshed data
+        if: always()
+        run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add puc-entries-fast.mjs itf-entries.mjs te-entries.mjs historical-refresh.log data.json alerts.json
+          [ -f puc-entries.json ] && git add puc-entries.json
+          [ -f itf-sync.json ] && git add itf-sync.json
+          [ -f te-entries.json ] && git add te-entries.json
+          [ -f puc-results.json ] && git add puc-results.json
+          if ! git diff --cached --quiet; then git commit -m 'Refresh all circuits from 20 June 2026'; git pull --rebase origin main; git push; fi
