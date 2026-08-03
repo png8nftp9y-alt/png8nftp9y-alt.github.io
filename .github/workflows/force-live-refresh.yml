@@ -1,0 +1,22 @@
+name: Force Court Watch live deployment
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [force-live-refresh.mjs, .github/workflows/force-live-refresh.yml]
+permissions: {contents: write}
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22}
+      - run: node force-live-refresh.mjs && node --check app.js
+      - run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add index.html app.js vercel.json deploy-version.json
+          git commit -m 'Force uncached Court Watch live updates'
+          git pull --rebase origin main
+          git push
