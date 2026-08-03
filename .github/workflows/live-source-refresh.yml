@@ -1,31 +1,46 @@
 name: Court Watch live source refresh
+
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [.github/workflows/live-source-refresh.yml, stabilize-live-refresh.mjs]
   schedule:
-    - cron: '1-59/5 * * * *'
-    - cron: '3-59/5 * * * *'
-permissions: {contents: write}
-concurrency: {group: live-source-refresh,cancel-in-progress: true}
+    - cron: '*/5 * * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: court-watch-live-refresh
+  cancel-in-progress: true
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: node stabilize-live-refresh.mjs && node --check app.js
-      - run: |
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Refresh official data
+        run: |
           node courtwatch-live-hotfix-v2.mjs
           node puc-results.mjs
           node courtwatch-finalize.mjs
-      - run: |
-          git config user.name 'courtwatch-bot'
-          git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add app.js index.html live-refresh-version.json data.json alerts.json puc-results.json live-hotfix-v2.json .github/workflows/live-source-refresh.yml
-          git commit -m 'Stabilize automatic Court Watch refresh' || exit 0
-          git pull --rebase origin main
-          git push
+
+      - name: Record heartbeat
+        run: |
+          node -e "require('fs').writeFileSync('live-refresh-heartbeat.json', JSON.stringify({status:'complete',at:new Date().toISOString(),source:'github-actions'}, null, 2)+'\n')"
+
+      - name: Publish refreshed data
+        run: |
+          git config user.name "courtwatch-bot"
+          git config user.email "courtwatch-bot@users.noreply.github.com"
+          git add data.json alerts.json puc-results.json live-hotfix-v2.json live-refresh-heartbeat.json
+          git commit -m "Refresh Court Watch live data" || exit 0
+          git push origin HEAD:main
