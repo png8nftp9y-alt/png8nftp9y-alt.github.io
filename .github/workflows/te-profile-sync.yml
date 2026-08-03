@@ -1,0 +1,24 @@
+name: Synchronize Tennis Europe player profiles
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [te-profile-sync.mjs, te-profile-pool.json, .github/workflows/te-profile-sync.yml]
+permissions: {contents: write}
+concurrency: {group: court-watch-te-profiles,cancel-in-progress: true}
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: 22,cache: npm}
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: node te-profile-sync.mjs
+      - run: |
+          git config user.name 'courtwatch-bot'
+          git config user.email 'courtwatch-bot@users.noreply.github.com'
+          git add players.json te-profile-sync.json
+          if ! git diff --cached --quiet; then git commit -m 'Synchronize verified Tennis Europe profiles'; git pull --rebase origin main; git push; fi
