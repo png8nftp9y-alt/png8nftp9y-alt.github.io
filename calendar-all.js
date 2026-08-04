@@ -1,0 +1,35 @@
+// Calendarizzazione completa: mostra tornei passati, in corso e futuri.
+function calendarAllGroups(){
+  const map=new Map();
+  for(const t of state.data.tournaments||[]){
+    if(!state.selected.has(t.playerId))continue;
+    const start=t.startDate||t.endDate,end=t.endDate||t.startDate;
+    if(!start)continue;
+    const identity=t.competitionId||t.teTournamentId||t.itfTournamentKey||String(t.name).toUpperCase().replace(/[^A-Z0-9]+/g,'-');
+    const key=`${identity}|${t.location||''}|${circuit(t)}|${start}|${end}`;
+    const g=map.get(key)||{...t,startDate:start,endDate:end,players:[],playerIds:[]};
+    if(!g.players.includes(t.playerName))g.players.push(t.playerName);
+    if(!g.playerIds.includes(t.playerId))g.playerIds.push(t.playerId);
+    map.set(key,g);
+  }
+  return[...map.values()];
+}
+renderCalendar=function(){
+  const first=new Date(state.month.getFullYear(),state.month.getMonth(),1,12),start=monday(first);
+  $('monthTitle').textContent='Calendario tornei · '+new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(first);
+  let html='<div class="weekdays">'+['Lun','Mar','Mer','Gio','Ven','Sab','Dom'].map(x=>`<b>${x}</b>`).join('')+'</div>';
+  const all=calendarAllGroups();
+  for(let w=0;w<6;w++){
+    const ws=add(start,w*7),we=add(ws,6),a=iso(ws),b=iso(we);
+    const bars=all.filter(t=>t.startDate<=b&&t.endDate>=a);
+    html+=`<section class="calWeek"><div class="dates">${[0,1,2,3,4,5,6].map(i=>{const d=add(ws,i),k=iso(d);return`<span class="${d.getMonth()!==first.getMonth()?'out':''} ${k===iso(new Date())?'today':''}">${d.getDate()}</span>`}).join('')}</div><div class="bands">${bars.map(t=>{const s=Math.max(0,Math.round((new Date(t.startDate+'T12:00:00')-ws)/864e5)),e=Math.min(6,Math.round((new Date(t.endDate+'T12:00:00')-ws)/864e5)),loc=t.location||'Luogo da pubblicare',status=t.status==='finished'||t.status==='eliminated'?' · concluso':'';return`<button class="tourBand ${circuit(t)} ${status?'past':''}" style="grid-column:${s+1}/${e+2}" data-player="${esc(t.playerIds[0])}" title="${esc(loc+' · '+t.players.join(', ')+status)}"><strong>${esc(t.name)}</strong><span>${esc(loc)} · ${esc(t.players.join(', '))}${esc(status)}</span></button>`}).join('')}</div></section>`;
+  }
+  $('calendar').innerHTML=html;
+  document.querySelectorAll('.tourBand[data-player]').forEach(x=>x.onclick=()=>openProfile(x.dataset.player));
+};
+renderPlayers=function(){
+  const ps=state.data.players||[];
+  $('playerTotal').textContent=ps.length;
+  $('playersList').innerHTML=ps.map(p=>{const n=(state.data.tournaments||[]).filter(t=>t.playerId===p.id).length;return`<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(p.name)}</strong><small>${n?`${n} ${n===1?'torneo':'tornei'} in calendario`:'Ricerca iscrizioni in corso'}</small></div><i>›</i></div>`}).join('');
+  document.querySelectorAll('[data-profile]').forEach(x=>x.onclick=()=>openProfile(x.dataset.profile));
+};
