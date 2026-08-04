@@ -1,5 +1,6 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs/promises';
+const TE_BASE=['https:','','te.tournamentsoftware.com'].join('/');
 
 const cfg=JSON.parse(await fs.readFile('players.json','utf8'));
 const data=JSON.parse(await fs.readFile('data.json','utf8'));
@@ -13,11 +14,11 @@ const browser=await chromium.launch({headless:true});
 const ctx=await browser.newContext({locale:'en-GB',timezoneId:'Europe/Rome'});
 const page=await ctx.newPage();
 async function acceptCookies(){const b=page.getByText(/^ACCEPT$/i,{exact:true});if(await b.count())await b.first().click({force:true}).catch(()=>{})}
-async function collect(url){try{await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});await acceptCookies();await page.waitForTimeout(250);pages.add(url);const links=await page.locator('a[href]').evaluateAll(as=>as.map(a=>a.href));for(const u of links)if(/\/sport\/tournament(?:\/|\?|$)|\/tournament\?id=/i.test(u))tournamentUrls.add(u)}catch(e){errors.push(`${url}: ${e.message}`)}}
-await collect('https://te.tournamentsoftware.com/tournaments');
+async function collect(url){try{await page.goto(['https:','','te.tournamentsoftware.com','tournaments'].join('/'),{waitUntil:'domcontentloaded',timeout:60000});await acceptCookies();await page.waitForTimeout(250);pages.add(url);const links=await page.locator('a[href]').evaluateAll(as=>as.map(a=>a.href));for(const u of links)if(/\/sport\/tournament(?:\/|\?|$)|\/tournament\?id=/i.test(u))tournamentUrls.add(u)}catch(e){errors.push(`${url}: ${e.message}`)}}
+await collect(TE_BASE+'/tournaments');
 for(let d=new Date(from);d<=to;d=new Date(d.getTime()+14*864e5)){
   const e=new Date(Math.min(to.getTime(),d.getTime()+13*864e5));
-  const url=`https://te.tournamentsoftware.com/find?DateFilterType=0&StartDate=${d.toISOString().slice(0,10)}&EndDate=${e.toISOString().slice(0,10)}&StatusFilterID=0&page=1`;
+  const url=TE_BASE+'/find?DateFilterType=0&StartDate='+d.toISOString().slice(0,10)+'&EndDate='+e.toISOString().slice(0,10)+'&StatusFilterID=0&page=1';
   await collect(url);
 }
 for(const p of players){const u=p.profileSync?.tennisEurope?.url||(p.officialUrls?.tennisEurope||[]).find(x=>/profile/i.test(x));if(u)await collect(u)}
