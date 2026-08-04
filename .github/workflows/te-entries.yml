@@ -5,15 +5,16 @@ on:
     branches: [main]
     paths: [te-entries.mjs, players.json, former-players.json, run-with-former.mjs, .github/workflows/te-entries.yml]
   schedule:
-    - cron: '17 */3 * * *'
+    - cron: '*/5 * * * *'
 permissions: {contents: write}
-concurrency: {group: court-watch-te-entries,cancel-in-progress: true}
+concurrency: {group: court-watch-te-entries-v2,cancel-in-progress: true}
 jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: 22,cache: npm}
       - run: npm ci
@@ -21,7 +22,8 @@ jobs:
       - run: node --check te-entries.mjs && node run-with-former.mjs te-entries.mjs
       - run: node run-with-former.mjs courtwatch-finalize.mjs
       - run: |
+          node -e "const fs=require('fs'); const data=JSON.parse(fs.readFileSync('data.json','utf8')); fs.writeFileSync('te-heartbeat.json',JSON.stringify({at:new Date().toISOString(),source:'official Tennis Europe / tournamentsoftware',players:'current+former',teTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='tennis-europe').length,entries:data.teEntryDiscovery||null},null,2)+'\n')"
           git config user.name 'courtwatch-bot'
           git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add data.json te-entries.json
-          if ! git diff --cached --quiet; then git commit -m 'Sync verified Tennis Europe entries'; git pull --rebase origin main; git push; fi
+          git add data.json te-entries.json te-heartbeat.json
+          if ! git diff --cached --quiet; then git commit -m 'Sync official Tennis Europe entries for current and former players'; git pull --rebase origin main; git push; fi
