@@ -1,0 +1,23 @@
+name: Court Watch action execution probe
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions: {contents: write}
+concurrency: {group: court-watch-action-probe,cancel-in-progress: true}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write probe
+        run: |
+          node -e "require('fs').writeFileSync('action-probe.json', JSON.stringify({ranAt:new Date().toISOString(),sha:process.env.GITHUB_SHA,workflow:'courtwatch-action-probe'}, null, 2)+'\n')"
+      - name: Commit probe
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add action-probe.json
+          git commit -m 'Court Watch action probe ran' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
