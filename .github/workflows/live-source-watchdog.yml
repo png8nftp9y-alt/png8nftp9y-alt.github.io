@@ -5,11 +5,11 @@ on:
     branches: [main]
     paths: ['.github/workflows/live-source-watchdog.yml']
   schedule:
-    - cron: '4,14,24,34,44,54 * * * *'
+    - cron: '4,9,14,19,24,29,34,39,44,49,54,59 * * * *'
 permissions:
   contents: write
 concurrency:
-  group: court-watch-live-refresh
+  group: court-watch-live-refresh-v2
   cancel-in-progress: false
 jobs:
   watchdog:
@@ -25,7 +25,7 @@ jobs:
         shell: bash
         run: |
           node - <<'NODE'
-          const fs=require('fs');let stale=true;try{const h=JSON.parse(fs.readFileSync('live-refresh-heartbeat.json'));stale=Date.now()-Date.parse(h.at)>7*60*1000}catch{}
+          const fs=require('fs');let stale=true;try{const h=JSON.parse(fs.readFileSync('live-refresh-heartbeat.json'));stale=Date.now()-Date.parse(h.at)>4*60*1000}catch{}
           fs.appendFileSync(process.env.GITHUB_OUTPUT,`stale=${stale}\n`)
           NODE
       - name: Recover live refresh
