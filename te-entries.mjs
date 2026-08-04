@@ -9,6 +9,7 @@ const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUp
 const clean=s=>String(s||'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&#39;/g,"'").replace(/&quot;/g,'"').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
 const parseDate=s=>{let m=String(s).match(/(\d{1,2})\/(\d{1,2})\/(20\d{2})/);if(m)return`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;m=String(s).match(/(20\d{2})-(\d{2})-(\d{2})/);return m?m[0]:null};
 const from=new Date('2026-06-20T00:00:00Z'),to=new Date(Date.now()+240*864e5),today=new Date().toISOString().slice(0,10),now=new Date().toISOString(),errors=[],hits=[],pages=new Set(),tournamentUrls=new Set();
+try{const r=await fetch(TE_CALENDAR,{headers:{'user-agent':'Mozilla/5.0 CourtWatchTE/3.1'}}),html=await r.text();for(const m of html.matchAll(/te\.tournamentsoftware\.com\/sport\/acceptancelist\.aspx\?id=([0-9A-F-]{36})/gi))tournamentUrls.add(TE_BASE+'/sport/acceptancelist.aspx?id='+m[1]);pages.add(TE_CALENDAR)}catch(e){errors.push('official-calendar: '+e.message)}
 const browser=await chromium.launch({headless:true});
 const ctx=await browser.newContext({locale:'en-GB',timezoneId:'Europe/Rome',userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36'});
 const page=await ctx.newPage();
