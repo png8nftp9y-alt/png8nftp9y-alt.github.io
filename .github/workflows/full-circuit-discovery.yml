@@ -10,33 +10,36 @@ concurrency: {group: court-watch-continuous-official-sync,cancel-in-progress: tr
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 58
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: '22', cache: 'npm'}
-      - name: Prepare official scanners
-        shell: bash
-        run: |
-          set -e
-          npm ci
-          npx playwright install --with-deps chromium
-      - name: Continuous sync current and former players
+      - name: Prepare official scanners bounded
         shell: bash
         run: |
           set +e
-          : > full-discovery.log
-          node run-with-former.mjs puc-entries-fast.mjs >> full-discovery.log 2>&1; FITP=$?
-          node run-with-former.mjs te-entries.mjs >> full-discovery.log 2>&1; TE=$?
-          node run-with-former.mjs itf-entries.mjs >> full-discovery.log 2>&1; ITF=$?
-          node official-order-of-play.mjs >> full-discovery.log 2>&1; OOP=$?
-          node run-with-former.mjs puc-results.mjs >> full-discovery.log 2>&1; RESULTS=$?
-          node run-with-former.mjs puc-opponent-meta.mjs >> full-discovery.log 2>&1; CLUBS=$?
-          node player-memberships.mjs >> full-discovery.log 2>&1; MEMBERS=$?
-          node puc-conditional-reconcile.mjs >> full-discovery.log 2>&1; CONDITIONAL=$?
-          node run-with-former.mjs courtwatch-finalize.mjs >> full-discovery.log 2>&1; FINALIZE=$?
-          node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('data.json','utf8'));const hb={status:'complete',at:new Date().toISOString(),continuous:true,frequency:'*/5 * * * *',coverageFrom:'2025-12-18',players:'current+former',sources:'FITP/P.U.C. + official Tennis Europe + official ITF',fitp:+process.argv[1],tennisEurope:+process.argv[2],itf:+process.argv[3],orderOfPlay:+process.argv[4],results:+process.argv[5],opponentClubs:+process.argv[6],memberships:+process.argv[7],conditional:+process.argv[8],finalize:+process.argv[9],matches:(data.matches||[]).length,tournaments:(data.tournaments||[]).length,fitpTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='fitp-puc').length,teTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='tennis-europe').length,itfTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='itf').length,generatedAt:data.generatedAt};fs.writeFileSync('full-discovery-heartbeat.json',JSON.stringify(hb,null,2)+'\n')" "$FITP" "$TE" "$ITF" "$OOP" "$RESULTS" "$CLUBS" "$MEMBERS" "$CONDITIONAL" "$FINALIZE"
+          timeout 180 npm ci > full-discovery.log 2>&1; NPM=$?
+          timeout 240 npx playwright install chromium >> full-discovery.log 2>&1; BROWSER=$?
+          echo "NPM=$NPM" >> "$GITHUB_ENV"
+          echo "BROWSER=$BROWSER" >> "$GITHUB_ENV"
+          exit 0
+      - name: Continuous sync current and former players bounded
+        shell: bash
+        run: |
+          set +e
+          : >> full-discovery.log
+          timeout 240 node run-with-former.mjs puc-entries-fast.mjs >> full-discovery.log 2>&1; FITP=$?
+          timeout 180 node run-with-former.mjs te-entries.mjs >> full-discovery.log 2>&1; TE=$?
+          timeout 180 node run-with-former.mjs itf-entries.mjs >> full-discovery.log 2>&1; ITF=$?
+          timeout 120 node official-order-of-play.mjs >> full-discovery.log 2>&1; OOP=$?
+          timeout 180 node run-with-former.mjs puc-results.mjs >> full-discovery.log 2>&1; RESULTS=$?
+          timeout 120 node run-with-former.mjs puc-opponent-meta.mjs >> full-discovery.log 2>&1; CLUBS=$?
+          timeout 120 node player-memberships.mjs >> full-discovery.log 2>&1; MEMBERS=$?
+          timeout 60 node puc-conditional-reconcile.mjs >> full-discovery.log 2>&1; CONDITIONAL=$?
+          timeout 60 node run-with-former.mjs courtwatch-finalize.mjs >> full-discovery.log 2>&1; FINALIZE=$?
+          node -e "const fs=require('fs');let data={};try{data=JSON.parse(fs.readFileSync('data.json','utf8'))}catch{};const hb={status:'complete',at:new Date().toISOString(),continuous:true,bounded:true,frequency:'*/5 * * * *',coverageFrom:'2025-12-18',players:'current+former',sources:'FITP/P.U.C. + official Tennis Europe + official ITF',npm:+process.argv[1],browser:+process.argv[2],fitp:+process.argv[3],tennisEurope:+process.argv[4],itf:+process.argv[5],orderOfPlay:+process.argv[6],results:+process.argv[7],opponentClubs:+process.argv[8],memberships:+process.argv[9],conditional:+process.argv[10],finalize:+process.argv[11],matches:(data.matches||[]).length,tournaments:(data.tournaments||[]).length,fitpTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='fitp-puc').length,teTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='tennis-europe').length,itfTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='itf').length,generatedAt:data.generatedAt};fs.writeFileSync('full-discovery-heartbeat.json',JSON.stringify(hb,null,2)+'\n')" "${NPM:-0}" "${BROWSER:-0}" "$FITP" "$TE" "$ITF" "$OOP" "$RESULTS" "$CLUBS" "$MEMBERS" "$CONDITIONAL" "$FINALIZE"
           exit 0
       - name: Publish data atomically
         shell: bash
@@ -45,9 +48,9 @@ jobs:
           git config user.email courtwatch-bot@users.noreply.github.com
           git add -A ':!node_modules'
           git commit -m 'Continuous Court Watch official sync' || exit 0
-          for attempt in 1 2 3 4 5; do
+          for attempt in 1 2 3; do
             git pull --rebase origin main && git push origin HEAD:main && exit 0
             git rebase --abort || true
-            sleep $((attempt*8))
+            sleep $((attempt*5))
           done
           exit 1
