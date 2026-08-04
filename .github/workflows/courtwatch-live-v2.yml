@@ -1,27 +1,10 @@
 name: Court Watch live refresh v2
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [courtwatch-live-hotfix-v2.mjs, .github/workflows/courtwatch-live-v2.yml]
-  schedule:
-    - cron: '*/5 * * * *'
 permissions: {contents: write}
-concurrency: {group: court-watch-live-v2,cancel-in-progress: true}
+concurrency: {group: court-watch-live-v2-disabled,cancel-in-progress: true}
 jobs:
-  live:
+  disabled:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: |
-          node courtwatch-live-hotfix-v2.mjs
-          node puc-results.mjs || true
-          node courtwatch-finalize.mjs
-      - run: |
-          git config user.name 'courtwatch-bot'
-          git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add data.json alerts.json puc-results.json live-hotfix-v2.json
-          if ! git diff --cached --quiet; then git commit -m 'Remove Vitali duplicate and refresh official positions'; git pull --rebase origin main; git push; fi
+      - run: echo "Disabled. Continuous sync is handled by full-circuit-discovery.yml."
