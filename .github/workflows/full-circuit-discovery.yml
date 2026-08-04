@@ -6,6 +6,7 @@ on:
     paths:
       - '.github/workflows/full-circuit-discovery.yml'
       - 'apply-coverage-live.mjs'
+      - 'repair-international-sources.mjs'
       - 'te-entries.mjs'
       - 'itf-entries.mjs'
       - 'former-players.json'
@@ -14,7 +15,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: court-watch-full-discovery-v2
+  group: court-watch-full-discovery-v3
   cancel-in-progress: false
 jobs:
   discover:
@@ -38,6 +39,7 @@ jobs:
         shell: bash
         run: |
           set +e
+          node repair-international-sources.mjs >> full-discovery.log 2>&1; REPAIR=$?
           node apply-coverage-live.mjs >> full-discovery.log 2>&1; PATCH=$?
           node run-with-former.mjs puc-entries-fast.mjs >> full-discovery.log 2>&1; FITP=$?
           node run-with-former.mjs te-entries.mjs >> full-discovery.log 2>&1; TE=$?
@@ -47,7 +49,7 @@ jobs:
           node run-with-former.mjs puc-opponent-meta.mjs >> full-discovery.log 2>&1; CLUBS=$?
           node puc-conditional-reconcile.mjs >> full-discovery.log 2>&1; CONDITIONAL=$?
           node run-with-former.mjs courtwatch-finalize.mjs >> full-discovery.log 2>&1; FINALIZE=$?
-          node -e "require('fs').writeFileSync('full-discovery-heartbeat.json',JSON.stringify({status:'complete',at:new Date().toISOString(),coverageFrom:'2026-06-20',npm:+process.argv[1],browser:+process.argv[2],patch:+process.argv[3],fitp:+process.argv[4],tennisEurope:+process.argv[5],itf:+process.argv[6],results:+process.argv[7],mainetti:+process.argv[8],clubs:+process.argv[9],conditional:+process.argv[10],finalize:+process.argv[11]},null,2)+'\n')" "${NPM:-0}" "${BROWSER:-0}" "$PATCH" "$FITP" "$TE" "$ITF" "$RESULTS" "$MAINETTI" "$CLUBS" "$CONDITIONAL" "$FINALIZE"
+          node -e "require('fs').writeFileSync('full-discovery-heartbeat.json',JSON.stringify({status:'complete',at:new Date().toISOString(),coverageFrom:'2026-06-20',npm:+process.argv[1],browser:+process.argv[2],repair:+process.argv[3],patch:+process.argv[4],fitp:+process.argv[5],tennisEurope:+process.argv[6],itf:+process.argv[7],results:+process.argv[8],mainetti:+process.argv[9],clubs:+process.argv[10],conditional:+process.argv[11],finalize:+process.argv[12]},null,2)+'\n')" "${NPM:-0}" "${BROWSER:-0}" "$REPAIR" "$PATCH" "$FITP" "$TE" "$ITF" "$RESULTS" "$MAINETTI" "$CLUBS" "$CONDITIONAL" "$FINALIZE"
           exit 0
       - name: Publish discovery safely
         shell: bash

@@ -1,0 +1,12 @@
+import fs from'node:fs/promises';
+let te=await fs.readFile('te-entries.mjs','utf8');
+if(!te.includes('const TE_BASE='))te=te.replace("import fs from 'node:fs/promises';","import fs from 'node:fs/promises';\nconst TE_BASE=['https:','','te.tournamentsoftware.com'].join('/');");
+te=te.replace(/await collect\([^;\n]*\/tournaments[^;\n]*\);/,"await collect(TE_BASE+'/tournaments');");
+te=te.replace(/  const url=.*?\n  await collect\(url\);/s,"  const url=TE_BASE+'/find?DateFilterType=0&StartDate='+d.toISOString().slice(0,10)+'&EndDate='+e.toISOString().slice(0,10)+'&StatusFilterID=0&page=1';\n  await collect(url);");
+if(te.includes('{{https'))throw Error('URL Tennis Europe ancora compressa');
+await fs.writeFile('te-entries.mjs',te);
+let itf=await fs.readFile('itf-entries.mjs','utf8');
+if(!itf.includes('const ITF_SITE='))itf=itf.replace("import fs from 'node:fs/promises';","import fs from 'node:fs/promises';\nconst ITF_SITE=['https:','','www.itftennis.com'].join('/');");
+itf=itf.replace(/url:`[^`]*acceptance-list\/`/,"url:ITF_SITE+link+(link.endsWith('/')?'':'/')+'acceptance-list/'");
+if(itf.includes('{{https'))throw Error('URL ITF ancora compressa');
+await fs.writeFile('itf-entries.mjs',itf);
