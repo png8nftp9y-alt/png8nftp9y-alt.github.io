@@ -1,51 +1,9 @@
-name: Court Watch live source refresh
+name: Court Watch live source refresh legacy
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/live-source-refresh.yml']
-  schedule:
-    - cron: '0,30 * * * *'
-permissions:
-  contents: write
-concurrency:
-  group: court-watch-live-refresh-v3
-  cancel-in-progress: false
+permissions: {contents: read}
 jobs:
-  refresh:
+  disabled:
     runs-on: ubuntu-latest
-    timeout-minutes: 42
     steps:
-      - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
-      - uses: actions/setup-node@v4
-        with: {node-version: '22'}
-      - name: Maintain five minute live refresh loop
-        shell: bash
-        run: |
-          set +e
-          git config user.name courtwatch-bot
-          git config user.email courtwatch-bot@users.noreply.github.com
-          for cycle in 1 2 3 4 5 6 7; do
-            git fetch origin main
-            git reset --hard origin/main
-            : > live-refresh.log
-            START=$(date +%s)
-            node run-with-former.mjs courtwatch-live-hotfix-v2.mjs >> live-refresh.log 2>&1; HOTFIX=$?
-            node run-with-former.mjs puc-results.mjs >> live-refresh.log 2>&1; RESULTS=$?
-            node mainetti-aug4-fix.mjs >> live-refresh.log 2>&1; MAINETTI=$?
-            node puc-conditional-reconcile.mjs >> live-refresh.log 2>&1; CONDITIONAL=$?
-            node run-with-former.mjs courtwatch-finalize.mjs >> live-refresh.log 2>&1; FINALIZE=$?
-            END=$(date +%s)
-            node -e "require('fs').writeFileSync('live-refresh-heartbeat.json',JSON.stringify({status:'continuous',at:new Date().toISOString(),cycle:+process.argv[1],durationSeconds:+process.argv[2],hotfix:+process.argv[3],results:+process.argv[4],mainetti:+process.argv[5],conditional:+process.argv[6],finalize:+process.argv[7]},null,2)+'\n')" "$cycle" "$((END-START))" "$HOTFIX" "$RESULTS" "$MAINETTI" "$CONDITIONAL" "$FINALIZE"
-            git add data.json alerts.json puc-results.json live-hotfix-v2.json live-refresh-heartbeat.json live-refresh.log conditional-reconciliation.json mainetti-aug4-reconciliation.json
-            git commit -m "Refresh Court Watch live matches cycle $cycle" || true
-            for attempt in 1 2 3; do
-              git push origin HEAD:main && break
-              git fetch origin main
-              git rebase origin/main && continue
-              git rebase --abort || true
-              sleep $((attempt*10))
-            done
-            [ "$cycle" = 7 ] || sleep 285
-          done
+      - run: echo "Disabled: full-circuit-discovery.yml is the only Court Watch data writer."

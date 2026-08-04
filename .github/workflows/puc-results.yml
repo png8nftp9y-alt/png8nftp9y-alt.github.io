@@ -1,35 +1,9 @@
-name: Sync official FITP results
+name: PUC results legacy
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [puc-results.mjs, puc-opponent-meta.mjs, courtwatch-finalize.mjs, .github/workflows/puc-results.yml]
-  schedule:
-    - cron: '*/5 * * * *'
-permissions: {contents: write,issues: write}
-concurrency: {group: court-watch-puc-results,cancel-in-progress: false}
+permissions: {contents: read}
 jobs:
-  results:
+  disabled:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: node --check puc-results.mjs && node --check puc-opponent-meta.mjs && node --check courtwatch-finalize.mjs
-      - run: |
-          node puc-results.mjs
-          node puc-opponent-meta.mjs
-          node courtwatch-finalize.mjs
-      - name: Notify verified changes
-        env: {GH_TOKEN: "${{ github.token }}"}
-        run: |
-          node <<'NODE'
-          const fs=require('fs'),a=JSON.parse(fs.readFileSync('alerts.json','utf8'));if(!a.notifications?.length)process.exit(0);fs.writeFileSync('/tmp/results.md',['@png8nftp9y-alt **risultati ufficiali Court Watch**','',...a.notifications.map(n=>`- **${n.playerName}** — ${n.message}`)].join('\n'));
-          NODE
-          if [ -s /tmp/results.md ]; then gh issue comment 7 --body-file /tmp/results.md; fi
-      - run: |
-          git config user.name 'courtwatch-bot'
-          git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add data.json alerts.json puc-results.json
-          if ! git diff --cached --quiet; then git commit -m 'Sync verified official FITP results'; git pull --rebase origin main; git push; fi
+      - run: echo "Disabled: full-circuit-discovery.yml is the only Court Watch data writer."

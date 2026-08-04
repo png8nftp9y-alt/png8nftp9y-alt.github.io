@@ -1,29 +1,9 @@
-name: Court Watch continuous live refresh
+name: Court Watch live refresh legacy
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [courtwatch-live-hotfix.mjs, puc-results.mjs, te-profile-sync.mjs, itf-entries.mjs, .github/workflows/courtwatch-live.yml]
-  schedule:
-    - cron: '*/5 * * * *'
-permissions: {contents: write,issues: write}
-concurrency: {group: court-watch-live,cancel-in-progress: true}
+permissions: {contents: read}
 jobs:
-  live:
+  disabled:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: node --check courtwatch-live-hotfix.mjs
-      - run: |
-          node courtwatch-live-hotfix.mjs
-          node puc-results.mjs || true
-          node puc-opponent-meta.mjs || true
-          node courtwatch-finalize.mjs
-      - run: |
-          git config user.name 'courtwatch-bot'
-          git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add data.json alerts.json puc-results.json live-hotfix.json
-          if ! git diff --cached --quiet; then git commit -m 'Refresh live agenda, results and acceptance positions'; git pull --rebase origin main; git push; fi
+      - run: echo "Disabled: full-circuit-discovery.yml is the only Court Watch data writer."

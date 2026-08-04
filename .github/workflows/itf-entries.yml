@@ -1,29 +1,9 @@
-name: Sync all ITF junior acceptance lists
+name: ITF entries legacy
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [itf-entries.mjs, players.json, former-players.json, run-with-former.mjs, .github/workflows/itf-entries.yml]
-  schedule:
-    - cron: '*/5 * * * *'
-permissions: {contents: write}
-concurrency: {group: court-watch-itf-entries-v2,cancel-in-progress: true}
+permissions: {contents: read}
 jobs:
-  sync:
+  disabled:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
-      - uses: actions/setup-node@v4
-        with: {node-version: 22, cache: npm}
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: node --check itf-entries.mjs && node run-with-former.mjs itf-entries.mjs
-      - run: node run-with-former.mjs courtwatch-finalize.mjs
-      - run: |
-          node -e "const fs=require('fs'); const data=JSON.parse(fs.readFileSync('data.json','utf8')); fs.writeFileSync('itf-heartbeat.json',JSON.stringify({at:new Date().toISOString(),source:'official ITF site',players:'current+former',itfTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='itf').length,entries:data.itfEntryDiscovery||null},null,2)+'\n')"
-          git config user.name 'courtwatch-bot'
-          git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add data.json itf-sync.json itf-heartbeat.json
-          if ! git diff --cached --quiet; then git commit -m 'Sync official ITF entries for current and former players'; git pull --rebase origin main; git push; fi
+      - run: echo "Disabled: full-circuit-discovery.yml is the only Court Watch data writer."

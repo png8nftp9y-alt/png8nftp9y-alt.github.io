@@ -1,20 +1,9 @@
-name: Extract international official routes
+name: International routes legacy
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [extract-international-routes.mjs, international-route-discovery.json, .github/workflows/international-routes.yml]
-permissions: {contents: write}
+permissions: {contents: read}
 jobs:
-  extract:
+  disabled:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: node extract-international-routes.mjs
-      - run: |
-          git config user.name 'courtwatch-bot'
-          git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add international-routes.json
-          if ! git diff --cached --quiet; then git commit -m 'Extract official international data routes'; git pull --rebase origin main; git push; fi
+      - run: echo "Disabled: full-circuit-discovery.yml is the only Court Watch data writer."

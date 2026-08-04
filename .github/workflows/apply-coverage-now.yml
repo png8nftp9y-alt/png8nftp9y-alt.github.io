@@ -1,27 +1,9 @@
-name: Apply coverage from 20 June immediately
+name: Apply coverage now legacy
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [.github/workflows/apply-coverage-now.yml]
-permissions: {contents: write}
-concurrency: {group: apply-coverage-now,cancel-in-progress: true}
+permissions: {contents: read}
 jobs:
-  apply:
+  disabled:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: node extend-coverage-20260620.mjs
-      - run: node --check puc-entries-fast.mjs && node --check itf-entries.mjs && node --check te-entries.mjs
-      - run: node puc-entries-fast.mjs > coverage-20260620.log 2>&1
-      - run: node courtwatch-finalize.mjs >> coverage-20260620.log 2>&1
-      - run: |
-          git config user.name 'courtwatch-bot'
-          git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add puc-entries-fast.mjs itf-entries.mjs te-entries.mjs puc-entries.json data.json alerts.json coverage-20260620.log
-          git commit -m 'Apply and verify coverage from 20 June 2026'
-          git pull --rebase origin main
-          git push
+      - run: echo "Disabled: full-circuit-discovery.yml is the only Court Watch data writer."

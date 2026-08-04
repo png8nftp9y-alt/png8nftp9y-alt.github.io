@@ -1,21 +1,9 @@
-name: Validate Court Watch data
+name: Court Watch cleanup legacy
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [courtwatch-cleanup.mjs, build-surname-aliases.mjs, .github/workflows/courtwatch-cleanup.yml]
-permissions: {contents: write}
+permissions: {contents: read}
 jobs:
-  validate:
+  disabled:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: node build-surname-aliases.mjs
-      - run: node courtwatch-cleanup.mjs
-      - run: |
-          git config user.name 'courtwatch-bot'
-          git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add data.json players.json cleanup-report.json
-          if ! git diff --cached --quiet; then git commit -m 'Remove duplicate and unsupported schedule data'; git pull --rebase origin main; git push; fi
+      - run: echo "Disabled: full-circuit-discovery.yml is the only Court Watch data writer."

@@ -1,56 +1,9 @@
-name: Court Watch live refresh watchdog
+name: Court Watch live source watchdog legacy
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/live-source-watchdog.yml']
-  schedule:
-    - cron: '4,9,14,19,24,29,34,39,44,49,54,59 * * * *'
-permissions:
-  contents: write
-concurrency:
-  group: court-watch-live-refresh-v2
-  cancel-in-progress: false
+permissions: {contents: read}
 jobs:
-  watchdog:
+  disabled:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
     steps:
-      - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
-      - uses: actions/setup-node@v4
-        with: {node-version: '22'}
-      - name: Refresh only when heartbeat is stale
-        id: stale
-        shell: bash
-        run: |
-          node - <<'NODE'
-          const fs=require('fs');let stale=true;try{const h=JSON.parse(fs.readFileSync('live-refresh-heartbeat.json'));stale=Date.now()-Date.parse(h.at)>4*60*1000}catch{}
-          fs.appendFileSync(process.env.GITHUB_OUTPUT,`stale=${stale}\n`)
-          NODE
-      - name: Recover live refresh
-        if: steps.stale.outputs.stale == 'true'
-        shell: bash
-        run: |
-          set +e
-          : > live-refresh.log
-          START=$(date +%s)
-          node run-with-former.mjs courtwatch-live-hotfix-v2.mjs >> live-refresh.log 2>&1; HOTFIX=$?
-          node run-with-former.mjs puc-results.mjs >> live-refresh.log 2>&1; RESULTS=$?
-          node mainetti-aug4-fix.mjs >> live-refresh.log 2>&1; MAINETTI=$?
-          node puc-conditional-reconcile.mjs >> live-refresh.log 2>&1; CONDITIONAL=$?
-          node run-with-former.mjs courtwatch-finalize.mjs >> live-refresh.log 2>&1; FINALIZE=$?
-          END=$(date +%s)
-          node -e "require('fs').writeFileSync('live-refresh-heartbeat.json',JSON.stringify({status:'watchdog-recovery',at:new Date().toISOString(),durationSeconds:+process.argv[1],hotfix:+process.argv[2],results:+process.argv[3],mainetti:+process.argv[4],conditional:+process.argv[5],finalize:+process.argv[6]},null,2)+'\n')" "$((END-START))" "$HOTFIX" "$RESULTS" "$MAINETTI" "$CONDITIONAL" "$FINALIZE"
-          git config user.name courtwatch-bot
-          git config user.email courtwatch-bot@users.noreply.github.com
-          git add data.json alerts.json puc-results.json live-hotfix-v2.json live-refresh-heartbeat.json live-refresh.log conditional-reconciliation.json mainetti-aug4-reconciliation.json
-          git commit -m 'Recover stale Court Watch live refresh' || exit 0
-          for attempt in 1 2 3; do
-            git push origin HEAD:main && exit 0
-            git fetch origin main
-            git rebase origin/main && continue
-            git rebase --abort || true
-            sleep $((attempt*10))
-          done
-          exit 1
+      - run: echo "Disabled: full-circuit-discovery.yml is the only Court Watch data writer."

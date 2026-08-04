@@ -1,45 +1,9 @@
-name: Court Watch Tennis Europe sync
+name: Tennis Europe sync legacy
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/tennis-europe-sync.yml'
-      - 'te-entries.mjs'
-  schedule:
-    - cron: '11,31,51 * * * *'
-permissions:
-  contents: write
-concurrency:
-  group: court-watch-tennis-europe-v1
-  cancel-in-progress: false
+permissions: {contents: read}
 jobs:
-  sync:
+  disabled:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
     steps:
-      - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
-      - uses: actions/setup-node@v4
-        with: {node-version: '22', cache: 'npm'}
-      - name: Install browser
-        run: |
-          npm ci
-          npx playwright install --with-deps chromium
-      - name: Discover Tennis Europe entries
-        run: node run-with-former.mjs te-entries.mjs
-      - name: Publish Tennis Europe data
-        shell: bash
-        run: |
-          git config user.name courtwatch-bot
-          git config user.email courtwatch-bot@users.noreply.github.com
-          git add data.json te-entries.json
-          git commit -m 'Sync Tennis Europe entries' || exit 0
-          for attempt in 1 2 3; do
-            git push origin HEAD:main && exit 0
-            git fetch origin main
-            git rebase origin/main && continue
-            git rebase --abort || true
-            sleep $((attempt*10))
-          done
-          exit 1
+      - run: echo "Disabled: full-circuit-discovery.yml is the only Court Watch data writer."

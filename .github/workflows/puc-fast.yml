@@ -1,50 +1,9 @@
-name: Fast FITP PUC schedule scan
+name: PUC fast legacy
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [puc-direct.mjs, puc-importer.mjs, puc-authoritative-fix.mjs, puc-enrich-current.mjs, puc-results.mjs, puc-opponent-meta.mjs, courtwatch-cleanup.mjs, courtwatch-finalize.mjs, .github/workflows/puc-fast.yml]
-  schedule:
-    - cron: '*/5 * * * *'
-permissions: {contents: write,issues: write}
-concurrency: {group: court-watch-puc-fast,cancel-in-progress: false}
+permissions: {contents: read}
 jobs:
-  puc:
+  disabled:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: 22}
-      - run: sudo apt-get update -qq && sudo apt-get install -y poppler-utils
-      - run: node build-surname-aliases.mjs
-      - name: Download official P.U.C. documents
-        run: |
-          date -u +%FT%TZ > puc-run-start.txt
-          node puc-direct.mjs 2>&1 | tee puc-diagnostics.log
-      - name: Import, enrich and validate schedules and results
-        run: |
-          node puc-importer.mjs --inbox puc-inbox --data data.json --players players.json --alerts alerts.json 2>&1 | tee -a puc-diagnostics.log
-          node puc-authoritative-fix.mjs
-          node puc-enrich-current.mjs
-          node courtwatch-cleanup.mjs
-          node puc-results.mjs
-          node puc-opponent-meta.mjs
-          node courtwatch-finalize.mjs
-      - name: Notify Federico
-        env: {GH_TOKEN: "${{ github.token }}"}
-        run: |
-          node <<'NODE'
-          const fs=require('fs'),a=JSON.parse(fs.readFileSync('alerts.json','utf8'));if(!a.notifications?.length)process.exit(0);fs.writeFileSync('/tmp/alert.md',['@png8nftp9y-alt **nuovo aggiornamento Court Watch**','',...a.notifications.map(n=>`- **${n.playerName}** — ${n.message}`)].join('\n'));
-          NODE
-          if [ -s /tmp/alert.md ]; then gh issue comment 7 --body-file /tmp/alert.md; fi
-      - name: Remove processed PDFs
-        if: always()
-        run: rm -f puc-inbox/*.pdf 2>/dev/null || true
-      - name: Save updates
-        if: always()
-        run: |
-          git config user.name 'courtwatch-bot'
-          git config user.email 'courtwatch-bot@users.noreply.github.com'
-          git add -A puc-inbox puc-run-start.txt puc-diagnostics.log puc-discovery.json puc-api.json puc-results.json data.json alerts.json players.json cleanup-report.json
-          if ! git diff --cached --quiet; then git commit -m 'Import validated FITP schedules and results'; git pull --rebase origin main; git push; fi
+      - run: echo "Disabled: full-circuit-discovery.yml is the only Court Watch data writer."
