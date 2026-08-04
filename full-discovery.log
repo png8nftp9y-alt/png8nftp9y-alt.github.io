@@ -1,5 +1,5 @@
 
-added 2 packages, and audited 3 packages in 1s
+added 2 packages, and audited 3 packages in 2s
 
 1 high severity vulnerability
 
@@ -10,15 +10,15 @@ Run `npm audit` for details.
 Installing dependencies...
 Switching to root user to install dependencies...
 Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
-Hit:6 https://packages.microsoft.com/repos/azure-cli noble InRelease
-Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+Hit:3 https://packages.microsoft.com/repos/azure-cli noble InRelease
 Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
-Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
-Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
-Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+Get:4 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+Get:5 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+Get:6 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
 Get:8 https://dl.google.com/linux/chrome-stable/deb stable InRelease [2548 B]
-Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [229 kB]
-Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [263 kB]
+Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [263 kB]
+Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [229 kB]
 Get:11 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.7 kB]
 Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1154 kB]
 Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [278 kB]
@@ -45,7 +45,7 @@ Get:33 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translat
 Get:34 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [40.3 kB]
 Get:35 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse Translation-en [10.6 kB]
 Get:36 https://dl.google.com/linux/chrome-stable/deb stable/main amd64 Packages [1414 B]
-Fetched 11.0 MB in 1s (8001 kB/s)
+Fetched 11.0 MB in 1s (8047 kB/s)
 Reading package lists...
 Reading package lists...
 Building dependency tree...
@@ -121,7 +121,7 @@ Get:7 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings a
 Get:8 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
 Get:9 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
 Get:10 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
-Fetched 21.1 MB in 1s (36.6 MB/s)
+Fetched 21.1 MB in 1s (16.7 MB/s)
 Selecting previously unselected package fonts-ipafont-gothic.
 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 202954 files and directories currently installed.)
 Preparing to unpack .../0-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
@@ -212,6 +212,7 @@ Downloading Chromium Headless Shell 139.0.7258.5 (playwright build v1181) from h
 |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 104.8 MiB
 |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 104.8 MiB
 Chromium Headless Shell 139.0.7258.5 (playwright build v1181) downloaded to /home/runner/.cache/ms-playwright/chromium_headless_shell-1181
+International source validation complete
 {
   "status": "complete",
   "coverageFrom": "2026-06-20",
@@ -223,7 +224,7 @@ Chromium Headless Shell 139.0.7258.5 (playwright build v1181) downloaded to /hom
   "errors": 0
 }
 {
-  "lastRun": "2026-08-04T01:56:23.204Z",
+  "lastRun": "2026-08-04T02:13:00.729Z",
   "status": "failed",
   "coverageFrom": "2026-06-20",
   "coverageUntil": "2027-04-01",
@@ -233,119 +234,24 @@ Chromium Headless Shell 139.0.7258.5 (playwright build v1181) downloaded to /hom
   "entriesFound": 0,
   "errors": []
 }
+file:///home/runner/work/png8nftp9y-alt.github.io/png8nftp9y-alt.github.io/itf-entries.mjs?run=1785809626735:19
+async function worker(){const page=await ctx.newPage();while(index<tournaments.length){const t=tournaments[index++],key=String(t.tournamentKey||t.TournamentKey||'').toLowerCase();if(!key)continue;const url=publicUrl(t,key);try{const responsePromise=page.waitForResponse(r=>r.url().includes('GetAcceptanceList'),{timeout:12000}).catch(()=>null);await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});const response=await responsePromise;let j=null;if(response){const text=await response.text();try{j=JSON.parse(text)}catch{errors.push(`${key}: risposta browser non JSON ${text.slice(0,120)}`)}}if(!j){const r=await ctx.request.get(API+'/GetAcceptanceList?tournamentKey='+encodeURIComponent(key)+'&circuitCode=JT',{headers:{accept:'application/json','referer':url,'x-requested-with':'XMLHttpRequest'}}),text=await r.text();try{j=JSON.parse(text)}catch{errors.push(`${key}: JSON non valido ${text.slice(0,120)}`)}}if(j)record(j,t,key,url);else{const body=await page.locator('body').innerText().catch(()=> '');for(const p of players){if(![p.name,...(p.aliases||[])].some(a=>norm(body).includes(norm(a))))continue;record([{name:p.name,status:/MAIN DRAW/i.test(body)?'Main Draw':/QUALIFYING/i.test(body)?'Qualifying':/ALTERNATE/i.test(body)?'Alternates':'Iscritto'}],t,key,url)}}catch(e){errors.push(`${key}: ${e.message}`)}}await page.close()}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+
+SyntaxError: Unexpected token 'catch'
+    at compileSourceTextModule (node:internal/modules/esm/utils:346:16)
+    at ModuleLoader.moduleStrategy (node:internal/modules/esm/translators:110:18)
+    at #translate (node:internal/modules/esm/loader:559:20)
+    at afterLoad (node:internal/modules/esm/loader:612:29)
+    at ModuleLoader.loadAndTranslate (node:internal/modules/esm/loader:617:12)
+    at #createModuleJob (node:internal/modules/esm/loader:640:36)
+    at #getJobFromResolveResult (node:internal/modules/esm/loader:353:34)
+    at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:321:41)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:680:25)
+
+Node.js v22.23.1
 {
-  "lastRun": "2026-08-04T01:56:48.085Z",
-  "status": "partial",
-  "coverageFrom": "2026-06-20",
-  "coverageUntil": "2027-04-01",
-  "tournamentsChecked": 542,
-  "playersChecked": 5,
-  "entriesFound": 0,
-  "errors": [
-    "j-j30-can-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-gbr-2026-005: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-zam-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-bih-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-mex-2026-006: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-hon-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-ger-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-arg-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-rou-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-bel-2026-005: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-ned-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-egy-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-fra-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j200-cze-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j300-gbr-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j200-mex-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-est-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-irl-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-bel-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-tha-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-aut-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-geo-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-sui-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-aru-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-bra-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-mex-2026-007: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-hkg-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-ken-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-can-2026-005: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-tjk-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-cze-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j200-ned-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-rou-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-uru-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-ger-2026-005: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-bih-2026-005: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-jgs-gbr-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-bra-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-ina-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-col-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-dom-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-fra-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-mex-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-egy-2026-005: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-geo-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-aut-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-can-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-hkg-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-cze-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-chn-2026-010: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-arm-2026-007: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-uru-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-irl-2026-008: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-ken-2026-005: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-ina-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-tjk-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-gre-2026-005: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-aus-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-aru-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-esa-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-mda-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-egy-2026-006: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-fra-2026-005: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-bih-2026-006: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-ger-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-chn-2026-005: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j200-col-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-ken-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-dom-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-arm-2026-008: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-aus-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-geo-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-jam-2026-006: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-ecu-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-mda-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-mda-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-ltu-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-jam-2026-006: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-geo-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-tur-2026-004: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-fij-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-gre-2026-006: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-ned-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-hun-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-ger-2026-006: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-ina-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-par-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-fin-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j100-col-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-esp-2026-009: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-uzb-2026-003: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-usa-2026-006: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-chn-2026-006: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-ltu-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-jam-2026-007: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j300-pol-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-ecu-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-mas-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j30-bul-2026-001: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte",
-    "j-j60-fij-2026-002: JSON non valido: <html style=\"height:100%\"><head><META NAME=\"ROBOTS\" CONTENT=\"NOINDEX, NOFOLLOW\"><meta name=\"format-detection\" content=\"telephone=no\"><meta name=\"viewport\" conte"
-  ]
-}
-{
-  "lastRun": "2026-08-04T01:57:05.822Z",
+  "lastRun": "2026-08-04T02:13:46.766Z",
   "status": "complete",
   "competitionsChecked": 23,
   "sectionsChecked": 103,
@@ -355,7 +261,7 @@ Chromium Headless Shell 139.0.7258.5 (playwright build v1181) downloaded to /hom
   "errors": []
 }
 {
-  "lastRun": "2026-08-04T01:57:31.173Z",
+  "lastRun": "2026-08-04T02:14:24.354Z",
   "changes": [
     {
       "player": "Matilde Mainetti",
@@ -366,7 +272,7 @@ Chromium Headless Shell 139.0.7258.5 (playwright build v1181) downloaded to /hom
   ]
 }
 {
-  "lastRun": "2026-08-04T01:57:31.243Z",
+  "lastRun": "2026-08-04T02:14:24.417Z",
   "conditionalRemoved": 0,
   "tournamentDuplicatesRemoved": 0,
   "matchDuplicatesRemoved": 0
