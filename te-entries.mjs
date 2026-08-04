@@ -1,7 +1,8 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs/promises';
 const TE_BASE=['https:','','te.tournamentsoftware.com'].join('/');
-const TE_CALENDAR=['https:','','www.tenniseurope.org','calendar','82','European-Calendar'].join('/');
+const TE_CALENDAR=['https:','','www.tenniseurope.org','calendar','82','European-Tennis-Calendar?year=2026'].join('/');
+const TE_CALENDAR_2027=['https:','','www.tenniseurope.org','calendar','82','European-Tennis-Calendar?year=2027'].join('/');
 const cfg=JSON.parse(await fs.readFile('players.json','utf8'));
 const data=JSON.parse(await fs.readFile('data.json','utf8'));
 const players=(cfg.players||[]).filter(p=>(p.circuits||[]).some(c=>String(c).toUpperCase()==='TENNIS EUROPE'));
@@ -9,13 +10,15 @@ const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUp
 const clean=s=>String(s||'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&#39;/g,"'").replace(/&quot;/g,'"').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
 const parseDate=s=>{let m=String(s).match(/(\d{1,2})\/(\d{1,2})\/(20\d{2})/);if(m)return`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;m=String(s).match(/(20\d{2})-(\d{2})-(\d{2})/);return m?m[0]:null};
 const from=new Date('2026-06-20T00:00:00Z'),to=new Date(Date.now()+240*864e5),today=new Date().toISOString().slice(0,10),now=new Date().toISOString(),errors=[],hits=[],pages=new Set(),tournamentUrls=new Set();
-try{const r=await fetch(TE_CALENDAR,{headers:{'user-agent':'Mozilla/5.0 CourtWatchTE/3.1'}}),html=await r.text();for(const m of html.matchAll(/te\.tournamentsoftware\.com\/sport\/acceptancelist\.aspx\?id=([0-9A-F-]{36})/gi))tournamentUrls.add(TE_BASE+'/sport/acceptancelist.aspx?id='+m[1]);pages.add(TE_CALENDAR)}catch(e){errors.push('official-calendar: '+e.message)}
+async function seedCalendar(url){try{const r=await fetch(url,{headers:{'user-agent':'Mozilla/5.0 CourtWatchTE/3.2'}}),html=await r.text();for(const m of html.matchAll(/(?:te\.tournamentsoftware\.com\/)?sport\/acceptancelist\.aspx\?id=([0-9A-F-]{36})/gi))tournamentUrls.add(TE_BASE+'/sport/acceptancelist.aspx?id='+m[1]);pages.add(url)}catch(e){errors.push('official-calendar: '+e.message)}}
+await seedCalendar(TE_CALENDAR);await seedCalendar(TE_CALENDAR_2027);
 const browser=await chromium.launch({headless:true});
 const ctx=await browser.newContext({locale:'en-GB',timezoneId:'Europe/Rome',userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36'});
 const page=await ctx.newPage();
 async function cookies(){for(const t of ['ACCEPT','Accept all','Accetta tutto']){const b=page.getByText(new RegExp('^'+t+'$','i'),{exact:true});if(await b.count())await b.first().click({force:true}).catch(()=>{})}}
-async function collect(url){try{await page.goto(['https:','','te.tournamentsoftware.com','tournaments'].join('/'),{waitUntil:'domcontentloaded',timeout:60000});await cookies();await page.waitForTimeout(800);pages.add(url);const links=await page.locator('a[href]').evaluateAll(as=>as.map(a=>a.href));for(const u of links){if(/te\.tournamentsoftware\.com\/sport\/(?:acceptancelist|tournament)\.aspx\?id=/i.test(u)||/te\.tournamentsoftware\.com\/tournament\/[0-9a-f-]{36}/i.test(u))tournamentUrls.add(u)}}catch(e){errors.push(`${url}: ${e.message}`)}}
+async function collect(url){try{await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});await cookies();await page.waitForTimeout(1000);pages.add(url);const links=await page.locator('a[href]').evaluateAll(as=>as.map(a=>a.href));for(const u of links){if(/te\.tournamentsoftware\.com\/sport\/(?:acceptancelist|tournament)\.aspx\?id=/i.test(u)||/te\.tournamentsoftware\.com\/tournament\/[0-9a-f-]{36}/i.test(u))tournamentUrls.add(u)}}catch(e){errors.push(`${url}: ${e.message}`)}}
 await collect(TE_CALENDAR);
+await collect(TE_CALENDAR_2027);
 await collect(TE_BASE+'/tournaments');
 for(let d=new Date(from);d<=to;d=new Date(d.getTime()+14*864e5)){const e=new Date(Math.min(to.getTime(),d.getTime()+13*864e5));await collect(TE_BASE+'/find?DateFilterType=0&StartDate='+d.toISOString().slice(0,10)+'&EndDate='+e.toISOString().slice(0,10)+'&StatusFilterID=0&page=1')}
 for(const p of players){const u=p.profileSync?.tennisEurope?.url||(p.officialUrls?.tennisEurope||[]).find(x=>/profile/i.test(x));if(u)await collect(u)}
