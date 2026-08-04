@@ -5,39 +5,47 @@ on:
     branches: [main]
     paths: ['.github/workflows/live-source-refresh.yml']
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 * * * *'
 permissions:
   contents: write
 concurrency:
   group: court-watch-live-refresh
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Refresh live matches and metadata
+      - name: Refresh live matches
         shell: bash
         run: |
           set +e
           : > live-refresh.log
+          START=$(date +%s)
           node run-with-former.mjs courtwatch-live-hotfix-v2.mjs >> live-refresh.log 2>&1; HOTFIX=$?
           node run-with-former.mjs puc-results.mjs >> live-refresh.log 2>&1; RESULTS=$?
           node mainetti-aug4-fix.mjs >> live-refresh.log 2>&1; MAINETTI=$?
-          node fitp-club-discovery.mjs >> live-refresh.log 2>&1; DISCOVERY=$?
-          node run-with-former.mjs puc-opponent-meta.mjs >> live-refresh.log 2>&1; CLUBS=$?
           node puc-conditional-reconcile.mjs >> live-refresh.log 2>&1; CONDITIONAL=$?
           node run-with-former.mjs courtwatch-finalize.mjs >> live-refresh.log 2>&1; FINALIZE=$?
-          node -e "require('fs').writeFileSync('live-refresh-heartbeat.json',JSON.stringify({status:'complete',at:new Date().toISOString(),hotfix:+process.argv[1],results:+process.argv[2],mainetti:+process.argv[3],clubDiscovery:+process.argv[4],clubs:+process.argv[5],conditional:+process.argv[6],finalize:+process.argv[7]},null,2)+'\n')" "$HOTFIX" "$RESULTS" "$MAINETTI" "$DISCOVERY" "$CLUBS" "$CONDITIONAL" "$FINALIZE"
+          END=$(date +%s)
+          node -e "require('fs').writeFileSync('live-refresh-heartbeat.json',JSON.stringify({status:'complete',at:new Date().toISOString(),durationSeconds:+process.argv[1],hotfix:+process.argv[2],results:+process.argv[3],mainetti:+process.argv[4],conditional:+process.argv[5],finalize:+process.argv[6]},null,2)+'\n')" "$((END-START))" "$HOTFIX" "$RESULTS" "$MAINETTI" "$CONDITIONAL" "$FINALIZE"
           exit 0
-      - name: Publish
+      - name: Publish safely
+        shell: bash
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add data.json alerts.json puc-results.json live-hotfix-v2.json live-refresh-heartbeat.json live-refresh.log conditional-reconciliation.json puc-opponent-clubs.json mainetti-aug4-reconciliation.json fitp-club-discovery.json
-          git commit -m 'Refresh Court Watch live matches and FITP metadata' || exit 0
-          git push origin HEAD:main
+          git add data.json alerts.json puc-results.json live-hotfix-v2.json live-refresh-heartbeat.json live-refresh.log conditional-reconciliation.json mainetti-aug4-reconciliation.json
+          git commit -m 'Refresh Court Watch live matches' || exit 0
+          for attempt in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            git fetch origin main
+            git rebase origin/main && continue
+            git rebase --abort || true
+            sleep $((attempt*10))
+          done
+          exit 1
