@@ -1,0 +1,36 @@
+name: Court Watch order of play live agenda
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['official-order-of-play.mjs','courtwatch-finalize.mjs','data.json','players.json','former-players.json','.github/workflows/courtwatch-order-of-play-live.yml']
+  schedule:
+    - cron: '*/5 * * * *'
+permissions: {contents: write}
+concurrency: {group: court-watch-order-of-play,cancel-in-progress: true}
+jobs:
+  oop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: 'npm'}
+      - run: npm ci || true
+      - name: Sync order of play agenda
+        run: |
+          set +e
+          : > order-of-play-live.log
+          timeout 300 node official-order-of-play.mjs >> order-of-play-live.log 2>&1; OOP=$?
+          timeout 60 node run-with-former.mjs courtwatch-finalize.mjs >> order-of-play-live.log 2>&1; FINALIZE=$?
+          node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync('data.json','utf8'));fs.writeFileSync('official-order-of-play-heartbeat.json',JSON.stringify({at:new Date().toISOString(),orderOfPlay:process.argv[1],finalize:process.argv[2],matches:(d.matches||[]).length,sync:d.officialOrderOfPlaySync||null},null,2)+'\n')" "$OOP" "$FINALIZE"
+          exit 0
+      - name: Publish order of play agenda
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json official-order-of-play.json official-order-of-play-heartbeat.json order-of-play-live.log
+          git commit -m 'Update Court Watch order of play agenda' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true

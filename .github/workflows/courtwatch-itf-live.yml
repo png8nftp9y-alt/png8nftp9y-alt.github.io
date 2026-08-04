@@ -1,0 +1,36 @@
+name: Court Watch ITF live data
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['itf-entries.mjs','courtwatch-finalize.mjs','players.json','former-players.json','.github/workflows/courtwatch-itf-live.yml']
+  schedule:
+    - cron: '*/10 * * * *'
+permissions: {contents: write}
+concurrency: {group: court-watch-itf-live,cancel-in-progress: true}
+jobs:
+  itf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: 'npm'}
+      - run: npm ci || true
+      - name: Sync ITF official only
+        run: |
+          set +e
+          : > itf-live.log
+          timeout 360 node run-with-former.mjs itf-entries.mjs >> itf-live.log 2>&1; ITF=$?
+          timeout 60 node run-with-former.mjs courtwatch-finalize.mjs >> itf-live.log 2>&1; FINALIZE=$?
+          node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync('data.json','utf8'));fs.writeFileSync('itf-heartbeat.json',JSON.stringify({at:new Date().toISOString(),source:'official ITF',itf:process.argv[1],finalize:process.argv[2],itfTournaments:(d.tournaments||[]).filter(t=>t.sourceId==='itf').length,entries:d.itfEntryDiscovery||null},null,2)+'\n')" "$ITF" "$FINALIZE"
+          exit 0
+      - name: Publish ITF data
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json itf-sync.json itf-heartbeat.json itf-live.log
+          git commit -m 'Update Court Watch ITF live data' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true

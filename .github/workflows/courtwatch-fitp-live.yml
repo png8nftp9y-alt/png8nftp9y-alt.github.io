@@ -1,0 +1,38 @@
+name: Court Watch FITP live data
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['puc-entries-fast.mjs','puc-results.mjs','puc-opponent-meta.mjs','player-memberships.mjs','courtwatch-finalize.mjs','players.json','former-players.json','.github/workflows/courtwatch-fitp-live.yml']
+  schedule:
+    - cron: '*/5 * * * *'
+permissions: {contents: write}
+concurrency: {group: court-watch-fitp-live,cancel-in-progress: true}
+jobs:
+  fitp:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Sync FITP, results, clubs, memberships
+        run: |
+          set +e
+          : > fitp-live.log
+          timeout 300 node run-with-former.mjs puc-entries-fast.mjs >> fitp-live.log 2>&1; FITP=$?
+          timeout 240 node run-with-former.mjs puc-results.mjs >> fitp-live.log 2>&1; RESULTS=$?
+          timeout 180 node run-with-former.mjs puc-opponent-meta.mjs >> fitp-live.log 2>&1; CLUBS=$?
+          timeout 180 node player-memberships.mjs >> fitp-live.log 2>&1; MEMBERS=$?
+          timeout 90 node run-with-former.mjs courtwatch-finalize.mjs >> fitp-live.log 2>&1; FINALIZE=$?
+          node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync('data.json','utf8'));fs.writeFileSync('fitp-live-heartbeat.json',JSON.stringify({at:new Date().toISOString(),fitp:process.argv[1],results:process.argv[2],clubs:process.argv[3],memberships:process.argv[4],finalize:process.argv[5],matches:(d.matches||[]).length,fitpTournaments:(d.tournaments||[]).filter(t=>t.sourceId==='fitp-puc').length},null,2)+'\n')" "$FITP" "$RESULTS" "$CLUBS" "$MEMBERS" "$FINALIZE"
+          exit 0
+      - name: Publish FITP live data
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json players.json former-players.json alerts.json puc-entries.json puc-results.json puc-opponent-clubs.json player-memberships.json fitp-live-heartbeat.json fitp-live.log
+          git commit -m 'Update Court Watch FITP live data' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true

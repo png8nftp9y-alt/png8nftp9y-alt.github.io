@@ -1,0 +1,36 @@
+name: Court Watch Tennis Europe live data
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['te-entries.mjs','courtwatch-finalize.mjs','players.json','former-players.json','.github/workflows/courtwatch-te-live.yml']
+  schedule:
+    - cron: '*/10 * * * *'
+permissions: {contents: write}
+concurrency: {group: court-watch-te-live,cancel-in-progress: true}
+jobs:
+  te:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: 'npm'}
+      - run: npm ci || true
+      - name: Sync Tennis Europe official only
+        run: |
+          set +e
+          : > te-live.log
+          timeout 360 node run-with-former.mjs te-entries.mjs >> te-live.log 2>&1; TE=$?
+          timeout 60 node run-with-former.mjs courtwatch-finalize.mjs >> te-live.log 2>&1; FINALIZE=$?
+          node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync('data.json','utf8'));fs.writeFileSync('te-heartbeat.json',JSON.stringify({at:new Date().toISOString(),source:'official Tennis Europe',te:process.argv[1],finalize:process.argv[2],teTournaments:(d.tournaments||[]).filter(t=>t.sourceId==='tennis-europe').length,entries:d.teEntryDiscovery||null},null,2)+'\n')" "$TE" "$FINALIZE"
+          exit 0
+      - name: Publish Tennis Europe data
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json te-entries.json te-heartbeat.json te-live.log
+          git commit -m 'Update Court Watch Tennis Europe live data' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
