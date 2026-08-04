@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [te-entries.mjs, players.json, .github/workflows/te-entries.yml]
+    paths: [te-entries.mjs, players.json, former-players.json, run-with-former.mjs, .github/workflows/te-entries.yml]
   schedule:
     - cron: '17 */3 * * *'
 permissions: {contents: write}
@@ -18,8 +18,8 @@ jobs:
         with: {node-version: 22,cache: npm}
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: node --check te-entries.mjs && node te-entries.mjs
-      - run: node courtwatch-finalize.mjs
+      - run: node --check te-entries.mjs && node run-with-former.mjs te-entries.mjs
+      - run: node run-with-former.mjs courtwatch-finalize.mjs
       - run: |
           git config user.name 'courtwatch-bot'
           git config user.email 'courtwatch-bot@users.noreply.github.com'

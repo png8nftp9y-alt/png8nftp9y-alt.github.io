@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [itf-entries.mjs, players.json, .github/workflows/itf-entries.yml]
+    paths: [itf-entries.mjs, players.json, former-players.json, run-with-former.mjs, .github/workflows/itf-entries.yml]
   schedule:
     - cron: '*/5 * * * *'
 permissions: {contents: write}
@@ -16,8 +16,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: 22}
-      - run: node --check itf-entries.mjs && node itf-entries.mjs
-      - run: node courtwatch-finalize.mjs
+      - run: node --check itf-entries.mjs && node run-with-former.mjs itf-entries.mjs
+      - run: node run-with-former.mjs courtwatch-finalize.mjs
       - run: |
           git config user.name 'courtwatch-bot'
           git config user.email 'courtwatch-bot@users.noreply.github.com'
