@@ -5,19 +5,17 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/full-circuit-discovery.yml'
-      - 'apply-coverage-live.mjs'
-      - 'repair-international-sources.mjs'
       - 'te-entries.mjs'
       - 'itf-entries.mjs'
       - 'puc-entries-fast.mjs'
-      - 'intl-from-fitp.mjs'
       - 'former-players.json'
+      - 'styles.css'
   schedule:
     - cron: '14,44 * * * *'
 permissions:
   contents: write
 concurrency:
-  group: court-watch-full-discovery-v7
+  group: court-watch-full-discovery-v8
   cancel-in-progress: false
 jobs:
   discover:
@@ -37,23 +35,19 @@ jobs:
           echo "NPM=$NPM" >> "$GITHUB_ENV"
           echo "BROWSER=$BROWSER" >> "$GITHUB_ENV"
           exit 0
-      - name: Repair FITP, agenda and international calendar
+      - name: Sync official sources only
         shell: bash
         run: |
           set +e
-          node repair-international-sources.mjs >> full-discovery.log 2>&1; REPAIR=$?
-          node apply-coverage-live.mjs >> full-discovery.log 2>&1; PATCH=$?
           node run-with-former.mjs puc-entries-fast.mjs >> full-discovery.log 2>&1; FITP=$?
           node run-with-former.mjs te-entries.mjs >> full-discovery.log 2>&1; TE=$?
           node run-with-former.mjs itf-entries.mjs >> full-discovery.log 2>&1; ITF=$?
-          node intl-from-fitp.mjs >> full-discovery.log 2>&1; INTL_FALLBACK=$?
           node run-with-former.mjs puc-results.mjs >> full-discovery.log 2>&1; RESULTS=$?
           node mainetti-aug4-fix.mjs >> full-discovery.log 2>&1; MAINETTI=$?
           node run-with-former.mjs puc-opponent-meta.mjs >> full-discovery.log 2>&1; CLUBS=$?
           node puc-conditional-reconcile.mjs >> full-discovery.log 2>&1; CONDITIONAL=$?
           node run-with-former.mjs courtwatch-finalize.mjs >> full-discovery.log 2>&1; FINALIZE=$?
-          node intl-from-fitp.mjs >> full-discovery.log 2>&1; INTL_FINAL=$?
-          node -e "require('fs').writeFileSync('full-discovery-heartbeat.json',JSON.stringify({status:'complete',at:new Date().toISOString(),coverageFrom:'2025-12-18',npm:+process.argv[1],browser:+process.argv[2],repair:+process.argv[3],patch:+process.argv[4],fitp:+process.argv[5],tennisEurope:+process.argv[6],itf:+process.argv[7],intlFallback:+process.argv[8],results:+process.argv[9],mainetti:+process.argv[10],clubs:+process.argv[11],conditional:+process.argv[12],finalize:+process.argv[13],intlFinal:+process.argv[14]},null,2)+'\n')" "${NPM:-0}" "${BROWSER:-0}" "$REPAIR" "$PATCH" "$FITP" "$TE" "$ITF" "$INTL_FALLBACK" "$RESULTS" "$MAINETTI" "$CLUBS" "$CONDITIONAL" "$FINALIZE" "$INTL_FINAL"
+          node -e "require('fs').writeFileSync('full-discovery-heartbeat.json',JSON.stringify({status:'complete',at:new Date().toISOString(),coverageFrom:'2025-12-18',note:'TE and ITF are synced only from their official sites, not derived from PUC',npm:+process.argv[1],browser:+process.argv[2],fitp:+process.argv[3],tennisEurope:+process.argv[4],itf:+process.argv[5],results:+process.argv[6],mainetti:+process.argv[7],clubs:+process.argv[8],conditional:+process.argv[9],finalize:+process.argv[10]},null,2)+'\n')" "${NPM:-0}" "${BROWSER:-0}" "$FITP" "$TE" "$ITF" "$RESULTS" "$MAINETTI" "$CLUBS" "$CONDITIONAL" "$FINALIZE"
           exit 0
       - name: Publish discovery safely
         shell: bash
@@ -61,7 +55,7 @@ jobs:
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
           git add -A ':!node_modules'
-          git commit -m 'Repair Court Watch live tournament data' || exit 0
+          git commit -m 'Sync Court Watch official tournament data' || exit 0
           for attempt in 1 2 3; do
             git push origin HEAD:main && exit 0
             git fetch origin main
