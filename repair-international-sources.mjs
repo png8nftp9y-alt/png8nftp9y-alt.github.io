@@ -20,6 +20,7 @@ if(!itf.includes('ITF_BROWSER_READY')){
 }
 itf=itf.replace(/url:`[^`]*acceptance-list\/`/,"url:ITF_SITE+link+(link.endsWith('/')?'':'/')+'acceptance-list/'");
 itf=itf.replace("const concurrency=24","const concurrency=4");
+itf=itf.replace("ITF_API+'/GetAcceptanceList?TournamentKey='+encodeURIComponent(key)","ITF_API+'/GetAcceptanceList?TournamentKey='+encodeURIComponent(key)+'&circuitCode=JT'");
 itf=itf.replace("const r=await fetch(url,{headers:{accept:'application/json'}});","const opts={headers:{accept:'application/json, text/plain, */*','user-agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36','referer':ITF_SITE+'/en/itf-tours/world-tennis-tour-juniors/','x-requested-with':'XMLHttpRequest'}};const r=url.includes('GetAcceptanceList')?await itfContext.request.get(url,opts):await fetch(url,opts);");
 if(!itf.includes('await itfBrowser.close();'))itf=itf.replace("await fs.writeFile('itf-sync.json'","await itfBrowser.close();\nawait fs.writeFile('itf-sync.json'");
 if(itf.includes('{{https'))throw Error('URL ITF ancora compressa');
