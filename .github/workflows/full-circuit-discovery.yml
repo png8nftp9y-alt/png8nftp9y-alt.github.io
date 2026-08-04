@@ -9,17 +9,21 @@ on:
       - 'itf-entries.mjs'
       - 'puc-entries-fast.mjs'
       - 'puc-results.mjs'
+      - 'puc-opponent-meta.mjs'
+      - 'official-order-of-play.mjs'
+      - 'player-memberships.mjs'
+      - 'app.js'
       - 'calendar-all.js'
       - 'former-players.json'
       - 'players.json'
       - 'styles.css'
+      - 'result-outcome.css'
+      - 'result-outcome.js'
+      - 'opponent-club-hover.js'
   schedule:
     - cron: '*/5 * * * *'
-permissions:
-  contents: write
-concurrency:
-  group: court-watch-full-discovery-v9
-  cancel-in-progress: true
+permissions: {contents: write}
+concurrency: {group: court-watch-live-definitive,cancel-in-progress: true}
 jobs:
   discover:
     runs-on: ubuntu-latest
@@ -29,41 +33,29 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: '22', cache: 'npm'}
-      - name: Prepare scanner
-        shell: bash
-        run: |
-          set +e
-          npm ci > full-discovery.log 2>&1; NPM=$?
-          npx playwright install --with-deps chromium >> full-discovery.log 2>&1; BROWSER=$?
-          echo "NPM=$NPM" >> "$GITHUB_ENV"
-          echo "BROWSER=$BROWSER" >> "$GITHUB_ENV"
-          exit 0
-      - name: Sync official sources and historical agenda
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Sync in requested order
         shell: bash
         run: |
           set +e
           node run-with-former.mjs puc-entries-fast.mjs >> full-discovery.log 2>&1; FITP=$?
           node run-with-former.mjs te-entries.mjs >> full-discovery.log 2>&1; TE=$?
           node run-with-former.mjs itf-entries.mjs >> full-discovery.log 2>&1; ITF=$?
+          node official-order-of-play.mjs >> full-discovery.log 2>&1; OOP=$?
           node run-with-former.mjs puc-results.mjs >> full-discovery.log 2>&1; RESULTS=$?
-          node mainetti-aug4-fix.mjs >> full-discovery.log 2>&1; MAINETTI=$?
           node run-with-former.mjs puc-opponent-meta.mjs >> full-discovery.log 2>&1; CLUBS=$?
+          node player-memberships.mjs >> full-discovery.log 2>&1; MEMBERS=$?
           node puc-conditional-reconcile.mjs >> full-discovery.log 2>&1; CONDITIONAL=$?
           node run-with-former.mjs courtwatch-finalize.mjs >> full-discovery.log 2>&1; FINALIZE=$?
-          node -e "const fs=require('fs'); const data=JSON.parse(fs.readFileSync('data.json','utf8')); fs.writeFileSync('full-discovery-heartbeat.json',JSON.stringify({status:'complete',at:new Date().toISOString(),coverageFrom:'2025-12-18',agendaHistoricalFrom:'2025-12-18',note:'Agenda includes historical matches from 2025-12-18. TE and ITF are synced only from official sites.',npm:+process.argv[1],browser:+process.argv[2],fitp:+process.argv[3],tennisEurope:+process.argv[4],itf:+process.argv[5],results:+process.argv[6],mainetti:+process.argv[7],clubs:+process.argv[8],conditional:+process.argv[9],finalize:+process.argv[10],matches:(data.matches||[]).length,itfTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='itf').length,teTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='tennis-europe').length},null,2)+'\n')" "${NPM:-0}" "${BROWSER:-0}" "$FITP" "$TE" "$ITF" "$RESULTS" "$MAINETTI" "$CLUBS" "$CONDITIONAL" "$FINALIZE"
+          node -e "const fs=require('fs'); const data=JSON.parse(fs.readFileSync('data.json','utf8')); fs.writeFileSync('full-discovery-heartbeat.json',JSON.stringify({status:'complete',at:new Date().toISOString(),coverageFrom:'2025-12-18',order:'1 official tournaments, 2 order of play agenda, 3 results/clubs/memberships',fitp:+process.argv[1],tennisEurope:+process.argv[2],itf:+process.argv[3],orderOfPlay:+process.argv[4],results:+process.argv[5],opponentClubs:+process.argv[6],memberships:+process.argv[7],conditional:+process.argv[8],finalize:+process.argv[9],matches:(data.matches||[]).length,itfTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='itf').length,teTournaments:(data.tournaments||[]).filter(t=>t.sourceId==='tennis-europe').length},null,2)+'\n')" "$FITP" "$TE" "$ITF" "$OOP" "$RESULTS" "$CLUBS" "$MEMBERS" "$CONDITIONAL" "$FINALIZE"
           exit 0
-      - name: Publish discovery safely
+      - name: Publish
         shell: bash
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
           git add -A ':!node_modules'
-          git commit -m 'Sync Court Watch agenda and official tournament data' || exit 0
-          for attempt in 1 2 3; do
-            git push origin HEAD:main && exit 0
-            git fetch origin main
-            git rebase origin/main && continue
-            git rebase --abort || true
-            sleep $((attempt*10))
-          done
-          exit 1
+          git commit -m 'Definitive Court Watch live agenda sync' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main
