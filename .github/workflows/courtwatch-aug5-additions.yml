@@ -1,0 +1,33 @@
+name: Court Watch Aug 5 additions
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['aug5-additions-trigger.json','aug5-additions.mjs','.github/workflows/courtwatch-aug5-additions.yml']
+permissions: {contents: write}
+concurrency: {group: court-watch-aug5-additions,cancel-in-progress: true}
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Apply additions
+        run: |
+          set +e
+          : > aug5-additions.log
+          timeout 90 node aug5-additions.mjs >> aug5-additions.log 2>&1; ADD=$?
+          timeout 30 node courtwatch-audit.mjs >> aug5-additions.log 2>&1; AUDIT=$?
+          node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync('data.json','utf8'));fs.writeFileSync('aug5-additions-heartbeat.json',JSON.stringify({at:new Date().toISOString(),additions:process.argv[1],audit:process.argv[2],aug5Additions:d.aug5Additions||null,matches:(d.matches||[]).length},null,2)+'\n')" "$ADD" "$AUDIT"
+          exit 0
+      - name: Publish additions
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json players.json courtwatch-data-audit.json aug5-additions.json aug5-additions-heartbeat.json aug5-additions.log
+          git commit -m 'Add missing August 5 doubles and Camilla Lingeri' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
