@@ -1,0 +1,32 @@
+name: Court Watch Virginia FITP final apply
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['virginia-fitp-final.json','src/apply-virginia-fitp-final.mjs','.github/workflows/courtwatch-virginia-fitp-final.yml','courtwatch-virginia-fitp-final-trigger.json']
+permissions: {contents: write}
+concurrency: {group: court-watch-virginia-fitp-final,cancel-in-progress: true}
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Apply Virginia final FITP result
+        run: |
+          node src/apply-virginia-fitp-final.mjs | tee virginia-fitp-final-apply.log
+          node run-with-former.mjs courtwatch-finalize.mjs >> virginia-fitp-final-apply.log 2>&1 || true
+          node courtwatch-audit.mjs >> virginia-fitp-final-apply.log 2>&1 || true
+          node src/build-courtwatch-v2.mjs >> virginia-fitp-final-apply.log 2>&1 || true
+          node src/audit-courtwatch-v2.mjs >> virginia-fitp-final-apply.log 2>&1 || true
+      - name: Publish applied data
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json courtwatch-data-audit.json dist/ virginia-fitp-final-apply.log || true
+          git commit -m 'Apply Virginia Cereghini final FITP tournament set' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
