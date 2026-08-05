@@ -12,7 +12,9 @@ const base=JSON.parse(stdout);
 function isNextGenBrallo(m){return m.competitionId===BRALLO && /JUNIOR NEXT GEN/i.test(String(m.tournamentName||''));}
 function isBrallo(m){return m.competitionId===BRALLO || /BRALLO/i.test(String(m.tournamentName||''));}
 function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();}
-function isDouble(m){const txt=norm(`${m.eventType||''} ${m.draw||''} ${m.category||''} ${m.round||''}`); const p=norm(m.partner), name=norm(m.playerName); return txt.includes('DOPPIO') || (!!p && p!==name && p.includes('/'));}
+function tokenSet(s){return new Set(norm(s).split(' ').filter(Boolean));}
+function samePerson(a,b){const A=tokenSet(a),B=tokenSet(b); if(!A.size||!B.size) return false; if(A.size!==B.size) return false; for(const x of A) if(!B.has(x)) return false; return true;}
+function isDouble(m){const txt=norm(`${m.eventType||''} ${m.draw||''} ${m.category||''} ${m.round||''}`); const p=String(m.partner||''); if(txt.includes('DOPPIO')) return true; if(!p) return false; if(p.includes('/')) return true; return !samePerson(p,m.playerName);}
 function clearToday(m,reason){if(m.date===DATE) delete m.date; delete m.time; delete m.todayAgendaSource; delete m.orderOfPlayFile; delete m.orderOfPlayLine; m.orderOfPlayCheckedAt=now; if(reason) m.cancellationReason=reason; if(m.result) m.status='completed';}
 function setToday(m,time,line){m.date=DATE;m.time=time;m.status='scheduled';m.todayAgendaSource='manual-user-confirmed-aug5-precise';m.orderOfPlayFile='oraridigioco_20260805.pdf';m.orderOfPlayLine=line;m.orderOfPlayCheckedAt=now; delete m.cancellationReason;}
 const rebuilt=[];let removed=0, restored=0;
@@ -22,9 +24,9 @@ current.matches=rebuilt;
 const counters={puccioRemoved:0,ghislotti:0,cereghini:0,zennaro:0,vitali:0,gelli:0,paganini:0};
 for(const m of current.matches||[]){
   if(!isNextGenBrallo(m)) continue;
-  if(m.playerId==='gregorio-puccio'){clearToday(m,'Non gioca il 05/08: ha perso.');counters.puccioRemoved++;continue;}
   const dbl=isDouble(m);
   const opp=norm(m.opponent);
+  if(m.playerId==='gregorio-puccio'){clearToday(m,'Non gioca il 05/08: ha perso.');counters.puccioRemoved++;continue;}
   if(m.playerId==='carlo-ghislotti' && !dbl && !m.result){setToday(m,'08:00','05/08 ufficiale: Ghislotti singolare ore 08:00');counters.ghislotti++;}
   if(m.playerId==='virginia-cereghini' && !dbl && !m.result){setToday(m,'13:00','05/08 ufficiale: Cereghini singolare ore 13:00');counters.cereghini++;}
   if(m.playerId==='aila-zennaro' && !dbl && !m.result){setToday(m,'13:00','05/08 ufficiale: Zennaro singolare ore 13:00');counters.zennaro++;}
