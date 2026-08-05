@@ -1,0 +1,26 @@
+name: Court Watch Virginia FITP v5
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/discover-virginia-fitp-v5.mjs'
+      - 'courtwatch-virginia-fitp-v5-trigger.json'
+permissions:
+  contents: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Discover Virginia FITP v5
+        run: node src/discover-virginia-fitp-v5.mjs
+      - name: Commit result
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add virginia-fitp-final.json virginia-fitp-candidates-v5.json virginia-fitp-v5.log
+          git commit -m "Run circuit-aware Virginia FITP discovery v5" || exit 0
+          git push
