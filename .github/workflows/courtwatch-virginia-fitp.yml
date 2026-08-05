@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['puc-virginia-fitp.mjs','.github/workflows/courtwatch-virginia-fitp.yml','players.json']
+    paths: ['puc-virginia-fitp.mjs','.github/workflows/courtwatch-virginia-fitp.yml','players.json','courtwatch-virginia-fitp-trigger.json']
 permissions: {contents: write}
 concurrency: {group: court-watch-virginia-fitp,cancel-in-progress: true}
 jobs:
