@@ -1,0 +1,33 @@
+name: Court Watch Brallo emergency rollback
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['brallo-emergency-trigger.json','emergency-rollback-brallo.mjs','.github/workflows/courtwatch-brallo-emergency-rollback.yml']
+permissions: {contents: write}
+concurrency: {group: court-watch-brallo-emergency-rollback,cancel-in-progress: true}
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Roll back Brallo rows to clean baseline
+        run: |
+          set +e
+          : > brallo-emergency-rollback.log
+          timeout 90 node emergency-rollback-brallo.mjs >> brallo-emergency-rollback.log 2>&1; ROLLBACK=$?
+          timeout 30 node courtwatch-audit.mjs >> brallo-emergency-rollback.log 2>&1; AUDIT=$?
+          node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync('data.json','utf8'));fs.writeFileSync('brallo-emergency-rollback-heartbeat.json',JSON.stringify({at:new Date().toISOString(),rollback:process.argv[1],audit:process.argv[2],rollbackInfo:d.bralloEmergencyRollback||null,matches:(d.matches||[]).length},null,2)+'\n')" "$ROLLBACK" "$AUDIT"
+          exit 0
+      - name: Publish emergency rollback
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json courtwatch-data-audit.json brallo-emergency-rollback.json brallo-emergency-rollback-heartbeat.json brallo-emergency-rollback.log
+          git commit -m 'Emergency rollback Brallo data to clean baseline' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
