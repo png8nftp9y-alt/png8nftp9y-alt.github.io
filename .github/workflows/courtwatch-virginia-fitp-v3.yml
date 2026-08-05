@@ -1,0 +1,29 @@
+name: Court Watch Virginia FITP v3 discovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/discover-virginia-fitp-v3.mjs','src/virginia-fitp-discovery-plan.md','.github/workflows/courtwatch-virginia-fitp-v3.yml','courtwatch-virginia-fitp-v3-trigger.json']
+permissions: {contents: write}
+concurrency: {group: court-watch-virginia-fitp-v3,cancel-in-progress: true}
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Discover Virginia FITP without expected count
+        run: |
+          set -e
+          node src/discover-virginia-fitp-v3.mjs | tee virginia-fitp-v3.log
+      - name: Publish Virginia FITP v3 discovery
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add virginia-fitp-final.json virginia-fitp-candidates.json virginia-fitp-discovery-log.json virginia-fitp-v3.log || true
+          git commit -m 'Run Virginia FITP v3 discovery without expected count' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
