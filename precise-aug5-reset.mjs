@@ -11,13 +11,13 @@ const {stdout}=await exec('git',['show',`${BASE_SHA}:data.json`],{maxBuffer:50*1
 const base=JSON.parse(stdout);
 function isNextGenBrallo(m){return m.competitionId===BRALLO && /JUNIOR NEXT GEN/i.test(String(m.tournamentName||''));}
 function isBrallo(m){return m.competitionId===BRALLO || /BRALLO/i.test(String(m.tournamentName||''));}
-function isDouble(m){return /doppio/i.test(`${m.eventType||''} ${m.draw||''} ${m.category||''} ${m.round||''}`)||!!m.partner;}
-function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();}
+function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();}
+function isDouble(m){const txt=norm(`${m.eventType||''} ${m.draw||''} ${m.category||''} ${m.round||''}`); const p=norm(m.partner), name=norm(m.playerName); return txt.includes('DOPPIO') || (!!p && p!==name && p.includes('/'));}
 function clearToday(m,reason){if(m.date===DATE) delete m.date; delete m.time; delete m.todayAgendaSource; delete m.orderOfPlayFile; delete m.orderOfPlayLine; m.orderOfPlayCheckedAt=now; if(reason) m.cancellationReason=reason; if(m.result) m.status='completed';}
 function setToday(m,time,line){m.date=DATE;m.time=time;m.status='scheduled';m.todayAgendaSource='manual-user-confirmed-aug5-precise';m.orderOfPlayFile='oraridigioco_20260805.pdf';m.orderOfPlayLine=line;m.orderOfPlayCheckedAt=now; delete m.cancellationReason;}
 const rebuilt=[];let removed=0, restored=0;
 for(const m of current.matches||[]){if(isBrallo(m)) removed++; else rebuilt.push(m);}
-for(const b of base.matches||[]){if(isBrallo(b)){rebuilt.push({...b}); restored++;}}
+for(const b of base.matches||[]){if(isBrallo(b)){const m={...b}; if(m.todayAgendaSource==='active-brallo-fitp'){delete m.todayAgendaSource; if(m.date===DATE) delete m.date;} rebuilt.push(m); restored++;}}
 current.matches=rebuilt;
 const counters={puccioRemoved:0,ghislotti:0,cereghini:0,zennaro:0,vitali:0,gelli:0,paganini:0};
 for(const m of current.matches||[]){
