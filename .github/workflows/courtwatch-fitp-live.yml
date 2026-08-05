@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['fitp-brallo-agenda.mjs','puc-entries-fast.mjs','puc-results.mjs','puc-opponent-meta.mjs','player-memberships.mjs','courtwatch-finalize.mjs','players.json','former-players.json','.github/workflows/courtwatch-fitp-live.yml']
+    paths: ['today-agenda.mjs','fitp-brallo-trigger.json','fitp-brallo-agenda.mjs','puc-entries-fast.mjs','puc-results.mjs','puc-opponent-meta.mjs','player-memberships.mjs','courtwatch-finalize.mjs','courtwatch-audit.mjs','players.json','former-players.json','.github/workflows/courtwatch-fitp-live.yml']
   schedule:
     - cron: '*/5 * * * *'
 permissions: {contents: write}
@@ -27,13 +27,15 @@ jobs:
           timeout 180 node run-with-former.mjs puc-opponent-meta.mjs >> fitp-live.log 2>&1; CLUBS=$?
           timeout 180 node player-memberships.mjs >> fitp-live.log 2>&1; MEMBERS=$?
           timeout 90 node run-with-former.mjs courtwatch-finalize.mjs >> fitp-live.log 2>&1; FINALIZE=$?
-          node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync('data.json','utf8'));fs.writeFileSync('fitp-live-heartbeat.json',JSON.stringify({at:new Date().toISOString(),fitp:process.argv[1],brallo:process.argv[2],results:process.argv[3],clubs:process.argv[4],memberships:process.argv[5],finalize:process.argv[6],matches:(d.matches||[]).length,bralloAgenda:d.bralloAgendaSync||null,fitpTournaments:(d.tournaments||[]).filter(t=>t.sourceId==='fitp-puc').length},null,2)+'\n')" "$FITP" "$BRALLO" "$RESULTS" "$CLUBS" "$MEMBERS" "$FINALIZE"
+          timeout 30 node today-agenda.mjs >> fitp-live.log 2>&1; TODAY=$?
+          timeout 30 node courtwatch-audit.mjs >> fitp-live.log 2>&1; AUDIT=$?
+          node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync('data.json','utf8'));fs.writeFileSync('fitp-live-heartbeat.json',JSON.stringify({at:new Date().toISOString(),fitp:process.argv[1],brallo:process.argv[2],results:process.argv[3],clubs:process.argv[4],memberships:process.argv[5],finalize:process.argv[6],today:process.argv[7],audit:process.argv[8],matches:(d.matches||[]).length,todayAgenda:d.todayAgendaSync||null,bralloAgenda:d.bralloAgendaSync||null,fitpTournaments:(d.tournaments||[]).filter(t=>t.sourceId==='fitp-puc').length},null,2)+'\n')" "$FITP" "$BRALLO" "$RESULTS" "$CLUBS" "$MEMBERS" "$FINALIZE" "$TODAY" "$AUDIT"
           exit 0
       - name: Publish FITP live data
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add data.json players.json former-players.json alerts.json puc-entries.json puc-results.json puc-opponent-clubs.json player-memberships.json brallo-agenda.json fitp-live-heartbeat.json fitp-live.log
+          git add data.json players.json former-players.json alerts.json puc-entries.json puc-results.json puc-opponent-clubs.json player-memberships.json brallo-agenda.json today-agenda.json courtwatch-data-audit.json fitp-live-heartbeat.json fitp-live.log
           git commit -m 'Update Court Watch FITP live data' || exit 0
           git pull --rebase origin main || true
           git push origin HEAD:main || true
