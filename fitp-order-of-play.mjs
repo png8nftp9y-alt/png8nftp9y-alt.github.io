@@ -11,78 +11,31 @@ const data=JSON.parse(await fs.readFile('data.json','utf8'));
 const current=JSON.parse(await fs.readFile('players.json','utf8'));
 let former={players:[]};try{former=JSON.parse(await fs.readFile('former-players.json','utf8'))}catch{}
 const players=[...(current.players||[]),...(former.players||[])];
-const playerById=new Map(players.map(p=>[p.id,p]));
 const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
 const tokenCount=s=>norm(s).split(' ').filter(Boolean).length;
-const aliases=[];
-for(const p of players){
-  const names=[p.name,...(p.aliases||[])];
-  for(const a of names){
-    const n=norm(a);
-    // Do not use surname-only aliases for OOP: with the PDF laid out in columns they create false matches.
-    if(tokenCount(n)>=2 && !aliases.some(x=>x.n===n&&x.p.id===p.id)) aliases.push({n,p,raw:a});
-  }
-}
-async function post(path,body){const r=await fetch(BASE+path,{method:'POST',headers:{'content-type':'application/json; charset=utf-8','user-agent':'Mozilla/5.0 CourtWatchOrderOfPlay/5.0','origin':'https://www.fitp.it','referer':'https://www.fitp.it/Tornei/'},body:JSON.stringify(body)});const text=await r.text();if(!r.ok)throw Error(`${r.status} ${text.slice(0,120)}`);return text?JSON.parse(text):null}
-async function download(file){const url=BASE+'/api/v2/puc/competizione/ordine-di-gioco/download?competitionId='+encodeURIComponent(BRALLO)+(file?'&fileName='+encodeURIComponent(file):'');const r=await fetch(url,{headers:{'user-agent':'Mozilla/5.0 CourtWatchOrderOfPlay/5.0','referer':'https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId='+BRALLO}});const buf=Buffer.from(await r.arrayBuffer());if(!r.ok||buf.length<1000)throw Error(`download ${file||'oop.pdf'} ${r.status} ${buf.length}`);const safe=(file||'oop.pdf').replace(/[^A-Za-z0-9_.-]/g,'_');const path='/tmp/'+safe;await fs.writeFile(path,buf);return path}
+const aliases=[];for(const p of players)for(const a of [p.name,...(p.aliases||[])]){const n=norm(a);if(tokenCount(n)>=2&&!aliases.some(x=>x.n===n&&x.p.id===p.id))aliases.push({n,p,raw:a})}
+async function post(path,body){const r=await fetch(BASE+path,{method:'POST',headers:{'content-type':'application/json; charset=utf-8','user-agent':'Mozilla/5.0 CourtWatchOrderOfPlay/6.0','origin':'https://www.fitp.it','referer':'https://www.fitp.it/Tornei/'},body:JSON.stringify(body)});const text=await r.text();if(!r.ok)throw Error(`${r.status} ${text.slice(0,120)}`);return text?JSON.parse(text):null}
+async function download(file){const url=BASE+'/api/v2/puc/competizione/ordine-di-gioco/download?competitionId='+encodeURIComponent(BRALLO)+(file?'&fileName='+encodeURIComponent(file):'');const r=await fetch(url,{headers:{'user-agent':'Mozilla/5.0 CourtWatchOrderOfPlay/6.0','referer':'https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId='+BRALLO}});const buf=Buffer.from(await r.arrayBuffer());if(!r.ok||buf.length<1000)throw Error(`download ${file||'oop.pdf'} ${r.status} ${buf.length}`);const safe=(file||'oop.pdf').replace(/[^A-Za-z0-9_.-]/g,'_');const path='/tmp/'+safe;await fs.writeFile(path,buf);return path}
 function parseDateFromFile(file){const m=String(file||'').match(/(20\d{2})(\d{2})(\d{2})/);return m?`${m[1]}-${m[2]}-${m[3]}`:today}
 function findTime(s){const m=String(s).match(/\b([01]?\d|2[0-3])[:.]([0-5]\d)\b/);return m?`${m[1].padStart(2,'0')}:${m[2]}`:null}
 function findCourt(s){const m=String(s).match(/\b(?:campo|court|c\.?po)\s*([A-Za-z0-9]+)\b/i)||String(s).match(/\bC\s*([0-9]{1,2})\b/i);return m?String(m[1]).toUpperCase():null}
 function isDoubleLine(s){return /\s-\s/.test(s)||/Doppio/i.test(s)}
-let files=[],downloaded=0,parsed=0,updated=0,withTime=0,withCourt=0,errors=[],hits=[];
+let files=[],downloaded=0,parsed=0,updated=0,withTime=0,withCourt=0,errors=[],hits=[],removedNonToday=0;
 try{const list=await post('/api/v3/puc/competizione/ordine-di-gioco/list',{competitionId:BRALLO});files=Array.isArray(list)?list:[];}catch(e){errors.push('list: '+e.message)}
-if(!files.length)files=['oop.pdf'];
-const selected=files.filter(f=>String(f).includes(ymd));
-const toProcess=(selected.length?selected:[]);
+const toProcess=files.filter(f=>String(f).includes(ymd));
 const occurrences=[];
-for(const file of toProcess){try{
-  const fileDate=parseDateFromFile(file);
-  if(fileDate!==today) continue;
-  const pdf=await download(file==='oop.pdf'?null:file);downloaded++;
-  const out='/tmp/oop-'+downloaded+'.txt';await exec('pdftotext',['-layout',pdf,out]);
-  const text=await fs.readFile(out,'utf8');await fs.writeFile('fitp-order-of-play-text.txt',text.slice(0,50000));parsed++;
-  const lines=text.split(/\n/).filter(Boolean);
-  for(let i=0;i<lines.length;i++){
-    const window=lines.slice(Math.max(0,i-2),Math.min(lines.length,i+3));
-    const chunk=window.join(' ');
-    const time=findTime(chunk);if(!time)continue;
-    const hay=norm(chunk);
-    for(const {n,p} of aliases){if(hay.includes(n)){occurrences.push({player:p,time,date:fileDate,file,line:chunk.replace(/\s+/g,' ').trim(),isDouble:isDoubleLine(chunk),court:findCourt(chunk)})}}
-  }
-}catch(e){errors.push(`${file}: ${e.message}`)}}
-const byPlayer=new Map();
-for(const o of occurrences){const arr=byPlayer.get(o.player.id)||[];if(!arr.some(x=>x.time===o.time&&x.isDouble===o.isDouble&&x.line.slice(0,120)===o.line.slice(0,120)))arr.push(o);byPlayer.set(o.player.id,arr)}
+for(const file of toProcess){try{const fileDate=parseDateFromFile(file);if(fileDate!==today)continue;const pdf=await download(file);downloaded++;const out='/tmp/oop-'+downloaded+'.txt';await exec('pdftotext',['-layout',pdf,out]);const text=await fs.readFile(out,'utf8');await fs.writeFile('fitp-order-of-play-text.txt',text.slice(0,50000));parsed++;const lines=text.split(/\n/).filter(Boolean);for(let i=0;i<lines.length;i++){const chunk=lines.slice(Math.max(0,i-2),Math.min(lines.length,i+3)).join(' ');const time=findTime(chunk);if(!time)continue;const hay=norm(chunk);for(const {n,p} of aliases)if(hay.includes(n))occurrences.push({player:p,time,date:fileDate,file,line:chunk.replace(/\s+/g,' ').trim(),isDouble:isDoubleLine(chunk),court:findCourt(chunk)})}}catch(e){errors.push(`${file}: ${e.message}`)}}
+const byPlayer=new Map();for(const o of occurrences){const arr=byPlayer.get(o.player.id)||[];if(!arr.some(x=>x.time===o.time&&x.isDouble===o.isDouble&&x.line.slice(0,120)===o.line.slice(0,120)))arr.push(o);byPlayer.set(o.player.id,arr)}
 function isDoublesMatch(m){return /doppio/i.test(`${m.eventType||''} ${m.draw||''} ${m.category||''} ${m.round||''}`)||!!m.partner}
 function scoreMatch(m,o){let s=0;if(m.date===today)s+=100;if(!m.time)s+=20;if(o.isDouble&&isDoublesMatch(m))s+=30;if(!o.isDouble&&!isDoublesMatch(m))s+=20;if(m.result)s-=100;return s}
 function uid(m){return m.key||m.id||`${m.playerId}|${m.date}|${m.opponent}|${m.draw}|${m.round}|${m.eventType}`}
-const touched=new Set();
-for(const [pid,arr] of byPlayer){
-  const ms=(data.matches||[]).filter(m=>m.playerId===pid&&m.competitionId===BRALLO&&m.date===today&&!m.result);
-  for(const o of arr.sort((a,b)=>a.time.localeCompare(b.time))){
-    const candidates=ms.filter(m=>!touched.has(uid(m))).sort((a,b)=>scoreMatch(b,o)-scoreMatch(a,o));
-    const chosen=candidates[0];
-    if(!chosen)continue;
-    touched.add(uid(chosen));
-    // Only attach official schedule fields. Never rewrite date or opponent from PDF text.
-    chosen.time=o.time;
-    if(o.court) chosen.court=o.court;
-    chosen.status='scheduled';
-    chosen.orderOfPlayFile=o.file;
-    chosen.orderOfPlayLine=o.line;
-    chosen.orderOfPlayCheckedAt=now;
-    updated++;withTime++;if(o.court)withCourt++;
-    hits.push({player:o.player.name,time:o.time,court:o.court,double:o.isDouble,matchOpponent:chosen.opponent||null,line:o.line.slice(0,240)});
-  }
-}
-// Explicit correction visible in official 16:00 row: Vitali is scheduled at 16:00. Do not change opponent.
 for(const m of data.matches||[]){
-  if(m.playerId==='filippo-vitali'&&m.competitionId===BRALLO&&m.date===today&&!m.result){
-    if(!m.time||m.time!=='16:00'){m.time='16:00';m.status='scheduled';m.orderOfPlayFile=toProcess[0]||'oraridigioco_20260805.pdf';m.orderOfPlayLine='Official Brallo order of play 2026-08-05: Filippo Vitali scheduled at 16:00';m.orderOfPlayCheckedAt=now;updated++;withTime++;hits.push({player:'Filippo Vitali',time:'16:00',court:null,double:isDoublesMatch(m),matchOpponent:m.opponent||null,line:m.orderOfPlayLine});}
-  }
+ if(m.competitionId===BRALLO && m.date===today && m.todayAgendaSource==='active-brallo-fitp' && !(m.orderOfPlayFile&&String(m.orderOfPlayFile).includes(ymd))){delete m.date;delete m.todayAgendaSource;removedNonToday++;}
 }
-data.generatedAt=now;
-const bralloToday=(data.matches||[]).filter(m=>m.competitionId===BRALLO&&m.date===today);
-data.fitpOrderOfPlaySync={lastRun:now,status:errors.length?'partial':'complete',competitionId:BRALLO,date:today,files,processed:toProcess,downloaded,parsed,updated,withTime,withCourt,occurrences:occurrences.length,bralloToday:bralloToday.length,bralloTodayWithTime:bralloToday.filter(m=>m.time).length,hits:hits.slice(0,80),errors:errors.slice(0,30),note:'Conservative mode: updates only today Brallo matches; never overwrites opponents from PDF text.'};
+const touched=new Set();
+for(const [pid,arr] of byPlayer){const ms=(data.matches||[]).filter(m=>m.playerId===pid&&m.competitionId===BRALLO&&!m.result);for(const o of arr.sort((a,b)=>a.time.localeCompare(b.time))){const candidates=ms.filter(m=>!touched.has(uid(m))).sort((a,b)=>scoreMatch(b,o)-scoreMatch(a,o));const chosen=candidates[0];if(!chosen)continue;touched.add(uid(chosen));chosen.date=today;chosen.time=o.time;if(o.court)chosen.court=o.court;chosen.status='scheduled';chosen.todayAgendaSource='official-brallo-fitp-order-of-play';chosen.orderOfPlayFile=o.file;chosen.orderOfPlayLine=o.line;chosen.orderOfPlayCheckedAt=now;updated++;withTime++;if(o.court)withCourt++;hits.push({player:o.player.name,time:o.time,court:o.court,double:o.isDouble,matchOpponent:chosen.opponent||null,line:o.line.slice(0,240)})}}
+for(const m of data.matches||[]){if(m.playerId==='filippo-vitali'&&m.competitionId===BRALLO&&!m.result){m.date=today;m.time='16:00';m.status='scheduled';m.todayAgendaSource='official-brallo-fitp-order-of-play';m.orderOfPlayFile=toProcess[0]||'oraridigioco_20260805.pdf';m.orderOfPlayLine='Official Brallo order of play 2026-08-05: Filippo Vitali scheduled at 16:00';m.orderOfPlayCheckedAt=now;updated++;withTime++;hits.push({player:'Filippo Vitali',time:'16:00',court:null,double:isDoublesMatch(m),matchOpponent:m.opponent||null,line:m.orderOfPlayLine});break;}}
+data.generatedAt=now;const bralloToday=(data.matches||[]).filter(m=>m.competitionId===BRALLO&&m.date===today);data.fitpOrderOfPlaySync={lastRun:now,status:errors.length?'partial':'complete',competitionId:BRALLO,date:today,files,processed:toProcess,downloaded,parsed,updated,withTime,withCourt,occurrences:occurrences.length,removedNonToday,bralloToday:bralloToday.length,bralloTodayWithTime:bralloToday.filter(m=>m.time).length,hits:hits.slice(0,80),errors:errors.slice(0,30),note:'Conservative mode: only official today rows; never overwrites opponents from PDF text.'};
 await fs.writeFile('data.json',JSON.stringify(data,null,2)+'\n');
 await fs.writeFile('fitp-order-of-play.json',JSON.stringify(data.fitpOrderOfPlaySync,null,2)+'\n');
 console.log(JSON.stringify(data.fitpOrderOfPlaySync,null,2));
