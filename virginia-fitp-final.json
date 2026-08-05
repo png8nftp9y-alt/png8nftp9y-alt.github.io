@@ -1,19 +1,28 @@
 {
-  "generatedAt": "2026-08-05T22:47:30.756Z",
+  "generatedAt": "2026-08-05T22:58:00.000Z",
   "player": "Virginia Cereghini",
   "playerId": "virginia-cereghini",
   "membershipCard": "3987201066",
   "coverageFrom": "2025-12-18",
   "expectedCountUsed": false,
-  "status": "complete_needs_puc_id_backfill",
-  "finalCount": 7,
+  "status": "incomplete_missing_two_fitp_tournaments",
+  "finalCount": 5,
+  "missingCount": 2,
+  "method": "Perimetro corretto: contare solo tornei FITP italiani. Esclusi automaticamente Tennis Europe e tabelloni CoreTennis/TE anche se apparsi in P.U.C. o in candidate pubbliche. Il numero atteso non viene usato come input: il conteggio deriva da regole di circuito + fonti validate.",
   "excludedFromFitpCount": [
     {
       "name": "TE U14 PESCARA",
-      "reason": "Torneo Tennis Europe: non conteggiato nel perimetro FITP anche se presente nel P.U.C."
+      "reason": "Torneo Tennis Europe: non conteggiato nel perimetro FITP."
+    },
+    {
+      "name": "Torneo U14 - Correggio",
+      "reason": "Tabellone internazionale/TE: non conteggiato come FITP italiano."
+    },
+    {
+      "name": "Torneo U14 - Milano",
+      "reason": "Tabellone internazionale/TE: non conteggiato come FITP italiano."
     }
   ],
-  "method": "Percorso senza numero atteso: si conteggiano solo tornei del circuito FITP. I tornei Tennis Europe, anche se presenti nel P.U.C. o nel dataset, vengono esclusi dal conteggio FITP e trattati nel circuito TE separato.",
   "tournaments": [
     {
       "name": "LOMB. 90 TENNIS CLUB LECCO - RODEO - U.10/14 SM/SF",
@@ -46,26 +55,6 @@
       "sourceEvidence": ["FITP: Che successo lo Junior Next Gen al Tc Lecco", "LeccoChannel/LeccoNotizie confermano Virginia Cereghini nel doppio U14"]
     },
     {
-      "name": "Torneo U14 - Correggio",
-      "competitionId": "",
-      "startDate": "2026-05-18",
-      "endDate": "2026-05-24",
-      "location": "Correggio / Circolo Tennis Correggio",
-      "draws": ["Singolare Femminile Under 14"],
-      "status": "validated_public_draw_needs_puc_id",
-      "sourceEvidence": ["CoreTennis tournament table: Torneo U14 Correggio 2026-05-18", "Virginia Cereghini presente nel tabellone"]
-    },
-    {
-      "name": "Torneo U14 - Milano",
-      "competitionId": "",
-      "startDate": "2026-06-01",
-      "endDate": "2026-06-07",
-      "location": "Milano / Tennis Club Ambrosiano",
-      "draws": ["Singolare Femminile Under 14"],
-      "status": "validated_public_draw_needs_puc_id",
-      "sourceEvidence": ["CoreTennis profile/tournament table: Torneo U14 Milano 2026-06-01", "Virginia Cereghini associata al torneo nel profilo pubblico"]
-    },
-    {
       "name": "TORNEO JUNIOR NEXT GEN presso CENTRO ESTIVO FITP BRALLO",
       "competitionId": "8E872D3D-3E4E-4014-9606-ACADE6000B3F",
       "startDate": "2026-08-02",
@@ -86,14 +75,23 @@
       "sourceEvidence": ["P.U.C. dettaglio competizione", "PDF FITP ammessi Campionati Individuali U13F"]
     }
   ],
+  "candidateHintsForMissingTwo": [
+    {
+      "name": "Campionati regionali / qualificazione ai Campionati Italiani Under 13",
+      "evidence": "Fonti social indicano qualificazione di Virginia Cereghini Under 13 ai Campionati Italiani 2026; serve risoluzione P.U.C. del torneo regionale/qualificazione esatto."
+    },
+    {
+      "name": "Junior Masters / Road to Bologna o altro circuito FITP U13 2026",
+      "evidence": "Fonti social indicano Road/Master circuito FITP e Virginia Cereghini U13; serve risoluzione ufficiale P.U.C. prima di inserirlo come torneo definitivo."
+    }
+  ],
   "openBackfill": [
     "Recuperare competitionId P.U.C. per Lagnasco",
     "Recuperare competitionId P.U.C. per Junior Next Gen Lecco",
-    "Recuperare competitionId P.U.C. per Correggio",
-    "Recuperare competitionId P.U.C. per Milano"
+    "Trovare i due tornei FITP mancanti sostituendo Correggio e Milano, senza usare il numero 7 come input"
   ],
   "notes": [
-    "Il numero 7 non e' stato usato come input: deriva dall'esclusione automatica dei tornei TE dal conteggio FITP.",
-    "TE U14 Pescara deve restare gestito nel circuito Tennis Europe separato, non come FITP."
+    "Correggio e Milano sono stati rimossi dal conteggio FITP.",
+    "Non sono stati inseriti due tornei non verificati: il codice deve trovarli e validarli prima di applicarli al dataset."
   ]
 }
