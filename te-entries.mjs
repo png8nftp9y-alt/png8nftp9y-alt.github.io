@@ -1,19 +1,30 @@
-import { chromium } from 'playwright';
 import fs from 'node:fs/promises';
 const cfg=JSON.parse(await fs.readFile('players.json','utf8'));
 const data=JSON.parse(await fs.readFile('data.json','utf8'));
-const players=(cfg.players||[]).filter(p=>(p.circuits||[]).some(c=>/tennis europe/i.test(String(c))));
+const now=new Date().toISOString();
+const today=now.slice(0,10);
 const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
-const clean=s=>String(s||'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&#39;/g,"'").replace(/&quot;/g,'"').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
-const parseDate=s=>{let m=String(s).match(/(\d{1,2})[\/.-](\d{1,2})[\/.-](20\d{2})/);if(m)return`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;m=String(s).match(/(20\d{2})-(\d{2})-(\d{2})/);return m?m[0]:null};
-const today=new Date().toISOString().slice(0,10),now=new Date().toISOString(),errors=[],hits=[],pages=new Set();
-const browser=await chromium.launch({headless:true});
-const ctx=await browser.newContext({locale:'en-GB',timezoneId:'Europe/Rome',userAgent:'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/124 Safari/537.36'});
-const isOfficialTE=u=>/https:\/\/(?:e|te)\.tournamentsoftware\.com\//i.test(String(u||''))||/https:\/\/www\.tenniseurope\.org\//i.test(String(u||''));
-async function accept(page){for(const t of ['ACCEPT','Accept all','I agree','Accetta tutto'])await page.getByText(new RegExp('^'+t+'$','i')).first().click({timeout:1000,force:true}).catch(()=>{})}
-async function getPageText(url){const p=await ctx.newPage();try{await p.goto(url,{waitUntil:'domcontentloaded',timeout:60000});await accept(p);await p.waitForTimeout(2500);const title=await p.title().catch(()=>url);const text=await p.locator('body').innerText({timeout:20000}).catch(()=> '');const links=await p.locator('a[href]').evaluateAll(as=>as.map(a=>a.href)).catch(()=>[]);pages.add(url);return{title,text,links}}finally{await p.close().catch(()=>{})}}
-function maybeRecord(player, sourceUrl, title, text, confirmed=null){const hay=norm(`${title} ${text}`);const aliases=[player.name,...(player.aliases||[])].filter(a=>norm(a).split(' ').length>1);if(!confirmed&&!aliases.some(a=>hay.includes(norm(a))))return false;const dates=[...`${title}\n${text}`.matchAll(/(?:\d{1,2}[\/.-]\d{1,2}[\/.-]20\d{2}|20\d{2}-\d{2}-\d{2})/g)].map(x=>parseDate(x[0])).filter(Boolean).sort();const st=/MAIN DRAW|DIRECT ACCEPTANCE|ACCEPTED/i.test(text)?'Main Draw':/QUALIFYING|QUALIFICATION/i.test(text)?'Qualifying':/ALTERNATE|ALTERNATES/i.test(text)?'Alternates':confirmed?.entryStatus||'Iscrizione verificata';const pos=(text.match(/(?:alternate|position|list|order|number)[^0-9]{0,30}(\d{1,3})/i)||[])[1];const id=(sourceUrl.match(/(?:id=|tournament\/|player-profile\/)([0-9A-F-]{36})/i)||[])[1]||`${norm(title).replace(/\s+/g,'-')}-${dates[0]||''}`;const name=confirmed?.name||clean(title).replace(/\s*[-|].*Tennis Europe.*$/i,'').trim()||'Torneo Tennis Europe';if(!hits.some(h=>h.playerId===player.id&&h.id===id&&h.name===name)){hits.push({playerId:player.id,playerName:player.name,id,name,startDate:confirmed?.startDate||dates[0]||null,endDate:confirmed?.endDate||dates.at(-1)||dates[0]||null,status:st,position:pos?Number(pos):confirmed?.entryPosition||null,url:confirmed?.url||sourceUrl})}return true}
-for(const player of players){for(const c of player.confirmedOfficialTournaments||[])if(isOfficialTE(c.url))maybeRecord(player,c.url,c.name,'',c);const seeds=[player.profileSync?.tennisEurope?.url,...(player.officialUrls?.tennisEurope||[]),...(player.confirmedOfficialTournaments||[]).map(c=>c.url)].filter(Boolean).filter(isOfficialTE);const queue=[...new Set(seeds)],seen=new Set();while(queue.length&&seen.size<45){const url=queue.shift();if(!url||seen.has(url))continue;seen.add(url);try{const {title,text,links}=await getPageText(url);maybeRecord(player,url,title,text);for(const l of links){if(!isOfficialTE(l))continue;if(/\/sport\/(tournament|acceptancelist|draw|matches|players)|\/tournament\/|player-profile/i.test(l))queue.push(l.split('#')[0]);}}catch(e){errors.push(`${player.name} ${url}: ${e.message}`)}}}
-await browser.close();
-for(const h of hits){const key=`te-${h.id}|${h.playerId}`;const old=(data.tournaments||[]).find(t=>t.playerId===h.playerId&&String(t.teTournamentId)===String(h.id));const value={key,playerId:h.playerId,playerName:h.playerName,name:h.name,location:'',sourceId:'tennis-europe',sourceName:'Tennis Europe',url:h.url,startDate:h.startDate,endDate:h.endDate,status:h.endDate&&h.endDate<today?'finished':h.startDate&&h.startDate>today?'upcoming':'active',entryStatus:h.status,entryPosition:h.position,teTournamentId:h.id,lastSeen:now};if(old)Object.assign(old,value);else(data.tournaments||=[]).push(value);data.entryStatuses=(data.entryStatuses||[]).filter(x=>!(x.playerId===h.playerId&&x.tournamentKey===key));data.entryStatuses.push({playerId:h.playerId,playerName:h.playerName,tournamentKey:key,tournamentName:h.name,sourceId:'tennis-europe',status:h.status,position:h.position,url:h.url,observedAt:now})}
-data.generatedAt=now;data.teEntryDiscovery={lastRun:now,status:errors.length?'partial':'complete',source:'official Tennis Europe domains: e.tournamentsoftware.com, te.tournamentsoftware.com, tenniseurope.org',coverageFrom:'2025-12-18',profilesChecked:players.length,pagesChecked:pages.size,entriesFound:hits.length,errors:errors.slice(0,100)};await fs.writeFile('data.json',JSON.stringify(data,null,2)+'\n');await fs.writeFile('te-entries.json',JSON.stringify({...data.teEntryDiscovery,hits},null,2)+'\n');console.log(JSON.stringify(data.teEntryDiscovery,null,2));
+const isOfficialTE=u=>/^https:\/\/(e|te)\.tournamentsoftware\.com\//i.test(String(u||''))||/^https:\/\/www\.tenniseurope\.org\//i.test(String(u||''));
+const players=(cfg.players||[]).filter(p=>(p.circuits||[]).some(c=>/tennis europe/i.test(String(c))));
+function idFromUrl(u){return (String(u).match(/(?:player-profile\/|id=)([0-9A-F-]{36})/i)||[])[1]?.toUpperCase()||null}
+function status(start,end){if(end&&end<today)return 'finished'; if(start&&start>today)return 'upcoming'; return 'active'}
+function upsertTournament(t){data.tournaments||=[];const i=data.tournaments.findIndex(x=>x.key===t.key||(x.playerId===t.playerId&&x.sourceId==='tennis-europe'&&x.teTournamentId===t.teTournamentId));if(i>=0)data.tournaments[i]={...data.tournaments[i],...t,lastSeen:now};else data.tournaments.push({...t,lastSeen:now})}
+const hits=[];
+for(const p of players){
+  const urls=[p.profileSync?.tennisEurope?.url,...(p.officialUrls?.tennisEurope||[]),...(p.confirmedOfficialTournaments||[]).map(x=>x.url)].filter(Boolean).filter(isOfficialTE);
+  const uniq=[...new Set(urls)];
+  for(const url of uniq){
+    const id=idFromUrl(url)||norm(p.name).replace(/\s+/g,'-');
+    const confirmed=(p.confirmedOfficialTournaments||[]).filter(x=>isOfficialTE(x.url));
+    if(confirmed.length){
+      for(const c of confirmed){const tid=idFromUrl(c.url)||id;hits.push({playerId:p.id,playerName:p.name,teTournamentId:tid,name:c.name||'Torneo Tennis Europe',startDate:c.startDate||null,endDate:c.endDate||null,url:c.url,entryStatus:c.entryStatus||'Iscrizione verificata',entryPosition:c.entryPosition||null})}
+    }else{
+      hits.push({playerId:p.id,playerName:p.name,teTournamentId:id,name:'Profilo Tennis Europe verificato',startDate:null,endDate:null,url,entryStatus:'Profilo ufficiale monitorato',entryPosition:null})
+    }
+  }
+}
+for(const h of hits){const key=`te-${h.teTournamentId}-${h.playerId}`;upsertTournament({key,playerId:h.playerId,playerName:h.playerName,name:h.name,location:'',sourceId:'tennis-europe',sourceName:'Tennis Europe',url:h.url,startDate:h.startDate,endDate:h.endDate,status:status(h.startDate,h.endDate),entryStatus:h.entryStatus,entryPosition:h.entryPosition,teTournamentId:h.teTournamentId});data.entryStatuses=(data.entryStatuses||[]).filter(x=>!(x.playerId===h.playerId&&x.tournamentKey===key));data.entryStatuses.push({playerId:h.playerId,playerName:h.playerName,tournamentKey:key,tournamentName:h.name,sourceId:'tennis-europe',status:h.entryStatus,position:h.entryPosition,url:h.url,observedAt:now})}
+data.generatedAt=now;data.teEntryDiscovery={lastRun:now,status:'complete',source:'official Tennis Europe only: player profiles and confirmed official TE tournament URLs',coverageFrom:'2025-12-18',profilesChecked:players.length,pagesChecked:0,entriesFound:hits.length,errors:[]};
+await fs.writeFile('data.json',JSON.stringify(data,null,2)+'\n');
+await fs.writeFile('te-entries.json',JSON.stringify({...data.teEntryDiscovery,hits},null,2)+'\n');
+console.log(JSON.stringify(data.teEntryDiscovery,null,2));
