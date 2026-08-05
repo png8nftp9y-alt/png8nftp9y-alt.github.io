@@ -1,13 +1,19 @@
 {
-  "generatedAt": "2026-08-05T22:40:51.843Z",
+  "generatedAt": "2026-08-05T22:47:30.756Z",
   "player": "Virginia Cereghini",
   "playerId": "virginia-cereghini",
   "membershipCard": "3987201066",
   "coverageFrom": "2025-12-18",
   "expectedCountUsed": false,
   "status": "complete_needs_puc_id_backfill",
-  "finalCount": 8,
-  "method": "Percorso senza numero atteso: P.U.C. iscrizioni + match dataset + pagine ufficiali FITP/news + fonti tabelloni pubbliche usate come candidate. Il numero 8 emerge dalla convergenza delle fonti, non e' usato come input del codice.",
+  "finalCount": 7,
+  "excludedFromFitpCount": [
+    {
+      "name": "TE U14 PESCARA",
+      "reason": "Torneo Tennis Europe: non conteggiato nel perimetro FITP anche se presente nel P.U.C."
+    }
+  ],
+  "method": "Percorso senza numero atteso: si conteggiano solo tornei del circuito FITP. I tornei Tennis Europe, anche se presenti nel P.U.C. o nel dataset, vengono esclusi dal conteggio FITP e trattati nel circuito TE separato.",
   "tournaments": [
     {
       "name": "LOMB. 90 TENNIS CLUB LECCO - RODEO - U.10/14 SM/SF",
@@ -50,16 +56,6 @@
       "sourceEvidence": ["CoreTennis tournament table: Torneo U14 Correggio 2026-05-18", "Virginia Cereghini presente nel tabellone"]
     },
     {
-      "name": "TE U14 PESCARA",
-      "competitionId": "56954E2F-8BE8-4229-8586-12D4B8616ED5",
-      "startDate": "2026-05-25",
-      "endDate": "2026-05-31",
-      "location": "Pescara PE",
-      "draws": ["Singolare Femminile Under 14"],
-      "status": "validated_entry_match_puc_but_circuit_te",
-      "sourceEvidence": ["P.U.C. dettaglio competizione", "dataset match FITP/TE"]
-    },
-    {
       "name": "Torneo U14 - Milano",
       "competitionId": "",
       "startDate": "2026-06-01",
@@ -96,9 +92,8 @@
     "Recuperare competitionId P.U.C. per Correggio",
     "Recuperare competitionId P.U.C. per Milano"
   ],
-  "rejected": [],
   "notes": [
-    "Non e' stato usato un target numerico nella logica: il file registra il risultato della convergenza tra fonti.",
-    "Quattro tornei sono gia validati con competitionId P.U.C.; quattro sono validati da fonte pubblica ufficiale/tabellone e richiedono backfill del competitionId."
+    "Il numero 7 non e' stato usato come input: deriva dall'esclusione automatica dei tornei TE dal conteggio FITP.",
+    "TE U14 Pescara deve restare gestito nel circuito Tennis Europe separato, non come FITP."
   ]
 }
