@@ -1,0 +1,33 @@
+name: Court Watch Brallo clean rebuild
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['brallo-clean-trigger.json','rebuild-brallo-clean.mjs','.github/workflows/courtwatch-brallo-clean-rebuild.yml']
+permissions: {contents: write}
+concurrency: {group: court-watch-brallo-clean-rebuild,cancel-in-progress: true}
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Rebuild Brallo from clean baseline
+        run: |
+          set +e
+          : > brallo-clean-rebuild.log
+          timeout 90 node rebuild-brallo-clean.mjs >> brallo-clean-rebuild.log 2>&1; REBUILD=$?
+          timeout 30 node courtwatch-audit.mjs >> brallo-clean-rebuild.log 2>&1; AUDIT=$?
+          node -e "const fs=require('fs');const d=JSON.parse(fs.readFileSync('data.json','utf8'));fs.writeFileSync('brallo-clean-rebuild-heartbeat.json',JSON.stringify({at:new Date().toISOString(),rebuild:process.argv[1],audit:process.argv[2],cleanRebuild:d.bralloCleanRebuild||null,matches:(d.matches||[]).length},null,2)+'\n')" "$REBUILD" "$AUDIT"
+          exit 0
+      - name: Publish clean rebuild
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json courtwatch-data-audit.json brallo-clean-rebuild.json brallo-clean-rebuild-heartbeat.json brallo-clean-rebuild.log
+          git commit -m 'Rebuild Brallo agenda from clean baseline' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
