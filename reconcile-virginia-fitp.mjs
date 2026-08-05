@@ -1,0 +1,31 @@
+import fs from 'node:fs/promises';
+const PLAYER_ID='virginia-cereghini';
+const FROM='2025-12-18';
+const now=new Date().toISOString();
+const data=JSON.parse(await fs.readFile('data.json','utf8'));
+const players=JSON.parse(await fs.readFile('players.json','utf8')).players||[];
+const player=players.find(p=>p.id===PLAYER_ID);
+if(!player)throw new Error('Missing Virginia player');
+const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
+const iso=v=>{const s=String(v||'');let m=s.match(/^(20\d{2})-(\d{2})-(\d{2})/);if(m)return m[0];m=s.match(/(\d{1,2})\D(\d{1,2})\D(20\d{2})/);return m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:null};
+const current=(data.tournaments||[]).filter(t=>t.playerId===PLAYER_ID&&t.sourceId==='fitp-puc');
+const byId=new Map(current.map(t=>[String(t.competitionId||t.key||t.name).toUpperCase(),{...t,from:'entry'}]));
+for(const m of data.matches||[]){
+ if(m.playerId!==PLAYER_ID)continue;
+ if(m.sourceId!=='fitp-puc')continue;
+ const date=iso(m.date); if(date&&date<FROM)continue;
+ const cid=String(m.competitionId||'').toUpperCase();
+ const key=cid||norm(m.tournamentName||''); if(!key)continue;
+ const existing=byId.get(key);
+ const start=existing?.startDate||date||null;
+ const end=existing?.endDate||date||null;
+ byId.set(key,{key:`fitp-${String(cid||norm(m.tournamentName)).toLowerCase()}|${PLAYER_ID}`,playerId:PLAYER_ID,playerName:player.name,name:existing?.name||m.tournamentName||'Torneo FITP',location:existing?.location||m.location||'',sourceId:'fitp-puc',sourceName:'P.U.C. FITP',url:existing?.url||(cid?'https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId='+encodeURIComponent(cid):''),startDate:start,endDate:end,status:existing?.status||'detected-from-matches',competitionId:existing?.competitionId||cid,draws:[...new Set([...(existing?.draws||[]),m.draw].filter(Boolean))],playerRanking:existing?.playerRanking||'',membershipCard:existing?.membershipCard||player.membershipCard||'',lastSeen:now,searchScope:existing?.searchScope||'virginia-fitp-reconciled-from-matches',from:existing?.from==='entry'?'entry+match':'match'});
+}
+const reconciled=[...byId.values()].sort((a,b)=>String(a.startDate||'').localeCompare(String(b.startDate||''))||a.name.localeCompare(b.name));
+data.tournaments=(data.tournaments||[]).filter(t=>!(t.playerId===PLAYER_ID&&t.sourceId==='fitp-puc'));
+data.tournaments.push(...reconciled.map(({from,...t})=>t));
+data.generatedAt=now;
+data.virginiaFitpReconcile={lastRun:now,status:reconciled.length>=8?'complete':'incomplete',expected:8,found:reconciled.length,fromEntries:reconciled.filter(t=>t.from?.includes('entry')).length,fromMatches:reconciled.filter(t=>t.from?.includes('match')).length,tournaments:reconciled.map(t=>({name:t.name,competitionId:t.competitionId,startDate:t.startDate,endDate:t.endDate,draws:t.draws,from:t.from})),note:'Unisce tornei FITP Virginia da iscrizioni P.U.C. e partite già verificate nel dataset.'};
+await fs.writeFile('data.json',JSON.stringify(data,null,2)+'\n');
+await fs.writeFile('virginia-fitp-reconcile.json',JSON.stringify(data.virginiaFitpReconcile,null,2)+'\n');
+console.log(JSON.stringify(data.virginiaFitpReconcile,null,2));

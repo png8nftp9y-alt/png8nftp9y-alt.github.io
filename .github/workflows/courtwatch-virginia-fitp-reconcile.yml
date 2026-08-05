@@ -1,0 +1,33 @@
+name: Court Watch Virginia FITP reconcile
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['reconcile-virginia-fitp.mjs','.github/workflows/courtwatch-virginia-fitp-reconcile.yml','courtwatch-virginia-fitp-reconcile-trigger.json']
+permissions: {contents: write}
+concurrency: {group: court-watch-virginia-fitp-reconcile,cancel-in-progress: true}
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Reconcile Virginia FITP tournaments
+        run: |
+          set -e
+          node reconcile-virginia-fitp.mjs | tee virginia-fitp-reconcile.log
+          node run-with-former.mjs courtwatch-finalize.mjs >> virginia-fitp-reconcile.log 2>&1 || true
+          node courtwatch-audit.mjs >> virginia-fitp-reconcile.log 2>&1 || true
+          node src/build-courtwatch-v2.mjs >> virginia-fitp-reconcile.log 2>&1 || true
+          node src/audit-courtwatch-v2.mjs >> virginia-fitp-reconcile.log 2>&1 || true
+      - name: Publish reconciled Virginia FITP data
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add data.json virginia-fitp-reconcile.json virginia-fitp-reconcile.log courtwatch-data-audit.json dist/ || true
+          git commit -m 'Reconcile Virginia Cereghini FITP tournaments from matches' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
