@@ -1,0 +1,24 @@
+name: Court Watch verify Aug 5 corrections
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['verify-aug5-trigger.json','verify-aug5-corrections.mjs','.github/workflows/courtwatch-verify-aug5-corrections.yml']
+permissions: {contents: write}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node verify-aug5-corrections.mjs
+      - run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add verify-aug5-corrections.json
+          git commit -m 'Verify August 5 player agenda corrections' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
