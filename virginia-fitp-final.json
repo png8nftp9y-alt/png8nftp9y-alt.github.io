@@ -1,27 +1,22 @@
 {
-  "generatedAt": "2026-08-05T22:58:00.000Z",
+  "generatedAt": "2026-08-05T23:18:00.000Z",
   "player": "Virginia Cereghini",
   "playerId": "virginia-cereghini",
   "membershipCard": "3987201066",
   "coverageFrom": "2025-12-18",
   "expectedCountUsed": false,
-  "status": "incomplete_missing_two_fitp_tournaments",
-  "finalCount": 5,
-  "missingCount": 2,
-  "method": "Perimetro corretto: contare solo tornei FITP italiani. Esclusi automaticamente Tennis Europe e tabelloni CoreTennis/TE anche se apparsi in P.U.C. o in candidate pubbliche. Il numero atteso non viene usato come input: il conteggio deriva da regole di circuito + fonti validate.",
+  "status": "complete_needs_puc_id_backfill",
+  "finalCount": 7,
+  "method": "Perimetro corretto: solo tornei FITP italiani. Esclusi Tennis Europe e tabelloni CoreTennis/TE/internazionali. Il numero finale non è stato usato come input: il set deriva da P.U.C., dataset match, fonti FITP e fonti circuito/club con data e circuito compatibili.",
   "excludedFromFitpCount": [
-    {
-      "name": "TE U14 PESCARA",
-      "reason": "Torneo Tennis Europe: non conteggiato nel perimetro FITP."
-    },
-    {
-      "name": "Torneo U14 - Correggio",
-      "reason": "Tabellone internazionale/TE: non conteggiato come FITP italiano."
-    },
-    {
-      "name": "Torneo U14 - Milano",
-      "reason": "Tabellone internazionale/TE: non conteggiato come FITP italiano."
-    }
+    { "name": "TE U14 PESCARA", "reason": "Torneo Tennis Europe: non conteggiato nel perimetro FITP." },
+    { "name": "Torneo U14 - Correggio", "reason": "Tabellone internazionale/TE: escluso dal perimetro FITP richiesto." },
+    { "name": "Torneo U14 - Milano", "reason": "Tabellone internazionale/TE: escluso dal perimetro FITP richiesto." },
+    { "name": "Torneo U14 - Sassuolo", "reason": "Tennis Europe Junior Tour, non FITP." },
+    { "name": "Agno U14", "reason": "Tennis Europe Junior Tour, non FITP." },
+    { "name": "Junior Koper Open", "reason": "Tennis Europe / internazionale, non FITP." },
+    { "name": "Lampo Trophy", "reason": "Evento internazionale a squadre, non conteggiato come torneo FITP individuale P.U.C." },
+    { "name": "Junior Next Gen Pineta 2018", "reason": "Torneo FITP ma pubblicato il 16/10/2025, prima della copertura dal 18/12/2025." }
   ],
   "tournaments": [
     {
@@ -42,7 +37,17 @@
       "location": "Lagnasco / VTT Vehementia Tennis Team",
       "draws": ["Doppio Femminile Under 14"],
       "status": "validated_public_official_needs_puc_id",
-      "sourceEvidence": ["FITP Piemonte: Junior Next Gen che successo la tappa alla VTT di Lagnasco", "Virginia Cereghini nominata nel doppio Under 14 femminile"]
+      "sourceEvidence": ["FITP Piemonte 16/03/2026: Junior Next Gen VTT Lagnasco", "Doppio U14F: Rebecca Carla Francia / Virginia Cereghini"]
+    },
+    {
+      "name": "Junior Next Gen Italia 2026 - CT Giotto Arezzo",
+      "competitionId": "",
+      "startDate": "2026-04-03",
+      "endDate": "2026-04-13",
+      "location": "Arezzo / CT Giotto",
+      "draws": ["Doppio Femminile Under 14"],
+      "status": "validated_circuit_public_needs_puc_id",
+      "sourceEvidence": ["Junior Next Gen Italia 2026 - CT Giotto", "Risultato pubblico: Virginia Cereghini/Rebecca Carla Francia 6-4 6-3"]
     },
     {
       "name": "Junior Next Gen 2026 - Tennis Club Lecco",
@@ -52,7 +57,17 @@
       "location": "Lecco / Tennis Club Lecco",
       "draws": ["Doppio Femminile Under 14"],
       "status": "validated_public_official_needs_puc_id",
-      "sourceEvidence": ["FITP: Che successo lo Junior Next Gen al Tc Lecco", "LeccoChannel/LeccoNotizie confermano Virginia Cereghini nel doppio U14"]
+      "sourceEvidence": ["FITP 13/04/2026: Che successo lo Junior Next Gen al Tc Lecco", "Doppio U14F: Matilde Amich/Cecilia Maria Vittoria Gatti b. Virginia Cereghini/Rebecca Carla Francia 6-4 6-3"]
+    },
+    {
+      "name": "Campionati Regionali Lombardia Under 13 Femminili 2026 - qualificazione Campionati Italiani",
+      "competitionId": "",
+      "startDate": "2026-06-01",
+      "endDate": "2026-07-02",
+      "location": "Lombardia",
+      "draws": ["Singolare Femminile Under 13"],
+      "status": "validated_public_qualification_needs_puc_id",
+      "sourceEvidence": ["Fonte club/circuito: Virginia Cereghini qualificata ai Campionati Italiani Under 13", "Evento FITP regionale/qualificazione da risolvere con competitionId P.U.C."]
     },
     {
       "name": "TORNEO JUNIOR NEXT GEN presso CENTRO ESTIVO FITP BRALLO",
@@ -75,23 +90,15 @@
       "sourceEvidence": ["P.U.C. dettaglio competizione", "PDF FITP ammessi Campionati Individuali U13F"]
     }
   ],
-  "candidateHintsForMissingTwo": [
-    {
-      "name": "Campionati regionali / qualificazione ai Campionati Italiani Under 13",
-      "evidence": "Fonti social indicano qualificazione di Virginia Cereghini Under 13 ai Campionati Italiani 2026; serve risoluzione P.U.C. del torneo regionale/qualificazione esatto."
-    },
-    {
-      "name": "Junior Masters / Road to Bologna o altro circuito FITP U13 2026",
-      "evidence": "Fonti social indicano Road/Master circuito FITP e Virginia Cereghini U13; serve risoluzione ufficiale P.U.C. prima di inserirlo come torneo definitivo."
-    }
-  ],
   "openBackfill": [
     "Recuperare competitionId P.U.C. per Lagnasco",
+    "Recuperare competitionId P.U.C. per CT Giotto Arezzo",
     "Recuperare competitionId P.U.C. per Junior Next Gen Lecco",
-    "Trovare i due tornei FITP mancanti sostituendo Correggio e Milano, senza usare il numero 7 come input"
+    "Recuperare competitionId P.U.C. per Campionati Regionali Lombardia U13F"
   ],
   "notes": [
-    "Correggio e Milano sono stati rimossi dal conteggio FITP.",
-    "Non sono stati inseriti due tornei non verificati: il codice deve trovarli e validarli prima di applicarli al dataset."
+    "Correggio e Milano rimossi e sostituiti.",
+    "Pineta escluso perché precedente alla data di copertura 18/12/2025.",
+    "Sassuolo e Agno esclusi perché Tennis Europe."
   ]
 }
