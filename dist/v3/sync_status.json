@@ -1,7 +1,7 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-07T20:09:08.604Z",
-  "status": "orders_of_play_engine_built_from_v3_entries_and_official_agenda_sources",
+  "generatedAt": "2026-08-07T20:14:53.767Z",
+  "status": "results_engine_built_from_v3_agenda",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
@@ -16,19 +16,25 @@
     "matches": 332,
     "agenda": 40,
     "rejectedWithoutEntry": 82,
-    "timedAgenda": 1
+    "timedAgenda": 1,
+    "results": 40,
+    "completed": 25,
+    "losses": 11,
+    "opponents": 40,
+    "opponentsWithClub": 0,
+    "opponentsWithNationality": 0
   },
   "engines": {
     "entries": {
       "status": "built"
     },
     "ordersOfPlay": {
-      "status": "built",
-      "file": "src/v3/orders-of-play-engine.mjs",
-      "method": "v3 entries -> official/confirmed OOP agenda; no v1/v2 UI dependency"
+      "status": "built"
     },
     "results": {
-      "status": "pending"
+      "status": "built",
+      "file": "src/v3/results-engine.mjs",
+      "method": "v3 agenda -> results/opponents; loss color red"
     }
   },
   "warnings": [
