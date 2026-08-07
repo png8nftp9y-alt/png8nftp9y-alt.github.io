@@ -1,0 +1,38 @@
+name: Court Watch v3 results engine
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/results-engine.mjs'
+      - 'courtwatch-v3-results-trigger.json'
+      - '.github/workflows/courtwatch-v3-results.yml'
+      - 'dist/v3/agenda.json'
+      - 'dist/v3/matches.json'
+permissions: {contents: write}
+concurrency: {group: court-watch-v3-results,cancel-in-progress: true}
+jobs:
+  results:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Run independent v3 results engine
+        run: |
+          set +e
+          node src/v3/results-engine.mjs > courtwatch-v3-results-run.log 2>&1
+          code=$?
+          echo "exitCode=$code" >> courtwatch-v3-results-run.log
+          cat courtwatch-v3-results-run.log
+          exit $code
+      - name: Commit v3 results output
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/results.json dist/v3/opponents.json dist/v3/results_log.json dist/v3/sync_status.json courtwatch-v3-results-run.log .github/workflows/courtwatch-v3-results.yml
+          git commit -m "Build Court Watch v3 results data" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
