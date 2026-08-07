@@ -1,26 +1,22 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-07T21:48:03.487Z",
-  "status": "orders_of_play_engine_ex_novo_waiting_official_daily_oop",
+  "generatedAt": "2026-08-07T22:38:36.175Z",
+  "status": "entries_engine_merged_ex_novo_discoveries",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
-    "tournamentEntries": 166,
-    "tournaments": 166,
+    "tournamentEntries": 19,
+    "tournaments": 19,
     "byCircuit": {
-      "fitp": 148,
+      "fitp": 1,
       "tennis-europe": 17,
       "itf": 1
     },
-    "warnings": 0,
-    "entries": 166,
-    "matches": 0,
-    "agenda": 166,
-    "timedAgenda": 0
+    "warnings": 0
   },
   "engines": {
     "discoverFitp": {
-      "status": "complete"
+      "status": "complete_no_keyword_entry_list_draw_only"
     },
     "discoverTennisEurope": {
       "status": "seeded_pending_live_tournamentsoftware_scan"
@@ -29,12 +25,12 @@
       "status": "seeded_pending_live_itf_scan"
     },
     "entries": {
-      "status": "built"
+      "status": "built",
+      "file": "src/v3/entries-engine.mjs",
+      "method": "merge dist/v3/source_*_entries.json only; no v1/v2/data.json"
     },
     "ordersOfPlay": {
-      "status": "built",
-      "file": "src/v3/orders-of-play-engine.mjs",
-      "method": "starts only from v3 tournament_entries; no data.json and no v2"
+      "status": "pending"
     },
     "results": {
       "status": "pending"
