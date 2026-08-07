@@ -18,11 +18,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: node src/build-courtwatch-v3.mjs
-      - name: Commit v3 data
+      - name: Build v3 with diagnostics
+        run: |
+          set +e
+          node src/build-courtwatch-v3.mjs > courtwatch-v3-build.log 2>&1
+          code=$?
+          echo "exitCode=$code" >> courtwatch-v3-build.log
+          cat courtwatch-v3-build.log
+          exit 0
+      - name: Commit v3 data and diagnostics
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3
+          git add dist/v3 courtwatch-v3-build.log
           git commit -m "Build Court Watch v3 agenda-first data" || exit 0
           git push
