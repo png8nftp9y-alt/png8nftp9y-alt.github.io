@@ -1,0 +1,28 @@
+name: Court Watch v3 build
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/build-courtwatch-v3.mjs'
+      - 'courtwatch-v3-trigger.json'
+      - 'data.json'
+      - 'players.json'
+      - 'former-players.json'
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node src/build-courtwatch-v3.mjs
+      - name: Commit v3 data
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3
+          git commit -m "Build Court Watch v3 agenda-first data" || exit 0
+          git push
