@@ -1,0 +1,37 @@
+name: Court Watch v3 order of play engine
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/orders-of-play-engine.mjs'
+      - 'courtwatch-v3-oop-trigger.json'
+      - '.github/workflows/courtwatch-v3-oop.yml'
+      - 'dist/v3/tournament_entries.json'
+permissions: {contents: write}
+concurrency: {group: court-watch-v3-oop,cancel-in-progress: true}
+jobs:
+  oop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Run independent v3 OOP engine
+        run: |
+          set +e
+          node src/v3/orders-of-play-engine.mjs > courtwatch-v3-oop-run.log 2>&1
+          code=$?
+          echo "exitCode=$code" >> courtwatch-v3-oop-run.log
+          cat courtwatch-v3-oop-run.log
+          exit $code
+      - name: Commit v3 OOP output
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/matches.json dist/v3/agenda.json dist/v3/oop_log.json dist/v3/sync_status.json courtwatch-v3-oop-run.log .github/workflows/courtwatch-v3-oop.yml
+          git commit -m "Build Court Watch v3 order of play data" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
