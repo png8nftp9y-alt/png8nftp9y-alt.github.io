@@ -1,18 +1,1 @@
-{
-  "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-07T14:30:00.000Z",
-  "status": "bootstrap_online_with_fallback",
-  "principle": "players -> tournament entries -> monitored tournaments -> orders of play -> agenda -> results -> opponent metadata",
-  "files": [
-    "players.json",
-    "tournament_entries.json",
-    "tournaments.json",
-    "agenda.json",
-    "matches.json",
-    "results.json",
-    "opponents.json",
-    "sync_status.json",
-    "data.json"
-  ],
-  "note": "La UI v3 è online e usa dist/v3/data.json quando disponibile; in attesa del commit automatico del build, ricostruisce la struttura v3 dal dataset live dist/data-preview.json."
-}
+{"version":"cw-v3-agenda-first","generatedAt":"2026-08-07T17:35:00.000Z","status":"independent_bootstrap_waiting_for_build","principle":"v3 uses v1 graphics only; all data must come from dist/v3/* and v3 engines","checks":{"players":0,"tournamentEntries":0,"tournaments":0,"agenda":0,"matches":0,"results":0,"opponents":0},"engines":{"entries":"src/v3/entries-engine.mjs","ordersOfPlay":"src/v3/orders-of-play-engine.mjs","results":"src/v3/results-engine.mjs"}}
