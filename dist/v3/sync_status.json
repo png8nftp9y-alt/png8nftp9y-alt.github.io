@@ -1,0 +1,18 @@
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-07T14:30:00.000Z",
+  "status": "bootstrap_online_with_fallback",
+  "principle": "players -> tournament entries -> monitored tournaments -> orders of play -> agenda -> results -> opponent metadata",
+  "files": [
+    "players.json",
+    "tournament_entries.json",
+    "tournaments.json",
+    "agenda.json",
+    "matches.json",
+    "results.json",
+    "opponents.json",
+    "sync_status.json",
+    "data.json"
+  ],
+  "note": "La UI v3 è online e usa dist/v3/data.json quando disponibile; in attesa del commit automatico del build, ricostruisce la struttura v3 dal dataset live dist/data-preview.json."
+}
