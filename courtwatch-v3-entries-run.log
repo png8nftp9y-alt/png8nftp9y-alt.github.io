@@ -1,25 +1,23 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-07T20:03:55.291Z",
-  "status": "entries_engine_built_with_circuit_filter",
+  "generatedAt": "2026-08-07T21:12:36.762Z",
+  "status": "entries_engine_ex_novo_source_files_only",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
-    "tournamentEntries": 181,
-    "tournaments": 181,
+    "tournamentEntries": 19,
+    "tournaments": 19,
     "byCircuit": {
-      "fitp": 160,
-      "itf": 2,
-      "tennis-europe": 19
+      "tennis-europe": 18,
+      "itf": 1
     },
-    "warnings": 4,
-    "rejectedCircuitMismatch": 4
+    "warnings": 0
   },
   "engines": {
     "entries": {
       "status": "built",
       "file": "src/v3/entries-engine.mjs",
-      "method": "v3 independent entries with circuit mismatch exclusions; no v1/v2 data dependency"
+      "method": "FITP from puc-entries.json, Tennis Europe from te-entries.json, ITF from itf-sync.json; no data.json and no v2"
     },
     "ordersOfPlay": {
       "status": "pending"
@@ -28,45 +26,6 @@
       "status": "pending"
     }
   },
-  "warnings": [
-    "FITP senza P.U.C. id: Virginia Cereghini · Junior Next Gen 2026 - Vehementia Tennis Team Lagnasco",
-    "FITP senza P.U.C. id: Virginia Cereghini · Junior Next Gen Italia 2026 - CT Giotto Arezzo",
-    "FITP senza P.U.C. id: Virginia Cereghini · Junior Next Gen 2026 - Tennis Club Lecco",
-    "FITP senza P.U.C. id: Virginia Cereghini · Campionati Regionali Lombardia Under 13 Femminili 2026 - qualificazione Campionati Italiani"
-  ],
-  "rejected": [
-    {
-      "playerId": "matteo-bocchio",
-      "playerName": "Matteo Bocchio",
-      "tournamentName": "LOMB. 327  SPORTING BORGO BAGNOLO - RODEO - U.10 SM / U.14 LIM. 4.NC - 4.1 SF / U.16 LIM. 4.NC - 4.1 SM ",
-      "reason": "fitp source row classified as TE/international; excluded from v3 FITP entries",
-      "competitionId": "D964469D-EBF0-492D-8250-F7C410925C17",
-      "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=D964469D-EBF0-492D-8250-F7C410925C17"
-    },
-    {
-      "playerId": "nikola-kerkenyakov",
-      "playerName": "Nikola Nikolaev Kerkenyakov",
-      "tournamentName": "TE U14 PESCARA",
-      "reason": "fitp source row classified as TE/international; excluded from v3 FITP entries",
-      "competitionId": "56954E2F-8BE8-4229-8586-12D4B8616ED5",
-      "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=56954E2F-8BE8-4229-8586-12D4B8616ED5"
-    },
-    {
-      "playerId": "aila-zennaro",
-      "playerName": "Aila Zennaro",
-      "tournamentName": "TE U16 CREMA",
-      "reason": "fitp source row classified as TE/international; excluded from v3 FITP entries",
-      "competitionId": "7E22D231-926D-4DFE-BFF8-136B5C391F1B",
-      "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=7E22D231-926D-4DFE-BFF8-136B5C391F1B"
-    },
-    {
-      "playerId": "virginia-cereghini",
-      "playerName": "Virginia Cereghini",
-      "tournamentName": "TE U14 PESCARA",
-      "reason": "fitp source row classified as TE/international; excluded from v3 FITP entries",
-      "competitionId": "56954E2F-8BE8-4229-8586-12D4B8616ED5",
-      "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=56954E2F-8BE8-4229-8586-12D4B8616ED5"
-    }
-  ]
+  "warnings": []
 }
 exitCode=0
