@@ -1,62 +1,36 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-07T21:18:44.641Z",
-  "status": "results_engine_ex_novo_waiting_official_results",
+  "generatedAt": "2026-08-07T21:34:14.515Z",
+  "status": "entries_engine_merged_ex_novo_discoveries",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
-    "tournamentEntries": 176,
-    "tournaments": 176,
-    "byCircuit": {
-      "fitp": 35,
-      "tennis-europe": 18,
-      "itf": 1
-    },
-    "warnings": 0,
-    "rejectedCircuitMismatch": 3,
-    "entries": 54,
-    "matches": 0,
-    "agenda": 54,
-    "timedAgenda": 0,
-    "results": 54,
-    "completed": 0,
-    "losses": 0,
-    "opponents": 0,
-    "opponentsWithClub": 0,
-    "opponentsWithNationality": 0
+    "tournamentEntries": 0,
+    "tournaments": 0,
+    "byCircuit": {},
+    "warnings": 0
   },
   "engines": {
+    "discoverFitp": {
+      "status": "missing"
+    },
+    "discoverTennisEurope": {
+      "status": "missing"
+    },
+    "discoverItf": {
+      "status": "missing"
+    },
     "entries": {
-      "status": "built"
+      "status": "built",
+      "file": "src/v3/entries-engine.mjs",
+      "method": "merge dist/v3/source_*_entries.json only; no v1/v2/data.json"
     },
     "ordersOfPlay": {
-      "status": "built"
+      "status": "pending"
     },
     "results": {
-      "status": "built",
-      "file": "src/v3/results-engine.mjs",
-      "method": "starts only from v3 agenda and official result targets; no data.json and no v2"
+      "status": "pending"
     }
   },
-  "warnings": [],
-  "rejected": [
-    {
-      "player": "Virginia Cereghini",
-      "tournamentName": "TE U14 PESCARA",
-      "competitionId": "56954E2F-8BE8-4229-8586-12D4B8616ED5",
-      "reason": "excluded from FITP v3 because source row is TE/ITF/international"
-    },
-    {
-      "player": "Nikola Nikolaev Kerkenyakov",
-      "tournamentName": "TE U14 PESCARA",
-      "competitionId": "56954E2F-8BE8-4229-8586-12D4B8616ED5",
-      "reason": "excluded from FITP v3 because source row is TE/ITF/international"
-    },
-    {
-      "player": "Aila Zennaro",
-      "tournamentName": "TE U16 CREMA",
-      "competitionId": "7E22D231-926D-4DFE-BFF8-136B5C391F1B",
-      "reason": "excluded from FITP v3 because source row is TE/ITF/international"
-    }
-  ]
+  "warnings": []
 }
