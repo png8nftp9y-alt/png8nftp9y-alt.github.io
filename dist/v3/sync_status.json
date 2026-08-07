@@ -1,7 +1,7 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-07T21:16:59.807Z",
-  "status": "orders_of_play_engine_ex_novo_waiting_official_daily_oop",
+  "generatedAt": "2026-08-07T21:18:44.641Z",
+  "status": "results_engine_ex_novo_waiting_official_results",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
@@ -17,19 +17,25 @@
     "entries": 54,
     "matches": 0,
     "agenda": 54,
-    "timedAgenda": 0
+    "timedAgenda": 0,
+    "results": 54,
+    "completed": 0,
+    "losses": 0,
+    "opponents": 0,
+    "opponentsWithClub": 0,
+    "opponentsWithNationality": 0
   },
   "engines": {
     "entries": {
       "status": "built"
     },
     "ordersOfPlay": {
-      "status": "built",
-      "file": "src/v3/orders-of-play-engine.mjs",
-      "method": "starts only from v3 tournament_entries; no data.json and no v2"
+      "status": "built"
     },
     "results": {
-      "status": "pending"
+      "status": "built",
+      "file": "src/v3/results-engine.mjs",
+      "method": "starts only from v3 agenda and official result targets; no data.json and no v2"
     }
   },
   "warnings": [],
