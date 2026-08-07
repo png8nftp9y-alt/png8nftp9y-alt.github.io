@@ -1,35 +1,9 @@
-name: Court Watch v3 build
+name: Court Watch v3 legacy builder disabled
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'src/build-courtwatch-v3.mjs'
-      - 'courtwatch-v3-trigger.json'
-      - 'data.json'
-      - 'players.json'
-      - 'former-players.json'
-permissions:
-  contents: write
+permissions: {contents: read}
 jobs:
-  build:
+  disabled:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - name: Build v3 with diagnostics
-        run: |
-          set +e
-          node src/build-courtwatch-v3.mjs > courtwatch-v3-build.log 2>&1
-          code=$?
-          echo "exitCode=$code" >> courtwatch-v3-build.log
-          cat courtwatch-v3-build.log
-          exit 0
-      - name: Commit v3 data and diagnostics
-        run: |
-          git config user.name courtwatch-bot
-          git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3 courtwatch-v3-build.log
-          git commit -m "Build Court Watch v3 agenda-first data" || exit 0
-          git push
+      - run: echo 'Disabled: v3 is now built only by src/v3 independent engines.'

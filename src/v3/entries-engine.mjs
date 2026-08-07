@@ -6,28 +6,30 @@ const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUp
 const slug=v=>norm(v).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 async function readJson(path,fallback){try{return JSON.parse(await fs.readFile(path,'utf8'))}catch{return fallback}}
 async function writeJson(path,value){await fs.mkdir(path.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(path,JSON.stringify(value,null,2)+'\n')}
-function nameLooksInternational(t){const n=norm(`${t.name||''} ${t.sourceName||''} ${t.url||''}`);return /\bTE\b|TENNIS EUROPE|EUROPEAN|ITF|CORETENNIS|AGNO|KOPER|SASSUOLO|CORREGGIO|PESCARA|MILANO/.test(n)&&!/CAMPIONATI ITALIANI|QUALIFICAZIONE AI CAMPIONATI ITALIANI/.test(n)}
-function circuitOf(t){const s=String(t.sourceId||t.source||t.sourceName||t.circuit||'').toLowerCase();if(s.includes('tennis-europe')||s.includes('tennis europe')||s==='te')return 'tennis-europe';if(s.includes('itf'))return 'itf';if(String(t.sourceId||'').toLowerCase()==='fitp-puc'&&nameLooksInternational(t))return 'excluded-fitp-circuit-mismatch';return 'fitp'}
-function validForCoverage(t){const e=t.endDate||t.date||'';return !e||e>=COVERAGE_FROM}
-function sourceQuality(t){if(t.competitionId||t.teTournamentId||t.itfTournamentKey)return 'official_id';if(/^https?:\/\//i.test(t.url||''))return 'official_or_public_url';return 'dataset_pending_id'}
-function entryStatus(t){if(t.entryStatus)return t.entryStatus;if(t.status==='finished')return 'completed';if(t.status==='active')return 'active';if(t.status==='upcoming')return 'registered';return 'detected'}
-function makeTournament(t){const c=circuitOf(t);return {...t,circuit:c,circuitColor:c==='fitp'?'blue':c==='tennis-europe'?'orange':c==='itf'?'green':'gray',entrySourceQuality:sourceQuality(t),lastV3EntrySync:NOW}}
-function makeEntry(t){const c=circuitOf(t);const key=t.competitionId||t.teTournamentId||t.itfTournamentKey||t.key||t.id||t.name;return {id:['entry',c,t.playerId,slug(key)].filter(Boolean).join('__'),playerId:t.playerId||'',playerName:t.playerName||'',circuit:c,tournamentId:t.id||t.key||'',competitionId:t.competitionId||t.teTournamentId||t.itfTournamentKey||'',tournamentName:t.name||'',location:t.location||'',startDate:t.startDate||'',endDate:t.endDate||'',draws:t.draws||[],status:entryStatus(t),sourceQuality:sourceQuality(t),sourceUrl:t.url||'',lastSeen:t.lastSeen||t.generatedAt||NOW,engine:'v3-entries'}}
+function validDate(end){return !end||String(end)>=COVERAGE_FROM}
+function playerMap(players){return new Map((players||[]).map(p=>[p.id,p]))}
+function fitpEntry(row,pm){const p=(pm.get(row.playerId)||{});return {id:['entry','fitp',row.playerId,slug(row.competitionId||row.competition||row.name)].join('__'),playerId:row.playerId,playerName:row.player||row.playerName||p.name||'',circuit:'fitp',competitionId:row.competitionId||'',tournamentName:row.competition||row.tournamentName||row.name||'',location:row.location||'',startDate:row.startDate||'',endDate:row.endDate||'',draws:row.draws||[],status:row.endDate&&row.endDate<NOW.slice(0,10)?'completed':'detected',sourceQuality:row.competitionId?'official_puc_id':'puc_pending_id',sourceUrl:row.competitionId?'https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId='+encodeURIComponent(row.competitionId):'',lastSeen:NOW,engine:'v3-entries-fitp-official-puc'}}
+function teEntry(row,pm){const p=(pm.get(row.playerId)||{});return {id:['entry','tennis-europe',row.playerId,slug(row.teTournamentId||row.tournamentName||row.name)].join('__'),playerId:row.playerId,playerName:row.playerName||p.name||'',circuit:'tennis-europe',competitionId:row.teTournamentId||row.tournamentKey||'',tournamentName:row.name||row.tournamentName||'Tennis Europe',location:row.location||'',startDate:row.startDate||'',endDate:row.endDate||'',draws:row.draws||[],status:row.entryStatus||row.status||'detected',sourceQuality:row.url?'official_te_url':'te_pending_url',sourceUrl:row.url||'',lastSeen:NOW,engine:'v3-entries-tennis-europe-official'}}
+function itfEntry(row,pm){const p=(pm.get(row.playerId)||{});return {id:['entry','itf',row.playerId,slug(row.tournamentKey||row.tournamentName||row.name)].join('__'),playerId:row.playerId,playerName:row.playerName||p.name||'',circuit:'itf',competitionId:row.tournamentKey||row.itfTournamentKey||'',tournamentName:row.tournamentName||row.name||'ITF',location:row.location||'',startDate:row.startDate||'',endDate:row.endDate||'',draws:row.draws||[],status:row.status||'detected',sourceQuality:row.url?'official_itf_url':'itf_pending_url',sourceUrl:row.url||'',lastSeen:NOW,engine:'v3-entries-itf-official'}}
+function toTournament(e){return {id:['tour',e.circuit,e.playerId,slug(e.competitionId||e.tournamentName)].join('__'),playerId:e.playerId,playerName:e.playerName,circuit:e.circuit,circuitColor:e.circuit==='fitp'?'blue':e.circuit==='tennis-europe'?'orange':'green',competitionId:e.competitionId,name:e.tournamentName,location:e.location,startDate:e.startDate,endDate:e.endDate,status:e.status,draws:e.draws,sourceUrl:e.sourceUrl,entrySourceQuality:e.sourceQuality,lastV3EntrySync:NOW}}
 const playersDoc=await readJson('players.json',{players:[]});
-const data=await readJson('data.json',{tournaments:[]});
-const playerIds=new Set((playersDoc.players||[]).map(p=>p.id));
-const raw=(data.tournaments||[]).filter(t=>t.playerId&&playerIds.has(t.playerId)&&validForCoverage(t));
-const rejected=raw.filter(t=>circuitOf(t)==='excluded-fitp-circuit-mismatch').map(t=>({playerId:t.playerId,playerName:t.playerName,tournamentName:t.name,reason:'fitp source row classified as TE/international; excluded from v3 FITP entries',competitionId:t.competitionId||'',sourceUrl:t.url||''}));
-const scoped=raw.filter(t=>circuitOf(t)!=='excluded-fitp-circuit-mismatch');
-const tournaments=scoped.map(makeTournament);
-const tournamentEntries=tournaments.map(makeEntry);
+const pm=playerMap(playersDoc.players||[]);
+const fitp=await readJson('puc-entries.json',{found:[]});
+const te=await readJson('te-entries.json',{hits:[]});
+const itf=await readJson('itf-sync.json',{hits:[]});
+const entries=[...(fitp.found||[]).map(r=>fitpEntry(r,pm)),...(te.hits||[]).map(r=>teEntry(r,pm)),...(itf.hits||[]).map(r=>itfEntry(r,pm))].filter(e=>e.playerId&&validDate(e.endDate));
+const seen=new Set();
+const tournamentEntries=entries.filter(e=>{const k=[e.playerId,e.circuit,e.competitionId||e.tournamentName].join('|');if(seen.has(k))return false;seen.add(k);return true});
+const tournaments=tournamentEntries.map(toTournament);
 const byCircuit=tournamentEntries.reduce((a,e)=>{a[e.circuit]=(a[e.circuit]||0)+1;return a},{});
-const warnings=[];
-for(const e of tournamentEntries){if(e.circuit==='fitp'&&!e.competitionId)warnings.push(`FITP senza P.U.C. id: ${e.playerName} · ${e.tournamentName}`);if((e.circuit==='tennis-europe'||e.circuit==='itf')&&!e.sourceUrl)warnings.push(`${e.circuit} senza URL ufficiale: ${e.playerName} · ${e.tournamentName}`)}
-const syncStatus={version:VERSION,generatedAt:NOW,status:'entries_engine_built_with_circuit_filter',coverageFrom:COVERAGE_FROM,checks:{players:(playersDoc.players||[]).length,tournamentEntries:tournamentEntries.length,tournaments:tournaments.length,byCircuit,warnings:warnings.length,rejectedCircuitMismatch:rejected.length},engines:{entries:{status:'built',file:'src/v3/entries-engine.mjs',method:'v3 independent entries with circuit mismatch exclusions; no v1/v2 data dependency'},ordersOfPlay:{status:'pending'},results:{status:'pending'}},warnings:warnings.slice(0,200),rejected};
+const warnings=[];for(const e of tournamentEntries){if(e.circuit==='fitp'&&!e.competitionId)warnings.push('FITP senza P.U.C. id: '+e.playerName+' · '+e.tournamentName);if(e.circuit==='tennis-europe'&&!e.sourceUrl)warnings.push('Tennis Europe senza URL: '+e.playerName+' · '+e.tournamentName);if(e.circuit==='itf'&&!e.sourceUrl)warnings.push('ITF senza URL: '+e.playerName+' · '+e.tournamentName)}
+const syncStatus={version:VERSION,generatedAt:NOW,status:'entries_engine_ex_novo_source_files_only',coverageFrom:COVERAGE_FROM,checks:{players:(playersDoc.players||[]).length,tournamentEntries:tournamentEntries.length,tournaments:tournaments.length,byCircuit,warnings:warnings.length},engines:{entries:{status:'built',file:'src/v3/entries-engine.mjs',method:'FITP from puc-entries.json, Tennis Europe from te-entries.json, ITF from itf-sync.json; no data.json and no v2'},ordersOfPlay:{status:'pending'},results:{status:'pending'}},warnings:warnings.slice(0,200)};
 await writeJson('dist/v3/players.json',{version:VERSION,generatedAt:NOW,players:playersDoc.players||[]});
 await writeJson('dist/v3/tournament_entries.json',{version:VERSION,generatedAt:NOW,tournamentEntries});
 await writeJson('dist/v3/tournaments.json',{version:VERSION,generatedAt:NOW,tournaments});
+await writeJson('dist/v3/entries_fitp.json',{version:VERSION,generatedAt:NOW,tournamentEntries:tournamentEntries.filter(e=>e.circuit==='fitp')});
+await writeJson('dist/v3/entries_tennis_europe.json',{version:VERSION,generatedAt:NOW,tournamentEntries:tournamentEntries.filter(e=>e.circuit==='tennis-europe')});
+await writeJson('dist/v3/entries_itf.json',{version:VERSION,generatedAt:NOW,tournamentEntries:tournamentEntries.filter(e=>e.circuit==='itf')});
 await writeJson('dist/v3/sync_status.json',syncStatus);
 await writeJson('dist/v3/entries_log.json',syncStatus);
 console.log(JSON.stringify(syncStatus,null,2));
