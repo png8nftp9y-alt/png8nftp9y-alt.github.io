@@ -1,24 +1,62 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-07T21:34:14.515Z",
+  "generatedAt": "2026-08-07T21:40:30.745Z",
+  "status": "complete",
+  "source": "ex novo FITP P.U.C. discovery, independent from v1/v2/data.json",
+  "coverageFrom": "2025-12-18",
+  "queries": 1092,
+  "competitionsChecked": 3257,
+  "entriesFound": 148,
+  "errors": []
+}
+fitpExit=0
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-07T21:43:02.037Z",
+  "status": "seeded_pending_live_tournamentsoftware_scan",
+  "source": "ex novo Tennis Europe discovery; no v1/v2/data.json; official profile/tournament seeds only until live scanner is expanded",
+  "coverageFrom": "2025-12-18",
+  "profiles": 17,
+  "entriesFound": 17,
+  "errors": []
+}
+teExit=0
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-07T21:43:02.068Z",
+  "status": "seeded_pending_live_itf_scan",
+  "source": "ex novo ITF discovery; no v1/v2/data.json; official ITF seeds only until live scanner is expanded",
+  "coverageFrom": "2025-12-18",
+  "profiles": 1,
+  "entriesFound": 2,
+  "errors": []
+}
+itfExit=0
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-07T21:43:02.099Z",
   "status": "entries_engine_merged_ex_novo_discoveries",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
-    "tournamentEntries": 0,
-    "tournaments": 0,
-    "byCircuit": {},
+    "tournamentEntries": 166,
+    "tournaments": 166,
+    "byCircuit": {
+      "fitp": 148,
+      "tennis-europe": 17,
+      "itf": 1
+    },
     "warnings": 0
   },
   "engines": {
     "discoverFitp": {
-      "status": "missing"
+      "status": "complete"
     },
     "discoverTennisEurope": {
-      "status": "missing"
+      "status": "seeded_pending_live_tournamentsoftware_scan"
     },
     "discoverItf": {
-      "status": "missing"
+      "status": "seeded_pending_live_itf_scan"
     },
     "entries": {
       "status": "built",
@@ -34,4 +72,4 @@
   },
   "warnings": []
 }
-exitCode=0
+entriesExit=0
