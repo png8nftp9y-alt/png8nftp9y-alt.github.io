@@ -1,0 +1,27 @@
+name: Court Watch v3 entries engine
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'src/v3/entries-engine.mjs'
+      - 'courtwatch-v3-entries-trigger.json'
+      - 'data.json'
+      - 'players.json'
+permissions:
+  contents: write
+jobs:
+  entries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node src/v3/entries-engine.mjs
+      - name: Commit v3 entries output
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/entries_log.json
+          git commit -m "Build Court Watch v3 entries data" || exit 0
+          git push
