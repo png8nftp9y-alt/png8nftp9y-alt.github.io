@@ -1,17 +1,19 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-07T21:12:36.762Z",
+  "generatedAt": "2026-08-07T21:14:58.787Z",
   "status": "entries_engine_ex_novo_source_files_only",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
-    "tournamentEntries": 19,
-    "tournaments": 19,
+    "tournamentEntries": 176,
+    "tournaments": 176,
     "byCircuit": {
+      "fitp": 157,
       "tennis-europe": 18,
       "itf": 1
     },
-    "warnings": 0
+    "warnings": 0,
+    "rejectedCircuitMismatch": 3
   },
   "engines": {
     "entries": {
@@ -26,6 +28,26 @@
       "status": "pending"
     }
   },
-  "warnings": []
+  "warnings": [],
+  "rejected": [
+    {
+      "player": "Virginia Cereghini",
+      "tournamentName": "TE U14 PESCARA",
+      "competitionId": "56954E2F-8BE8-4229-8586-12D4B8616ED5",
+      "reason": "excluded from FITP v3 because source row is TE/ITF/international"
+    },
+    {
+      "player": "Nikola Nikolaev Kerkenyakov",
+      "tournamentName": "TE U14 PESCARA",
+      "competitionId": "56954E2F-8BE8-4229-8586-12D4B8616ED5",
+      "reason": "excluded from FITP v3 because source row is TE/ITF/international"
+    },
+    {
+      "player": "Aila Zennaro",
+      "tournamentName": "TE U16 CREMA",
+      "competitionId": "7E22D231-926D-4DFE-BFF8-136B5C391F1B",
+      "reason": "excluded from FITP v3 because source row is TE/ITF/international"
+    }
+  ]
 }
 exitCode=0
