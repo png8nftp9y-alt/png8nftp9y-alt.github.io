@@ -4,12 +4,12 @@ on:
   push:
     branches: [main]
     paths:
+      - 'src/v3/discover-fitp.mjs'
+      - 'src/v3/discover-tennis-europe.mjs'
+      - 'src/v3/discover-itf.mjs'
       - 'src/v3/entries-engine.mjs'
       - 'courtwatch-v3-entries-trigger.json'
       - '.github/workflows/courtwatch-v3-entries.yml'
-      - 'puc-entries.json'
-      - 'te-entries.json'
-      - 'itf-sync.json'
       - 'players.json'
 permissions:
   contents: write
@@ -19,18 +19,25 @@ concurrency:
 jobs:
   entries:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Run ex novo v3 entries engine
+      - name: Run ex novo v3 discovery and entries engine
         run: |
           set +e
-          node src/v3/entries-engine.mjs > courtwatch-v3-entries-run.log 2>&1
+          : > courtwatch-v3-entries-run.log
+          node src/v3/discover-fitp.mjs >> courtwatch-v3-entries-run.log 2>&1
+          echo "fitpExit=$?" >> courtwatch-v3-entries-run.log
+          node src/v3/discover-tennis-europe.mjs >> courtwatch-v3-entries-run.log 2>&1
+          echo "teExit=$?" >> courtwatch-v3-entries-run.log
+          node src/v3/discover-itf.mjs >> courtwatch-v3-entries-run.log 2>&1
+          echo "itfExit=$?" >> courtwatch-v3-entries-run.log
+          node src/v3/entries-engine.mjs >> courtwatch-v3-entries-run.log 2>&1
           code=$?
-          echo "exitCode=$code" >> courtwatch-v3-entries-run.log
+          echo "entriesExit=$code" >> courtwatch-v3-entries-run.log
           cat courtwatch-v3-entries-run.log
           exit $code
       - name: Commit v3 entries output
@@ -38,7 +45,7 @@ jobs:
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/sync_status.json dist/v3/entries_log.json courtwatch-v3-entries-run.log .github/workflows/courtwatch-v3-entries.yml
+          git add dist/v3/source_fitp_entries.json dist/v3/source_tennis_europe_entries.json dist/v3/source_itf_entries.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/sync_status.json dist/v3/entries_log.json courtwatch-v3-entries-run.log .github/workflows/courtwatch-v3-entries.yml
           git commit -m "Build Court Watch v3 entries data" || exit 0
           git pull --rebase origin main || true
           git push origin HEAD:main || true
