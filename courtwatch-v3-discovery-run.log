@@ -1,0 +1,75 @@
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-07T21:36:17.586Z",
+  "status": "complete",
+  "source": "ex novo FITP P.U.C. discovery, independent from v1/v2/data.json",
+  "coverageFrom": "2025-12-18",
+  "queries": 1092,
+  "competitionsChecked": 3257,
+  "entriesFound": 148,
+  "errors": []
+}
+fitpExit=0
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-07T21:38:52.284Z",
+  "status": "seeded_pending_live_tournamentsoftware_scan",
+  "source": "ex novo Tennis Europe discovery; no v1/v2/data.json; official profile/tournament seeds only until live scanner is expanded",
+  "coverageFrom": "2025-12-18",
+  "profiles": 17,
+  "entriesFound": 17,
+  "errors": []
+}
+teExit=0
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-07T21:38:52.320Z",
+  "status": "seeded_pending_live_itf_scan",
+  "source": "ex novo ITF discovery; no v1/v2/data.json; official ITF seeds only until live scanner is expanded",
+  "coverageFrom": "2025-12-18",
+  "profiles": 1,
+  "entriesFound": 2,
+  "errors": []
+}
+itfExit=0
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-07T21:38:52.359Z",
+  "status": "entries_engine_merged_ex_novo_discoveries",
+  "coverageFrom": "2025-12-18",
+  "checks": {
+    "players": 19,
+    "tournamentEntries": 166,
+    "tournaments": 166,
+    "byCircuit": {
+      "fitp": 148,
+      "tennis-europe": 17,
+      "itf": 1
+    },
+    "warnings": 0
+  },
+  "engines": {
+    "discoverFitp": {
+      "status": "complete"
+    },
+    "discoverTennisEurope": {
+      "status": "seeded_pending_live_tournamentsoftware_scan"
+    },
+    "discoverItf": {
+      "status": "seeded_pending_live_itf_scan"
+    },
+    "entries": {
+      "status": "built",
+      "file": "src/v3/entries-engine.mjs",
+      "method": "merge dist/v3/source_*_entries.json only; no v1/v2/data.json"
+    },
+    "ordersOfPlay": {
+      "status": "pending"
+    },
+    "results": {
+      "status": "pending"
+    }
+  },
+  "warnings": []
+}
+entriesExit=0
