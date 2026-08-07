@@ -1,28 +1,32 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-07T21:14:58.787Z",
-  "status": "entries_engine_ex_novo_source_files_only",
+  "generatedAt": "2026-08-07T21:16:59.807Z",
+  "status": "orders_of_play_engine_ex_novo_waiting_official_daily_oop",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
     "tournamentEntries": 176,
     "tournaments": 176,
     "byCircuit": {
-      "fitp": 157,
+      "fitp": 35,
       "tennis-europe": 18,
       "itf": 1
     },
     "warnings": 0,
-    "rejectedCircuitMismatch": 3
+    "rejectedCircuitMismatch": 3,
+    "entries": 54,
+    "matches": 0,
+    "agenda": 54,
+    "timedAgenda": 0
   },
   "engines": {
     "entries": {
-      "status": "built",
-      "file": "src/v3/entries-engine.mjs",
-      "method": "FITP from puc-entries.json, Tennis Europe from te-entries.json, ITF from itf-sync.json; no data.json and no v2"
+      "status": "built"
     },
     "ordersOfPlay": {
-      "status": "pending"
+      "status": "built",
+      "file": "src/v3/orders-of-play-engine.mjs",
+      "method": "starts only from v3 tournament_entries; no data.json and no v2"
     },
     "results": {
       "status": "pending"
