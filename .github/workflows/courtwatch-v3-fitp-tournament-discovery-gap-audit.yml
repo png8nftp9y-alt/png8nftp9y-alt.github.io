@@ -1,0 +1,25 @@
+name: Court Watch v3 FITP tournament discovery gap audit
+on:
+  push:
+    paths:
+      - 'src/v3/audit-fitp-tournament-discovery-gaps.mjs'
+      - 'courtwatch-v3-fitp-tournament-discovery-gap-audit-trigger.json'
+      - '.github/workflows/courtwatch-v3-fitp-tournament-discovery-gap-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node src/v3/audit-fitp-tournament-discovery-gaps.mjs || true
+      - run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_fitp_tournament_discovery_gap_audit.json courtwatch-v3-fitp-tournament-discovery-gap-audit-run.log
+          git commit -m "Build Court Watch v3 FITP tournament discovery gap audit" || echo "No changes"
+          git push
