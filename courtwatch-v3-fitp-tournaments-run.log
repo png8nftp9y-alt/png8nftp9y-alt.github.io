@@ -1,14 +1,41 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-08T12:36:23.892Z",
-  "status": "fitp_tournament_discovery_complete_list_only_no_draws",
-  "source": "FITP P.U.C. tournament search only: id_disciplina=4332 tennis; cod_fonte=1 Tornei FITP or 3 Campionati a squadre; no keyword; no draws; no order of play; no results",
+  "generatedAt": "2026-08-08T12:43:40.104Z",
+  "status": "fitp_tournament_discovery_reliable_complete",
+  "source": "FITP P.U.C. reliable tournament search only: id_disciplina=4332 tennis; cod_fonte=1 Tornei FITP or 3 Campionati a squadre; freetext empty; reconciled 7/14/31-day windows; no draws; no order of play; no results",
   "coverageFrom": "2025-12-18",
-  "queries": 354,
-  "tournamentsFound": 249,
+  "coverageUntil": "2027-10-02",
+  "queries": 1182,
+  "tournamentsFound": 821,
   "bySource": {
-    "TORNEI FITP": 97,
-    "CAMPIONATI A SQUADRE": 152
+    "TORNEI FITP": 525,
+    "CAMPIONATI A SQUADRE": 296
+  },
+  "byStatus": {
+    "finished": 356,
+    "active_or_open": 217,
+    "upcoming": 248
+  },
+  "quality": {
+    "rawRows": 99692,
+    "uniqueRawCompetitions": 824,
+    "duplicateRows": 98868,
+    "accepted": 821,
+    "excluded": 3,
+    "queries": 1182,
+    "failedQueries": 0,
+    "emptyQueries": 158,
+    "coverageFrom": "2025-12-18",
+    "coverageUntil": "2027-10-02",
+    "usesKeywords": false,
+    "usesDraws": false,
+    "usesOrderOfPlay": false,
+    "usesResults": false,
+    "windowDays": [
+      7,
+      14,
+      31
+    ]
   },
   "errors": []
 }
