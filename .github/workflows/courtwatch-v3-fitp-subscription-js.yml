@@ -1,0 +1,32 @@
+name: Court Watch v3 FITP subscription JS audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/audit-fitp-subscription-js.mjs'
+      - 'courtwatch-v3-fitp-subscription-js-trigger.json'
+      - '.github/workflows/courtwatch-v3-fitp-subscription-js.yml'
+permissions: {contents: write}
+concurrency: {group: court-watch-v3-fitp-subscription-js,cancel-in-progress: true}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Extract JS subscription logic
+        run: |
+          node src/v3/audit-fitp-subscription-js.mjs > courtwatch-v3-fitp-subscription-js-run.log 2>&1
+          cat courtwatch-v3-fitp-subscription-js-run.log
+      - name: Commit JS audit output
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_fitp_subscription_js_audit.json courtwatch-v3-fitp-subscription-js-run.log
+          git commit -m "Build Court Watch v3 FITP subscription JS audit" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
