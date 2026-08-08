@@ -1,82 +1,90 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-08T18:55:04.646Z",
-  "status": "fitp_tournament_discovery_daily_reliable_complete",
-  "source": "FITP P.U.C. reliable tournament search only: id_disciplina=4332 tennis; cod_fonte=1 Tornei FITP or 3 Campionati a squadre; freetext empty; reconciled 1/3/7/14/31-day windows including single-day granularity; no draws; no order of play; no results",
+  "generatedAt": "2026-08-08T20:28:28.943Z",
+  "status": "fitp_individual_tournament_discovery_rewritten_complete",
+  "source": "FITP individual tournaments only: official P.U.C. list, id_disciplina=4332 tennis, cod_fonte=1 Tornei FITP, no team championships, no player keywords for tournament universe, no draws, no OOP, no results. Multi-strategy date reconciliation plus public-list freetext categories; entries are confirmed later through official detail Participants.",
   "coverageFrom": "2025-12-18",
-  "coverageUntil": "2027-10-02",
-  "queries": 5034,
-  "tournamentsFound": 1015,
+  "coverageUntil": "2027-10-12",
+  "queries": 1627,
+  "tournamentsFound": 983,
   "bySource": {
-    "TORNEI FITP": 570,
-    "CAMPIONATI A SQUADRE": 445
+    "TORNEI FITP": 983
   },
   "byStatus": {
-    "finished": 400,
-    "active_or_open": 366,
-    "upcoming": 249
+    "finished": 422,
+    "active_or_open": 102,
+    "upcoming": 459
   },
   "quality": {
-    "rawRows": 373582,
-    "uniqueRawCompetitions": 1016,
-    "duplicateRows": 372566,
-    "accepted": 1015,
-    "excluded": 1,
-    "queries": 5034,
+    "specs": 1061,
     "failedQueries": 0,
-    "emptyQueries": 1026,
-    "coverageFrom": "2025-12-18",
-    "coverageUntil": "2027-10-02",
-    "usesKeywords": false,
+    "emptyQueries": 534,
+    "uniqueAccepted": 983,
+    "excluded": 446,
+    "usesPlayerKeywords": false,
     "usesDraws": false,
     "usesOrderOfPlay": false,
     "usesResults": false,
-    "windowDays": [
-      1,
-      3,
-      7,
-      14,
-      31
-    ],
-    "byWindow": {
-      "1d": 199234,
-      "3d": 74652,
-      "7d": 41536,
-      "14d": 30262,
-      "31d": 27898
-    },
-    "dailyQueries": 2826,
-    "dailyOnlyTournaments": 3
+    "individualOnly": true,
+    "teamChampionshipsIncluded": false,
+    "byMode": {
+      "daily": 3,
+      "3d": 258,
+      "7d": 462,
+      "freetext_RODEO": 107,
+      "freetext_LOMB.": 175,
+      "freetext_VENETO": 73,
+      "freetext_OPEN": 174,
+      "freetext_TOS - T.": 78,
+      "14d": 98,
+      "31d": 39,
+      "freetext_CAMPIONATI ITALIANI": 19,
+      "freetext_CAMPIONATI REGIONALI": 8,
+      "freetext_JUNIOR NEXT GEN": 7
+    }
   },
   "errors": []
 }
 fitpTournamentsExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-08T18:56:40.795Z",
-  "status": "fitp_only_entries_complete_from_puc_any_list_name_or_card",
-  "source": "FITP ONLY entries: reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first, exact full name second. TE/ITF excluded; no OOP; no results.",
+  "generatedAt": "2026-08-08T20:28:57.010Z",
+  "status": "fitp_individual_entries_complete_from_puc_any_list_name_or_card",
+  "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first, exact full name second. Team championships/cod_fonte=3 are excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 1015,
-  "detailsChecked": 1015,
-  "detailsWithDraws": 570,
-  "detailsWithParticipants": 1185,
-  "participantsScanned": 20416,
-  "participantsWithCard": 20416,
-  "entriesFound": 14,
-  "playersWithEntries": 8,
+  "tournamentsInput": 983,
+  "allFitpTournamentsInput": 983,
+  "excludedTeamChampionships": 0,
+  "detailsChecked": 983,
+  "detailsWithDraws": 983,
+  "detailsWithParticipants": 2140,
+  "participantsScanned": 45048,
+  "participantsWithCard": 45048,
+  "entriesFound": 42,
+  "playersWithEntries": 19,
   "byPlayer": {
     "martina-danesi": 1,
-    "edoardo-grimoldi": 2,
-    "noemi-paganini": 3,
-    "matteo-bocchio": 1,
-    "camilla-lingeri": 2,
-    "francesco-bocchio": 2,
-    "gregorio-puccio": 2,
-    "francesco-renzulli": 1
+    "edoardo-grimoldi": 3,
+    "noemi-paganini": 5,
+    "matteo-bocchio": 3,
+    "camilla-lingeri": 5,
+    "francesco-bocchio": 4,
+    "virginia-rossoni": 2,
+    "nicholas-scappa": 1,
+    "gregorio-puccio": 3,
+    "matilde-mainetti": 1,
+    "aila-zennaro": 2,
+    "virginia-cereghini": 2,
+    "carlo-ghislotti": 2,
+    "filippo-vitali": 2,
+    "daniele-gelli": 2,
+    "francesco-renzulli": 1,
+    "nikola-kerkenyakov": 1,
+    "giulia-scozzafava": 1,
+    "alessio-nava": 1
   },
   "byMatchMethod": {
-    "membership_card": 14
+    "membership_card": 42
   },
   "errors": []
 }
