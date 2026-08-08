@@ -1,0 +1,30 @@
+name: Court Watch v3 FITP list id resolution audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/audit-fitp-list-id-resolution.mjs'
+      - 'courtwatch-v3-fitp-list-id-resolution-trigger.json'
+      - '.github/workflows/courtwatch-v3-fitp-list-id-resolution.yml'
+permissions: {contents: write}
+concurrency: {group: court-watch-v3-fitp-list-id-resolution,cancel-in-progress: true}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: |
+          node src/v3/audit-fitp-list-id-resolution.mjs > courtwatch-v3-fitp-list-id-resolution-run.log 2>&1
+          cat courtwatch-v3-fitp-list-id-resolution-run.log
+      - if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_fitp_list_id_resolution_audit.json courtwatch-v3-fitp-list-id-resolution-run.log
+          git commit -m "Build Court Watch v3 FITP list id resolution audit" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
