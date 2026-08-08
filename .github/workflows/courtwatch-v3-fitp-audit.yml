@@ -1,0 +1,37 @@
+name: Court Watch v3 FITP discovery audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/audit-fitp-discovery.mjs'
+      - 'courtwatch-v3-fitp-audit-trigger.json'
+      - '.github/workflows/courtwatch-v3-fitp-audit.yml'
+      - 'players.json'
+permissions: {contents: write}
+concurrency: {group: court-watch-v3-fitp-audit,cancel-in-progress: true}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Run FITP discovery audit
+        run: |
+          set +e
+          node src/v3/audit-fitp-discovery.mjs > courtwatch-v3-fitp-audit-run.log 2>&1
+          code=$?
+          echo "exitCode=$code" >> courtwatch-v3-fitp-audit-run.log
+          cat courtwatch-v3-fitp-audit-run.log
+          exit $code
+      - name: Commit FITP audit
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_fitp_player_audit.json dist/v3/source_fitp_tournament_detail_audit.json dist/v3/source_fitp_audit_summary.json courtwatch-v3-fitp-audit-run.log .github/workflows/courtwatch-v3-fitp-audit.yml
+          git commit -m "Build Court Watch v3 FITP discovery audit" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
