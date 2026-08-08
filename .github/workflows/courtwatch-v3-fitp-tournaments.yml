@@ -12,12 +12,12 @@ concurrency: {group: court-watch-v3-fitp-tournaments,cancel-in-progress: true}
 jobs:
   discover:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Run FITP tournament discovery only
+      - name: Run reliable FITP tournament discovery only
         run: |
           set +e
           node src/v3/discover-fitp-tournaments.mjs > courtwatch-v3-fitp-tournaments-run.log 2>&1
@@ -30,7 +30,7 @@ jobs:
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_fitp_tournaments.json courtwatch-v3-fitp-tournaments-run.log .github/workflows/courtwatch-v3-fitp-tournaments.yml
-          git commit -m "Build Court Watch v3 FITP tournament discovery" || exit 0
+          git add dist/v3/source_fitp_tournaments.json dist/v3/source_fitp_tournaments_audit.json courtwatch-v3-fitp-tournaments-run.log .github/workflows/courtwatch-v3-fitp-tournaments.yml
+          git commit -m "Build Court Watch v3 reliable FITP tournament discovery" || exit 0
           git pull --rebase origin main || true
           git push origin HEAD:main || true
