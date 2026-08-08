@@ -1,35 +1,36 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-08T12:56:00.600Z",
-  "status": "fitp_only_entries_complete_from_reliable_tournament_map",
-  "source": "FITP ONLY entries: reliable FITP tournament map first, then official P.U.C. detail participant confirmation; TE/ITF deliberately excluded; no OOP; no results",
+  "generatedAt": "2026-08-08T18:48:21.626Z",
+  "status": "fitp_only_entries_complete_from_puc_any_list_name_or_card",
+  "source": "FITP ONLY entries: reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first, exact full name second. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 821,
-  "detailsChecked": 821,
-  "detailsWithDraws": 525,
-  "detailsWithParticipants": 1066,
-  "participantsScanned": 18633,
-  "participantsWithCard": 18633,
-  "entriesFound": 11,
-  "playersWithEntries": 7,
+  "tournamentsInput": 1014,
+  "detailsChecked": 1014,
+  "detailsWithDraws": 569,
+  "detailsWithParticipants": 1185,
+  "participantsScanned": 20415,
+  "participantsWithCard": 20415,
+  "entriesFound": 14,
+  "playersWithEntries": 8,
   "byPlayer": {
+    "martina-danesi": 1,
     "edoardo-grimoldi": 2,
     "noemi-paganini": 3,
     "matteo-bocchio": 1,
     "camilla-lingeri": 2,
-    "gregorio-puccio": 1,
-    "francesco-renzulli": 1,
-    "francesco-bocchio": 1
+    "francesco-bocchio": 2,
+    "gregorio-puccio": 2,
+    "francesco-renzulli": 1
   },
   "byMatchMethod": {
-    "membership_card": 11
+    "membership_card": 14
   },
   "errors": []
 }
 fitpExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-08T12:56:11.450Z",
+  "generatedAt": "2026-08-08T18:48:34.100Z",
   "status": "seeded_pending_live_tournamentsoftware_scan",
   "source": "ex novo Tennis Europe discovery; no v1/v2/data.json; official profile/tournament seeds only until live scanner is expanded",
   "coverageFrom": "2025-12-18",
@@ -40,7 +41,7 @@ fitpExit=0
 teExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-08T12:56:11.483Z",
+  "generatedAt": "2026-08-08T18:48:34.133Z",
   "status": "seeded_pending_live_itf_scan",
   "source": "ex novo ITF discovery; no v1/v2/data.json; official ITF seeds only until live scanner is expanded",
   "coverageFrom": "2025-12-18",
@@ -51,15 +52,15 @@ teExit=0
 itfExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-08T12:56:11.515Z",
+  "generatedAt": "2026-08-08T18:48:34.166Z",
   "status": "entries_engine_merged_ex_novo_discoveries",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
-    "tournamentEntries": 29,
-    "tournaments": 29,
+    "tournamentEntries": 32,
+    "tournaments": 32,
     "byCircuit": {
-      "fitp": 11,
+      "fitp": 14,
       "tennis-europe": 17,
       "itf": 1
     },
@@ -67,7 +68,7 @@ itfExit=0
   },
   "engines": {
     "discoverFitp": {
-      "status": "fitp_only_entries_complete_from_reliable_tournament_map"
+      "status": "fitp_only_entries_complete_from_puc_any_list_name_or_card"
     },
     "discoverTennisEurope": {
       "status": "seeded_pending_live_tournamentsoftware_scan"
