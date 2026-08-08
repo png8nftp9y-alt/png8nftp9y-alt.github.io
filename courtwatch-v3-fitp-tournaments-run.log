@@ -1,30 +1,30 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-08T12:43:40.104Z",
-  "status": "fitp_tournament_discovery_reliable_complete",
-  "source": "FITP P.U.C. reliable tournament search only: id_disciplina=4332 tennis; cod_fonte=1 Tornei FITP or 3 Campionati a squadre; freetext empty; reconciled 7/14/31-day windows; no draws; no order of play; no results",
+  "generatedAt": "2026-08-08T13:16:05.839Z",
+  "status": "fitp_tournament_discovery_daily_reliable_complete",
+  "source": "FITP P.U.C. reliable tournament search only: id_disciplina=4332 tennis; cod_fonte=1 Tornei FITP or 3 Campionati a squadre; freetext empty; reconciled 1/3/7/14/31-day windows including single-day granularity; no draws; no order of play; no results",
   "coverageFrom": "2025-12-18",
   "coverageUntil": "2027-10-02",
-  "queries": 1182,
-  "tournamentsFound": 821,
+  "queries": 5034,
+  "tournamentsFound": 1014,
   "bySource": {
-    "TORNEI FITP": 525,
-    "CAMPIONATI A SQUADRE": 296
+    "TORNEI FITP": 569,
+    "CAMPIONATI A SQUADRE": 445
   },
   "byStatus": {
-    "finished": 356,
-    "active_or_open": 217,
+    "finished": 400,
+    "active_or_open": 366,
     "upcoming": 248
   },
   "quality": {
-    "rawRows": 99692,
-    "uniqueRawCompetitions": 824,
-    "duplicateRows": 98868,
-    "accepted": 821,
-    "excluded": 3,
-    "queries": 1182,
+    "rawRows": 373574,
+    "uniqueRawCompetitions": 1015,
+    "duplicateRows": 372559,
+    "accepted": 1014,
+    "excluded": 1,
+    "queries": 5034,
     "failedQueries": 0,
-    "emptyQueries": 158,
+    "emptyQueries": 1026,
     "coverageFrom": "2025-12-18",
     "coverageUntil": "2027-10-02",
     "usesKeywords": false,
@@ -32,10 +32,21 @@
     "usesOrderOfPlay": false,
     "usesResults": false,
     "windowDays": [
+      1,
+      3,
       7,
       14,
       31
-    ]
+    ],
+    "byWindow": {
+      "1d": 199234,
+      "3d": 74648,
+      "7d": 41532,
+      "14d": 30262,
+      "31d": 27898
+    },
+    "dailyQueries": 2826,
+    "dailyOnlyTournaments": 3
   },
   "errors": []
 }
