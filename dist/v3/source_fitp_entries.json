@@ -1,52 +1,22 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-08T11:25:07.187Z",
-  "status": "complete_structured_no_keyword_tennis_tornei_fitp_squadre_no_veterans_membership_primary",
-  "source": "ex novo FITP P.U.C. discovery: structured filters only: id_disciplina=4332 tennis; cod_fonte=1 Tornei FITP or 3 Campionati a squadre; no keyword search; no veterans; entries confirmed only by official entry/draw lists; membership card primary; results never used",
+  "generatedAt": "2026-08-08T11:37:33.580Z",
+  "status": "complete_structured_no_keyword_tennis_tornei_fitp_squadre_no_veteran_filter_membership_primary",
+  "source": "ex novo FITP P.U.C. discovery: structured filters only: id_disciplina=4332 tennis; cod_fonte=1 Tornei FITP or 3 Campionati a squadre; no keyword search; no veteran exclusion; entries confirmed only by official entry/draw lists; membership card primary; results never used",
   "coverageFrom": "2025-12-18",
   "queries": 354,
   "competitionsListed": 249,
-  "competitionsChecked": 146,
-  "excludedByReason": {
-    "excluded_veteran_tournament": 103
-  },
+  "competitionsChecked": 249,
+  "excludedByReason": {},
   "entriesFound": 2,
   "byPlayer": {
-    "edoardo-grimoldi": 1,
-    "camilla-lingeri": 1
+    "camilla-lingeri": 1,
+    "edoardo-grimoldi": 1
   },
   "byMatchMethod": {
     "membership_card": 2
   },
   "entries": [
-    {
-      "playerId": "edoardo-grimoldi",
-      "playerName": "Edoardo Grimoldi",
-      "circuit": "fitp",
-      "competitionId": "7FA6D9F6-F8B6-4A21-9EF2-3D960CA2887B",
-      "tournamentName": "LOMB. 1057 TENNIS A-RETE - RODEO - U.12/14 SM/SF",
-      "location": "Guanzate CO",
-      "startDate": "2026-09-18",
-      "endDate": "2026-09-20",
-      "draws": [
-        "Singolare Maschile Under 12"
-      ],
-      "entryStatus": "entry_confirmed_by_official_list_or_draw",
-      "confirmationSource": "official_entry_or_draw_list",
-      "matchMethod": "membership_card",
-      "filtersApplied": [
-        "id_disciplina:4332 tennis",
-        "cod_fonte:1 tornei_fitp OR cod_fonte:3 campionati_a_squadre",
-        "exclude:veterans",
-        "no:freetext_keywords"
-      ],
-      "resultUsedForEntry": false,
-      "ranking": "3.5",
-      "membershipCard": "8553826467",
-      "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=7FA6D9F6-F8B6-4A21-9EF2-3D960CA2887B",
-      "source": "FITP P.U.C. structured official filters: discipline tennis, source Tornei FITP/Campionati a squadre; no keyword discovery; no veterans; no results; membership card primary match",
-      "lastSeen": "2026-08-08T11:25:07.187Z"
-    },
     {
       "playerId": "camilla-lingeri",
       "playerName": "Camilla Lingeri",
@@ -65,15 +35,43 @@
       "filtersApplied": [
         "id_disciplina:4332 tennis",
         "cod_fonte:1 tornei_fitp OR cod_fonte:3 campionati_a_squadre",
-        "exclude:veterans",
+        "no:veteran_filter",
         "no:freetext_keywords"
       ],
       "resultUsedForEntry": false,
       "ranking": "3.5",
       "membershipCard": "5579495592",
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=7A37ABFA-E5E5-4067-ADBE-69ADA41A644A",
-      "source": "FITP P.U.C. structured official filters: discipline tennis, source Tornei FITP/Campionati a squadre; no keyword discovery; no veterans; no results; membership card primary match",
-      "lastSeen": "2026-08-08T11:25:07.187Z"
+      "source": "FITP P.U.C. structured official filters: discipline tennis, source Tornei FITP/Campionati a squadre; no keyword discovery; no veteran exclusion; no results; membership card primary match",
+      "lastSeen": "2026-08-08T11:37:33.580Z"
+    },
+    {
+      "playerId": "edoardo-grimoldi",
+      "playerName": "Edoardo Grimoldi",
+      "circuit": "fitp",
+      "competitionId": "7FA6D9F6-F8B6-4A21-9EF2-3D960CA2887B",
+      "tournamentName": "LOMB. 1057 TENNIS A-RETE - RODEO - U.12/14 SM/SF",
+      "location": "Guanzate CO",
+      "startDate": "2026-09-18",
+      "endDate": "2026-09-20",
+      "draws": [
+        "Singolare Maschile Under 12"
+      ],
+      "entryStatus": "entry_confirmed_by_official_list_or_draw",
+      "confirmationSource": "official_entry_or_draw_list",
+      "matchMethod": "membership_card",
+      "filtersApplied": [
+        "id_disciplina:4332 tennis",
+        "cod_fonte:1 tornei_fitp OR cod_fonte:3 campionati_a_squadre",
+        "no:veteran_filter",
+        "no:freetext_keywords"
+      ],
+      "resultUsedForEntry": false,
+      "ranking": "3.5",
+      "membershipCard": "8553826467",
+      "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=7FA6D9F6-F8B6-4A21-9EF2-3D960CA2887B",
+      "source": "FITP P.U.C. structured official filters: discipline tennis, source Tornei FITP/Campionati a squadre; no keyword discovery; no veteran exclusion; no results; membership card primary match",
+      "lastSeen": "2026-08-08T11:37:33.580Z"
     }
   ],
   "errors": []
