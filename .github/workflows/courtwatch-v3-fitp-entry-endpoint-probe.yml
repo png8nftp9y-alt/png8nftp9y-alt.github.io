@@ -1,0 +1,35 @@
+name: Court Watch v3 FITP entry endpoint probe
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/audit-fitp-entry-endpoints.mjs'
+      - 'courtwatch-v3-fitp-entry-endpoint-probe-trigger.json'
+      - '.github/workflows/courtwatch-v3-fitp-entry-endpoint-probe.yml'
+permissions: {contents: write}
+concurrency: {group: court-watch-v3-fitp-entry-endpoint-probe,cancel-in-progress: true}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Probe FITP live entry endpoints
+        run: |
+          set +e
+          node src/v3/audit-fitp-entry-endpoints.mjs > courtwatch-v3-fitp-entry-endpoint-probe-run.log 2>&1
+          code=$?
+          cat courtwatch-v3-fitp-entry-endpoint-probe-run.log
+          exit $code
+      - name: Commit probe output
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_fitp_entry_endpoint_probe.json courtwatch-v3-fitp-entry-endpoint-probe-run.log
+          git commit -m "Build Court Watch v3 FITP entry endpoint probe" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
