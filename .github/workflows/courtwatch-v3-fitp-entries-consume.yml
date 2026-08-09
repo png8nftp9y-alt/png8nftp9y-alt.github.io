@@ -1,0 +1,60 @@
+name: Court Watch v3 FITP entries consume existing tournament map
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'courtwatch-v3-fitp-entries-consume-trigger.json'
+      - '.github/workflows/courtwatch-v3-fitp-entries-consume.yml'
+      - 'src/v3/discover-fitp.mjs'
+      - 'src/v3/entries-engine.mjs'
+      - 'dist/v3/source_fitp_tournaments.json'
+permissions: {contents: write}
+concurrency:
+  group: court-watch-v3-fitp-entries-consume-${{ github.run_id }}
+  cancel-in-progress: false
+jobs:
+  entries-consume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Consume existing FITP tournament map and rebuild entries/calendar
+        run: |
+          set +e
+          tmpLog="courtwatch-v3-fitp-entries-consume-run.tmp.log"
+          : > "$tmpLog"
+          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          echo "sourceSha=${GITHUB_SHA}" >> "$tmpLog"
+          echo "runId=${GITHUB_RUN_ID}" >> "$tmpLog"
+          echo "mode=consume-existing-source_fitp_tournaments" >> "$tmpLog"
+          node src/v3/discover-fitp.mjs >> "$tmpLog" 2>&1
+          fitpCode=$?
+          echo "fitpEntriesExit=$fitpCode" >> "$tmpLog"
+          if [ "$fitpCode" -ne 0 ]; then
+            cat "$tmpLog"
+            cp "$tmpLog" courtwatch-v3-fitp-entries-consume-run.log
+            exit "$fitpCode"
+          fi
+          node src/v3/entries-engine.mjs >> "$tmpLog" 2>&1
+          mergeCode=$?
+          echo "calendarMergeExit=$mergeCode" >> "$tmpLog"
+          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          cat "$tmpLog"
+          cp "$tmpLog" courtwatch-v3-fitp-entries-consume-run.log
+          exit "$mergeCode"
+      - name: Commit FITP consume-only entries/calendar output
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          if [ ! -s courtwatch-v3-fitp-entries-consume-run.log ]; then
+            echo "No non-empty consume log produced; skipping commit."
+            exit 0
+          fi
+          git add dist/v3/source_fitp_entries.json dist/v3/source_fitp_entries_audit.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/sync_status.json dist/v3/entries_log.json courtwatch-v3-fitp-entries-consume-run.log .github/workflows/courtwatch-v3-fitp-entries-consume.yml
+          git commit -m "Build Court Watch v3 FITP entries from current tournament map" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
