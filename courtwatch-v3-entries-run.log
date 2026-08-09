@@ -1,48 +1,49 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-09T00:45:03.241Z",
+  "generatedAt": "2026-08-09T01:49:19.918Z",
   "status": "fitp_individual_entries_complete_from_puc_any_list_name_or_card",
   "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first, exact full name second. Team championships/cod_fonte=3 are excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 1440,
-  "allFitpTournamentsInput": 1440,
+  "tournamentsInput": 4770,
+  "allFitpTournamentsInput": 4770,
   "excludedTeamChampionships": 0,
-  "detailsChecked": 1440,
-  "detailsWithDraws": 1440,
-  "detailsWithParticipants": 3388,
-  "participantsScanned": 69104,
-  "participantsWithCard": 69104,
-  "entriesFound": 49,
-  "playersWithEntries": 18,
+  "detailsChecked": 4770,
+  "detailsWithDraws": 4768,
+  "detailsWithParticipants": 13190,
+  "participantsScanned": 325587,
+  "participantsWithCard": 325587,
+  "entriesFound": 229,
+  "playersWithEntries": 19,
   "byPlayer": {
-    "martina-danesi": 1,
-    "edoardo-grimoldi": 3,
-    "camilla-lingeri": 7,
-    "noemi-paganini": 4,
-    "matteo-bocchio": 5,
-    "carlo-ghislotti": 4,
-    "francesco-bocchio": 4,
-    "gregorio-puccio": 3,
-    "alessio-nava": 2,
-    "matilde-mainetti": 1,
-    "aila-zennaro": 2,
-    "virginia-cereghini": 2,
-    "virginia-rossoni": 2,
-    "filippo-vitali": 3,
-    "daniele-gelli": 2,
-    "francesco-renzulli": 2,
-    "giulia-scozzafava": 1,
-    "nikola-kerkenyakov": 1
+    "francesco-renzulli": 16,
+    "nikola-kerkenyakov": 11,
+    "carlo-ghislotti": 12,
+    "matilde-mainetti": 9,
+    "aila-zennaro": 8,
+    "virginia-cereghini": 6,
+    "martina-danesi": 8,
+    "filippo-vitali": 15,
+    "nicholas-scappa": 8,
+    "noemi-paganini": 11,
+    "camilla-lingeri": 25,
+    "virginia-rossoni": 13,
+    "matteo-bocchio": 18,
+    "giulia-scozzafava": 5,
+    "edoardo-grimoldi": 10,
+    "gregorio-puccio": 14,
+    "daniele-gelli": 12,
+    "francesco-bocchio": 20,
+    "alessio-nava": 8
   },
   "byMatchMethod": {
-    "membership_card": 49
+    "membership_card": 229
   },
   "errors": []
 }
 fitpExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-09T00:45:21.436Z",
+  "generatedAt": "2026-08-09T01:50:21.376Z",
   "status": "seeded_pending_live_tournamentsoftware_scan",
   "source": "ex novo Tennis Europe discovery; no v1/v2/data.json; official profile/tournament seeds only until live scanner is expanded",
   "coverageFrom": "2025-12-18",
@@ -53,7 +54,7 @@ fitpExit=0
 teExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-09T00:45:21.466Z",
+  "generatedAt": "2026-08-09T01:50:21.408Z",
   "status": "seeded_pending_live_itf_scan",
   "source": "ex novo ITF discovery; no v1/v2/data.json; official ITF seeds only until live scanner is expanded",
   "coverageFrom": "2025-12-18",
@@ -64,26 +65,27 @@ teExit=0
 itfExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-09T00:45:21.497Z",
-  "status": "entries_engine_merged_ex_novo_discoveries",
+  "generatedAt": "2026-08-09T01:50:21.441Z",
+  "status": "entries_engine_merged_ex_novo_discoveries_te_excluded_from_calendar",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
-    "tournamentEntries": 67,
-    "tournaments": 67,
+    "tournamentEntries": 230,
+    "tournaments": 230,
     "byCircuit": {
-      "fitp": 49,
-      "tennis-europe": 17,
+      "fitp": 229,
       "itf": 1
     },
-    "warnings": 0
+    "warnings": 0,
+    "tennisEuropeExcludedFromCalendar": 17
   },
   "engines": {
     "discoverFitp": {
       "status": "fitp_individual_entries_complete_from_puc_any_list_name_or_card"
     },
     "discoverTennisEurope": {
-      "status": "seeded_pending_live_tournamentsoftware_scan"
+      "status": "seeded_pending_live_tournamentsoftware_scan",
+      "calendarMerge": "excluded_until_dedicated_te_engine"
     },
     "discoverItf": {
       "status": "seeded_pending_live_itf_scan"
@@ -91,7 +93,7 @@ itfExit=0
     "entries": {
       "status": "built",
       "file": "src/v3/entries-engine.mjs",
-      "method": "merge dist/v3/source_*_entries.json only; no v1/v2/data.json"
+      "method": "merge FITP + ITF only; TE source retained but excluded from visible calendar; no v1/v2/data.json"
     },
     "ordersOfPlay": {
       "status": "pending"
