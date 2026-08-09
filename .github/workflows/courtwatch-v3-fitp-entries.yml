@@ -13,7 +13,9 @@ on:
       - '.github/workflows/courtwatch-v3-fitp-entries.yml'
       - 'players.json'
 permissions: {contents: write}
-concurrency: {group: court-watch-v3-fitp-entries,cancel-in-progress: true}
+concurrency:
+  group: court-watch-v3-fitp-entries-${{ github.run_id }}
+  cancel-in-progress: false
 jobs:
   entries:
     runs-on: ubuntu-latest
@@ -28,6 +30,8 @@ jobs:
           tmpLog="courtwatch-v3-fitp-entries-run.tmp.log"
           : > "$tmpLog"
           echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          echo "sourceSha=${GITHUB_SHA}" >> "$tmpLog"
+          echo "runId=${GITHUB_RUN_ID}" >> "$tmpLog"
           node src/v3/discover-fitp-tournaments.mjs >> "$tmpLog" 2>&1
           fitpTournamentsCode=$?
           echo "fitpTournamentsExit=$fitpTournamentsCode" >> "$tmpLog"
