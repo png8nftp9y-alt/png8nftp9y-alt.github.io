@@ -13,18 +13,21 @@ const playersDoc=await readJson('players.json',{players:[]});
 const fitp=await readJson('dist/v3/source_fitp_entries.json',{entries:[]});
 const te=await readJson('dist/v3/source_tennis_europe_entries.json',{entries:[]});
 const itf=await readJson('dist/v3/source_itf_entries.json',{entries:[]});
-const entries=[...(fitp.entries||[]),...(te.entries||[]),...(itf.entries||[])].map(entry).filter(e=>e.playerId&&validDate(e.endDate));
+// Tennis Europe rows are deliberately NOT merged into the visible v3 calendar for now.
+// They remain in their source file for the future dedicated TE engine, but the calendar must not show TE seed rows as FITP/active tournaments.
+const teEntries=(te.entries||[]).map(entry).filter(e=>e.playerId&&validDate(e.endDate));
+const entries=[...(fitp.entries||[]),...(itf.entries||[])].map(entry).filter(e=>e.playerId&&validDate(e.endDate));
 const seen=new Set();
 const tournamentEntries=entries.filter(e=>{const k=[e.playerId,e.circuit,e.competitionId||e.tournamentName].join('|');if(seen.has(k))return false;seen.add(k);return true});
 const tournaments=tournamentEntries.map(toTournament);
 const byCircuit=tournamentEntries.reduce((a,e)=>{a[e.circuit]=(a[e.circuit]||0)+1;return a},{});
-const warnings=[];for(const e of tournamentEntries){if(e.circuit==='fitp'&&!e.competitionId)warnings.push('FITP senza P.U.C. id: '+e.playerName+' · '+e.tournamentName);if((e.circuit==='tennis-europe'||e.circuit==='itf')&&!e.sourceUrl)warnings.push(e.circuit+' senza URL ufficiale: '+e.playerName+' · '+e.tournamentName)}
-const syncStatus={version:VERSION,generatedAt:NOW,status:'entries_engine_merged_ex_novo_discoveries',coverageFrom:COVERAGE_FROM,checks:{players:(playersDoc.players||[]).length,tournamentEntries:tournamentEntries.length,tournaments:tournaments.length,byCircuit,warnings:warnings.length},engines:{discoverFitp:{status:fitp.status||'missing'},discoverTennisEurope:{status:te.status||'missing'},discoverItf:{status:itf.status||'missing'},entries:{status:'built',file:'src/v3/entries-engine.mjs',method:'merge dist/v3/source_*_entries.json only; no v1/v2/data.json'},ordersOfPlay:{status:'pending'},results:{status:'pending'}},warnings:warnings.slice(0,200)};
+const warnings=[];for(const e of tournamentEntries){if(e.circuit==='fitp'&&!e.competitionId)warnings.push('FITP senza P.U.C. id: '+e.playerName+' · '+e.tournamentName);if(e.circuit==='itf'&&!e.sourceUrl)warnings.push(e.circuit+' senza URL ufficiale: '+e.playerName+' · '+e.tournamentName)}
+const syncStatus={version:VERSION,generatedAt:NOW,status:'entries_engine_merged_ex_novo_discoveries_te_excluded_from_calendar',coverageFrom:COVERAGE_FROM,checks:{players:(playersDoc.players||[]).length,tournamentEntries:tournamentEntries.length,tournaments:tournaments.length,byCircuit,warnings:warnings.length,tennisEuropeExcludedFromCalendar:teEntries.length},engines:{discoverFitp:{status:fitp.status||'missing'},discoverTennisEurope:{status:te.status||'missing',calendarMerge:'excluded_until_dedicated_te_engine'},discoverItf:{status:itf.status||'missing'},entries:{status:'built',file:'src/v3/entries-engine.mjs',method:'merge FITP + ITF only; TE source retained but excluded from visible calendar; no v1/v2/data.json'},ordersOfPlay:{status:'pending'},results:{status:'pending'}},warnings:warnings.slice(0,200)};
 await writeJson('dist/v3/players.json',{version:VERSION,generatedAt:NOW,players:playersDoc.players||[]});
 await writeJson('dist/v3/tournament_entries.json',{version:VERSION,generatedAt:NOW,tournamentEntries});
 await writeJson('dist/v3/tournaments.json',{version:VERSION,generatedAt:NOW,tournaments});
 await writeJson('dist/v3/entries_fitp.json',{version:VERSION,generatedAt:NOW,tournamentEntries:tournamentEntries.filter(e=>e.circuit==='fitp')});
-await writeJson('dist/v3/entries_tennis_europe.json',{version:VERSION,generatedAt:NOW,tournamentEntries:tournamentEntries.filter(e=>e.circuit==='tennis-europe')});
+await writeJson('dist/v3/entries_tennis_europe.json',{version:VERSION,generatedAt:NOW,tournamentEntries:[]});
 await writeJson('dist/v3/entries_itf.json',{version:VERSION,generatedAt:NOW,tournamentEntries:tournamentEntries.filter(e=>e.circuit==='itf')});
 await writeJson('dist/v3/sync_status.json',syncStatus);
 await writeJson('dist/v3/entries_log.json',syncStatus);
