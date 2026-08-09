@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/v3/discover-fitp-tournaments.mjs'
       - 'src/v3/discover-fitp.mjs'
+      - 'src/v3/entries-engine.mjs'
       - 'courtwatch-v3-fitp-entries-trigger.json'
       - '.github/workflows/courtwatch-v3-fitp-entries.yml'
       - 'players.json'
@@ -19,23 +20,27 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Run FITP-only tournament and entries discovery
+      - name: Run FITP-only discovery, entries and calendar merge
         run: |
           set +e
           : > courtwatch-v3-fitp-entries-run.log
           node src/v3/discover-fitp-tournaments.mjs >> courtwatch-v3-fitp-entries-run.log 2>&1
           echo "fitpTournamentsExit=$?" >> courtwatch-v3-fitp-entries-run.log
           node src/v3/discover-fitp.mjs >> courtwatch-v3-fitp-entries-run.log 2>&1
-          code=$?
-          echo "fitpEntriesExit=$code" >> courtwatch-v3-fitp-entries-run.log
+          fitpCode=$?
+          echo "fitpEntriesExit=$fitpCode" >> courtwatch-v3-fitp-entries-run.log
+          node src/v3/entries-engine.mjs >> courtwatch-v3-fitp-entries-run.log 2>&1
+          mergeCode=$?
+          echo "calendarMergeExit=$mergeCode" >> courtwatch-v3-fitp-entries-run.log
           cat courtwatch-v3-fitp-entries-run.log
-          exit $code
-      - name: Commit FITP-only entries output
+          if [ "$fitpCode" -ne 0 ]; then exit "$fitpCode"; fi
+          exit "$mergeCode"
+      - name: Commit FITP-only entries and calendar output
         if: always()
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_fitp_tournaments.json dist/v3/source_fitp_tournaments_audit.json dist/v3/source_fitp_entries.json dist/v3/source_fitp_entries_audit.json courtwatch-v3-fitp-entries-run.log .github/workflows/courtwatch-v3-fitp-entries.yml
-          git commit -m "Build Court Watch v3 FITP-only entries" || exit 0
+          git add dist/v3/source_fitp_tournaments.json dist/v3/source_fitp_tournaments_audit.json dist/v3/source_fitp_entries.json dist/v3/source_fitp_entries_audit.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/sync_status.json dist/v3/entries_log.json courtwatch-v3-fitp-entries-run.log .github/workflows/courtwatch-v3-fitp-entries.yml
+          git commit -m "Build Court Watch v3 FITP entries and calendar" || exit 0
           git pull --rebase origin main || true
           git push origin HEAD:main || true
