@@ -1,6 +1,8 @@
 name: Court Watch v3 FITP-only entries
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
   push:
     branches: [main]
     paths:
