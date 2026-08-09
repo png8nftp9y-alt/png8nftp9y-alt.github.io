@@ -1,0 +1,91 @@
+startedAt=2026-08-09T19:42:08Z
+sourceSha=557237a14d1c92a8b275d8e5c2449a70dca2812d
+runId=31332330812
+mode=consume-existing-source_fitp_tournaments
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-09T19:42:08.042Z",
+  "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict",
+  "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first; exact full name only when no P.U.C. card is available, preventing homonym/card-mismatch false positives. Team championships/cod_fonte=3 are excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
+  "coverageFrom": "2025-12-18",
+  "tournamentsInput": 5315,
+  "allFitpTournamentsInput": 5315,
+  "excludedTeamChampionships": 0,
+  "detailsChecked": 5315,
+  "detailsWithDraws": 5312,
+  "detailsWithParticipants": 14634,
+  "participantsScanned": 366596,
+  "participantsWithCard": 366596,
+  "entriesFound": 280,
+  "playersWithEntries": 19,
+  "homonymRejected": 0,
+  "byPlayer": {
+    "francesco-renzulli": 18,
+    "nikola-kerkenyakov": 11,
+    "carlo-ghislotti": 13,
+    "matilde-mainetti": 9,
+    "aila-zennaro": 11,
+    "virginia-cereghini": 7,
+    "martina-danesi": 10,
+    "filippo-vitali": 18,
+    "nicholas-scappa": 8,
+    "noemi-paganini": 11,
+    "camilla-lingeri": 34,
+    "daniele-gelli": 17,
+    "francesco-bocchio": 26,
+    "gregorio-puccio": 23,
+    "virginia-rossoni": 14,
+    "matteo-bocchio": 23,
+    "giulia-scozzafava": 6,
+    "edoardo-grimoldi": 12,
+    "alessio-nava": 9
+  },
+  "byMatchMethod": {
+    "membership_card": 280
+  },
+  "errors": []
+}
+fitpEntriesExit=0
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-09T19:43:15.498Z",
+  "status": "entries_engine_merged_ex_novo_discoveries_te_excluded_from_calendar",
+  "coverageFrom": "2025-12-18",
+  "checks": {
+    "players": 19,
+    "tournamentEntries": 281,
+    "tournaments": 281,
+    "byCircuit": {
+      "fitp": 280,
+      "itf": 1
+    },
+    "warnings": 0,
+    "tennisEuropeExcludedFromCalendar": 17
+  },
+  "engines": {
+    "discoverFitp": {
+      "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict"
+    },
+    "discoverTennisEurope": {
+      "status": "seeded_pending_live_tournamentsoftware_scan",
+      "calendarMerge": "excluded_until_dedicated_te_engine"
+    },
+    "discoverItf": {
+      "status": "seeded_pending_live_itf_scan"
+    },
+    "entries": {
+      "status": "built",
+      "file": "src/v3/entries-engine.mjs",
+      "method": "merge FITP + ITF only; TE source retained but excluded from visible calendar; no v1/v2/data.json"
+    },
+    "ordersOfPlay": {
+      "status": "pending"
+    },
+    "results": {
+      "status": "pending"
+    }
+  },
+  "warnings": []
+}
+calendarMergeExit=0
+finishedAt=2026-08-09T19:43:15Z
