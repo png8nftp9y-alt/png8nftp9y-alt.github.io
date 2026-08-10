@@ -1,0 +1,32 @@
+name: Court Watch v3 FITP player sheet API
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'courtwatch-v3-fitp-player-sheet-api-trigger.json'
+      - 'src/v3/diagnose-fitp-player-sheet-api.mjs'
+      - '.github/workflows/courtwatch-v3-fitp-player-sheet-api.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          set +e
+          node src/v3/diagnose-fitp-player-sheet-api.mjs > courtwatch-v3-fitp-player-sheet-api-run.log 2>&1
+          echo "sheetApiExit=$?" >> courtwatch-v3-fitp-player-sheet-api-run.log
+      - run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/fitp_player_sheet_api_diagnostic.json courtwatch-v3-fitp-player-sheet-api-run.log
+          git commit -m "Run Court Watch v3 FITP player sheet API diagnostic" || echo "No changes"
+          git push
