@@ -7,17 +7,51 @@ permissions: {contents: write}
 concurrency: {group: court-watch-action-probe,cancel-in-progress: true}
 jobs:
   probe:
+    if: ${{ !contains(github.event.head_commit.message, 'Build Court Watch v3 FITP entries and calendar') && !contains(github.event.head_commit.message, 'Court Watch action probe ran') }}
     runs-on: ubuntu-latest
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
-      - name: Write probe
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Run FITP rebuild through proven probe path
         run: |
-          node -e "require('fs').writeFileSync('action-probe.json', JSON.stringify({ranAt:new Date().toISOString(),sha:process.env.GITHUB_SHA,workflow:'courtwatch-action-probe'}, null, 2)+'\n')"
-      - name: Commit probe
+          set +e
+          tmpLog="courtwatch-v3-fitp-entries-run.tmp.log"
+          : > "$tmpLog"
+          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          echo "sourceSha=${GITHUB_SHA}" >> "$tmpLog"
+          echo "runId=${GITHUB_RUN_ID}" >> "$tmpLog"
+          echo "mode=probe-forced-fitp-rebuild-after-imperia-rescue" >> "$tmpLog"
+          node src/v3/discover-fitp-tournaments.mjs >> "$tmpLog" 2>&1
+          fitpTournamentsCode=$?
+          echo "fitpTournamentsExit=$fitpTournamentsCode" >> "$tmpLog"
+          if [ "$fitpTournamentsCode" -ne 0 ]; then
+            cat "$tmpLog"
+            cp "$tmpLog" courtwatch-v3-fitp-entries-run.log
+            exit "$fitpTournamentsCode"
+          fi
+          node src/v3/discover-fitp.mjs >> "$tmpLog" 2>&1
+          fitpCode=$?
+          echo "fitpEntriesExit=$fitpCode" >> "$tmpLog"
+          if [ "$fitpCode" -ne 0 ]; then
+            cat "$tmpLog"
+            cp "$tmpLog" courtwatch-v3-fitp-entries-run.log
+            exit "$fitpCode"
+          fi
+          node src/v3/entries-engine.mjs >> "$tmpLog" 2>&1
+          mergeCode=$?
+          echo "calendarMergeExit=$mergeCode" >> "$tmpLog"
+          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          cat "$tmpLog"
+          cp "$tmpLog" courtwatch-v3-fitp-entries-run.log
+          exit "$mergeCode"
+      - name: Commit FITP rebuild output
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add action-probe.json
-          git commit -m 'Court Watch action probe ran' || exit 0
-          git pull --rebase origin main
-          git push origin HEAD:main
+          git add action-probe.json dist/v3/source_fitp_tournaments.json dist/v3/source_fitp_tournaments_audit.json dist/v3/source_fitp_entries.json dist/v3/source_fitp_entries_audit.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/sync_status.json dist/v3/entries_log.json courtwatch-v3-fitp-entries-run.log .github/workflows/courtwatch-action-probe.yml
+          git commit --allow-empty -m 'Build Court Watch v3 FITP entries and calendar' || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
