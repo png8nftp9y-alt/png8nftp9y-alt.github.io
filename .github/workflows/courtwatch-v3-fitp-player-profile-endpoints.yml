@@ -1,0 +1,32 @@
+name: Court Watch v3 FITP player profile endpoints
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'courtwatch-v3-fitp-player-profile-endpoints-trigger.json'
+      - 'src/v3/diagnose-fitp-player-profile-endpoints.mjs'
+      - '.github/workflows/courtwatch-v3-fitp-player-profile-endpoints.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          set +e
+          node src/v3/diagnose-fitp-player-profile-endpoints.mjs > courtwatch-v3-fitp-player-profile-endpoints-run.log 2>&1
+          echo "endpointExit=$?" >> courtwatch-v3-fitp-player-profile-endpoints-run.log
+      - run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/fitp_player_profile_endpoint_diagnostic.json courtwatch-v3-fitp-player-profile-endpoints-run.log
+          git commit -m "Run Court Watch v3 FITP profile endpoint diagnostic" || echo "No changes"
+          git push
