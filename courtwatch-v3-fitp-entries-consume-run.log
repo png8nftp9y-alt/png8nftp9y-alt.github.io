@@ -1,24 +1,24 @@
-startedAt=2026-08-09T23:05:32Z
-sourceSha=54c047cf73dcf796bc971d52ae9a8e84ecf38eae
-runId=31341023968
+startedAt=2026-08-10T05:08:50Z
+sourceSha=c66fb5303b4a8d47a9840c24aaee8f2235954858
+runId=31357654757
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-09T23:05:32.404Z",
+  "generatedAt": "2026-08-10T05:08:50.551Z",
   "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict",
   "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first; exact full name only when no P.U.C. card is available, preventing homonym/card-mismatch false positives. Team championships/cod_fonte=3 are excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 5316,
-  "allFitpTournamentsInput": 5316,
+  "tournamentsInput": 5418,
+  "allFitpTournamentsInput": 5418,
   "excludedTeamChampionships": 0,
-  "detailsChecked": 5316,
-  "detailsWithDraws": 5313,
-  "detailsWithParticipants": 14638,
-  "participantsScanned": 366766,
-  "participantsWithCard": 366766,
-  "entriesFound": 280,
+  "detailsChecked": 5418,
+  "detailsWithDraws": 5415,
+  "detailsWithParticipants": 14925,
+  "participantsScanned": 378455,
+  "participantsWithCard": 378455,
+  "entriesFound": 281,
   "playersWithEntries": 19,
-  "homonymRejected": 0,
+  "homonymRejected": 1,
   "byPlayer": {
     "francesco-renzulli": 18,
     "nikola-kerkenyakov": 11,
@@ -38,25 +38,25 @@ mode=consume-existing-source_fitp_tournaments
     "matteo-bocchio": 23,
     "giulia-scozzafava": 6,
     "edoardo-grimoldi": 12,
-    "alessio-nava": 9
+    "alessio-nava": 10
   },
   "byMatchMethod": {
-    "membership_card": 280
+    "membership_card": 281
   },
   "errors": []
 }
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-09T23:07:14.720Z",
+  "generatedAt": "2026-08-10T05:10:36.293Z",
   "status": "entries_engine_merged_ex_novo_discoveries_te_excluded_from_calendar",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
-    "tournamentEntries": 281,
-    "tournaments": 281,
+    "tournamentEntries": 282,
+    "tournaments": 282,
     "byCircuit": {
-      "fitp": 280,
+      "fitp": 281,
       "itf": 1
     },
     "warnings": 0,
@@ -88,4 +88,4 @@ fitpEntriesExit=0
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-09T23:07:14Z
+finishedAt=2026-08-10T05:10:36Z
