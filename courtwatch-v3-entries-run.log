@@ -1,61 +1,155 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-09T15:51:57.871Z",
+  "generatedAt": "2026-08-10T19:36:15.791Z",
   "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict",
   "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first; exact full name only when no P.U.C. card is available, preventing homonym/card-mismatch false positives. Team championships/cod_fonte=3 are excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 5378,
-  "allFitpTournamentsInput": 5378,
+  "tournamentsInput": 5484,
+  "baseTournamentsInput": 5483,
+  "allFitpTournamentsInput": 5483,
   "excludedTeamChampionships": 0,
-  "detailsChecked": 5378,
-  "detailsWithDraws": 5375,
-  "detailsWithParticipants": 14821,
-  "participantsScanned": 373643,
-  "participantsWithCard": 373643,
-  "entriesFound": 275,
+  "detailsChecked": 5484,
+  "detailsWithDraws": 5481,
+  "detailsWithParticipants": 15087,
+  "participantsScanned": 382884,
+  "participantsWithCard": 382884,
+  "entriesFound": 282,
   "playersWithEntries": 19,
   "homonymRejected": 1,
+  "verifiedCompetitionIds": [
+    "25C6CC33-AE3A-447E-A55B-FBE66FBAFC80",
+    "B3110C9E-C6E4-4DE6-A9A3-BAB9B1341D47"
+  ],
+  "verifiedCompetitionEntryRescues": 1,
   "byPlayer": {
     "francesco-renzulli": 18,
     "nikola-kerkenyakov": 11,
     "carlo-ghislotti": 13,
     "matilde-mainetti": 9,
-    "aila-zennaro": 10,
+    "aila-zennaro": 11,
     "virginia-cereghini": 7,
-    "martina-danesi": 9,
-    "filippo-vitali": 17,
+    "martina-danesi": 10,
+    "filippo-vitali": 18,
     "nicholas-scappa": 8,
     "noemi-paganini": 11,
-    "camilla-lingeri": 33,
-    "daniele-gelli": 16,
+    "camilla-lingeri": 34,
+    "daniele-gelli": 17,
     "francesco-bocchio": 26,
     "gregorio-puccio": 23,
-    "virginia-rossoni": 14,
+    "virginia-rossoni": 15,
     "matteo-bocchio": 23,
     "giulia-scozzafava": 6,
     "edoardo-grimoldi": 12,
-    "alessio-nava": 9
+    "alessio-nava": 10
   },
   "byMatchMethod": {
-    "membership_card": 275
+    "membership_card": 282
   },
   "errors": []
 }
 fitpExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-09T15:53:10.505Z",
-  "status": "seeded_pending_live_tournamentsoftware_scan",
-  "source": "ex novo Tennis Europe discovery; no v1/v2/data.json; official profile/tournament seeds only until live scanner is expanded",
+  "generatedAt": "2026-08-10T19:37:46.465Z",
+  "status": "tennis_europe_profile_tournament_scan_complete",
+  "source": "Ex novo Tennis Europe engine: scans official TournamentSoftware player profiles, follows official tournament links, confirms entry only when the official tournament page contains the tracked player. No FITP P.U.C., no v1/v2/data.json.",
   "coverageFrom": "2025-12-18",
   "profiles": 17,
-  "entriesFound": 17,
-  "errors": []
+  "entriesFound": 0,
+  "profileSeeds": 11,
+  "byPlayer": {},
+  "errors": [
+    {
+      "playerId": "aila-zennaro",
+      "profileId": "D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "alessio-nava",
+      "playerName": "Alessio Nava",
+      "type": "missing_te_profile_id"
+    },
+    {
+      "playerId": "carlo-ghislotti",
+      "playerName": "Carlo Ghislotti",
+      "type": "missing_te_profile_id"
+    },
+    {
+      "playerId": "daniele-gelli",
+      "profileId": "5E353E97-2922-4325-86E9-5649DD0B1278",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "edoardo-grimoldi",
+      "profileId": "DD39851A-1AA9-4599-BD5D-03A476DE1359",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "filippo-vitali",
+      "profileId": "6D381ABF-684B-48A4-8F31-7AB2DF775C3D",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "francesco-bocchio",
+      "playerName": "Francesco Bocchio",
+      "type": "missing_te_profile_id"
+    },
+    {
+      "playerId": "francesco-renzulli",
+      "profileId": "AAE7B4D4-B63E-49F5-A7E2-8B062CB43854",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "giulia-scozzafava",
+      "profileId": "8863E330-0C45-4DEA-B014-B5320FAD1725",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "gregorio-puccio",
+      "profileId": "D8EA4480-5E3A-4AC6-AEC1-9D8FA564D433",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "martina-danesi",
+      "profileId": "46010E1A-5310-41AB-95AF-6D1B0BC54EB6",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "matteo-bocchio",
+      "playerName": "Matteo Bocchio",
+      "type": "missing_te_profile_id"
+    },
+    {
+      "playerId": "nicholas-scappa",
+      "playerName": "Nicholas Scappa",
+      "type": "missing_te_profile_id"
+    },
+    {
+      "playerId": "nikola-kerkenyakov",
+      "profileId": "79C36DD2-6BE3-4549-A428-F5897229E763",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "noemi-paganini",
+      "profileId": "D8396AA5-30E5-44D0-BA66-54F01F7FEA98",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "virginia-cereghini",
+      "profileId": "39E97344-EA92-41F7-8FDF-77A250650ADE",
+      "type": "no_tournament_links_found"
+    },
+    {
+      "playerId": "virginia-rossoni",
+      "playerName": "Virginia Rossoni",
+      "type": "missing_te_profile_id"
+    }
+  ]
 }
 teExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-09T15:53:10.541Z",
+  "generatedAt": "2026-08-10T19:37:58.462Z",
   "status": "seeded_pending_live_itf_scan",
   "source": "ex novo ITF discovery; no v1/v2/data.json; official ITF seeds only until live scanner is expanded",
   "coverageFrom": "2025-12-18",
@@ -66,26 +160,27 @@ teExit=0
 itfExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-09T15:53:10.576Z",
+  "generatedAt": "2026-08-10T19:37:58.488Z",
   "status": "entries_engine_merged_ex_novo_discoveries_te_excluded_from_calendar",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 19,
-    "tournamentEntries": 276,
-    "tournaments": 276,
+    "tournamentEntries": 283,
+    "tournaments": 283,
     "byCircuit": {
-      "fitp": 275,
+      "fitp": 282,
       "itf": 1
     },
     "warnings": 0,
-    "tennisEuropeExcludedFromCalendar": 17
+    "tennisEuropeExcludedFromCalendar": 11,
+    "diagnostics": "yellow"
   },
   "engines": {
     "discoverFitp": {
       "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict"
     },
     "discoverTennisEurope": {
-      "status": "seeded_pending_live_tournamentsoftware_scan",
+      "status": "tennis_europe_profile_tournament_scan_complete",
       "calendarMerge": "excluded_until_dedicated_te_engine"
     },
     "discoverItf": {
@@ -97,10 +192,10 @@ itfExit=0
       "method": "merge FITP + ITF only; TE source retained but excluded from visible calendar; no v1/v2/data.json"
     },
     "ordersOfPlay": {
-      "status": "pending"
+      "status": "active"
     },
     "results": {
-      "status": "pending"
+      "status": "active"
     }
   },
   "warnings": []
