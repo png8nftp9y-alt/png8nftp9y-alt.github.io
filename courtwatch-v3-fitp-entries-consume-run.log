@@ -1,21 +1,21 @@
-startedAt=2026-08-10T10:04:00Z
-sourceSha=09a4f7951a2a6a82844ce832bf8d818a31e20703
-runId=31377461113
+startedAt=2026-08-10T14:35:50Z
+sourceSha=7493a1670ccb90317af6589ca98f49d0f79445c2
+runId=31398994344
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-10T10:04:00.666Z",
+  "generatedAt": "2026-08-10T14:35:50.594Z",
   "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict",
   "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first; exact full name only when no P.U.C. card is available, preventing homonym/card-mismatch false positives. Team championships/cod_fonte=3 are excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 5418,
-  "allFitpTournamentsInput": 5418,
+  "tournamentsInput": 5483,
+  "allFitpTournamentsInput": 5483,
   "excludedTeamChampionships": 0,
-  "detailsChecked": 5418,
-  "detailsWithDraws": 5413,
-  "detailsWithParticipants": 14927,
-  "participantsScanned": 378751,
-  "participantsWithCard": 378751,
+  "detailsChecked": 5483,
+  "detailsWithDraws": 5480,
+  "detailsWithParticipants": 15067,
+  "participantsScanned": 382444,
+  "participantsWithCard": 382444,
   "entriesFound": 281,
   "playersWithEntries": 19,
   "homonymRejected": 1,
@@ -48,7 +48,7 @@ mode=consume-existing-source_fitp_tournaments
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-10T10:05:43.509Z",
+  "generatedAt": "2026-08-10T14:37:39.451Z",
   "status": "entries_engine_merged_ex_novo_discoveries_te_excluded_from_calendar",
   "coverageFrom": "2025-12-18",
   "checks": {
@@ -60,14 +60,14 @@ fitpEntriesExit=0
       "itf": 1
     },
     "warnings": 0,
-    "tennisEuropeExcludedFromCalendar": 17
+    "tennisEuropeExcludedFromCalendar": 11
   },
   "engines": {
     "discoverFitp": {
       "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict"
     },
     "discoverTennisEurope": {
-      "status": "seeded_pending_live_tournamentsoftware_scan",
+      "status": "tennis_europe_profile_tournament_scan_complete",
       "calendarMerge": "excluded_until_dedicated_te_engine"
     },
     "discoverItf": {
@@ -88,4 +88,4 @@ fitpEntriesExit=0
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-10T10:05:43Z
+finishedAt=2026-08-10T14:37:39Z
