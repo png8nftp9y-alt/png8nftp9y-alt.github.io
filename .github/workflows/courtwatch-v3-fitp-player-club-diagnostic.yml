@@ -1,0 +1,38 @@
+name: Court Watch v3 FITP player club diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'courtwatch-v3-fitp-player-club-diagnostic-trigger.json'
+      - 'src/v3/diagnose-fitp-player-clubs.mjs'
+      - '.github/workflows/courtwatch-v3-fitp-player-club-diagnostic.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: courtwatch-v3-fitp-player-club-diagnostic
+  cancel-in-progress: true
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Diagnose player clubs
+        run: |
+          set +e
+          node src/v3/diagnose-fitp-player-clubs.mjs > courtwatch-v3-fitp-player-club-diagnostic-run.log 2>&1
+          echo "diagnosticExit=$?" >> courtwatch-v3-fitp-player-club-diagnostic-run.log
+      - name: Commit diagnostic
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/fitp_player_club_diagnostic.json courtwatch-v3-fitp-player-club-diagnostic-run.log
+          git commit -m "Run Court Watch v3 FITP player club diagnostic" || echo "No changes"
+          git push
