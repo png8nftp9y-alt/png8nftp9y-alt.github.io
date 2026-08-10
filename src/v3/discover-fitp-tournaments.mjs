@@ -11,10 +11,10 @@ const HORIZON_DAYS=730;
 const REGION_IDS=Array.from({length:20},(_,i)=>String(i+1));
 const STATE_IDS=['0','1','2','3','4'];
 const PROVINCE_IDS=Array.from({length:130},(_,i)=>String(i+1));
-const DIAGNOSTIC_WORDS=['IMPERIA','MILANO 3','MILANO3','MILANO TRE','TENNIS CLUB MILANO 3','TC MILANO 3','TENNIS CLUB IMPERIA','TC IMPERIA'];
+const DIAGNOSTIC_WORDS=['IMPERIA','MILANO 3','MILANO3','MILANO TRE','TENNIS CLUB MILANO 3','TC MILANO 3','SPORTING MILANO 3','SPORTING MI3','BASIGLIO','TENNIS CLUB IMPERIA','TC IMPERIA','IMPERIA KINDER','KINDER IMPERIA','TENNIS TROPHY IMPERIA','MILANO 3 KINDER','KINDER MILANO 3','BASIGLIO KINDER','SPORTING MILANO 3 KINDER','SPORTING MI3 KINDER','TENNIS TROPHY MILANO 3','TENNIS TROPHY BASIGLIO'];
 async function writeJson(p,v){await fs.mkdir(p.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(p,JSON.stringify(v,null,2)+'\n')}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-async function post(body,attempt=0){const r=await fetch(BASE+'/api/v3/tornei/puc/list',{method:'POST',headers:{'content-type':'application/json','user-agent':'Mozilla/5.0 CourtWatch-v3-fitp-individual-discovery/7.4-kinder-diagnostic-scopefix','origin':'https://www.fitp.it','referer':'https://www.fitp.it/Tornei/Ricerca-tornei'},body:JSON.stringify(body)});const text=await r.text();if(!r.ok){if(attempt<3&&(r.status>=500||r.status===429)){await sleep(500*(attempt+1));return post(body,attempt+1)}throw Error(r.status+' '+text.slice(0,220))}return text?JSON.parse(text):null}
+async function post(body,attempt=0){const r=await fetch(BASE+'/api/v3/tornei/puc/list',{method:'POST',headers:{'content-type':'application/json','user-agent':'Mozilla/5.0 CourtWatch-v3-fitp-individual-discovery/7.5-compound-kinder-terms','origin':'https://www.fitp.it','referer':'https://www.fitp.it/Tornei/Ricerca-tornei'},body:JSON.stringify(body)});const text=await r.text();if(!r.ok){if(attempt<3&&(r.status>=500||r.status===429)){await sleep(500*(attempt+1));return post(body,attempt+1)}throw Error(r.status+' '+text.slice(0,220))}return text?JSON.parse(text):null}
 const dd=n=>String(n).padStart(2,'0');
 function it(d){return `${dd(d.getUTCDate())}/${dd(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`}
 function iso(v){const s=String(v||'').trim();let m=s.match(/^(20\d{2})-(\d{2})-(\d{2})/);if(m)return m[0];m=s.match(/^(\d{1,2})\D(\d{1,2})\D(20\d{2})/);return m?`${m[3]}-${dd(m[2])}-${dd(m[1])}`:''}
