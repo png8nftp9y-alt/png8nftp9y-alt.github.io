@@ -1,10 +1,10 @@
-startedAt=2026-08-10T18:31:22Z
-sourceSha=00d6f0414e21a4d743d0b376a4cc5b413424fe58
-runId=31419481219
+startedAt=2026-08-10T19:21:00Z
+sourceSha=9c48ad0f872733c7bf96a02f840bc40af27420e8
+runId=31423633079
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-10T18:31:22.579Z",
+  "generatedAt": "2026-08-10T19:21:00.401Z",
   "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict",
   "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first; exact full name only when no P.U.C. card is available, preventing homonym/card-mismatch false positives. Team championships/cod_fonte=3 are excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
@@ -14,9 +14,9 @@ mode=consume-existing-source_fitp_tournaments
   "excludedTeamChampionships": 0,
   "detailsChecked": 5484,
   "detailsWithDraws": 5481,
-  "detailsWithParticipants": 15084,
-  "participantsScanned": 382817,
-  "participantsWithCard": 382817,
+  "detailsWithParticipants": 15085,
+  "participantsScanned": 382871,
+  "participantsWithCard": 382871,
   "entriesFound": 282,
   "playersWithEntries": 19,
   "homonymRejected": 1,
@@ -54,7 +54,7 @@ mode=consume-existing-source_fitp_tournaments
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-10T18:32:40.487Z",
+  "generatedAt": "2026-08-10T19:22:36.154Z",
   "status": "entries_engine_merged_ex_novo_discoveries_te_excluded_from_calendar",
   "coverageFrom": "2025-12-18",
   "checks": {
@@ -66,7 +66,8 @@ fitpEntriesExit=0
       "itf": 1
     },
     "warnings": 0,
-    "tennisEuropeExcludedFromCalendar": 11
+    "tennisEuropeExcludedFromCalendar": 11,
+    "diagnostics": "yellow"
   },
   "engines": {
     "discoverFitp": {
@@ -85,13 +86,13 @@ fitpEntriesExit=0
       "method": "merge FITP + ITF only; TE source retained but excluded from visible calendar; no v1/v2/data.json"
     },
     "ordersOfPlay": {
-      "status": "pending"
+      "status": "active"
     },
     "results": {
-      "status": "pending"
+      "status": "active"
     }
   },
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-10T18:32:40Z
+finishedAt=2026-08-10T19:22:36Z
