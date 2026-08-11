@@ -1,22 +1,23 @@
-startedAt=2026-08-11T15:30:17Z
-sourceSha=7c4c5fe5f97f6961b6e0312a16a3a839c985c2d2
-runId=31507363975
+startedAt=2026-08-11T20:52:52Z
+sourceSha=05e72527bcf27d61ac36d6fb8383536934625b89
+runId=31535149887
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-11T15:30:17.736Z",
-  "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict",
-  "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first; exact full name only when no P.U.C. card is available, preventing homonym/card-mismatch false positives. Team championships/cod_fonte=3 are excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
+  "generatedAt": "2026-08-11T20:52:52.089Z",
+  "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict_with_player_driven_candidate_rescue",
+  "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable tournament map first, plus general player-driven P.U.C. candidate rescue for every tracked FITP player using card/name/aliases, then official P.U.C. detail participant confirmation. A tournament is valid only if the player appears in at least one Participants list. Matching uses membership card first; exact full name only when no P.U.C. card is available, preventing homonym/card-mismatch false positives. Team championships/cod_fonte=3 excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 5489,
-  "baseTournamentsInput": 5488,
-  "allFitpTournamentsInput": 5488,
+  "tournamentsInput": 5495,
+  "baseTournamentsInput": 5494,
+  "allFitpTournamentsInput": 5494,
   "excludedTeamChampionships": 0,
-  "detailsChecked": 5489,
-  "detailsWithDraws": 5486,
-  "detailsWithParticipants": 15031,
-  "participantsScanned": 381033,
-  "participantsWithCard": 381033,
+  "playerDrivenCandidateTournaments": 0,
+  "detailsChecked": 5495,
+  "detailsWithDraws": 5492,
+  "detailsWithParticipants": 15054,
+  "participantsScanned": 381590,
+  "participantsWithCard": 381590,
   "entriesFound": 301,
   "playersWithEntries": 20,
   "homonymRejected": 1,
@@ -25,6 +26,8 @@ mode=consume-existing-source_fitp_tournaments
     "B3110C9E-C6E4-4DE6-A9A3-BAB9B1341D47"
   ],
   "verifiedCompetitionEntryRescues": 1,
+  "playerDrivenCandidateRescues": 0,
+  "playerDrivenCandidatesConfirmed": 0,
   "byPlayer": {
     "francesco-renzulli": 18,
     "nikola-kerkenyakov": 11,
@@ -50,34 +53,38 @@ mode=consume-existing-source_fitp_tournaments
   "byMatchMethod": {
     "membership_card": 301
   },
+  "byDiscoveryMethod": {
+    "fitp_individual_tournament_map_then_official_detail_any_list_card_strict_confirmation": 300,
+    "fitp_verified_competition_detail_rescue_card_strict_confirmation": 1
+  },
   "errors": []
 }
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-11T15:32:01.975Z",
+  "generatedAt": "2026-08-11T21:00:17.347Z",
   "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 20,
-    "tournamentEntries": 340,
-    "tournaments": 340,
+    "tournamentEntries": 332,
+    "tournaments": 332,
     "byCircuit": {
       "fitp": 301,
-      "tennis-europe": 38,
+      "tennis-europe": 30,
       "itf": 1
     },
     "warnings": 0,
-    "tennisEuropeVisible": 38,
-    "tennisEuropeAcceptanceConfirmed": 15,
-    "diagnostics": "yellow"
+    "tennisEuropeVisible": 30,
+    "tennisEuropeAcceptanceConfirmed": 1,
+    "diagnostics": "red"
   },
   "engines": {
     "discoverFitp": {
-      "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict"
+      "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict_with_player_driven_candidate_rescue"
     },
     "discoverTennisEurope": {
-      "status": "tennis_europe_acceptance_list_engine_complete",
+      "status": "tennis_europe_acceptance_list_engine_complete_multievent_acceptance_applied_started_draw_rules_applied",
       "calendarMerge": "enabled_for_dated_official_acceptance_list_entries"
     },
     "discoverItf": {
@@ -98,4 +105,4 @@ fitpEntriesExit=0
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-11T15:32:02Z
+finishedAt=2026-08-11T21:00:17Z
