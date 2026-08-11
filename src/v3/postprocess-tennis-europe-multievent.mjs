@@ -49,7 +49,7 @@ async function req(method, url, { cookie = '', body = null } = {}) {
     method,
     redirect: 'manual',
     headers: {
-      'user-agent': 'Mozilla/5.0 CourtWatch-v3-tennis-europe-multievent/1.0',
+      'user-agent': 'Mozilla/5.0 CourtWatch-v3-tennis-europe-multievent/1.1',
       accept: 'text/html,application/json,*/*',
       'accept-language': 'en-GB,en;q=0.9,it;q=0.8',
       'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -85,39 +85,46 @@ function nameForms(name) {
 function listCode(section) {
   return section === 'Main' ? 'MD' : section === 'Qualifying' ? 'Q' : section === 'Alternates' ? 'A' : section === 'Withdrawn' ? 'W' : '';
 }
+function attr(tag, name) {
+  const m = tag.match(new RegExp(`${name}=["']([^"']*)["']`, 'i'));
+  return m ? m[1].replace(/&quot;/g, '"').replace(/&amp;/g, '&') : '';
+}
 function parseHidden(html) {
   const out = {};
-  const re = /<input\b[^>]*type=["']hidden["'][^>]*>/gi;
+  const re = /<input\b[^>]*>/gi;
   let m;
   while ((m = re.exec(html))) {
     const tag = m[0];
-    const name = (tag.match(/name=["']([^"']+)["']/i) || [])[1];
-    const value = (tag.match(/value=["']([^"']*)["']/i) || [])[1] || '';
-    if (name) out[name] = value.replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+    if (!/type=["']hidden["']/i.test(tag)) continue;
+    const name = attr(tag, 'name');
+    if (name) out[name] = attr(tag, 'value');
   }
   return out;
 }
 function parseOptions(html) {
   const selectRe = new RegExp(`<select\\b[^>]*name=["']${SELECT_NAME}["'][^>]*>([\\s\\S]*?)<\\/select>`, 'i');
-  const sel = html.match(selectRe)?.[1] || '';
+  let sel = html.match(selectRe)?.[1] || '';
+  if (!sel) {
+    const anySelect = [...html.matchAll(/<select\b[^>]*>([\s\S]*?)<\/select>/gi)].find(m => /BS\d\d|GS\d\d/i.test(m[1]));
+    sel = anySelect?.[1] || '';
+  }
   const out = [];
   const re = /<option\b([^>]*)>([\s\S]*?)<\/option>/gi;
   let m;
   while ((m = re.exec(sel))) {
-    const value = (m[1].match(/value=["']([^"']+)["']/i) || [])[1] || '';
+    const value = attr(m[1], 'value');
     const label = clean(m[2]);
     const selected = /selected/i.test(m[1]);
-    if (value && label) out.push({ value, label, selected });
+    if (value && /^(BS|GS)\d{2}$/i.test(label)) out.push({ value, label: label.toUpperCase(), selected });
   }
   return out;
 }
-function sections(text) {
-  const t = clean(text);
+function sections(html) {
+  const t = clean(html);
   const heads = [...t.matchAll(/\b(Main|Qualifying|Alternates|Withdrawn)\b/g)].map(m => ({ name: m[1], i: m.index }));
   return heads.map((h, idx) => ({ name: h.name, text: t.slice(h.i, heads[idx + 1]?.i || t.length) }));
 }
 function rowCandidates(sectionText) {
-  // Split before a likely numbered country row. This keeps position, country and name inside one record.
   return sectionText.split(/(?=\s\d{1,3}\s+(?:\([^)]*\)\s+)?\[[A-Z]{2,3}\]\s+)/g).map(clean).filter(Boolean);
 }
 function parseAcceptanceHtml(html, playerMap, forcedEvent = '') {
@@ -125,14 +132,12 @@ function parseAcceptanceHtml(html, playerMap, forcedEvent = '') {
   const event = forcedEvent || (t.match(/\b(BS\d\d|GS\d\d) Acceptance list\b/i) || [])[1] || '';
   const lastUpdated = (t.match(/Last updated:\s*([^\.]+)\./i) || [])[1] || '';
   const found = [];
-
   for (const sec of sections(html)) {
     for (const row of rowCandidates(sec.text)) {
       const rowNorm = normName(row);
       const pos = Number((row.match(/^\s*(\d{1,3})\s+/) || [])[1] || 0) || null;
       for (const player of playerMap.values()) {
-        const matched = player.forms.some(f => rowNorm.includes(f));
-        if (!matched) continue;
+        if (!player.forms.some(f => rowNorm.includes(f))) continue;
         const code = listCode(sec.name);
         found.push({
           playerId: player.id,
@@ -151,7 +156,7 @@ function parseAcceptanceHtml(html, playerMap, forcedEvent = '') {
   return found;
 }
 async function fetchEventHtml(url, cookie, baseHtml, option) {
-  if (!option) return baseHtml;
+  if (!option?.value) return baseHtml;
   const hidden = parseHidden(baseHtml);
   const body = new URLSearchParams();
   for (const [k, v] of Object.entries(hidden)) body.set(k, v);
@@ -159,36 +164,37 @@ async function fetchEventHtml(url, cookie, baseHtml, option) {
   body.set('__EVENTARGUMENT', '');
   body.set(SELECT_NAME, option.value);
   const r = await req('POST', url, { cookie, body: body.toString() });
-  return r.status === 200 && r.text ? r.text : baseHtml;
+  if (r.status === 200 && r.text && /Acceptance list/i.test(r.text)) return r.text;
+  return baseHtml;
 }
 async function parseCompetitionAcceptance(competitionId, entries, cookie) {
   const url = `${BASE}/sport/acceptancelist.aspx?id=${competitionId}`;
   const r = await req('GET', url, { cookie });
   if (r.status !== 200) return { competitionId, url, published: false, events: [], matches: [], error: `status_${r.status}` };
+  const pageText = clean(r.text);
+  if (/not available|Page not found/i.test(pageText)) return { competitionId, url, published: false, events: [], matches: [] };
 
   const playerMap = new Map();
-  for (const e of entries) {
-    playerMap.set(e.playerId, { id: e.playerId, name: e.playerName, forms: nameForms(e.playerName) });
-  }
+  for (const e of entries) playerMap.set(e.playerId, { id: e.playerId, name: e.playerName, forms: nameForms(e.playerName) });
 
   const options = parseOptions(r.text);
-  const events = options.length ? options : [{ value: '', label: '', selected: true }];
+  const defaultEvent = (pageText.match(/\b(BS\d\d|GS\d\d) Acceptance list\b/i) || [])[1] || '';
+  const events = options.length ? options : [{ value: '', label: defaultEvent, selected: true }];
   const byKey = new Map();
   const eventAudit = [];
-
   for (const option of events) {
-    const html = option.value ? await fetchEventHtml(url, cookie, r.text, option) : r.text;
-    const matches = parseAcceptanceHtml(html, playerMap, option.label);
-    eventAudit.push({ label: option.label || 'default', value: option.value || '', matches: matches.length });
+    const html = option.value && !option.selected ? await fetchEventHtml(url, cookie, r.text, option) : r.text;
+    const matches = parseAcceptanceHtml(html, playerMap, option.label || defaultEvent);
+    eventAudit.push({ label: option.label || defaultEvent || 'default', value: option.value || '', selected: !!option.selected, matches: matches.length });
     for (const m of matches) byKey.set(`${m.playerId}|${m.acceptanceEvent}|${m.acceptanceList}|${m.acceptancePosition || ''}`, m);
     await sleep(20);
   }
-
   return { competitionId, url, published: true, events: eventAudit, matches: [...byKey.values()] };
 }
 function chooseBest(matches) {
   if (!matches.length) return null;
-  const order = { Main: 1, Qualifying: 2, Alternates: 3, Withdrawn: 4 };
+  if (matches.some(m => m.acceptanceList === 'Withdrawn')) return matches.find(m => m.acceptanceList === 'Withdrawn');
+  const order = { Main: 1, Qualifying: 2, Alternates: 3 };
   return [...matches].sort((a, b) => (order[a.acceptanceList] || 9) - (order[b.acceptanceList] || 9) || (a.acceptancePosition || 9999) - (b.acceptancePosition || 9999))[0];
 }
 
@@ -234,9 +240,7 @@ for (const e of entries) {
       acceptanceLastUpdated: best.acceptanceLastUpdated,
       multiEventAcceptanceMatched: true,
     });
-  } else {
-    updated.push(e);
-  }
+  } else updated.push(e);
 }
 
 const teEntries = updated.filter(e => e.circuit === 'tennis-europe');
@@ -248,33 +252,19 @@ for (const e of teEntries) {
   bySourceMode[e.entryStatus] = (bySourceMode[e.entryStatus] || 0) + 1;
   byAcceptance[e.calendarListLabel || e.entryStatus] = (byAcceptance[e.calendarListLabel || e.entryStatus] || 0) + 1;
 }
-
 const eventsParsed = [...acceptanceByCompetition.values()].reduce((a, x) => a + (x.events?.length || 0), 0);
 const matchesFound = [...acceptanceByCompetition.values()].reduce((a, x) => a + (x.matches?.length || 0), 0);
 
 const output = {
   ...data,
   status: String(data.status || 'tennis_europe_acceptance_list_engine_complete') + '_multievent_acceptance_applied',
-  multiEventAcceptance: {
-    appliedAt: NOW,
-    competitionsChecked: acceptanceByCompetition.size,
-    eventsParsed,
-    matchesFound,
-    removedWithdrawn: removedWithdrawn.length,
-  },
+  multiEventAcceptance: { appliedAt: NOW, competitionsChecked: acceptanceByCompetition.size, eventsParsed, matchesFound, removedWithdrawn: removedWithdrawn.length },
   entriesFound: teEntries.length,
   byPlayer,
   bySourceMode,
   byAcceptance,
   entries: updated,
 };
-
 await writeJson(FILE, output);
-await writeJson(AUDIT_FILE, {
-  generatedAt: NOW,
-  summary: output.multiEventAcceptance,
-  competitions: [...acceptanceByCompetition.values()].map(x => ({ competitionId: x.competitionId, url: x.url, published: x.published, events: x.events, matches: x.matches })),
-  removedWithdrawn,
-});
-
+await writeJson(AUDIT_FILE, { generatedAt: NOW, summary: output.multiEventAcceptance, competitions: [...acceptanceByCompetition.values()].map(x => ({ competitionId: x.competitionId, url: x.url, published: x.published, events: x.events, matches: x.matches })), removedWithdrawn });
 console.log(JSON.stringify(output.multiEventAcceptance, null, 2));
