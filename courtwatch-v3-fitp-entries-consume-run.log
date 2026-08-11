@@ -1,23 +1,23 @@
-startedAt=2026-08-11T11:32:43Z
-sourceSha=c27b51248c65abc97b3c59e7a07d062246002785
-runId=31487099789
+startedAt=2026-08-11T15:30:17Z
+sourceSha=7c4c5fe5f97f6961b6e0312a16a3a839c985c2d2
+runId=31507363975
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-11T11:32:43.313Z",
+  "generatedAt": "2026-08-11T15:30:17.736Z",
   "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict",
   "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first; exact full name only when no P.U.C. card is available, preventing homonym/card-mismatch false positives. Team championships/cod_fonte=3 are excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 5459,
-  "baseTournamentsInput": 5458,
-  "allFitpTournamentsInput": 5458,
+  "tournamentsInput": 5489,
+  "baseTournamentsInput": 5488,
+  "allFitpTournamentsInput": 5488,
   "excludedTeamChampionships": 0,
-  "detailsChecked": 5459,
-  "detailsWithDraws": 5455,
-  "detailsWithParticipants": 15011,
-  "participantsScanned": 380461,
-  "participantsWithCard": 380461,
-  "entriesFound": 298,
+  "detailsChecked": 5489,
+  "detailsWithDraws": 5486,
+  "detailsWithParticipants": 15031,
+  "participantsScanned": 381033,
+  "participantsWithCard": 381033,
+  "entriesFound": 301,
   "playersWithEntries": 20,
   "homonymRejected": 1,
   "verifiedCompetitionIds": [
@@ -45,30 +45,31 @@ mode=consume-existing-source_fitp_tournaments
     "giulia-scozzafava": 6,
     "edoardo-grimoldi": 12,
     "anna-gambarini": 16,
-    "alessio-nava": 10
+    "alessio-nava": 13
   },
   "byMatchMethod": {
-    "membership_card": 298
+    "membership_card": 301
   },
   "errors": []
 }
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-11T11:34:30.587Z",
-  "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te",
+  "generatedAt": "2026-08-11T15:32:01.975Z",
+  "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 20,
-    "tournamentEntries": 331,
-    "tournaments": 331,
+    "tournamentEntries": 340,
+    "tournaments": 340,
     "byCircuit": {
-      "fitp": 298,
-      "tennis-europe": 32,
+      "fitp": 301,
+      "tennis-europe": 38,
       "itf": 1
     },
     "warnings": 0,
-    "tennisEuropeVisible": 32,
+    "tennisEuropeVisible": 38,
+    "tennisEuropeAcceptanceConfirmed": 15,
     "diagnostics": "yellow"
   },
   "engines": {
@@ -76,8 +77,8 @@ fitpEntriesExit=0
       "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict"
     },
     "discoverTennisEurope": {
-      "status": "tennis_europe_global_calendar_engine_complete",
-      "calendarMerge": "enabled_for_dated_official_profile_entries"
+      "status": "tennis_europe_acceptance_list_engine_complete",
+      "calendarMerge": "enabled_for_dated_official_acceptance_list_entries"
     },
     "discoverItf": {
       "status": "seeded_pending_live_itf_scan"
@@ -85,7 +86,7 @@ fitpEntriesExit=0
     "entries": {
       "status": "built",
       "file": "src/v3/entries-engine.mjs",
-      "method": "merge FITP + validated dated TE + ITF; no v1/v2/data.json"
+      "method": "merge FITP + validated dated TE acceptance list/profile entries + ITF; no v1/v2/data.json"
     },
     "ordersOfPlay": {
       "status": "active"
@@ -97,4 +98,4 @@ fitpEntriesExit=0
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-11T11:34:30Z
+finishedAt=2026-08-11T15:32:02Z
