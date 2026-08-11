@@ -1,10 +1,10 @@
-startedAt=2026-08-11T20:52:52Z
-sourceSha=05e72527bcf27d61ac36d6fb8383536934625b89
-runId=31535149887
+startedAt=2026-08-11T21:12:40Z
+sourceSha=24ec3e6a45c9eee556c67aec9910f2e3cd0f05a9
+runId=31536785981
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-11T20:52:52.089Z",
+  "generatedAt": "2026-08-11T21:12:40.064Z",
   "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict_with_player_driven_candidate_rescue",
   "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable tournament map first, plus general player-driven P.U.C. candidate rescue for every tracked FITP player using card/name/aliases, then official P.U.C. detail participant confirmation. A tournament is valid only if the player appears in at least one Participants list. Matching uses membership card first; exact full name only when no P.U.C. card is available, preventing homonym/card-mismatch false positives. Team championships/cod_fonte=3 excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
@@ -15,9 +15,9 @@ mode=consume-existing-source_fitp_tournaments
   "playerDrivenCandidateTournaments": 0,
   "detailsChecked": 5495,
   "detailsWithDraws": 5492,
-  "detailsWithParticipants": 15054,
-  "participantsScanned": 381590,
-  "participantsWithCard": 381590,
+  "detailsWithParticipants": 15055,
+  "participantsScanned": 381614,
+  "participantsWithCard": 381614,
   "entriesFound": 301,
   "playersWithEntries": 20,
   "homonymRejected": 1,
@@ -62,7 +62,7 @@ mode=consume-existing-source_fitp_tournaments
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-11T21:00:17.347Z",
+  "generatedAt": "2026-08-11T21:24:06.798Z",
   "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
@@ -77,7 +77,7 @@ fitpEntriesExit=0
     "warnings": 0,
     "tennisEuropeVisible": 30,
     "tennisEuropeAcceptanceConfirmed": 1,
-    "diagnostics": "red"
+    "diagnostics": "yellow"
   },
   "engines": {
     "discoverFitp": {
@@ -105,4 +105,4 @@ fitpEntriesExit=0
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-11T21:00:17Z
+finishedAt=2026-08-11T21:24:06Z
