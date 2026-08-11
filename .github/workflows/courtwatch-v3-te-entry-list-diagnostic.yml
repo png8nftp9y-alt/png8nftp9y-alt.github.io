@@ -1,0 +1,32 @@
+name: Court Watch v3 Tennis Europe entry list diagnostic
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'courtwatch-v3-te-entry-list-diagnostic-trigger.json'
+      - 'src/v3/diagnose-tennis-europe-entry-lists.mjs'
+      - '.github/workflows/courtwatch-v3-te-entry-list-diagnostic.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          set +e
+          node src/v3/diagnose-tennis-europe-entry-lists.mjs > courtwatch-v3-te-entry-list-diagnostic-run.log 2>&1
+          echo "teEntryListDiagnosticExit=$?" >> courtwatch-v3-te-entry-list-diagnostic-run.log
+      - run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/tennis_europe_entry_list_diagnostic.json courtwatch-v3-te-entry-list-diagnostic-run.log
+          git commit -m "Run Court Watch v3 Tennis Europe entry list diagnostic" || echo "No changes"
+          git push
