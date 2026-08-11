@@ -1,25 +1,34 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-11T02:19:59.563Z",
-  "status": "tennis_europe_broader_profile_engine_complete",
-  "source": "Ex novo Tennis Europe engine: accepted official TournamentSoftware session, scans official player overview plus /tournaments and tab pages, enriches from official tournament pages, keeps only dated entries with clean city/country location. No FITP/P.U.C., no v1/v2/data.json.",
+  "generatedAt": "2026-08-11T02:26:52.801Z",
+  "status": "tennis_europe_global_calendar_engine_complete",
+  "source": "Ex novo Tennis Europe engine: accepted official TournamentSoftware session, scans official global tournament search with moving date/country/age/grade windows plus official player profile tabs, enriches from official tournament pages, keeps only dated entries with clean city/country location. No FITP/P.U.C., no v1/v2/data.json.",
   "coverageFrom": "2025-12-18",
-  "coverageMode": "official_profile_overview_plus_tournaments_tabs_not_global_calendar_yet",
+  "coverageUntil": "2028-08-10",
+  "coverageMode": "global_tournament_calendar_search_plus_profile_tabs",
   "profiles": 17,
   "profileSeeds": 11,
+  "globalSearch": {
+    "specs": 2075,
+    "queries": 2429,
+    "tournamentsFound": 598
+  },
   "rawEntriesFound": 86,
-  "entriesFound": 35,
+  "entriesFound": 32,
   "byPlayer": {
     "aila-zennaro": 9,
     "daniele-gelli": 1,
     "edoardo-grimoldi": 1,
     "filippo-vitali": 1,
     "francesco-renzulli": 1,
-    "giulia-scozzafava": 6,
+    "giulia-scozzafava": 5,
     "gregorio-puccio": 1,
-    "nikola-kerkenyakov": 5,
+    "nikola-kerkenyakov": 4,
     "noemi-paganini": 1,
-    "virginia-cereghini": 9
+    "virginia-cereghini": 8
+  },
+  "bySourceMode": {
+    "confirmed_on_official_profile": 32
   },
   "entries": [
     {
@@ -38,71 +47,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/39E97344-EA92-41F7-8FDF-77A250650ADE/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
-    },
-    {
-      "playerId": "giulia-scozzafava",
-      "playerName": "Giulia Scozzafava",
-      "circuit": "tennis-europe",
-      "competitionId": "154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
-      "tournamentName": "Ljubicic Academy Open",
-      "location": "inj, Croatia",
-      "startDate": "2026-03-21",
-      "endDate": "2026-03-29",
-      "draws": [
-        "Girls Doubles 14 Main Draw",
-        "Girls Singles 14 Main Draw"
-      ],
-      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
-      "sourcePage": "https://te.tournamentsoftware.com/player-profile/8863E330-0C45-4DEA-B014-B5320FAD1725/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
-      "entryStatus": "confirmed_on_official_profile",
-      "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
-    },
-    {
-      "playerId": "nikola-kerkenyakov",
-      "playerName": "Nikola Nikolaev Kerkenyakov",
-      "circuit": "tennis-europe",
-      "competitionId": "154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
-      "tournamentName": "Ljubicic Academy Open",
-      "location": "inj, Croatia",
-      "startDate": "2026-03-21",
-      "endDate": "2026-03-29",
-      "draws": [
-        "Boys Singles 14 Qualifying",
-        "Boys Singles 14 Main Draw",
-        "Boys Doubles 14 Main Draw"
-      ],
-      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
-      "sourcePage": "https://te.tournamentsoftware.com/player-profile/79C36DD2-6BE3-4549-A428-F5897229E763/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
-      "entryStatus": "confirmed_on_official_profile",
-      "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
-    },
-    {
-      "playerId": "virginia-cereghini",
-      "playerName": "Virginia Cereghini",
-      "circuit": "tennis-europe",
-      "competitionId": "154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
-      "tournamentName": "Ljubicic Academy Open",
-      "location": "inj, Croatia",
-      "startDate": "2026-03-21",
-      "endDate": "2026-03-29",
-      "draws": [
-        "Girls Doubles 14 Main Draw",
-        "Girls Singles 14 Main Draw"
-      ],
-      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
-      "sourcePage": "https://te.tournamentsoftware.com/player-profile/39E97344-EA92-41F7-8FDF-77A250650ADE/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
-      "entryStatus": "confirmed_on_official_profile",
-      "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "giulia-scozzafava",
@@ -119,10 +67,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=33BF0A37-C87E-4261-A28A-498946F83558",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/8863E330-0C45-4DEA-B014-B5320FAD1725/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "aila-zennaro",
@@ -138,10 +86,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "virginia-cereghini",
@@ -159,10 +107,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/39E97344-EA92-41F7-8FDF-77A250650ADE/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "aila-zennaro",
@@ -180,10 +128,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "francesco-renzulli",
@@ -199,10 +147,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/AAE7B4D4-B63E-49F5-A7E2-8B062CB43854?tab=matches",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "giulia-scozzafava",
@@ -218,10 +166,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/8863E330-0C45-4DEA-B014-B5320FAD1725/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "nikola-kerkenyakov",
@@ -237,10 +185,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/79C36DD2-6BE3-4549-A428-F5897229E763/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "virginia-cereghini",
@@ -257,10 +205,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/39E97344-EA92-41F7-8FDF-77A250650ADE/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "virginia-cereghini",
@@ -277,10 +225,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/39E97344-EA92-41F7-8FDF-77A250650ADE/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "aila-zennaro",
@@ -297,10 +245,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "giulia-scozzafava",
@@ -317,10 +265,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/8863E330-0C45-4DEA-B014-B5320FAD1725/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "nikola-kerkenyakov",
@@ -336,10 +284,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/79C36DD2-6BE3-4549-A428-F5897229E763/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "nikola-kerkenyakov",
@@ -357,10 +305,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/79C36DD2-6BE3-4549-A428-F5897229E763/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "virginia-cereghini",
@@ -378,10 +326,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/39E97344-EA92-41F7-8FDF-77A250650ADE/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "aila-zennaro",
@@ -397,17 +345,17 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "aila-zennaro",
       "playerName": "Aila Zennaro",
       "circuit": "tennis-europe",
       "competitionId": "6A379359-E8F3-42F4-9063-16EFB100DB7B",
-      "tournamentName": "Torneo Internazionale Under 16 - Citt&#224; di Crema",
+      "tournamentName": "Torneo Internazionale Under 16 - Città di Crema",
       "location": "Crema, Italy",
       "startDate": "2026-06-13",
       "endDate": "2026-06-20",
@@ -418,10 +366,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=6A379359-E8F3-42F4-9063-16EFB100DB7B",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "aila-zennaro",
@@ -439,10 +387,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "giulia-scozzafava",
@@ -460,10 +408,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/8863E330-0C45-4DEA-B014-B5320FAD1725/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "giulia-scozzafava",
@@ -480,10 +428,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/8863E330-0C45-4DEA-B014-B5320FAD1725?tab=matches",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "virginia-cereghini",
@@ -500,10 +448,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/39E97344-EA92-41F7-8FDF-77A250650ADE/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "aila-zennaro",
@@ -520,10 +468,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=DF3193A8-A3E6-4654-BC71-433D0501456C",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "filippo-vitali",
@@ -539,10 +487,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/6D381ABF-684B-48A4-8F31-7AB2DF775C3D?tab=matches",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "nikola-kerkenyakov",
@@ -559,10 +507,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/79C36DD2-6BE3-4549-A428-F5897229E763?tab=matches",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "noemi-paganini",
@@ -578,10 +526,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D8396AA5-30E5-44D0-BA66-54F01F7FEA98?tab=matches",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "daniele-gelli",
@@ -599,10 +547,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/5E353E97-2922-4325-86E9-5649DD0B1278?tab=matches",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "edoardo-grimoldi",
@@ -620,10 +568,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/DD39851A-1AA9-4599-BD5D-03A476DE1359?tab=matches",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "gregorio-puccio",
@@ -641,10 +589,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D8EA4480-5E3A-4AC6-AEC1-9D8FA564D433?tab=matches",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "virginia-cereghini",
@@ -661,10 +609,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=60B383B6-49FE-4A33-9F20-629E32856200",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/39E97344-EA92-41F7-8FDF-77A250650ADE/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "virginia-cereghini",
@@ -681,10 +629,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/39E97344-EA92-41F7-8FDF-77A250650ADE?tab=matches",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "aila-zennaro",
@@ -700,10 +648,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=B43C14DB-7AB5-477D-B470-46FACAD7F187",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5?tab=matches",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     },
     {
       "playerId": "aila-zennaro",
@@ -720,10 +668,10 @@
       ],
       "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=60B383B6-49FE-4A33-9F20-629E32856200",
       "sourcePage": "https://te.tournamentsoftware.com/player-profile/D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5/tournaments",
-      "source": "Tennis Europe / TournamentSoftware official accepted player profile and tournaments tab",
+      "source": "Tennis Europe official profile/tournaments tabs",
       "entryStatus": "confirmed_on_official_profile",
       "status": "detected",
-      "lastSeen": "2026-08-11T02:19:59.563Z"
+      "lastSeen": "2026-08-11T02:26:52.801Z"
     }
   ],
   "profileSeedsDetail": [
