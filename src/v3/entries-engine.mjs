@@ -12,6 +12,21 @@ function toTournament(e){return {id:['tour',e.circuit,e.playerId,slug(e.competit
 function ageHours(iso){const t=Date.parse(iso||'');return Number.isFinite(t)?(Date.now()-t)/36e5:null}
 function light(status,label,detail,critical=false){return {status,label,detail,critical}}
 function worst(items){if(items.some(x=>x.status==='red'&&x.critical))return 'red';if(items.some(x=>x.status==='red'))return 'yellow';if(items.some(x=>x.status==='yellow'))return 'yellow';return 'green'}
+function fitpTournamentLight(fitpTournaments){
+ const found=fitpTournaments.tournamentsFound||0;
+ const errors=fitpTournaments.errors||[];
+ const failed=fitpTournaments.quality?.failedQueries ?? errors.length;
+ if(found<5300)return 'red';
+ if(failed>25)return 'yellow';
+ return 'green';
+}
+function fitpTournamentDetail(fitpTournaments,mapAge){
+ const found=fitpTournaments.tournamentsFound||0;
+ const failed=fitpTournaments.quality?.failedQueries ?? (fitpTournaments.errors||[]).length;
+ const ageText=mapAge==null?'data n/d':Math.round(mapAge)+'h fa';
+ const errorText=failed?` · ${failed} query fallite/non bloccanti`:'';
+ return `${found} tornei · ${ageText}${errorText}`;
+}
 const playersDoc=await readJson('players.json',{players:[]});
 const fitp=await readJson('dist/v3/source_fitp_entries.json',{entries:[]});
 const fitpTournaments=await readJson('dist/v3/source_fitp_tournaments.json',{tournaments:[]});
@@ -30,8 +45,9 @@ const warnings=[];for(const e of tournamentEntries){if(e.circuit==='fitp'&&!e.co
 const fitpCardOnly=(fitp.byMatchMethod&&Object.keys(fitp.byMatchMethod).length===1&&fitp.byMatchMethod.membership_card===fitp.entriesFound);
 const mapAge=ageHours(fitpTournaments.generatedAt);
 const teAcceptance=(te.entries||[]).filter(e=>e.entryStatus==='confirmed_on_acceptance_list').length;
+const fitpTournamentStatus=fitpTournamentLight(fitpTournaments);
 const diagnosticsItems=[
- light((fitpTournaments.tournamentsFound||0)>=5300&&!(fitpTournaments.errors||[]).length?'green':'red','FITP tornei',`${fitpTournaments.tournamentsFound||0} tornei · ${mapAge==null?'data n/d':Math.round(mapAge)+'h fa'}`,true),
+ light(fitpTournamentStatus,'FITP tornei',fitpTournamentDetail(fitpTournaments,mapAge),true),
  light((fitp.entriesFound||0)>=282&&fitpCardOnly&&!(fitp.errors||[]).length?'green':'yellow','FITP iscrizioni',`${fitp.entriesFound||0} entry · tessera ${fitp.byMatchMethod?.membership_card||0}/${fitp.entriesFound||0} · rescue ${fitp.verifiedCompetitionEntryRescues||0}`,true),
  light(teEntries.length>0?'green':'yellow','Tennis Europe',`${teEntries.length} entry TE · acceptance ${teAcceptance} · liste ${te.globalSearch?.acceptanceListsPublished||0}/${te.globalSearch?.acceptanceListsChecked||0}`,false),
  light((itf.entries||[]).length>0?'green':'yellow','ITF',`${(itf.entries||[]).length} entry · stato ${itf.status||'n/d'}`,false),
@@ -41,7 +57,7 @@ const diagnosticsItems=[
  light((opponentsDoc.opponents||[]).length&&!(opponentsDoc.opponents||[]).filter(o=>o.dataStatus!=='ok').length?'green':'yellow','Avversari',`${(opponentsDoc.opponents||[]).length} record · da completare ${(opponentsDoc.opponents||[]).filter(o=>o.dataStatus!=='ok').length}`,false),
  light('green','App/UI',`file v3 generati · ultimo merge ${new Date(NOW).toLocaleString('it-IT',{timeZone:'Europe/Rome'})}`,true)
 ];
-const diagnostics={version:VERSION,generatedAt:NOW,overall:worst(diagnosticsItems),legend:{green:'ok',yellow:'attenzione/parziale',red:'errore o motore incompleto'},items:diagnosticsItems,raw:{fitp:{entriesFound:fitp.entriesFound,byPlayer:fitp.byPlayer,byMatchMethod:fitp.byMatchMethod,homonymRejected:fitp.homonymRejected,verifiedCompetitionEntryRescues:fitp.verifiedCompetitionEntryRescues},calendar:{tournamentEntries:tournamentEntries.length,byCircuit,warnings:warnings.length},te:{status:te.status,profileSeeds:te.profileSeeds,entriesVisible:teEntries.length,acceptanceConfirmed:teAcceptance,byPlayer:te.byPlayer,byAcceptance:te.byAcceptance},itf:{status:itf.status,entries:(itf.entries||[]).length}}};
+const diagnostics={version:VERSION,generatedAt:NOW,overall:worst(diagnosticsItems),legend:{green:'ok',yellow:'attenzione/parziale',red:'errore o motore incompleto'},items:diagnosticsItems,raw:{fitp:{entriesFound:fitp.entriesFound,byPlayer:fitp.byPlayer,byMatchMethod:fitp.byMatchMethod,homonymRejected:fitp.homonymRejected,verifiedCompetitionEntryRescues:fitp.verifiedCompetitionEntryRescues,playerDrivenCandidateTournaments:fitp.playerDrivenCandidateTournaments,playerDrivenCandidateRescues:fitp.playerDrivenCandidateRescues,playerDrivenCandidatesConfirmed:fitp.playerDrivenCandidatesConfirmed},calendar:{tournamentEntries:tournamentEntries.length,byCircuit,warnings:warnings.length},te:{status:te.status,profileSeeds:te.profileSeeds,entriesVisible:teEntries.length,acceptanceConfirmed:teAcceptance,byPlayer:te.byPlayer,byAcceptance:te.byAcceptance},itf:{status:itf.status,entries:(itf.entries||[]).length}}};
 const syncStatus={version:VERSION,generatedAt:NOW,status:'entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists',coverageFrom:COVERAGE_FROM,checks:{players:(playersDoc.players||[]).length,tournamentEntries:tournamentEntries.length,tournaments:tournaments.length,byCircuit,warnings:warnings.length,tennisEuropeVisible:teEntries.length,tennisEuropeAcceptanceConfirmed:teAcceptance,diagnostics:diagnostics.overall},engines:{discoverFitp:{status:fitp.status||'missing'},discoverTennisEurope:{status:te.status||'missing',calendarMerge:'enabled_for_dated_official_acceptance_list_entries'},discoverItf:{status:itf.status||'missing'},entries:{status:'built',file:'src/v3/entries-engine.mjs',method:'merge FITP + validated dated TE acceptance list/profile entries + ITF; no v1/v2/data.json'},ordersOfPlay:{status:(agendaDoc.agenda||[]).length?'active':'pending'},results:{status:(resultsDoc.results||[]).length?'active':'pending'}},warnings:warnings.slice(0,200)};
 await writeJson('dist/v3/players.json',{version:VERSION,generatedAt:NOW,players:playersDoc.players||[]});
 await writeJson('dist/v3/tournament_entries.json',{version:VERSION,generatedAt:NOW,tournamentEntries});
