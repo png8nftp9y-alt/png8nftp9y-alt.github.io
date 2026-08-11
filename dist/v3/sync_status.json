@@ -1,18 +1,19 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-11T00:04:22.290Z",
-  "status": "entries_engine_merged_ex_novo_discoveries_te_excluded_from_calendar",
+  "generatedAt": "2026-08-11T01:25:00.633Z",
+  "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 20,
-    "tournamentEntries": 299,
-    "tournaments": 299,
+    "tournamentEntries": 314,
+    "tournaments": 314,
     "byCircuit": {
       "fitp": 298,
+      "tennis-europe": 15,
       "itf": 1
     },
     "warnings": 0,
-    "tennisEuropeExcludedFromCalendar": 11,
+    "tennisEuropeVisible": 15,
     "diagnostics": "yellow"
   },
   "engines": {
@@ -20,8 +21,8 @@
       "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict"
     },
     "discoverTennisEurope": {
-      "status": "tennis_europe_profile_tournament_scan_complete",
-      "calendarMerge": "excluded_until_dedicated_te_engine"
+      "status": "tennis_europe_accepted_profile_engine_complete",
+      "calendarMerge": "enabled_for_dated_official_profile_entries"
     },
     "discoverItf": {
       "status": "seeded_pending_live_itf_scan"
@@ -29,7 +30,7 @@
     "entries": {
       "status": "built",
       "file": "src/v3/entries-engine.mjs",
-      "method": "merge FITP + ITF only; TE source retained but excluded from visible calendar; no v1/v2/data.json"
+      "method": "merge FITP + validated dated TE + ITF; no v1/v2/data.json"
     },
     "ordersOfPlay": {
       "status": "active"

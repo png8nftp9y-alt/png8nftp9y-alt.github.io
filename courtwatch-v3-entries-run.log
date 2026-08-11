@@ -1,18 +1,18 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-10T21:12:05.535Z",
+  "generatedAt": "2026-08-11T01:23:08.331Z",
   "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict",
   "source": "FITP INDIVIDUAL TOURNAMENTS ONLY: cod_fonte=1. Reliable FITP tournament map first, then official P.U.C. detail participant confirmation. A tournament is valid for a player if the player appears in at least one Participants list. Matching uses membership card first; exact full name only when no P.U.C. card is available, preventing homonym/card-mismatch false positives. Team championships/cod_fonte=3 are excluded for a future independent engine. TE/ITF excluded; no OOP; no results.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 5484,
-  "baseTournamentsInput": 5483,
-  "allFitpTournamentsInput": 5483,
+  "tournamentsInput": 5459,
+  "baseTournamentsInput": 5458,
+  "allFitpTournamentsInput": 5458,
   "excludedTeamChampionships": 0,
-  "detailsChecked": 5484,
-  "detailsWithDraws": 5481,
-  "detailsWithParticipants": 15086,
-  "participantsScanned": 383017,
-  "participantsWithCard": 383017,
+  "detailsChecked": 5459,
+  "detailsWithDraws": 5456,
+  "detailsWithParticipants": 14997,
+  "participantsScanned": 379949,
+  "participantsWithCard": 379949,
   "entriesFound": 298,
   "playersWithEntries": 20,
   "homonymRejected": 1,
@@ -51,20 +51,365 @@
 fitpExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-10T21:13:29.878Z",
-  "status": "tennis_europe_profile_tournament_scan_complete",
-  "source": "Ex novo Tennis Europe engine: scans official TournamentSoftware player profiles, follows official tournament links, confirms entry only when the official tournament page contains the tracked player. No FITP P.U.C., no v1/v2/data.json.",
+  "generatedAt": "2026-08-11T01:24:52.174Z",
+  "status": "tennis_europe_accepted_profile_engine_complete",
+  "source": "Ex novo Tennis Europe engine: accepts official TournamentSoftware cookie wall server-side, scans official player profiles, extracts dated official tournament links. No FITP/P.U.C., no v1/v2/data.json.",
   "coverageFrom": "2025-12-18",
   "profiles": 17,
-  "entriesFound": 0,
   "profileSeeds": 11,
-  "byPlayer": {},
-  "errors": [
+  "entriesFound": 15,
+  "byPlayer": {
+    "aila-zennaro": 2,
+    "daniele-gelli": 1,
+    "edoardo-grimoldi": 1,
+    "filippo-vitali": 1,
+    "francesco-renzulli": 1,
+    "giulia-scozzafava": 2,
+    "gregorio-puccio": 1,
+    "nikola-kerkenyakov": 1,
+    "noemi-paganini": 1,
+    "virginia-cereghini": 4
+  },
+  "entries": [
     {
       "playerId": "aila-zennaro",
-      "profileId": "D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5",
-      "type": "no_tournament_links_found"
+      "playerName": "Aila Zennaro",
+      "circuit": "tennis-europe",
+      "competitionId": "B43C14DB-7AB5-477D-B470-46FACAD7F187",
+      "tournamentName": "Agno U16 (2)",
+      "location": "GoAcademy | Agno, Switzerland",
+      "startDate": "2026-08-09",
+      "endDate": "2026-08-15",
+      "draws": [
+        "Girls Singles 16 Main Draw"
+      ],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=B43C14DB-7AB5-477D-B470-46FACAD7F187",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
     },
+    {
+      "playerId": "aila-zennaro",
+      "playerName": "Aila Zennaro",
+      "circuit": "tennis-europe",
+      "competitionId": "DF3193A8-A3E6-4654-BC71-433D0501456C",
+      "tournamentName": "Open de Pully TE U14",
+      "location": "GoAcademy | Agno, Switzerland",
+      "startDate": "2026-08-09",
+      "endDate": "2026-08-15",
+      "draws": [],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "daniele-gelli",
+      "playerName": "Daniele Gelli",
+      "circuit": "tennis-europe",
+      "competitionId": "72B85BEB-F56D-48F3-AA67-88C1F293C970",
+      "tournamentName": "Austrian Youth Open Kufstein",
+      "location": "Tournaments Austrian Youth Open Kufstein TC Sparkasse Kufstein | Kufstein, Austria",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-25",
+      "draws": [
+        "Boys Singles 12 Bonus Draw",
+        "Boys Singles 12 Main Draw",
+        "Boys Doubles 12 Main Draw"
+      ],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "edoardo-grimoldi",
+      "playerName": "Edoardo Grimoldi",
+      "circuit": "tennis-europe",
+      "competitionId": "72B85BEB-F56D-48F3-AA67-88C1F293C970",
+      "tournamentName": "Austrian Youth Open Kufstein",
+      "location": "Tournaments Austrian Youth Open Kufstein TC Sparkasse Kufstein | Kufstein, Austria",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-25",
+      "draws": [
+        "Boys Singles 12 Bonus Draw",
+        "Boys Singles 12 Main Draw",
+        "Boys Doubles 12 Main Draw"
+      ],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "filippo-vitali",
+      "playerName": "Filippo Vitali",
+      "circuit": "tennis-europe",
+      "competitionId": "00523E1D-06C9-430A-B8B9-851B401381E3",
+      "tournamentName": "7° MEMORIAL GAIO CAMPORESI",
+      "location": "",
+      "startDate": "2026-07-11",
+      "endDate": "2026-07-18",
+      "draws": [
+        "Boys Singles 12 Qualifying"
+      ],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "francesco-renzulli",
+      "playerName": "Francesco Leone Renzulli",
+      "circuit": "tennis-europe",
+      "competitionId": "A50EC59F-4B5E-406F-9C36-E5819A408A23",
+      "tournamentName": "U14 Correggio - Memorial Marco Testi",
+      "location": "",
+      "startDate": "2026-05-16",
+      "endDate": "2026-05-23",
+      "draws": [
+        "Boys Singles 14 Qualifying"
+      ],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "giulia-scozzafava",
+      "playerName": "Giulia Scozzafava",
+      "circuit": "tennis-europe",
+      "competitionId": "64E38FA7-D4F4-4A03-B273-23E82B02124A",
+      "tournamentName": "16.Makro 5 Junior Slovenia Open Under 14-powered by Mestna občina Koper",
+      "location": "",
+      "startDate": "2026-07-04",
+      "endDate": "2026-07-12",
+      "draws": [
+        "Girls Doubles 14 Main Draw",
+        "Girls Singles 14 Main Draw"
+      ],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "giulia-scozzafava",
+      "playerName": "Giulia Scozzafava",
+      "circuit": "tennis-europe",
+      "competitionId": "99ACB026-700F-4BEE-A6F6-6B09D2502C76",
+      "tournamentName": "Montreux U14",
+      "location": "",
+      "startDate": "2026-07-06",
+      "endDate": "2026-07-06",
+      "draws": [],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "gregorio-puccio",
+      "playerName": "Gregorio Puccio",
+      "circuit": "tennis-europe",
+      "competitionId": "72B85BEB-F56D-48F3-AA67-88C1F293C970",
+      "tournamentName": "Austrian Youth Open Kufstein",
+      "location": "Tournaments Austrian Youth Open Kufstein TC Sparkasse Kufstein | Kufstein, Austria",
+      "startDate": "2026-07-18",
+      "endDate": "2026-07-25",
+      "draws": [
+        "Boys Singles 12 Main Draw",
+        "Boys Singles 12 Bonus Draw",
+        "Boys Doubles 12 Main Draw"
+      ],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "nikola-kerkenyakov",
+      "playerName": "Nikola Nikolaev Kerkenyakov",
+      "circuit": "tennis-europe",
+      "competitionId": "5ECC8B89-2AD2-4AA2-8ADE-09C49E668970",
+      "tournamentName": "Peter Hagedorn International",
+      "location": "Tournaments Peter Hagedorn International Tennisclub Waiblingen | Waiblingen, Germany",
+      "startDate": "2026-07-11",
+      "endDate": "2026-07-19",
+      "draws": [
+        "Boys Singles 14 Qualifying",
+        "Boys Singles 14 Main Draw"
+      ],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "noemi-paganini",
+      "playerName": "Noemi Paganini",
+      "circuit": "tennis-europe",
+      "competitionId": "00523E1D-06C9-430A-B8B9-851B401381E3",
+      "tournamentName": "7° MEMORIAL GAIO CAMPORESI",
+      "location": "",
+      "startDate": "2026-07-11",
+      "endDate": "2026-07-18",
+      "draws": [
+        "Girls Singles 12 Qualifying"
+      ],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "virginia-cereghini",
+      "playerName": "Virginia Cereghini",
+      "circuit": "tennis-europe",
+      "competitionId": "F7915804-D040-48E9-AFF6-17B4B9C1B952",
+      "tournamentName": "Agno U14",
+      "location": "",
+      "startDate": "2026-07-25",
+      "endDate": "2026-08-01",
+      "draws": [
+        "Girls Doubles 14 Main Draw",
+        "Girls Singles 14 Main Draw"
+      ],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "virginia-cereghini",
+      "playerName": "Virginia Cereghini",
+      "circuit": "tennis-europe",
+      "competitionId": "5B85E9FC-D375-4BBB-B6BB-4387A8F73559",
+      "tournamentName": "Bad Waltersdorf 2026 - Indoor",
+      "location": "",
+      "startDate": "2026-07-31",
+      "endDate": "2026-07-31",
+      "draws": [],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "virginia-cereghini",
+      "playerName": "Virginia Cereghini",
+      "circuit": "tennis-europe",
+      "competitionId": "95934EB5-7E9E-4E6A-8E6C-37D770EB1A00",
+      "tournamentName": "Torneo U12 - Maglie",
+      "location": "",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-01",
+      "draws": [],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=95934EB5-7E9E-4E6A-8E6C-37D770EB1A00",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    },
+    {
+      "playerId": "virginia-cereghini",
+      "playerName": "Virginia Cereghini",
+      "circuit": "tennis-europe",
+      "competitionId": "763BA25F-4D36-41C2-B3BA-B2B86EA7ADDA",
+      "tournamentName": "Tirana Open",
+      "location": "",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-01",
+      "draws": [],
+      "sourceUrl": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=763BA25F-4D36-41C2-B3BA-B2B86EA7ADDA",
+      "source": "Tennis Europe / TournamentSoftware official accepted player profile",
+      "entryStatus": "confirmed_on_official_profile",
+      "status": "detected",
+      "lastSeen": "2026-08-11T01:24:52.174Z"
+    }
+  ],
+  "profileSeedsDetail": [
+    {
+      "playerId": "aila-zennaro",
+      "playerName": "Aila Zennaro",
+      "teProfileId": "D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/D53EDFB2-9B79-4881-BBE2-11EC2F61C7D5"
+    },
+    {
+      "playerId": "daniele-gelli",
+      "playerName": "Daniele Gelli",
+      "teProfileId": "5E353E97-2922-4325-86E9-5649DD0B1278",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/5E353E97-2922-4325-86E9-5649DD0B1278"
+    },
+    {
+      "playerId": "edoardo-grimoldi",
+      "playerName": "Edoardo Grimoldi",
+      "teProfileId": "DD39851A-1AA9-4599-BD5D-03A476DE1359",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/DD39851A-1AA9-4599-BD5D-03A476DE1359"
+    },
+    {
+      "playerId": "filippo-vitali",
+      "playerName": "Filippo Vitali",
+      "teProfileId": "6D381ABF-684B-48A4-8F31-7AB2DF775C3D",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/6D381ABF-684B-48A4-8F31-7AB2DF775C3D"
+    },
+    {
+      "playerId": "francesco-renzulli",
+      "playerName": "Francesco Leone Renzulli",
+      "teProfileId": "AAE7B4D4-B63E-49F5-A7E2-8B062CB43854",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/AAE7B4D4-B63E-49F5-A7E2-8B062CB43854"
+    },
+    {
+      "playerId": "giulia-scozzafava",
+      "playerName": "Giulia Scozzafava",
+      "teProfileId": "8863E330-0C45-4DEA-B014-B5320FAD1725",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/8863E330-0C45-4DEA-B014-B5320FAD1725"
+    },
+    {
+      "playerId": "gregorio-puccio",
+      "playerName": "Gregorio Puccio",
+      "teProfileId": "D8EA4480-5E3A-4AC6-AEC1-9D8FA564D433",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/D8EA4480-5E3A-4AC6-AEC1-9D8FA564D433"
+    },
+    {
+      "playerId": "martina-danesi",
+      "playerName": "Martina Danesi",
+      "teProfileId": "46010E1A-5310-41AB-95AF-6D1B0BC54EB6",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/46010E1A-5310-41AB-95AF-6D1B0BC54EB6"
+    },
+    {
+      "playerId": "nikola-kerkenyakov",
+      "playerName": "Nikola Nikolaev Kerkenyakov",
+      "teProfileId": "79C36DD2-6BE3-4549-A428-F5897229E763",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/79C36DD2-6BE3-4549-A428-F5897229E763"
+    },
+    {
+      "playerId": "noemi-paganini",
+      "playerName": "Noemi Paganini",
+      "teProfileId": "D8396AA5-30E5-44D0-BA66-54F01F7FEA98",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/D8396AA5-30E5-44D0-BA66-54F01F7FEA98"
+    },
+    {
+      "playerId": "virginia-cereghini",
+      "playerName": "Virginia Cereghini",
+      "teProfileId": "39E97344-EA92-41F7-8FDF-77A250650ADE",
+      "sourceUrl": "https://te.tournamentsoftware.com/player-profile/39E97344-EA92-41F7-8FDF-77A250650ADE"
+    }
+  ],
+  "errors": [
     {
       "playerId": "alessio-nava",
       "playerName": "Alessio Nava",
@@ -76,44 +421,14 @@ fitpExit=0
       "type": "missing_te_profile_id"
     },
     {
-      "playerId": "daniele-gelli",
-      "profileId": "5E353E97-2922-4325-86E9-5649DD0B1278",
-      "type": "no_tournament_links_found"
-    },
-    {
-      "playerId": "edoardo-grimoldi",
-      "profileId": "DD39851A-1AA9-4599-BD5D-03A476DE1359",
-      "type": "no_tournament_links_found"
-    },
-    {
-      "playerId": "filippo-vitali",
-      "profileId": "6D381ABF-684B-48A4-8F31-7AB2DF775C3D",
-      "type": "no_tournament_links_found"
-    },
-    {
       "playerId": "francesco-bocchio",
       "playerName": "Francesco Bocchio",
       "type": "missing_te_profile_id"
     },
     {
-      "playerId": "francesco-renzulli",
-      "profileId": "AAE7B4D4-B63E-49F5-A7E2-8B062CB43854",
-      "type": "no_tournament_links_found"
-    },
-    {
-      "playerId": "giulia-scozzafava",
-      "profileId": "8863E330-0C45-4DEA-B014-B5320FAD1725",
-      "type": "no_tournament_links_found"
-    },
-    {
-      "playerId": "gregorio-puccio",
-      "profileId": "D8EA4480-5E3A-4AC6-AEC1-9D8FA564D433",
-      "type": "no_tournament_links_found"
-    },
-    {
       "playerId": "martina-danesi",
       "profileId": "46010E1A-5310-41AB-95AF-6D1B0BC54EB6",
-      "type": "no_tournament_links_found"
+      "type": "no_dated_tournaments_found"
     },
     {
       "playerId": "matteo-bocchio",
@@ -126,21 +441,6 @@ fitpExit=0
       "type": "missing_te_profile_id"
     },
     {
-      "playerId": "nikola-kerkenyakov",
-      "profileId": "79C36DD2-6BE3-4549-A428-F5897229E763",
-      "type": "no_tournament_links_found"
-    },
-    {
-      "playerId": "noemi-paganini",
-      "profileId": "D8396AA5-30E5-44D0-BA66-54F01F7FEA98",
-      "type": "no_tournament_links_found"
-    },
-    {
-      "playerId": "virginia-cereghini",
-      "profileId": "39E97344-EA92-41F7-8FDF-77A250650ADE",
-      "type": "no_tournament_links_found"
-    },
-    {
       "playerId": "virginia-rossoni",
       "playerName": "Virginia Rossoni",
       "type": "missing_te_profile_id"
@@ -150,7 +450,7 @@ fitpExit=0
 teExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-10T21:13:42.468Z",
+  "generatedAt": "2026-08-11T01:25:00.603Z",
   "status": "seeded_pending_live_itf_scan",
   "source": "ex novo ITF discovery; no v1/v2/data.json; official ITF seeds only until live scanner is expanded",
   "coverageFrom": "2025-12-18",
@@ -161,19 +461,20 @@ teExit=0
 itfExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-10T21:13:42.490Z",
-  "status": "entries_engine_merged_ex_novo_discoveries_te_excluded_from_calendar",
+  "generatedAt": "2026-08-11T01:25:00.633Z",
+  "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 20,
-    "tournamentEntries": 299,
-    "tournaments": 299,
+    "tournamentEntries": 314,
+    "tournaments": 314,
     "byCircuit": {
       "fitp": 298,
+      "tennis-europe": 15,
       "itf": 1
     },
     "warnings": 0,
-    "tennisEuropeExcludedFromCalendar": 11,
+    "tennisEuropeVisible": 15,
     "diagnostics": "yellow"
   },
   "engines": {
@@ -181,8 +482,8 @@ itfExit=0
       "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict"
     },
     "discoverTennisEurope": {
-      "status": "tennis_europe_profile_tournament_scan_complete",
-      "calendarMerge": "excluded_until_dedicated_te_engine"
+      "status": "tennis_europe_accepted_profile_engine_complete",
+      "calendarMerge": "enabled_for_dated_official_profile_entries"
     },
     "discoverItf": {
       "status": "seeded_pending_live_itf_scan"
@@ -190,7 +491,7 @@ itfExit=0
     "entries": {
       "status": "built",
       "file": "src/v3/entries-engine.mjs",
-      "method": "merge FITP + ITF only; TE source retained but excluded from visible calendar; no v1/v2/data.json"
+      "method": "merge FITP + validated dated TE + ITF; no v1/v2/data.json"
     },
     "ordersOfPlay": {
       "status": "active"
