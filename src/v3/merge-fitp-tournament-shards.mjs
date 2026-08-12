@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 const NOW=new Date().toISOString();
-const SHARDS=['core','north_west','north_east','centre','south_islands'];
+const SHARDS=['core_dates','core_terms','nw_regions','nw_provinces1','nw_provinces2','nw_terms','ne_regions','ne_provinces1','ne_provinces2','ne_terms','ce_regions','ce_provinces1','ce_provinces2','ce_terms','so_regions','so_provinces1','so_provinces2','so_terms'];
 async function readJson(p,f){try{return JSON.parse(await fs.readFile(p,'utf8'))}catch{return f}}
 async function writeJson(p,v){await fs.mkdir(p.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(p,JSON.stringify(v,null,2)+'\n')}
 const byId=new Map(); const shardStats=[]; const errors=[];
@@ -19,7 +19,7 @@ for(const shard of SHARDS){
 }
 const tournaments=[...byId.values()].sort((a,b)=>(a.startDate||'9999').localeCompare(b.startDate||'9999')||String(a.tournamentName||'').localeCompare(String(b.tournamentName||'')));
 const byStatus={}; for(const t of tournaments)byStatus[t.status]=(byStatus[t.status]||0)+1;
-const out={version:'cw-v3-agenda-first',generatedAt:NOW,status:errors.length?'fitp_individual_tournament_sharded_map_with_missing_shards':'fitp_individual_tournament_sharded_map_complete',source:'FITP individual tournaments only: merged sharded official P.U.C. discovery. Shards: core, north_west, north_east, centre, south_islands. Tennis Europe excluded. No player keywords, no team championships, no draws, no OOP, no results.',coverageFrom:'2025-12-18',coverageUntil:tournaments.reduce((m,t)=>t.endDate&&t.endDate>m?t.endDate:m,'2025-12-18'),queries:shardStats.reduce((a,s)=>a+(s.queries||0),0),tournamentsFound:tournaments.length,bySource:{'TORNEI FITP':tournaments.length},byStatus,quality:{sharded:true,shards:shardStats,failedShards:errors.length,individualOnly:true,tennisEuropeExcluded:true,usesPlayerKeywords:false,usesDraws:false,usesOrderOfPlay:false,usesResults:false},tournaments,errors};
+const out={version:'cw-v3-agenda-first',generatedAt:NOW,status:errors.length?'fitp_individual_tournament_micro_sharded_map_with_missing_shards':'fitp_individual_tournament_micro_sharded_map_complete',source:'FITP individual tournaments only: merged micro-sharded official P.U.C. discovery. Micro-shards by core/date, terms, region, province groups and geographic terms. Tennis Europe excluded. No player keywords, no team championships, no draws, no OOP, no results.',coverageFrom:'2025-12-18',coverageUntil:tournaments.reduce((m,t)=>t.endDate&&t.endDate>m?t.endDate:m,'2025-12-18'),queries:shardStats.reduce((a,s)=>a+(s.queries||0),0),tournamentsFound:tournaments.length,bySource:{'TORNEI FITP':tournaments.length},byStatus,quality:{microSharded:true,shards:shardStats,expectedShards:SHARDS.length,failedShards:errors.length,individualOnly:true,tennisEuropeExcluded:true,usesPlayerKeywords:false,usesDraws:false,usesOrderOfPlay:false,usesResults:false},tournaments,errors};
 await writeJson('dist/v3/source_fitp_tournaments.json',out);
 await writeJson('dist/v3/source_fitp_tournaments_audit.json',{...out,tournaments:undefined,sample:tournaments.slice(0,300)});
 console.log(JSON.stringify({...out,tournaments:undefined},null,2));
