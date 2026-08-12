@@ -1,6 +1,6 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-12T01:30:46.615Z",
+  "generatedAt": "2026-08-12T16:39:56.735Z",
   "overall": "yellow",
   "legend": {
     "green": "ok",
@@ -11,31 +11,31 @@
     {
       "status": "green",
       "label": "FITP tornei",
-      "detail": "5494 tornei · 6h fa · 2 query fallite/non bloccanti",
+      "detail": "5327 tornei · 0h fa",
       "critical": true
     },
     {
       "status": "green",
       "label": "FITP iscrizioni",
-      "detail": "301 entry · tessera 301/301 · rescue 1",
+      "detail": "351 entry · tessera 351/351 · rescue 2",
       "critical": true
     },
     {
       "status": "green",
       "label": "Tennis Europe",
-      "detail": "30 entry TE · acceptance 1 · liste 529/600",
+      "detail": "30 entry TE · acceptance 1 · liste 530/600",
       "critical": false
     },
     {
       "status": "green",
       "label": "ITF",
-      "detail": "2 entry · stato seeded_pending_live_itf_scan",
+      "detail": "4 entry · stato seeded_pending_live_itf_scan",
       "critical": false
     },
     {
       "status": "green",
       "label": "Calendario",
-      "detail": "332 tornei visibili · FITP 301 · TE 30 · ITF 1",
+      "detail": "383 tornei visibili · FITP 351 · TE 30 · ITF 2",
       "critical": true
     },
     {
@@ -59,56 +59,60 @@
     {
       "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 12/08/2026, 03:30:46",
+      "detail": "file v3 generati · ultimo merge 12/08/2026, 18:39:56",
       "critical": true
     }
   ],
   "raw": {
     "fitp": {
-      "entriesFound": 301,
+      "entriesFound": 351,
       "byPlayer": {
         "francesco-renzulli": 18,
         "nikola-kerkenyakov": 11,
         "carlo-ghislotti": 13,
+        "manuel-natale": 29,
+        "niccolo-zanaga": 13,
         "matilde-mainetti": 9,
         "aila-zennaro": 11,
-        "virginia-cereghini": 7,
+        "virginia-cereghini": 6,
         "martina-danesi": 10,
         "filippo-vitali": 18,
         "nicholas-scappa": 8,
+        "pietro-sala": 3,
         "noemi-paganini": 11,
-        "camilla-lingeri": 34,
+        "camilla-lingeri": 33,
+        "martina-busa": 10,
         "daniele-gelli": 17,
-        "francesco-bocchio": 26,
+        "francesco-bocchio": 25,
         "gregorio-puccio": 23,
         "virginia-rossoni": 15,
-        "matteo-bocchio": 23,
+        "matteo-bocchio": 22,
         "giulia-scozzafava": 6,
-        "edoardo-grimoldi": 12,
         "anna-gambarini": 16,
-        "alessio-nava": 13
+        "edoardo-grimoldi": 12,
+        "alessio-nava": 12
       },
       "byMatchMethod": {
-        "membership_card": 301
+        "membership_card": 351
       },
-      "homonymRejected": 1,
-      "verifiedCompetitionEntryRescues": 1,
+      "homonymRejected": 12,
+      "verifiedCompetitionEntryRescues": 2,
       "playerDrivenCandidateTournaments": 0,
       "playerDrivenCandidateRescues": 0,
       "playerDrivenCandidatesConfirmed": 0
     },
     "calendar": {
-      "tournamentEntries": 332,
+      "tournamentEntries": 383,
       "byCircuit": {
-        "fitp": 301,
+        "fitp": 351,
         "tennis-europe": 30,
-        "itf": 1
+        "itf": 2
       },
       "warnings": 0
     },
     "te": {
-      "status": "tennis_europe_acceptance_list_engine_complete_multievent_acceptance_applied_started_draw_rules_applied",
-      "profileSeeds": 11,
+      "status": "tennis_europe_acceptance_list_engine_complete_multievent_acceptance_applied_started_draw_rules_applied_same_rule_all_events",
+      "profileSeeds": 13,
       "entriesVisible": 30,
       "acceptanceConfirmed": 1,
       "byPlayer": {
@@ -130,7 +134,7 @@
     },
     "itf": {
       "status": "seeded_pending_live_itf_scan",
-      "entries": 2
+      "entries": 4
     }
   }
 }
