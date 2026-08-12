@@ -1,0 +1,44 @@
+name: Court Watch v3 FITP provincial coverage compare
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/compare-fitp-provincial-coverage.mjs'
+      - 'courtwatch-v3-fitp-provincial-coverage-trigger.json'
+      - '.github/workflows/courtwatch-v3-fitp-provincial-coverage-compare.yml'
+permissions: {contents: write}
+concurrency:
+  group: court-watch-v3-fitp-provincial-coverage-compare
+  cancel-in-progress: false
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Compare provincial FITP coverage
+        run: |
+          set +e
+          tmpLog="courtwatch-v3-fitp-provincial-coverage-run.tmp.log"
+          : > "$tmpLog"
+          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          echo "sourceSha=${GITHUB_SHA}" >> "$tmpLog"
+          node src/v3/compare-fitp-provincial-coverage.mjs >> "$tmpLog" 2>&1
+          code=$?
+          echo "exitCode=$code" >> "$tmpLog"
+          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          cp "$tmpLog" courtwatch-v3-fitp-provincial-coverage-run.log
+          cat courtwatch-v3-fitp-provincial-coverage-run.log
+          exit $code
+      - name: Commit comparison
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/fitp_provincial_coverage_comparison.json courtwatch-v3-fitp-provincial-coverage-run.log src/v3/compare-fitp-provincial-coverage.mjs .github/workflows/courtwatch-v3-fitp-provincial-coverage-compare.yml
+          git commit -m "Build FITP provincial coverage comparison" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
