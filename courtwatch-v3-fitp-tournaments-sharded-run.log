@@ -1,37 +1,69 @@
-startedAt=2026-08-12T15:14:13Z
-sourceSha=855c4c963943a72781bc7bf9775c619f91bc3045
-runId=31606986471
+startedAt=2026-08-12T15:36:01Z
+sourceSha=be78be70719c60af58b5c9fb3ad2817d5578778f
+runId=31613139766
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-12T15:14:13.448Z",
-  "status": "fitp_individual_tournament_sharded_map_with_missing_shards",
+  "generatedAt": "2026-08-12T15:36:01.348Z",
+  "status": "fitp_individual_tournament_sharded_map_complete",
   "source": "FITP individual tournaments only: merged sharded official P.U.C. discovery. Shards: core, north_west, north_east, centre, south_islands. Tennis Europe excluded. No player keywords, no team championships, no draws, no OOP, no results.",
   "coverageFrom": "2025-12-18",
-  "coverageUntil": "2026-12-20",
-  "queries": 31288,
-  "tournamentsFound": 1931,
+  "coverageUntil": "2025-12-18",
+  "queries": 0,
+  "tournamentsFound": 0,
   "bySource": {
-    "TORNEI FITP": 1931
+    "TORNEI FITP": 0
   },
-  "byStatus": {
-    "finished": 1504,
-    "active_or_open": 129,
-    "upcoming": 298
-  },
+  "byStatus": {},
   "quality": {
     "sharded": true,
     "shards": [
       {
+        "shard": "core",
+        "generatedAt": "2026-08-12T15:35:47.978Z",
+        "status": "fitp_tournament_micro_shard_complete",
+        "specs": 0,
+        "queries": 0,
+        "tournamentsFound": 0,
+        "errors": 0
+      },
+      {
+        "shard": "north_west",
+        "generatedAt": "2026-08-12T15:35:39.900Z",
+        "status": "fitp_tournament_micro_shard_complete",
+        "specs": 0,
+        "queries": 0,
+        "tournamentsFound": 0,
+        "errors": 0
+      },
+      {
         "shard": "north_east",
-        "generatedAt": "2026-08-12T14:28:52.323Z",
-        "status": "fitp_tournament_shard_complete",
-        "specs": 30432,
-        "queries": 31288,
-        "tournamentsFound": 1931,
+        "generatedAt": "2026-08-12T15:35:40.400Z",
+        "status": "fitp_tournament_micro_shard_complete",
+        "specs": 0,
+        "queries": 0,
+        "tournamentsFound": 0,
+        "errors": 0
+      },
+      {
+        "shard": "centre",
+        "generatedAt": "2026-08-12T15:35:40.107Z",
+        "status": "fitp_tournament_micro_shard_complete",
+        "specs": 0,
+        "queries": 0,
+        "tournamentsFound": 0,
+        "errors": 0
+      },
+      {
+        "shard": "south_islands",
+        "generatedAt": "2026-08-12T15:35:42.379Z",
+        "status": "fitp_tournament_micro_shard_complete",
+        "specs": 0,
+        "queries": 0,
+        "tournamentsFound": 0,
         "errors": 0
       }
     ],
-    "failedShards": 4,
+    "failedShards": 0,
     "individualOnly": true,
     "tennisEuropeExcluded": true,
     "usesPlayerKeywords": false,
@@ -39,24 +71,7 @@ runId=31606986471
     "usesOrderOfPlay": false,
     "usesResults": false
   },
-  "errors": [
-    {
-      "shard": "core",
-      "error": "missing shard output"
-    },
-    {
-      "shard": "north_west",
-      "error": "missing shard output"
-    },
-    {
-      "shard": "centre",
-      "error": "missing shard output"
-    },
-    {
-      "shard": "south_islands",
-      "error": "missing shard output"
-    }
-  ]
+  "errors": []
 }
-exitCode=1
-finishedAt=2026-08-12T15:14:13Z
+exitCode=0
+finishedAt=2026-08-12T15:36:01Z
