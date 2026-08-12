@@ -1,186 +1,1855 @@
 {
-  "generatedAt": "2026-08-12T01:56:15.051Z",
-  "status": "fitp_player_profile_endpoint_diagnostic_anna_complete",
-  "profiles": [
+  "generatedAt": "2026-08-12T02:00:17.294Z",
+  "status": "fitp_player_detail_script_endpoint_extract_complete",
+  "scriptLength": 121832,
+  "endpoints": [
+    "https://dp-fit-prod-function.azurewebsites.net/api/v3/player/sheet/simple",
+    "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/sheet/simple",
+    "https://dp-myfit-test-function-v2.azurewebsites.net/api/v1/tesserati/dettaglio/semplice",
+    "https://codepen.io/xgad/post/svg-radial-progress-meters",
+    "http://www.w3.org/2000/svg",
+    "http://www.w3.org/1999/xlink",
+    "https://dp-fit-prod-function.azurewebsites.net/api/v6/sso/app/login",
+    "https://www.supertennis.tv/SSO/login.html?Guid=",
+    "https://myfit.federtennis.it/SSO/login.html?Guid=",
+    "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/sheet",
+    "https://my2.fitp.it",
+    "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/stats",
+    "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/stats/career",
+    "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/stats/focus",
+    "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/ranking"
+  ],
+  "windowCount": 1378,
+  "useful": [
     {
-      "testCard": "3876473411",
-      "url": "https://www.fitp.it/Pagina-Giocatore/?cardNumber=Mzg3NjQ3MzQxMQ%3D%3D",
-      "title": "Federtennis",
-      "scriptCount": 43,
-      "apiHintCount": 24,
-      "downloaded": 40,
-      "downloadedHints": [
-        "http://www.w3.org/1999/xlink",
-        "http://www.w3.org/2000/svg",
-        "http://www.w3.org/1998/Math/MathML",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "http://getbootstrap.com)",
-        "http://silviomoreto.github.io/bootstrap-select)",
-        "https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)",
-        "http://imsky.co",
-        "http://holderjs.com",
-        "https://github.com/imsky/holder/issues",
-        "http://www.w3.org/2000/svg",
-        "http://www.w3.org/2000/svg",
-        "http://momentjs.com/guides/#/warnings/define-locale/",
-        "http://momentjs.com/guides/#/warnings/add-inverted-param/",
-        "http://momentjs.com/guides/#/warnings/js-date/",
-        "http://momentjs.com/guides/#/warnings/min-max/",
-        "http://momentjs.com/guides/#/warnings/min-max/",
-        "http://momentjs.com/guides/#/warnings/zone/",
-        "http://momentjs.com/guides/#/warnings/dst-shifted/",
-        "https://github.com/aliem",
-        "https://github.com/nostalgiaz",
-        "http://jquery.eisbehr.de/lazy",
-        "http://jquery.eisbehr.de/lazy",
-        "https://player.vimeo.com/video/",
-        "https://www.youtube.com/embed/",
-        "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css",
-        "https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.2/dist/fp.min.js",
-        "https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@main/dist/es5/detectIncognito.min.js",
-        "https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.6.0/lib/msal-browser.js",
-        "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
-        "/api/sitecore/Common/GetOriginalImage",
-        "http://fian.my.id/Waves",
-        "https://github.com/fians/Waves/blob/master/LICENSE",
-        "http://kenwheeler.github.io",
-        "http://kenwheeler.github.io/slick",
-        "http://github.com/kenwheeler/slick",
-        "http://github.com/kenwheeler/slick/issues",
-        "http://horizon-swiper.sebsauer.de/",
-        "http://www.sebsauer.de/",
-        "https://github.com/sebsauer90/horizon-swiper/blob/master/LICENSE",
-        "https://github.com/conradfeyt/Simple-Marquee",
-        "https://github.com/eternicode/bootstrap-datepicker)",
-        "http://www.apache.org/licenses/LICENSE-2.0)",
-        "Guid",
-        "http://erik.io/blog/2014/03/04/definitive-guide-to-cookie-domains/",
-        "http://w3c.github.io/aria-in-html/)",
-        "Iscri",
-        "Iscri",
-        "https://dp-fit-prod-function.azurewebsites.net/api/v3/generic/newsletter/subscribe",
-        "iscri",
-        "iscri",
-        "guid",
-        "https://my.fitp.it",
-        "Guid",
-        "Guid",
-        "Guid",
-        "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/list",
-        "guid",
-        "Guid",
-        "Guid",
-        "Guid"
-      ]
+      "card": "3876473411",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "cardNumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
     },
     {
-      "testCard": "7578095942",
-      "url": "https://www.fitp.it/Pagina-Giocatore/?cardNumber=NzU3ODA5NTk0Mg%3D%3D",
-      "title": "Federtennis",
-      "scriptCount": 43,
-      "apiHintCount": 24,
-      "downloaded": 40,
-      "downloadedHints": [
-        "http://www.w3.org/1999/xlink",
-        "http://www.w3.org/2000/svg",
-        "http://www.w3.org/1998/Math/MathML",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "guid",
-        "http://getbootstrap.com)",
-        "http://silviomoreto.github.io/bootstrap-select)",
-        "https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)",
-        "http://imsky.co",
-        "http://holderjs.com",
-        "https://github.com/imsky/holder/issues",
-        "http://www.w3.org/2000/svg",
-        "http://www.w3.org/2000/svg",
-        "http://momentjs.com/guides/#/warnings/define-locale/",
-        "http://momentjs.com/guides/#/warnings/add-inverted-param/",
-        "http://momentjs.com/guides/#/warnings/js-date/",
-        "http://momentjs.com/guides/#/warnings/min-max/",
-        "http://momentjs.com/guides/#/warnings/min-max/",
-        "http://momentjs.com/guides/#/warnings/zone/",
-        "http://momentjs.com/guides/#/warnings/dst-shifted/",
-        "https://github.com/aliem",
-        "https://github.com/nostalgiaz",
-        "http://jquery.eisbehr.de/lazy",
-        "http://jquery.eisbehr.de/lazy",
-        "https://player.vimeo.com/video/",
-        "https://www.youtube.com/embed/",
-        "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css",
-        "https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.2/dist/fp.min.js",
-        "https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@main/dist/es5/detectIncognito.min.js",
-        "https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.6.0/lib/msal-browser.js",
-        "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
-        "/api/sitecore/Common/GetOriginalImage",
-        "http://fian.my.id/Waves",
-        "https://github.com/fians/Waves/blob/master/LICENSE",
-        "http://kenwheeler.github.io",
-        "http://kenwheeler.github.io/slick",
-        "http://github.com/kenwheeler/slick",
-        "http://github.com/kenwheeler/slick/issues",
-        "http://horizon-swiper.sebsauer.de/",
-        "http://www.sebsauer.de/",
-        "https://github.com/sebsauer90/horizon-swiper/blob/master/LICENSE",
-        "https://github.com/conradfeyt/Simple-Marquee",
-        "https://github.com/eternicode/bootstrap-datepicker)",
-        "http://www.apache.org/licenses/LICENSE-2.0)",
-        "Guid",
-        "http://erik.io/blog/2014/03/04/definitive-guide-to-cookie-domains/",
-        "http://w3c.github.io/aria-in-html/)",
-        "Iscri",
-        "Iscri",
-        "https://dp-fit-prod-function.azurewebsites.net/api/v3/generic/newsletter/subscribe",
-        "iscri",
-        "iscri",
-        "guid",
-        "https://my.fitp.it",
-        "Guid",
-        "Guid",
-        "Guid",
-        "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/list",
-        "guid",
-        "Guid",
-        "Guid",
-        "Guid"
-      ]
+      "card": "3876473411",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "cardnumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "CardNumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "idDiscipline": 4332,
+        "cardNumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "cardNumber": "Mzg3NjQ3MzQxMQ==",
+        "year": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "cardNumber": "Mzg3NjQ3MzQxMQ==",
+        "season": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "cardNumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "cardnumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "CardNumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "idDiscipline": 4332,
+        "cardNumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "cardNumber": "Mzg3NjQ3MzQxMQ==",
+        "year": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "cardNumber": "Mzg3NjQ3MzQxMQ==",
+        "season": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"ANNA\",\"Surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"MembershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "ANNA",
+          "Surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******411",
+          "Category": "3° Categoria",
+          "Ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "cardNumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"ANNA\",\"surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"membershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "ANNA",
+          "surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******411",
+          "category": "3° Categoria",
+          "ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026,
+          "guid": "3950EF4D-F7FC-4983-A4DE-1920F721EAA9"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "cardnumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"ANNA\",\"surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"membershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "ANNA",
+          "surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******411",
+          "category": "3° Categoria",
+          "ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026,
+          "guid": "3950EF4D-F7FC-4983-A4DE-1920F721EAA9"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "CardNumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"ANNA\",\"surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"membershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "ANNA",
+          "surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******411",
+          "category": "3° Categoria",
+          "ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026,
+          "guid": "3950EF4D-F7FC-4983-A4DE-1920F721EAA9"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "idDiscipline": 4332,
+        "cardNumber": "Mzg3NjQ3MzQxMQ=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"ANNA\",\"surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"membershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "ANNA",
+          "surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******411",
+          "category": "3° Categoria",
+          "ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026,
+          "guid": "3950EF4D-F7FC-4983-A4DE-1920F721EAA9"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "cardNumber": "Mzg3NjQ3MzQxMQ==",
+        "year": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"ANNA\",\"surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"membershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "ANNA",
+          "surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******411",
+          "category": "3° Categoria",
+          "ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026,
+          "guid": "3950EF4D-F7FC-4983-A4DE-1920F721EAA9"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "3876473411",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "cardNumber": "Mzg3NjQ3MzQxMQ==",
+        "season": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"ANNA\",\"surname\":\"GAMBARINI\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"tennis_club_id\":\"03130478\",\"membershipCard",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "ANNA",
+          "surname": "GAMBARINI",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******411",
+          "category": "3° Categoria",
+          "ranking": "3.4",
+          "max_rank": "3.4",
+          "max_rank_stagione": 2026,
+          "guid": "3950EF4D-F7FC-4983-A4DE-1920F721EAA9"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "Mzg3NjQ3MzQxMQ=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "bf2f67db-0bf2-4242-92e3-091017ff73ae"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "cardNumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "cardnumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "CardNumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "idDiscipline": 4332,
+        "cardNumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "cardNumber": "NzU3ODA5NTk0Mg==",
+        "year": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v3/player/sheet/simple",
+      "body": {
+        "cardNumber": "NzU3ODA5NTk0Mg==",
+        "season": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "cardNumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "cardnumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "CardNumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "idDiscipline": 4332,
+        "cardNumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "cardNumber": "NzU3ODA5NTk0Mg==",
+        "year": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v6/player/sheet/simple",
+      "body": {
+        "cardNumber": "NzU3ODA5NTk0Mg==",
+        "season": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"Name\":\"NIKOLA NIKOLAEV\",\"Surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "Name": "NIKOLA NIKOLAEV",
+          "Surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "MembershipCard": "*******942",
+          "Category": "3° Categoria",
+          "Ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": null,
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "cardNumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"NIKOLA NIKOLAEV\",\"surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "NIKOLA NIKOLAEV",
+          "surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******942",
+          "category": "3° Categoria",
+          "ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "cardnumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"NIKOLA NIKOLAEV\",\"surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "NIKOLA NIKOLAEV",
+          "surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******942",
+          "category": "3° Categoria",
+          "ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "CardNumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"NIKOLA NIKOLAEV\",\"surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "NIKOLA NIKOLAEV",
+          "surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******942",
+          "category": "3° Categoria",
+          "ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "idDiscipline": 4332,
+        "cardNumber": "NzU3ODA5NTk0Mg=="
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"NIKOLA NIKOLAEV\",\"surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "NIKOLA NIKOLAEV",
+          "surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******942",
+          "category": "3° Categoria",
+          "ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "cardNumber": "NzU3ODA5NTk0Mg==",
+        "year": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"NIKOLA NIKOLAEV\",\"surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "NIKOLA NIKOLAEV",
+          "surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******942",
+          "category": "3° Categoria",
+          "ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
+    },
+    {
+      "card": "7578095942",
+      "path": "/api/v1/tesserati/dettaglio/semplice",
+      "body": {
+        "cardNumber": "NzU3ODA5NTk0Mg==",
+        "season": 2026
+      },
+      "status": 200,
+      "text": "{\"activeYears\":[{\"year\":2021},{\"year\":2022},{\"year\":2023},{\"year\":2024},{\"year\":2025},{\"year\":2026}],\"player\":{\"name\":\"NIKOLA NIKOLAEV\",\"surname\":\"KERKENYAKOV\",\"tennis_club_name\":\"ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO\",\"tennis_club_municipality\":\"\",\"tennis_club_province\":\"Lecco\",\"t",
+      "json": {
+        "activeYears": [
+          {
+            "year": 2021
+          },
+          {
+            "year": 2022
+          },
+          {
+            "year": 2023
+          },
+          {
+            "year": 2024
+          },
+          {
+            "year": 2025
+          },
+          {
+            "year": 2026
+          }
+        ],
+        "player": {
+          "name": "NIKOLA NIKOLAEV",
+          "surname": "KERKENYAKOV",
+          "tennis_club_name": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO",
+          "tennis_club_municipality": "",
+          "tennis_club_province": "Lecco",
+          "tennis_club_id": "03130478",
+          "membershipCard": "*******942",
+          "category": "3° Categoria",
+          "ranking": "3.1",
+          "max_rank": "3.1",
+          "max_rank_stagione": 2026,
+          "guid": "DBB15F53-9922-4A89-BCE1-27ED6BCAB5EE"
+        },
+        "discipline": [
+          {
+            "idDiscipline": 4332,
+            "discipline": "Tennis",
+            "membershipCard": "NzU3ODA5NTk0Mg=="
+          }
+        ],
+        "baseStat": [],
+        "avatar": "00000000-0000-0000-0000-000000000000"
+      }
     }
   ]
 }
