@@ -32,6 +32,7 @@ function eventGender(entry) {
 function clearAcceptanceLabel(entry) {
   return {
     ...entry,
+    eventGender: eventGender(entry),
     preTournamentAcceptanceList: entry.acceptanceList || '',
     preTournamentAcceptanceCode: entry.acceptanceCode || '',
     preTournamentAcceptancePosition: entry.acceptancePosition ?? null,
@@ -42,16 +43,6 @@ function clearAcceptanceLabel(entry) {
     calendarListLabel: '',
     calendarDecision: 'kept_started_in_draw_without_label',
     entryStatus: 'started_confirmed_in_draw',
-  };
-}
-function keepFemaleDrawGap(entry) {
-  return {
-    ...entry,
-    eventGender: 'female',
-    calendarDecision: 'kept_started_female_draw_gap_pending_engine_strengthening',
-    entryStatus: entry.entryStatus || 'profile_seen_not_on_acceptance_list_yet',
-    drawConfirmationPending: true,
-    drawConfirmationPendingReason: 'female_te_event_draw_gap_do_not_remove_until_gender_event_draw_parser_confirms_absence',
   };
 }
 
@@ -88,7 +79,7 @@ for (const entry of originalEntries) {
   }
 
   if (inDraw) {
-    const next = { ...clearAcceptanceLabel(entry), eventGender: gender };
+    const next = clearAcceptanceLabel(entry);
     kept.push(next);
     audit.push({
       playerId: entry.playerId,
@@ -102,22 +93,6 @@ for (const entry of originalEntries) {
       draws: entry.draws,
       preTournamentListLabel: entry.calendarListLabel || '',
       calendarDecision: 'kept_started_in_draw_without_label',
-    });
-  } else if (gender === 'female') {
-    const next = keepFemaleDrawGap(entry);
-    kept.push(next);
-    audit.push({
-      playerId: entry.playerId,
-      playerName: entry.playerName,
-      competitionId: entry.competitionId,
-      tournamentName: entry.tournamentName,
-      startDate: entry.startDate,
-      tournamentStarted: true,
-      foundInDraw: false,
-      eventGender: 'female',
-      preTournamentListLabel: entry.calendarListLabel || '',
-      acceptanceList: entry.acceptanceList || '',
-      calendarDecision: 'kept_started_female_draw_gap_pending_engine_strengthening',
     });
   } else {
     audit.push({
@@ -148,20 +123,18 @@ for (const entry of kept.filter(e => e.circuit === 'tennis-europe')) {
 const removed = audit.filter(a => a.calendarDecision === 'removed_started_not_in_draw');
 const keptStarted = audit.filter(a => a.calendarDecision === 'kept_started_in_draw_without_label');
 const keptFuture = audit.filter(a => a.calendarDecision === 'kept_not_started_acceptance_list_rule');
-const keptFemaleDrawGaps = audit.filter(a => a.calendarDecision === 'kept_started_female_draw_gap_pending_engine_strengthening');
 
 const output = {
   ...data,
-  status: String(data.status || 'tennis_europe_acceptance_list_engine_complete') + '_started_draw_rules_applied_event_gender_draw_gaps_kept',
+  status: String(data.status || 'tennis_europe_acceptance_list_engine_complete') + '_started_draw_rules_applied_same_rule_all_events',
   startedTournamentRule: {
     appliedAt: new Date().toISOString(),
     today: TODAY,
-    rule: 'Before tournament start use acceptance labels MD/Q/A. From tournament start keep players found in official draw data and remove MD/Q/A labels. Male entries only present in acceptance list but absent from draws are removed. Female event entries with draw gaps are kept until the event-specific draw parser confirms absence.',
+    rule: 'Same rule for boys and girls: before tournament start use acceptance labels MD/Q/A; from tournament start keep only players found in official draw data and remove MD/Q/A labels; remove players only present in acceptance list but absent from draws.',
     originalEntries: originalEntries.length,
     entriesFound: kept.filter(e => e.circuit === 'tennis-europe').length,
     removedStartedNotInDraw: removed.length,
     keptStartedInDrawWithoutLabel: keptStarted.length,
-    keptStartedFemaleDrawGapsPending: keptFemaleDrawGaps.length,
     keptNotStartedWithAcceptanceRule: keptFuture.length,
   },
   entriesFound: kept.filter(e => e.circuit === 'tennis-europe').length,
