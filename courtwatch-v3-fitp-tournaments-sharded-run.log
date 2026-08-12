@@ -1,0 +1,62 @@
+startedAt=2026-08-12T15:14:13Z
+sourceSha=855c4c963943a72781bc7bf9775c619f91bc3045
+runId=31606986471
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-12T15:14:13.448Z",
+  "status": "fitp_individual_tournament_sharded_map_with_missing_shards",
+  "source": "FITP individual tournaments only: merged sharded official P.U.C. discovery. Shards: core, north_west, north_east, centre, south_islands. Tennis Europe excluded. No player keywords, no team championships, no draws, no OOP, no results.",
+  "coverageFrom": "2025-12-18",
+  "coverageUntil": "2026-12-20",
+  "queries": 31288,
+  "tournamentsFound": 1931,
+  "bySource": {
+    "TORNEI FITP": 1931
+  },
+  "byStatus": {
+    "finished": 1504,
+    "active_or_open": 129,
+    "upcoming": 298
+  },
+  "quality": {
+    "sharded": true,
+    "shards": [
+      {
+        "shard": "north_east",
+        "generatedAt": "2026-08-12T14:28:52.323Z",
+        "status": "fitp_tournament_shard_complete",
+        "specs": 30432,
+        "queries": 31288,
+        "tournamentsFound": 1931,
+        "errors": 0
+      }
+    ],
+    "failedShards": 4,
+    "individualOnly": true,
+    "tennisEuropeExcluded": true,
+    "usesPlayerKeywords": false,
+    "usesDraws": false,
+    "usesOrderOfPlay": false,
+    "usesResults": false
+  },
+  "errors": [
+    {
+      "shard": "core",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "north_west",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "centre",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "south_islands",
+      "error": "missing shard output"
+    }
+  ]
+}
+exitCode=1
+finishedAt=2026-08-12T15:14:13Z
