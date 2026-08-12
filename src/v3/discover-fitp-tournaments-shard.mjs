@@ -1,0 +1,40 @@
+import fs from 'node:fs/promises';
+const NOW=new Date().toISOString();
+const TODAY=NOW.slice(0,10);
+const FROM='2025-12-18';
+const BASE='https://dp-myfit-test-function-v2.azurewebsites.net';
+const TENNIS='4332';
+const FETCH=100;
+const MAX_PAGES=120;
+const HORIZON_DAYS=730;
+const SHARD=process.env.FITP_SHARD||'core';
+const SHARDS={
+  core:{regions:[],provinces:[],states:['0','1','2','3','4','5','6'],terms:['U10','U11','U12','U14','U16','U18','OPEN','RODEO','KINDER','TENNIS TROPHY FITP','TENNIS TROPHY','JUNIOR NEXT GEN','CAMPIONATI INDIVIDUALI','PROVE DI QUALIFICAZIONE','BABOLAT CUP','MASTER DELLA BRIANZA','BRIANZA','CIRCUITO GIOVANILE']},
+  north_west:{regions:['1','2','3','7'],provinces:['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','96','97','98','103','108'],states:['0','1','2','3','4','5','6'],terms:['LOMB','LOMB.','LOMBARDIA','PIE','PIEMONTE','LIG','LIGURIA','VDA','VALLE D AOSTA','LECCO','TENNIS CLUB LECCO','TC LECCO','IMPERIA','TENNIS CLUB IMPERIA','TC IMPERIA','MILANO 3','MILANO3','MILANO TRE','BASIGLIO','SPORTING MILANO 3']},
+  north_east:{regions:['4','5','6'],provinces:['21','22','23','24','25','26','27','28','29','30','31','32'],states:['0','1','2','3','4','5','6'],terms:['VENETO','VEN','TRENTINO','TN','ALTO ADIGE','FVG','FRIULI']},
+  centre:{regions:['8','9','10','11','12','13'],provinces:['33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','99','100','101','102','109','110'],states:['0','1','2','3','4','5','6'],terms:['EMILIA','EMILIA ROMAGNA','TOS','TOSCANA','MAR','MARCHE','UMB','UMBRIA','LAZ','LAZIO','ABR','ABRUZZO','MOL','MOLISE']},
+  south_islands:{regions:['14','15','16','17','18','19','20'],provinces:['61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','87','88','89','90','91','92','93','94','95','111'],states:['0','1','2','3','4','5','6'],terms:['CAM','CAMPANIA','PUG','PUGLIA','BAS','BASILICATA','CAL','CALABRIA','SIC','SICILIA','SAR','SARDEGNA']}
+};
+const cfg=SHARDS[SHARD]||SHARDS.core;
+const dd=n=>String(n).padStart(2,'0');
+const addDays=(d,n)=>new Date(d.getTime()+n*864e5);
+const it=d=>`${dd(d.getUTCDate())}/${dd(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`;
+const iso=v=>{const s=String(v||'');let m=s.match(/^(20\d{2})-(\d{2})-(\d{2})/);if(m)return m[0];m=s.match(/^(\d{1,2})\D(\d{1,2})\D(20\d{2})/);return m?`${m[3]}-${dd(m[2])}-${dd(m[1])}`:''};
+const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
+const key=r=>String(r?.guid||r?.competitionId||'').toUpperCase();
+async function writeJson(p,v){await fs.mkdir(p.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(p,JSON.stringify(v,null,2)+'\n')}
+async function post(body,attempt=0){const r=await fetch(BASE+'/api/v3/tornei/puc/list',{method:'POST',headers:{'content-type':'application/json','user-agent':'Mozilla/5.0 CourtWatch-v3-fitp-shard/1.0','origin':'https://www.fitp.it','referer':'https://www.fitp.it/Tornei/Ricerca-tornei'},body:JSON.stringify(body)});const text=await r.text();if(!r.ok){if(attempt<3&&(r.status>=500||r.status===429)){await new Promise(x=>setTimeout(x,700*(attempt+1)));return post(body,attempt+1)}throw Error(r.status+' '+text.slice(0,180))}return text?JSON.parse(text):null}
+function base(){return{guid:'',profilazione:'',freetext:'',id_regione:'',id_provincia:'',id_stato:'',id_disciplina:TENNIS,sesso:'',data_inizio:'',data_fine:'',tipo_competizione:'',categoria_eta:'',id_classifica:'',classifica:'',massimale_montepremi:'',id_area_regionale:'',ambito:'',cod_fonte:'1',id_fonte:'TORNEI FITP',rowstoskip:0,fetchrows:FETCH,sortcolumn:'',sortorder:''}}
+function reject(r){const id=key(r); if(!id||id==='11111111-1111-1111-1111-111111111111')return true; if(String(r.id_disciplina||'')!==TENNIS)return true; if(String(r.cod_fonte||'')!=='1')return true; const n=norm([r.nome_torneo,r.name,r.descrizione,r.id_fonte].join(' ')); return /TENNIS EUROPE|TE U\s?\d{2}|TENNIS EUROPE JUNIOR TOUR/.test(n)}
+function statusOf(a,b){if(b&&b<TODAY)return'finished'; if(a&&a>TODAY)return'upcoming'; return'active_or_open'}
+function spec(mode,extra={},start=null,end=null){return{mode,...extra,start,end}}
+function specs(){const out=[]; const start=new Date(FROM+'T00:00:00Z'); const limit=addDays(new Date(TODAY+'T00:00:00Z'),HORIZON_DAYS); const windows=SHARD==='core'?[1,2,3,5,7,10,14,21,31,62]:[1,3,7,14,31,62,124]; const win=(mode,days,extra={})=>{for(let s=new Date(start);s<=limit;s=addDays(s,days)){const e=new Date(Math.min(limit,addDays(s,days-1)));out.push(spec(mode,extra,new Date(s),e))}}; for(const d of windows)win(`${SHARD}_${d}d`,d); for(const st of cfg.states){out.push(spec(`${SHARD}_state_${st}`,{id_stato:st})); for(const d of [7,14,31])win(`${SHARD}_state_${st}_${d}d`,d,{id_stato:st})} for(const r of cfg.regions){out.push(spec(`${SHARD}_region_${r}`,{id_regione:r})); for(const st of cfg.states)for(const d of [7,14,31])win(`${SHARD}_region_${r}_state_${st}_${d}d`,d,{id_regione:r,id_stato:st})} for(const p of cfg.provinces){out.push(spec(`${SHARD}_province_${p}`,{id_provincia:p})); for(const st of cfg.states)for(const d of [7,14,31])win(`${SHARD}_province_${p}_state_${st}_${d}d`,d,{id_provincia:p,id_stato:st})} for(const term of cfg.terms){out.push(spec(`${SHARD}_term_${term}`,{freetext:term})); for(const d of [7,14,31,62,124])win(`${SHARD}_term_${term}_${d}d`,d,{freetext:term})} return out}
+function payload(s,skip){const p=base();p.rowstoskip=skip;if(s.start){p.data_inizio=it(s.start);p.data_fine=it(s.end)}for(const k of ['freetext','id_regione','id_provincia','id_stato','categoria_eta','sesso'])if(s[k])p[k]=s[k];return p}
+const all=specs(); const byId=new Map(), coverage={}, queries=[], errors=[]; let idx=0;
+async function run(s){let prev=''; for(let page=0,skip=0;page<MAX_PAGES;page++,skip+=FETCH){let j;try{j=await post(payload(s,skip))}catch(e){errors.push({mode:s.mode,skip,error:e.message});break}const rows=j?.competizioni||[];const sig=rows.map(key).join('|');queries.push({mode:s.mode,skip,rows:rows.length,total:Number(j?.record||0),saturated:rows.length>=FETCH}); if(!rows.length||sig===prev)break; prev=sig; for(const r of rows){if(reject(r))continue;const k=key(r);if(!byId.has(k))byId.set(k,r);(coverage[k]??=new Set()).add(s.mode)} if(rows.length<FETCH)break}}
+async function worker(){while(idx<all.length)await run(all[idx++])} await Promise.all(Array.from({length:8},worker));
+const tournaments=[...byId.values()].map(r=>{const startDate=iso(r.data_inizio), rawEnd=iso(r.data_fine), endDate=rawEnd==='1900-01-01'?'':rawEnd, k=key(r);return{circuit:'fitp',competitionId:k,tournamentName:r.nome_torneo||'',location:[r.citta,r.sigla_provincia||r.provincia].filter(Boolean).join(' '),startDate,endDate,status:statusOf(startDate,endDate),disciplineId:String(r.id_disciplina||''),sourceCode:String(r.cod_fonte||''),sourceName:r.id_fonte||'',categoryAge:r.cat_eta||'',categoryClass:r.cat_class||'',tournamentType:r.tipo_torneo||'',club:r.tennisclub||'',sourceUrl:'https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId='+encodeURIComponent(k),discoveryShard:SHARD,coverageModes:[...(coverage[k]||new Set())].sort(),lastSeen:NOW}}).filter(t=>!t.endDate||t.endDate>=FROM).sort((a,b)=>(a.startDate||'9999').localeCompare(b.startDate||'9999')||a.tournamentName.localeCompare(b.tournamentName));
+const out={version:'cw-v3-agenda-first',generatedAt:NOW,status:errors.length?'fitp_tournament_shard_with_errors':'fitp_tournament_shard_complete',shard:SHARD,coverageFrom:FROM,coverageUntil:addDays(new Date(TODAY+'T00:00:00Z'),HORIZON_DAYS).toISOString().slice(0,10),specs:all.length,queries:queries.length,tournamentsFound:tournaments.length,tournaments,errors};
+await writeJson(`dist/v3/shards/source_fitp_tournaments_${SHARD}.json`,out);
+await writeJson(`dist/v3/shards/source_fitp_tournaments_${SHARD}_audit.json`,{...out,tournaments:undefined,queries,sample:tournaments.slice(0,200)});
+console.log(JSON.stringify({...out,tournaments:undefined},null,2));
