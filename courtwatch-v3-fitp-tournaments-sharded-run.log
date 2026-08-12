@@ -1,186 +1,168 @@
-startedAt=2026-08-12T22:03:18Z
-sourceSha=16acf77e699ce07a1eed750c07f86887e92f1db2
-runId=31643730338
+startedAt=2026-08-12T23:34:22Z
+sourceSha=7eb29836e69661dfe5ad23ac7fb50a17ee00d2e8
+runId=31651331661
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-12T22:03:18.585Z",
+  "generatedAt": "2026-08-12T23:34:22.791Z",
   "status": "fitp_individual_tournament_micro_sharded_map_complete",
   "source": "FITP individual tournaments only: merged micro-sharded official P.U.C. discovery. Micro-shards by core/date, terms, region, province groups and geographic terms. Tennis Europe excluded. No player keywords, no team championships, no draws, no OOP, no results.",
   "coverageFrom": "2025-12-18",
   "coverageUntil": "2026-12-20",
-  "queries": 104596,
-  "tournamentsFound": 5254,
+  "queries": 863,
+  "tournamentsFound": 4078,
   "bySource": {
-    "TORNEI FITP": 5254
+    "TORNEI FITP": 4078
   },
   "byStatus": {
-    "finished": 4185,
-    "active_or_open": 141,
-    "upcoming": 928
+    "finished": 3276,
+    "active_or_open": 117,
+    "upcoming": 685
   },
   "quality": {
     "microSharded": true,
     "shards": [
       {
         "shard": "core_dates",
-        "generatedAt": "2026-08-12T21:42:31.150Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 2354,
-        "queries": 3254,
-        "tournamentsFound": 658,
+        "generatedAt": "2026-08-12T23:33:47.137Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 159,
         "errors": 0
       },
       {
         "shard": "core_terms",
-        "generatedAt": "2026-08-12T21:42:22.652Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 2540,
-        "queries": 2843,
-        "tournamentsFound": 4361,
+        "generatedAt": "2026-08-12T23:33:47.149Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 184,
         "errors": 0
       },
       {
         "shard": "nw_regions",
-        "generatedAt": "2026-08-12T21:42:29.967Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 2860,
-        "queries": 2896,
-        "tournamentsFound": 1489,
+        "generatedAt": "2026-08-12T23:33:47.390Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 147,
         "errors": 0
       },
       {
         "shard": "nw_provinces1",
-        "generatedAt": "2026-08-12T21:42:32.371Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 9295,
-        "queries": 9295,
-        "tournamentsFound": 441,
+        "generatedAt": "2026-08-12T23:34:07.533Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 49,
+        "tournamentsFound": 316,
         "errors": 0
       },
       {
         "shard": "nw_provinces2",
-        "generatedAt": "2026-08-12T21:42:22.649Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 8580,
-        "queries": 8580,
-        "tournamentsFound": 640,
+        "generatedAt": "2026-08-12T23:33:47.409Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 49,
+        "tournamentsFound": 282,
         "errors": 0
       },
       {
         "shard": "nw_terms",
-        "generatedAt": "2026-08-12T21:42:22.546Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 3302,
-        "queries": 3369,
-        "tournamentsFound": 1147,
+        "generatedAt": "2026-08-12T23:33:48.892Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 198,
         "errors": 0
       },
       {
         "shard": "ne_regions",
-        "generatedAt": "2026-08-12T21:42:23.934Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 2145,
-        "queries": 2157,
-        "tournamentsFound": 632,
+        "generatedAt": "2026-08-12T23:33:47.841Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 49,
+        "tournamentsFound": 290,
         "errors": 0
       },
       {
         "shard": "ne_provinces1",
-        "generatedAt": "2026-08-12T21:42:25.952Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 4290,
-        "queries": 4290,
-        "tournamentsFound": 375,
+        "generatedAt": "2026-08-12T23:33:47.382Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 228,
         "errors": 0
       },
       {
         "shard": "ne_provinces2",
-        "generatedAt": "2026-08-12T21:42:23.019Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 4290,
-        "queries": 4290,
-        "tournamentsFound": 151,
+        "generatedAt": "2026-08-12T23:33:47.885Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 262,
         "errors": 0
       },
       {
         "shard": "ne_terms",
-        "generatedAt": "2026-08-12T21:42:22.767Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 889,
-        "queries": 903,
-        "tournamentsFound": 564,
+        "generatedAt": "2026-08-12T23:33:47.266Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 49,
+        "tournamentsFound": 252,
         "errors": 0
       },
       {
         "shard": "ce_regions",
-        "generatedAt": "2026-08-12T21:42:24.619Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 4290,
-        "queries": 4328,
-        "tournamentsFound": 1622,
+        "generatedAt": "2026-08-12T23:33:47.145Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 234,
         "errors": 0
       },
       {
         "shard": "ce_provinces1",
-        "generatedAt": "2026-08-12T21:42:22.592Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 12155,
-        "queries": 12155,
-        "tournamentsFound": 654,
+        "generatedAt": "2026-08-12T23:33:47.137Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 261,
         "errors": 0
       },
       {
         "shard": "ce_provinces2",
-        "generatedAt": "2026-08-12T21:42:22.464Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 12155,
-        "queries": 12155,
-        "tournamentsFound": 523,
+        "generatedAt": "2026-08-12T23:33:47.942Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 50,
+        "tournamentsFound": 259,
         "errors": 0
       },
       {
         "shard": "ce_terms",
-        "generatedAt": "2026-08-12T21:42:23.257Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 1778,
-        "queries": 1792,
-        "tournamentsFound": 911,
+        "generatedAt": "2026-08-12T23:33:51.313Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 49,
+        "tournamentsFound": 191,
         "errors": 0
       },
       {
         "shard": "so_regions",
-        "generatedAt": "2026-08-12T21:42:25.844Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 5005,
-        "queries": 5013,
-        "tournamentsFound": 787,
+        "generatedAt": "2026-08-12T23:33:55.934Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 138,
         "errors": 0
       },
       {
         "shard": "so_provinces1",
-        "generatedAt": "2026-08-12T21:42:22.759Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 12870,
-        "queries": 12870,
-        "tournamentsFound": 352,
+        "generatedAt": "2026-08-12T23:33:47.248Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 215,
         "errors": 0
       },
       {
         "shard": "so_provinces2",
-        "generatedAt": "2026-08-12T21:42:30.890Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 12870,
-        "queries": 12870,
-        "tournamentsFound": 231,
+        "generatedAt": "2026-08-12T23:33:47.882Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 48,
+        "tournamentsFound": 247,
         "errors": 0
       },
       {
         "shard": "so_terms",
-        "generatedAt": "2026-08-12T21:42:22.935Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 1524,
-        "queries": 1536,
-        "tournamentsFound": 660,
+        "generatedAt": "2026-08-12T23:33:49.651Z",
+        "status": "fitp_provincial_window_shard_complete",
+        "queries": 40,
+        "tournamentsFound": 215,
         "errors": 0
       }
     ],
@@ -196,4 +178,4 @@ runId=31643730338
   "errors": []
 }
 exitCode=0
-finishedAt=2026-08-12T22:03:18Z
+finishedAt=2026-08-12T23:34:22Z
