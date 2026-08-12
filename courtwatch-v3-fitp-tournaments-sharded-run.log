@@ -1,11 +1,11 @@
-startedAt=2026-08-12T15:36:01Z
-sourceSha=be78be70719c60af58b5c9fb3ad2817d5578778f
-runId=31613139766
+startedAt=2026-08-12T15:38:51Z
+sourceSha=64c01b17eca28a3215465f59c983f1d5a4f55029
+runId=31613404858
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-12T15:36:01.348Z",
-  "status": "fitp_individual_tournament_sharded_map_complete",
-  "source": "FITP individual tournaments only: merged sharded official P.U.C. discovery. Shards: core, north_west, north_east, centre, south_islands. Tennis Europe excluded. No player keywords, no team championships, no draws, no OOP, no results.",
+  "generatedAt": "2026-08-12T15:38:51.522Z",
+  "status": "fitp_individual_tournament_micro_sharded_map_with_missing_shards",
+  "source": "FITP individual tournaments only: merged micro-sharded official P.U.C. discovery. Micro-shards by core/date, terms, region, province groups and geographic terms. Tennis Europe excluded. No player keywords, no team championships, no draws, no OOP, no results.",
   "coverageFrom": "2025-12-18",
   "coverageUntil": "2025-12-18",
   "queries": 0,
@@ -15,55 +15,10 @@ runId=31613139766
   },
   "byStatus": {},
   "quality": {
-    "sharded": true,
-    "shards": [
-      {
-        "shard": "core",
-        "generatedAt": "2026-08-12T15:35:47.978Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 0,
-        "queries": 0,
-        "tournamentsFound": 0,
-        "errors": 0
-      },
-      {
-        "shard": "north_west",
-        "generatedAt": "2026-08-12T15:35:39.900Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 0,
-        "queries": 0,
-        "tournamentsFound": 0,
-        "errors": 0
-      },
-      {
-        "shard": "north_east",
-        "generatedAt": "2026-08-12T15:35:40.400Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 0,
-        "queries": 0,
-        "tournamentsFound": 0,
-        "errors": 0
-      },
-      {
-        "shard": "centre",
-        "generatedAt": "2026-08-12T15:35:40.107Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 0,
-        "queries": 0,
-        "tournamentsFound": 0,
-        "errors": 0
-      },
-      {
-        "shard": "south_islands",
-        "generatedAt": "2026-08-12T15:35:42.379Z",
-        "status": "fitp_tournament_micro_shard_complete",
-        "specs": 0,
-        "queries": 0,
-        "tournamentsFound": 0,
-        "errors": 0
-      }
-    ],
-    "failedShards": 0,
+    "microSharded": true,
+    "shards": [],
+    "expectedShards": 18,
+    "failedShards": 18,
     "individualOnly": true,
     "tennisEuropeExcluded": true,
     "usesPlayerKeywords": false,
@@ -71,7 +26,80 @@ runId=31613139766
     "usesOrderOfPlay": false,
     "usesResults": false
   },
-  "errors": []
+  "errors": [
+    {
+      "shard": "core_dates",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "core_terms",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "nw_regions",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "nw_provinces1",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "nw_provinces2",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "nw_terms",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "ne_regions",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "ne_provinces1",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "ne_provinces2",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "ne_terms",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "ce_regions",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "ce_provinces1",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "ce_provinces2",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "ce_terms",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "so_regions",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "so_provinces1",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "so_provinces2",
+      "error": "missing shard output"
+    },
+    {
+      "shard": "so_terms",
+      "error": "missing shard output"
+    }
+  ]
 }
-exitCode=0
-finishedAt=2026-08-12T15:36:01Z
+exitCode=1
+finishedAt=2026-08-12T15:38:51Z
