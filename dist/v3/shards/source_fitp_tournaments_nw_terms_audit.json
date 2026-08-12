@@ -1,6 +1,6 @@
 {
   "version": "cw-v3-fitp-provincial-window-engine",
-  "generatedAt": "2026-08-12T23:33:48.892Z",
+  "generatedAt": "2026-08-12T23:55:06.907Z",
   "status": "fitp_provincial_window_shard_complete",
   "shard": "nw_terms",
   "source": "FITP tournament discovery by province × rotating logical windows. Each query uses official P.U.C. structured filters only: tennis discipline, TORNEI FITP, province, data_inizio, data_fine. No player names and no tournament keywords. Logical quadrimestre windows overlap the query start by 21 days except the first historical window. Saturated branches auto-split to shorter windows and final map dedupes by competitionId.",
@@ -77,6 +77,24 @@
       "shard": "nw_terms",
       "provinceId": "6",
       "provinceOrdinal": 5,
+      "windowLabel": "window_3_2026-08-19_2026-12-19",
+      "logicalStart": "2026-08-19",
+      "logicalEnd": "2026-12-19",
+      "queryStart": "2026-07-29",
+      "queryEnd": "2026-12-19",
+      "level": "quadrimestre",
+      "depth": 0,
+      "pagesRead": 1,
+      "rowsRead": 22,
+      "totalDeclared": 22,
+      "saturated": false,
+      "split": false,
+      "errors": []
+    },
+    {
+      "shard": "nw_terms",
+      "provinceId": "6",
+      "provinceOrdinal": 5,
       "windowLabel": "window_4_2026-12-19_2027-04-20",
       "logicalStart": "2026-12-19",
       "logicalEnd": "2027-04-20",
@@ -95,16 +113,16 @@
       "shard": "nw_terms",
       "provinceId": "6",
       "provinceOrdinal": 5,
-      "windowLabel": "window_3_2026-08-19_2026-12-19",
-      "logicalStart": "2026-08-19",
-      "logicalEnd": "2026-12-19",
-      "queryStart": "2026-07-29",
-      "queryEnd": "2026-12-19",
+      "windowLabel": "window_1_2025-12-18_2026-04-19",
+      "logicalStart": "2025-12-18",
+      "logicalEnd": "2026-04-19",
+      "queryStart": "2025-12-18",
+      "queryEnd": "2026-04-19",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
-      "rowsRead": 22,
-      "totalDeclared": 22,
+      "rowsRead": 39,
+      "totalDeclared": 39,
       "saturated": false,
       "split": false,
       "errors": []
@@ -131,16 +149,16 @@
       "shard": "nw_terms",
       "provinceId": "6",
       "provinceOrdinal": 5,
-      "windowLabel": "window_1_2025-12-18_2026-04-19",
-      "logicalStart": "2025-12-18",
-      "logicalEnd": "2026-04-19",
-      "queryStart": "2025-12-18",
-      "queryEnd": "2026-04-19",
+      "windowLabel": "window_5_2027-04-20_2027-08-20",
+      "logicalStart": "2027-04-20",
+      "logicalEnd": "2027-08-20",
+      "queryStart": "2027-03-30",
+      "queryEnd": "2027-08-20",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
-      "rowsRead": 39,
-      "totalDeclared": 39,
+      "rowsRead": 0,
+      "totalDeclared": 0,
       "saturated": false,
       "split": false,
       "errors": []
@@ -219,13 +237,13 @@
     },
     {
       "shard": "nw_terms",
-      "provinceId": "6",
-      "provinceOrdinal": 5,
-      "windowLabel": "window_5_2027-04-20_2027-08-20",
-      "logicalStart": "2027-04-20",
-      "logicalEnd": "2027-08-20",
-      "queryStart": "2027-03-30",
-      "queryEnd": "2027-08-20",
+      "provinceId": "103",
+      "provinceOrdinal": 23,
+      "windowLabel": "window_4_2026-12-19_2027-04-20",
+      "logicalStart": "2026-12-19",
+      "logicalEnd": "2027-04-20",
+      "queryStart": "2026-11-28",
+      "queryEnd": "2027-04-20",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
@@ -257,16 +275,16 @@
       "shard": "nw_terms",
       "provinceId": "103",
       "provinceOrdinal": 23,
-      "windowLabel": "window_1_2025-12-18_2026-04-19",
-      "logicalStart": "2025-12-18",
-      "logicalEnd": "2026-04-19",
-      "queryStart": "2025-12-18",
-      "queryEnd": "2026-04-19",
+      "windowLabel": "window_5_2027-04-20_2027-08-20",
+      "logicalStart": "2027-04-20",
+      "logicalEnd": "2027-08-20",
+      "queryStart": "2027-03-30",
+      "queryEnd": "2027-08-20",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
-      "rowsRead": 9,
-      "totalDeclared": 9,
+      "rowsRead": 0,
+      "totalDeclared": 0,
       "saturated": false,
       "split": false,
       "errors": []
@@ -275,11 +293,11 @@
       "shard": "nw_terms",
       "provinceId": "103",
       "provinceOrdinal": 23,
-      "windowLabel": "window_5_2027-04-20_2027-08-20",
-      "logicalStart": "2027-04-20",
-      "logicalEnd": "2027-08-20",
-      "queryStart": "2027-03-30",
-      "queryEnd": "2027-08-20",
+      "windowLabel": "window_7_2027-12-20_2028-04-20",
+      "logicalStart": "2027-12-20",
+      "logicalEnd": "2028-04-20",
+      "queryStart": "2027-11-29",
+      "queryEnd": "2028-04-20",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
@@ -311,11 +329,11 @@
       "shard": "nw_terms",
       "provinceId": "103",
       "provinceOrdinal": 23,
-      "windowLabel": "window_4_2026-12-19_2027-04-20",
-      "logicalStart": "2026-12-19",
-      "logicalEnd": "2027-04-20",
-      "queryStart": "2026-11-28",
-      "queryEnd": "2027-04-20",
+      "windowLabel": "window_8_2028-04-20_2028-08-11",
+      "logicalStart": "2028-04-20",
+      "logicalEnd": "2028-08-11",
+      "queryStart": "2028-03-30",
+      "queryEnd": "2028-08-11",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
@@ -327,13 +345,13 @@
     },
     {
       "shard": "nw_terms",
-      "provinceId": "103",
-      "provinceOrdinal": 23,
-      "windowLabel": "window_7_2027-12-20_2028-04-20",
-      "logicalStart": "2027-12-20",
-      "logicalEnd": "2028-04-20",
-      "queryStart": "2027-11-29",
-      "queryEnd": "2028-04-20",
+      "provinceId": "37",
+      "provinceOrdinal": 41,
+      "windowLabel": "window_1_2025-12-18_2026-04-19",
+      "logicalStart": "2025-12-18",
+      "logicalEnd": "2026-04-19",
+      "queryStart": "2025-12-18",
+      "queryEnd": "2026-04-19",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
@@ -363,8 +381,8 @@
     },
     {
       "shard": "nw_terms",
-      "provinceId": "37",
-      "provinceOrdinal": 41,
+      "provinceId": "103",
+      "provinceOrdinal": 23,
       "windowLabel": "window_1_2025-12-18_2026-04-19",
       "logicalStart": "2025-12-18",
       "logicalEnd": "2026-04-19",
@@ -373,8 +391,8 @@
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
-      "rowsRead": 0,
-      "totalDeclared": 0,
+      "rowsRead": 9,
+      "totalDeclared": 9,
       "saturated": false,
       "split": false,
       "errors": []
@@ -388,24 +406,6 @@
       "logicalEnd": "2026-12-19",
       "queryStart": "2026-07-29",
       "queryEnd": "2026-12-19",
-      "level": "quadrimestre",
-      "depth": 0,
-      "pagesRead": 1,
-      "rowsRead": 0,
-      "totalDeclared": 0,
-      "saturated": false,
-      "split": false,
-      "errors": []
-    },
-    {
-      "shard": "nw_terms",
-      "provinceId": "103",
-      "provinceOrdinal": 23,
-      "windowLabel": "window_8_2028-04-20_2028-08-11",
-      "logicalStart": "2028-04-20",
-      "logicalEnd": "2028-08-11",
-      "queryStart": "2028-03-30",
-      "queryEnd": "2028-08-11",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
@@ -437,11 +437,11 @@
       "shard": "nw_terms",
       "provinceId": "37",
       "provinceOrdinal": 41,
-      "windowLabel": "window_6_2027-08-20_2027-12-20",
-      "logicalStart": "2027-08-20",
-      "logicalEnd": "2027-12-20",
-      "queryStart": "2027-07-30",
-      "queryEnd": "2027-12-20",
+      "windowLabel": "window_4_2026-12-19_2027-04-20",
+      "logicalStart": "2026-12-19",
+      "logicalEnd": "2027-04-20",
+      "queryStart": "2026-11-28",
+      "queryEnd": "2027-04-20",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
@@ -455,11 +455,11 @@
       "shard": "nw_terms",
       "provinceId": "37",
       "provinceOrdinal": 41,
-      "windowLabel": "window_4_2026-12-19_2027-04-20",
-      "logicalStart": "2026-12-19",
-      "logicalEnd": "2027-04-20",
-      "queryStart": "2026-11-28",
-      "queryEnd": "2027-04-20",
+      "windowLabel": "window_6_2027-08-20_2027-12-20",
+      "logicalStart": "2027-08-20",
+      "logicalEnd": "2027-12-20",
+      "queryStart": "2027-07-30",
+      "queryEnd": "2027-12-20",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
@@ -501,6 +501,24 @@
       "pagesRead": 1,
       "rowsRead": 0,
       "totalDeclared": 0,
+      "saturated": false,
+      "split": false,
+      "errors": []
+    },
+    {
+      "shard": "nw_terms",
+      "provinceId": "55",
+      "provinceOrdinal": 59,
+      "windowLabel": "window_1_2025-12-18_2026-04-19",
+      "logicalStart": "2025-12-18",
+      "logicalEnd": "2026-04-19",
+      "queryStart": "2025-12-18",
+      "queryEnd": "2026-04-19",
+      "level": "quadrimestre",
+      "depth": 0,
+      "pagesRead": 1,
+      "rowsRead": 25,
+      "totalDeclared": 25,
       "saturated": false,
       "split": false,
       "errors": []
@@ -537,24 +555,6 @@
       "pagesRead": 1,
       "rowsRead": 0,
       "totalDeclared": 0,
-      "saturated": false,
-      "split": false,
-      "errors": []
-    },
-    {
-      "shard": "nw_terms",
-      "provinceId": "55",
-      "provinceOrdinal": 59,
-      "windowLabel": "window_1_2025-12-18_2026-04-19",
-      "logicalStart": "2025-12-18",
-      "logicalEnd": "2026-04-19",
-      "queryStart": "2025-12-18",
-      "queryEnd": "2026-04-19",
-      "level": "quadrimestre",
-      "depth": 0,
-      "pagesRead": 1,
-      "rowsRead": 25,
-      "totalDeclared": 25,
       "saturated": false,
       "split": false,
       "errors": []
@@ -617,11 +617,11 @@
       "shard": "nw_terms",
       "provinceId": "55",
       "provinceOrdinal": 59,
-      "windowLabel": "window_7_2027-12-20_2028-04-20",
-      "logicalStart": "2027-12-20",
-      "logicalEnd": "2028-04-20",
-      "queryStart": "2027-11-29",
-      "queryEnd": "2028-04-20",
+      "windowLabel": "window_8_2028-04-20_2028-08-11",
+      "logicalStart": "2028-04-20",
+      "logicalEnd": "2028-08-11",
+      "queryStart": "2028-03-30",
+      "queryEnd": "2028-08-11",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
@@ -635,11 +635,11 @@
       "shard": "nw_terms",
       "provinceId": "55",
       "provinceOrdinal": 59,
-      "windowLabel": "window_8_2028-04-20_2028-08-11",
-      "logicalStart": "2028-04-20",
-      "logicalEnd": "2028-08-11",
-      "queryStart": "2028-03-30",
-      "queryEnd": "2028-08-11",
+      "windowLabel": "window_7_2027-12-20_2028-04-20",
+      "logicalStart": "2027-12-20",
+      "logicalEnd": "2028-04-20",
+      "queryStart": "2027-11-29",
+      "queryEnd": "2028-04-20",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
@@ -833,24 +833,6 @@
       "shard": "nw_terms",
       "provinceId": "85",
       "provinceOrdinal": 95,
-      "windowLabel": "window_3_2026-08-19_2026-12-19",
-      "logicalStart": "2026-08-19",
-      "logicalEnd": "2026-12-19",
-      "queryStart": "2026-07-29",
-      "queryEnd": "2026-12-19",
-      "level": "quadrimestre",
-      "depth": 0,
-      "pagesRead": 1,
-      "rowsRead": 11,
-      "totalDeclared": 11,
-      "saturated": false,
-      "split": false,
-      "errors": []
-    },
-    {
-      "shard": "nw_terms",
-      "provinceId": "85",
-      "provinceOrdinal": 95,
       "windowLabel": "window_4_2026-12-19_2027-04-20",
       "logicalStart": "2026-12-19",
       "logicalEnd": "2027-04-20",
@@ -869,16 +851,16 @@
       "shard": "nw_terms",
       "provinceId": "85",
       "provinceOrdinal": 95,
-      "windowLabel": "window_6_2027-08-20_2027-12-20",
-      "logicalStart": "2027-08-20",
-      "logicalEnd": "2027-12-20",
-      "queryStart": "2027-07-30",
-      "queryEnd": "2027-12-20",
+      "windowLabel": "window_3_2026-08-19_2026-12-19",
+      "logicalStart": "2026-08-19",
+      "logicalEnd": "2026-12-19",
+      "queryStart": "2026-07-29",
+      "queryEnd": "2026-12-19",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
-      "rowsRead": 0,
-      "totalDeclared": 0,
+      "rowsRead": 11,
+      "totalDeclared": 11,
       "saturated": false,
       "split": false,
       "errors": []
@@ -923,6 +905,24 @@
       "shard": "nw_terms",
       "provinceId": "85",
       "provinceOrdinal": 95,
+      "windowLabel": "window_6_2027-08-20_2027-12-20",
+      "logicalStart": "2027-08-20",
+      "logicalEnd": "2027-12-20",
+      "queryStart": "2027-07-30",
+      "queryEnd": "2027-12-20",
+      "level": "quadrimestre",
+      "depth": 0,
+      "pagesRead": 1,
+      "rowsRead": 0,
+      "totalDeclared": 0,
+      "saturated": false,
+      "split": false,
+      "errors": []
+    },
+    {
+      "shard": "nw_terms",
+      "provinceId": "85",
+      "provinceOrdinal": 95,
       "windowLabel": "window_8_2028-04-20_2028-08-11",
       "logicalStart": "2028-04-20",
       "logicalEnd": "2028-08-11",
@@ -941,6 +941,16 @@
   "queries": [
     {
       "provinceId": "6",
+      "windowLabel": "window_3_2026-08-19_2026-12-19",
+      "queryStart": "2026-07-29",
+      "queryEnd": "2026-12-19",
+      "skip": 0,
+      "rows": 22,
+      "total": 22,
+      "saturated": false
+    },
+    {
+      "provinceId": "6",
       "windowLabel": "window_4_2026-12-19_2027-04-20",
       "queryStart": "2026-11-28",
       "queryEnd": "2027-04-20",
@@ -951,12 +961,12 @@
     },
     {
       "provinceId": "6",
-      "windowLabel": "window_3_2026-08-19_2026-12-19",
-      "queryStart": "2026-07-29",
-      "queryEnd": "2026-12-19",
+      "windowLabel": "window_1_2025-12-18_2026-04-19",
+      "queryStart": "2025-12-18",
+      "queryEnd": "2026-04-19",
       "skip": 0,
-      "rows": 22,
-      "total": 22,
+      "rows": 39,
+      "total": 39,
       "saturated": false
     },
     {
@@ -971,12 +981,12 @@
     },
     {
       "provinceId": "6",
-      "windowLabel": "window_1_2025-12-18_2026-04-19",
-      "queryStart": "2025-12-18",
-      "queryEnd": "2026-04-19",
+      "windowLabel": "window_5_2027-04-20_2027-08-20",
+      "queryStart": "2027-03-30",
+      "queryEnd": "2027-08-20",
       "skip": 0,
-      "rows": 39,
-      "total": 39,
+      "rows": 0,
+      "total": 0,
       "saturated": false
     },
     {
@@ -1020,10 +1030,10 @@
       "saturated": false
     },
     {
-      "provinceId": "6",
-      "windowLabel": "window_5_2027-04-20_2027-08-20",
-      "queryStart": "2027-03-30",
-      "queryEnd": "2027-08-20",
+      "provinceId": "103",
+      "windowLabel": "window_4_2026-12-19_2027-04-20",
+      "queryStart": "2026-11-28",
+      "queryEnd": "2027-04-20",
       "skip": 0,
       "rows": 0,
       "total": 0,
@@ -1041,19 +1051,19 @@
     },
     {
       "provinceId": "103",
-      "windowLabel": "window_1_2025-12-18_2026-04-19",
-      "queryStart": "2025-12-18",
-      "queryEnd": "2026-04-19",
+      "windowLabel": "window_5_2027-04-20_2027-08-20",
+      "queryStart": "2027-03-30",
+      "queryEnd": "2027-08-20",
       "skip": 0,
-      "rows": 9,
-      "total": 9,
+      "rows": 0,
+      "total": 0,
       "saturated": false
     },
     {
       "provinceId": "103",
-      "windowLabel": "window_5_2027-04-20_2027-08-20",
-      "queryStart": "2027-03-30",
-      "queryEnd": "2027-08-20",
+      "windowLabel": "window_7_2027-12-20_2028-04-20",
+      "queryStart": "2027-11-29",
+      "queryEnd": "2028-04-20",
       "skip": 0,
       "rows": 0,
       "total": 0,
@@ -1071,19 +1081,19 @@
     },
     {
       "provinceId": "103",
-      "windowLabel": "window_4_2026-12-19_2027-04-20",
-      "queryStart": "2026-11-28",
-      "queryEnd": "2027-04-20",
+      "windowLabel": "window_8_2028-04-20_2028-08-11",
+      "queryStart": "2028-03-30",
+      "queryEnd": "2028-08-11",
       "skip": 0,
       "rows": 0,
       "total": 0,
       "saturated": false
     },
     {
-      "provinceId": "103",
-      "windowLabel": "window_7_2027-12-20_2028-04-20",
-      "queryStart": "2027-11-29",
-      "queryEnd": "2028-04-20",
+      "provinceId": "37",
+      "windowLabel": "window_1_2025-12-18_2026-04-19",
+      "queryStart": "2025-12-18",
+      "queryEnd": "2026-04-19",
       "skip": 0,
       "rows": 0,
       "total": 0,
@@ -1100,13 +1110,13 @@
       "saturated": false
     },
     {
-      "provinceId": "37",
+      "provinceId": "103",
       "windowLabel": "window_1_2025-12-18_2026-04-19",
       "queryStart": "2025-12-18",
       "queryEnd": "2026-04-19",
       "skip": 0,
-      "rows": 0,
-      "total": 0,
+      "rows": 9,
+      "total": 9,
       "saturated": false
     },
     {
@@ -1114,16 +1124,6 @@
       "windowLabel": "window_3_2026-08-19_2026-12-19",
       "queryStart": "2026-07-29",
       "queryEnd": "2026-12-19",
-      "skip": 0,
-      "rows": 0,
-      "total": 0,
-      "saturated": false
-    },
-    {
-      "provinceId": "103",
-      "windowLabel": "window_8_2028-04-20_2028-08-11",
-      "queryStart": "2028-03-30",
-      "queryEnd": "2028-08-11",
       "skip": 0,
       "rows": 0,
       "total": 0,
@@ -1141,9 +1141,9 @@
     },
     {
       "provinceId": "37",
-      "windowLabel": "window_6_2027-08-20_2027-12-20",
-      "queryStart": "2027-07-30",
-      "queryEnd": "2027-12-20",
+      "windowLabel": "window_4_2026-12-19_2027-04-20",
+      "queryStart": "2026-11-28",
+      "queryEnd": "2027-04-20",
       "skip": 0,
       "rows": 0,
       "total": 0,
@@ -1151,9 +1151,9 @@
     },
     {
       "provinceId": "37",
-      "windowLabel": "window_4_2026-12-19_2027-04-20",
-      "queryStart": "2026-11-28",
-      "queryEnd": "2027-04-20",
+      "windowLabel": "window_6_2027-08-20_2027-12-20",
+      "queryStart": "2027-07-30",
+      "queryEnd": "2027-12-20",
       "skip": 0,
       "rows": 0,
       "total": 0,
@@ -1177,6 +1177,16 @@
       "skip": 0,
       "rows": 0,
       "total": 0,
+      "saturated": false
+    },
+    {
+      "provinceId": "55",
+      "windowLabel": "window_1_2025-12-18_2026-04-19",
+      "queryStart": "2025-12-18",
+      "queryEnd": "2026-04-19",
+      "skip": 0,
+      "rows": 25,
+      "total": 25,
       "saturated": false
     },
     {
@@ -1197,16 +1207,6 @@
       "skip": 0,
       "rows": 0,
       "total": 0,
-      "saturated": false
-    },
-    {
-      "provinceId": "55",
-      "windowLabel": "window_1_2025-12-18_2026-04-19",
-      "queryStart": "2025-12-18",
-      "queryEnd": "2026-04-19",
-      "skip": 0,
-      "rows": 25,
-      "total": 25,
       "saturated": false
     },
     {
@@ -1241,9 +1241,9 @@
     },
     {
       "provinceId": "55",
-      "windowLabel": "window_7_2027-12-20_2028-04-20",
-      "queryStart": "2027-11-29",
-      "queryEnd": "2028-04-20",
+      "windowLabel": "window_8_2028-04-20_2028-08-11",
+      "queryStart": "2028-03-30",
+      "queryEnd": "2028-08-11",
       "skip": 0,
       "rows": 0,
       "total": 0,
@@ -1251,9 +1251,9 @@
     },
     {
       "provinceId": "55",
-      "windowLabel": "window_8_2028-04-20_2028-08-11",
-      "queryStart": "2028-03-30",
-      "queryEnd": "2028-08-11",
+      "windowLabel": "window_7_2027-12-20_2028-04-20",
+      "queryStart": "2027-11-29",
+      "queryEnd": "2028-04-20",
       "skip": 0,
       "rows": 0,
       "total": 0,
@@ -1361,16 +1361,6 @@
     },
     {
       "provinceId": "85",
-      "windowLabel": "window_3_2026-08-19_2026-12-19",
-      "queryStart": "2026-07-29",
-      "queryEnd": "2026-12-19",
-      "skip": 0,
-      "rows": 11,
-      "total": 11,
-      "saturated": false
-    },
-    {
-      "provinceId": "85",
       "windowLabel": "window_4_2026-12-19_2027-04-20",
       "queryStart": "2026-11-28",
       "queryEnd": "2027-04-20",
@@ -1381,12 +1371,12 @@
     },
     {
       "provinceId": "85",
-      "windowLabel": "window_6_2027-08-20_2027-12-20",
-      "queryStart": "2027-07-30",
-      "queryEnd": "2027-12-20",
+      "windowLabel": "window_3_2026-08-19_2026-12-19",
+      "queryStart": "2026-07-29",
+      "queryEnd": "2026-12-19",
       "skip": 0,
-      "rows": 0,
-      "total": 0,
+      "rows": 11,
+      "total": 11,
       "saturated": false
     },
     {
@@ -1404,6 +1394,16 @@
       "windowLabel": "window_7_2027-12-20_2028-04-20",
       "queryStart": "2027-11-29",
       "queryEnd": "2028-04-20",
+      "skip": 0,
+      "rows": 0,
+      "total": 0,
+      "saturated": false
+    },
+    {
+      "provinceId": "85",
+      "windowLabel": "window_6_2027-08-20_2027-12-20",
+      "queryStart": "2027-07-30",
+      "queryEnd": "2027-12-20",
       "skip": 0,
       "rows": 0,
       "total": 0,
@@ -1449,7 +1449,7 @@
       "coverageModes": [
         "55:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1471,7 +1471,7 @@
       "coverageModes": [
         "67:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1493,7 +1493,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1515,7 +1515,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1537,7 +1537,7 @@
       "coverageModes": [
         "103:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1559,7 +1559,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1581,7 +1581,7 @@
       "coverageModes": [
         "85:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1603,7 +1603,7 @@
       "coverageModes": [
         "85:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1625,7 +1625,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1647,7 +1647,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1669,7 +1669,7 @@
       "coverageModes": [
         "85:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1691,7 +1691,7 @@
       "coverageModes": [
         "103:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1713,7 +1713,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1735,7 +1735,7 @@
       "coverageModes": [
         "55:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1757,7 +1757,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1779,7 +1779,7 @@
       "coverageModes": [
         "67:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1801,7 +1801,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1823,7 +1823,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1845,7 +1845,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1867,7 +1867,7 @@
       "coverageModes": [
         "55:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1889,7 +1889,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1911,7 +1911,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1933,7 +1933,7 @@
       "coverageModes": [
         "55:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1955,7 +1955,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1977,7 +1977,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -1999,7 +1999,7 @@
       "coverageModes": [
         "103:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2021,7 +2021,7 @@
       "coverageModes": [
         "55:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2043,7 +2043,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2065,7 +2065,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2087,7 +2087,7 @@
       "coverageModes": [
         "103:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2109,7 +2109,7 @@
       "coverageModes": [
         "85:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2131,7 +2131,7 @@
       "coverageModes": [
         "55:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2153,7 +2153,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2175,7 +2175,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2197,7 +2197,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2219,7 +2219,7 @@
       "coverageModes": [
         "55:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2241,7 +2241,7 @@
       "coverageModes": [
         "55:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2263,7 +2263,7 @@
       "coverageModes": [
         "55:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2285,7 +2285,7 @@
       "coverageModes": [
         "6:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2307,7 +2307,7 @@
       "coverageModes": [
         "55:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2329,7 +2329,7 @@
       "coverageModes": [
         "103:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2352,7 +2352,7 @@
         "85:window_1_2025-12-18_2026-04-19",
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2375,7 +2375,7 @@
         "55:window_1_2025-12-18_2026-04-19",
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2398,7 +2398,7 @@
         "67:window_1_2025-12-18_2026-04-19",
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2421,7 +2421,7 @@
         "6:window_1_2025-12-18_2026-04-19",
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2444,7 +2444,7 @@
         "103:window_1_2025-12-18_2026-04-19",
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2467,7 +2467,7 @@
         "55:window_1_2025-12-18_2026-04-19",
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2490,7 +2490,7 @@
         "55:window_1_2025-12-18_2026-04-19",
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2512,7 +2512,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2534,7 +2534,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2557,7 +2557,7 @@
         "55:window_1_2025-12-18_2026-04-19",
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2579,7 +2579,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2602,7 +2602,7 @@
         "85:window_1_2025-12-18_2026-04-19",
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2624,7 +2624,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2646,7 +2646,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2668,7 +2668,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2690,7 +2690,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2712,7 +2712,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2734,7 +2734,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2756,7 +2756,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2778,7 +2778,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2800,7 +2800,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2822,7 +2822,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2844,7 +2844,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2866,7 +2866,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2888,7 +2888,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2910,7 +2910,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2932,7 +2932,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2954,7 +2954,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2976,7 +2976,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -2998,7 +2998,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3020,7 +3020,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3042,7 +3042,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3064,7 +3064,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3086,7 +3086,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3108,7 +3108,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3130,7 +3130,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3152,7 +3152,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3174,7 +3174,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3196,7 +3196,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3218,7 +3218,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3240,7 +3240,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3262,7 +3262,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3284,7 +3284,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3306,7 +3306,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3328,7 +3328,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3350,7 +3350,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3372,7 +3372,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3394,7 +3394,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3416,7 +3416,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3438,7 +3438,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3460,7 +3460,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3482,7 +3482,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3504,7 +3504,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3526,7 +3526,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3548,7 +3548,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3570,7 +3570,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3592,7 +3592,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3614,7 +3614,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3636,7 +3636,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3658,7 +3658,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3680,7 +3680,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3702,7 +3702,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3724,7 +3724,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3746,7 +3746,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3768,7 +3768,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3790,7 +3790,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3812,7 +3812,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3834,7 +3834,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3856,7 +3856,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3878,7 +3878,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3900,7 +3900,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3922,7 +3922,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3944,7 +3944,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3966,7 +3966,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -3988,7 +3988,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4010,7 +4010,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4032,7 +4032,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4054,7 +4054,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4076,7 +4076,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4098,7 +4098,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4120,7 +4120,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4142,7 +4142,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4164,7 +4164,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4186,7 +4186,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4208,7 +4208,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4230,7 +4230,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4252,7 +4252,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4274,7 +4274,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4296,7 +4296,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4318,7 +4318,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4340,7 +4340,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4362,7 +4362,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4384,7 +4384,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4406,7 +4406,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4428,7 +4428,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4450,7 +4450,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4472,7 +4472,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4494,7 +4494,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4516,7 +4516,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4538,7 +4538,7 @@
       "coverageModes": [
         "67:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4560,7 +4560,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4582,7 +4582,7 @@
       "coverageModes": [
         "6:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4604,7 +4604,7 @@
       "coverageModes": [
         "103:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4626,7 +4626,7 @@
       "coverageModes": [
         "85:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4648,7 +4648,7 @@
       "coverageModes": [
         "55:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4671,7 +4671,7 @@
         "55:window_2_2026-04-19_2026-08-19",
         "55:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4694,7 +4694,7 @@
         "103:window_2_2026-04-19_2026-08-19",
         "103:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4717,7 +4717,7 @@
         "67:window_2_2026-04-19_2026-08-19",
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4740,7 +4740,7 @@
         "103:window_2_2026-04-19_2026-08-19",
         "103:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4763,7 +4763,7 @@
         "85:window_2_2026-04-19_2026-08-19",
         "85:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4786,7 +4786,7 @@
         "55:window_2_2026-04-19_2026-08-19",
         "55:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4809,7 +4809,7 @@
         "55:window_2_2026-04-19_2026-08-19",
         "55:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4831,7 +4831,7 @@
       "coverageModes": [
         "103:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4853,7 +4853,7 @@
       "coverageModes": [
         "55:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4875,7 +4875,7 @@
       "coverageModes": [
         "85:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4897,7 +4897,7 @@
       "coverageModes": [
         "55:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4919,7 +4919,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4941,7 +4941,7 @@
       "coverageModes": [
         "55:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4963,7 +4963,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -4985,7 +4985,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5007,7 +5007,7 @@
       "coverageModes": [
         "103:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5029,7 +5029,7 @@
       "coverageModes": [
         "55:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5051,7 +5051,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5073,7 +5073,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5095,7 +5095,7 @@
       "coverageModes": [
         "103:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5117,7 +5117,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5139,7 +5139,7 @@
       "coverageModes": [
         "85:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5161,7 +5161,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5183,7 +5183,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5205,7 +5205,7 @@
       "coverageModes": [
         "55:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5227,7 +5227,7 @@
       "coverageModes": [
         "55:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5249,7 +5249,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5271,7 +5271,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5293,7 +5293,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5315,7 +5315,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5337,7 +5337,7 @@
       "coverageModes": [
         "103:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5359,7 +5359,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5381,7 +5381,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5403,7 +5403,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5425,7 +5425,7 @@
       "coverageModes": [
         "55:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5447,7 +5447,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5469,7 +5469,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5491,7 +5491,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5513,7 +5513,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5535,7 +5535,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5557,7 +5557,7 @@
       "coverageModes": [
         "103:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5579,7 +5579,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5601,7 +5601,7 @@
       "coverageModes": [
         "85:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5623,7 +5623,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5645,7 +5645,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5667,7 +5667,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5689,7 +5689,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5711,7 +5711,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5733,7 +5733,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5755,7 +5755,7 @@
       "coverageModes": [
         "67:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5777,7 +5777,7 @@
       "coverageModes": [
         "6:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     },
     {
       "circuit": "fitp",
@@ -5799,7 +5799,7 @@
       "coverageModes": [
         "67:window_4_2026-12-19_2027-04-20"
       ],
-      "lastSeen": "2026-08-12T23:33:48.892Z"
+      "lastSeen": "2026-08-12T23:55:06.907Z"
     }
   ]
 }
