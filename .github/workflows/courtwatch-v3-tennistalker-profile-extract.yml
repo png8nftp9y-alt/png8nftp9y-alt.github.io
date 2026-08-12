@@ -1,0 +1,41 @@
+name: Court Watch v3 TennisTalker profile extract
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/extract-tennistalker-anna-profile.mjs'
+      - 'courtwatch-v3-tennistalker-profile-trigger.json'
+      - '.github/workflows/courtwatch-v3-tennistalker-profile-extract.yml'
+permissions:
+  contents: write
+concurrency:
+  group: court-watch-v3-tennistalker-profile-extract
+  cancel-in-progress: true
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Extract TennisTalker Anna profile details
+        run: |
+          set +e
+          : > courtwatch-v3-tennistalker-profile-run.log
+          node src/v3/extract-tennistalker-anna-profile.mjs >> courtwatch-v3-tennistalker-profile-run.log 2>&1
+          code=$?
+          echo "tennistalkerProfileExit=$code" >> courtwatch-v3-tennistalker-profile-run.log
+          cat courtwatch-v3-tennistalker-profile-run.log
+          exit $code
+      - name: Commit TennisTalker profile extract
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/tennistalker_anna_profile_extract.json courtwatch-v3-tennistalker-profile-run.log src/v3/extract-tennistalker-anna-profile.mjs .github/workflows/courtwatch-v3-tennistalker-profile-extract.yml
+          git commit -m "Build TennisTalker Anna profile extract" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
