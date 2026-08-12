@@ -1,0 +1,88 @@
+name: Court Watch v3 FITP tournament discovery sharded
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/discover-fitp-tournaments-shard.mjs'
+      - 'src/v3/merge-fitp-tournament-shards.mjs'
+      - 'courtwatch-v3-fitp-tournaments-sharded-trigger.json'
+      - '.github/workflows/courtwatch-v3-fitp-tournaments-sharded.yml'
+permissions: {contents: write}
+concurrency:
+  group: court-watch-v3-fitp-tournaments-sharded-${{ github.run_id }}
+  cancel-in-progress: false
+jobs:
+  shard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [core, north_west, north_east, centre, south_islands]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Run FITP tournament shard
+        run: |
+          set +e
+          mkdir -p dist/v3/shards
+          tmpLog="courtwatch-v3-fitp-tournaments-${{ matrix.shard }}-run.tmp.log"
+          : > "$tmpLog"
+          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          echo "sourceSha=${GITHUB_SHA}" >> "$tmpLog"
+          echo "runId=${GITHUB_RUN_ID}" >> "$tmpLog"
+          echo "shard=${{ matrix.shard }}" >> "$tmpLog"
+          FITP_SHARD=${{ matrix.shard }} node src/v3/discover-fitp-tournaments-shard.mjs >> "$tmpLog" 2>&1
+          code=$?
+          echo "exitCode=$code" >> "$tmpLog"
+          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          cp "$tmpLog" "courtwatch-v3-fitp-tournaments-${{ matrix.shard }}-run.log"
+          cat "courtwatch-v3-fitp-tournaments-${{ matrix.shard }}-run.log"
+          exit $code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fitp-tournament-shard-${{ matrix.shard }}
+          path: |
+            dist/v3/shards/source_fitp_tournaments_${{ matrix.shard }}.json
+            dist/v3/shards/source_fitp_tournaments_${{ matrix.shard }}_audit.json
+            courtwatch-v3-fitp-tournaments-${{ matrix.shard }}-run.log
+  merge:
+    needs: shard
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: fitp-tournament-shard-*
+          merge-multiple: true
+      - name: Merge FITP tournament shards
+        run: |
+          set +e
+          tmpLog="courtwatch-v3-fitp-tournaments-sharded-run.tmp.log"
+          : > "$tmpLog"
+          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          echo "sourceSha=${GITHUB_SHA}" >> "$tmpLog"
+          echo "runId=${GITHUB_RUN_ID}" >> "$tmpLog"
+          node src/v3/merge-fitp-tournament-shards.mjs >> "$tmpLog" 2>&1
+          code=$?
+          echo "exitCode=$code" >> "$tmpLog"
+          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
+          cp "$tmpLog" courtwatch-v3-fitp-tournaments-sharded-run.log
+          cat courtwatch-v3-fitp-tournaments-sharded-run.log
+          exit $code
+      - name: Commit merged FITP tournaments
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_fitp_tournaments.json dist/v3/source_fitp_tournaments_audit.json dist/v3/shards courtwatch-v3-fitp-tournaments-*-run.log courtwatch-v3-fitp-tournaments-sharded-run.log .github/workflows/courtwatch-v3-fitp-tournaments-sharded.yml
+          git commit -m "Build Court Watch v3 sharded FITP tournament discovery" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
