@@ -1,4 +1,4 @@
-name: Court Watch v3 FITP tournament discovery sharded
+name: Court Watch v3 FITP tournament discovery micro-sharded
 on:
   workflow_dispatch:
   push:
@@ -15,16 +15,16 @@ concurrency:
 jobs:
   shard:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        shard: [core, north_west, north_east, centre, south_islands]
+        shard: [core_dates, core_terms, nw_regions, nw_provinces1, nw_provinces2, nw_terms, ne_regions, ne_provinces1, ne_provinces2, ne_terms, ce_regions, ce_provinces1, ce_provinces2, ce_terms, so_regions, so_provinces1, so_provinces2, so_terms]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Run FITP tournament shard
+      - name: Run FITP tournament micro-shard
         run: |
           set +e
           mkdir -p dist/v3/shards
@@ -53,7 +53,7 @@ jobs:
     needs: shard
     if: always()
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -62,7 +62,7 @@ jobs:
         with:
           pattern: fitp-tournament-shard-*
           merge-multiple: true
-      - name: Merge FITP tournament shards
+      - name: Merge FITP tournament micro-shards
         run: |
           set +e
           tmpLog="courtwatch-v3-fitp-tournaments-sharded-run.tmp.log"
@@ -83,6 +83,6 @@ jobs:
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
           git add dist/v3/source_fitp_tournaments.json dist/v3/source_fitp_tournaments_audit.json dist/v3/shards courtwatch-v3-fitp-tournaments-*-run.log courtwatch-v3-fitp-tournaments-sharded-run.log .github/workflows/courtwatch-v3-fitp-tournaments-sharded.yml
-          git commit -m "Build Court Watch v3 sharded FITP tournament discovery" || exit 0
+          git commit -m "Build Court Watch v3 micro-sharded FITP tournament discovery" || exit 0
           git pull --rebase origin main || true
           git push origin HEAD:main || true
