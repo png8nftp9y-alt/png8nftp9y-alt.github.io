@@ -1,443 +1,1271 @@
 {
-  "generatedAt": "2026-08-10T20:51:05.739Z",
-  "testCard": "7578095942",
-  "url": "https://www.fitp.it/Pagina-Giocatore/?cardNumber=NzU3ODA5NTk0Mg%3D%3D",
-  "page": {
-    "status": 200,
-    "contentType": "text/html",
-    "length": 52783,
-    "title": "Federtennis",
-    "textSnippet": "Federtennis SCHEDA GIOCATORE Tennis Padel Beach Pickleball TORNA AI RISULTATI DI RICERCA GIOCATORE {{PLAYER}} Atleta agonista Tessera FITP {{CARDNUMBER}} Circolo di appartenenza {{CLUB}} Best rank nel {{MAXRANKDATE}} {{MAXRANK}} Classifica {{RANK}} Categoria {{CATEGORY}} Carriera Partite vinte 0 0 perse giocate 0 Tornei giocati 0 Game vinti 0 0 persi giocati 0 Per visualizzare le statistiche è necessario essere un utente registrato e tesserato Accedi e visualizza Totale Tornei Campionati Manifestazioni Dati non disponibili Partite 0 vinte perse 0 Vinte 0 2 set 0 3 set 0 per assenza 0 per ritiro Perse 0 2 set 0 3 set 0 per assenza 0 per ritiro Vinte 0 Perse 0 vinte Singolo perse 0 0 Doppio 0 0 singolo 0 0 doppio Partite giocate Set 0 vinte perse 0 Focus tie-break 0 Tie-break vinti 0 Tie-break persi Focus bagels 0 Set vinti 6-0 o 4-0 0 Set persi 0-6 o 4-0 vinti Singolo persi 0 0 Doppio 0 0 Game Singolo 0 vinti persi 0 Doppio 0 vinti persi 0 vinti Totali persi 0 0 Ranking avversario Giocate Vinte Perse (Attenzione: I dati statistici si riferiscono alla classifica dell'avversario ad inizio della competizione, si evidenzia che i dati esposti non impattano sul calcolo delle classifiche) Andamento Dati non disponibili Best rank Storico classifica Partite vinte Singolo perse 0 0 Doppio 0 0 Totale Singolo Doppio Partite giocate singolo 0 0 doppio Set Singolo 0 vinti persi 0 Doppio 0 vinti persi 0 vinti Totali persi 0 0 Game Singolo 0 vinti persi 0 Doppio 0 vinti persi 0 vinti Totali persi 0 0 Ranking avversario Partite Set giocate vinte perse Vinte 0 2 set 0 3 set 0 per assenza 0 per ritiro Perse 0 2 set 0 3 set 0 per assenza 0 per ritiro Vinte 0 Perse 0 giocati vinti persi Focus bagels 0 Set vinti 6-0 0 Set persi 0-6 Focus tie-break 0 Tie-break vinti 0 Tie-break persi Focus Partite Set giocate vinte perse Vinte 0 2 set 0 3 set 0 per assenza 0 per ritiro Perse 0 2 set 0 3 set 0 per assenza 0 per ritiro Vinte 0 Perse 0 giocati vinti persi Focus bagels 0 Set vinti 6-0 0 Set persi 0-6 Focus tie-break 0 Tie-break vinti 0 Tie-break persi Attività &times; Storico classifica Chiudi",
-    "hasPlaceholders": true,
-    "scriptCount": 43,
-    "scripts": [
-      "https://cdn.jsdelivr.net/npm/vue@2.6.11",
-      "https://www.fitp.it/Scripts/axios.min.js",
-      "https://code.jquery.com/jquery-2.2.4.min.js",
-      "https://www.fitp.it/Scripts/initialize_jquery_v2.js",
-      "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/it.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js",
-      "https://www.fitp.it/Scripts/Common.js",
-      "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-init-min.js",
-      "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-min.js",
-      "https://www.fitp.it/Scripts/messageBox.js",
-      "https://www.fitp.it/Areas/Federtennis/Scripts/subscribe-newsletter.js",
-      "https://www.fitp.it/Scripts/saveFavorite.js",
-      "https://www.fitp.it/Scripts/virtualgoods-cache.js",
-      "https://www.fitp.it/Scripts/cookieconsent.js",
-      "https://www.fitp.it/Scripts/client.min.js",
-      "https://www.fitp.it/Scripts/social-sharer.js",
-      "https://www.fitp.it/Scripts/custom-analytics.js",
-      "https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js",
-      "https://oss.maxcdn.com/respond/1.4.2/respond.min.js",
-      "https://www.fitp.it/Scripts/antiforgery-init.js",
-      "https://cdn.jsdelivr.net/npm/bluebird@3.7.2/js/browser/bluebird.min.js",
-      "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
-      "https://www.fitp.it/Areas/Fitp/js/f_adb2c_sso_2025_v2.js",
-      "https://www.fitp.it/Scripts/f_fingerprint_old.js",
-      "https://www.googletagservices.com/tag/js/gpt.js",
-      "https://www.fitp.it/Scripts/f_banner.js",
-      "https://www.fitp.it/Scripts/fg_analytics.js",
-      "https://www.fitp.it/Scripts/f_appinsights.js",
-      "https://www.fitp.it/Scripts/f_cookie.js",
-      "https://www.fitp.it/Scripts/set_cookie.js",
-      "https://www.fitp.it/Scripts/f_general.js",
-      "https://www.fitp.it/Scripts/crossHeader.js",
-      "https://www.fitp.it/Scripts/searchBar.js",
-      "https://www.fitp.it/js/plugins/fancybox_v3/dist/jquery.fancybox.min.js",
-      "https://www.fitp.it/js/plugins/chartjs.2.3.0/Chart.js",
-      "https://www.fitp.it/js/plugins/chartjs.2.3.0/Chart.roundedBarCharts.js",
-      "https://www.fitp.it/Areas/Federtennis/Scripts/SearchPlayers/player-details_v7.2.2.js",
-      "https://www.fitp.it/Scripts/JSLINQ.js"
-    ],
-    "apiHints": [
-      "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css",
-      "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css",
-      "https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i",
-      "https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i",
-      "https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700",
-      "https://code.jquery.com/jquery-2.2.4.min.js",
-      "https://cdn.jsdelivr.net/npm/vue@2.6.11",
-      "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/it.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js",
-      "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js",
-      "https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js",
-      "https://oss.maxcdn.com/respond/1.4.2/respond.min.js",
-      "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
-      "https://www.googletagservices.com/tag/js/gpt.js",
-      "http://schema.org/WPHeader",
-      "https://www.fitp.it/Campionati-tornei-e-classifiche/Classifiche/Ricerca-Giocatore",
-      "http://www.w3.org/2000/svg",
-      "https://codepen.io/xgad/post/svg-radial-progress-meters",
-      "http://www.w3.org/1999/xlink",
-      "http://schema.org/WPFooter"
-    ],
-    "inlineSnippet": "\n\n\n\n\n\n\n\n\n\n\nmoment.locale('it');\nwindow.suppressAjaxError = true;\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\r\n\t\t\tjQueryV2(\"#top-header\").load(\"/common/top-header.html\");\r\n\t\t\n\r\n\t\tjQueryV2(\"#dynamic-top-menu\").load(\"/common/top-menu.html\");\r\n\t\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progressValue = document.querySelector('.cc-circle-graph-1 .cc-progress-value');\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar RADIUS = 54;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar CIRCUMFERENCE = 2 * Math.PI * RADIUS;\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tfunction progress(value) {\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progress = value / 100;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar dashoffset = CIRCUMFERENCE * (1 - progress);\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue.style.strokeDashoffset = dashoffset;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue.style.strokeDasharray = CIRCUMFERENCE;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t//progress(50); // Questa è la percentuale da toccare!! Il valore è la percentuale di sconfitte!\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progressValue2 = document.querySelector('.cc-circle-graph-2 .cc-progress-value');\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar RADIUS = 54;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar CIRCUMFERENCE = 2 * Math.PI * RADIUS;\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tfunction progress2(value) {\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progress = value / 100;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar dashoffset = CIRCUMFERENCE * (1 - progress);\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue2.style.strokeDashoffset = dashoffset;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue2.style.strokeDasharray = CIRCUMFERENCE;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t//progress(50); // Questa è la percentuale da toccare!! Il valore è la percentuale di sconfitte!\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\tcreateAdvContent(\"div-gpt-ad-1529672065449-\", null, null, AdvertisementTypes[\"970x250FT\"], \"430140eb-01d3-450f-9724-ce35772d7200\");\r\n\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\tcreateAdvContent(null, \"div-gpt-ad-1529663467262-\", null, AdvertisementTypes[\"728x90\"], \"0efff14f-9ef7-49dd-bb0f-614dd746ffa1\");\r\n\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\tcreateAdvContent(null, null, \"div-gpt-ad-1529663467262-\", AdvertisementTypes[\"320x100\"], \"1c189970-b3f1-43ea-83d8-8bf17c764710\");\r\n\t\t\t\t\t\t\t\n\n\n\r\n\t\tjQueryV2(\"#div-footer\").load(\"/common/footer.html\");\r\n\t\n\r\n\t\tjQueryV2(\"#div-cookie\").load(\"/common/cookie.html\");\r\n\t"
-  },
-  "downloaded": [
+  "generatedAt": "2026-08-12T01:54:09.677Z",
+  "status": "fitp_player_profile_endpoint_diagnostic_anna_complete",
+  "profiles": [
     {
-      "url": "https://cdn.jsdelivr.net/npm/vue@2.6.11",
-      "status": 200,
-      "contentType": "application/javascript; charset=utf-8",
-      "length": 93670,
-      "snippet": "/*!\n * Vue.js v2.6.11\n * (c) 2014-2019 Evan You\n * Released under the MIT License.\n */\n!function(e,t){\"object\"==typeof exports&&\"undefined\"!=typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(t):(e=e||self).Vue=t()}(this,function(){\"use strict\";var e=Object.freeze({});function t(e){return null==e}function n(e){return null!=e}function r(e){return!0===e}function i(e){return\"string\"==typeof e||\"number\"==typeof e||\"symbol\"==typeof e||\"boolean\"==typeof e}function o(e){return null!==e&&\"object\"==typeof e}var a=Object.prototype.toString;function s(e){return\"[object Object]\"===a.call(e)}function c(e){var t=parseFloat(String(e));return t>=0&&Math.floor(t)===t&&isFinite(e)}function u(e){return n(e)&&\"function\"==typeof e.then&&\"function\"==typeof e.catch}function l(e){return null==e?\"\":Array.isArray(e)||s(e)&&e.toString===a?JSON.stringify(e,null,2):String(e)}function f(e){var t=parseFloat(e);return isNaN(t)?e:t}function p(e,t){for(var n=Object.create(null),r=e.split(\",\")",
-      "apiHints": [
-        "http://www.w3.org/1999/xlink",
-        "http://www.w3.org/2000/svg",
-        "http://www.w3.org/1998/Math/MathML"
+      "testCard": "3876473411",
+      "encoded": "Mzg3NjQ3MzQxMQ==",
+      "url": "https://www.fitp.it/Pagina-Giocatore/?cardNumber=Mzg3NjQ3MzQxMQ%3D%3D",
+      "page": {
+        "status": 200,
+        "contentType": "text/html",
+        "length": 52783,
+        "title": "Federtennis",
+        "textSnippet": "Federtennis SCHEDA GIOCATORE Tennis Padel Beach Pickleball TORNA AI RISULTATI DI RICERCA GIOCATORE {{PLAYER}} Atleta agonista Tessera FITP {{CARDNUMBER}} Circolo di appartenenza {{CLUB}} Best rank nel {{MAXRANKDATE}} {{MAXRANK}} Classifica {{RANK}} Categoria {{CATEGORY}} Carriera Partite vinte 0 0 perse giocate 0 Tornei giocati 0 Game vinti 0 0 persi giocati 0 Per visualizzare le statistiche è necessario essere un utente registrato e tesserato Accedi e visualizza Totale Tornei Campionati Manifestazioni Dati non disponibili Partite 0 vinte perse 0 Vinte 0 2 set 0 3 set 0 per assenza 0 per ritiro Perse 0 2 set 0 3 set 0 per assenza 0 per ritiro Vinte 0 Perse 0 vinte Singolo perse 0 0 Doppio 0 0 singolo 0 0 doppio Partite giocate Set 0 vinte perse 0 Focus tie-break 0 Tie-break vinti 0 Tie-break persi Focus bagels 0 Set vinti 6-0 o 4-0 0 Set persi 0-6 o 4-0 vinti Singolo persi 0 0 Doppio 0 0 Game Singolo 0 vinti persi 0 Doppio 0 vinti persi 0 vinti Totali persi 0 0 Ranking avversario Giocate Vinte Perse (Attenzione: I dati statistici si riferiscono alla classifica dell'avversario ad inizio della competizione, si evidenzia che i dati esposti non impattano sul calcolo delle classifiche) Andamento Dati non disponibili Best rank Storico classifica Partite vinte Singolo perse 0 0 Doppio 0 0 Totale Singolo Doppio Partite giocate singolo 0 0 doppio Set Singolo 0 vinti persi 0 Doppio 0 vinti persi 0 vinti Totali persi 0 0 Game Singolo 0 vinti persi 0 Doppio 0 vinti persi 0 vinti Totali persi 0 0 Ranking avversario Partite Set giocate vinte perse Vinte 0 2 set 0 3 set 0 per assenza 0 per ritiro Perse 0 2 set 0 3 set 0 per assenza 0 per ritiro Vinte 0 Perse 0 giocati vinti persi Focus bagels 0 Set vinti 6-0 0 Set persi 0-6 Focus tie-break 0 Tie-break vinti 0 Tie-break persi Focus Partite Set giocate vinte perse Vinte 0 2 set 0 3 set 0 per assenza 0 per ritiro Perse 0 2 set 0 3 set 0 per assenza 0 per ritiro Vinte 0 Perse 0 giocati vinti persi Focus bagels 0 Set vinti 6-0 0 Set persi 0-6 Focus tie-break 0 Tie-break vinti 0 Tie-break persi Attività &times; Storico classifica Chiudi",
+        "hasPlaceholders": true,
+        "scriptCount": 43,
+        "scripts": [
+          "https://cdn.jsdelivr.net/npm/vue@2.6.11",
+          "https://www.fitp.it/Scripts/axios.min.js",
+          "https://code.jquery.com/jquery-2.2.4.min.js",
+          "https://www.fitp.it/Scripts/initialize_jquery_v2.js",
+          "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/it.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js",
+          "https://www.fitp.it/Scripts/Common.js",
+          "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-init-min.js",
+          "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-min.js",
+          "https://www.fitp.it/Scripts/messageBox.js",
+          "https://www.fitp.it/Areas/Federtennis/Scripts/subscribe-newsletter.js",
+          "https://www.fitp.it/Scripts/saveFavorite.js",
+          "https://www.fitp.it/Scripts/virtualgoods-cache.js",
+          "https://www.fitp.it/Scripts/cookieconsent.js",
+          "https://www.fitp.it/Scripts/client.min.js",
+          "https://www.fitp.it/Scripts/social-sharer.js",
+          "https://www.fitp.it/Scripts/custom-analytics.js",
+          "https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js",
+          "https://oss.maxcdn.com/respond/1.4.2/respond.min.js",
+          "https://www.fitp.it/Scripts/antiforgery-init.js",
+          "https://cdn.jsdelivr.net/npm/bluebird@3.7.2/js/browser/bluebird.min.js",
+          "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
+          "https://www.fitp.it/Areas/Fitp/js/f_adb2c_sso_2025_v2.js",
+          "https://www.fitp.it/Scripts/f_fingerprint_old.js",
+          "https://www.googletagservices.com/tag/js/gpt.js",
+          "https://www.fitp.it/Scripts/f_banner.js",
+          "https://www.fitp.it/Scripts/fg_analytics.js",
+          "https://www.fitp.it/Scripts/f_appinsights.js",
+          "https://www.fitp.it/Scripts/f_cookie.js",
+          "https://www.fitp.it/Scripts/set_cookie.js",
+          "https://www.fitp.it/Scripts/f_general.js",
+          "https://www.fitp.it/Scripts/crossHeader.js",
+          "https://www.fitp.it/Scripts/searchBar.js",
+          "https://www.fitp.it/js/plugins/fancybox_v3/dist/jquery.fancybox.min.js",
+          "https://www.fitp.it/js/plugins/chartjs.2.3.0/Chart.js",
+          "https://www.fitp.it/js/plugins/chartjs.2.3.0/Chart.roundedBarCharts.js",
+          "https://www.fitp.it/Areas/Federtennis/Scripts/SearchPlayers/player-details_v7.2.2.js",
+          "https://www.fitp.it/Scripts/JSLINQ.js"
+        ],
+        "apiHints": [
+          "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css",
+          "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css",
+          "https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i",
+          "https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i",
+          "https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700",
+          "https://code.jquery.com/jquery-2.2.4.min.js",
+          "https://cdn.jsdelivr.net/npm/vue@2.6.11",
+          "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/it.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js",
+          "https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js",
+          "https://oss.maxcdn.com/respond/1.4.2/respond.min.js",
+          "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
+          "https://www.googletagservices.com/tag/js/gpt.js",
+          "http://schema.org/WPHeader",
+          "https://www.fitp.it/Campionati-tornei-e-classifiche/Classifiche/Ricerca-Giocatore",
+          "http://www.w3.org/2000/svg",
+          "https://codepen.io/xgad/post/svg-radial-progress-meters",
+          "http://www.w3.org/1999/xlink",
+          "http://schema.org/WPFooter"
+        ],
+        "inlineSnippet": "\n\n\n\n\n\n\n\n\n\n\nmoment.locale('it');\nwindow.suppressAjaxError = true;\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\r\n\t\t\tjQueryV2(\"#top-header\").load(\"/common/top-header.html\");\r\n\t\t\n\r\n\t\tjQueryV2(\"#dynamic-top-menu\").load(\"/common/top-menu.html\");\r\n\t\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progressValue = document.querySelector('.cc-circle-graph-1 .cc-progress-value');\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar RADIUS = 54;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar CIRCUMFERENCE = 2 * Math.PI * RADIUS;\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tfunction progress(value) {\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progress = value / 100;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar dashoffset = CIRCUMFERENCE * (1 - progress);\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue.style.strokeDashoffset = dashoffset;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue.style.strokeDasharray = CIRCUMFERENCE;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t//progress(50); // Questa è la percentuale da toccare!! Il valore è la percentuale di sconfitte!\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progressValue2 = document.querySelector('.cc-circle-graph-2 .cc-progress-value');\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar RADIUS = 54;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar CIRCUMFERENCE = 2 * Math.PI * RADIUS;\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tfunction progress2(value) {\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progress = value / 100;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar dashoffset = CIRCUMFERENCE * (1 - progress);\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue2.style.strokeDashoffset = dashoffset;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue2.style.strokeDasharray = CIRCUMFERENCE;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t//progress(50); // Questa è la percentuale da toccare!! Il valore è la percentuale di sconfitte!\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\tcreateAdvContent(\"div-gpt-ad-1529672065449-\", null, null, AdvertisementTypes[\"970x250FT\"], \"430140eb-01d3-450f-9724-ce35772d7200\");\r\n\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\tcreateAdvContent(null, \"div-gpt-ad-1529663467262-\", null, AdvertisementTypes[\"728x90\"], \"0efff14f-9ef7-49dd-bb0f-614dd746ffa1\");\r\n\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\tcreateAdvContent(null, null, \"div-gpt-ad-1529663467262-\", AdvertisementTypes[\"320x100\"], \"1c189970-b3f1-43ea-83d8-8bf17c764710\");\r\n\t\t\t\t\t\t\t\n\n\n\r\n\t\tjQueryV2(\"#div-footer\").load(\"/common/footer.html\");\r\n\t\n\r\n\t\tjQueryV2(\"#div-cookie\").load(\"/common/cookie.html\");\r\n\t"
+      },
+      "downloaded": [
+        {
+          "url": "https://cdn.jsdelivr.net/npm/vue@2.6.11",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 93670,
+          "snippet": "/*!\n * Vue.js v2.6.11\n * (c) 2014-2019 Evan You\n * Released under the MIT License.\n */\n!function(e,t){\"object\"==typeof exports&&\"undefined\"!=typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(t):(e=e||self).Vue=t()}(this,function(){\"use strict\";var e=Object.freeze({});function t(e){return null==e}function n(e){return null!=e}function r(e){return!0===e}function i(e){return\"string\"==typeof e||\"number\"==typeof e||\"symbol\"==typeof e||\"boolean\"==typeof e}function o(e){return null!==e&&\"object\"==typeof e}var a=Object.prototype.toString;function s(e){return\"[object Object]\"===a.call(e)}function c(e){var t=parseFloat(String(e));return t>=0&&Math.floor(t)===t&&isFinite(e)}function u(e){return n(e)&&\"function\"==typeof e.then&&\"function\"==typeof e.catch}function l(e){return null==e?\"\":Array.isArray(e)||s(e)&&e.toString===a?JSON.stringify(e,null,2):String(e)}function f(e){var t=parseFloat(e);return isNaN(t)?e:t}function p(e,t){for(var n=Object.create(null),r=e.split(\",\"),i=0;i<r.length;i++)n[r[i]]=!0;return t?function(e){return n[e.toLowerCase()]}:function(e){return n[e]}}var d=p(\"slot,component\",!0),v=p(\"key,ref,slot,slot-scope,is\");function h(e,t){if(e.length){var ",
+          "apiHints": [
+            "http://www.w3.org/1999/xlink",
+            "http://www.w3.org/2000/svg",
+            "http://www.w3.org/1998/Math/MathML"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/axios.min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 26498,
+          "snippet": "!function(e,t){\"object\"==typeof exports&&\"undefined\"!=typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(t):(e=\"undefined\"!=typeof globalThis?globalThis:e||self).axios=t()}(this,(function(){\"use strict\";function e(t){return e=\"function\"==typeof Symbol&&\"symbol\"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&\"function\"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?\"symbol\":typeof e},e(t)}function t(e,t){if(!(e instanceof t))throw new TypeError(\"Cannot call a class as a function\")}function n(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,\"value\"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r)}}function r(e,t,r){return t&&n(e.prototype,t),r&&n(e,r),Object.defineProperty(e,\"prototype\",{writable:!1}),e}function o(e,t){return function(){return e.apply(t,arguments)}}var i,s=Object.prototype.toString,a=Object.getPrototypeOf,u=(i=Object.create(null),function(e){var t=s.call(e);return i[t]||(i[t]=t.slice(8,-1).toLowerCase())}),c=function(e){return e=e.toLowerCase(),function(t){return u(t)===e}},f=function(t){return function(n){return e(n)===t}},l=Array.isArray,d=f(\"undefin",
+          "apiHints": []
+        },
+        {
+          "url": "https://code.jquery.com/jquery-2.2.4.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 85578,
+          "snippet": "/*! jQuery v2.2.4 | (c) jQuery Foundation | jquery.org/license */\n!function(a,b){\"object\"==typeof module&&\"object\"==typeof module.exports?module.exports=a.document?b(a,!0):function(a){if(!a.document)throw new Error(\"jQuery requires a window with a document\");return b(a)}:b(a)}(\"undefined\"!=typeof window?window:this,function(a,b){var c=[],d=a.document,e=c.slice,f=c.concat,g=c.push,h=c.indexOf,i={},j=i.toString,k=i.hasOwnProperty,l={},m=\"2.2.4\",n=function(a,b){return new n.fn.init(a,b)},o=/^[\\s\\uFEFF\\xA0]+|[\\s\\uFEFF\\xA0]+$/g,p=/^-ms-/,q=/-([\\da-z])/gi,r=function(a,b){return b.toUpperCase()};n.fn=n.prototype={jquery:m,constructor:n,selector:\"\",length:0,toArray:function(){return e.call(this)},get:function(a){return null!=a?0>a?this[a+this.length]:this[a]:e.call(this)},pushStack:function(a){var b=n.merge(this.constructor(),a);return b.prevObject=this,b.context=this.context,b},each:function(a){return n.each(this,a)},map:function(a){return this.pushStack(n.map(this,function(b,c){return a.call(b,c,b)}))},slice:function(){return this.pushStack(e.apply(this,arguments))},first:function(){return this.eq(0)},last:function(){return this.eq(-1)},eq:function(a){var b=this.length,c=+a+(0>a?b:0);ret",
+          "apiHints": [
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/initialize_jquery_v2.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 639,
+          "snippet": "window.jQueryV2 = jQuery.noConflict();\r\n(function ($) {\r\n\t$(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {\r\n        if (window.suppressAjaxError) return;\r\n        if (ajaxSettings.url.indexOf(\"ification\") >= 0 && jqXHR.status === 0) return; // <== suppress the misterious \"fica\" bug\r\n        var message = ajaxSettings.url +\r\n\t\t\t\" Failed with statusCode : \" +\r\n\t\t\tjqXHR.status +\r\n\t\t\t\"\\nstatusText: \" + jqXHR.statusText;\r\n\t\t//window.appInsights.trackTrace(message, { Url: ajaxSettings.url, StatusCode: jqXHR.status } , 3);\r\n\t\t//window.GenericErrorMessageBox();\r\n        console.error(message);\r\n\t});\r\n})(jQueryV2);",
+          "apiHints": []
+        },
+        {
+          "url": "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 37045,
+          "snippet": "/*!\n * Bootstrap v3.3.7 (http://getbootstrap.com)\n * Copyright 2011-2016 Twitter, Inc.\n * Licensed under the MIT license\n */\nif(\"undefined\"==typeof jQuery)throw new Error(\"Bootstrap's JavaScript requires jQuery\");+function(a){\"use strict\";var b=a.fn.jquery.split(\" \")[0].split(\".\");if(b[0]<2&&b[1]<9||1==b[0]&&9==b[1]&&b[2]<1||b[0]>3)throw new Error(\"Bootstrap's JavaScript requires jQuery version 1.9.1 or higher, but lower than version 4\")}(jQuery),+function(a){\"use strict\";function b(){var a=document.createElement(\"bootstrap\"),b={WebkitTransition:\"webkitTransitionEnd\",MozTransition:\"transitionend\",OTransition:\"oTransitionEnd otransitionend\",transition:\"transitionend\"};for(var c in b)if(void 0!==a.style[c])return{end:b[c]};return!1}a.fn.emulateTransitionEnd=function(b){var c=!1,d=this;a(this).one(\"bsTransitionEnd\",function(){c=!0});var e=function(){c||a(d).trigger(a.support.transition.end)};return setTimeout(e,b),this},a(function(){a.support.transition=b(),a.support.transition&&(a.event.special.bsTransitionEnd={bindType:a.support.transition.end,delegateType:a.support.transition.end,handle:function(b){if(a(b.target).is(this))return b.handleObj.handler.apply(this,arguments)}})})}(jQuer",
+          "apiHints": [
+            "http://getbootstrap.com)"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 33379,
+          "snippet": "/*!\n * Bootstrap-select v1.12.4 (http://silviomoreto.github.io/bootstrap-select)\n *\n * Copyright 2013-2017 bootstrap-select\n * Licensed under MIT (https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)\n */\n!function(a,b){\"function\"==typeof define&&define.amd?define([\"jquery\"],function(a){return b(a)}):\"object\"==typeof module&&module.exports?module.exports=b(require(\"jquery\")):b(a.jQuery)}(this,function(a){!function(a){\"use strict\";function b(b){var c=[{re:/[\\xC0-\\xC6]/g,ch:\"A\"},{re:/[\\xE0-\\xE6]/g,ch:\"a\"},{re:/[\\xC8-\\xCB]/g,ch:\"E\"},{re:/[\\xE8-\\xEB]/g,ch:\"e\"},{re:/[\\xCC-\\xCF]/g,ch:\"I\"},{re:/[\\xEC-\\xEF]/g,ch:\"i\"},{re:/[\\xD2-\\xD6]/g,ch:\"O\"},{re:/[\\xF2-\\xF6]/g,ch:\"o\"},{re:/[\\xD9-\\xDC]/g,ch:\"U\"},{re:/[\\xF9-\\xFC]/g,ch:\"u\"},{re:/[\\xC7-\\xE7]/g,ch:\"c\"},{re:/[\\xD1]/g,ch:\"N\"},{re:/[\\xF1]/g,ch:\"n\"}];return a.each(c,function(){b=b?b.replace(this.re,this.ch):\"\"}),b}function c(b){var c=arguments,d=b;[].shift.apply(c);var e,f=this.each(function(){var b=a(this);if(b.is(\"select\")){var f=b.data(\"selectpicker\"),g=\"object\"==typeof d&&d;if(f){if(g)for(var h in g)g.hasOwnProperty(h)&&(f.options[h]=g[h])}else{var i=a.extend({},l.DEFAULTS,a.fn.selectpicker.defaults||{},b.data(),g);i.template=",
+          "apiHints": [
+            "http://silviomoreto.github.io/bootstrap-select)",
+            "https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 32280,
+          "snippet": "/*!\n\nHolder - client side image placeholders\nVersion 2.9.4+cabil\n© 2016 Ivan Malopinsky - http://imsky.co\n\nSite:     http://holderjs.com\nIssues:   https://github.com/imsky/holder/issues\nLicense:  MIT\n\n*/\n!function(e){if(e.document){var t=e.document;t.querySelectorAll||(t.querySelectorAll=function(n){var r,i=t.createElement(\"style\"),o=[];for(t.documentElement.firstChild.appendChild(i),t._qsa=[],i.styleSheet.cssText=n+\"{x-qsa:expression(document._qsa && document._qsa.push(this))}\",e.scrollBy(0,0),i.parentNode.removeChild(i);t._qsa.length;)r=t._qsa.shift(),r.style.removeAttribute(\"x-qsa\"),o.push(r);return t._qsa=null,o}),t.querySelector||(t.querySelector=function(e){var n=t.querySelectorAll(e);return n.length?n[0]:null}),t.getElementsByClassName||(t.getElementsByClassName=function(e){return e=String(e).replace(/^|\\s+/g,\".\"),t.querySelectorAll(e)}),Object.keys||(Object.keys=function(e){if(e!==Object(e))throw TypeError(\"Object.keys called on non-object\");var t,n=[];for(t in e)Object.prototype.hasOwnProperty.call(e,t)&&n.push(t);return n}),Array.prototype.forEach||(Array.prototype.forEach=function(e){if(void 0===this||null===this)throw TypeError();var t=Object(this),n=t.length>>>0;if(\"fu",
+          "apiHints": [
+            "http://imsky.co",
+            "http://holderjs.com",
+            "https://github.com/imsky/holder/issues",
+            "http://www.w3.org/2000/svg",
+            "http://www.w3.org/2000/svg"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 51265,
+          "snippet": "!function(e,t){\"object\"==typeof exports&&\"undefined\"!=typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(t):e.moment=t()}(this,function(){\"use strict\";function e(){return Yt.apply(null,arguments)}function t(e){return e instanceof Array||\"[object Array]\"===Object.prototype.toString.call(e)}function n(e){return null!=e&&\"[object Object]\"===Object.prototype.toString.call(e)}function s(e){if(Object.getOwnPropertyNames)return 0===Object.getOwnPropertyNames(e).length;var t;for(t in e)if(e.hasOwnProperty(t))return!1;return!0}function i(e){return void 0===e}function r(e){return\"number\"==typeof e||\"[object Number]\"===Object.prototype.toString.call(e)}function a(e){return e instanceof Date||\"[object Date]\"===Object.prototype.toString.call(e)}function o(e,t){var n,s=[];for(n=0;n<e.length;++n)s.push(t(e[n],n));return s}function u(e,t){return Object.prototype.hasOwnProperty.call(e,t)}function l(e,t){for(var n in t)u(t,n)&&(e[n]=t[n]);return u(t,\"toString\")&&(e.toString=t.toString),u(t,\"valueOf\")&&(e.valueOf=t.valueOf),e}function d(e,t,n,s){return je(e,t,n,s,!0).utc()}function h(){return{empty:!1,unusedTokens:[],unusedInput:[],overflow:-2,charsLeftOver:0,nullInput:!1,i",
+          "apiHints": [
+            "http://momentjs.com/guides/#/warnings/define-locale/",
+            "http://momentjs.com/guides/#/warnings/add-inverted-param/",
+            "http://momentjs.com/guides/#/warnings/js-date/",
+            "http://momentjs.com/guides/#/warnings/min-max/",
+            "http://momentjs.com/guides/#/warnings/min-max/",
+            "http://momentjs.com/guides/#/warnings/zone/",
+            "http://momentjs.com/guides/#/warnings/dst-shifted/"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/it.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 2257,
+          "snippet": "//! moment.js locale configuration\n//! locale : Italian [it]\n//! author : Lorenzo : https://github.com/aliem\n//! author: Mattia Larentis: https://github.com/nostalgiaz\n\n;(function (global, factory) {\n   typeof exports === 'object' && typeof module !== 'undefined'\n       && typeof require === 'function' ? factory(require('../moment')) :\n   typeof define === 'function' && define.amd ? define(['../moment'], factory) :\n   factory(global.moment)\n}(this, (function (moment) { 'use strict';\n\n\nvar it = moment.defineLocale('it', {\n    months : 'gennaio_febbraio_marzo_aprile_maggio_giugno_luglio_agosto_settembre_ottobre_novembre_dicembre'.split('_'),\n    monthsShort : 'gen_feb_mar_apr_mag_giu_lug_ago_set_ott_nov_dic'.split('_'),\n    weekdays : 'domenica_lunedì_martedì_mercoledì_giovedì_venerdì_sabato'.split('_'),\n    weekdaysShort : 'dom_lun_mar_mer_gio_ven_sab'.split('_'),\n    weekdaysMin : 'do_lu_ma_me_gi_ve_sa'.split('_'),\n    longDateFormat : {\n        LT : 'HH:mm',\n        LTS : 'HH:mm:ss',\n        L : 'DD/MM/YYYY',\n        LL : 'D MMMM YYYY',\n        LLL : 'D MMMM YYYY HH:mm',\n        LLLL : 'dddd, D MMMM YYYY HH:mm'\n    },\n    calendar : {\n        sameDay: '[Oggi alle] LT',\n        nex",
+          "apiHints": [
+            "https://github.com/aliem",
+            "https://github.com/nostalgiaz"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 5022,
+          "snippet": "/*! jQuery & Zepto Lazy v1.7.9 - http://jquery.eisbehr.de/lazy - MIT&GPL-2.0 license - Copyright 2012-2018 Daniel 'Eisbehr' Kern */\n!function(t,e){\"use strict\";function r(r,a,i,u,l){function f(){L=t.devicePixelRatio>1,i=c(i),a.delay>=0&&setTimeout(function(){s(!0)},a.delay),(a.delay<0||a.combined)&&(u.e=v(a.throttle,function(t){\"resize\"===t.type&&(w=B=-1),s(t.all)}),u.a=function(t){t=c(t),i.push.apply(i,t)},u.g=function(){return i=n(i).filter(function(){return!n(this).data(a.loadedName)})},u.f=function(t){for(var e=0;e<t.length;e++){var r=i.filter(function(){return this===t[e]});r.length&&s(!1,r)}},s(),n(a.appendScroll).on(\"scroll.\"+l+\" resize.\"+l,u.e))}function c(t){var i=a.defaultImage,o=a.placeholder,u=a.imageBase,l=a.srcsetAttribute,f=a.loaderAttribute,c=a._f||{};t=n(t).filter(function(){var t=n(this),r=m(this);return!t.data(a.handledName)&&(t.attr(a.attribute)||t.attr(l)||t.attr(f)||c[r]!==e)}).data(\"plugin_\"+a.name,r);for(var s=0,d=t.length;s<d;s++){var A=n(t[s]),g=m(t[s]),h=A.attr(a.imageBaseAttribute)||u;g===N&&h&&A.attr(l)&&A.attr(l,b(A.attr(l),h)),c[g]===e||A.attr(f)||A.attr(f,c[g]),g===N&&i&&!A.attr(E)?A.attr(E,i):g===N||!o||A.css(O)&&\"none\"!==A.css(O)||A.css(O,\"url('\"+o",
+          "apiHints": [
+            "http://jquery.eisbehr.de/lazy"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 4412,
+          "snippet": "/*! jQuery & Zepto Lazy - All Plugins v1.7.9 - http://jquery.eisbehr.de/lazy - MIT&GPL-2.0 license - Copyright 2012-2018 Daniel 'Eisbehr' Kern */\n!function(t){function a(a,e,r,o){o=o?o.toUpperCase():\"GET\";var i;\"POST\"!==o&&\"PUT\"!==o||!a.config(\"ajaxCreateData\")||(i=a.config(\"ajaxCreateData\").apply(a,[e])),t.ajax({url:e.attr(\"data-src\"),type:\"POST\"===o||\"PUT\"===o?o:\"GET\",data:i,dataType:e.attr(\"data-type\")||\"html\",success:function(t){e.html(t),r(!0),a.config(\"removeAttribute\")&&e.removeAttr(\"data-src data-method data-type\")},error:function(){r(!1)}})}t.lazy(\"ajax\",function(t,e){a(this,t,e,t.attr(\"data-method\"))}),t.lazy(\"get\",function(t,e){a(this,t,e,\"GET\")}),t.lazy(\"post\",function(t,e){a(this,t,e,\"POST\")}),t.lazy(\"put\",function(t,e){a(this,t,e,\"PUT\")})}(window.jQuery||window.Zepto),function(t){t.lazy([\"av\",\"audio\",\"video\"],[\"audio\",\"video\"],function(a,e){var r=a[0].tagName.toLowerCase();if(\"audio\"===r||\"video\"===r){var o=a.find(\"data-src\"),i=a.find(\"data-track\"),n=0,c=function(){++n===o.length&&e(!1)},s=function(){var a=t(this),e=a[0].tagName.toLowerCase(),r=a.prop(\"attributes\"),o=t(\"data-src\"===e?\"<source>\":\"<track>\");\"data-src\"===e&&o.one(\"error\",c),t.each(r,function(t,a){o.attr(",
+          "apiHints": [
+            "http://jquery.eisbehr.de/lazy",
+            "https://player.vimeo.com/video/",
+            "https://www.youtube.com/embed/"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/Common.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 12590,
+          "snippet": "var scripts = document.querySelectorAll(\"script[src]\");\r\nscripts.forEach(function (script) {\r\n  if (\r\n    script.src === \"https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js\" ||\r\n    script.src === \"/Scripts/f_adb2c_sso_2024_v2.js\"\r\n  ) {\r\n    script.parentNode.removeChild(script);\r\n  }\r\n});\r\ndocument.write(\"<!-- INIZIO CODICE SSO -->\");\r\ndocument.write(\r\n  \"<lin\" +\r\n    'k rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css\" \"rel=\"stylesheet\"/>'\r\n);\r\ndocument.write(\r\n  \"<scr\" +\r\n    'ipt type=\"text/javascript\" src=\"https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.2/dist/fp.min.js\"></scr' +\r\n    \"ipt>\"\r\n);\r\ndocument.write(\r\n  \"<scr\" +\r\n    'ipt type=\"text/javascript\" src=\"https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@main/dist/es5/detectIncognito.min.js\" ></scr' +\r\n    \"ipt>\"\r\n);\r\ndocument.write(\r\n  \"<scr\" +\r\n    'ipt type=\"text/javascript\" src=\"/Scripts/estrazioneIdentificativo.js\" ></scr' +\r\n    \"ipt>\"\r\n);\r\n// document.write(\r\n//   \"<scr\" +\r\n//     'ipt type=\"text/javascript\" src=\"https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.6.0/lib/msal-browser.js\" ></scr' +\r\n//     \"ipt>\"\r\n// );\r\ndocument.writ",
+          "apiHints": [
+            "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css",
+            "https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.2/dist/fp.min.js",
+            "https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@main/dist/es5/detectIncognito.min.js",
+            "https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.6.0/lib/msal-browser.js",
+            "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
+            "/api/sitecore/Common/GetOriginalImage"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-init-min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 183427,
+          "snippet": "/*!\r\n * Waves v0.6.4\r\n * http://fian.my.id/Waves\r\n *\r\n * Copyright 2014 Alfiana E. Sibuea and other contributors\r\n * Released under the MIT license\r\n * https://github.com/fians/Waves/blob/master/LICENSE\r\n */\r\n\r\n;(function(window) {\r\n    'use strict';\r\n\r\n    var waves_effect = \"we\";\r\n\r\n\tvar wavesElement = document.getElementsByClassName(\"we\");\r\n\tif (wavesElement.length == 0) return;\r\n\r\n    var Waves = Waves || {};\r\n    var $$ = document.querySelectorAll.bind(document);\r\n\r\n    // Find exact position of element\r\n    function isWindow(obj) {\r\n        return obj !== null && obj === obj.window;\r\n    }\r\n\r\n    function getWindow(elem) {\r\n        return isWindow(elem) ? elem : elem.nodeType === 9 && elem.defaultView;\r\n    }\r\n\r\n    function offset(elem) {\r\n        var docElem, win,\r\n            box = {top: 0, left: 0},\r\n            doc = elem && elem.ownerDocument;\r\n\r\n        docElem = doc.documentElement;\r\n\r\n        if (typeof elem.getBoundingClientRect !== typeof undefined) {\r\n            box = elem.getBoundingClientRect();\r\n        }\r\n        win = getWindow(doc);\r\n        return {\r\n            top: box.top + win.pageYOffset - docElem.clientTop,\r\n            left: box.left + win.pageXOffs",
+          "apiHints": [
+            "http://fian.my.id/Waves",
+            "https://github.com/fians/Waves/blob/master/LICENSE",
+            "http://kenwheeler.github.io",
+            "http://kenwheeler.github.io/slick",
+            "http://github.com/kenwheeler/slick",
+            "http://github.com/kenwheeler/slick/issues",
+            "http://horizon-swiper.sebsauer.de/",
+            "http://www.sebsauer.de/",
+            "https://github.com/sebsauer90/horizon-swiper/blob/master/LICENSE",
+            "https://github.com/conradfeyt/Simple-Marquee",
+            "https://github.com/eternicode/bootstrap-datepicker)",
+            "http://www.apache.org/licenses/LICENSE-2.0)"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 51481,
+          "snippet": "// @codekit-append \"main.js\";\r\n\r\n(function ($) {\r\n    /* $ rappresenta la nostra versione di jQuery, abbiamo dichiarato la variabile nell'head dell'html, subito dopo l'inclusione di jQuery */\r\n\r\n    /* Variabili globali */\r\n    window.isMobile = false;\r\n\r\n    /* Funzioni Globali */\r\n    var responsiveResize = function () {\r\n        if (window.matchMedia(\"(max-width: 1023px)\").matches) {\r\n            $('body')\r\n                .addClass('cc-mobile')\r\n                .removeClass('cc-desktop');\r\n            window.isMobile = true;\r\n        } else {\r\n            $('body')\r\n                .addClass('cc-desktop')\r\n                .removeClass('cc-mobile');\r\n            window.isMobile = false;\r\n        }\r\n\r\n        visualSliderMobile();\r\n\r\n        sponsorSlider();\r\n\r\n        initSectionPlayMobileSlider();\r\n\r\n        initPromoCorsoMobileSlider();\r\n\r\n        initCompetitionsMobileSlider();\r\n\r\n    };\r\n\r\n    var syncSearchBars = function () {\r\n        var dest;\r\n        var source;\r\n        if (window.matchMedia(\"(max-width: 1023px)\").matches) {\r\n\r\n            dest = $(\".cc-header-desktop\").find(\"input[name=search-terms]\");\r\n            source = $(\".cc-header-mobile\").find(\"input[name=sear",
+          "apiHints": [
+            "Guid",
+            "http://erik.io/blog/2014/03/04/definitive-guide-to-cookie-domains/",
+            "http://w3c.github.io/aria-in-html/)"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/messageBox.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 1923,
+          "snippet": "(function ($) {\r\n\t$(function () {\r\n\t\tvar selector = \"div#errorMessageBox\";\r\n\t\tvar createDom = function () {\r\n\t\t\tif ($(\"div#errorMessageBox\").length === 0) {\r\n\t\t\t\tvar mainDiv =\r\n\t\t\t\t\t'<div class=\"cc-overlay-message\" id=\"errorMessageBox\">' +\r\n\t\t\t\t\t'   <div class=\"cc-container\">' +\r\n\t\t\t\t\t'       <div class=\"cc-content-box-share\">' +\r\n\t\t\t\t\t'           <div class=\"cc-content-main\">' +\r\n\t\t\t\t\t'               <div class=\"cc-close-overlay cc-button-close\">' +\r\n\t\t\t\t\t'                   <div class=\"cc-svg cc-svg-close-primary-color\"><span>Chiudi</span></div>' +\r\n\t\t\t\t\t'               </div>' +\r\n\t\t\t\t\t'               <div class=\"cc-content-message\">' +\r\n\t\t\t\t\t'                   <p class=\"cc-title\"></p>' +\r\n\t\t\t\t\t'                   <p class=\"cc-text\"></p>' +\r\n\t\t\t\t\t'               </div>' +\r\n\t\t\t\t\t'            </div>' +\r\n\t\t\t\t\t'        </div>' +\r\n\t\t\t\t\t'    </div>' +\r\n\t\t\t\t\t'</div>';\r\n\t\t\t\t$(\"body\").prepend(mainDiv);\r\n\t\t\t}\r\n\t\t}\r\n\t\tcreateDom();\r\n\r\n\t\tvar show = function () {\r\n\t\t\t$(selector).fadeIn(200);\r\n\t\t}\r\n\r\n\t\tvar hide = function () {\r\n\t\t    $(selector).fadeOut(200);\r\n\t\t    if (onCloseCallback != null) {\r\n\t\t        onCloseCallback();\r\n\t\t    }\r\n\t\t}\r\n\r\n\t\tvar onCloseCallback = null;\r\n\r\n\t\tvar messageBox =",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Areas/Federtennis/Scripts/subscribe-newsletter.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 6411,
+          "snippet": "(function ($) {\r\n\r\n    function isEmail(email) {\r\n        var regex = /^([a-zA-Z0-9_.+-])+\\@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$/;\r\n        return regex.test(email);\r\n    }\r\n\r\n\t$(document).on('click', '#viewSubscribeToNewsletter', function (event) {\r\n\t\tvar emailAddress = $(\"#newsletterAddressTmp\").val();\r\n        var errors = '';\r\n        if (!isEmail(emailAddress)) {\r\n            errors += \"E' necessario inserire una mail valida\\n\";\r\n        }\t\r\n        if (errors) {\r\n            MessageBox(\"Attenzione\", errors);\r\n            return;\r\n        }\r\n\t\tvar popuUp = '<div  id=\"popup\" class=\"cc-overlay cc-overlay-purchase cc-overlay-newsletter\" style=\"display: block;\">' +\r\n\t\t\t'   <div class=\"cc-overlay-main cc-overlay-main-small\"   style=\"background: white;\"  >' +\r\n\t\t\t'      <div class=\"cc-close-button\">' +\r\n\t\t\t'         <div class=\"cc-svg cc-svg-close-primary-color jq-popup-close\"><span>Chiudi</span></div>' +\r\n\t\t\t'      </div>' +\r\n\t\t\t'      <section class=\"cc-purchase-contents\">' +\r\n\t\t\t'         <div class=\"cc-content-title cc-content-title-feedback\">' +\r\n\t\t\t'            <h1 class=\"cc-purchase-main-title\" style=\"color:#222225\">Iscriviti alla nostra newsletter</h1>' +\r\n\t\t\t'          ",
+          "apiHints": [
+            "Iscri",
+            "Iscri",
+            "https://dp-fit-prod-function.azurewebsites.net/api/v3/generic/newsletter/subscribe",
+            "iscri",
+            "iscri"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/saveFavorite.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 18493,
+          "snippet": "(function ($) {\r\n  $(function () {\r\n    var itemsChecked = new Array();\r\n\r\n    function initSaveFavoriteButtonsPlugin() {\r\n      var updateSaveFavoriteButtons = function () {\r\n        $(\".jq_save_favorite\").each(function () {\r\n          var itemId = $(this).attr(\"jq_item_id\");\r\n\r\n          if (itemId !== null && itemId !== undefined && itemId !== \"\") {\r\n            if (itemsChecked.indexOf(itemId) > -1) {\r\n              // already checked\r\n            } else {\r\n              //console.info(itemId);\r\n\r\n              itemsChecked.push(itemId);\r\n\r\n              updateSingleItem(this);\r\n            }\r\n          }\r\n        });\r\n      };\r\n\r\n      updateSaveFavoriteButtons();\r\n\r\n      //$(\".jq_save_favorite\").off(\"click\");\r\n    }\r\n\r\n    window.initSaveFavoriteButtonsPlugin = initSaveFavoriteButtonsPlugin;\r\n\r\n    $(document).on(\"click\", \".jq_save_favorite\", function (event) {\r\n      console.log(\"click classe jq\");\r\n      event.preventDefault(); // Impedisce il comportamento predefinito del link\r\n      event.stopPropagation(); // Impedisce che il click si propaghi all'anchor\r\n      console.log(this);\r\n      if (!localStorage.getItem(\"Token\")) {\r\n        console.log(\"TOKEN\");\r\n        showPo",
+          "apiHints": [
+            "guid",
+            "https://my.fitp.it",
+            "Guid",
+            "Guid",
+            "Guid",
+            "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/list",
+            "guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/add",
+            "guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/del",
+            "guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "guid",
+            "Guid",
+            "Guid",
+            "guid",
+            "Guid"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/virtualgoods-cache.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 834,
+          "snippet": "(function ($) {\r\n\r\n    window.areVirtualGoodsAlreadyPaid = function() {\r\n        $(\".jq-virtual-good\").each(function () {\r\n            var itemId = $(this).attr(\"data-id\");\r\n            var clientVirtualGoods = window.readCookie(\"FitVirtualGoodsCookie\");\r\n            if (clientVirtualGoods.toUpperCase().indexOf(itemId.toUpperCase()) >= 0) {\r\n\r\n                $(this).replaceWith('<div class=\"cc-content-purchased-icon\" style=\"display:block\">' +\r\n                    '                <div class=\"cc-svg cc-svg-purchased\"><span>Acquistato</span></div>' +\r\n                    '                <span class=\"cc-text\"><strong>Acquistato</strong></span>' +\r\n                    '            </div>');\r\n            }\r\n        });\r\n    };\r\n\r\n    \r\n    $(function () {\r\n        window.areVirtualGoodsAlreadyPaid();\r\n    });\r\n\r\n})(jQueryV2);",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/cookieconsent.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 0,
+          "snippet": "",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/client.min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 55519,
+          "snippet": "(function (f) {\r\n    var d, e, p = function () { d = (new (window.UAParser || exports.UAParser)).getResult(); e = new Detector; return this }; p.prototype = {\r\n        getSoftwareVersion: function () { return \"0.1.11\" }, getBrowserData: function () { return d }, getFingerprint: function () {\r\n            var b = d.ua, c = this.getScreenPrint(), a = this.getPlugins(), g = this.getFonts(), n = this.isLocalStorage(), f = this.isSessionStorage(), h = this.getTimeZone(), u = this.getLanguage(), m = this.getSystemLanguage(), e = this.isCookie(), C = this.getCanvasPrint(); return murmurhash3_32_gc(b + \"|\" +\r\n                c + \"|\" + a + \"|\" + g + \"|\" + n + \"|\" + f + \"|\" + h + \"|\" + u + \"|\" + m + \"|\" + e + \"|\" + C, 256)\r\n        }, getCustomFingerprint: function () { for (var b = \"\", c = 0; c < arguments.length; c++)b += arguments[c] + \"|\"; return murmurhash3_32_gc(b, 256) }, getUserAgent: function () { return d.ua }, getUserAgentLowerCase: function () { return d.ua.toLowerCase() }, getBrowser: function () { return d.browser.name }, getBrowserVersion: function () { return d.browser.version }, getBrowserMajorVersion: function () { return d.browser.major }, isIE: function () { return /IE/i.",
+          "apiHints": [
+            "http://java.com/dt-redirect",
+            "http://java.com/dt-redirect?",
+            "http://java.com/js/webstart.png",
+            "http://java.com/js/webstart.png"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/social-sharer.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 6306,
+          "snippet": "(function ($) {\r\n  console.log(\"TEST SHARE NEWS\");\r\n  $(function () {\r\n    // Inizializzazione: rimuove eventuali stili inline e mostra il box nuvola-share\r\n    $(document).ready(function () {\r\n      document.querySelectorAll(\".nuvola-share\").forEach(el => el.removeAttribute(\"style\"));\r\n      $(\".nuvola-share\").removeClass(\"d-none\");\r\n      $(\".jq_share_news\").each(function () {\r\n        this.style.setProperty(\"display\", \"inline\", \"important\");\r\n      });\r\n    });\r\n\r\n    // Gestione dei click sulla prima area e sulle altre 3 aree\r\n    $('#col_hero_area > a:first').on('click', function(e) {\r\n      console.log(\"Click dalla prima area\");\r\n    });\r\n    $('#col_hero_area .col-4 a').on('click', function(e) {\r\n      console.log(\"Click dalle altre 3 aree\");\r\n    });\r\n\r\n    // Gestione del click sull'icona share\r\n    $(\".jq_share_news\").on(\"click\", function (event) {\r\n      event.preventDefault();\r\n      event.stopPropagation();\r\n    \r\n      // Recupera gli attributi utili\r\n      var itemId = $(this).attr(\"jq_item_id\");\r\n      var dynamicUrl = $(this).attr(\"data-url\");\r\n      console.log(\"itemId:\", itemId);\r\n    \r\n      // Seleziona il box corrispondente\r\n      var $box = $('.nuvola-share[j",
+          "apiHints": [
+            "/api/sitecore/ShareAnalytics/Index"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/custom-analytics.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 10332,
+          "snippet": "var cookieSettings = [];\r\n\r\n//var _iub = _iub || [];\r\n//_iub.csConfiguration = {\"countryDetection\":true,\"invalidateConsentWithoutLog\":true,\"reloadOnConsent\":true,\"consentOnContinuedBrowsing\":false,\"enableTcf\":true,\"googleAdditionalConsentMode\":true,\"whitelabel\":false,\"lang\":\"it\",\"siteId\":2229768,\"cookiePolicyId\":41507304,\"cookiePolicyUrl\":\"https://www.fitp.it/Privacy-Policy-Simple\", \"banner\":{ \"acceptButtonDisplay\":true,\"customizeButtonDisplay\":true,\"acceptButtonColor\":\"#48d7f1\",\"acceptButtonCaptionColor\":\"white\",\"customizeButtonColor\":\"rgba(33.78, 33.78, 33.78, 0.69)\",\"customizeButtonCaptionColor\":\"white\",\"rejectButtonColor\":\"#d5d5d5\",\"rejectButtonCaptionColor\":\"white\",\"position\":\"float-bottom-center\",\"textColor\":\"#000000\",\"backgroundColor\":\"#ffffff\",\"explicitWithdrawal\":true,\"rejectButtonDisplay\":true,\"closeButtonRejects\":true }};\r\n\r\nvar _iub = _iub || [];\r\n\r\n_iub.csConfiguration = {\r\n    \"countryDetection\": true,\r\n    \"consentOnContinuedBrowsing\": false,\r\n    \"enableCMP\": true,\r\n    \"googleAdditionalConsentMode\": true,\r\n    \"whitelabel\": false,\r\n    \"lang\": \"it\",\r\n    \"siteId\": 2229768,\r\n    \"cookiePolicyId\": 41507304,\r\n    \"cookiePolicyUrl\": \"https://www.federtennis.it/Privacy-",
+          "apiHints": [
+            "https://www.fitp.it/Privacy-Policy-Simple",
+            "https://www.federtennis.it/Privacy-Policy-Simple",
+            "https://cdn.shareaholic.net/assets/pub/shareaholic.js",
+            "https://cdn.shareaholic.net/assets/pub/shareaholic.js"
+          ]
+        },
+        {
+          "url": "https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 31,
+          "snippet": "Hello World!! (oss.maxcdn.com)\n",
+          "apiHints": []
+        },
+        {
+          "url": "https://oss.maxcdn.com/respond/1.4.2/respond.min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 31,
+          "snippet": "Hello World!! (oss.maxcdn.com)\n",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/antiforgery-init.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 665,
+          "snippet": "(function ($) {\r\n    var token = $('input[name=\"__RequestVerificationToken\"]').val();\r\n    /*\r\n    $.ajaxPrefilter(function (options, originalOptions) {\r\n        if (options.type.toUpperCase() === \"POST\") {\r\n\r\n            if (options.data === null || options.data === undefined) {\r\n                options.data = new FormData();\r\n            }\r\n\r\n            if (options.data instanceof FormData) {\r\n\r\n                options.data.append('__RequestVerificationToken', token);\r\n\r\n            } else {\r\n\r\n                options.data = $.param($.extend(originalOptions.data, { __RequestVerificationToken: token }));\r\n            }\r\n        }\r\n    });*/\r\n})(jQueryV2);",
+          "apiHints": []
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/npm/bluebird@3.7.2/js/browser/bluebird.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 81530,
+          "snippet": "/* @preserve\n * The MIT License (MIT)\n * \n * Copyright (c) 2013-2018 Petka Antonov\n * \n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, subject to the following conditions:\n * \n * The above copyright notice and this permission notice shall be included in\n * all copies or substantial portions of the Software.\n * \n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n * THE SOFTWARE.\n * \n */\n/**\n * bluebird build version ",
+          "apiHints": [
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/rRqMUw",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n"
+          ]
+        },
+        {
+          "url": "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
+          "status": 200,
+          "contentType": "text/javascript",
+          "length": 130363,
+          "snippet": "/*! msal v1.4.6 2021-02-09 */\n\"use strict\";!function(e,t){\"object\"==typeof exports&&\"object\"==typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(\"Msal\",[],t):\"object\"==typeof exports?exports.Msal=t():e.Msal=t()}(self,(function(){return e={795:(e,t)=>{\n/*! *****************************************************************************\nCopyright (c) Microsoft Corporation. All rights reserved.\nLicensed under the Apache License, Version 2.0 (the \"License\"); you may not use\nthis file except in compliance with the License. You may obtain a copy of the\nLicense at http://www.apache.org/licenses/LICENSE-2.0\n\nTHIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\nKIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED\nWARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,\nMERCHANTABLITY OR NON-INFRINGEMENT.\n\nSee the Apache Version 2.0 License for specific language governing permissions\nand limitations under the License.\n***************************************************************************** */\nObject.defineProperty(t,\"__esModule\",{value:!0});var r=function(e,t){return(r=Object.setPrototypeOf||{__proto_",
+          "apiHints": [
+            "http://www.apache.org/licenses/LICENSE-2.0",
+            "Guid",
+            "https://login.microsoftonline.com/common",
+            "Guid",
+            "https://github.com/AzureAD/microsoft-authentication-library-for-js/wiki/MSAL-basics.",
+            "https://github.com/AzureAD/microsoft-authentication-library-for-js/wiki/MSAL-basics.",
+            "guid",
+            "guid",
+            "Guid",
+            "https://login.microsoftonline.com/common/",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Areas/Fitp/js/f_adb2c_sso_2025_v2.js",
+          "status": 404,
+          "contentType": "text/html; charset=utf-8",
+          "length": 4978,
+          "snippet": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\"> \n<html xmlns=\"http://www.w3.org/1999/xhtml\"> \n<head> \n<title>IIS 10.0 Detailed Error - 404.0 - Not Found</title> \n<style type=\"text/css\"> \n<!-- \nbody{margin:0;font-size:.7em;font-family:Verdana,Arial,Helvetica,sans-serif;} \ncode{margin:0;color:#006600;font-size:1.1em;font-weight:bold;} \n.config_source code{font-size:.8em;color:#000000;} \npre{margin:0;font-size:1.4em;word-wrap:break-word;} \nul,ol{margin:10px 0 10px 5px;} \nul.first,ol.first{margin-top:5px;} \nfieldset{padding:0 15px 10px 15px;word-break:break-all;} \n.summary-container fieldset{padding-bottom:5px;margin-top:4px;} \nlegend.no-expand-all{padding:2px 15px 4px 10px;margin:0 0 0 -12px;} \nlegend{color:#333333;;margin:4px 0 8px -12px;_margin-top:0px; \nfont-weight:bold;font-size:1em;} \na:link,a:visited{color:#007EFF;font-weight:bold;} \na:hover{text-decoration:none;} \nh1{font-size:2.4em;margin:0;color:#FFF;} \nh2{font-size:1.7em;margin:0;color:#CC0000;} \nh3{font-size:1.4em;margin:10px 0 0 0;color:#CC0000;} \nh4{font-size:1.2em;margin:10px 0 5px 0; \n}#header{width:96%;margin:0 0 0 0;padding:6px 2% 6px 2%;font-family:\"trebuc",
+          "apiHints": [
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd",
+            "http://www.w3.org/1999/xhtml",
+            "http://go.microsoft.com/fwlink/?LinkID=66439",
+            "https://www.fitp.it:443/Areas/Fitp/js/f_adb2c_sso_2025_v2.js",
+            "https://go.microsoft.com/fwlink/?LinkID=62293&amp;IIS70Error=404,0,0x80070002,17763"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/f_fingerprint_old.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 329,
+          "snippet": "  /* var clientJs = new ClientJS();\r\n    var fingerprint = clientJs.getFingerprint();\r\n    var now = new Date();\r\n    now.setMinutes(now.getMinutes() + 120);\r\n    document.cookie =\r\n        \"CLIENT_FINGERPRINT=\" +\r\n        fingerprint +\r\n        \"; expires=\" +\r\n        now.toUTCString() +\r\n        \";Navigating=true;Path=/\";\r\n*/",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.googletagservices.com/tag/js/gpt.js",
+          "status": 200,
+          "contentType": "text/javascript; charset=UTF-8",
+          "length": 123588,
+          "snippet": "(function(sttc){var window=this;if(window.googletag&&googletag.evalScripts){googletag.evalScripts();}if(window.googletag&&googletag._loaded_)return;var aa,q,ba=typeof Object.create==\"function\"?Object.create:function(a){var b=function(){};b.prototype=a;return new b},ca=typeof Object.defineProperties==\"function\"?Object.defineProperty:function(a,b,c){if(a==Array.prototype||a==Object.prototype)return a;a[b]=c.value;return a},da=function(a){a=[\"object\"==typeof globalThis&&globalThis,a,\"object\"==typeof window&&window,\"object\"==typeof self&&self,\"object\"==typeof global&&global];for(var b=0;b<a.length;++b){var c=a[b];if(c&&c.Math==Math)return c}throw Error(\"Cannot find global object\");},ea=da(this),fa=typeof Symbol===\"function\"&&typeof Symbol(\"x\")===\"symbol\",v={},ha={},w=function(a,b,c){if(!c||a!=null){c=ha[b];if(c==null)return a[b];c=a[c];return c!==void 0?c:a[b]}},x=function(a,b,c){if(b)a:{var d=a.split(\".\");a=d.length===1;var e=d[0],f;!a&&e in v?f=v:f=ea;for(e=0;e<d.length-1;e++){var g=d[e];if(!(g in f))break a;f=f[g]}d=d[d.length-1];c=fa&&c===\"es6\"?f[d]:null;b=b(c);b!=null&&(a?ca(v,d,{configurable:!0,writable:!0,value:b}):b!==c&&(ha[d]===void 0&&(a=Math.random()*1E9>>>0,ha[d]=fa?ea.Sym",
+          "apiHints": [
+            "https://pagead2.googlesyndication.com/pagead/gen_204?id=rcs_internal",
+            "https://pagead2.googlesyndication.com/pagead/ping",
+            "https://pagead2.googlesyndication.com/pagead/managed/dict/",
+            "https://securepubads.g.doubleclick.net/pagead/managed/dict/",
+            "https://pagead2.googlesyndication.com/pagead/js/err_rep.js",
+            "https://pagead2.googlesyndication.com/pagead/gen_204?id=plmetrics",
+            "https://pagead2.googlesyndication.com/pagead/managed/js/gpt/",
+            "https://securepubads.g.doubleclick.net/pagead/managed/js/gpt/",
+            "https://pagead2.googlesyndication.com/pagead/ppub_config",
+            "https://securepubads.g.doubleclick.net/pagead/ppub_config"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/f_banner.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 3904,
+          "snippet": "/*      googletag.cmd.push(function () {\r\n            googletag.pubads().setCookieOptions(1);\r\n            googletag.pubads().setRequestNonPersonalizedAds(1);\r\n\t\t\t\r\n\t\t\t*/\r\n\t\t\t\r\n            /*\r\n\t\t\tgoogletag.defineSlot('/5196/fit/300x250_1', [300, 250], 'div-gpt-ad-1529663467262-0').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/300x250_2', [300, 250], 'div-gpt-ad-1529663467262-1').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/300x250_3', [300, 250], 'div-gpt-ad-1529663467262-2').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/300x250_300x600_1', [[300, 250], [300, 600]], 'div-gpt-ad-1529663467262-3').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/320x50_320x100_1', [[320, 50], [320, 100]], 'div-gpt-ad-1529663467262-4').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/320x50_320x100_2', [[320, 50], [320, 100]], 'div-gpt-ad-1529663467262-5').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/320x50_320x100_3', [[320, 50], [320, 100]], 'div-gpt-ad-1529663467262-6').addService(googletag.pubads());\r\n            googl",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/fg_analytics.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 787,
+          "snippet": "\r\n   \r\n\r\n    (function ($) {\r\n        function initGoogleAnalytics(enabled) {\r\n            if (enabled) {\r\n                // Inizio script Google Analytics \r\n                $.getScript(\"https://www.googletagmanager.com/gtag/js?id=G-K3W3E4PCL2\")\r\n                .done(function(script, textStatus) {\r\n                    window.dataLayer = window.dataLayer || [];\r\n                    function gtag(){dataLayer.push(arguments);}\r\n                    gtag('js', new Date());\r\n                    gtag('config', 'G-K3W3E4PCL2');\r\n                })\r\n                .fail(function( jqxhr, settings, exception ) {\r\n                });\r\n                // Fine script  Google Analytics \r\n            }\r\n        }\r\n        window.initGoogleAnalytics = initGoogleAnalytics;\r\n    })(jQueryV2);",
+          "apiHints": [
+            "https://www.googletagmanager.com/gtag/js?id=G-K3W3E4PCL2"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/f_appinsights.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 5955,
+          "snippet": "/*  \r\n  (function ($) {\r\n            function initAppInsights(enabled) {\r\n                if (enabled) {\r\n                    -- Inizio script AppInsights \r\n                    var appInsights=window.appInsights||function(a){\r\n                        function b(a){c[a]=function(){var b=arguments;c.queue.push(function(){c[a].apply(c,b)})}}var c={config:a},d=document,e=window;setTimeout(function(){var b=d.createElement(\"script\");b.src=a.url||\"https://az416426.vo.msecnd.net/scripts/a/ai.0.js\",d.getElementsByTagName(\"script\")[0].parentNode.appendChild(b)});try{c.cookie=d.cookie}catch(a){}c.queue=[];for(var f=[\"Event\",\"Exception\",\"Metric\",\"PageView\",\"Trace\",\"Dependency\"];f.length;)b(\"track\"+f.pop());if(b(\"setAuthenticatedUserContext\"),b(\"clearAuthenticatedUserContext\"),b(\"startTrackEvent\"),b(\"stopTrackEvent\"),b(\"startTrackPage\"),b(\"stopTrackPage\"),b(\"flush\"),!a.disableExceptionTracking){f=\"onerror\",b(\"_\"+f);var g=e[f];e[f]=function(a,b,d,e,h){var i=g&&g(a,b,d,e,h);return!0!==i&&c[\"_\"+f](a,b,d,e,h),i}}return c\r\n                    }({\r\n                        instrumentationKey:\"ae8eeb65-76f9-4bd4-abfe-5c83a0d97a52\"\r\n                    });\r\n                    window.appInsights = appIn",
+          "apiHints": [
+            "https://az416426.vo.msecnd.net/scripts/a/ai.0.js",
+            "https://go.microsoft.com/fwlink/?linkid=2128109\\nHost:",
+            "https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/f_cookie.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 1031,
+          "snippet": "    function splitHostname() {\r\n        var result = {};\r\n        var regexParse = new RegExp('([a-z\\-0-9]{2,63})\\.([a-z\\.]{2,5})$');\r\n        var urlParts = regexParse.exec(window.location.hostname);\r\n        result.domain = urlParts[1];\r\n        result.type = urlParts[2];\r\n        result.subdomain = window.location.hostname.replace(result.domain + '.' + result.type, '').slice(0, -1);;\r\n        return result;\r\n    }\r\n\r\n    function setCustomCookie(name, value, days) {\r\n        var expires = \"\";\r\n        if (days) {\r\n            var date = new Date();\r\n            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));\r\n            expires = \"; expires=\" + date.toUTCString();\r\n        }\r\n        var splitHostName = splitHostname();\r\n        document.cookie = name + \"=\" + (value || \"\") + expires + \"; domain=\" + splitHostName.domain + '.' + splitHostName.type;\r\n    }\r\n\r\n    function redirectToCommunity(url) {\r\n        setCustomCookie('coming-from-login-page', \" \", 1);\r\n        window.location.href = url;\r\n    }\r\n",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/set_cookie.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 1942,
+          "snippet": " function loadCookieSettings() {\r\n            if (cookieSettings.length > 0) {\r\n                return;\r\n            }\r\n            cookieSettings = [{\r\n                cookieName: \"federtennis-disable-google-analytics\",\r\n                buttonOn: \"btnCustomAnalyticsOn\",\r\n                buttonOff: \"btnCustomAnalyticsOff\",\r\n                functionName: \"initGoogleAnalytics\"\r\n            },\r\n            {\r\n                cookieName: \"federtennis-disable-appinsights\",\r\n                buttonOn: \"btnCustomInsightsOn\",\r\n                buttonOff: \"btnCustomInsightsOff\",\r\n                functionName: \"initAppInsights\"\r\n            },\r\n            {\r\n                cookieName: \"federtennis-disable-googletagpubads\",\r\n                buttonOn: \"btnCustomTagPubAdsOn\",\r\n                buttonOff: \"btnCustomTagPubAdsOff\",\r\n                functionName: \"initGoogleTagPubAds\"\r\n            }];\r\n        }\r\n\t\t\r\n  function splitHostname() {\r\n        var result = {};\r\n        var regexParse = new RegExp('([a-z\\-0-9]{2,63})\\.([a-z\\.]{2,5})$');\r\n        var urlParts = regexParse.exec(window.location.hostname);\r\n        result.domain = urlParts[1];\r\n        result.type = urlParts[2];\r\n        resul",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/f_general.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 1814,
+          "snippet": "var versionmenu = \"v1\";\r\n\r\njQueryV2(function() {\r\n\tjQueryV2(document).on(\"click\", \".fancybox-single-image\", function() {\r\n\t\tjQueryV2.fancybox.open({\r\n\t\t\tsrc: jQueryV2(this).data(\"src\"),\r\n\t\t\ttype: 'image',\r\n\t\t\tcaption: jQueryV2(this).data(\"caption\")\r\n\t\t});\r\n\t});\t\r\n\tjQueryV2(document).on(\"click\", \".cc-megamenu-item\", function() {\r\n\t\tlocalStorage.setItem('menuitemid', jQueryV2(this).attr(\"data-id\"));\r\n\t});\r\n});\r\n\r\nfunction fnMediaGalleryFancyboxView(guid) {\r\n\tjQueryV2.ajax({\r\n\t\turl : \"https://dp-fit-prod-function.azurewebsites.net/api/v1/content/gallery/image/list\",\r\n\t\ttype: 'POST',\r\n\t\tdataType: 'json',\r\n\t\tdata: JSON.stringify({\"guid_foto_gallery\" : guid}),\r\n\t\tcontentType: \"application/json; charset=utf-8\",\t\t\r\n\t\tsuccess : function(data) {\r\n\t\t\tvar jsonObjTmp = [];\r\n\t\t\tjQueryV2.each(data, function(index, element) {\r\n\t\t\t\tjQueryV2.each(element.images, function(k, v) {\r\n\t\t\t\t\tif(v.hasOwnProperty('image')) {\r\n\t\t\t\t\t\titem = {};\r\n\t\t\t\t\t\titem [\"src\"] = \"/media_gallery/fotogallery/\" + String(element.idGallery) + \"/\" + v.image;\r\n\t\t\t\t\t\titem [\"caption\"] = v.descriptionImage;\r\n\t\t\t\t\t\tjsonObjTmp.push(item);\t\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t});\r\n\t\t\tif(jsonObjTmp.length > 0) {\r\n\t\t\t\tjQueryV2.fancybox.open(jsonObjTmp)",
+          "apiHints": [
+            "guid",
+            "https://dp-fit-prod-function.azurewebsites.net/api/v1/content/gallery/image/list",
+            "guid",
+            "guid"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/crossHeader.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 8705,
+          "snippet": "/*\r\n(function ($) {\r\n    $(function () {\r\n        function isValidUrl(str) {\r\n            return str !== undefined && str !== null && str.length > 0;\r\n        }\r\n\r\n        var _chpii = \"\";\r\n        if ($(\"#IsB2CUser\").length > 0 && $(\"#IsB2CUser\").val().toLowerCase() === 'true') {\r\n            _chpii = $(\"#chpii\").val();\r\n            loadUnreadNotification();\r\n            loadGamificationStatus();\r\n            loadNotifications();\r\n            setInterval(updateNotificationsAgo, 10000);\r\n        }\r\n\r\n        function updateNotificationsAgo() {\r\n            for (var i = 0; i < $(\".jq-timeago\").length; ++i) {\r\n                var element = $(\".jq-timeago\")[i];\r\n                $(element).text(getTime($(element).attr(\"jq-iso-date\")));\r\n            }\r\n        }\r\n\r\n\r\n        $(\"#login,#loginMobile,#accedi,#accediChat\").click(function (e) {\r\n            e.preventDefault();\r\n            var redirection = $(location).attr(\"href\");\r\n            var addressValue = $(this).attr(\"href\") + redirection;\r\n            $(location).attr(\"href\", addressValue);\r\n        });\r\n        $(\"#logout\").click(function (e) {\r\n            e.preventDefault();\r\n            jQuery(\"#frmLogout\").submit();\r\n        ",
+          "apiHints": [
+            "https://fitprodglstacdn.blob.core.windows.net/global-avatar/default.png"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/searchBar.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 393,
+          "snippet": "(function ($) {\r\n    $(function () {\r\n        var searchForms = $(\"form[name=search]\");\r\n        searchForms.each(function (index) {\r\n            $(this).submit(function () {\r\n                if ($(this).find(\"input[name=search-terms]\").val().trim() === \"\" || pageEditorMode()) {\r\n                    return false;\r\n                }\r\n            });\r\n        });\r\n    });\r\n})(jQueryV2);\r\n\r\n\r\n",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/js/plugins/fancybox_v3/dist/jquery.fancybox.min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 52298,
+          "snippet": "// ==================================================\n// fancyBox v3.1.20\n//\n// Licensed GPLv3 for open source use\n// or fancyBox Commercial License for commercial use\n//\n// http://fancyapps.com/fancybox/\n// Copyright 2017 fancyApps\n//\n// ==================================================\n!function(t,e,n,o){\"use strict\";function i(t){var e=t.currentTarget,o=t.data?t.data.options:{},i=t.data?t.data.items:[],a=n(e).attr(\"data-fancybox\")||\"\",s=0;t.preventDefault(),t.stopPropagation(),a?(i=i.length?i.filter('[data-fancybox=\"'+a+'\"]'):n('[data-fancybox=\"'+a+'\"]'),s=i.index(e),s<0&&(s=0)):i=[e],n.fancybox.open(i,o,s)}if(n){if(n.fn.fancybox)return void n.error(\"fancyBox already initialized\");var a={loop:!1,margin:[44,0],gutter:50,keyboard:!0,arrows:!0,infobar:!1,toolbar:!0,buttons:[\"slideShow\",\"fullScreen\",\"thumbs\",\"close\"],idleTime:4,smallBtn:\"auto\",protect:!1,modal:!1,image:{preload:\"auto\"},ajax:{settings:{data:{fancybox:!0}}},iframe:{tpl:'<iframe id=\"fancybox-frame{rnd}\" name=\"fancybox-frame{rnd}\" class=\"fancybox-iframe\" frameborder=\"0\" vspace=\"0\" hspace=\"0\" webkitAllowFullScreen mozallowfullscreen allowFullScreen allowtransparency=\"true\" src=\"\"></iframe>',preload:!0,css:{},attr:{scrol",
+          "apiHints": [
+            "http://fancyapps.com/fancybox/"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/js/plugins/chartjs.2.3.0/Chart.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 314657,
+          "snippet": "/*!\n * Chart.js\n * http://chartjs.org/\n * Version: 2.3.0\n *\n * Copyright 2016 Nick Downie\n * Released under the MIT license\n * https://github.com/chartjs/Chart.js/blob/master/LICENSE.md\n */\n(function(f){if(typeof exports===\"object\"&&typeof module!==\"undefined\"){module.exports=f()}else if(typeof define===\"function\"&&define.amd){define([],f)}else{var g;if(typeof window!==\"undefined\"){g=window}else if(typeof global!==\"undefined\"){g=global}else if(typeof self!==\"undefined\"){g=self}else{g=this}g.Chart = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error(\"Cannot find module '\"+o+\"'\");throw f.code=\"MODULE_NOT_FOUND\",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\n\n},{}],2:[function(require,module,exports){\n/* MIT license */\r\nvar colorNames = require(6);\r\n\r\nmodule.exports = {\r\n   getRgba: getRgba,\r\n   getHsla: getHsla,\r\n   ge",
+          "apiHints": [
+            "http://chartjs.org/",
+            "https://github.com/chartjs/Chart.js/blob/master/LICENSE.md",
+            "http://www.w3.org/TR/WCAG20/#relativeluminancedef",
+            "http://www.w3.org/TR/WCAG20/#contrast-ratiodef",
+            "http://24ways.org/2010/calculating-color-contrast",
+            "http://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale",
+            "https://github.com/sass/libsass/blob/0e6b4a2850092356aa3ece07c6b249f0221caced/functions.cpp#L209",
+            "http://dev.w3.org/csswg/css-color/#hwb-to-rgb",
+            "https://github.com/chartjs/Chart.js/issues/2435#issuecomment-216718158",
+            "http://scaledinnovation.com/analytics/splines/aboutSplines.html",
+            "https://en.wikipedia.org/wiki/Monotone_cubic_interpolation",
+            "http://www.robertpenner.com/easing/",
+            "http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/",
+            "http://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/",
+            "http://www.nathanaeljones.com/blog/2013/reading-max-width-cross-browser",
+            "http://stackoverflow.com/a/14853974",
+            "http://stackoverflow.com/questions/8506881/nice-label-algorithm-for-charts-with-minimum-ticks",
+            "https://gist.github.com/nnnick/696cc9c55f4b0beb8fe9",
+            "https://dl.dropboxusercontent.com/u/34601363/toomuchscience.gif",
+            "https://dl.dropboxusercontent.com/u/34601363/yeahscience.gif",
+            "http://momentjs.com/docs/#/parsing/string-format/",
+            "http://momentjs.com/docs/#/parsing/string-format/",
+            "http://momentjs.com/docs/#/get-set/iso-weekday/",
+            "http://momentjs.com/docs/#/displaying/format/",
+            "https://momentjs.com",
+            "http://nnnick.github.io/Chart.js/docs-v2/#scales-time-scale"
+          ]
+        }
       ]
     },
     {
-      "url": "https://www.fitp.it/Scripts/axios.min.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 26498,
-      "snippet": "!function(e,t){\"object\"==typeof exports&&\"undefined\"!=typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(t):(e=\"undefined\"!=typeof globalThis?globalThis:e||self).axios=t()}(this,(function(){\"use strict\";function e(t){return e=\"function\"==typeof Symbol&&\"symbol\"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&\"function\"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?\"symbol\":typeof e},e(t)}function t(e,t){if(!(e instanceof t))throw new TypeError(\"Cannot call a class as a function\")}function n(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,\"value\"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r)}}function r(e,t,r){return t&&n(e.prototype,t),r&&n(e,r),Object.defineProperty(e,\"prototype\",{writable:!1}),e}function o(e,t){return function(){return e.apply(t,arguments)}}var i,s=Object.prototype.toString,a=Object.getPrototypeOf,u=(i=Object.create(null),function(e){var t=s.call(e",
-      "apiHints": []
-    },
-    {
-      "url": "https://code.jquery.com/jquery-2.2.4.min.js",
-      "status": 200,
-      "contentType": "application/javascript; charset=utf-8",
-      "length": 85578,
-      "snippet": "/*! jQuery v2.2.4 | (c) jQuery Foundation | jquery.org/license */\n!function(a,b){\"object\"==typeof module&&\"object\"==typeof module.exports?module.exports=a.document?b(a,!0):function(a){if(!a.document)throw new Error(\"jQuery requires a window with a document\");return b(a)}:b(a)}(\"undefined\"!=typeof window?window:this,function(a,b){var c=[],d=a.document,e=c.slice,f=c.concat,g=c.push,h=c.indexOf,i={},j=i.toString,k=i.hasOwnProperty,l={},m=\"2.2.4\",n=function(a,b){return new n.fn.init(a,b)},o=/^[\\s\\uFEFF\\xA0]+|[\\s\\uFEFF\\xA0]+$/g,p=/^-ms-/,q=/-([\\da-z])/gi,r=function(a,b){return b.toUpperCase()};n.fn=n.prototype={jquery:m,constructor:n,selector:\"\",length:0,toArray:function(){return e.call(this)},get:function(a){return null!=a?0>a?this[a+this.length]:this[a]:e.call(this)},pushStack:function(a){var b=n.merge(this.constructor(),a);return b.prevObject=this,b.context=this.context,b},each:function(a){return n.each(this,a)},map:function(a){return this.pushStack(n.map(this,function(b,c){return a.call",
-      "apiHints": []
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/initialize_jquery_v2.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 639,
-      "snippet": "window.jQueryV2 = jQuery.noConflict();\r\n(function ($) {\r\n\t$(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {\r\n        if (window.suppressAjaxError) return;\r\n        if (ajaxSettings.url.indexOf(\"ification\") >= 0 && jqXHR.status === 0) return; // <== suppress the misterious \"fica\" bug\r\n        var message = ajaxSettings.url +\r\n\t\t\t\" Failed with statusCode : \" +\r\n\t\t\tjqXHR.status +\r\n\t\t\t\"\\nstatusText: \" + jqXHR.statusText;\r\n\t\t//window.appInsights.trackTrace(message, { Url: ajaxSettings.url, StatusCode: jqXHR.status } , 3);\r\n\t\t//window.GenericErrorMessageBox();\r\n        console.error(message);\r\n\t});\r\n})(jQueryV2);",
-      "apiHints": []
-    },
-    {
-      "url": "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
-      "status": 200,
-      "contentType": "application/javascript; charset=utf-8",
-      "length": 37045,
-      "snippet": "/*!\n * Bootstrap v3.3.7 (http://getbootstrap.com)\n * Copyright 2011-2016 Twitter, Inc.\n * Licensed under the MIT license\n */\nif(\"undefined\"==typeof jQuery)throw new Error(\"Bootstrap's JavaScript requires jQuery\");+function(a){\"use strict\";var b=a.fn.jquery.split(\" \")[0].split(\".\");if(b[0]<2&&b[1]<9||1==b[0]&&9==b[1]&&b[2]<1||b[0]>3)throw new Error(\"Bootstrap's JavaScript requires jQuery version 1.9.1 or higher, but lower than version 4\")}(jQuery),+function(a){\"use strict\";function b(){var a=document.createElement(\"bootstrap\"),b={WebkitTransition:\"webkitTransitionEnd\",MozTransition:\"transitionend\",OTransition:\"oTransitionEnd otransitionend\",transition:\"transitionend\"};for(var c in b)if(void 0!==a.style[c])return{end:b[c]};return!1}a.fn.emulateTransitionEnd=function(b){var c=!1,d=this;a(this).one(\"bsTransitionEnd\",function(){c=!0});var e=function(){c||a(d).trigger(a.support.transition.end)};return setTimeout(e,b),this},a(function(){a.support.transition=b(),a.support.transition&&(a.event.",
-      "apiHints": [
-        "http://getbootstrap.com)"
-      ]
-    },
-    {
-      "url": "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js",
-      "status": 200,
-      "contentType": "application/javascript; charset=utf-8",
-      "length": 33379,
-      "snippet": "/*!\n * Bootstrap-select v1.12.4 (http://silviomoreto.github.io/bootstrap-select)\n *\n * Copyright 2013-2017 bootstrap-select\n * Licensed under MIT (https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)\n */\n!function(a,b){\"function\"==typeof define&&define.amd?define([\"jquery\"],function(a){return b(a)}):\"object\"==typeof module&&module.exports?module.exports=b(require(\"jquery\")):b(a.jQuery)}(this,function(a){!function(a){\"use strict\";function b(b){var c=[{re:/[\\xC0-\\xC6]/g,ch:\"A\"},{re:/[\\xE0-\\xE6]/g,ch:\"a\"},{re:/[\\xC8-\\xCB]/g,ch:\"E\"},{re:/[\\xE8-\\xEB]/g,ch:\"e\"},{re:/[\\xCC-\\xCF]/g,ch:\"I\"},{re:/[\\xEC-\\xEF]/g,ch:\"i\"},{re:/[\\xD2-\\xD6]/g,ch:\"O\"},{re:/[\\xF2-\\xF6]/g,ch:\"o\"},{re:/[\\xD9-\\xDC]/g,ch:\"U\"},{re:/[\\xF9-\\xFC]/g,ch:\"u\"},{re:/[\\xC7-\\xE7]/g,ch:\"c\"},{re:/[\\xD1]/g,ch:\"N\"},{re:/[\\xF1]/g,ch:\"n\"}];return a.each(c,function(){b=b?b.replace(this.re,this.ch):\"\"}),b}function c(b){var c=arguments,d=b;[].shift.apply(c);var e,f=this.each(function(){var b=a(this);if(b.is(\"select\")){var f=b.",
-      "apiHints": [
-        "http://silviomoreto.github.io/bootstrap-select)",
-        "https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)"
-      ]
-    },
-    {
-      "url": "https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.min.js",
-      "status": 200,
-      "contentType": "application/javascript; charset=utf-8",
-      "length": 32280,
-      "snippet": "/*!\n\nHolder - client side image placeholders\nVersion 2.9.4+cabil\n© 2016 Ivan Malopinsky - http://imsky.co\n\nSite:     http://holderjs.com\nIssues:   https://github.com/imsky/holder/issues\nLicense:  MIT\n\n*/\n!function(e){if(e.document){var t=e.document;t.querySelectorAll||(t.querySelectorAll=function(n){var r,i=t.createElement(\"style\"),o=[];for(t.documentElement.firstChild.appendChild(i),t._qsa=[],i.styleSheet.cssText=n+\"{x-qsa:expression(document._qsa && document._qsa.push(this))}\",e.scrollBy(0,0),i.parentNode.removeChild(i);t._qsa.length;)r=t._qsa.shift(),r.style.removeAttribute(\"x-qsa\"),o.push(r);return t._qsa=null,o}),t.querySelector||(t.querySelector=function(e){var n=t.querySelectorAll(e);return n.length?n[0]:null}),t.getElementsByClassName||(t.getElementsByClassName=function(e){return e=String(e).replace(/^|\\s+/g,\".\"),t.querySelectorAll(e)}),Object.keys||(Object.keys=function(e){if(e!==Object(e))throw TypeError(\"Object.keys called on non-object\");var t,n=[];for(t in e)Object.prototy",
-      "apiHints": [
-        "http://imsky.co",
-        "http://holderjs.com",
-        "https://github.com/imsky/holder/issues",
-        "http://www.w3.org/2000/svg",
-        "http://www.w3.org/2000/svg"
-      ]
-    },
-    {
-      "url": "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js",
-      "status": 200,
-      "contentType": "application/javascript; charset=utf-8",
-      "length": 51265,
-      "snippet": "!function(e,t){\"object\"==typeof exports&&\"undefined\"!=typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(t):e.moment=t()}(this,function(){\"use strict\";function e(){return Yt.apply(null,arguments)}function t(e){return e instanceof Array||\"[object Array]\"===Object.prototype.toString.call(e)}function n(e){return null!=e&&\"[object Object]\"===Object.prototype.toString.call(e)}function s(e){if(Object.getOwnPropertyNames)return 0===Object.getOwnPropertyNames(e).length;var t;for(t in e)if(e.hasOwnProperty(t))return!1;return!0}function i(e){return void 0===e}function r(e){return\"number\"==typeof e||\"[object Number]\"===Object.prototype.toString.call(e)}function a(e){return e instanceof Date||\"[object Date]\"===Object.prototype.toString.call(e)}function o(e,t){var n,s=[];for(n=0;n<e.length;++n)s.push(t(e[n],n));return s}function u(e,t){return Object.prototype.hasOwnProperty.call(e,t)}function l(e,t){for(var n in t)u(t,n)&&(e[n]=t[n]);return u(t,\"toString\")&&(e.toString=t.",
-      "apiHints": [
-        "http://momentjs.com/guides/#/warnings/define-locale/",
-        "http://momentjs.com/guides/#/warnings/add-inverted-param/",
-        "http://momentjs.com/guides/#/warnings/js-date/",
-        "http://momentjs.com/guides/#/warnings/min-max/",
-        "http://momentjs.com/guides/#/warnings/min-max/",
-        "http://momentjs.com/guides/#/warnings/zone/",
-        "http://momentjs.com/guides/#/warnings/dst-shifted/"
-      ]
-    },
-    {
-      "url": "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/it.js",
-      "status": 200,
-      "contentType": "application/javascript; charset=utf-8",
-      "length": 2257,
-      "snippet": "//! moment.js locale configuration\n//! locale : Italian [it]\n//! author : Lorenzo : https://github.com/aliem\n//! author: Mattia Larentis: https://github.com/nostalgiaz\n\n;(function (global, factory) {\n   typeof exports === 'object' && typeof module !== 'undefined'\n       && typeof require === 'function' ? factory(require('../moment')) :\n   typeof define === 'function' && define.amd ? define(['../moment'], factory) :\n   factory(global.moment)\n}(this, (function (moment) { 'use strict';\n\n\nvar it = moment.defineLocale('it', {\n    months : 'gennaio_febbraio_marzo_aprile_maggio_giugno_luglio_agosto_settembre_ottobre_novembre_dicembre'.split('_'),\n    monthsShort : 'gen_feb_mar_apr_mag_giu_lug_ago_set_ott_nov_dic'.split('_'),\n    weekdays : 'domenica_lunedì_martedì_mercoledì_giovedì_venerdì_sabato'.split('_'),\n    weekdaysShort : 'dom_lun_mar_mer_gio_ven_sab'.split('_'),\n    weekdaysMin : 'do_lu_ma_me_gi_ve_sa'.split('_'),\n    longDateFormat : {\n        LT : 'HH:mm',\n        LTS : 'HH:mm:ss',\n",
-      "apiHints": [
-        "https://github.com/aliem",
-        "https://github.com/nostalgiaz"
-      ]
-    },
-    {
-      "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js",
-      "status": 200,
-      "contentType": "application/javascript; charset=utf-8",
-      "length": 5022,
-      "snippet": "/*! jQuery & Zepto Lazy v1.7.9 - http://jquery.eisbehr.de/lazy - MIT&GPL-2.0 license - Copyright 2012-2018 Daniel 'Eisbehr' Kern */\n!function(t,e){\"use strict\";function r(r,a,i,u,l){function f(){L=t.devicePixelRatio>1,i=c(i),a.delay>=0&&setTimeout(function(){s(!0)},a.delay),(a.delay<0||a.combined)&&(u.e=v(a.throttle,function(t){\"resize\"===t.type&&(w=B=-1),s(t.all)}),u.a=function(t){t=c(t),i.push.apply(i,t)},u.g=function(){return i=n(i).filter(function(){return!n(this).data(a.loadedName)})},u.f=function(t){for(var e=0;e<t.length;e++){var r=i.filter(function(){return this===t[e]});r.length&&s(!1,r)}},s(),n(a.appendScroll).on(\"scroll.\"+l+\" resize.\"+l,u.e))}function c(t){var i=a.defaultImage,o=a.placeholder,u=a.imageBase,l=a.srcsetAttribute,f=a.loaderAttribute,c=a._f||{};t=n(t).filter(function(){var t=n(this),r=m(this);return!t.data(a.handledName)&&(t.attr(a.attribute)||t.attr(l)||t.attr(f)||c[r]!==e)}).data(\"plugin_\"+a.name,r);for(var s=0,d=t.length;s<d;s++){var A=n(t[s]),g=m(t[s]),h=A.at",
-      "apiHints": [
-        "http://jquery.eisbehr.de/lazy"
-      ]
-    },
-    {
-      "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js",
-      "status": 200,
-      "contentType": "application/javascript; charset=utf-8",
-      "length": 4412,
-      "snippet": "/*! jQuery & Zepto Lazy - All Plugins v1.7.9 - http://jquery.eisbehr.de/lazy - MIT&GPL-2.0 license - Copyright 2012-2018 Daniel 'Eisbehr' Kern */\n!function(t){function a(a,e,r,o){o=o?o.toUpperCase():\"GET\";var i;\"POST\"!==o&&\"PUT\"!==o||!a.config(\"ajaxCreateData\")||(i=a.config(\"ajaxCreateData\").apply(a,[e])),t.ajax({url:e.attr(\"data-src\"),type:\"POST\"===o||\"PUT\"===o?o:\"GET\",data:i,dataType:e.attr(\"data-type\")||\"html\",success:function(t){e.html(t),r(!0),a.config(\"removeAttribute\")&&e.removeAttr(\"data-src data-method data-type\")},error:function(){r(!1)}})}t.lazy(\"ajax\",function(t,e){a(this,t,e,t.attr(\"data-method\"))}),t.lazy(\"get\",function(t,e){a(this,t,e,\"GET\")}),t.lazy(\"post\",function(t,e){a(this,t,e,\"POST\")}),t.lazy(\"put\",function(t,e){a(this,t,e,\"PUT\")})}(window.jQuery||window.Zepto),function(t){t.lazy([\"av\",\"audio\",\"video\"],[\"audio\",\"video\"],function(a,e){var r=a[0].tagName.toLowerCase();if(\"audio\"===r||\"video\"===r){var o=a.find(\"data-src\"),i=a.find(\"data-track\"),n=0,c=function(){++n===",
-      "apiHints": [
-        "http://jquery.eisbehr.de/lazy",
-        "https://player.vimeo.com/video/",
-        "https://www.youtube.com/embed/"
-      ]
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/Common.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 12590,
-      "snippet": "var scripts = document.querySelectorAll(\"script[src]\");\r\nscripts.forEach(function (script) {\r\n  if (\r\n    script.src === \"https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js\" ||\r\n    script.src === \"/Scripts/f_adb2c_sso_2024_v2.js\"\r\n  ) {\r\n    script.parentNode.removeChild(script);\r\n  }\r\n});\r\ndocument.write(\"<!-- INIZIO CODICE SSO -->\");\r\ndocument.write(\r\n  \"<lin\" +\r\n    'k rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css\" \"rel=\"stylesheet\"/>'\r\n);\r\ndocument.write(\r\n  \"<scr\" +\r\n    'ipt type=\"text/javascript\" src=\"https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.2/dist/fp.min.js\"></scr' +\r\n    \"ipt>\"\r\n);\r\ndocument.write(\r\n  \"<scr\" +\r\n    'ipt type=\"text/javascript\" src=\"https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@main/dist/es5/detectIncognito.min.js\" ></scr' +\r\n    \"ipt>\"\r\n);\r\ndocument.write(\r\n  \"<scr\" +\r\n    'ipt type=\"text/javascript\" src=\"/Scripts/estrazioneIdentificativo.js\" ></scr' +\r\n    \"ipt>\"\r\n)",
-      "apiHints": [
-        "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css",
-        "https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.2/dist/fp.min.js",
-        "https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@main/dist/es5/detectIncognito.min.js",
-        "https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.6.0/lib/msal-browser.js",
-        "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
-        "/api/sitecore/Common/GetOriginalImage"
-      ]
-    },
-    {
-      "url": "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-init-min.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 183427,
-      "snippet": "/*!\r\n * Waves v0.6.4\r\n * http://fian.my.id/Waves\r\n *\r\n * Copyright 2014 Alfiana E. Sibuea and other contributors\r\n * Released under the MIT license\r\n * https://github.com/fians/Waves/blob/master/LICENSE\r\n */\r\n\r\n;(function(window) {\r\n    'use strict';\r\n\r\n    var waves_effect = \"we\";\r\n\r\n\tvar wavesElement = document.getElementsByClassName(\"we\");\r\n\tif (wavesElement.length == 0) return;\r\n\r\n    var Waves = Waves || {};\r\n    var $$ = document.querySelectorAll.bind(document);\r\n\r\n    // Find exact position of element\r\n    function isWindow(obj) {\r\n        return obj !== null && obj === obj.window;\r\n    }\r\n\r\n    function getWindow(elem) {\r\n        return isWindow(elem) ? elem : elem.nodeType === 9 && elem.defaultView;\r\n    }\r\n\r\n    function offset(elem) {\r\n        var docElem, win,\r\n            box = {top: 0, left: 0},\r\n            doc = elem && elem.ownerDocument;\r\n\r\n        docElem = doc.documentElement;\r\n\r\n        if (typeof elem.getBoundingClientRect !== typeof undefined) {\r\n            box ",
-      "apiHints": [
-        "http://fian.my.id/Waves",
-        "https://github.com/fians/Waves/blob/master/LICENSE",
-        "http://kenwheeler.github.io",
-        "http://kenwheeler.github.io/slick",
-        "http://github.com/kenwheeler/slick",
-        "http://github.com/kenwheeler/slick/issues",
-        "http://horizon-swiper.sebsauer.de/",
-        "http://www.sebsauer.de/",
-        "https://github.com/sebsauer90/horizon-swiper/blob/master/LICENSE",
-        "https://github.com/conradfeyt/Simple-Marquee",
-        "https://github.com/eternicode/bootstrap-datepicker)",
-        "http://www.apache.org/licenses/LICENSE-2.0)"
-      ]
-    },
-    {
-      "url": "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-min.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 51481,
-      "snippet": "// @codekit-append \"main.js\";\r\n\r\n(function ($) {\r\n    /* $ rappresenta la nostra versione di jQuery, abbiamo dichiarato la variabile nell'head dell'html, subito dopo l'inclusione di jQuery */\r\n\r\n    /* Variabili globali */\r\n    window.isMobile = false;\r\n\r\n    /* Funzioni Globali */\r\n    var responsiveResize = function () {\r\n        if (window.matchMedia(\"(max-width: 1023px)\").matches) {\r\n            $('body')\r\n                .addClass('cc-mobile')\r\n                .removeClass('cc-desktop');\r\n            window.isMobile = true;\r\n        } else {\r\n            $('body')\r\n                .addClass('cc-desktop')\r\n                .removeClass('cc-mobile');\r\n            window.isMobile = false;\r\n        }\r\n\r\n        visualSliderMobile();\r\n\r\n        sponsorSlider();\r\n\r\n        initSectionPlayMobileSlider();\r\n\r\n        initPromoCorsoMobileSlider();\r\n\r\n        initCompetitionsMobileSlider();\r\n\r\n    };\r\n\r\n    var syncSearchBars = function () {\r\n        var dest;\r\n        var source;\r\n        if",
-      "apiHints": [
-        "http://erik.io/blog/2014/03/04/definitive-guide-to-cookie-domains/",
-        "http://w3c.github.io/aria-in-html/)"
-      ]
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/messageBox.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 1923,
-      "snippet": "(function ($) {\r\n\t$(function () {\r\n\t\tvar selector = \"div#errorMessageBox\";\r\n\t\tvar createDom = function () {\r\n\t\t\tif ($(\"div#errorMessageBox\").length === 0) {\r\n\t\t\t\tvar mainDiv =\r\n\t\t\t\t\t'<div class=\"cc-overlay-message\" id=\"errorMessageBox\">' +\r\n\t\t\t\t\t'   <div class=\"cc-container\">' +\r\n\t\t\t\t\t'       <div class=\"cc-content-box-share\">' +\r\n\t\t\t\t\t'           <div class=\"cc-content-main\">' +\r\n\t\t\t\t\t'               <div class=\"cc-close-overlay cc-button-close\">' +\r\n\t\t\t\t\t'                   <div class=\"cc-svg cc-svg-close-primary-color\"><span>Chiudi</span></div>' +\r\n\t\t\t\t\t'               </div>' +\r\n\t\t\t\t\t'               <div class=\"cc-content-message\">' +\r\n\t\t\t\t\t'                   <p class=\"cc-title\"></p>' +\r\n\t\t\t\t\t'                   <p class=\"cc-text\"></p>' +\r\n\t\t\t\t\t'               </div>' +\r\n\t\t\t\t\t'            </div>' +\r\n\t\t\t\t\t'        </div>' +\r\n\t\t\t\t\t'    </div>' +\r\n\t\t\t\t\t'</div>';\r\n\t\t\t\t$(\"body\").prepend(mainDiv);\r\n\t\t\t}\r\n\t\t}\r\n\t\tcreateDom();\r\n\r\n\t\tvar show = function () {\r\n\t\t\t$(selector).fadeIn(200);\r\n\t\t}",
-      "apiHints": []
-    },
-    {
-      "url": "https://www.fitp.it/Areas/Federtennis/Scripts/subscribe-newsletter.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 6411,
-      "snippet": "(function ($) {\r\n\r\n    function isEmail(email) {\r\n        var regex = /^([a-zA-Z0-9_.+-])+\\@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$/;\r\n        return regex.test(email);\r\n    }\r\n\r\n\t$(document).on('click', '#viewSubscribeToNewsletter', function (event) {\r\n\t\tvar emailAddress = $(\"#newsletterAddressTmp\").val();\r\n        var errors = '';\r\n        if (!isEmail(emailAddress)) {\r\n            errors += \"E' necessario inserire una mail valida\\n\";\r\n        }\t\r\n        if (errors) {\r\n            MessageBox(\"Attenzione\", errors);\r\n            return;\r\n        }\r\n\t\tvar popuUp = '<div  id=\"popup\" class=\"cc-overlay cc-overlay-purchase cc-overlay-newsletter\" style=\"display: block;\">' +\r\n\t\t\t'   <div class=\"cc-overlay-main cc-overlay-main-small\"   style=\"background: white;\"  >' +\r\n\t\t\t'      <div class=\"cc-close-button\">' +\r\n\t\t\t'         <div class=\"cc-svg cc-svg-close-primary-color jq-popup-close\"><span>Chiudi</span></div>' +\r\n\t\t\t'      </div>' +\r\n\t\t\t'      <section class=\"cc-purchase-contents\">' +\r\n\t\t\t",
-      "apiHints": [
-        "https://dp-fit-prod-function.azurewebsites.net/api/v3/generic/newsletter/subscribe"
-      ]
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/saveFavorite.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 18493,
-      "snippet": "(function ($) {\r\n  $(function () {\r\n    var itemsChecked = new Array();\r\n\r\n    function initSaveFavoriteButtonsPlugin() {\r\n      var updateSaveFavoriteButtons = function () {\r\n        $(\".jq_save_favorite\").each(function () {\r\n          var itemId = $(this).attr(\"jq_item_id\");\r\n\r\n          if (itemId !== null && itemId !== undefined && itemId !== \"\") {\r\n            if (itemsChecked.indexOf(itemId) > -1) {\r\n              // already checked\r\n            } else {\r\n              //console.info(itemId);\r\n\r\n              itemsChecked.push(itemId);\r\n\r\n              updateSingleItem(this);\r\n            }\r\n          }\r\n        });\r\n      };\r\n\r\n      updateSaveFavoriteButtons();\r\n\r\n      //$(\".jq_save_favorite\").off(\"click\");\r\n    }\r\n\r\n    window.initSaveFavoriteButtonsPlugin = initSaveFavoriteButtonsPlugin;\r\n\r\n    $(document).on(\"click\", \".jq_save_favorite\", function (event) {\r\n      console.log(\"click classe jq\");\r\n      event.preventDefault(); // Impedisce il comportamento predefinito del lin",
-      "apiHints": [
-        "https://my.fitp.it",
-        "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/list",
-        "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/add",
-        "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/del"
-      ]
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/virtualgoods-cache.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 834,
-      "snippet": "(function ($) {\r\n\r\n    window.areVirtualGoodsAlreadyPaid = function() {\r\n        $(\".jq-virtual-good\").each(function () {\r\n            var itemId = $(this).attr(\"data-id\");\r\n            var clientVirtualGoods = window.readCookie(\"FitVirtualGoodsCookie\");\r\n            if (clientVirtualGoods.toUpperCase().indexOf(itemId.toUpperCase()) >= 0) {\r\n\r\n                $(this).replaceWith('<div class=\"cc-content-purchased-icon\" style=\"display:block\">' +\r\n                    '                <div class=\"cc-svg cc-svg-purchased\"><span>Acquistato</span></div>' +\r\n                    '                <span class=\"cc-text\"><strong>Acquistato</strong></span>' +\r\n                    '            </div>');\r\n            }\r\n        });\r\n    };\r\n\r\n    \r\n    $(function () {\r\n        window.areVirtualGoodsAlreadyPaid();\r\n    });\r\n\r\n})(jQueryV2);",
-      "apiHints": []
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/cookieconsent.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 0,
-      "snippet": "",
-      "apiHints": []
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/client.min.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 55519,
-      "snippet": "(function (f) {\r\n    var d, e, p = function () { d = (new (window.UAParser || exports.UAParser)).getResult(); e = new Detector; return this }; p.prototype = {\r\n        getSoftwareVersion: function () { return \"0.1.11\" }, getBrowserData: function () { return d }, getFingerprint: function () {\r\n            var b = d.ua, c = this.getScreenPrint(), a = this.getPlugins(), g = this.getFonts(), n = this.isLocalStorage(), f = this.isSessionStorage(), h = this.getTimeZone(), u = this.getLanguage(), m = this.getSystemLanguage(), e = this.isCookie(), C = this.getCanvasPrint(); return murmurhash3_32_gc(b + \"|\" +\r\n                c + \"|\" + a + \"|\" + g + \"|\" + n + \"|\" + f + \"|\" + h + \"|\" + u + \"|\" + m + \"|\" + e + \"|\" + C, 256)\r\n        }, getCustomFingerprint: function () { for (var b = \"\", c = 0; c < arguments.length; c++)b += arguments[c] + \"|\"; return murmurhash3_32_gc(b, 256) }, getUserAgent: function () { return d.ua }, getUserAgentLowerCase: function () { return d.ua.toLowerCase() }, getBrowse",
-      "apiHints": [
-        "http://java.com/dt-redirect",
-        "http://java.com/dt-redirect?",
-        "http://java.com/js/webstart.png",
-        "http://java.com/js/webstart.png"
-      ]
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/social-sharer.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 6306,
-      "snippet": "(function ($) {\r\n  console.log(\"TEST SHARE NEWS\");\r\n  $(function () {\r\n    // Inizializzazione: rimuove eventuali stili inline e mostra il box nuvola-share\r\n    $(document).ready(function () {\r\n      document.querySelectorAll(\".nuvola-share\").forEach(el => el.removeAttribute(\"style\"));\r\n      $(\".nuvola-share\").removeClass(\"d-none\");\r\n      $(\".jq_share_news\").each(function () {\r\n        this.style.setProperty(\"display\", \"inline\", \"important\");\r\n      });\r\n    });\r\n\r\n    // Gestione dei click sulla prima area e sulle altre 3 aree\r\n    $('#col_hero_area > a:first').on('click', function(e) {\r\n      console.log(\"Click dalla prima area\");\r\n    });\r\n    $('#col_hero_area .col-4 a').on('click', function(e) {\r\n      console.log(\"Click dalle altre 3 aree\");\r\n    });\r\n\r\n    // Gestione del click sull'icona share\r\n    $(\".jq_share_news\").on(\"click\", function (event) {\r\n      event.preventDefault();\r\n      event.stopPropagation();\r\n    \r\n      // Recupera gli attributi utili\r\n      var itemId = $",
-      "apiHints": [
-        "/api/sitecore/ShareAnalytics/Index"
-      ]
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/custom-analytics.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 10332,
-      "snippet": "var cookieSettings = [];\r\n\r\n//var _iub = _iub || [];\r\n//_iub.csConfiguration = {\"countryDetection\":true,\"invalidateConsentWithoutLog\":true,\"reloadOnConsent\":true,\"consentOnContinuedBrowsing\":false,\"enableTcf\":true,\"googleAdditionalConsentMode\":true,\"whitelabel\":false,\"lang\":\"it\",\"siteId\":2229768,\"cookiePolicyId\":41507304,\"cookiePolicyUrl\":\"https://www.fitp.it/Privacy-Policy-Simple\", \"banner\":{ \"acceptButtonDisplay\":true,\"customizeButtonDisplay\":true,\"acceptButtonColor\":\"#48d7f1\",\"acceptButtonCaptionColor\":\"white\",\"customizeButtonColor\":\"rgba(33.78, 33.78, 33.78, 0.69)\",\"customizeButtonCaptionColor\":\"white\",\"rejectButtonColor\":\"#d5d5d5\",\"rejectButtonCaptionColor\":\"white\",\"position\":\"float-bottom-center\",\"textColor\":\"#000000\",\"backgroundColor\":\"#ffffff\",\"explicitWithdrawal\":true,\"rejectButtonDisplay\":true,\"closeButtonRejects\":true }};\r\n\r\nvar _iub = _iub || [];\r\n\r\n_iub.csConfiguration = {\r\n    \"countryDetection\": true,\r\n    \"consentOnContinuedBrowsing\": false,\r\n    \"enableCMP\": true,\r\n   ",
-      "apiHints": [
-        "https://www.fitp.it/Privacy-Policy-Simple",
-        "https://www.federtennis.it/Privacy-Policy-Simple",
-        "https://cdn.shareaholic.net/assets/pub/shareaholic.js",
-        "https://cdn.shareaholic.net/assets/pub/shareaholic.js"
-      ]
-    },
-    {
-      "url": "https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 31,
-      "snippet": "Hello World!! (oss.maxcdn.com)\n",
-      "apiHints": []
-    },
-    {
-      "url": "https://oss.maxcdn.com/respond/1.4.2/respond.min.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 31,
-      "snippet": "Hello World!! (oss.maxcdn.com)\n",
-      "apiHints": []
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/antiforgery-init.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 665,
-      "snippet": "(function ($) {\r\n    var token = $('input[name=\"__RequestVerificationToken\"]').val();\r\n    /*\r\n    $.ajaxPrefilter(function (options, originalOptions) {\r\n        if (options.type.toUpperCase() === \"POST\") {\r\n\r\n            if (options.data === null || options.data === undefined) {\r\n                options.data = new FormData();\r\n            }\r\n\r\n            if (options.data instanceof FormData) {\r\n\r\n                options.data.append('__RequestVerificationToken', token);\r\n\r\n            } else {\r\n\r\n                options.data = $.param($.extend(originalOptions.data, { __RequestVerificationToken: token }));\r\n            }\r\n        }\r\n    });*/\r\n})(jQueryV2);",
-      "apiHints": []
-    },
-    {
-      "url": "https://cdn.jsdelivr.net/npm/bluebird@3.7.2/js/browser/bluebird.min.js",
-      "status": 200,
-      "contentType": "application/javascript; charset=utf-8",
-      "length": 81530,
-      "snippet": "/* @preserve\n * The MIT License (MIT)\n * \n * Copyright (c) 2013-2018 Petka Antonov\n * \n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, subject to the following conditions:\n * \n * The above copyright notice and this permission notice shall be included in\n * all copies or substantial portions of the Software.\n * \n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY,",
-      "apiHints": [
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/rRqMUw",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n",
-        "http://goo.gl/MqrFmX\\n"
-      ]
-    },
-    {
-      "url": "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
-      "status": 200,
-      "contentType": "text/javascript",
-      "length": 130363,
-      "snippet": "/*! msal v1.4.6 2021-02-09 */\n\"use strict\";!function(e,t){\"object\"==typeof exports&&\"object\"==typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(\"Msal\",[],t):\"object\"==typeof exports?exports.Msal=t():e.Msal=t()}(self,(function(){return e={795:(e,t)=>{\n/*! *****************************************************************************\nCopyright (c) Microsoft Corporation. All rights reserved.\nLicensed under the Apache License, Version 2.0 (the \"License\"); you may not use\nthis file except in compliance with the License. You may obtain a copy of the\nLicense at http://www.apache.org/licenses/LICENSE-2.0\n\nTHIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\nKIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED\nWARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,\nMERCHANTABLITY OR NON-INFRINGEMENT.\n\nSee the Apache Version 2.0 License for specific language governing permissions\nand limitations under the ",
-      "apiHints": [
-        "http://www.apache.org/licenses/LICENSE-2.0",
-        "https://login.microsoftonline.com/common",
-        "https://github.com/AzureAD/microsoft-authentication-library-for-js/wiki/MSAL-basics.",
-        "https://github.com/AzureAD/microsoft-authentication-library-for-js/wiki/MSAL-basics.",
-        "https://login.microsoftonline.com/common/"
-      ]
-    },
-    {
-      "url": "https://www.fitp.it/Areas/Fitp/js/f_adb2c_sso_2025_v2.js",
-      "status": 404,
-      "contentType": "text/html; charset=utf-8",
-      "length": 4978,
-      "snippet": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\"> \n<html xmlns=\"http://www.w3.org/1999/xhtml\"> \n<head> \n<title>IIS 10.0 Detailed Error - 404.0 - Not Found</title> \n<style type=\"text/css\"> \n<!-- \nbody{margin:0;font-size:.7em;font-family:Verdana,Arial,Helvetica,sans-serif;} \ncode{margin:0;color:#006600;font-size:1.1em;font-weight:bold;} \n.config_source code{font-size:.8em;color:#000000;} \npre{margin:0;font-size:1.4em;word-wrap:break-word;} \nul,ol{margin:10px 0 10px 5px;} \nul.first,ol.first{margin-top:5px;} \nfieldset{padding:0 15px 10px 15px;word-break:break-all;} \n.summary-container fieldset{padding-bottom:5px;margin-top:4px;} \nlegend.no-expand-all{padding:2px 15px 4px 10px;margin:0 0 0 -12px;} \nlegend{color:#333333;;margin:4px 0 8px -12px;_margin-top:0px; \nfont-weight:bold;font-size:1em;} \na:link,a:visited{color:#007EFF;font-weight:bold;} \na:hover{text-decoration:none;} \nh1{font-size:2.4em;margin:0;color:#FFF;} \nh2{font-size:1.",
-      "apiHints": [
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd",
-        "http://www.w3.org/1999/xhtml",
-        "http://go.microsoft.com/fwlink/?LinkID=66439",
-        "https://www.fitp.it:443/Areas/Fitp/js/f_adb2c_sso_2025_v2.js",
-        "https://go.microsoft.com/fwlink/?LinkID=62293&amp;IIS70Error=404,0,0x80070002,17763"
-      ]
-    },
-    {
-      "url": "https://www.fitp.it/Scripts/f_fingerprint_old.js",
-      "status": 200,
-      "contentType": "application/javascript",
-      "length": 329,
-      "snippet": "  /* var clientJs = new ClientJS();\r\n    var fingerprint = clientJs.getFingerprint();\r\n    var now = new Date();\r\n    now.setMinutes(now.getMinutes() + 120);\r\n    document.cookie =\r\n        \"CLIENT_FINGERPRINT=\" +\r\n        fingerprint +\r\n        \"; expires=\" +\r\n        now.toUTCString() +\r\n        \";Navigating=true;Path=/\";\r\n*/",
-      "apiHints": []
-    },
-    {
-      "url": "https://www.googletagservices.com/tag/js/gpt.js",
-      "status": 200,
-      "contentType": "text/javascript; charset=UTF-8",
-      "length": 118308,
-      "snippet": "(function(sttc){var window=this;if(window.googletag&&googletag.evalScripts){googletag.evalScripts();}if(window.googletag&&googletag._loaded_)return;var aa,q,ba=typeof Object.create==\"function\"?Object.create:function(a){var b=function(){};b.prototype=a;return new b},ca=typeof Object.defineProperties==\"function\"?Object.defineProperty:function(a,b,c){if(a==Array.prototype||a==Object.prototype)return a;a[b]=c.value;return a},da=function(a){a=[\"object\"==typeof globalThis&&globalThis,a,\"object\"==typeof window&&window,\"object\"==typeof self&&self,\"object\"==typeof global&&global];for(var b=0;b<a.length;++b){var c=a[b];if(c&&c.Math==Math)return c}throw Error(\"Cannot find global object\");},ea=da(this),fa=typeof Symbol===\"function\"&&typeof Symbol(\"x\")===\"symbol\",v={},ha={},w=function(a,b,c){if(!c||a!=null){c=ha[b];if(c==null)return a[b];c=a[c];return c!==void 0?c:a[b]}},x=function(a,b,c){if(b)a:{var d=a.split(\".\");a=d.length===1;var e=d[0],f;!a&&e in v?f=v:f=ea;for(e=0;e<d.length-1;e++){var g=d[e]",
-      "apiHints": [
-        "https://pagead2.googlesyndication.com/pagead/gen_204?id=rcs_internal",
-        "https://pagead2.googlesyndication.com/pagead/ping",
-        "https://pagead2.googlesyndication.com/pagead/managed/dict/",
-        "https://securepubads.g.doubleclick.net/pagead/managed/dict/",
-        "https://pagead2.googlesyndication.com/pagead/js/err_rep.js",
-        "https://pagead2.googlesyndication.com/pagead/gen_204?id=plmetrics",
-        "https://pagead2.googlesyndication.com/pagead/managed/js/gpt/",
-        "https://securepubads.g.doubleclick.net/pagead/managed/js/gpt/",
-        "https://pagead2.googlesyndication.com/pagead/ppub_config",
-        "https://securepubads.g.doubleclick.net/pagead/ppub_config"
+      "testCard": "7578095942",
+      "encoded": "NzU3ODA5NTk0Mg==",
+      "url": "https://www.fitp.it/Pagina-Giocatore/?cardNumber=NzU3ODA5NTk0Mg%3D%3D",
+      "page": {
+        "status": 200,
+        "contentType": "text/html",
+        "length": 52783,
+        "title": "Federtennis",
+        "textSnippet": "Federtennis SCHEDA GIOCATORE Tennis Padel Beach Pickleball TORNA AI RISULTATI DI RICERCA GIOCATORE {{PLAYER}} Atleta agonista Tessera FITP {{CARDNUMBER}} Circolo di appartenenza {{CLUB}} Best rank nel {{MAXRANKDATE}} {{MAXRANK}} Classifica {{RANK}} Categoria {{CATEGORY}} Carriera Partite vinte 0 0 perse giocate 0 Tornei giocati 0 Game vinti 0 0 persi giocati 0 Per visualizzare le statistiche è necessario essere un utente registrato e tesserato Accedi e visualizza Totale Tornei Campionati Manifestazioni Dati non disponibili Partite 0 vinte perse 0 Vinte 0 2 set 0 3 set 0 per assenza 0 per ritiro Perse 0 2 set 0 3 set 0 per assenza 0 per ritiro Vinte 0 Perse 0 vinte Singolo perse 0 0 Doppio 0 0 singolo 0 0 doppio Partite giocate Set 0 vinte perse 0 Focus tie-break 0 Tie-break vinti 0 Tie-break persi Focus bagels 0 Set vinti 6-0 o 4-0 0 Set persi 0-6 o 4-0 vinti Singolo persi 0 0 Doppio 0 0 Game Singolo 0 vinti persi 0 Doppio 0 vinti persi 0 vinti Totali persi 0 0 Ranking avversario Giocate Vinte Perse (Attenzione: I dati statistici si riferiscono alla classifica dell'avversario ad inizio della competizione, si evidenzia che i dati esposti non impattano sul calcolo delle classifiche) Andamento Dati non disponibili Best rank Storico classifica Partite vinte Singolo perse 0 0 Doppio 0 0 Totale Singolo Doppio Partite giocate singolo 0 0 doppio Set Singolo 0 vinti persi 0 Doppio 0 vinti persi 0 vinti Totali persi 0 0 Game Singolo 0 vinti persi 0 Doppio 0 vinti persi 0 vinti Totali persi 0 0 Ranking avversario Partite Set giocate vinte perse Vinte 0 2 set 0 3 set 0 per assenza 0 per ritiro Perse 0 2 set 0 3 set 0 per assenza 0 per ritiro Vinte 0 Perse 0 giocati vinti persi Focus bagels 0 Set vinti 6-0 0 Set persi 0-6 Focus tie-break 0 Tie-break vinti 0 Tie-break persi Focus Partite Set giocate vinte perse Vinte 0 2 set 0 3 set 0 per assenza 0 per ritiro Perse 0 2 set 0 3 set 0 per assenza 0 per ritiro Vinte 0 Perse 0 giocati vinti persi Focus bagels 0 Set vinti 6-0 0 Set persi 0-6 Focus tie-break 0 Tie-break vinti 0 Tie-break persi Attività &times; Storico classifica Chiudi",
+        "hasPlaceholders": true,
+        "scriptCount": 43,
+        "scripts": [
+          "https://cdn.jsdelivr.net/npm/vue@2.6.11",
+          "https://www.fitp.it/Scripts/axios.min.js",
+          "https://code.jquery.com/jquery-2.2.4.min.js",
+          "https://www.fitp.it/Scripts/initialize_jquery_v2.js",
+          "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/it.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js",
+          "https://www.fitp.it/Scripts/Common.js",
+          "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-init-min.js",
+          "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-min.js",
+          "https://www.fitp.it/Scripts/messageBox.js",
+          "https://www.fitp.it/Areas/Federtennis/Scripts/subscribe-newsletter.js",
+          "https://www.fitp.it/Scripts/saveFavorite.js",
+          "https://www.fitp.it/Scripts/virtualgoods-cache.js",
+          "https://www.fitp.it/Scripts/cookieconsent.js",
+          "https://www.fitp.it/Scripts/client.min.js",
+          "https://www.fitp.it/Scripts/social-sharer.js",
+          "https://www.fitp.it/Scripts/custom-analytics.js",
+          "https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js",
+          "https://oss.maxcdn.com/respond/1.4.2/respond.min.js",
+          "https://www.fitp.it/Scripts/antiforgery-init.js",
+          "https://cdn.jsdelivr.net/npm/bluebird@3.7.2/js/browser/bluebird.min.js",
+          "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
+          "https://www.fitp.it/Areas/Fitp/js/f_adb2c_sso_2025_v2.js",
+          "https://www.fitp.it/Scripts/f_fingerprint_old.js",
+          "https://www.googletagservices.com/tag/js/gpt.js",
+          "https://www.fitp.it/Scripts/f_banner.js",
+          "https://www.fitp.it/Scripts/fg_analytics.js",
+          "https://www.fitp.it/Scripts/f_appinsights.js",
+          "https://www.fitp.it/Scripts/f_cookie.js",
+          "https://www.fitp.it/Scripts/set_cookie.js",
+          "https://www.fitp.it/Scripts/f_general.js",
+          "https://www.fitp.it/Scripts/crossHeader.js",
+          "https://www.fitp.it/Scripts/searchBar.js",
+          "https://www.fitp.it/js/plugins/fancybox_v3/dist/jquery.fancybox.min.js",
+          "https://www.fitp.it/js/plugins/chartjs.2.3.0/Chart.js",
+          "https://www.fitp.it/js/plugins/chartjs.2.3.0/Chart.roundedBarCharts.js",
+          "https://www.fitp.it/Areas/Federtennis/Scripts/SearchPlayers/player-details_v7.2.2.js",
+          "https://www.fitp.it/Scripts/JSLINQ.js"
+        ],
+        "apiHints": [
+          "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css",
+          "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css",
+          "https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i",
+          "https://fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i",
+          "https://fonts.googleapis.com/css?family=Roboto+Slab:300,400,700",
+          "https://code.jquery.com/jquery-2.2.4.min.js",
+          "https://cdn.jsdelivr.net/npm/vue@2.6.11",
+          "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/it.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js",
+          "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js",
+          "https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js",
+          "https://oss.maxcdn.com/respond/1.4.2/respond.min.js",
+          "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
+          "https://www.googletagservices.com/tag/js/gpt.js",
+          "http://schema.org/WPHeader",
+          "https://www.fitp.it/Campionati-tornei-e-classifiche/Classifiche/Ricerca-Giocatore",
+          "http://www.w3.org/2000/svg",
+          "https://codepen.io/xgad/post/svg-radial-progress-meters",
+          "http://www.w3.org/1999/xlink",
+          "http://schema.org/WPFooter"
+        ],
+        "inlineSnippet": "\n\n\n\n\n\n\n\n\n\n\nmoment.locale('it');\nwindow.suppressAjaxError = true;\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\r\n\t\t\tjQueryV2(\"#top-header\").load(\"/common/top-header.html\");\r\n\t\t\n\r\n\t\tjQueryV2(\"#dynamic-top-menu\").load(\"/common/top-menu.html\");\r\n\t\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progressValue = document.querySelector('.cc-circle-graph-1 .cc-progress-value');\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar RADIUS = 54;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar CIRCUMFERENCE = 2 * Math.PI * RADIUS;\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tfunction progress(value) {\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progress = value / 100;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar dashoffset = CIRCUMFERENCE * (1 - progress);\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue.style.strokeDashoffset = dashoffset;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue.style.strokeDasharray = CIRCUMFERENCE;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t//progress(50); // Questa è la percentuale da toccare!! Il valore è la percentuale di sconfitte!\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progressValue2 = document.querySelector('.cc-circle-graph-2 .cc-progress-value');\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar RADIUS = 54;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar CIRCUMFERENCE = 2 * Math.PI * RADIUS;\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tfunction progress2(value) {\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar progress = value / 100;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tvar dashoffset = CIRCUMFERENCE * (1 - progress);\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue2.style.strokeDashoffset = dashoffset;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tprogressValue2.style.strokeDasharray = CIRCUMFERENCE;\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t//progress(50); // Questa è la percentuale da toccare!! Il valore è la percentuale di sconfitte!\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\tcreateAdvContent(\"div-gpt-ad-1529672065449-\", null, null, AdvertisementTypes[\"970x250FT\"], \"430140eb-01d3-450f-9724-ce35772d7200\");\r\n\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\tcreateAdvContent(null, \"div-gpt-ad-1529663467262-\", null, AdvertisementTypes[\"728x90\"], \"0efff14f-9ef7-49dd-bb0f-614dd746ffa1\");\r\n\t\t\t\t\t\t\t\n\r\n\t\t\t\t\t\t\t\tcreateAdvContent(null, null, \"div-gpt-ad-1529663467262-\", AdvertisementTypes[\"320x100\"], \"1c189970-b3f1-43ea-83d8-8bf17c764710\");\r\n\t\t\t\t\t\t\t\n\n\n\r\n\t\tjQueryV2(\"#div-footer\").load(\"/common/footer.html\");\r\n\t\n\r\n\t\tjQueryV2(\"#div-cookie\").load(\"/common/cookie.html\");\r\n\t"
+      },
+      "downloaded": [
+        {
+          "url": "https://cdn.jsdelivr.net/npm/vue@2.6.11",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 93670,
+          "snippet": "/*!\n * Vue.js v2.6.11\n * (c) 2014-2019 Evan You\n * Released under the MIT License.\n */\n!function(e,t){\"object\"==typeof exports&&\"undefined\"!=typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(t):(e=e||self).Vue=t()}(this,function(){\"use strict\";var e=Object.freeze({});function t(e){return null==e}function n(e){return null!=e}function r(e){return!0===e}function i(e){return\"string\"==typeof e||\"number\"==typeof e||\"symbol\"==typeof e||\"boolean\"==typeof e}function o(e){return null!==e&&\"object\"==typeof e}var a=Object.prototype.toString;function s(e){return\"[object Object]\"===a.call(e)}function c(e){var t=parseFloat(String(e));return t>=0&&Math.floor(t)===t&&isFinite(e)}function u(e){return n(e)&&\"function\"==typeof e.then&&\"function\"==typeof e.catch}function l(e){return null==e?\"\":Array.isArray(e)||s(e)&&e.toString===a?JSON.stringify(e,null,2):String(e)}function f(e){var t=parseFloat(e);return isNaN(t)?e:t}function p(e,t){for(var n=Object.create(null),r=e.split(\",\"),i=0;i<r.length;i++)n[r[i]]=!0;return t?function(e){return n[e.toLowerCase()]}:function(e){return n[e]}}var d=p(\"slot,component\",!0),v=p(\"key,ref,slot,slot-scope,is\");function h(e,t){if(e.length){var ",
+          "apiHints": [
+            "http://www.w3.org/1999/xlink",
+            "http://www.w3.org/2000/svg",
+            "http://www.w3.org/1998/Math/MathML"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/axios.min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 26498,
+          "snippet": "!function(e,t){\"object\"==typeof exports&&\"undefined\"!=typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(t):(e=\"undefined\"!=typeof globalThis?globalThis:e||self).axios=t()}(this,(function(){\"use strict\";function e(t){return e=\"function\"==typeof Symbol&&\"symbol\"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&\"function\"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?\"symbol\":typeof e},e(t)}function t(e,t){if(!(e instanceof t))throw new TypeError(\"Cannot call a class as a function\")}function n(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,\"value\"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r)}}function r(e,t,r){return t&&n(e.prototype,t),r&&n(e,r),Object.defineProperty(e,\"prototype\",{writable:!1}),e}function o(e,t){return function(){return e.apply(t,arguments)}}var i,s=Object.prototype.toString,a=Object.getPrototypeOf,u=(i=Object.create(null),function(e){var t=s.call(e);return i[t]||(i[t]=t.slice(8,-1).toLowerCase())}),c=function(e){return e=e.toLowerCase(),function(t){return u(t)===e}},f=function(t){return function(n){return e(n)===t}},l=Array.isArray,d=f(\"undefin",
+          "apiHints": []
+        },
+        {
+          "url": "https://code.jquery.com/jquery-2.2.4.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 85578,
+          "snippet": "/*! jQuery v2.2.4 | (c) jQuery Foundation | jquery.org/license */\n!function(a,b){\"object\"==typeof module&&\"object\"==typeof module.exports?module.exports=a.document?b(a,!0):function(a){if(!a.document)throw new Error(\"jQuery requires a window with a document\");return b(a)}:b(a)}(\"undefined\"!=typeof window?window:this,function(a,b){var c=[],d=a.document,e=c.slice,f=c.concat,g=c.push,h=c.indexOf,i={},j=i.toString,k=i.hasOwnProperty,l={},m=\"2.2.4\",n=function(a,b){return new n.fn.init(a,b)},o=/^[\\s\\uFEFF\\xA0]+|[\\s\\uFEFF\\xA0]+$/g,p=/^-ms-/,q=/-([\\da-z])/gi,r=function(a,b){return b.toUpperCase()};n.fn=n.prototype={jquery:m,constructor:n,selector:\"\",length:0,toArray:function(){return e.call(this)},get:function(a){return null!=a?0>a?this[a+this.length]:this[a]:e.call(this)},pushStack:function(a){var b=n.merge(this.constructor(),a);return b.prevObject=this,b.context=this.context,b},each:function(a){return n.each(this,a)},map:function(a){return this.pushStack(n.map(this,function(b,c){return a.call(b,c,b)}))},slice:function(){return this.pushStack(e.apply(this,arguments))},first:function(){return this.eq(0)},last:function(){return this.eq(-1)},eq:function(a){var b=this.length,c=+a+(0>a?b:0);ret",
+          "apiHints": [
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid",
+            "guid"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/initialize_jquery_v2.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 639,
+          "snippet": "window.jQueryV2 = jQuery.noConflict();\r\n(function ($) {\r\n\t$(document).ajaxError(function (event, jqXHR, ajaxSettings, thrownError) {\r\n        if (window.suppressAjaxError) return;\r\n        if (ajaxSettings.url.indexOf(\"ification\") >= 0 && jqXHR.status === 0) return; // <== suppress the misterious \"fica\" bug\r\n        var message = ajaxSettings.url +\r\n\t\t\t\" Failed with statusCode : \" +\r\n\t\t\tjqXHR.status +\r\n\t\t\t\"\\nstatusText: \" + jqXHR.statusText;\r\n\t\t//window.appInsights.trackTrace(message, { Url: ajaxSettings.url, StatusCode: jqXHR.status } , 3);\r\n\t\t//window.GenericErrorMessageBox();\r\n        console.error(message);\r\n\t});\r\n})(jQueryV2);",
+          "apiHints": []
+        },
+        {
+          "url": "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 37045,
+          "snippet": "/*!\n * Bootstrap v3.3.7 (http://getbootstrap.com)\n * Copyright 2011-2016 Twitter, Inc.\n * Licensed under the MIT license\n */\nif(\"undefined\"==typeof jQuery)throw new Error(\"Bootstrap's JavaScript requires jQuery\");+function(a){\"use strict\";var b=a.fn.jquery.split(\" \")[0].split(\".\");if(b[0]<2&&b[1]<9||1==b[0]&&9==b[1]&&b[2]<1||b[0]>3)throw new Error(\"Bootstrap's JavaScript requires jQuery version 1.9.1 or higher, but lower than version 4\")}(jQuery),+function(a){\"use strict\";function b(){var a=document.createElement(\"bootstrap\"),b={WebkitTransition:\"webkitTransitionEnd\",MozTransition:\"transitionend\",OTransition:\"oTransitionEnd otransitionend\",transition:\"transitionend\"};for(var c in b)if(void 0!==a.style[c])return{end:b[c]};return!1}a.fn.emulateTransitionEnd=function(b){var c=!1,d=this;a(this).one(\"bsTransitionEnd\",function(){c=!0});var e=function(){c||a(d).trigger(a.support.transition.end)};return setTimeout(e,b),this},a(function(){a.support.transition=b(),a.support.transition&&(a.event.special.bsTransitionEnd={bindType:a.support.transition.end,delegateType:a.support.transition.end,handle:function(b){if(a(b.target).is(this))return b.handleObj.handler.apply(this,arguments)}})})}(jQuer",
+          "apiHints": [
+            "http://getbootstrap.com)"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 33379,
+          "snippet": "/*!\n * Bootstrap-select v1.12.4 (http://silviomoreto.github.io/bootstrap-select)\n *\n * Copyright 2013-2017 bootstrap-select\n * Licensed under MIT (https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)\n */\n!function(a,b){\"function\"==typeof define&&define.amd?define([\"jquery\"],function(a){return b(a)}):\"object\"==typeof module&&module.exports?module.exports=b(require(\"jquery\")):b(a.jQuery)}(this,function(a){!function(a){\"use strict\";function b(b){var c=[{re:/[\\xC0-\\xC6]/g,ch:\"A\"},{re:/[\\xE0-\\xE6]/g,ch:\"a\"},{re:/[\\xC8-\\xCB]/g,ch:\"E\"},{re:/[\\xE8-\\xEB]/g,ch:\"e\"},{re:/[\\xCC-\\xCF]/g,ch:\"I\"},{re:/[\\xEC-\\xEF]/g,ch:\"i\"},{re:/[\\xD2-\\xD6]/g,ch:\"O\"},{re:/[\\xF2-\\xF6]/g,ch:\"o\"},{re:/[\\xD9-\\xDC]/g,ch:\"U\"},{re:/[\\xF9-\\xFC]/g,ch:\"u\"},{re:/[\\xC7-\\xE7]/g,ch:\"c\"},{re:/[\\xD1]/g,ch:\"N\"},{re:/[\\xF1]/g,ch:\"n\"}];return a.each(c,function(){b=b?b.replace(this.re,this.ch):\"\"}),b}function c(b){var c=arguments,d=b;[].shift.apply(c);var e,f=this.each(function(){var b=a(this);if(b.is(\"select\")){var f=b.data(\"selectpicker\"),g=\"object\"==typeof d&&d;if(f){if(g)for(var h in g)g.hasOwnProperty(h)&&(f.options[h]=g[h])}else{var i=a.extend({},l.DEFAULTS,a.fn.selectpicker.defaults||{},b.data(),g);i.template=",
+          "apiHints": [
+            "http://silviomoreto.github.io/bootstrap-select)",
+            "https://github.com/silviomoreto/bootstrap-select/blob/master/LICENSE)"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 32280,
+          "snippet": "/*!\n\nHolder - client side image placeholders\nVersion 2.9.4+cabil\n© 2016 Ivan Malopinsky - http://imsky.co\n\nSite:     http://holderjs.com\nIssues:   https://github.com/imsky/holder/issues\nLicense:  MIT\n\n*/\n!function(e){if(e.document){var t=e.document;t.querySelectorAll||(t.querySelectorAll=function(n){var r,i=t.createElement(\"style\"),o=[];for(t.documentElement.firstChild.appendChild(i),t._qsa=[],i.styleSheet.cssText=n+\"{x-qsa:expression(document._qsa && document._qsa.push(this))}\",e.scrollBy(0,0),i.parentNode.removeChild(i);t._qsa.length;)r=t._qsa.shift(),r.style.removeAttribute(\"x-qsa\"),o.push(r);return t._qsa=null,o}),t.querySelector||(t.querySelector=function(e){var n=t.querySelectorAll(e);return n.length?n[0]:null}),t.getElementsByClassName||(t.getElementsByClassName=function(e){return e=String(e).replace(/^|\\s+/g,\".\"),t.querySelectorAll(e)}),Object.keys||(Object.keys=function(e){if(e!==Object(e))throw TypeError(\"Object.keys called on non-object\");var t,n=[];for(t in e)Object.prototype.hasOwnProperty.call(e,t)&&n.push(t);return n}),Array.prototype.forEach||(Array.prototype.forEach=function(e){if(void 0===this||null===this)throw TypeError();var t=Object(this),n=t.length>>>0;if(\"fu",
+          "apiHints": [
+            "http://imsky.co",
+            "http://holderjs.com",
+            "https://github.com/imsky/holder/issues",
+            "http://www.w3.org/2000/svg",
+            "http://www.w3.org/2000/svg"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 51265,
+          "snippet": "!function(e,t){\"object\"==typeof exports&&\"undefined\"!=typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(t):e.moment=t()}(this,function(){\"use strict\";function e(){return Yt.apply(null,arguments)}function t(e){return e instanceof Array||\"[object Array]\"===Object.prototype.toString.call(e)}function n(e){return null!=e&&\"[object Object]\"===Object.prototype.toString.call(e)}function s(e){if(Object.getOwnPropertyNames)return 0===Object.getOwnPropertyNames(e).length;var t;for(t in e)if(e.hasOwnProperty(t))return!1;return!0}function i(e){return void 0===e}function r(e){return\"number\"==typeof e||\"[object Number]\"===Object.prototype.toString.call(e)}function a(e){return e instanceof Date||\"[object Date]\"===Object.prototype.toString.call(e)}function o(e,t){var n,s=[];for(n=0;n<e.length;++n)s.push(t(e[n],n));return s}function u(e,t){return Object.prototype.hasOwnProperty.call(e,t)}function l(e,t){for(var n in t)u(t,n)&&(e[n]=t[n]);return u(t,\"toString\")&&(e.toString=t.toString),u(t,\"valueOf\")&&(e.valueOf=t.valueOf),e}function d(e,t,n,s){return je(e,t,n,s,!0).utc()}function h(){return{empty:!1,unusedTokens:[],unusedInput:[],overflow:-2,charsLeftOver:0,nullInput:!1,i",
+          "apiHints": [
+            "http://momentjs.com/guides/#/warnings/define-locale/",
+            "http://momentjs.com/guides/#/warnings/add-inverted-param/",
+            "http://momentjs.com/guides/#/warnings/js-date/",
+            "http://momentjs.com/guides/#/warnings/min-max/",
+            "http://momentjs.com/guides/#/warnings/min-max/",
+            "http://momentjs.com/guides/#/warnings/zone/",
+            "http://momentjs.com/guides/#/warnings/dst-shifted/"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/locale/it.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 2257,
+          "snippet": "//! moment.js locale configuration\n//! locale : Italian [it]\n//! author : Lorenzo : https://github.com/aliem\n//! author: Mattia Larentis: https://github.com/nostalgiaz\n\n;(function (global, factory) {\n   typeof exports === 'object' && typeof module !== 'undefined'\n       && typeof require === 'function' ? factory(require('../moment')) :\n   typeof define === 'function' && define.amd ? define(['../moment'], factory) :\n   factory(global.moment)\n}(this, (function (moment) { 'use strict';\n\n\nvar it = moment.defineLocale('it', {\n    months : 'gennaio_febbraio_marzo_aprile_maggio_giugno_luglio_agosto_settembre_ottobre_novembre_dicembre'.split('_'),\n    monthsShort : 'gen_feb_mar_apr_mag_giu_lug_ago_set_ott_nov_dic'.split('_'),\n    weekdays : 'domenica_lunedì_martedì_mercoledì_giovedì_venerdì_sabato'.split('_'),\n    weekdaysShort : 'dom_lun_mar_mer_gio_ven_sab'.split('_'),\n    weekdaysMin : 'do_lu_ma_me_gi_ve_sa'.split('_'),\n    longDateFormat : {\n        LT : 'HH:mm',\n        LTS : 'HH:mm:ss',\n        L : 'DD/MM/YYYY',\n        LL : 'D MMMM YYYY',\n        LLL : 'D MMMM YYYY HH:mm',\n        LLLL : 'dddd, D MMMM YYYY HH:mm'\n    },\n    calendar : {\n        sameDay: '[Oggi alle] LT',\n        nex",
+          "apiHints": [
+            "https://github.com/aliem",
+            "https://github.com/nostalgiaz"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 5022,
+          "snippet": "/*! jQuery & Zepto Lazy v1.7.9 - http://jquery.eisbehr.de/lazy - MIT&GPL-2.0 license - Copyright 2012-2018 Daniel 'Eisbehr' Kern */\n!function(t,e){\"use strict\";function r(r,a,i,u,l){function f(){L=t.devicePixelRatio>1,i=c(i),a.delay>=0&&setTimeout(function(){s(!0)},a.delay),(a.delay<0||a.combined)&&(u.e=v(a.throttle,function(t){\"resize\"===t.type&&(w=B=-1),s(t.all)}),u.a=function(t){t=c(t),i.push.apply(i,t)},u.g=function(){return i=n(i).filter(function(){return!n(this).data(a.loadedName)})},u.f=function(t){for(var e=0;e<t.length;e++){var r=i.filter(function(){return this===t[e]});r.length&&s(!1,r)}},s(),n(a.appendScroll).on(\"scroll.\"+l+\" resize.\"+l,u.e))}function c(t){var i=a.defaultImage,o=a.placeholder,u=a.imageBase,l=a.srcsetAttribute,f=a.loaderAttribute,c=a._f||{};t=n(t).filter(function(){var t=n(this),r=m(this);return!t.data(a.handledName)&&(t.attr(a.attribute)||t.attr(l)||t.attr(f)||c[r]!==e)}).data(\"plugin_\"+a.name,r);for(var s=0,d=t.length;s<d;s++){var A=n(t[s]),g=m(t[s]),h=A.attr(a.imageBaseAttribute)||u;g===N&&h&&A.attr(l)&&A.attr(l,b(A.attr(l),h)),c[g]===e||A.attr(f)||A.attr(f,c[g]),g===N&&i&&!A.attr(E)?A.attr(E,i):g===N||!o||A.css(O)&&\"none\"!==A.css(O)||A.css(O,\"url('\"+o",
+          "apiHints": [
+            "http://jquery.eisbehr.de/lazy"
+          ]
+        },
+        {
+          "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 4412,
+          "snippet": "/*! jQuery & Zepto Lazy - All Plugins v1.7.9 - http://jquery.eisbehr.de/lazy - MIT&GPL-2.0 license - Copyright 2012-2018 Daniel 'Eisbehr' Kern */\n!function(t){function a(a,e,r,o){o=o?o.toUpperCase():\"GET\";var i;\"POST\"!==o&&\"PUT\"!==o||!a.config(\"ajaxCreateData\")||(i=a.config(\"ajaxCreateData\").apply(a,[e])),t.ajax({url:e.attr(\"data-src\"),type:\"POST\"===o||\"PUT\"===o?o:\"GET\",data:i,dataType:e.attr(\"data-type\")||\"html\",success:function(t){e.html(t),r(!0),a.config(\"removeAttribute\")&&e.removeAttr(\"data-src data-method data-type\")},error:function(){r(!1)}})}t.lazy(\"ajax\",function(t,e){a(this,t,e,t.attr(\"data-method\"))}),t.lazy(\"get\",function(t,e){a(this,t,e,\"GET\")}),t.lazy(\"post\",function(t,e){a(this,t,e,\"POST\")}),t.lazy(\"put\",function(t,e){a(this,t,e,\"PUT\")})}(window.jQuery||window.Zepto),function(t){t.lazy([\"av\",\"audio\",\"video\"],[\"audio\",\"video\"],function(a,e){var r=a[0].tagName.toLowerCase();if(\"audio\"===r||\"video\"===r){var o=a.find(\"data-src\"),i=a.find(\"data-track\"),n=0,c=function(){++n===o.length&&e(!1)},s=function(){var a=t(this),e=a[0].tagName.toLowerCase(),r=a.prop(\"attributes\"),o=t(\"data-src\"===e?\"<source>\":\"<track>\");\"data-src\"===e&&o.one(\"error\",c),t.each(r,function(t,a){o.attr(",
+          "apiHints": [
+            "http://jquery.eisbehr.de/lazy",
+            "https://player.vimeo.com/video/",
+            "https://www.youtube.com/embed/"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/Common.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 12590,
+          "snippet": "var scripts = document.querySelectorAll(\"script[src]\");\r\nscripts.forEach(function (script) {\r\n  if (\r\n    script.src === \"https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js\" ||\r\n    script.src === \"/Scripts/f_adb2c_sso_2024_v2.js\"\r\n  ) {\r\n    script.parentNode.removeChild(script);\r\n  }\r\n});\r\ndocument.write(\"<!-- INIZIO CODICE SSO -->\");\r\ndocument.write(\r\n  \"<lin\" +\r\n    'k rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css\" \"rel=\"stylesheet\"/>'\r\n);\r\ndocument.write(\r\n  \"<scr\" +\r\n    'ipt type=\"text/javascript\" src=\"https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.2/dist/fp.min.js\"></scr' +\r\n    \"ipt>\"\r\n);\r\ndocument.write(\r\n  \"<scr\" +\r\n    'ipt type=\"text/javascript\" src=\"https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@main/dist/es5/detectIncognito.min.js\" ></scr' +\r\n    \"ipt>\"\r\n);\r\ndocument.write(\r\n  \"<scr\" +\r\n    'ipt type=\"text/javascript\" src=\"/Scripts/estrazioneIdentificativo.js\" ></scr' +\r\n    \"ipt>\"\r\n);\r\n// document.write(\r\n//   \"<scr\" +\r\n//     'ipt type=\"text/javascript\" src=\"https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.6.0/lib/msal-browser.js\" ></scr' +\r\n//     \"ipt>\"\r\n// );\r\ndocument.writ",
+          "apiHints": [
+            "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css",
+            "https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3.4.2/dist/fp.min.js",
+            "https://cdn.jsdelivr.net/gh/Joe12387/detectIncognito@main/dist/es5/detectIncognito.min.js",
+            "https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.6.0/lib/msal-browser.js",
+            "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
+            "/api/sitecore/Common/GetOriginalImage"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-init-min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 183427,
+          "snippet": "/*!\r\n * Waves v0.6.4\r\n * http://fian.my.id/Waves\r\n *\r\n * Copyright 2014 Alfiana E. Sibuea and other contributors\r\n * Released under the MIT license\r\n * https://github.com/fians/Waves/blob/master/LICENSE\r\n */\r\n\r\n;(function(window) {\r\n    'use strict';\r\n\r\n    var waves_effect = \"we\";\r\n\r\n\tvar wavesElement = document.getElementsByClassName(\"we\");\r\n\tif (wavesElement.length == 0) return;\r\n\r\n    var Waves = Waves || {};\r\n    var $$ = document.querySelectorAll.bind(document);\r\n\r\n    // Find exact position of element\r\n    function isWindow(obj) {\r\n        return obj !== null && obj === obj.window;\r\n    }\r\n\r\n    function getWindow(elem) {\r\n        return isWindow(elem) ? elem : elem.nodeType === 9 && elem.defaultView;\r\n    }\r\n\r\n    function offset(elem) {\r\n        var docElem, win,\r\n            box = {top: 0, left: 0},\r\n            doc = elem && elem.ownerDocument;\r\n\r\n        docElem = doc.documentElement;\r\n\r\n        if (typeof elem.getBoundingClientRect !== typeof undefined) {\r\n            box = elem.getBoundingClientRect();\r\n        }\r\n        win = getWindow(doc);\r\n        return {\r\n            top: box.top + win.pageYOffset - docElem.clientTop,\r\n            left: box.left + win.pageXOffs",
+          "apiHints": [
+            "http://fian.my.id/Waves",
+            "https://github.com/fians/Waves/blob/master/LICENSE",
+            "http://kenwheeler.github.io",
+            "http://kenwheeler.github.io/slick",
+            "http://github.com/kenwheeler/slick",
+            "http://github.com/kenwheeler/slick/issues",
+            "http://horizon-swiper.sebsauer.de/",
+            "http://www.sebsauer.de/",
+            "https://github.com/sebsauer90/horizon-swiper/blob/master/LICENSE",
+            "https://github.com/conradfeyt/Simple-Marquee",
+            "https://github.com/eternicode/bootstrap-datepicker)",
+            "http://www.apache.org/licenses/LICENSE-2.0)"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Areas/Federtennis/Scripts/frontend-min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 51481,
+          "snippet": "// @codekit-append \"main.js\";\r\n\r\n(function ($) {\r\n    /* $ rappresenta la nostra versione di jQuery, abbiamo dichiarato la variabile nell'head dell'html, subito dopo l'inclusione di jQuery */\r\n\r\n    /* Variabili globali */\r\n    window.isMobile = false;\r\n\r\n    /* Funzioni Globali */\r\n    var responsiveResize = function () {\r\n        if (window.matchMedia(\"(max-width: 1023px)\").matches) {\r\n            $('body')\r\n                .addClass('cc-mobile')\r\n                .removeClass('cc-desktop');\r\n            window.isMobile = true;\r\n        } else {\r\n            $('body')\r\n                .addClass('cc-desktop')\r\n                .removeClass('cc-mobile');\r\n            window.isMobile = false;\r\n        }\r\n\r\n        visualSliderMobile();\r\n\r\n        sponsorSlider();\r\n\r\n        initSectionPlayMobileSlider();\r\n\r\n        initPromoCorsoMobileSlider();\r\n\r\n        initCompetitionsMobileSlider();\r\n\r\n    };\r\n\r\n    var syncSearchBars = function () {\r\n        var dest;\r\n        var source;\r\n        if (window.matchMedia(\"(max-width: 1023px)\").matches) {\r\n\r\n            dest = $(\".cc-header-desktop\").find(\"input[name=search-terms]\");\r\n            source = $(\".cc-header-mobile\").find(\"input[name=sear",
+          "apiHints": [
+            "Guid",
+            "http://erik.io/blog/2014/03/04/definitive-guide-to-cookie-domains/",
+            "http://w3c.github.io/aria-in-html/)"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/messageBox.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 1923,
+          "snippet": "(function ($) {\r\n\t$(function () {\r\n\t\tvar selector = \"div#errorMessageBox\";\r\n\t\tvar createDom = function () {\r\n\t\t\tif ($(\"div#errorMessageBox\").length === 0) {\r\n\t\t\t\tvar mainDiv =\r\n\t\t\t\t\t'<div class=\"cc-overlay-message\" id=\"errorMessageBox\">' +\r\n\t\t\t\t\t'   <div class=\"cc-container\">' +\r\n\t\t\t\t\t'       <div class=\"cc-content-box-share\">' +\r\n\t\t\t\t\t'           <div class=\"cc-content-main\">' +\r\n\t\t\t\t\t'               <div class=\"cc-close-overlay cc-button-close\">' +\r\n\t\t\t\t\t'                   <div class=\"cc-svg cc-svg-close-primary-color\"><span>Chiudi</span></div>' +\r\n\t\t\t\t\t'               </div>' +\r\n\t\t\t\t\t'               <div class=\"cc-content-message\">' +\r\n\t\t\t\t\t'                   <p class=\"cc-title\"></p>' +\r\n\t\t\t\t\t'                   <p class=\"cc-text\"></p>' +\r\n\t\t\t\t\t'               </div>' +\r\n\t\t\t\t\t'            </div>' +\r\n\t\t\t\t\t'        </div>' +\r\n\t\t\t\t\t'    </div>' +\r\n\t\t\t\t\t'</div>';\r\n\t\t\t\t$(\"body\").prepend(mainDiv);\r\n\t\t\t}\r\n\t\t}\r\n\t\tcreateDom();\r\n\r\n\t\tvar show = function () {\r\n\t\t\t$(selector).fadeIn(200);\r\n\t\t}\r\n\r\n\t\tvar hide = function () {\r\n\t\t    $(selector).fadeOut(200);\r\n\t\t    if (onCloseCallback != null) {\r\n\t\t        onCloseCallback();\r\n\t\t    }\r\n\t\t}\r\n\r\n\t\tvar onCloseCallback = null;\r\n\r\n\t\tvar messageBox =",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Areas/Federtennis/Scripts/subscribe-newsletter.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 6411,
+          "snippet": "(function ($) {\r\n\r\n    function isEmail(email) {\r\n        var regex = /^([a-zA-Z0-9_.+-])+\\@(([a-zA-Z0-9-])+\\.)+([a-zA-Z0-9]{2,4})+$/;\r\n        return regex.test(email);\r\n    }\r\n\r\n\t$(document).on('click', '#viewSubscribeToNewsletter', function (event) {\r\n\t\tvar emailAddress = $(\"#newsletterAddressTmp\").val();\r\n        var errors = '';\r\n        if (!isEmail(emailAddress)) {\r\n            errors += \"E' necessario inserire una mail valida\\n\";\r\n        }\t\r\n        if (errors) {\r\n            MessageBox(\"Attenzione\", errors);\r\n            return;\r\n        }\r\n\t\tvar popuUp = '<div  id=\"popup\" class=\"cc-overlay cc-overlay-purchase cc-overlay-newsletter\" style=\"display: block;\">' +\r\n\t\t\t'   <div class=\"cc-overlay-main cc-overlay-main-small\"   style=\"background: white;\"  >' +\r\n\t\t\t'      <div class=\"cc-close-button\">' +\r\n\t\t\t'         <div class=\"cc-svg cc-svg-close-primary-color jq-popup-close\"><span>Chiudi</span></div>' +\r\n\t\t\t'      </div>' +\r\n\t\t\t'      <section class=\"cc-purchase-contents\">' +\r\n\t\t\t'         <div class=\"cc-content-title cc-content-title-feedback\">' +\r\n\t\t\t'            <h1 class=\"cc-purchase-main-title\" style=\"color:#222225\">Iscriviti alla nostra newsletter</h1>' +\r\n\t\t\t'          ",
+          "apiHints": [
+            "Iscri",
+            "Iscri",
+            "https://dp-fit-prod-function.azurewebsites.net/api/v3/generic/newsletter/subscribe",
+            "iscri",
+            "iscri"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/saveFavorite.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 18493,
+          "snippet": "(function ($) {\r\n  $(function () {\r\n    var itemsChecked = new Array();\r\n\r\n    function initSaveFavoriteButtonsPlugin() {\r\n      var updateSaveFavoriteButtons = function () {\r\n        $(\".jq_save_favorite\").each(function () {\r\n          var itemId = $(this).attr(\"jq_item_id\");\r\n\r\n          if (itemId !== null && itemId !== undefined && itemId !== \"\") {\r\n            if (itemsChecked.indexOf(itemId) > -1) {\r\n              // already checked\r\n            } else {\r\n              //console.info(itemId);\r\n\r\n              itemsChecked.push(itemId);\r\n\r\n              updateSingleItem(this);\r\n            }\r\n          }\r\n        });\r\n      };\r\n\r\n      updateSaveFavoriteButtons();\r\n\r\n      //$(\".jq_save_favorite\").off(\"click\");\r\n    }\r\n\r\n    window.initSaveFavoriteButtonsPlugin = initSaveFavoriteButtonsPlugin;\r\n\r\n    $(document).on(\"click\", \".jq_save_favorite\", function (event) {\r\n      console.log(\"click classe jq\");\r\n      event.preventDefault(); // Impedisce il comportamento predefinito del link\r\n      event.stopPropagation(); // Impedisce che il click si propaghi all'anchor\r\n      console.log(this);\r\n      if (!localStorage.getItem(\"Token\")) {\r\n        console.log(\"TOKEN\");\r\n        showPo",
+          "apiHints": [
+            "guid",
+            "https://my.fitp.it",
+            "Guid",
+            "Guid",
+            "Guid",
+            "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/list",
+            "guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/add",
+            "guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "https://dp-fit-prod-function.azurewebsites.net/api/v6/player/favourites/del",
+            "guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "guid",
+            "Guid",
+            "Guid",
+            "guid",
+            "Guid"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/virtualgoods-cache.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 834,
+          "snippet": "(function ($) {\r\n\r\n    window.areVirtualGoodsAlreadyPaid = function() {\r\n        $(\".jq-virtual-good\").each(function () {\r\n            var itemId = $(this).attr(\"data-id\");\r\n            var clientVirtualGoods = window.readCookie(\"FitVirtualGoodsCookie\");\r\n            if (clientVirtualGoods.toUpperCase().indexOf(itemId.toUpperCase()) >= 0) {\r\n\r\n                $(this).replaceWith('<div class=\"cc-content-purchased-icon\" style=\"display:block\">' +\r\n                    '                <div class=\"cc-svg cc-svg-purchased\"><span>Acquistato</span></div>' +\r\n                    '                <span class=\"cc-text\"><strong>Acquistato</strong></span>' +\r\n                    '            </div>');\r\n            }\r\n        });\r\n    };\r\n\r\n    \r\n    $(function () {\r\n        window.areVirtualGoodsAlreadyPaid();\r\n    });\r\n\r\n})(jQueryV2);",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/cookieconsent.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 0,
+          "snippet": "",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/client.min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 55519,
+          "snippet": "(function (f) {\r\n    var d, e, p = function () { d = (new (window.UAParser || exports.UAParser)).getResult(); e = new Detector; return this }; p.prototype = {\r\n        getSoftwareVersion: function () { return \"0.1.11\" }, getBrowserData: function () { return d }, getFingerprint: function () {\r\n            var b = d.ua, c = this.getScreenPrint(), a = this.getPlugins(), g = this.getFonts(), n = this.isLocalStorage(), f = this.isSessionStorage(), h = this.getTimeZone(), u = this.getLanguage(), m = this.getSystemLanguage(), e = this.isCookie(), C = this.getCanvasPrint(); return murmurhash3_32_gc(b + \"|\" +\r\n                c + \"|\" + a + \"|\" + g + \"|\" + n + \"|\" + f + \"|\" + h + \"|\" + u + \"|\" + m + \"|\" + e + \"|\" + C, 256)\r\n        }, getCustomFingerprint: function () { for (var b = \"\", c = 0; c < arguments.length; c++)b += arguments[c] + \"|\"; return murmurhash3_32_gc(b, 256) }, getUserAgent: function () { return d.ua }, getUserAgentLowerCase: function () { return d.ua.toLowerCase() }, getBrowser: function () { return d.browser.name }, getBrowserVersion: function () { return d.browser.version }, getBrowserMajorVersion: function () { return d.browser.major }, isIE: function () { return /IE/i.",
+          "apiHints": [
+            "http://java.com/dt-redirect",
+            "http://java.com/dt-redirect?",
+            "http://java.com/js/webstart.png",
+            "http://java.com/js/webstart.png"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/social-sharer.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 6306,
+          "snippet": "(function ($) {\r\n  console.log(\"TEST SHARE NEWS\");\r\n  $(function () {\r\n    // Inizializzazione: rimuove eventuali stili inline e mostra il box nuvola-share\r\n    $(document).ready(function () {\r\n      document.querySelectorAll(\".nuvola-share\").forEach(el => el.removeAttribute(\"style\"));\r\n      $(\".nuvola-share\").removeClass(\"d-none\");\r\n      $(\".jq_share_news\").each(function () {\r\n        this.style.setProperty(\"display\", \"inline\", \"important\");\r\n      });\r\n    });\r\n\r\n    // Gestione dei click sulla prima area e sulle altre 3 aree\r\n    $('#col_hero_area > a:first').on('click', function(e) {\r\n      console.log(\"Click dalla prima area\");\r\n    });\r\n    $('#col_hero_area .col-4 a').on('click', function(e) {\r\n      console.log(\"Click dalle altre 3 aree\");\r\n    });\r\n\r\n    // Gestione del click sull'icona share\r\n    $(\".jq_share_news\").on(\"click\", function (event) {\r\n      event.preventDefault();\r\n      event.stopPropagation();\r\n    \r\n      // Recupera gli attributi utili\r\n      var itemId = $(this).attr(\"jq_item_id\");\r\n      var dynamicUrl = $(this).attr(\"data-url\");\r\n      console.log(\"itemId:\", itemId);\r\n    \r\n      // Seleziona il box corrispondente\r\n      var $box = $('.nuvola-share[j",
+          "apiHints": [
+            "/api/sitecore/ShareAnalytics/Index"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/custom-analytics.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 10332,
+          "snippet": "var cookieSettings = [];\r\n\r\n//var _iub = _iub || [];\r\n//_iub.csConfiguration = {\"countryDetection\":true,\"invalidateConsentWithoutLog\":true,\"reloadOnConsent\":true,\"consentOnContinuedBrowsing\":false,\"enableTcf\":true,\"googleAdditionalConsentMode\":true,\"whitelabel\":false,\"lang\":\"it\",\"siteId\":2229768,\"cookiePolicyId\":41507304,\"cookiePolicyUrl\":\"https://www.fitp.it/Privacy-Policy-Simple\", \"banner\":{ \"acceptButtonDisplay\":true,\"customizeButtonDisplay\":true,\"acceptButtonColor\":\"#48d7f1\",\"acceptButtonCaptionColor\":\"white\",\"customizeButtonColor\":\"rgba(33.78, 33.78, 33.78, 0.69)\",\"customizeButtonCaptionColor\":\"white\",\"rejectButtonColor\":\"#d5d5d5\",\"rejectButtonCaptionColor\":\"white\",\"position\":\"float-bottom-center\",\"textColor\":\"#000000\",\"backgroundColor\":\"#ffffff\",\"explicitWithdrawal\":true,\"rejectButtonDisplay\":true,\"closeButtonRejects\":true }};\r\n\r\nvar _iub = _iub || [];\r\n\r\n_iub.csConfiguration = {\r\n    \"countryDetection\": true,\r\n    \"consentOnContinuedBrowsing\": false,\r\n    \"enableCMP\": true,\r\n    \"googleAdditionalConsentMode\": true,\r\n    \"whitelabel\": false,\r\n    \"lang\": \"it\",\r\n    \"siteId\": 2229768,\r\n    \"cookiePolicyId\": 41507304,\r\n    \"cookiePolicyUrl\": \"https://www.federtennis.it/Privacy-",
+          "apiHints": [
+            "https://www.fitp.it/Privacy-Policy-Simple",
+            "https://www.federtennis.it/Privacy-Policy-Simple",
+            "https://cdn.shareaholic.net/assets/pub/shareaholic.js",
+            "https://cdn.shareaholic.net/assets/pub/shareaholic.js"
+          ]
+        },
+        {
+          "url": "https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 31,
+          "snippet": "Hello World!! (oss.maxcdn.com)\n",
+          "apiHints": []
+        },
+        {
+          "url": "https://oss.maxcdn.com/respond/1.4.2/respond.min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 31,
+          "snippet": "Hello World!! (oss.maxcdn.com)\n",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/antiforgery-init.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 665,
+          "snippet": "(function ($) {\r\n    var token = $('input[name=\"__RequestVerificationToken\"]').val();\r\n    /*\r\n    $.ajaxPrefilter(function (options, originalOptions) {\r\n        if (options.type.toUpperCase() === \"POST\") {\r\n\r\n            if (options.data === null || options.data === undefined) {\r\n                options.data = new FormData();\r\n            }\r\n\r\n            if (options.data instanceof FormData) {\r\n\r\n                options.data.append('__RequestVerificationToken', token);\r\n\r\n            } else {\r\n\r\n                options.data = $.param($.extend(originalOptions.data, { __RequestVerificationToken: token }));\r\n            }\r\n        }\r\n    });*/\r\n})(jQueryV2);",
+          "apiHints": []
+        },
+        {
+          "url": "https://cdn.jsdelivr.net/npm/bluebird@3.7.2/js/browser/bluebird.min.js",
+          "status": 200,
+          "contentType": "application/javascript; charset=utf-8",
+          "length": 81530,
+          "snippet": "/* @preserve\n * The MIT License (MIT)\n * \n * Copyright (c) 2013-2018 Petka Antonov\n * \n * Permission is hereby granted, free of charge, to any person obtaining a copy\n * of this software and associated documentation files (the \"Software\"), to deal\n * in the Software without restriction, including without limitation the rights\n * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n * copies of the Software, and to permit persons to whom the Software is\n * furnished to do so, subject to the following conditions:\n * \n * The above copyright notice and this permission notice shall be included in\n * all copies or substantial portions of the Software.\n * \n * THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE\n * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n * THE SOFTWARE.\n * \n */\n/**\n * bluebird build version ",
+          "apiHints": [
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/rRqMUw",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n",
+            "http://goo.gl/MqrFmX\\n"
+          ]
+        },
+        {
+          "url": "https://alcdn.msauth.net/lib/1.4.6/js/msal.min.js",
+          "status": 200,
+          "contentType": "text/javascript",
+          "length": 130363,
+          "snippet": "/*! msal v1.4.6 2021-02-09 */\n\"use strict\";!function(e,t){\"object\"==typeof exports&&\"object\"==typeof module?module.exports=t():\"function\"==typeof define&&define.amd?define(\"Msal\",[],t):\"object\"==typeof exports?exports.Msal=t():e.Msal=t()}(self,(function(){return e={795:(e,t)=>{\n/*! *****************************************************************************\nCopyright (c) Microsoft Corporation. All rights reserved.\nLicensed under the Apache License, Version 2.0 (the \"License\"); you may not use\nthis file except in compliance with the License. You may obtain a copy of the\nLicense at http://www.apache.org/licenses/LICENSE-2.0\n\nTHIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\nKIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED\nWARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,\nMERCHANTABLITY OR NON-INFRINGEMENT.\n\nSee the Apache Version 2.0 License for specific language governing permissions\nand limitations under the License.\n***************************************************************************** */\nObject.defineProperty(t,\"__esModule\",{value:!0});var r=function(e,t){return(r=Object.setPrototypeOf||{__proto_",
+          "apiHints": [
+            "http://www.apache.org/licenses/LICENSE-2.0",
+            "Guid",
+            "https://login.microsoftonline.com/common",
+            "Guid",
+            "https://github.com/AzureAD/microsoft-authentication-library-for-js/wiki/MSAL-basics.",
+            "https://github.com/AzureAD/microsoft-authentication-library-for-js/wiki/MSAL-basics.",
+            "guid",
+            "guid",
+            "Guid",
+            "https://login.microsoftonline.com/common/",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid",
+            "Guid"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Areas/Fitp/js/f_adb2c_sso_2025_v2.js",
+          "status": 404,
+          "contentType": "text/html; charset=utf-8",
+          "length": 4978,
+          "snippet": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\"> \n<html xmlns=\"http://www.w3.org/1999/xhtml\"> \n<head> \n<title>IIS 10.0 Detailed Error - 404.0 - Not Found</title> \n<style type=\"text/css\"> \n<!-- \nbody{margin:0;font-size:.7em;font-family:Verdana,Arial,Helvetica,sans-serif;} \ncode{margin:0;color:#006600;font-size:1.1em;font-weight:bold;} \n.config_source code{font-size:.8em;color:#000000;} \npre{margin:0;font-size:1.4em;word-wrap:break-word;} \nul,ol{margin:10px 0 10px 5px;} \nul.first,ol.first{margin-top:5px;} \nfieldset{padding:0 15px 10px 15px;word-break:break-all;} \n.summary-container fieldset{padding-bottom:5px;margin-top:4px;} \nlegend.no-expand-all{padding:2px 15px 4px 10px;margin:0 0 0 -12px;} \nlegend{color:#333333;;margin:4px 0 8px -12px;_margin-top:0px; \nfont-weight:bold;font-size:1em;} \na:link,a:visited{color:#007EFF;font-weight:bold;} \na:hover{text-decoration:none;} \nh1{font-size:2.4em;margin:0;color:#FFF;} \nh2{font-size:1.7em;margin:0;color:#CC0000;} \nh3{font-size:1.4em;margin:10px 0 0 0;color:#CC0000;} \nh4{font-size:1.2em;margin:10px 0 5px 0; \n}#header{width:96%;margin:0 0 0 0;padding:6px 2% 6px 2%;font-family:\"trebuc",
+          "apiHints": [
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd",
+            "http://www.w3.org/1999/xhtml",
+            "http://go.microsoft.com/fwlink/?LinkID=66439",
+            "https://www.fitp.it:443/Areas/Fitp/js/f_adb2c_sso_2025_v2.js",
+            "https://go.microsoft.com/fwlink/?LinkID=62293&amp;IIS70Error=404,0,0x80070002,17763"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/f_fingerprint_old.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 329,
+          "snippet": "  /* var clientJs = new ClientJS();\r\n    var fingerprint = clientJs.getFingerprint();\r\n    var now = new Date();\r\n    now.setMinutes(now.getMinutes() + 120);\r\n    document.cookie =\r\n        \"CLIENT_FINGERPRINT=\" +\r\n        fingerprint +\r\n        \"; expires=\" +\r\n        now.toUTCString() +\r\n        \";Navigating=true;Path=/\";\r\n*/",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.googletagservices.com/tag/js/gpt.js",
+          "status": 200,
+          "contentType": "text/javascript; charset=UTF-8",
+          "length": 123594,
+          "snippet": "(function(sttc){var window=this;if(window.googletag&&googletag.evalScripts){googletag.evalScripts();}if(window.googletag&&googletag._loaded_)return;var aa,q,ba=typeof Object.create==\"function\"?Object.create:function(a){var b=function(){};b.prototype=a;return new b},ca=typeof Object.defineProperties==\"function\"?Object.defineProperty:function(a,b,c){if(a==Array.prototype||a==Object.prototype)return a;a[b]=c.value;return a},da=function(a){a=[\"object\"==typeof globalThis&&globalThis,a,\"object\"==typeof window&&window,\"object\"==typeof self&&self,\"object\"==typeof global&&global];for(var b=0;b<a.length;++b){var c=a[b];if(c&&c.Math==Math)return c}throw Error(\"Cannot find global object\");},ea=da(this),fa=typeof Symbol===\"function\"&&typeof Symbol(\"x\")===\"symbol\",v={},ha={},w=function(a,b,c){if(!c||a!=null){c=ha[b];if(c==null)return a[b];c=a[c];return c!==void 0?c:a[b]}},x=function(a,b,c){if(b)a:{var d=a.split(\".\");a=d.length===1;var e=d[0],f;!a&&e in v?f=v:f=ea;for(e=0;e<d.length-1;e++){var g=d[e];if(!(g in f))break a;f=f[g]}d=d[d.length-1];c=fa&&c===\"es6\"?f[d]:null;b=b(c);b!=null&&(a?ca(v,d,{configurable:!0,writable:!0,value:b}):b!==c&&(ha[d]===void 0&&(a=Math.random()*1E9>>>0,ha[d]=fa?ea.Sym",
+          "apiHints": [
+            "https://pagead2.googlesyndication.com/pagead/gen_204?id=rcs_internal",
+            "https://pagead2.googlesyndication.com/pagead/ping",
+            "https://pagead2.googlesyndication.com/pagead/managed/dict/",
+            "https://securepubads.g.doubleclick.net/pagead/managed/dict/",
+            "https://pagead2.googlesyndication.com/pagead/js/err_rep.js",
+            "https://pagead2.googlesyndication.com/pagead/gen_204?id=plmetrics",
+            "https://pagead2.googlesyndication.com/pagead/managed/js/gpt/",
+            "https://securepubads.g.doubleclick.net/pagead/managed/js/gpt/",
+            "https://pagead2.googlesyndication.com/pagead/ppub_config",
+            "https://securepubads.g.doubleclick.net/pagead/ppub_config"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/f_banner.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 3904,
+          "snippet": "/*      googletag.cmd.push(function () {\r\n            googletag.pubads().setCookieOptions(1);\r\n            googletag.pubads().setRequestNonPersonalizedAds(1);\r\n\t\t\t\r\n\t\t\t*/\r\n\t\t\t\r\n            /*\r\n\t\t\tgoogletag.defineSlot('/5196/fit/300x250_1', [300, 250], 'div-gpt-ad-1529663467262-0').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/300x250_2', [300, 250], 'div-gpt-ad-1529663467262-1').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/300x250_3', [300, 250], 'div-gpt-ad-1529663467262-2').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/300x250_300x600_1', [[300, 250], [300, 600]], 'div-gpt-ad-1529663467262-3').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/320x50_320x100_1', [[320, 50], [320, 100]], 'div-gpt-ad-1529663467262-4').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/320x50_320x100_2', [[320, 50], [320, 100]], 'div-gpt-ad-1529663467262-5').addService(googletag.pubads());\r\n            googletag.defineSlot('/5196/fit/320x50_320x100_3', [[320, 50], [320, 100]], 'div-gpt-ad-1529663467262-6').addService(googletag.pubads());\r\n            googl",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/fg_analytics.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 787,
+          "snippet": "\r\n   \r\n\r\n    (function ($) {\r\n        function initGoogleAnalytics(enabled) {\r\n            if (enabled) {\r\n                // Inizio script Google Analytics \r\n                $.getScript(\"https://www.googletagmanager.com/gtag/js?id=G-K3W3E4PCL2\")\r\n                .done(function(script, textStatus) {\r\n                    window.dataLayer = window.dataLayer || [];\r\n                    function gtag(){dataLayer.push(arguments);}\r\n                    gtag('js', new Date());\r\n                    gtag('config', 'G-K3W3E4PCL2');\r\n                })\r\n                .fail(function( jqxhr, settings, exception ) {\r\n                });\r\n                // Fine script  Google Analytics \r\n            }\r\n        }\r\n        window.initGoogleAnalytics = initGoogleAnalytics;\r\n    })(jQueryV2);",
+          "apiHints": [
+            "https://www.googletagmanager.com/gtag/js?id=G-K3W3E4PCL2"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/f_appinsights.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 5955,
+          "snippet": "/*  \r\n  (function ($) {\r\n            function initAppInsights(enabled) {\r\n                if (enabled) {\r\n                    -- Inizio script AppInsights \r\n                    var appInsights=window.appInsights||function(a){\r\n                        function b(a){c[a]=function(){var b=arguments;c.queue.push(function(){c[a].apply(c,b)})}}var c={config:a},d=document,e=window;setTimeout(function(){var b=d.createElement(\"script\");b.src=a.url||\"https://az416426.vo.msecnd.net/scripts/a/ai.0.js\",d.getElementsByTagName(\"script\")[0].parentNode.appendChild(b)});try{c.cookie=d.cookie}catch(a){}c.queue=[];for(var f=[\"Event\",\"Exception\",\"Metric\",\"PageView\",\"Trace\",\"Dependency\"];f.length;)b(\"track\"+f.pop());if(b(\"setAuthenticatedUserContext\"),b(\"clearAuthenticatedUserContext\"),b(\"startTrackEvent\"),b(\"stopTrackEvent\"),b(\"startTrackPage\"),b(\"stopTrackPage\"),b(\"flush\"),!a.disableExceptionTracking){f=\"onerror\",b(\"_\"+f);var g=e[f];e[f]=function(a,b,d,e,h){var i=g&&g(a,b,d,e,h);return!0!==i&&c[\"_\"+f](a,b,d,e,h),i}}return c\r\n                    }({\r\n                        instrumentationKey:\"ae8eeb65-76f9-4bd4-abfe-5c83a0d97a52\"\r\n                    });\r\n                    window.appInsights = appIn",
+          "apiHints": [
+            "https://az416426.vo.msecnd.net/scripts/a/ai.0.js",
+            "https://go.microsoft.com/fwlink/?linkid=2128109\\nHost:",
+            "https://az416426.vo.msecnd.net/scripts/b/ai.2.min.js"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/f_cookie.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 1031,
+          "snippet": "    function splitHostname() {\r\n        var result = {};\r\n        var regexParse = new RegExp('([a-z\\-0-9]{2,63})\\.([a-z\\.]{2,5})$');\r\n        var urlParts = regexParse.exec(window.location.hostname);\r\n        result.domain = urlParts[1];\r\n        result.type = urlParts[2];\r\n        result.subdomain = window.location.hostname.replace(result.domain + '.' + result.type, '').slice(0, -1);;\r\n        return result;\r\n    }\r\n\r\n    function setCustomCookie(name, value, days) {\r\n        var expires = \"\";\r\n        if (days) {\r\n            var date = new Date();\r\n            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));\r\n            expires = \"; expires=\" + date.toUTCString();\r\n        }\r\n        var splitHostName = splitHostname();\r\n        document.cookie = name + \"=\" + (value || \"\") + expires + \"; domain=\" + splitHostName.domain + '.' + splitHostName.type;\r\n    }\r\n\r\n    function redirectToCommunity(url) {\r\n        setCustomCookie('coming-from-login-page', \" \", 1);\r\n        window.location.href = url;\r\n    }\r\n",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/set_cookie.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 1942,
+          "snippet": " function loadCookieSettings() {\r\n            if (cookieSettings.length > 0) {\r\n                return;\r\n            }\r\n            cookieSettings = [{\r\n                cookieName: \"federtennis-disable-google-analytics\",\r\n                buttonOn: \"btnCustomAnalyticsOn\",\r\n                buttonOff: \"btnCustomAnalyticsOff\",\r\n                functionName: \"initGoogleAnalytics\"\r\n            },\r\n            {\r\n                cookieName: \"federtennis-disable-appinsights\",\r\n                buttonOn: \"btnCustomInsightsOn\",\r\n                buttonOff: \"btnCustomInsightsOff\",\r\n                functionName: \"initAppInsights\"\r\n            },\r\n            {\r\n                cookieName: \"federtennis-disable-googletagpubads\",\r\n                buttonOn: \"btnCustomTagPubAdsOn\",\r\n                buttonOff: \"btnCustomTagPubAdsOff\",\r\n                functionName: \"initGoogleTagPubAds\"\r\n            }];\r\n        }\r\n\t\t\r\n  function splitHostname() {\r\n        var result = {};\r\n        var regexParse = new RegExp('([a-z\\-0-9]{2,63})\\.([a-z\\.]{2,5})$');\r\n        var urlParts = regexParse.exec(window.location.hostname);\r\n        result.domain = urlParts[1];\r\n        result.type = urlParts[2];\r\n        resul",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/f_general.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 1814,
+          "snippet": "var versionmenu = \"v1\";\r\n\r\njQueryV2(function() {\r\n\tjQueryV2(document).on(\"click\", \".fancybox-single-image\", function() {\r\n\t\tjQueryV2.fancybox.open({\r\n\t\t\tsrc: jQueryV2(this).data(\"src\"),\r\n\t\t\ttype: 'image',\r\n\t\t\tcaption: jQueryV2(this).data(\"caption\")\r\n\t\t});\r\n\t});\t\r\n\tjQueryV2(document).on(\"click\", \".cc-megamenu-item\", function() {\r\n\t\tlocalStorage.setItem('menuitemid', jQueryV2(this).attr(\"data-id\"));\r\n\t});\r\n});\r\n\r\nfunction fnMediaGalleryFancyboxView(guid) {\r\n\tjQueryV2.ajax({\r\n\t\turl : \"https://dp-fit-prod-function.azurewebsites.net/api/v1/content/gallery/image/list\",\r\n\t\ttype: 'POST',\r\n\t\tdataType: 'json',\r\n\t\tdata: JSON.stringify({\"guid_foto_gallery\" : guid}),\r\n\t\tcontentType: \"application/json; charset=utf-8\",\t\t\r\n\t\tsuccess : function(data) {\r\n\t\t\tvar jsonObjTmp = [];\r\n\t\t\tjQueryV2.each(data, function(index, element) {\r\n\t\t\t\tjQueryV2.each(element.images, function(k, v) {\r\n\t\t\t\t\tif(v.hasOwnProperty('image')) {\r\n\t\t\t\t\t\titem = {};\r\n\t\t\t\t\t\titem [\"src\"] = \"/media_gallery/fotogallery/\" + String(element.idGallery) + \"/\" + v.image;\r\n\t\t\t\t\t\titem [\"caption\"] = v.descriptionImage;\r\n\t\t\t\t\t\tjsonObjTmp.push(item);\t\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t});\r\n\t\t\tif(jsonObjTmp.length > 0) {\r\n\t\t\t\tjQueryV2.fancybox.open(jsonObjTmp)",
+          "apiHints": [
+            "guid",
+            "https://dp-fit-prod-function.azurewebsites.net/api/v1/content/gallery/image/list",
+            "guid",
+            "guid"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/crossHeader.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 8705,
+          "snippet": "/*\r\n(function ($) {\r\n    $(function () {\r\n        function isValidUrl(str) {\r\n            return str !== undefined && str !== null && str.length > 0;\r\n        }\r\n\r\n        var _chpii = \"\";\r\n        if ($(\"#IsB2CUser\").length > 0 && $(\"#IsB2CUser\").val().toLowerCase() === 'true') {\r\n            _chpii = $(\"#chpii\").val();\r\n            loadUnreadNotification();\r\n            loadGamificationStatus();\r\n            loadNotifications();\r\n            setInterval(updateNotificationsAgo, 10000);\r\n        }\r\n\r\n        function updateNotificationsAgo() {\r\n            for (var i = 0; i < $(\".jq-timeago\").length; ++i) {\r\n                var element = $(\".jq-timeago\")[i];\r\n                $(element).text(getTime($(element).attr(\"jq-iso-date\")));\r\n            }\r\n        }\r\n\r\n\r\n        $(\"#login,#loginMobile,#accedi,#accediChat\").click(function (e) {\r\n            e.preventDefault();\r\n            var redirection = $(location).attr(\"href\");\r\n            var addressValue = $(this).attr(\"href\") + redirection;\r\n            $(location).attr(\"href\", addressValue);\r\n        });\r\n        $(\"#logout\").click(function (e) {\r\n            e.preventDefault();\r\n            jQuery(\"#frmLogout\").submit();\r\n        ",
+          "apiHints": [
+            "https://fitprodglstacdn.blob.core.windows.net/global-avatar/default.png"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/Scripts/searchBar.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 393,
+          "snippet": "(function ($) {\r\n    $(function () {\r\n        var searchForms = $(\"form[name=search]\");\r\n        searchForms.each(function (index) {\r\n            $(this).submit(function () {\r\n                if ($(this).find(\"input[name=search-terms]\").val().trim() === \"\" || pageEditorMode()) {\r\n                    return false;\r\n                }\r\n            });\r\n        });\r\n    });\r\n})(jQueryV2);\r\n\r\n\r\n",
+          "apiHints": []
+        },
+        {
+          "url": "https://www.fitp.it/js/plugins/fancybox_v3/dist/jquery.fancybox.min.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 52298,
+          "snippet": "// ==================================================\n// fancyBox v3.1.20\n//\n// Licensed GPLv3 for open source use\n// or fancyBox Commercial License for commercial use\n//\n// http://fancyapps.com/fancybox/\n// Copyright 2017 fancyApps\n//\n// ==================================================\n!function(t,e,n,o){\"use strict\";function i(t){var e=t.currentTarget,o=t.data?t.data.options:{},i=t.data?t.data.items:[],a=n(e).attr(\"data-fancybox\")||\"\",s=0;t.preventDefault(),t.stopPropagation(),a?(i=i.length?i.filter('[data-fancybox=\"'+a+'\"]'):n('[data-fancybox=\"'+a+'\"]'),s=i.index(e),s<0&&(s=0)):i=[e],n.fancybox.open(i,o,s)}if(n){if(n.fn.fancybox)return void n.error(\"fancyBox already initialized\");var a={loop:!1,margin:[44,0],gutter:50,keyboard:!0,arrows:!0,infobar:!1,toolbar:!0,buttons:[\"slideShow\",\"fullScreen\",\"thumbs\",\"close\"],idleTime:4,smallBtn:\"auto\",protect:!1,modal:!1,image:{preload:\"auto\"},ajax:{settings:{data:{fancybox:!0}}},iframe:{tpl:'<iframe id=\"fancybox-frame{rnd}\" name=\"fancybox-frame{rnd}\" class=\"fancybox-iframe\" frameborder=\"0\" vspace=\"0\" hspace=\"0\" webkitAllowFullScreen mozallowfullscreen allowFullScreen allowtransparency=\"true\" src=\"\"></iframe>',preload:!0,css:{},attr:{scrol",
+          "apiHints": [
+            "http://fancyapps.com/fancybox/"
+          ]
+        },
+        {
+          "url": "https://www.fitp.it/js/plugins/chartjs.2.3.0/Chart.js",
+          "status": 200,
+          "contentType": "application/javascript",
+          "length": 314657,
+          "snippet": "/*!\n * Chart.js\n * http://chartjs.org/\n * Version: 2.3.0\n *\n * Copyright 2016 Nick Downie\n * Released under the MIT license\n * https://github.com/chartjs/Chart.js/blob/master/LICENSE.md\n */\n(function(f){if(typeof exports===\"object\"&&typeof module!==\"undefined\"){module.exports=f()}else if(typeof define===\"function\"&&define.amd){define([],f)}else{var g;if(typeof window!==\"undefined\"){g=window}else if(typeof global!==\"undefined\"){g=global}else if(typeof self!==\"undefined\"){g=self}else{g=this}g.Chart = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require==\"function\"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error(\"Cannot find module '\"+o+\"'\");throw f.code=\"MODULE_NOT_FOUND\",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require==\"function\"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){\n\n},{}],2:[function(require,module,exports){\n/* MIT license */\r\nvar colorNames = require(6);\r\n\r\nmodule.exports = {\r\n   getRgba: getRgba,\r\n   getHsla: getHsla,\r\n   ge",
+          "apiHints": [
+            "http://chartjs.org/",
+            "https://github.com/chartjs/Chart.js/blob/master/LICENSE.md",
+            "http://www.w3.org/TR/WCAG20/#relativeluminancedef",
+            "http://www.w3.org/TR/WCAG20/#contrast-ratiodef",
+            "http://24ways.org/2010/calculating-color-contrast",
+            "http://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale",
+            "https://github.com/sass/libsass/blob/0e6b4a2850092356aa3ece07c6b249f0221caced/functions.cpp#L209",
+            "http://dev.w3.org/csswg/css-color/#hwb-to-rgb",
+            "https://github.com/chartjs/Chart.js/issues/2435#issuecomment-216718158",
+            "http://scaledinnovation.com/analytics/splines/aboutSplines.html",
+            "https://en.wikipedia.org/wiki/Monotone_cubic_interpolation",
+            "http://www.robertpenner.com/easing/",
+            "http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/",
+            "http://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/",
+            "http://www.nathanaeljones.com/blog/2013/reading-max-width-cross-browser",
+            "http://stackoverflow.com/a/14853974",
+            "http://stackoverflow.com/questions/8506881/nice-label-algorithm-for-charts-with-minimum-ticks",
+            "https://gist.github.com/nnnick/696cc9c55f4b0beb8fe9",
+            "https://dl.dropboxusercontent.com/u/34601363/toomuchscience.gif",
+            "https://dl.dropboxusercontent.com/u/34601363/yeahscience.gif",
+            "http://momentjs.com/docs/#/parsing/string-format/",
+            "http://momentjs.com/docs/#/parsing/string-format/",
+            "http://momentjs.com/docs/#/get-set/iso-weekday/",
+            "http://momentjs.com/docs/#/displaying/format/",
+            "https://momentjs.com",
+            "http://nnnick.github.io/Chart.js/docs-v2/#scales-time-scale"
+          ]
+        }
       ]
     }
   ]
