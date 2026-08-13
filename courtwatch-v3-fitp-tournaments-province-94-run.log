@@ -1,0 +1,91 @@
+startedAt=2026-08-13T00:05:14Z
+sourceSha=bcd118696143ab6142d6725e4ddcd217397ab108
+runId=31653149164
+province=94
+{
+  "version": "cw-v3-fitp-provincial-window-engine",
+  "generatedAt": "2026-08-13T00:05:14.676Z",
+  "status": "fitp_provincial_window_shard_complete",
+  "shard": "core_dates",
+  "source": "FITP tournament discovery by province × rotating logical windows. Each query uses official P.U.C. structured filters only: tennis discipline, TORNEI FITP, province, data_inizio, data_fine. No player names and no tournament keywords. Logical quadrimestre windows overlap the query start by 21 days except the first historical window. Saturated branches auto-split to shorter windows and final map dedupes by competitionId.",
+  "coverageFrom": "2025-12-18",
+  "coverageUntil": "2028-08-12",
+  "provinces": [
+    "1",
+    "19",
+    "32",
+    "50",
+    "62",
+    "80"
+  ],
+  "logicalWindows": [
+    {
+      "label": "window_1_2025-12-18_2026-04-19",
+      "logicalStart": "2025-12-18",
+      "logicalEnd": "2026-04-19",
+      "queryStart": "2025-12-18",
+      "queryEnd": "2026-04-19"
+    },
+    {
+      "label": "window_2_2026-04-19_2026-08-19",
+      "logicalStart": "2026-04-19",
+      "logicalEnd": "2026-08-19",
+      "queryStart": "2026-03-29",
+      "queryEnd": "2026-08-19"
+    },
+    {
+      "label": "window_3_2026-08-19_2026-12-19",
+      "logicalStart": "2026-08-19",
+      "logicalEnd": "2026-12-19",
+      "queryStart": "2026-07-29",
+      "queryEnd": "2026-12-19"
+    },
+    {
+      "label": "window_4_2026-12-19_2027-04-20",
+      "logicalStart": "2026-12-19",
+      "logicalEnd": "2027-04-20",
+      "queryStart": "2026-11-28",
+      "queryEnd": "2027-04-20"
+    },
+    {
+      "label": "window_5_2027-04-20_2027-08-20",
+      "logicalStart": "2027-04-20",
+      "logicalEnd": "2027-08-20",
+      "queryStart": "2027-03-30",
+      "queryEnd": "2027-08-20"
+    },
+    {
+      "label": "window_6_2027-08-20_2027-12-20",
+      "logicalStart": "2027-08-20",
+      "logicalEnd": "2027-12-20",
+      "queryStart": "2027-07-30",
+      "queryEnd": "2027-12-20"
+    },
+    {
+      "label": "window_7_2027-12-20_2028-04-20",
+      "logicalStart": "2027-12-20",
+      "logicalEnd": "2028-04-20",
+      "queryStart": "2027-11-29",
+      "queryEnd": "2028-04-20"
+    },
+    {
+      "label": "window_8_2028-04-20_2028-08-12",
+      "logicalStart": "2028-04-20",
+      "logicalEnd": "2028-08-12",
+      "queryStart": "2028-03-30",
+      "queryEnd": "2028-08-12"
+    }
+  ],
+  "branches": 48,
+  "queries": 48,
+  "tournamentsFound": 159,
+  "unresolvedSaturations": 0,
+  "regression": {
+    "feniceBresciaLomb370": false,
+    "rossoniKinderImperia": false,
+    "navaKinderMilano3": false
+  },
+  "errors": []
+}
+exitCode=0
+finishedAt=2026-08-13T00:05:16Z
