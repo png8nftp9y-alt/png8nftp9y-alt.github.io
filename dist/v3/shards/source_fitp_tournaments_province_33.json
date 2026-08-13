@@ -1,21 +1,45 @@
 {
   "version": "cw-v3-fitp-province-shard",
-  "generatedAt": "2026-08-13T19:48:05.298Z",
-  "status": "fitp_province_shard_complete",
+  "generatedAt": "2026-08-13T22:24:19.396Z",
+  "status": "fitp_province_shard_with_unresolved_saturations",
   "provinceId": "33",
   "source": "One visible GitHub Actions shard per FITP province. Each province shard runs rotating logical windows with 21-day overlap except first historical window; saturated branches auto-split.",
   "coverageFrom": "2025-12-18",
   "coverageUntil": "2028-08-12",
-  "branches": 8,
-  "queries": 8,
-  "tournamentsFound": 44,
-  "unresolvedSaturations": 0,
+  "branches": 62,
+  "queries": 62,
+  "tournamentsFound": 45,
+  "unresolvedSaturations": 23,
   "regression": {
     "feniceBresciaLomb370": false,
     "rossoniKinderImperia": false,
     "navaKinderMilano3": false
   },
   "tournaments": [
+    {
+      "circuit": "fitp",
+      "competitionId": "EACB0AD1-3FAE-458A-ACB8-21D788658CDF",
+      "tournamentName": "2° Memorial Luigi Milani 5° Trofeo Tennis Piacenza - Activa",
+      "location": "Piacenza PC",
+      "startDate": "2025-12-14",
+      "endDate": "2025-12-29",
+      "status": "finished",
+      "disciplineId": "4332",
+      "sourceCode": "1",
+      "sourceName": "TORNEI FITP",
+      "categoryAge": "U08;U10;U11;U12;U13;U14;U15;U16;U17;U18;NOF;NOR;O30;O35;O40;O45;O50;O55;O60;O65;O70;O75;O80",
+      "categoryClass": "3.1;3.2;3.3;3.4;3.5;4.1;4.2;4.3;4.4;4.5;4.6;4.NC",
+      "tournamentType": "Femminile;Maschile",
+      "club": "ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS PIACENZA",
+      "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=EACB0AD1-3FAE-458A-ACB8-21D788658CDF",
+      "discoveryShard": "province_33",
+      "coverageModes": [
+        "33:window_1_2025-12-18_2026-04-19AAAB",
+        "33:window_1_2025-12-18_2026-04-19AAB",
+        "33:window_1_2025-12-18_2026-04-19AABA"
+      ],
+      "lastSeen": "2026-08-13T22:24:19.396Z"
+    },
     {
       "circuit": "fitp",
       "competitionId": "110F0770-6FD5-4A9F-ABBC-B16DF96AAAA6",
@@ -34,9 +58,16 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=110F0770-6FD5-4A9F-ABBC-B16DF96AAAA6",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_1_2025-12-18_2026-04-19"
+        "33:window_1_2025-12-18_2026-04-19",
+        "33:window_1_2025-12-18_2026-04-19A",
+        "33:window_1_2025-12-18_2026-04-19AA",
+        "33:window_1_2025-12-18_2026-04-19AAA",
+        "33:window_1_2025-12-18_2026-04-19AAAA",
+        "33:window_1_2025-12-18_2026-04-19AAAB",
+        "33:window_1_2025-12-18_2026-04-19AAB",
+        "33:window_1_2025-12-18_2026-04-19AABA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -56,9 +87,19 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=08B28181-67F4-47F1-9A75-941624E89ED6",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_1_2025-12-18_2026-04-19"
+        "33:window_1_2025-12-18_2026-04-19",
+        "33:window_1_2025-12-18_2026-04-19A",
+        "33:window_1_2025-12-18_2026-04-19AB",
+        "33:window_1_2025-12-18_2026-04-19ABB",
+        "33:window_1_2025-12-18_2026-04-19ABBA",
+        "33:window_1_2025-12-18_2026-04-19ABBB",
+        "33:window_1_2025-12-18_2026-04-19B",
+        "33:window_1_2025-12-18_2026-04-19BA",
+        "33:window_1_2025-12-18_2026-04-19BAA",
+        "33:window_1_2025-12-18_2026-04-19BAAA",
+        "33:window_1_2025-12-18_2026-04-19BAAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -78,9 +119,19 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=A46554DB-DEB7-40D8-B23F-34A59A4A5CDB",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_1_2025-12-18_2026-04-19"
+        "33:window_1_2025-12-18_2026-04-19",
+        "33:window_1_2025-12-18_2026-04-19A",
+        "33:window_1_2025-12-18_2026-04-19AB",
+        "33:window_1_2025-12-18_2026-04-19ABB",
+        "33:window_1_2025-12-18_2026-04-19ABBB",
+        "33:window_1_2025-12-18_2026-04-19B",
+        "33:window_1_2025-12-18_2026-04-19BA",
+        "33:window_1_2025-12-18_2026-04-19BAA",
+        "33:window_1_2025-12-18_2026-04-19BAAA",
+        "33:window_1_2025-12-18_2026-04-19BAAB",
+        "33:window_1_2025-12-18_2026-04-19BAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -100,9 +151,19 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=E74F0CA6-3076-4869-A04E-BC35FFF98933",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_1_2025-12-18_2026-04-19"
+        "33:window_1_2025-12-18_2026-04-19",
+        "33:window_1_2025-12-18_2026-04-19A",
+        "33:window_1_2025-12-18_2026-04-19AB",
+        "33:window_1_2025-12-18_2026-04-19ABB",
+        "33:window_1_2025-12-18_2026-04-19ABBB",
+        "33:window_1_2025-12-18_2026-04-19B",
+        "33:window_1_2025-12-18_2026-04-19BA",
+        "33:window_1_2025-12-18_2026-04-19BAA",
+        "33:window_1_2025-12-18_2026-04-19BAAA",
+        "33:window_1_2025-12-18_2026-04-19BAAB",
+        "33:window_1_2025-12-18_2026-04-19BAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -122,9 +183,17 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=3F11B2EC-AEDB-4A3B-8EF5-92658B654DD7",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_1_2025-12-18_2026-04-19"
+        "33:window_1_2025-12-18_2026-04-19",
+        "33:window_1_2025-12-18_2026-04-19B",
+        "33:window_1_2025-12-18_2026-04-19BA",
+        "33:window_1_2025-12-18_2026-04-19BAA",
+        "33:window_1_2025-12-18_2026-04-19BAAB",
+        "33:window_1_2025-12-18_2026-04-19BAB",
+        "33:window_1_2025-12-18_2026-04-19BB",
+        "33:window_1_2025-12-18_2026-04-19BBA",
+        "33:window_1_2025-12-18_2026-04-19BBAA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -144,9 +213,15 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=64F0DFDD-99FC-40DC-BC5A-A6874E165461",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_1_2025-12-18_2026-04-19"
+        "33:window_1_2025-12-18_2026-04-19",
+        "33:window_1_2025-12-18_2026-04-19B",
+        "33:window_1_2025-12-18_2026-04-19BA",
+        "33:window_1_2025-12-18_2026-04-19BAB",
+        "33:window_1_2025-12-18_2026-04-19BB",
+        "33:window_1_2025-12-18_2026-04-19BBA",
+        "33:window_1_2025-12-18_2026-04-19BBAA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -166,9 +241,16 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=E6F3360C-B46C-4864-8E0C-71B277436687",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_1_2025-12-18_2026-04-19"
+        "33:window_1_2025-12-18_2026-04-19",
+        "33:window_1_2025-12-18_2026-04-19B",
+        "33:window_1_2025-12-18_2026-04-19BA",
+        "33:window_1_2025-12-18_2026-04-19BAB",
+        "33:window_1_2025-12-18_2026-04-19BB",
+        "33:window_1_2025-12-18_2026-04-19BBA",
+        "33:window_1_2025-12-18_2026-04-19BBAA",
+        "33:window_1_2025-12-18_2026-04-19BBAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -188,9 +270,16 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=293115E0-5D14-4636-AE55-30F95A955EFC",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_1_2025-12-18_2026-04-19"
+        "33:window_1_2025-12-18_2026-04-19",
+        "33:window_1_2025-12-18_2026-04-19B",
+        "33:window_1_2025-12-18_2026-04-19BA",
+        "33:window_1_2025-12-18_2026-04-19BAB",
+        "33:window_1_2025-12-18_2026-04-19BB",
+        "33:window_1_2025-12-18_2026-04-19BBA",
+        "33:window_1_2025-12-18_2026-04-19BBAA",
+        "33:window_1_2025-12-18_2026-04-19BBAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -210,9 +299,16 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=61FA859E-E0EB-42F4-9306-8B4DCC24B3F0",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_1_2025-12-18_2026-04-19"
+        "33:window_1_2025-12-18_2026-04-19",
+        "33:window_1_2025-12-18_2026-04-19B",
+        "33:window_1_2025-12-18_2026-04-19BB",
+        "33:window_1_2025-12-18_2026-04-19BBA",
+        "33:window_1_2025-12-18_2026-04-19BBAB",
+        "33:window_1_2025-12-18_2026-04-19BBB",
+        "33:window_1_2025-12-18_2026-04-19BBBA",
+        "33:window_1_2025-12-18_2026-04-19BBBB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -233,9 +329,17 @@
       "discoveryShard": "province_33",
       "coverageModes": [
         "33:window_1_2025-12-18_2026-04-19",
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_1_2025-12-18_2026-04-19B",
+        "33:window_1_2025-12-18_2026-04-19BB",
+        "33:window_1_2025-12-18_2026-04-19BBB",
+        "33:window_1_2025-12-18_2026-04-19BBBB",
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AA",
+        "33:window_2_2026-04-19_2026-08-19AAA",
+        "33:window_2_2026-04-19_2026-08-19AAAA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -256,9 +360,17 @@
       "discoveryShard": "province_33",
       "coverageModes": [
         "33:window_1_2025-12-18_2026-04-19",
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_1_2025-12-18_2026-04-19B",
+        "33:window_1_2025-12-18_2026-04-19BB",
+        "33:window_1_2025-12-18_2026-04-19BBB",
+        "33:window_1_2025-12-18_2026-04-19BBBB",
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AA",
+        "33:window_2_2026-04-19_2026-08-19AAA",
+        "33:window_2_2026-04-19_2026-08-19AAAA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -278,9 +390,15 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=E1907319-8755-4050-8F0A-3DAC1D3C881F",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AA",
+        "33:window_2_2026-04-19_2026-08-19AAA",
+        "33:window_2_2026-04-19_2026-08-19AAAB",
+        "33:window_2_2026-04-19_2026-08-19AAB",
+        "33:window_2_2026-04-19_2026-08-19AABA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -300,9 +418,16 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=F7776953-EF36-4620-9D67-ED8575358304",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AA",
+        "33:window_2_2026-04-19_2026-08-19AAA",
+        "33:window_2_2026-04-19_2026-08-19AAAA",
+        "33:window_2_2026-04-19_2026-08-19AAAB",
+        "33:window_2_2026-04-19_2026-08-19AAB",
+        "33:window_2_2026-04-19_2026-08-19AABA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -322,9 +447,16 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=9A419D6D-2564-4B37-89F5-C1DF1CA1F164",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AA",
+        "33:window_2_2026-04-19_2026-08-19AAA",
+        "33:window_2_2026-04-19_2026-08-19AAAB",
+        "33:window_2_2026-04-19_2026-08-19AAB",
+        "33:window_2_2026-04-19_2026-08-19AABA",
+        "33:window_2_2026-04-19_2026-08-19AABB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -344,9 +476,16 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=47707BFD-8090-422A-8A83-F7981A49F316",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AA",
+        "33:window_2_2026-04-19_2026-08-19AAB",
+        "33:window_2_2026-04-19_2026-08-19AABB",
+        "33:window_2_2026-04-19_2026-08-19AB",
+        "33:window_2_2026-04-19_2026-08-19ABA",
+        "33:window_2_2026-04-19_2026-08-19ABAA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -366,9 +505,19 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=E8F98DAC-8689-40C6-948C-95379A5FD011",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AA",
+        "33:window_2_2026-04-19_2026-08-19AAB",
+        "33:window_2_2026-04-19_2026-08-19AABB",
+        "33:window_2_2026-04-19_2026-08-19AB",
+        "33:window_2_2026-04-19_2026-08-19ABA",
+        "33:window_2_2026-04-19_2026-08-19ABAA",
+        "33:window_2_2026-04-19_2026-08-19ABAB",
+        "33:window_2_2026-04-19_2026-08-19ABB",
+        "33:window_2_2026-04-19_2026-08-19ABBA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -388,9 +537,14 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=F96AE8F3-2C43-4B2A-8E54-D747DC375A9B",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AB",
+        "33:window_2_2026-04-19_2026-08-19ABB",
+        "33:window_2_2026-04-19_2026-08-19ABBA",
+        "33:window_2_2026-04-19_2026-08-19ABBB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -410,9 +564,16 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=0E8375F7-FF34-4768-B81F-1CC22DD9FA5C",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AB",
+        "33:window_2_2026-04-19_2026-08-19ABA",
+        "33:window_2_2026-04-19_2026-08-19ABAB",
+        "33:window_2_2026-04-19_2026-08-19ABB",
+        "33:window_2_2026-04-19_2026-08-19ABBA",
+        "33:window_2_2026-04-19_2026-08-19ABBB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -432,9 +593,14 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=769024E4-0BA4-4869-A404-D8136979C0C4",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AB",
+        "33:window_2_2026-04-19_2026-08-19ABB",
+        "33:window_2_2026-04-19_2026-08-19ABBA",
+        "33:window_2_2026-04-19_2026-08-19ABBB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -454,9 +620,20 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=87E2EF4E-27A1-49C7-95E6-E2DFE7B8B67F",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AB",
+        "33:window_2_2026-04-19_2026-08-19ABA",
+        "33:window_2_2026-04-19_2026-08-19ABAB",
+        "33:window_2_2026-04-19_2026-08-19ABB",
+        "33:window_2_2026-04-19_2026-08-19ABBA",
+        "33:window_2_2026-04-19_2026-08-19ABBB",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAA",
+        "33:window_2_2026-04-19_2026-08-19BAAA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -476,9 +653,18 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=02EEB30F-BB1E-41DA-BF63-A74CF01D8842",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AB",
+        "33:window_2_2026-04-19_2026-08-19ABB",
+        "33:window_2_2026-04-19_2026-08-19ABBA",
+        "33:window_2_2026-04-19_2026-08-19ABBB",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAA",
+        "33:window_2_2026-04-19_2026-08-19BAAA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -498,9 +684,18 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=9FC87DFA-A473-4901-989D-12793104DF98",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19A",
+        "33:window_2_2026-04-19_2026-08-19AB",
+        "33:window_2_2026-04-19_2026-08-19ABB",
+        "33:window_2_2026-04-19_2026-08-19ABBB",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAA",
+        "33:window_2_2026-04-19_2026-08-19BAAA",
+        "33:window_2_2026-04-19_2026-08-19BAAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -520,9 +715,14 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=71DCF275-70CA-4983-8366-761A70E1BCF6",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAA",
+        "33:window_2_2026-04-19_2026-08-19BAAA",
+        "33:window_2_2026-04-19_2026-08-19BAAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -542,9 +742,14 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=B75C13BF-EF46-438F-812D-B2FD7061E35C",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAA",
+        "33:window_2_2026-04-19_2026-08-19BAAA",
+        "33:window_2_2026-04-19_2026-08-19BAAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -564,9 +769,16 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=8A4FC16F-D9C5-48DC-A91E-27866E432B50",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAA",
+        "33:window_2_2026-04-19_2026-08-19BAAA",
+        "33:window_2_2026-04-19_2026-08-19BAAB",
+        "33:window_2_2026-04-19_2026-08-19BAB",
+        "33:window_2_2026-04-19_2026-08-19BABA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -586,9 +798,16 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=BA8134B4-2FF4-4C25-B78D-EE46EB0D63DD",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAA",
+        "33:window_2_2026-04-19_2026-08-19BAAB",
+        "33:window_2_2026-04-19_2026-08-19BAB",
+        "33:window_2_2026-04-19_2026-08-19BABA",
+        "33:window_2_2026-04-19_2026-08-19BABB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -608,9 +827,17 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=77AF80C8-0BA3-4DD6-AD92-ECF8241DBE99",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAB",
+        "33:window_2_2026-04-19_2026-08-19BABA",
+        "33:window_2_2026-04-19_2026-08-19BABB",
+        "33:window_2_2026-04-19_2026-08-19BB",
+        "33:window_2_2026-04-19_2026-08-19BBA",
+        "33:window_2_2026-04-19_2026-08-19BBAA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -630,9 +857,19 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=E90D0C8B-A690-43C7-A067-5E08A58A1185",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAA",
+        "33:window_2_2026-04-19_2026-08-19BAAB",
+        "33:window_2_2026-04-19_2026-08-19BAB",
+        "33:window_2_2026-04-19_2026-08-19BABA",
+        "33:window_2_2026-04-19_2026-08-19BABB",
+        "33:window_2_2026-04-19_2026-08-19BB",
+        "33:window_2_2026-04-19_2026-08-19BBA",
+        "33:window_2_2026-04-19_2026-08-19BBAA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -652,9 +889,19 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=171D3CE7-DC5B-4641-B211-CFBC2244F32B",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAA",
+        "33:window_2_2026-04-19_2026-08-19BAAB",
+        "33:window_2_2026-04-19_2026-08-19BAB",
+        "33:window_2_2026-04-19_2026-08-19BABA",
+        "33:window_2_2026-04-19_2026-08-19BABB",
+        "33:window_2_2026-04-19_2026-08-19BB",
+        "33:window_2_2026-04-19_2026-08-19BBA",
+        "33:window_2_2026-04-19_2026-08-19BBAA"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -674,9 +921,17 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=6E2D9A03-1198-4A1B-A05F-73158AF27C99",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAB",
+        "33:window_2_2026-04-19_2026-08-19BABB",
+        "33:window_2_2026-04-19_2026-08-19BB",
+        "33:window_2_2026-04-19_2026-08-19BBA",
+        "33:window_2_2026-04-19_2026-08-19BBAA",
+        "33:window_2_2026-04-19_2026-08-19BBAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -696,9 +951,17 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=F9CA9480-B0D4-4357-8327-0579C42F1933",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAB",
+        "33:window_2_2026-04-19_2026-08-19BABB",
+        "33:window_2_2026-04-19_2026-08-19BB",
+        "33:window_2_2026-04-19_2026-08-19BBA",
+        "33:window_2_2026-04-19_2026-08-19BBAA",
+        "33:window_2_2026-04-19_2026-08-19BBAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -718,9 +981,17 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=0221A69E-31CA-48AF-A1C4-581E1C870F89",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BA",
+        "33:window_2_2026-04-19_2026-08-19BAB",
+        "33:window_2_2026-04-19_2026-08-19BABB",
+        "33:window_2_2026-04-19_2026-08-19BB",
+        "33:window_2_2026-04-19_2026-08-19BBA",
+        "33:window_2_2026-04-19_2026-08-19BBAA",
+        "33:window_2_2026-04-19_2026-08-19BBAB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -740,9 +1011,15 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=47D96BD2-2D10-404E-AEAB-FF7BE0559983",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BB",
+        "33:window_2_2026-04-19_2026-08-19BBA",
+        "33:window_2_2026-04-19_2026-08-19BBAA",
+        "33:window_2_2026-04-19_2026-08-19BBAB",
+        "33:window_2_2026-04-19_2026-08-19BBB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -762,9 +1039,14 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=79D8E2BD-071F-44B7-9726-13863907AC37",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BB",
+        "33:window_2_2026-04-19_2026-08-19BBA",
+        "33:window_2_2026-04-19_2026-08-19BBAB",
+        "33:window_2_2026-04-19_2026-08-19BBB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -784,9 +1066,12 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=F7A1F203-A24B-498C-B474-4D63277A6252",
       "discoveryShard": "province_33",
       "coverageModes": [
-        "33:window_2_2026-04-19_2026-08-19"
+        "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BB",
+        "33:window_2_2026-04-19_2026-08-19BBB"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -807,9 +1092,12 @@
       "discoveryShard": "province_33",
       "coverageModes": [
         "33:window_2_2026-04-19_2026-08-19",
+        "33:window_2_2026-04-19_2026-08-19B",
+        "33:window_2_2026-04-19_2026-08-19BB",
+        "33:window_2_2026-04-19_2026-08-19BBB",
         "33:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -831,7 +1119,7 @@
       "coverageModes": [
         "33:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -853,7 +1141,7 @@
       "coverageModes": [
         "33:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -875,7 +1163,7 @@
       "coverageModes": [
         "33:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -897,7 +1185,7 @@
       "coverageModes": [
         "33:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -919,7 +1207,7 @@
       "coverageModes": [
         "33:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -941,7 +1229,7 @@
       "coverageModes": [
         "33:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -963,7 +1251,7 @@
       "coverageModes": [
         "33:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     },
     {
       "circuit": "fitp",
@@ -985,7 +1273,7 @@
       "coverageModes": [
         "33:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-13T19:48:05.298Z"
+      "lastSeen": "2026-08-13T22:24:19.396Z"
     }
   ],
   "errors": []
