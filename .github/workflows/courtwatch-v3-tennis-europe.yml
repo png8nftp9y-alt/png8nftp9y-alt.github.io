@@ -2,12 +2,15 @@ name: Court Watch v3 Tennis Europe entries
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
   push:
     paths:
       - 'courtwatch-v3-tennis-europe-trigger.json'
-      - 'src/v3/discover-tennis-europe.mjs'
-      - 'src/v3/postprocess-tennis-europe-multievent.mjs'
-      - 'src/v3/postprocess-tennis-europe-started-rules.mjs'
+      - 'src/v3/discover-tennis-europe-tournaments.mjs'
+      - 'src/v3/discover-tennis-europe-acceptance.mjs'
+      - 'src/v3/verify-tennis-europe-draws.mjs'
+      - 'src/v3/entries-engine.mjs'
       - '.github/workflows/courtwatch-v3-tennis-europe.yml'
       - 'players.json'
 
@@ -21,7 +24,7 @@ concurrency:
 jobs:
   discover:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,31 +33,25 @@ jobs:
       - run: |
           set +e
           : > courtwatch-v3-tennis-europe-run.log
-          node src/v3/discover-tennis-europe.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
-          te_code=$?
-          echo "tennisEuropeExit=$te_code" >> courtwatch-v3-tennis-europe-run.log
-          multi_code=0
-          started_code=0
-          if [ "$te_code" -eq 0 ]; then
-            node src/v3/postprocess-tennis-europe-multievent.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
-            multi_code=$?
-            echo "tennisEuropeMultiEventExit=$multi_code" >> courtwatch-v3-tennis-europe-run.log
-            if [ "$multi_code" -eq 0 ]; then
-              node src/v3/postprocess-tennis-europe-started-rules.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
-              started_code=$?
-            else
-              started_code=99
-            fi
-            echo "tennisEuropeStartedRulesExit=$started_code" >> courtwatch-v3-tennis-europe-run.log
-          fi
-          if [ "$te_code" -ne 0 ] || [ "$multi_code" -ne 0 ] || [ "$started_code" -ne 0 ]; then
-            exit 1
-          fi
+          node src/v3/discover-tennis-europe-tournaments.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
+          tournaments_code=$?
+          echo "tennisEuropeTournamentsExit=$tournaments_code" >> courtwatch-v3-tennis-europe-run.log
+          node src/v3/discover-tennis-europe-acceptance.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
+          acceptance_code=$?
+          echo "tennisEuropeAcceptanceExit=$acceptance_code" >> courtwatch-v3-tennis-europe-run.log
+          node src/v3/verify-tennis-europe-draws.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
+          draw_code=$?
+          echo "tennisEuropeDrawExit=$draw_code" >> courtwatch-v3-tennis-europe-run.log
+          node src/v3/entries-engine.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
+          entries_code=$?
+          echo "entriesEngineExit=$entries_code" >> courtwatch-v3-tennis-europe-run.log
+          cat courtwatch-v3-tennis-europe-run.log
+          if [ "$tournaments_code" -ne 0 ] || [ "$acceptance_code" -ne 0 ] || [ "$draw_code" -ne 0 ] || [ "$entries_code" -ne 0 ]; then exit 1; fi
       - if: always()
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_tennis_europe_entries.json dist/v3/source_tennis_europe_audit.json dist/v3/source_tennis_europe_multievent_audit.json dist/v3/source_tennis_europe_started_rules_audit.json courtwatch-v3-tennis-europe-run.log || true
-          git commit -m "Build Court Watch v3 Tennis Europe entries" || echo "No changes"
+          git add dist/v3/source_tennis_europe_tournaments.json dist/v3/source_tennis_europe_tournaments_audit.json dist/v3/source_tennis_europe_entries.json dist/v3/source_tennis_europe_acceptance_audit.json dist/v3/source_tennis_europe_draw_audit.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_tennis_europe.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json courtwatch-v3-tennis-europe-run.log .github/workflows/courtwatch-v3-tennis-europe.yml src/v3/discover-tennis-europe-tournaments.mjs src/v3/discover-tennis-europe-acceptance.mjs src/v3/verify-tennis-europe-draws.mjs || true
+          git commit -m "Refactor Court Watch v3 Tennis Europe engine" || echo "No changes"
           git pull --rebase origin main || true
           git push origin HEAD:main || true
