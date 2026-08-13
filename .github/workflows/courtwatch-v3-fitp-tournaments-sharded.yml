@@ -1,4 +1,4 @@
-name: Court Watch v3 FITP tournament discovery micro-sharded
+name: Court Watch v3 FITP tournament discovery province shards
 on:
   workflow_dispatch:
   push:
@@ -10,45 +10,46 @@ on:
       - '.github/workflows/courtwatch-v3-fitp-tournaments-sharded.yml'
 permissions: {contents: write}
 concurrency:
-  group: court-watch-v3-fitp-tournaments-sharded-${{ github.run_id }}
+  group: court-watch-v3-fitp-tournaments-province-shards-${{ github.run_id }}
   cancel-in-progress: false
 jobs:
   shard:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 35
     strategy:
       fail-fast: false
+      max-parallel: 20
       matrix:
-        shard: [core_dates, core_terms, nw_regions, nw_provinces1, nw_provinces2, nw_terms, ne_regions, ne_provinces1, ne_provinces2, ne_terms, ce_regions, ce_provinces1, ce_provinces2, ce_terms, so_regions, so_provinces1, so_provinces2, so_terms]
+        province: ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','87','88','89','90','91','92','93','94','95','96','97','98','99','100','101','102','103','108','109','110','111']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Run FITP tournament micro-shard
+      - name: Run FITP tournament province shard
         run: |
           set +e
           mkdir -p dist/v3/shards
-          tmpLog="courtwatch-v3-fitp-tournaments-${{ matrix.shard }}-run.tmp.log"
+          tmpLog="courtwatch-v3-fitp-tournaments-province-${{ matrix.province }}-run.tmp.log"
           : > "$tmpLog"
           echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
           echo "sourceSha=${GITHUB_SHA}" >> "$tmpLog"
           echo "runId=${GITHUB_RUN_ID}" >> "$tmpLog"
-          echo "shard=${{ matrix.shard }}" >> "$tmpLog"
-          FITP_SHARD=${{ matrix.shard }} node src/v3/discover-fitp-tournaments-shard.mjs >> "$tmpLog" 2>&1
+          echo "province=${{ matrix.province }}" >> "$tmpLog"
+          FITP_PROVINCE_ID=${{ matrix.province }} node src/v3/discover-fitp-tournaments-shard.mjs >> "$tmpLog" 2>&1
           code=$?
           echo "exitCode=$code" >> "$tmpLog"
           echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
-          cp "$tmpLog" "courtwatch-v3-fitp-tournaments-${{ matrix.shard }}-run.log"
-          cat "courtwatch-v3-fitp-tournaments-${{ matrix.shard }}-run.log"
+          cp "$tmpLog" "courtwatch-v3-fitp-tournaments-province-${{ matrix.province }}-run.log"
+          cat "courtwatch-v3-fitp-tournaments-province-${{ matrix.province }}-run.log"
           exit $code
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: fitp-tournament-shard-${{ matrix.shard }}
+          name: fitp-tournament-province-${{ matrix.province }}
           path: |
-            dist/v3/shards/source_fitp_tournaments_${{ matrix.shard }}.json
-            dist/v3/shards/source_fitp_tournaments_${{ matrix.shard }}_audit.json
-            courtwatch-v3-fitp-tournaments-${{ matrix.shard }}-run.log
+            dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}.json
+            dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}_audit.json
+            courtwatch-v3-fitp-tournaments-province-${{ matrix.province }}-run.log
   merge:
     needs: shard
     if: always()
@@ -60,9 +61,9 @@ jobs:
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
         with:
-          pattern: fitp-tournament-shard-*
+          pattern: fitp-tournament-province-*
           merge-multiple: true
-      - name: Merge FITP tournament micro-shards
+      - name: Merge FITP tournament province shards
         run: |
           set +e
           tmpLog="courtwatch-v3-fitp-tournaments-sharded-run.tmp.log"
@@ -82,7 +83,7 @@ jobs:
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_fitp_tournaments.json dist/v3/source_fitp_tournaments_audit.json dist/v3/shards courtwatch-v3-fitp-tournaments-*-run.log courtwatch-v3-fitp-tournaments-sharded-run.log .github/workflows/courtwatch-v3-fitp-tournaments-sharded.yml
-          git commit -m "Build Court Watch v3 micro-sharded FITP tournament discovery" || exit 0
+          git add dist/v3/source_fitp_tournaments.json dist/v3/source_fitp_tournaments_audit.json dist/v3/shards courtwatch-v3-fitp-tournaments-province-*-run.log courtwatch-v3-fitp-tournaments-sharded-run.log .github/workflows/courtwatch-v3-fitp-tournaments-sharded.yml
+          git commit -m "Build Court Watch v3 province-sharded FITP tournament discovery" || exit 0
           git pull --rebase origin main || true
           git push origin HEAD:main || true
