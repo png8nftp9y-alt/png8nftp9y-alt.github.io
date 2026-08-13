@@ -1,7 +1,7 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-13T22:47:38.685Z",
-  "overall": "yellow",
+  "generatedAt": "2026-08-13T23:33:59.211Z",
+  "overall": "green",
   "legend": {
     "green": "ok",
     "yellow": "attenzione/parziale",
@@ -11,79 +11,46 @@
     {
       "status": "green",
       "label": "FITP tornei",
-      "detail": "5585 tornei · 0h fa",
+      "detail": "5570 tornei sorgente · ref 55ff89a",
       "critical": true
     },
     {
-      "status": "yellow",
+      "status": "green",
       "label": "FITP iscrizioni",
-      "detail": "0 entry · tessera 0/0 · rescue 0",
+      "detail": "374 entry FITP",
       "critical": true
     },
     {
       "status": "green",
       "label": "Tennis Europe",
-      "detail": "44 entry TE · acceptance 44 · liste 0/0",
-      "critical": false
+      "detail": "44 entry TE · acceptance 44",
+      "critical": true
     },
     {
       "status": "green",
       "label": "ITF",
-      "detail": "4 entry · stato seeded_pending_live_itf_scan",
+      "detail": "2 entry",
       "critical": false
     },
     {
       "status": "green",
       "label": "Calendario",
-      "detail": "46 tornei visibili · FITP 0 · TE 44 · ITF 2",
+      "detail": "420 tornei visibili · FITP 374 · TE 44 · ITF 2",
       "critical": true
     },
     {
       "status": "green",
-      "label": "Agenda/OOP",
-      "detail": "166 voci · motore attivo",
-      "critical": false
-    },
-    {
-      "status": "green",
-      "label": "Risultati",
-      "detail": "54 risultati · motore attivo",
-      "critical": false
-    },
-    {
-      "status": "yellow",
-      "label": "Avversari",
-      "detail": "0 record · da completare 0",
-      "critical": false
-    },
-    {
-      "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 14/08/2026, 00:47:38",
+      "detail": "merge isolato 14/08/2026, 01:33:59",
       "critical": true
     }
   ],
   "raw": {
     "fitp": {
-      "entriesFound": 0,
-      "byPlayer": {},
-      "byMatchMethod": {},
-      "homonymRejected": 0,
-      "verifiedCompetitionEntryRescues": 0,
-      "playerDrivenCandidateTournaments": 0,
-      "playerDrivenCandidateRescues": 0,
-      "playerDrivenCandidatesConfirmed": 0
-    },
-    "calendar": {
-      "tournamentEntries": 46,
-      "byCircuit": {
-        "tennis-europe": 44,
-        "itf": 2
-      },
-      "warnings": 0
+      "entriesFound": 374,
+      "ref": "55ff89a05c6bdff332045935be79cf49c40c9cbc"
     },
     "te": {
-      "status": "tennis_europe_acceptance_complete",
       "entriesVisible": 44,
       "acceptanceConfirmed": 44,
       "byPlayer": {
@@ -136,11 +103,21 @@
         "Q-1": 1,
         "MD-4": 2,
         "MD-3": 1
-      }
+      },
+      "ref": "70ef3384f9159172265817b4e51dbc962c8b88e2"
     },
     "itf": {
-      "status": "seeded_pending_live_itf_scan",
-      "entries": 4
+      "entries": 4,
+      "ref": "55ff89a05c6bdff332045935be79cf49c40c9cbc"
+    },
+    "calendar": {
+      "tournamentEntries": 420,
+      "byCircuit": {
+        "fitp": 374,
+        "tennis-europe": 44,
+        "itf": 2
+      },
+      "warnings": 0
     }
   }
 }
