@@ -2,10 +2,11 @@ import fs from 'node:fs/promises';
 const NOW=new Date().toISOString();
 const PROVINCES=['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','87','88','89','90','91','92','93','94','95','96','97','98','99','100','101','102','103','108','109','110','111'];
 const OWNER='png8nftp9y-alt', REPO='png8nftp9y-alt.github.io', BASELINE_COMMIT='59f59a8d801baa0f9df5eb2679fbad926f2d75d2';
-const BASELINE_URL=`https://raw.githubusercontent.com/${OWNER}/${REPO}/${BASELINE_COMMIT}/dist/v3/source_fitp_tournaments.json`;
+const RAW_HOST='https:'+'//raw.githubusercontent.com';
+const BASELINE_URL=[RAW_HOST,OWNER,REPO,BASELINE_COMMIT,'dist/v3/source_fitp_tournaments.json'].join('/');
 const REGRESSION_IDS={feniceBresciaLomb370:'676A77A5-3B55-479E-81E2-45F109C25F98',rossoniKinderImperia:'25C6CC33-AE3A-447E-A55B-FBE66FBAFC80',navaKinderMilano3:'B3110C9E-C6E4-4DE6-A9A3-BAB9B1341D47'};
 async function readJson(p,f){try{return JSON.parse(await fs.readFile(p,'utf8'))}catch{return f}}
-async function fetchJson(url){try{const r=await fetch(url,{headers:{'user-agent':'CourtWatch-v3-fitp-province-merger/1.2'}});if(!r.ok)throw new Error(`${r.status}`);return await r.json()}catch(e){return{error:e.message,tournaments:[]}}}
+async function fetchJson(url){try{const r=await fetch(url,{headers:{'user-agent':'CourtWatch-v3-fitp-province-merger/1.3'}});if(!r.ok)throw new Error(`${r.status}`);return await r.json()}catch(e){return{error:e.message,tournaments:[]}}}
 async function writeJson(p,v){await fs.mkdir(p.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(p,JSON.stringify(v,null,2)+'\n')}
 const key=t=>String(t?.competitionId||t?.guid||'').toUpperCase();
 const provinceOf=t=>{const loc=String(t.location||'');const m=loc.match(/\b([A-Z]{2})$/);return m?m[1]:''};
