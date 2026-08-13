@@ -1,0 +1,55 @@
+name: Court Watch v3 fix Garibaldi ranking
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'courtwatch-v3-fix-garibaldi-ranking-trigger.json'
+      - '.github/workflows/courtwatch-v3-fix-garibaldi-ranking.yml'
+permissions:
+  contents: write
+concurrency:
+  group: court-watch-v3-fix-garibaldi-ranking
+  cancel-in-progress: false
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore players and set ranking
+        run: |
+          set -e
+          : > courtwatch-v3-fix-garibaldi-ranking-run.log
+          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-fix-garibaldi-ranking-run.log
+          echo "sourceSha=${GITHUB_SHA}" >> courtwatch-v3-fix-garibaldi-ranking-run.log
+          git show 37347bdd0484d704c7762707f0e5fbb94f43c8a0:players.json > players.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const p='players.json';
+          const doc=JSON.parse(fs.readFileSync(p,'utf8'));
+          const player=(doc.players||[]).find(x=>x.id==='mattia-garibaldi');
+          if(!player) throw new Error('mattia-garibaldi not found');
+          player.ranking='4.1';
+          doc.profileSyncUpdatedAt=new Date().toISOString();
+          fs.writeFileSync(p, JSON.stringify(doc,null,2)+'\n');
+          console.log(JSON.stringify({fixed:true,id:player.id,ranking:player.ranking,players:doc.players.length}));
+          NODE
+          node src/v3/entries-engine.mjs >> courtwatch-v3-fix-garibaldi-ranking-run.log 2>&1
+          echo "entriesMergeExit=0" >> courtwatch-v3-fix-garibaldi-ranking-run.log
+          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-fix-garibaldi-ranking-run.log
+          cat courtwatch-v3-fix-garibaldi-ranking-run.log
+      - name: Commit fix
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add players.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json courtwatch-v3-fix-garibaldi-ranking-run.log .github/workflows/courtwatch-v3-fix-garibaldi-ranking.yml
+          git commit -m "Fix Mattia Garibaldi ranking" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
