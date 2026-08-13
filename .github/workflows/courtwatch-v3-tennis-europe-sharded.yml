@@ -15,15 +15,99 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  safety-note:
-    name: Safe sharded pipeline placeholder
+  tournament-shards:
+    name: Tournament shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [core, west, east, north]
     steps:
       - uses: actions/checkout@v4
-      - name: Explain safe mode
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: |
+          set -euo pipefail
+          TE_SHARD=${{ matrix.shard }} node src/v3/discover-tennis-europe-tournaments-shard.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: te-tournaments-${{ matrix.shard }}
+          path: dist/v3/shards/tennis-europe/tournaments-${{ matrix.shard }}.json
+
+  merge-tournaments:
+    runs-on: ubuntu-latest
+    needs: tournament-shards
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist/v3/shards/tennis-europe
+          merge-multiple: true
+      - run: node src/v3/merge-tennis-europe-tournament-shards.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: te-tournaments-merged
+          path: |
+            dist/v3/source_tennis_europe_tournaments_sharded.json
+            dist/v3/source_tennis_europe_tournaments_sharded_audit.json
+
+  acceptance-shards:
+    name: Acceptance shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    needs: merge-tournaments
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0,1,2,3,4,5,6,7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: actions/download-artifact@v4
+        with:
+          name: te-tournaments-merged
+          path: dist/v3
+      - run: |
+          set -euo pipefail
+          TE_ACCEPTANCE_SHARD=${{ matrix.shard }} TE_ACCEPTANCE_TOTAL=8 node src/v3/discover-tennis-europe-acceptance-shard.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: te-acceptance-${{ matrix.shard }}
+          path: dist/v3/shards/tennis-europe/acceptance-${{ matrix.shard }}.json
+
+  merge-validate:
+    runs-on: ubuntu-latest
+    needs: acceptance-shards
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: actions/download-artifact@v4
+        with:
+          name: te-tournaments-merged
+          path: dist/v3
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist/v3/shards/tennis-europe
+          merge-multiple: true
+      - run: |
+          set -euo pipefail
+          node src/v3/merge-tennis-europe-acceptance-shards.mjs
+          cp dist/v3/source_tennis_europe_entries_sharded.json dist/v3/source_tennis_europe_entries.json
+          node src/v3/validate-tennis-europe-live.mjs
+          node src/v3/entries-engine.mjs
+      - name: Commit validated sharded Tennis Europe outputs
         run: |
           set -euo pipefail
-          echo "This workflow is intentionally manual-only while the sharded Tennis Europe pipeline is implemented."
-          echo "It must not publish partial data."
-          echo "Public v3 remains on the last known good backup until live validation passes."
-          cat src/v3/tennis-europe-sharded-recovery-plan.md
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_tennis_europe_tournaments_sharded.json dist/v3/source_tennis_europe_tournaments_sharded_audit.json dist/v3/source_tennis_europe_entries_sharded.json dist/v3/source_tennis_europe_acceptance_sharded_audit.json dist/v3/source_tennis_europe_entries.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_tennis_europe.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json
+          git commit -m "Publish validated sharded Tennis Europe data" || echo "No changes"
+          git pull --rebase origin main || true
+          git push origin HEAD:main
