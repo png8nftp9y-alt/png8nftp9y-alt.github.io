@@ -24,7 +24,7 @@ concurrency:
 jobs:
   discover:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -33,18 +33,40 @@ jobs:
       - run: |
           set +e
           : > courtwatch-v3-tennis-europe-run.log
+
+          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-tennis-europe-run.log
+          echo "sourceSha=${GITHUB_SHA}" >> courtwatch-v3-tennis-europe-run.log
+          echo "runId=${GITHUB_RUN_ID}" >> courtwatch-v3-tennis-europe-run.log
+
           node src/v3/discover-tennis-europe-tournaments.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
           tournaments_code=$?
           echo "tennisEuropeTournamentsExit=$tournaments_code" >> courtwatch-v3-tennis-europe-run.log
-          node src/v3/discover-tennis-europe-acceptance.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
-          acceptance_code=$?
+
+          if [ "$tournaments_code" -eq 0 ]; then
+            node src/v3/discover-tennis-europe-acceptance.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
+            acceptance_code=$?
+          else
+            acceptance_code=98
+          fi
           echo "tennisEuropeAcceptanceExit=$acceptance_code" >> courtwatch-v3-tennis-europe-run.log
-          node src/v3/verify-tennis-europe-draws.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
-          draw_code=$?
+
+          if [ "$acceptance_code" -eq 0 ]; then
+            node src/v3/verify-tennis-europe-draws.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
+            draw_code=$?
+          else
+            draw_code=97
+          fi
           echo "tennisEuropeDrawExit=$draw_code" >> courtwatch-v3-tennis-europe-run.log
-          node src/v3/entries-engine.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
-          entries_code=$?
+
+          if [ "$draw_code" -eq 0 ]; then
+            node src/v3/entries-engine.mjs >> courtwatch-v3-tennis-europe-run.log 2>&1
+            entries_code=$?
+          else
+            entries_code=96
+          fi
           echo "entriesEngineExit=$entries_code" >> courtwatch-v3-tennis-europe-run.log
+          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-tennis-europe-run.log
+
           cat courtwatch-v3-tennis-europe-run.log
           if [ "$tournaments_code" -ne 0 ] || [ "$acceptance_code" -ne 0 ] || [ "$draw_code" -ne 0 ] || [ "$entries_code" -ne 0 ]; then exit 1; fi
       - if: always()
