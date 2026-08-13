@@ -1,0 +1,41 @@
+name: Court Watch v3 add Mattia Garibaldi
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/add-mattia-garibaldi-player.mjs'
+      - 'courtwatch-v3-add-mattia-garibaldi-trigger.json'
+      - '.github/workflows/courtwatch-v3-add-mattia-garibaldi.yml'
+permissions:
+  contents: write
+concurrency:
+  group: court-watch-v3-add-mattia-garibaldi
+  cancel-in-progress: true
+jobs:
+  add-player:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Add Mattia Garibaldi to players
+        run: |
+          set +e
+          : > courtwatch-v3-add-mattia-garibaldi-run.log
+          node src/v3/add-mattia-garibaldi-player.mjs >> courtwatch-v3-add-mattia-garibaldi-run.log 2>&1
+          code=$?
+          echo "addPlayerExit=$code" >> courtwatch-v3-add-mattia-garibaldi-run.log
+          cat courtwatch-v3-add-mattia-garibaldi-run.log
+          exit $code
+      - name: Commit player update
+        if: always()
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add players.json courtwatch-v3-add-mattia-garibaldi-run.log .github/workflows/courtwatch-v3-add-mattia-garibaldi.yml src/v3/add-mattia-garibaldi-player.mjs
+          git commit -m "Add Mattia Garibaldi to Court Watch players" || exit 0
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
