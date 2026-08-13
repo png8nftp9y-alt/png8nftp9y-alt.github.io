@@ -1,0 +1,66 @@
+{
+  "version": "cw-v3-fitp-province-shard",
+  "generatedAt": "2026-08-13T00:11:13.744Z",
+  "status": "fitp_province_shard_complete",
+  "provinceId": "94",
+  "source": "One visible GitHub Actions shard per FITP province. Each province shard runs rotating logical windows with 21-day overlap except first historical window; saturated branches auto-split.",
+  "coverageFrom": "2025-12-18",
+  "coverageUntil": "2028-08-12",
+  "branches": 8,
+  "queries": 8,
+  "tournamentsFound": 2,
+  "unresolvedSaturations": 0,
+  "regression": {
+    "feniceBresciaLomb370": false,
+    "rossoniKinderImperia": false,
+    "navaKinderMilano3": false
+  },
+  "tournaments": [
+    {
+      "circuit": "fitp",
+      "competitionId": "FB57B12C-317E-4C32-B8AF-D2199500ACB5",
+      "tournamentName": "MOLISE - RODEO WEEKEND - Torneo IV categoria LIM 4.2",
+      "location": "Isernia IS",
+      "startDate": "2026-04-10",
+      "endDate": "2026-04-12",
+      "status": "finished",
+      "disciplineId": "4332",
+      "sourceCode": "1",
+      "sourceName": "TORNEI FITP",
+      "categoryAge": "U08;U10;U11;U12;U13;U14;U15;U16;U17;U18;NOF;NOR;O30;O35;O40;O45;O50;O55;O60;O65;O70;O75;O80",
+      "categoryClass": "4.2;4.3;4.4;4.5;4.6;4.NC",
+      "tournamentType": "Femminile;Maschile",
+      "club": "AS DILETTANTISTICA CIRCOLO TENNIS ISERNIA",
+      "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=FB57B12C-317E-4C32-B8AF-D2199500ACB5",
+      "discoveryShard": "province_94",
+      "coverageModes": [
+        "94:window_1_2025-12-18_2026-04-19",
+        "94:window_2_2026-04-19_2026-08-19"
+      ],
+      "lastSeen": "2026-08-13T00:11:13.744Z"
+    },
+    {
+      "circuit": "fitp",
+      "competitionId": "37984CCE-90E1-4FA1-A0AB-6BCF7F2697F2",
+      "tournamentName": "MOLISE - Isernia Open 5000 Euro",
+      "location": "Isernia IS",
+      "startDate": "2026-06-20",
+      "endDate": "2026-07-03",
+      "status": "finished",
+      "disciplineId": "4332",
+      "sourceCode": "1",
+      "sourceName": "TORNEI FITP",
+      "categoryAge": "U08;U10;U11;U12;U13;U14;U15;U16;U17;U18;NOR;O30;O35;O40;O45;O50;O55;O60;O65;O70;O75;O80",
+      "categoryClass": "1;2.1;2.2;2.3;2.4;2.5;2.6;2.7;2.8;3.1;3.2;3.3;3.4;3.5;4.1;4.2;4.3;4.4;4.5;4.6;4.NC",
+      "tournamentType": "Maschile",
+      "club": "AS DILETTANTISTICA CIRCOLO TENNIS ISERNIA",
+      "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=37984CCE-90E1-4FA1-A0AB-6BCF7F2697F2",
+      "discoveryShard": "province_94",
+      "coverageModes": [
+        "94:window_2_2026-04-19_2026-08-19"
+      ],
+      "lastSeen": "2026-08-13T00:11:13.744Z"
+    }
+  ],
+  "errors": []
+}

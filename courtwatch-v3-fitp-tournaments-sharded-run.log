@@ -1,64 +1,65 @@
-startedAt=2026-08-13T00:05:51Z
-sourceSha=bcd118696143ab6142d6725e4ddcd217397ab108
-runId=31653149164
+startedAt=2026-08-13T00:11:41Z
+sourceSha=ccbb04231d4ec0e7bc4fbaa0cb813647ca781df2
+runId=31653490077
 {
-  "version": "cw-v3-fitp-provincial-window-hybrid",
-  "generatedAt": "2026-08-13T00:05:51.706Z",
-  "status": "fitp_hybrid_tournament_map_complete",
-  "source": "Hybrid safety map: old complete micro-sharded FITP map preserved as baseline, plus new province × rotating-window structured P.U.C. engine. This prevents coverage regression while the provincial engine is hardened. Final dedupe by competitionId. No player keywords are used by the provincial engine.",
+  "version": "cw-v3-fitp-province-sharded-hybrid",
+  "generatedAt": "2026-08-13T00:11:41.490Z",
+  "status": "fitp_province_sharded_hybrid_with_errors",
+  "source": "One GitHub Actions shard per FITP province, merged with old complete baseline as safety net while province engine is validated. Final dedupe by competitionId.",
   "coverageFrom": "2025-12-18",
   "coverageUntil": "2026-12-20",
   "baseline": {
     "commit": "59f59a8d801baa0f9df5eb2679fbad926f2d75d2",
-    "count": 5327
+    "count": 0
   },
-  "provincialWindow": {
+  "provinceWindow": {
+    "expectedProvinceShards": 107,
+    "completedProvinceShards": 107,
+    "failedProvinceShards": 0,
     "queries": 863,
     "tournamentsFound": 4078,
-    "addedBeyondBaseline": 230,
-    "baselineOnly": 1479
+    "addedBeyondBaseline": 4078,
+    "baselineOnly": 0
   },
   "queries": 863,
-  "tournamentsFound": 5557,
+  "tournamentsFound": 4078,
   "bySource": {
-    "TORNEI FITP": 5557
+    "TORNEI FITP": 4078
   },
   "byStatus": {
-    "finished": 4486,
-    "active_or_open": 143,
-    "upcoming": 928
+    "finished": 3280,
+    "active_or_open": 117,
+    "upcoming": 681
   },
   "regression": {
     "feniceBresciaLomb370": {
       "present": true,
       "source": [
-        "provincial_window"
+        "province_window"
       ]
     },
     "rossoniKinderImperia": {
       "present": true,
       "source": [
-        "provincial_window"
+        "province_window"
       ]
     },
     "navaKinderMilano3": {
-      "present": true,
-      "source": [
-        "baseline"
-      ]
+      "present": false,
+      "source": []
     }
   },
   "quality": {
+    "provinceSharded": true,
     "hybridSafety": true,
-    "microSharded": true,
-    "shards": [
+    "provinceShards": [
       {
-        "shard": "core_dates",
-        "generatedAt": "2026-08-12T23:55:08.519Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 159,
+        "province": "1",
+        "generatedAt": "2026-08-13T00:10:25.297Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -68,12 +69,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "core_terms",
-        "generatedAt": "2026-08-12T23:55:07.320Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 184,
+        "province": "2",
+        "generatedAt": "2026-08-13T00:10:13.373Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 18,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -83,12 +84,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "nw_regions",
-        "generatedAt": "2026-08-12T23:55:11.229Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 147,
+        "province": "3",
+        "generatedAt": "2026-08-13T00:10:14.891Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 37,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -98,12 +99,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "nw_provinces1",
-        "generatedAt": "2026-08-12T23:55:07.368Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 49,
-        "tournamentsFound": 316,
+        "province": "4",
+        "generatedAt": "2026-08-13T00:10:22.795Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 94,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -113,12 +114,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "nw_provinces2",
-        "generatedAt": "2026-08-12T23:55:06.230Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 49,
-        "tournamentsFound": 282,
+        "province": "5",
+        "generatedAt": "2026-08-13T00:10:21.532Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 15,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -128,12 +129,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "nw_terms",
-        "generatedAt": "2026-08-12T23:55:06.907Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 198,
+        "province": "6",
+        "generatedAt": "2026-08-13T00:10:13.456Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 70,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -143,12 +144,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "ne_regions",
-        "generatedAt": "2026-08-12T23:55:11.364Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 49,
-        "tournamentsFound": 290,
+        "province": "7",
+        "generatedAt": "2026-08-13T00:10:12.290Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 13,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -158,12 +159,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "ne_provinces1",
-        "generatedAt": "2026-08-12T23:55:08.287Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 228,
+        "province": "8",
+        "generatedAt": "2026-08-13T00:10:20.012Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 38,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -173,12 +174,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "ne_provinces2",
-        "generatedAt": "2026-08-12T23:55:06.806Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 262,
+        "province": "9",
+        "generatedAt": "2026-08-13T00:10:12.364Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 78,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -188,12 +189,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "ne_terms",
-        "generatedAt": "2026-08-12T23:55:09.327Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 49,
-        "tournamentsFound": 252,
+        "province": "10",
+        "generatedAt": "2026-08-13T00:10:13.220Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -203,12 +204,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "ce_regions",
-        "generatedAt": "2026-08-12T23:55:06.024Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 234,
+        "province": "11",
+        "generatedAt": "2026-08-13T00:10:12.636Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 30,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -218,12 +219,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "ce_provinces1",
-        "generatedAt": "2026-08-12T23:55:08.266Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 261,
+        "province": "12",
+        "generatedAt": "2026-08-13T00:10:12.572Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 98,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -233,12 +234,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "ce_provinces2",
-        "generatedAt": "2026-08-12T23:55:06.278Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 50,
-        "tournamentsFound": 259,
+        "province": "13",
+        "generatedAt": "2026-08-13T00:10:12.592Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 10,
+        "tournamentsFound": 101,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -248,12 +249,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "ce_terms",
-        "generatedAt": "2026-08-12T23:55:07.955Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 49,
-        "tournamentsFound": 191,
+        "province": "14",
+        "generatedAt": "2026-08-13T00:10:16.066Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 23,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -263,12 +264,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "so_regions",
-        "generatedAt": "2026-08-12T23:55:07.468Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 138,
+        "province": "15",
+        "generatedAt": "2026-08-13T00:10:12.609Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -278,12 +279,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "so_provinces1",
-        "generatedAt": "2026-08-12T23:55:08.381Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 215,
+        "province": "16",
+        "generatedAt": "2026-08-13T00:10:15.616Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 108,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -293,12 +294,12 @@ runId=31653149164
         }
       },
       {
-        "shard": "so_provinces2",
-        "generatedAt": "2026-08-12T23:55:07.298Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 48,
-        "queries": 48,
-        "tournamentsFound": 247,
+        "province": "17",
+        "generatedAt": "2026-08-13T00:10:14.757Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 130,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -308,12 +309,1347 @@ runId=31653149164
         }
       },
       {
-        "shard": "so_terms",
-        "generatedAt": "2026-08-12T23:55:06.128Z",
-        "status": "fitp_provincial_window_shard_complete",
-        "branches": 40,
-        "queries": 40,
-        "tournamentsFound": 215,
+        "province": "18",
+        "generatedAt": "2026-08-13T00:10:12.670Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 112,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "19",
+        "generatedAt": "2026-08-13T00:10:13.779Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 78,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "20",
+        "generatedAt": "2026-08-13T00:10:15.112Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 43,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "21",
+        "generatedAt": "2026-08-13T00:10:21.083Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 84,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "22",
+        "generatedAt": "2026-08-13T00:10:25.123Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 70,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "23",
+        "generatedAt": "2026-08-13T00:10:26.147Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 99,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "24",
+        "generatedAt": "2026-08-13T00:10:23.895Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 72,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "25",
+        "generatedAt": "2026-08-13T00:10:23.771Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 12,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "26",
+        "generatedAt": "2026-08-13T00:10:23.365Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 87,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "27",
+        "generatedAt": "2026-08-13T00:10:26.763Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "28",
+        "generatedAt": "2026-08-13T00:10:29.425Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 81,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "29",
+        "generatedAt": "2026-08-13T00:10:23.975Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 30,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "30",
+        "generatedAt": "2026-08-13T00:10:28.375Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 29,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "31",
+        "generatedAt": "2026-08-13T00:10:25.724Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 18,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "32",
+        "generatedAt": "2026-08-13T00:10:32.930Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 24,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "33",
+        "generatedAt": "2026-08-13T00:10:26.219Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 44,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "34",
+        "generatedAt": "2026-08-13T00:10:30.360Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 38,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "35",
+        "generatedAt": "2026-08-13T00:10:31.388Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 96,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "36",
+        "generatedAt": "2026-08-13T00:10:31.783Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 72,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "37",
+        "generatedAt": "2026-08-13T00:10:35.073Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "38",
+        "generatedAt": "2026-08-13T00:10:31.783Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 29,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "39",
+        "generatedAt": "2026-08-13T00:10:35.660Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 67,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "40",
+        "generatedAt": "2026-08-13T00:10:34.998Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 60,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "41",
+        "generatedAt": "2026-08-13T00:10:36.389Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 46,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "42",
+        "generatedAt": "2026-08-13T00:10:36.988Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 52,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "43",
+        "generatedAt": "2026-08-13T00:10:34.135Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 29,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "44",
+        "generatedAt": "2026-08-13T00:10:34.317Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 27,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "45",
+        "generatedAt": "2026-08-13T00:10:37.812Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 83,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "46",
+        "generatedAt": "2026-08-13T00:10:37.445Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 28,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "47",
+        "generatedAt": "2026-08-13T00:10:39.300Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 27,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "48",
+        "generatedAt": "2026-08-13T00:10:42.662Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "49",
+        "generatedAt": "2026-08-13T00:10:38.971Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 42,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "50",
+        "generatedAt": "2026-08-13T00:10:41.449Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 46,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "51",
+        "generatedAt": "2026-08-13T00:10:41.516Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 54,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "52",
+        "generatedAt": "2026-08-13T00:10:44.685Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 45,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "53",
+        "generatedAt": "2026-08-13T00:10:44.081Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 28,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "54",
+        "generatedAt": "2026-08-13T00:10:45.926Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 9,
+        "tournamentsFound": 109,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "55",
+        "generatedAt": "2026-08-13T00:10:45.583Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 46,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "56",
+        "generatedAt": "2026-08-13T00:10:50.252Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 51,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "57",
+        "generatedAt": "2026-08-13T00:10:50.362Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 17,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "58",
+        "generatedAt": "2026-08-13T00:10:45.819Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "59",
+        "generatedAt": "2026-08-13T00:10:47.117Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 9,
+        "tournamentsFound": 55,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "60",
+        "generatedAt": "2026-08-13T00:10:45.747Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 36,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "61",
+        "generatedAt": "2026-08-13T00:10:47.869Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 26,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "62",
+        "generatedAt": "2026-08-13T00:10:54.277Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 11,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "63",
+        "generatedAt": "2026-08-13T00:10:46.277Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "64",
+        "generatedAt": "2026-08-13T00:10:51.774Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 12,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "65",
+        "generatedAt": "2026-08-13T00:10:51.135Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 9,
+        "tournamentsFound": 51,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "66",
+        "generatedAt": "2026-08-13T00:10:50.332Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 26,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "67",
+        "generatedAt": "2026-08-13T00:10:53.463Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 34,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "68",
+        "generatedAt": "2026-08-13T00:10:58.073Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 53,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "69",
+        "generatedAt": "2026-08-13T00:10:56.340Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 22,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "70",
+        "generatedAt": "2026-08-13T00:10:54.325Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 19,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "71",
+        "generatedAt": "2026-08-13T00:10:58.425Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 13,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "72",
+        "generatedAt": "2026-08-13T00:11:00.421Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "73",
+        "generatedAt": "2026-08-13T00:11:02.869Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 30,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "74",
+        "generatedAt": "2026-08-13T00:11:06.304Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 31,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "75",
+        "generatedAt": "2026-08-13T00:10:56.756Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 9,
+        "tournamentsFound": 47,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "76",
+        "generatedAt": "2026-08-13T00:10:57.637Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 21,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "77",
+        "generatedAt": "2026-08-13T00:11:00.030Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 12,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "78",
+        "generatedAt": "2026-08-13T00:11:00.768Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 46,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "79",
+        "generatedAt": "2026-08-13T00:11:00.691Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 17,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "80",
+        "generatedAt": "2026-08-13T00:11:04.392Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "81",
+        "generatedAt": "2026-08-13T00:11:02.326Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 25,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "82",
+        "generatedAt": "2026-08-13T00:11:03.559Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "83",
+        "generatedAt": "2026-08-13T00:11:03.537Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "84",
+        "generatedAt": "2026-08-13T00:11:07.894Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 23,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "85",
+        "generatedAt": "2026-08-13T00:11:07.671Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 22,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "86",
+        "generatedAt": "2026-08-13T00:11:14.761Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 9,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "87",
+        "generatedAt": "2026-08-13T00:11:05.311Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "88",
+        "generatedAt": "2026-08-13T00:11:10.927Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 35,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "89",
+        "generatedAt": "2026-08-13T00:11:08.797Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 39,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "90",
+        "generatedAt": "2026-08-13T00:11:18.701Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 44,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "91",
+        "generatedAt": "2026-08-13T00:11:11.121Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 11,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "92",
+        "generatedAt": "2026-08-13T00:11:12.194Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 0,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "93",
+        "generatedAt": "2026-08-13T00:11:15.465Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 31,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "94",
+        "generatedAt": "2026-08-13T00:11:13.744Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 2,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "95",
+        "generatedAt": "2026-08-13T00:11:13.981Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 9,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "96",
+        "generatedAt": "2026-08-13T00:11:12.871Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 15,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "97",
+        "generatedAt": "2026-08-13T00:11:13.335Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 47,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "98",
+        "generatedAt": "2026-08-13T00:11:14.884Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 37,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "99",
+        "generatedAt": "2026-08-13T00:11:13.649Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 81,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "100",
+        "generatedAt": "2026-08-13T00:11:17.303Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 13,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "101",
+        "generatedAt": "2026-08-13T00:11:19.287Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 7,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "102",
+        "generatedAt": "2026-08-13T00:11:16.041Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 6,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "103",
+        "generatedAt": "2026-08-13T00:11:19.557Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 26,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "108",
+        "generatedAt": "2026-08-13T00:11:19.709Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 9,
+        "tournamentsFound": 135,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "109",
+        "generatedAt": "2026-08-13T00:11:26.578Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 29,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "110",
+        "generatedAt": "2026-08-13T00:11:20.486Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 26,
+        "unresolvedSaturations": 0,
+        "errors": 0,
+        "regression": {
+          "feniceBresciaLomb370": false,
+          "rossoniKinderImperia": false,
+          "navaKinderMilano3": false
+        }
+      },
+      {
+        "province": "111",
+        "generatedAt": "2026-08-13T00:11:24.578Z",
+        "status": "fitp_province_shard_complete",
+        "branches": 8,
+        "queries": 8,
+        "tournamentsFound": 16,
         "unresolvedSaturations": 0,
         "errors": 0,
         "regression": {
@@ -323,130 +1659,131 @@ runId=31653149164
         }
       }
     ],
-    "expectedShards": 18,
-    "failedShards": 0,
     "individualOnly": true,
     "tennisEuropeExcluded": true,
     "usesPlayerKeywords": false,
     "usesDraws": false,
     "usesOrderOfPlay": false,
     "usesResults": false,
-    "baselineOnlyByProvince": {
-      "RM": 294,
-      "TO": 264,
-      "MI": 194,
-      "GE": 130,
-      "NA": 97,
-      "FI": 96,
-      "VE": 90,
-      "CT": 64,
-      "BO": 53,
-      "BA": 51,
-      "CA": 44,
-      "PA": 35,
-      "ME": 34,
-      "RC": 33
-    },
-    "baselineOnlyByMonth": {
-      "2026-06": 237,
-      "2026-07": 229,
-      "2026-05": 191,
-      "2026-03": 174,
-      "2026-08": 153,
-      "2026-02": 129,
-      "2026-09": 120,
-      "2026-04": 104,
-      "2026-01": 91,
-      "2025-12": 40,
-      "2026-10": 11
-    },
+    "baselineOnlyByProvince": {},
+    "baselineOnlyByMonth": {},
     "addedByProvince": {
-      "NO": 15,
-      "AL": 14,
-      "CN": 14,
-      "VA": 10,
-      "PG": 8,
-      "RN": 8,
-      "SA": 8,
-      "PV": 7,
-      "BS": 6,
-      "CS": 6,
-      "AT": 5,
-      "RG": 5,
-      "AV": 4,
-      "BI": 4,
-      "FC": 4,
-      "SR": 4,
-      "SV": 4,
-      "UD": 4,
-      "AN": 3,
-      "BR": 3,
-      "CE": 3,
-      "CH": 3,
-      "CO": 3,
-      "CR": 3,
-      "FM": 3,
-      "FR": 3,
-      "LT": 3,
-      "MS": 3,
-      "TP": 3,
-      "TR": 3,
-      "VC": 3,
-      "AG": 2,
-      "AR": 2,
-      "BZ": 2,
-      "FE": 2,
-      "FG": 2,
-      "IM": 2,
-      "LE": 2,
-      "MN": 2,
-      "MO": 2,
-      "PD": 2,
-      "PI": 2,
-      "PU": 2,
-      "RA": 2,
-      "RI": 2,
-      "SP": 2,
-      "TA": 2,
-      "TE": 2,
-      "VB": 2,
-      "VI": 2,
-      "AO": 1,
-      "AP": 1,
-      "BG": 1,
-      "BN": 1,
-      "BT": 1,
-      "KR": 1,
-      "LO": 1,
-      "LU": 1,
-      "MB": 1,
-      "MC": 1,
-      "PC": 1,
-      "PE": 1,
-      "PN": 1,
-      "PO": 1,
-      "PT": 1,
-      "PZ": 1,
-      "RO": 1,
-      "SI": 1,
-      "SO": 1,
-      "SS": 1,
-      "TV": 1,
-      "VT": 1,
-      "VV": 1
+      "MB": 135,
+      "BS": 130,
+      "PV": 112,
+      "PG": 109,
+      "BG": 108,
+      "CO": 101,
+      "VR": 99,
+      "VA": 98,
+      "RE": 96,
+      "CN": 94,
+      "TV": 87,
+      "BZ": 84,
+      "MS": 83,
+      "PD": 81,
+      "RN": 81,
+      "CR": 78,
+      "SV": 78,
+      "MO": 72,
+      "VI": 72,
+      "AL": 70,
+      "TN": 70,
+      "RA": 67,
+      "FC": 60,
+      "LT": 55,
+      "AR": 54,
+      "PE": 53,
+      "AN": 52,
+      "SA": 51,
+      "VT": 51,
+      "LC": 47,
+      "LE": 47,
+      "CS": 46,
+      "PI": 46,
+      "PU": 46,
+      "TR": 46,
+      "SI": 45,
+      "PC": 44,
+      "SS": 44,
+      "MN": 43,
+      "LI": 42,
+      "SR": 39,
+      "IM": 38,
+      "PR": 38,
+      "LO": 37,
+      "NO": 37,
+      "FR": 36,
+      "RG": 35,
+      "TE": 34,
+      "BR": 31,
+      "PN": 31,
+      "RO": 30,
+      "SP": 30,
+      "TA": 30,
+      "FE": 29,
+      "FM": 29,
+      "MC": 29,
+      "UD": 29,
+      "GR": 28,
+      "LU": 28,
+      "AP": 27,
+      "PT": 27,
+      "AQ": 26,
+      "BT": 26,
+      "CE": 26,
+      "VB": 26,
+      "TP": 25,
+      "TS": 24,
+      "AG": 23,
+      "SO": 23,
+      "CH": 22,
+      "CL": 22,
+      "PZ": 21,
+      "CB": 19,
+      "GO": 18,
+      "VC": 18,
+      "CZ": 17,
+      "RI": 17,
+      "SU": 16,
+      "AT": 15,
+      "BI": 15,
+      "AO": 13,
+      "FG": 13,
+      "PO": 13,
+      "AV": 12,
+      "BL": 12,
+      "MT": 12,
+      "BN": 11,
+      "NU": 11,
+      "EN": 9,
+      "OR": 9,
+      "KR": 7,
+      "VV": 6,
+      "IS": 2
     },
     "addedByMonth": {
-      "2026-04": 95,
-      "2026-06": 51,
-      "2026-07": 31,
-      "2026-05": 19,
-      "2026-02": 15,
-      "2026-03": 15,
-      "2026-01": 3,
-      "2025-12": 1
+      "2026-06": 664,
+      "2026-07": 630,
+      "2026-05": 541,
+      "2026-08": 457,
+      "2026-03": 413,
+      "2026-04": 385,
+      "2026-02": 328,
+      "2026-09": 325,
+      "2026-01": 202,
+      "2025-12": 95,
+      "2026-10": 31,
+      "2026-11": 6,
+      "2026-12": 1
     }
   },
-  "errors": []
+  "errors": [
+    {
+      "source": "baseline",
+      "error": "Failed to parse URL from {{https://raw.githubusercontent.com/png8nftp9y-alt}}/png8nftp9y-alt.github.io/59f59a8d801baa0f9df5eb2679fbad926f2d75d2/dist/v3/source_fitp_tournaments.json"
+    }
+  ]
 }
-exitCode=0
-finishedAt=2026-08-13T00:05:53Z
+exitCode=1
+finishedAt=2026-08-13T00:11:41Z
