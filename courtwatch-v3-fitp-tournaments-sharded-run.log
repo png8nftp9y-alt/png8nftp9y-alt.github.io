@@ -1,16 +1,17 @@
-startedAt=2026-08-13T00:11:41Z
-sourceSha=ccbb04231d4ec0e7bc4fbaa0cb813647ca781df2
-runId=31653490077
+startedAt=2026-08-13T00:18:15Z
+sourceSha=427175ae1e1b290c771d0867d0a01c3f428cdd12
+runId=31653877665
 {
   "version": "cw-v3-fitp-province-sharded-hybrid",
-  "generatedAt": "2026-08-13T00:11:41.490Z",
-  "status": "fitp_province_sharded_hybrid_with_errors",
+  "generatedAt": "2026-08-13T00:18:15.108Z",
+  "status": "fitp_province_sharded_hybrid_complete",
   "source": "One GitHub Actions shard per FITP province, merged with old complete baseline as safety net while province engine is validated. Final dedupe by competitionId.",
   "coverageFrom": "2025-12-18",
   "coverageUntil": "2026-12-20",
   "baseline": {
     "commit": "59f59a8d801baa0f9df5eb2679fbad926f2d75d2",
-    "count": 0
+    "count": 5327,
+    "url": "https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io/59f59a8d801baa0f9df5eb2679fbad926f2d75d2/dist/v3/source_fitp_tournaments.json"
   },
   "provinceWindow": {
     "expectedProvinceShards": 107,
@@ -18,18 +19,18 @@ runId=31653490077
     "failedProvinceShards": 0,
     "queries": 863,
     "tournamentsFound": 4078,
-    "addedBeyondBaseline": 4078,
-    "baselineOnly": 0
+    "addedBeyondBaseline": 230,
+    "baselineOnly": 1479
   },
   "queries": 863,
-  "tournamentsFound": 4078,
+  "tournamentsFound": 5557,
   "bySource": {
-    "TORNEI FITP": 4078
+    "TORNEI FITP": 5557
   },
   "byStatus": {
-    "finished": 3280,
-    "active_or_open": 117,
-    "upcoming": 681
+    "finished": 4486,
+    "active_or_open": 143,
+    "upcoming": 928
   },
   "regression": {
     "feniceBresciaLomb370": {
@@ -45,8 +46,10 @@ runId=31653490077
       ]
     },
     "navaKinderMilano3": {
-      "present": false,
-      "source": []
+      "present": true,
+      "source": [
+        "baseline"
+      ]
     }
   },
   "quality": {
@@ -55,7 +58,7 @@ runId=31653490077
     "provinceShards": [
       {
         "province": "1",
-        "generatedAt": "2026-08-13T00:10:25.297Z",
+        "generatedAt": "2026-08-13T00:16:52.758Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -70,7 +73,7 @@ runId=31653490077
       },
       {
         "province": "2",
-        "generatedAt": "2026-08-13T00:10:13.373Z",
+        "generatedAt": "2026-08-13T00:16:50.971Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -85,7 +88,7 @@ runId=31653490077
       },
       {
         "province": "3",
-        "generatedAt": "2026-08-13T00:10:14.891Z",
+        "generatedAt": "2026-08-13T00:16:50.448Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -100,7 +103,7 @@ runId=31653490077
       },
       {
         "province": "4",
-        "generatedAt": "2026-08-13T00:10:22.795Z",
+        "generatedAt": "2026-08-13T00:16:53.858Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -115,7 +118,7 @@ runId=31653490077
       },
       {
         "province": "5",
-        "generatedAt": "2026-08-13T00:10:21.532Z",
+        "generatedAt": "2026-08-13T00:16:52.018Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -130,7 +133,7 @@ runId=31653490077
       },
       {
         "province": "6",
-        "generatedAt": "2026-08-13T00:10:13.456Z",
+        "generatedAt": "2026-08-13T00:16:52.576Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -145,7 +148,7 @@ runId=31653490077
       },
       {
         "province": "7",
-        "generatedAt": "2026-08-13T00:10:12.290Z",
+        "generatedAt": "2026-08-13T00:17:05.404Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -160,7 +163,7 @@ runId=31653490077
       },
       {
         "province": "8",
-        "generatedAt": "2026-08-13T00:10:20.012Z",
+        "generatedAt": "2026-08-13T00:16:51.640Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -175,7 +178,7 @@ runId=31653490077
       },
       {
         "province": "9",
-        "generatedAt": "2026-08-13T00:10:12.364Z",
+        "generatedAt": "2026-08-13T00:17:00.232Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -190,7 +193,7 @@ runId=31653490077
       },
       {
         "province": "10",
-        "generatedAt": "2026-08-13T00:10:13.220Z",
+        "generatedAt": "2026-08-13T00:16:51.403Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -205,7 +208,7 @@ runId=31653490077
       },
       {
         "province": "11",
-        "generatedAt": "2026-08-13T00:10:12.636Z",
+        "generatedAt": "2026-08-13T00:16:53.766Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -220,7 +223,7 @@ runId=31653490077
       },
       {
         "province": "12",
-        "generatedAt": "2026-08-13T00:10:12.572Z",
+        "generatedAt": "2026-08-13T00:16:52.937Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -235,7 +238,7 @@ runId=31653490077
       },
       {
         "province": "13",
-        "generatedAt": "2026-08-13T00:10:12.592Z",
+        "generatedAt": "2026-08-13T00:16:51.005Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 10,
@@ -250,7 +253,7 @@ runId=31653490077
       },
       {
         "province": "14",
-        "generatedAt": "2026-08-13T00:10:16.066Z",
+        "generatedAt": "2026-08-13T00:16:51.727Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -265,7 +268,7 @@ runId=31653490077
       },
       {
         "province": "15",
-        "generatedAt": "2026-08-13T00:10:12.609Z",
+        "generatedAt": "2026-08-13T00:17:02.936Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -280,7 +283,7 @@ runId=31653490077
       },
       {
         "province": "16",
-        "generatedAt": "2026-08-13T00:10:15.616Z",
+        "generatedAt": "2026-08-13T00:16:51.708Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -295,7 +298,7 @@ runId=31653490077
       },
       {
         "province": "17",
-        "generatedAt": "2026-08-13T00:10:14.757Z",
+        "generatedAt": "2026-08-13T00:16:53.091Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -310,7 +313,7 @@ runId=31653490077
       },
       {
         "province": "18",
-        "generatedAt": "2026-08-13T00:10:12.670Z",
+        "generatedAt": "2026-08-13T00:16:51.753Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -325,7 +328,7 @@ runId=31653490077
       },
       {
         "province": "19",
-        "generatedAt": "2026-08-13T00:10:13.779Z",
+        "generatedAt": "2026-08-13T00:16:51.895Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -340,7 +343,7 @@ runId=31653490077
       },
       {
         "province": "20",
-        "generatedAt": "2026-08-13T00:10:15.112Z",
+        "generatedAt": "2026-08-13T00:16:53.752Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -355,7 +358,7 @@ runId=31653490077
       },
       {
         "province": "21",
-        "generatedAt": "2026-08-13T00:10:21.083Z",
+        "generatedAt": "2026-08-13T00:17:02.305Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -370,7 +373,7 @@ runId=31653490077
       },
       {
         "province": "22",
-        "generatedAt": "2026-08-13T00:10:25.123Z",
+        "generatedAt": "2026-08-13T00:17:03.291Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -385,7 +388,7 @@ runId=31653490077
       },
       {
         "province": "23",
-        "generatedAt": "2026-08-13T00:10:26.147Z",
+        "generatedAt": "2026-08-13T00:17:07.754Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -400,7 +403,7 @@ runId=31653490077
       },
       {
         "province": "24",
-        "generatedAt": "2026-08-13T00:10:23.895Z",
+        "generatedAt": "2026-08-13T00:17:04.669Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -415,7 +418,7 @@ runId=31653490077
       },
       {
         "province": "25",
-        "generatedAt": "2026-08-13T00:10:23.771Z",
+        "generatedAt": "2026-08-13T00:17:06.535Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -430,7 +433,7 @@ runId=31653490077
       },
       {
         "province": "26",
-        "generatedAt": "2026-08-13T00:10:23.365Z",
+        "generatedAt": "2026-08-13T00:17:02.488Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -445,7 +448,7 @@ runId=31653490077
       },
       {
         "province": "27",
-        "generatedAt": "2026-08-13T00:10:26.763Z",
+        "generatedAt": "2026-08-13T00:17:04.642Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -460,7 +463,7 @@ runId=31653490077
       },
       {
         "province": "28",
-        "generatedAt": "2026-08-13T00:10:29.425Z",
+        "generatedAt": "2026-08-13T00:17:05.582Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -475,7 +478,7 @@ runId=31653490077
       },
       {
         "province": "29",
-        "generatedAt": "2026-08-13T00:10:23.975Z",
+        "generatedAt": "2026-08-13T00:17:03.455Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -490,7 +493,7 @@ runId=31653490077
       },
       {
         "province": "30",
-        "generatedAt": "2026-08-13T00:10:28.375Z",
+        "generatedAt": "2026-08-13T00:17:05.476Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -505,7 +508,7 @@ runId=31653490077
       },
       {
         "province": "31",
-        "generatedAt": "2026-08-13T00:10:25.724Z",
+        "generatedAt": "2026-08-13T00:17:05.062Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -520,7 +523,7 @@ runId=31653490077
       },
       {
         "province": "32",
-        "generatedAt": "2026-08-13T00:10:32.930Z",
+        "generatedAt": "2026-08-13T00:17:04.355Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -535,7 +538,7 @@ runId=31653490077
       },
       {
         "province": "33",
-        "generatedAt": "2026-08-13T00:10:26.219Z",
+        "generatedAt": "2026-08-13T00:17:09.403Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -550,7 +553,7 @@ runId=31653490077
       },
       {
         "province": "34",
-        "generatedAt": "2026-08-13T00:10:30.360Z",
+        "generatedAt": "2026-08-13T00:17:13.982Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -565,7 +568,7 @@ runId=31653490077
       },
       {
         "province": "35",
-        "generatedAt": "2026-08-13T00:10:31.388Z",
+        "generatedAt": "2026-08-13T00:17:11.306Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -580,7 +583,7 @@ runId=31653490077
       },
       {
         "province": "36",
-        "generatedAt": "2026-08-13T00:10:31.783Z",
+        "generatedAt": "2026-08-13T00:17:16.826Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -595,7 +598,7 @@ runId=31653490077
       },
       {
         "province": "37",
-        "generatedAt": "2026-08-13T00:10:35.073Z",
+        "generatedAt": "2026-08-13T00:17:20.188Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -610,7 +613,7 @@ runId=31653490077
       },
       {
         "province": "38",
-        "generatedAt": "2026-08-13T00:10:31.783Z",
+        "generatedAt": "2026-08-13T00:17:14.348Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -625,7 +628,7 @@ runId=31653490077
       },
       {
         "province": "39",
-        "generatedAt": "2026-08-13T00:10:35.660Z",
+        "generatedAt": "2026-08-13T00:17:15.422Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -640,7 +643,7 @@ runId=31653490077
       },
       {
         "province": "40",
-        "generatedAt": "2026-08-13T00:10:34.998Z",
+        "generatedAt": "2026-08-13T00:17:14.556Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -655,7 +658,7 @@ runId=31653490077
       },
       {
         "province": "41",
-        "generatedAt": "2026-08-13T00:10:36.389Z",
+        "generatedAt": "2026-08-13T00:17:13.709Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -670,7 +673,7 @@ runId=31653490077
       },
       {
         "province": "42",
-        "generatedAt": "2026-08-13T00:10:36.988Z",
+        "generatedAt": "2026-08-13T00:17:15.516Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -685,7 +688,7 @@ runId=31653490077
       },
       {
         "province": "43",
-        "generatedAt": "2026-08-13T00:10:34.135Z",
+        "generatedAt": "2026-08-13T00:17:16.674Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -700,7 +703,7 @@ runId=31653490077
       },
       {
         "province": "44",
-        "generatedAt": "2026-08-13T00:10:34.317Z",
+        "generatedAt": "2026-08-13T00:17:16.697Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -715,7 +718,7 @@ runId=31653490077
       },
       {
         "province": "45",
-        "generatedAt": "2026-08-13T00:10:37.812Z",
+        "generatedAt": "2026-08-13T00:17:15.852Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -730,7 +733,7 @@ runId=31653490077
       },
       {
         "province": "46",
-        "generatedAt": "2026-08-13T00:10:37.445Z",
+        "generatedAt": "2026-08-13T00:17:16.074Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -745,7 +748,7 @@ runId=31653490077
       },
       {
         "province": "47",
-        "generatedAt": "2026-08-13T00:10:39.300Z",
+        "generatedAt": "2026-08-13T00:17:16.077Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -760,7 +763,7 @@ runId=31653490077
       },
       {
         "province": "48",
-        "generatedAt": "2026-08-13T00:10:42.662Z",
+        "generatedAt": "2026-08-13T00:17:18.625Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -775,7 +778,7 @@ runId=31653490077
       },
       {
         "province": "49",
-        "generatedAt": "2026-08-13T00:10:38.971Z",
+        "generatedAt": "2026-08-13T00:17:19.807Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -790,7 +793,7 @@ runId=31653490077
       },
       {
         "province": "50",
-        "generatedAt": "2026-08-13T00:10:41.449Z",
+        "generatedAt": "2026-08-13T00:17:19.998Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -805,7 +808,7 @@ runId=31653490077
       },
       {
         "province": "51",
-        "generatedAt": "2026-08-13T00:10:41.516Z",
+        "generatedAt": "2026-08-13T00:17:20.912Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -820,7 +823,7 @@ runId=31653490077
       },
       {
         "province": "52",
-        "generatedAt": "2026-08-13T00:10:44.685Z",
+        "generatedAt": "2026-08-13T00:17:22.613Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -835,7 +838,7 @@ runId=31653490077
       },
       {
         "province": "53",
-        "generatedAt": "2026-08-13T00:10:44.081Z",
+        "generatedAt": "2026-08-13T00:17:25.368Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -850,7 +853,7 @@ runId=31653490077
       },
       {
         "province": "54",
-        "generatedAt": "2026-08-13T00:10:45.926Z",
+        "generatedAt": "2026-08-13T00:17:25.970Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 9,
@@ -865,7 +868,7 @@ runId=31653490077
       },
       {
         "province": "55",
-        "generatedAt": "2026-08-13T00:10:45.583Z",
+        "generatedAt": "2026-08-13T00:17:29.748Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -880,7 +883,7 @@ runId=31653490077
       },
       {
         "province": "56",
-        "generatedAt": "2026-08-13T00:10:50.252Z",
+        "generatedAt": "2026-08-13T00:17:28.914Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -895,7 +898,7 @@ runId=31653490077
       },
       {
         "province": "57",
-        "generatedAt": "2026-08-13T00:10:50.362Z",
+        "generatedAt": "2026-08-13T00:17:26.058Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -910,7 +913,7 @@ runId=31653490077
       },
       {
         "province": "58",
-        "generatedAt": "2026-08-13T00:10:45.819Z",
+        "generatedAt": "2026-08-13T00:17:29.240Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -925,7 +928,7 @@ runId=31653490077
       },
       {
         "province": "59",
-        "generatedAt": "2026-08-13T00:10:47.117Z",
+        "generatedAt": "2026-08-13T00:17:26.622Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 9,
@@ -940,7 +943,7 @@ runId=31653490077
       },
       {
         "province": "60",
-        "generatedAt": "2026-08-13T00:10:45.747Z",
+        "generatedAt": "2026-08-13T00:17:30.193Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -955,7 +958,7 @@ runId=31653490077
       },
       {
         "province": "61",
-        "generatedAt": "2026-08-13T00:10:47.869Z",
+        "generatedAt": "2026-08-13T00:17:28.319Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -970,7 +973,7 @@ runId=31653490077
       },
       {
         "province": "62",
-        "generatedAt": "2026-08-13T00:10:54.277Z",
+        "generatedAt": "2026-08-13T00:17:31.442Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -985,7 +988,7 @@ runId=31653490077
       },
       {
         "province": "63",
-        "generatedAt": "2026-08-13T00:10:46.277Z",
+        "generatedAt": "2026-08-13T00:17:35.926Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1000,7 +1003,7 @@ runId=31653490077
       },
       {
         "province": "64",
-        "generatedAt": "2026-08-13T00:10:51.774Z",
+        "generatedAt": "2026-08-13T00:17:28.145Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1015,7 +1018,7 @@ runId=31653490077
       },
       {
         "province": "65",
-        "generatedAt": "2026-08-13T00:10:51.135Z",
+        "generatedAt": "2026-08-13T00:17:29.792Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 9,
@@ -1030,7 +1033,7 @@ runId=31653490077
       },
       {
         "province": "66",
-        "generatedAt": "2026-08-13T00:10:50.332Z",
+        "generatedAt": "2026-08-13T00:17:31.274Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1045,7 +1048,7 @@ runId=31653490077
       },
       {
         "province": "67",
-        "generatedAt": "2026-08-13T00:10:53.463Z",
+        "generatedAt": "2026-08-13T00:17:38.142Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1060,7 +1063,7 @@ runId=31653490077
       },
       {
         "province": "68",
-        "generatedAt": "2026-08-13T00:10:58.073Z",
+        "generatedAt": "2026-08-13T00:17:42.372Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1075,7 +1078,7 @@ runId=31653490077
       },
       {
         "province": "69",
-        "generatedAt": "2026-08-13T00:10:56.340Z",
+        "generatedAt": "2026-08-13T00:17:34.062Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1090,7 +1093,7 @@ runId=31653490077
       },
       {
         "province": "70",
-        "generatedAt": "2026-08-13T00:10:54.325Z",
+        "generatedAt": "2026-08-13T00:17:36.138Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1105,7 +1108,7 @@ runId=31653490077
       },
       {
         "province": "71",
-        "generatedAt": "2026-08-13T00:10:58.425Z",
+        "generatedAt": "2026-08-13T00:17:39.367Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1120,7 +1123,7 @@ runId=31653490077
       },
       {
         "province": "72",
-        "generatedAt": "2026-08-13T00:11:00.421Z",
+        "generatedAt": "2026-08-13T00:17:40.676Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1135,7 +1138,7 @@ runId=31653490077
       },
       {
         "province": "73",
-        "generatedAt": "2026-08-13T00:11:02.869Z",
+        "generatedAt": "2026-08-13T00:17:37.434Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1150,7 +1153,7 @@ runId=31653490077
       },
       {
         "province": "74",
-        "generatedAt": "2026-08-13T00:11:06.304Z",
+        "generatedAt": "2026-08-13T00:17:39.108Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1165,7 +1168,7 @@ runId=31653490077
       },
       {
         "province": "75",
-        "generatedAt": "2026-08-13T00:10:56.756Z",
+        "generatedAt": "2026-08-13T00:17:38.179Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 9,
@@ -1180,7 +1183,7 @@ runId=31653490077
       },
       {
         "province": "76",
-        "generatedAt": "2026-08-13T00:10:57.637Z",
+        "generatedAt": "2026-08-13T00:17:39.344Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1195,7 +1198,7 @@ runId=31653490077
       },
       {
         "province": "77",
-        "generatedAt": "2026-08-13T00:11:00.030Z",
+        "generatedAt": "2026-08-13T00:17:40.997Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1210,7 +1213,7 @@ runId=31653490077
       },
       {
         "province": "78",
-        "generatedAt": "2026-08-13T00:11:00.768Z",
+        "generatedAt": "2026-08-13T00:17:40.751Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1225,7 +1228,7 @@ runId=31653490077
       },
       {
         "province": "79",
-        "generatedAt": "2026-08-13T00:11:00.691Z",
+        "generatedAt": "2026-08-13T00:17:41.328Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1240,7 +1243,7 @@ runId=31653490077
       },
       {
         "province": "80",
-        "generatedAt": "2026-08-13T00:11:04.392Z",
+        "generatedAt": "2026-08-13T00:17:41.320Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1255,7 +1258,7 @@ runId=31653490077
       },
       {
         "province": "81",
-        "generatedAt": "2026-08-13T00:11:02.326Z",
+        "generatedAt": "2026-08-13T00:17:44.098Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1270,7 +1273,7 @@ runId=31653490077
       },
       {
         "province": "82",
-        "generatedAt": "2026-08-13T00:11:03.559Z",
+        "generatedAt": "2026-08-13T00:17:42.953Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1285,7 +1288,7 @@ runId=31653490077
       },
       {
         "province": "83",
-        "generatedAt": "2026-08-13T00:11:03.537Z",
+        "generatedAt": "2026-08-13T00:17:44.813Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1300,7 +1303,7 @@ runId=31653490077
       },
       {
         "province": "84",
-        "generatedAt": "2026-08-13T00:11:07.894Z",
+        "generatedAt": "2026-08-13T00:17:44.574Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1315,7 +1318,7 @@ runId=31653490077
       },
       {
         "province": "85",
-        "generatedAt": "2026-08-13T00:11:07.671Z",
+        "generatedAt": "2026-08-13T00:17:56.929Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1330,7 +1333,7 @@ runId=31653490077
       },
       {
         "province": "86",
-        "generatedAt": "2026-08-13T00:11:14.761Z",
+        "generatedAt": "2026-08-13T00:17:46.223Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1345,7 +1348,7 @@ runId=31653490077
       },
       {
         "province": "87",
-        "generatedAt": "2026-08-13T00:11:05.311Z",
+        "generatedAt": "2026-08-13T00:17:49.006Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1360,7 +1363,7 @@ runId=31653490077
       },
       {
         "province": "88",
-        "generatedAt": "2026-08-13T00:11:10.927Z",
+        "generatedAt": "2026-08-13T00:17:50.624Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1375,7 +1378,7 @@ runId=31653490077
       },
       {
         "province": "89",
-        "generatedAt": "2026-08-13T00:11:08.797Z",
+        "generatedAt": "2026-08-13T00:17:49.939Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1390,7 +1393,7 @@ runId=31653490077
       },
       {
         "province": "90",
-        "generatedAt": "2026-08-13T00:11:18.701Z",
+        "generatedAt": "2026-08-13T00:17:52.462Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1405,7 +1408,7 @@ runId=31653490077
       },
       {
         "province": "91",
-        "generatedAt": "2026-08-13T00:11:11.121Z",
+        "generatedAt": "2026-08-13T00:17:49.366Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1420,7 +1423,7 @@ runId=31653490077
       },
       {
         "province": "92",
-        "generatedAt": "2026-08-13T00:11:12.194Z",
+        "generatedAt": "2026-08-13T00:17:55.113Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1435,7 +1438,7 @@ runId=31653490077
       },
       {
         "province": "93",
-        "generatedAt": "2026-08-13T00:11:15.465Z",
+        "generatedAt": "2026-08-13T00:17:52.097Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1450,7 +1453,7 @@ runId=31653490077
       },
       {
         "province": "94",
-        "generatedAt": "2026-08-13T00:11:13.744Z",
+        "generatedAt": "2026-08-13T00:17:52.617Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1465,7 +1468,7 @@ runId=31653490077
       },
       {
         "province": "95",
-        "generatedAt": "2026-08-13T00:11:13.981Z",
+        "generatedAt": "2026-08-13T00:17:52.652Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1480,7 +1483,7 @@ runId=31653490077
       },
       {
         "province": "96",
-        "generatedAt": "2026-08-13T00:11:12.871Z",
+        "generatedAt": "2026-08-13T00:17:52.903Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1495,7 +1498,7 @@ runId=31653490077
       },
       {
         "province": "97",
-        "generatedAt": "2026-08-13T00:11:13.335Z",
+        "generatedAt": "2026-08-13T00:17:53.900Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1510,7 +1513,7 @@ runId=31653490077
       },
       {
         "province": "98",
-        "generatedAt": "2026-08-13T00:11:14.884Z",
+        "generatedAt": "2026-08-13T00:17:56.243Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1525,7 +1528,7 @@ runId=31653490077
       },
       {
         "province": "99",
-        "generatedAt": "2026-08-13T00:11:13.649Z",
+        "generatedAt": "2026-08-13T00:17:57.318Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1540,7 +1543,7 @@ runId=31653490077
       },
       {
         "province": "100",
-        "generatedAt": "2026-08-13T00:11:17.303Z",
+        "generatedAt": "2026-08-13T00:17:55.967Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1555,7 +1558,7 @@ runId=31653490077
       },
       {
         "province": "101",
-        "generatedAt": "2026-08-13T00:11:19.287Z",
+        "generatedAt": "2026-08-13T00:17:56.888Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1570,7 +1573,7 @@ runId=31653490077
       },
       {
         "province": "102",
-        "generatedAt": "2026-08-13T00:11:16.041Z",
+        "generatedAt": "2026-08-13T00:17:56.397Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1585,7 +1588,7 @@ runId=31653490077
       },
       {
         "province": "103",
-        "generatedAt": "2026-08-13T00:11:19.557Z",
+        "generatedAt": "2026-08-13T00:17:57.404Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1600,7 +1603,7 @@ runId=31653490077
       },
       {
         "province": "108",
-        "generatedAt": "2026-08-13T00:11:19.709Z",
+        "generatedAt": "2026-08-13T00:18:00.338Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 9,
@@ -1615,7 +1618,7 @@ runId=31653490077
       },
       {
         "province": "109",
-        "generatedAt": "2026-08-13T00:11:26.578Z",
+        "generatedAt": "2026-08-13T00:18:00.264Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1630,7 +1633,7 @@ runId=31653490077
       },
       {
         "province": "110",
-        "generatedAt": "2026-08-13T00:11:20.486Z",
+        "generatedAt": "2026-08-13T00:18:00.989Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1645,7 +1648,7 @@ runId=31653490077
       },
       {
         "province": "111",
-        "generatedAt": "2026-08-13T00:11:24.578Z",
+        "generatedAt": "2026-08-13T00:18:01.152Z",
         "status": "fitp_province_shard_complete",
         "branches": 8,
         "queries": 8,
@@ -1665,125 +1668,122 @@ runId=31653490077
     "usesDraws": false,
     "usesOrderOfPlay": false,
     "usesResults": false,
-    "baselineOnlyByProvince": {},
-    "baselineOnlyByMonth": {},
+    "baselineOnlyByProvince": {
+      "RM": 294,
+      "TO": 264,
+      "MI": 194,
+      "GE": 130,
+      "NA": 97,
+      "FI": 96,
+      "VE": 90,
+      "CT": 64,
+      "BO": 53,
+      "BA": 51,
+      "CA": 44,
+      "PA": 35,
+      "ME": 34,
+      "RC": 33
+    },
+    "baselineOnlyByMonth": {
+      "2026-06": 237,
+      "2026-07": 229,
+      "2026-05": 191,
+      "2026-03": 174,
+      "2026-08": 153,
+      "2026-02": 129,
+      "2026-09": 120,
+      "2026-04": 104,
+      "2026-01": 91,
+      "2025-12": 40,
+      "2026-10": 11
+    },
     "addedByProvince": {
-      "MB": 135,
-      "BS": 130,
-      "PV": 112,
-      "PG": 109,
-      "BG": 108,
-      "CO": 101,
-      "VR": 99,
-      "VA": 98,
-      "RE": 96,
-      "CN": 94,
-      "TV": 87,
-      "BZ": 84,
-      "MS": 83,
-      "PD": 81,
-      "RN": 81,
-      "CR": 78,
-      "SV": 78,
-      "MO": 72,
-      "VI": 72,
-      "AL": 70,
-      "TN": 70,
-      "RA": 67,
-      "FC": 60,
-      "LT": 55,
-      "AR": 54,
-      "PE": 53,
-      "AN": 52,
-      "SA": 51,
-      "VT": 51,
-      "LC": 47,
-      "LE": 47,
-      "CS": 46,
-      "PI": 46,
-      "PU": 46,
-      "TR": 46,
-      "SI": 45,
-      "PC": 44,
-      "SS": 44,
-      "MN": 43,
-      "LI": 42,
-      "SR": 39,
-      "IM": 38,
-      "PR": 38,
-      "LO": 37,
-      "NO": 37,
-      "FR": 36,
-      "RG": 35,
-      "TE": 34,
-      "BR": 31,
-      "PN": 31,
-      "RO": 30,
-      "SP": 30,
-      "TA": 30,
-      "FE": 29,
-      "FM": 29,
-      "MC": 29,
-      "UD": 29,
-      "GR": 28,
-      "LU": 28,
-      "AP": 27,
-      "PT": 27,
-      "AQ": 26,
-      "BT": 26,
-      "CE": 26,
-      "VB": 26,
-      "TP": 25,
-      "TS": 24,
-      "AG": 23,
-      "SO": 23,
-      "CH": 22,
-      "CL": 22,
-      "PZ": 21,
-      "CB": 19,
-      "GO": 18,
-      "VC": 18,
-      "CZ": 17,
-      "RI": 17,
-      "SU": 16,
-      "AT": 15,
-      "BI": 15,
-      "AO": 13,
-      "FG": 13,
-      "PO": 13,
-      "AV": 12,
-      "BL": 12,
-      "MT": 12,
-      "BN": 11,
-      "NU": 11,
-      "EN": 9,
-      "OR": 9,
-      "KR": 7,
-      "VV": 6,
-      "IS": 2
+      "NO": 15,
+      "AL": 14,
+      "CN": 14,
+      "VA": 10,
+      "PG": 8,
+      "RN": 8,
+      "SA": 8,
+      "PV": 7,
+      "BS": 6,
+      "CS": 6,
+      "AT": 5,
+      "RG": 5,
+      "AV": 4,
+      "BI": 4,
+      "FC": 4,
+      "SR": 4,
+      "SV": 4,
+      "UD": 4,
+      "AN": 3,
+      "BR": 3,
+      "CE": 3,
+      "CH": 3,
+      "CO": 3,
+      "CR": 3,
+      "FM": 3,
+      "FR": 3,
+      "LT": 3,
+      "MS": 3,
+      "TP": 3,
+      "TR": 3,
+      "VC": 3,
+      "AG": 2,
+      "AR": 2,
+      "BZ": 2,
+      "FE": 2,
+      "FG": 2,
+      "IM": 2,
+      "LE": 2,
+      "MN": 2,
+      "MO": 2,
+      "PD": 2,
+      "PI": 2,
+      "PU": 2,
+      "RA": 2,
+      "RI": 2,
+      "SP": 2,
+      "TA": 2,
+      "TE": 2,
+      "VB": 2,
+      "VI": 2,
+      "AO": 1,
+      "AP": 1,
+      "BG": 1,
+      "BN": 1,
+      "BT": 1,
+      "KR": 1,
+      "LO": 1,
+      "LU": 1,
+      "MB": 1,
+      "MC": 1,
+      "PC": 1,
+      "PE": 1,
+      "PN": 1,
+      "PO": 1,
+      "PT": 1,
+      "PZ": 1,
+      "RO": 1,
+      "SI": 1,
+      "SO": 1,
+      "SS": 1,
+      "TV": 1,
+      "VT": 1,
+      "VV": 1
     },
     "addedByMonth": {
-      "2026-06": 664,
-      "2026-07": 630,
-      "2026-05": 541,
-      "2026-08": 457,
-      "2026-03": 413,
-      "2026-04": 385,
-      "2026-02": 328,
-      "2026-09": 325,
-      "2026-01": 202,
-      "2025-12": 95,
-      "2026-10": 31,
-      "2026-11": 6,
-      "2026-12": 1
+      "2026-04": 95,
+      "2026-06": 51,
+      "2026-07": 31,
+      "2026-05": 19,
+      "2026-02": 15,
+      "2026-03": 15,
+      "2026-01": 3,
+      "2025-12": 1
     }
   },
-  "errors": [
-    {
-      "source": "baseline",
-      "error": "Failed to parse URL from {{https://raw.githubusercontent.com/png8nftp9y-alt}}/png8nftp9y-alt.github.io/59f59a8d801baa0f9df5eb2679fbad926f2d75d2/dist/v3/source_fitp_tournaments.json"
-    }
-  ]
+  "errors": []
 }
-exitCode=1
-finishedAt=2026-08-13T00:11:41Z
+exitCode=0
+finishedAt=2026-08-13T00:18:16Z
