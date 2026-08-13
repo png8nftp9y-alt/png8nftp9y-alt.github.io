@@ -1,6 +1,6 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-13T16:54:49.239Z",
+  "generatedAt": "2026-08-13T18:57:50.876Z",
   "overall": "yellow",
   "legend": {
     "green": "ok",
@@ -11,7 +11,7 @@
     {
       "status": "green",
       "label": "FITP tornei",
-      "detail": "5570 tornei · 1h fa",
+      "detail": "5570 tornei · 3h fa",
       "critical": true
     },
     {
@@ -21,9 +21,9 @@
       "critical": true
     },
     {
-      "status": "yellow",
+      "status": "green",
       "label": "Tennis Europe",
-      "detail": "0 entry TE · acceptance 0 · liste 0/0",
+      "detail": "44 entry TE · acceptance 44 · liste 0/0",
       "critical": false
     },
     {
@@ -35,7 +35,7 @@
     {
       "status": "green",
       "label": "Calendario",
-      "detail": "376 tornei visibili · FITP 374 · TE 0 · ITF 2",
+      "detail": "420 tornei visibili · FITP 374 · TE 44 · ITF 2",
       "critical": true
     },
     {
@@ -59,7 +59,7 @@
     {
       "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 13/08/2026, 18:54:49",
+      "detail": "file v3 generati · ultimo merge 13/08/2026, 20:57:50",
       "critical": true
     }
   ],
@@ -103,19 +103,68 @@
       "playerDrivenCandidatesConfirmed": 0
     },
     "calendar": {
-      "tournamentEntries": 376,
+      "tournamentEntries": 420,
       "byCircuit": {
         "fitp": 374,
+        "tennis-europe": 44,
         "itf": 2
       },
       "warnings": 0
     },
     "te": {
-      "status": "tennis_europe_acceptance_complete_draw_rules_applied",
-      "entriesVisible": 0,
-      "acceptanceConfirmed": 0,
-      "byPlayer": {},
-      "byAcceptance": {}
+      "status": "tennis_europe_acceptance_complete",
+      "entriesVisible": 44,
+      "acceptanceConfirmed": 44,
+      "byPlayer": {
+        "virginia-cereghini": 10,
+        "nikola-kerkenyakov": 7,
+        "giulia-scozzafava": 6,
+        "francesco-renzulli": 3,
+        "aila-zennaro": 10,
+        "filippo-vitali": 1,
+        "daniele-gelli": 2,
+        "noemi-paganini": 1,
+        "anna-gambarini": 1,
+        "gregorio-puccio": 2,
+        "edoardo-grimoldi": 1
+      },
+      "byAcceptance": {
+        "MD-96": 1,
+        "Q-6": 1,
+        "MD-19": 1,
+        "MD-39": 3,
+        "MD-53": 1,
+        "MD-37": 1,
+        "A-9": 1,
+        "A-16": 1,
+        "Q-4": 2,
+        "Q-21": 2,
+        "MD": 1,
+        "MD-27": 1,
+        "MD-35": 3,
+        "MD-21": 1,
+        "MD-13": 2,
+        "Q-8": 1,
+        "MD-32": 1,
+        "MD-10": 1,
+        "Q-11": 1,
+        "MD-36": 1,
+        "Q-7": 1,
+        "Q-10": 1,
+        "MD-20": 1,
+        "MD-30": 1,
+        "A-2": 1,
+        "MD-22": 1,
+        "MD-17": 1,
+        "MD-25": 1,
+        "MD-6": 1,
+        "MD-4": 2,
+        "Q-5": 1,
+        "MD-15": 2,
+        "Q-1": 1,
+        "MD-3": 1,
+        "MD-54": 1
+      }
     },
     "itf": {
       "status": "seeded_pending_live_itf_scan",
