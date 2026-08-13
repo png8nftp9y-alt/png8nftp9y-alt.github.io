@@ -1,0 +1,29 @@
+name: Court Watch v3 Tennis Europe sharded safe pipeline
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: courtwatch-v3-tennis-europe-sharded-safe
+  cancel-in-progress: false
+
+jobs:
+  safety-note:
+    name: Safe sharded pipeline placeholder
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Explain safe mode
+        run: |
+          set -euo pipefail
+          echo "This workflow is intentionally manual-only while the sharded Tennis Europe pipeline is implemented."
+          echo "It must not publish partial data."
+          echo "Public v3 remains on the last known good backup until live validation passes."
+          cat src/v3/tennis-europe-sharded-recovery-plan.md
