@@ -1,4 +1,4 @@
-const V3='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io/e3aa7f5203d2065d8e99b9eab66b8f7ece428b03/dist/v3/';
+const V3='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io/b1d93a02e9d5e398c2db4accf79357cbe7202f7d/dist/v3/';
 const FORMER_PLAYERS=new Set(['martina-busa','manuel-natale','pietro-sala','niccolo-zanaga']);
 const state={data:null,month:new Date(),agenda:new Date(),selected:new Set(),openPicker:null};
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
