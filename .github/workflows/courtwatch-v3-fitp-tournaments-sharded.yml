@@ -1,6 +1,8 @@
 name: Court Watch v3 FITP tournament discovery province shards
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
   push:
     branches: [main]
     paths:
