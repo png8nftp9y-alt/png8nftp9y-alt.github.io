@@ -56,8 +56,8 @@ jobs:
             dist/v3/source_tennis_europe_tournaments_audit.json
             courtwatch-v3-tennis-europe-tournaments-run.log
 
-  acceptance:
-    name: 2 - Match players in acceptance lists
+  acceptance-publish:
+    name: 2 - Match acceptance lists and publish labels
     needs: tournaments
     runs-on: ubuntu-latest
     timeout-minutes: 75
@@ -69,7 +69,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: tennis-europe-tournaments
-      - name: Match acceptance lists
+      - name: Match acceptance lists and publish calendar labels
         run: |
           set -euo pipefail
           mkdir -p dist/v3
@@ -79,8 +79,19 @@ jobs:
           echo "runId=${GITHUB_RUN_ID}" >> courtwatch-v3-tennis-europe-acceptance-run.log
           node src/v3/discover-tennis-europe-acceptance.mjs >> courtwatch-v3-tennis-europe-acceptance-run.log 2>&1
           echo "tennisEuropeAcceptanceExit=0" >> courtwatch-v3-tennis-europe-acceptance-run.log
+          node src/v3/entries-engine.mjs >> courtwatch-v3-tennis-europe-acceptance-run.log 2>&1
+          echo "entriesEngineAfterAcceptanceExit=0" >> courtwatch-v3-tennis-europe-acceptance-run.log
           echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-tennis-europe-acceptance-run.log
           cat courtwatch-v3-tennis-europe-acceptance-run.log
+          cat courtwatch-v3-tennis-europe-tournaments-run.log courtwatch-v3-tennis-europe-acceptance-run.log > courtwatch-v3-tennis-europe-run.log
+      - name: Commit acceptance-labelled calendar
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_tennis_europe_tournaments.json dist/v3/source_tennis_europe_tournaments_audit.json dist/v3/source_tennis_europe_entries.json dist/v3/source_tennis_europe_acceptance_audit.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_tennis_europe.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json courtwatch-v3-tennis-europe-run.log courtwatch-v3-tennis-europe-tournaments-run.log courtwatch-v3-tennis-europe-acceptance-run.log .github/workflows/courtwatch-v3-tennis-europe.yml src/v3/discover-tennis-europe-tournaments.mjs src/v3/discover-tennis-europe-acceptance.mjs || true
+          git commit -m "Publish Court Watch v3 Tennis Europe acceptance labels" || echo "No changes"
+          git pull --rebase origin main || true
+          git push origin HEAD:main || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -92,10 +103,11 @@ jobs:
             dist/v3/source_tennis_europe_acceptance_audit.json
             courtwatch-v3-tennis-europe-tournaments-run.log
             courtwatch-v3-tennis-europe-acceptance-run.log
+            courtwatch-v3-tennis-europe-run.log
 
   draw-and-merge:
-    name: 3 - Verify draws and publish calendar
-    needs: acceptance
+    name: 3 - Verify started draws and republish if changed
+    needs: acceptance-publish
     runs-on: ubuntu-latest
     timeout-minutes: 40
     steps:
@@ -117,15 +129,15 @@ jobs:
           node src/v3/verify-tennis-europe-draws.mjs >> courtwatch-v3-tennis-europe-draw-merge-run.log 2>&1
           echo "tennisEuropeDrawExit=0" >> courtwatch-v3-tennis-europe-draw-merge-run.log
           node src/v3/entries-engine.mjs >> courtwatch-v3-tennis-europe-draw-merge-run.log 2>&1
-          echo "entriesEngineExit=0" >> courtwatch-v3-tennis-europe-draw-merge-run.log
+          echo "entriesEngineAfterDrawExit=0" >> courtwatch-v3-tennis-europe-draw-merge-run.log
           echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-tennis-europe-draw-merge-run.log
           cat courtwatch-v3-tennis-europe-draw-merge-run.log
           cat courtwatch-v3-tennis-europe-tournaments-run.log courtwatch-v3-tennis-europe-acceptance-run.log courtwatch-v3-tennis-europe-draw-merge-run.log > courtwatch-v3-tennis-europe-run.log
-      - name: Commit complete Tennis Europe outputs only
+      - name: Commit draw-verified calendar
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_tennis_europe_tournaments.json dist/v3/source_tennis_europe_tournaments_audit.json dist/v3/source_tennis_europe_entries.json dist/v3/source_tennis_europe_acceptance_audit.json dist/v3/source_tennis_europe_draw_audit.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_tennis_europe.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json courtwatch-v3-tennis-europe-run.log courtwatch-v3-tennis-europe-tournaments-run.log courtwatch-v3-tennis-europe-acceptance-run.log courtwatch-v3-tennis-europe-draw-merge-run.log .github/workflows/courtwatch-v3-tennis-europe.yml src/v3/discover-tennis-europe-tournaments.mjs src/v3/discover-tennis-europe-acceptance.mjs src/v3/verify-tennis-europe-draws.mjs || true
-          git commit -m "Build Court Watch v3 Tennis Europe staged pipeline" || echo "No changes"
+          git add dist/v3/source_tennis_europe_entries.json dist/v3/source_tennis_europe_draw_audit.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_tennis_europe.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json courtwatch-v3-tennis-europe-run.log courtwatch-v3-tennis-europe-draw-merge-run.log src/v3/verify-tennis-europe-draws.mjs || true
+          git commit -m "Verify Court Watch v3 Tennis Europe draws" || echo "No changes"
           git pull --rebase origin main || true
           git push origin HEAD:main || true
