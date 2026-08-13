@@ -2,6 +2,16 @@ name: Court Watch v3 Tennis Europe sharded safe pipeline
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - 'courtwatch-v3-tennis-europe-sharded-trigger.json'
+      - 'src/v3/discover-tennis-europe-tournaments-shard.mjs'
+      - 'src/v3/merge-tennis-europe-tournament-shards.mjs'
+      - 'src/v3/discover-tennis-europe-acceptance-shard.mjs'
+      - 'src/v3/merge-tennis-europe-acceptance-shards.mjs'
+      - 'src/v3/validate-tennis-europe-live.mjs'
+      - '.github/workflows/courtwatch-v3-tennis-europe-sharded.yml'
+      - 'players.json'
 
 permissions:
   contents: write
