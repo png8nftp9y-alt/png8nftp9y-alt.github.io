@@ -1,4 +1,4 @@
-const V3='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io/dd36c7b170e76dfd535120ba0470260ccb5bcd8d/dist/v3/';
+const V3='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io/main/dist/v3/';
 const FORMER_PLAYERS=new Set(['martina-busa','manuel-natale','pietro-sala','niccolo-zanaga']);
 const state={data:null,month:new Date(),agenda:new Date(),selected:new Set(),openPicker:null};
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -11,7 +11,7 @@ const circuit=x=>{const s=(x.sourceId||x.source||x.sourceName||x.circuit||'').to
 const circuitRank=x=>({itf:0,'tennis-europe':1,fitp:2})[circuit(x)]??3;
 const active=t=>!['eliminated','excluded','withdrawn'].includes(String(t.status||'').toLowerCase())&&String(t.acceptanceList||'').toLowerCase()!=='withdrawn';
 const overlap=(t,a,b)=>active(t)&&(!t.startDate||t.startDate<=b)&&(!t.endDate||t.endDate>=a);
-const cityCountry=s=>{let v=String(s||'').replace(/^Tournaments\s+/i,'').trim();if(v.includes('|'))v=v.split('|').pop().trim();const m=v.match(/([A-Za-zÀ-ÿ' .-]+,\s*[A-Za-zÀ-ÿ' .-]+)(?:\s|$)/);return (m?m[1]:v).trim()||'Città/stato da pubblicare'};
+const cityCountry=s=>{let v=String(s||'').replace(/^Tournaments\s+/i,'').trim();if(v.includes('|'))v=v.split('|').pop().trim();const m=v.match(/([\p{L}' .-]+,\s*[\p{L}' .-]+)(?:\s|$)/u);return (m?m[1]:v).trim()||'Città/stato da pubblicare'};
 async function v3json(path){const r=await fetch(V3+path+'?t='+Date.now(),{cache:'no-store',mode:'cors'});if(!r.ok)throw Error('File v3 mancante: '+path);return r.json()}
 function matchMeta(m){const isDouble=m.matchType==='doubles'||m.eventType==='doubles'||/doppio|double/i.test(`${m.draw||''} ${m.category||''} ${m.eventType||''} ${m.partner||''}`),op=m.opponentOptions?.length?m.opponentOptions.join(' oppure '):m.opponent;return{isDouble,op,condition:m.condition||m.note||''}}
 function opponentHtml(m,x){if(!x.op)return'Avversario da definire';const club=m.opponentClub?` · circolo ${esc(m.opponentClub)}`:'';const nat=m.opponentNationality?` · naz. ${esc(m.opponentNationality)}`:'';const ranking=m.opponentRanking?` · classifica ${esc(m.opponentRanking)}`:'';return`vs <span class="opponentName">${esc(x.op)}</span>${ranking}<span class="opponentClub">${club}${nat}</span>`}

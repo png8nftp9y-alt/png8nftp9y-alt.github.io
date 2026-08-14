@@ -1,6 +1,8 @@
 name: Court Watch v3 guarded isolated merge
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
   push:
     branches: [main]
     paths:
@@ -21,9 +23,9 @@ jobs:
         with: {node-version: '22'}
       - name: Build guarded calendar from isolated engine outputs
         env:
-          STABLE_FITP_REF: 55ff89a05c6bdff332045935be79cf49c40c9cbc
-          TENNIS_EUROPE_REF: 70ef3384f9159172265817b4e51dbc962c8b88e2
-          ITF_REF: 55ff89a05c6bdff332045935be79cf49c40c9cbc
+          STABLE_FITP_REF: main
+          TENNIS_EUROPE_REF: main
+          ITF_REF: main
         run: |
           set -euo pipefail
           : > courtwatch-v3-merge-isolated-run.log
