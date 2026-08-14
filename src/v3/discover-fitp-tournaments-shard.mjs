@@ -1,36 +1,243 @@
 import fs from 'node:fs/promises';
-const NOW=new Date().toISOString();
-const TODAY=NOW.slice(0,10);
-const FROM='2025-12-18';
-const BASE='https://dp-myfit-test-function-v2.azurewebsites.net';
-const TENNIS='4332', FETCH=100, MAX_PAGES=40, OVERLAP_DAYS=21, MIN_SPLIT_DAYS=14, HORIZON_DAYS=730;
-const PROVINCE_ID=String(process.env.FITP_PROVINCE_ID||'');
-if(!PROVINCE_ID) throw new Error('FITP_PROVINCE_ID is required for province-sharded discovery');
-const REGRESSION_IDS={feniceBresciaLomb370:'676A77A5-3B55-479E-81E2-45F109C25F98',rossoniKinderImperia:'25C6CC33-AE3A-447E-A55B-FBE66FBAFC80',navaKinderMilano3:'B3110C9E-C6E4-4DE6-A9A3-BAB9B1341D47'};
-const dd=n=>String(n).padStart(2,'0');
-const addDays=(d,n)=>new Date(d.getTime()+n*864e5);
-const daysBetween=(a,b)=>Math.round((b-a)/864e5);
-const it=d=>`${dd(d.getUTCDate())}/${dd(d.getUTCMonth()+1)}/${d.getUTCFullYear()}`;
-const isoDate=d=>d.toISOString().slice(0,10);
-const iso=v=>{const s=String(v||'');let m=s.match(/^(20\d{2})-(\d{2})-(\d{2})/);if(m)return m[0];m=s.match(/^(\d{1,2})\D(\d{1,2})\D(20\d{2})/);return m?`${m[3]}-${dd(m[2])}-${dd(m[1])}`:''};
-const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
-const key=r=>String(r?.guid||r?.competitionId||'').toUpperCase();
-async function writeJson(p,v){await fs.mkdir(p.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(p,JSON.stringify(v,null,2)+'\n')}
-async function post(body,attempt=0){const r=await fetch(BASE+'/api/v3/tornei/puc/list',{method:'POST',headers:{'content-type':'application/json','user-agent':'Mozilla/5.0 CourtWatch-v3-fitp-province-shard/1.1','origin':'https://www.fitp.it','referer':'https://www.fitp.it/Tornei/Ricerca-tornei'},body:JSON.stringify(body)});const text=await r.text();if(!r.ok){if(attempt<3&&(r.status>=500||r.status===429)){await new Promise(x=>setTimeout(x,700*(attempt+1)));return post(body,attempt+1)}throw Error(r.status+' '+text.slice(0,180))}return text?JSON.parse(text):null}
-function base(){return{guid:'',profilazione:'',freetext:'',id_regione:'',id_provincia:'',id_stato:'',id_disciplina:TENNIS,sesso:'',data_inizio:'',data_fine:'',tipo_competizione:'',categoria_eta:'',id_classifica:'',classifica:'',massimale_montepremi:'',id_area_regionale:'',ambito:'',cod_fonte:'1',id_fonte:'TORNEI FITP',rowstoskip:0,fetchrows:FETCH,sortcolumn:'',sortorder:''}}
-function reject(r){const id=key(r); if(!id||id==='11111111-1111-1111-1111-111111111111')return true; if(String(r.id_disciplina||'')!==TENNIS)return true; if(String(r.cod_fonte||'')!=='1')return true; const n=norm([r.nome_torneo,r.name,r.descrizione,r.id_fonte].join(' ')); return /TENNIS EUROPE|TE U\s?\d{2}|TENNIS EUROPE JUNIOR TOUR/.test(n)}
-function statusOf(a,b){if(b&&b<TODAY)return'finished'; if(a&&a>TODAY)return'upcoming'; return'active_or_open'}
-function payload({queryStart,queryEnd,skip}){const p=base();p.id_provincia=PROVINCE_ID;p.data_inizio=it(queryStart);p.data_fine=it(queryEnd);p.rowstoskip=skip;return p}
-function logicalWindows(){const start=new Date(FROM+'T00:00:00Z'), limit=addDays(new Date(TODAY+'T00:00:00Z'),HORIZON_DAYS);const out=[];let n=0;for(let s=new Date(start);s<limit;s=addDays(s,122),n++){const e=new Date(Math.min(limit.getTime(),addDays(s,122).getTime()));out.push({label:`window_${n+1}_${isoDate(s)}_${isoDate(e)}`,logicalStart:new Date(s),logicalEnd:e,level:'quadrimestre',first:n===0})}return out}
-function queryStartFor(w){return w.first?new Date(w.logicalStart):addDays(w.logicalStart,-OVERLAP_DAYS)}
-function splitWindow(w){const span=daysBetween(w.logicalStart,w.logicalEnd); if(span<=MIN_SPLIT_DAYS)return[]; const mid=addDays(w.logicalStart,Math.ceil(span/2));return[{...w,label:w.label+'A',logicalEnd:mid,level:w.level==='quadrimestre'?'bimestre':'split',first:w.first},{...w,label:w.label+'B',logicalStart:mid,level:w.level==='quadrimestre'?'bimestre':'split',first:false}]}
-const byId=new Map(), coverage={}; const queries=[], errors=[], branches=[]; let unresolvedSaturations=0;
-async function runBranch(w,depth=0){const queryStart=queryStartFor(w), queryEnd=w.logicalEnd;const branch={provinceId:PROVINCE_ID,windowLabel:w.label,logicalStart:isoDate(w.logicalStart),logicalEnd:isoDate(w.logicalEnd),queryStart:isoDate(queryStart),queryEnd:isoDate(queryEnd),level:w.level,depth,pagesRead:0,rowsRead:0,totalDeclared:0,saturated:false,split:false,errors:[]};let prev='';for(let page=0,skip=0;page<MAX_PAGES;page++,skip+=FETCH){let j;try{j=await post(payload({queryStart,queryEnd,skip}))}catch(e){const er={provinceId:PROVINCE_ID,windowLabel:w.label,skip,error:e.message};errors.push(er);branch.errors.push(er);break}const rows=j?.competizioni||[], total=Number(j?.record||0), sig=rows.map(key).join('|');branch.pagesRead++;branch.rowsRead+=rows.length;branch.totalDeclared=Math.max(branch.totalDeclared,total||0);queries.push({provinceId:PROVINCE_ID,windowLabel:w.label,queryStart:branch.queryStart,queryEnd:branch.queryEnd,skip,rows:rows.length,total,saturated:rows.length>=FETCH||total>skip+rows.length});for(const r of rows){if(reject(r))continue;const k=key(r);if(!byId.has(k))byId.set(k,r);(coverage[k]??=new Set()).add(`${PROVINCE_ID}:${w.label}`)}if(!rows.length||sig===prev)break;prev=sig;if(rows.length<FETCH)break}branch.saturated=branch.rowsRead>=FETCH*MAX_PAGES||branch.totalDeclared>branch.rowsRead||(branch.pagesRead&&branch.rowsRead>=FETCH&&branch.rowsRead%FETCH===0);if(branch.saturated){const parts=splitWindow(w);if(parts.length){branch.split=true;branches.push(branch);for(const part of parts)await runBranch(part,depth+1);return}unresolvedSaturations++}branches.push(branch)}
-for(const w of logicalWindows()) await runBranch(w);
-const tournaments=[...byId.values()].map(r=>{const startDate=iso(r.data_inizio),rawEnd=iso(r.data_fine),endDate=rawEnd==='1900-01-01'?'':rawEnd,k=key(r);return{circuit:'fitp',competitionId:k,tournamentName:r.nome_torneo||'',location:[r.citta,r.sigla_provincia||r.provincia].filter(Boolean).join(' '),startDate,endDate,status:statusOf(startDate,endDate),disciplineId:String(r.id_disciplina||''),sourceCode:String(r.cod_fonte||''),sourceName:r.id_fonte||'',categoryAge:r.cat_eta||'',categoryClass:r.cat_class||'',tournamentType:r.tipo_torneo||'',club:r.tennisclub||'',sourceUrl:'https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId='+encodeURIComponent(k),discoveryShard:`province_${PROVINCE_ID}`,coverageModes:[...(coverage[k]||new Set())].sort(),lastSeen:NOW}}).filter(t=>!t.endDate||t.endDate>=FROM).sort((a,b)=>(a.startDate||'9999').localeCompare(b.startDate||'9999')||String(a.tournamentName||'').localeCompare(String(b.tournamentName||'')));
-const ids=new Set(tournaments.map(t=>String(t.competitionId).toUpperCase())); const regression={}; for(const [name,id] of Object.entries(REGRESSION_IDS)) regression[name]=ids.has(id);
-const out={version:'cw-v3-fitp-province-shard',generatedAt:NOW,status:errors.length?'fitp_province_shard_with_errors':unresolvedSaturations?'fitp_province_shard_with_unresolved_saturations':'fitp_province_shard_complete',provinceId:PROVINCE_ID,source:'One visible GitHub Actions shard per FITP province. Each province shard runs rotating logical windows with 21-day overlap except first historical window; saturated branches auto-split.',coverageFrom:FROM,coverageUntil:isoDate(addDays(new Date(TODAY+'T00:00:00Z'),HORIZON_DAYS)),branches:branches.length,queries:queries.length,tournamentsFound:tournaments.length,unresolvedSaturations,regression,tournaments,errors};
-await writeJson(`dist/v3/shards/source_fitp_tournaments_province_${PROVINCE_ID}.json`,out);
-await writeJson(`dist/v3/shards/source_fitp_tournaments_province_${PROVINCE_ID}_audit.json`,{...out,tournaments:undefined,queries,branches,sample:tournaments.slice(0,200)});
-console.log(JSON.stringify({...out,tournaments:undefined},null,2));
-if(errors.length>10||unresolvedSaturations>0) process.exitCode=unresolvedSaturations>0?2:1;
+
+const NOW = new Date().toISOString();
+const TODAY = NOW.slice(0, 10);
+const FROM = '2025-12-18';
+const BASE = 'https://dp-myfit-test-function-v2.azurewebsites.net';
+const TENNIS = '4332';
+const FETCH = 100;
+const MAX_PAGES = 80;
+const ROOT_WINDOW_DAYS = 31;
+const MIN_SPLIT_DAYS = 1;
+const HORIZON_DAYS = 730;
+const PROVINCE_ID = String(process.env.FITP_PROVINCE_ID || '');
+
+if (!PROVINCE_ID) throw new Error('FITP_PROVINCE_ID is required for province-sharded discovery');
+
+const REGRESSION_IDS = {
+  feniceBresciaLomb370: '676A77A5-3B55-479E-81E2-45F109C25F98',
+  rossonikinderImperia: '25C6CC33-AE3A-447E-A55B-FBE66FBAFC80',
+  navaKinderMilano3: 'B3110C9E-C6E4-4DE6-A9A3-BAB9B1341D47'
+};
+
+const dd = n => String(n).padStart(2, '0');
+const addDays = (d, n) => new Date(d.getTime() + n * 864e5);
+const daysBetween = (a, b) => Math.round((b - a) / 864e5);
+const it = d => `${dd(d.getUTCDate())}/${dd(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
+const isoDate = d => d.toISOString().slice(0, 10);
+const iso = v => {
+  const s = String(v || '');
+  let m = s.match(/^(20\d{2})-(\d{2})-(\d{2})/);
+  if (m) return m[0];
+  m = s.match(/^(\d{1,2})\D(\d{1,2})\D(20\d{2})/);
+  return m ? `${m[3]}-${dd(m[2])}-${dd(m[1])}` : '';
+};
+const norm = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
+const key = r => String(r?.guid || r?.competitionId || '').toUpperCase();
+
+async function writeJson(path, value) {
+  await fs.mkdir(path.split('/').slice(0, -1).join('/'), { recursive: true });
+  await fs.writeFile(path, JSON.stringify(value, null, 2) + '\n');
+}
+
+async function post(body, attempt = 0) {
+  const response = await fetch(BASE + '/api/v3/tornei/puc/list', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'user-agent': 'Mozilla/5.0 CourtWatch-v3-fitp-province-shard/2.0',
+      origin: 'https://www.fitp.it',
+      referer: 'https://www.fitp.it/Tornei/Ricerca-tornei'
+    },
+    body: JSON.stringify(body)
+  });
+  const text = await response.text();
+  if (!response.ok) {
+    if (attempt < 4 && (response.status >= 500 || response.status === 429)) {
+      await new Promise(resolve => setTimeout(resolve, 700 * (attempt + 1)));
+      return post(body, attempt + 1);
+    }
+    throw new Error(response.status + ' ' + text.slice(0, 180));
+  }
+  return text ? JSON.parse(text) : null;
+}
+
+function basePayload() {
+  return { guid: '', profilazione: '', freetext: '', id_regione: '', id_provincia: '', id_stato: '', id_disciplina: TENNIS, sesso: '', data_inizio: '', data_fine: '', tipo_competizione: '', categoria_eta: '', id_classifica: '', classifica: '', massimale_montepremi: '', id_area_regionale: '', ambito: '', cod_fonte: '1', id_fonte: 'TORNEI FITP', rowstoskip: 0, fetchrows: FETCH, sortcolumn: '', sortorder: '' };
+}
+
+function reject(row) {
+  const id = key(row);
+  if (!id || id === '11111111-1111-1111-1111-111111111111') return true;
+  if (String(row.id_disciplina || '') !== TENNIS) return true;
+  if (String(row.cod_fonte || '') !== '1') return true;
+  const name = norm([row.nome_torneo, row.name, row.descrizione, row.id_fonte].join(' '));
+  return /TENNIS EUROPE|TE U\s?\d{2}|TENNIS EUROPE JUNIOR TOUR/.test(name);
+}
+
+function statusOf(start, end) {
+  if (end && end < TODAY) return 'finished';
+  if (start && start > TODAY) return 'upcoming';
+  return 'active_or_open';
+}
+
+function payload(window, skip) {
+  const value = basePayload();
+  value.id_provincia = PROVINCE_ID;
+  value.data_inizio = it(window.start);
+  value.data_fine = it(window.end);
+  value.rowstoskip = skip;
+  return value;
+}
+
+function logicalWindows() {
+  const start = new Date(FROM + 'T00:00:00Z');
+  const limit = addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS);
+  const windows = [];
+  for (let cursor = new Date(start), index = 1; cursor <= limit; cursor = addDays(cursor, ROOT_WINDOW_DAYS), index++) {
+    const end = new Date(Math.min(limit.getTime(), addDays(cursor, ROOT_WINDOW_DAYS - 1).getTime()));
+    windows.push({ label: `window_${index}_${isoDate(cursor)}_${isoDate(end)}`, start: new Date(cursor), end, depth: 0 });
+  }
+  return windows;
+}
+
+function splitWindow(window) {
+  const span = daysBetween(window.start, window.end) + 1;
+  if (span <= MIN_SPLIT_DAYS) return [];
+  const leftDays = Math.ceil(span / 2);
+  const leftEnd = addDays(window.start, leftDays - 1);
+  const rightStart = addDays(leftEnd, 1);
+  return [
+    { label: window.label + 'A', start: new Date(window.start), end: leftEnd, depth: window.depth + 1 },
+    { label: window.label + 'B', start: rightStart, end: new Date(window.end), depth: window.depth + 1 }
+  ];
+}
+
+const byId = new Map();
+const coverage = {};
+const queries = [];
+const errors = [];
+const branches = [];
+let unresolvedSaturations = 0;
+
+async function runBranch(window) {
+  const branch = {
+    provinceId: PROVINCE_ID,
+    windowLabel: window.label,
+    start: isoDate(window.start),
+    end: isoDate(window.end),
+    depth: window.depth,
+    pagesRead: 0,
+    rowsRead: 0,
+    uniqueRows: 0,
+    totalDeclared: 0,
+    termination: '',
+    saturated: false,
+    split: false,
+    errors: []
+  };
+  const branchIds = new Set();
+  let previousSignature = '';
+
+  for (let page = 0, skip = 0; page < MAX_PAGES; page++, skip += FETCH) {
+    let json;
+    try {
+      json = await post(payload(window, skip));
+    } catch (error) {
+      const item = { provinceId: PROVINCE_ID, windowLabel: window.label, skip, error: error.message };
+      errors.push(item);
+      branch.errors.push(item);
+      branch.termination = 'request_error';
+      break;
+    }
+
+    const rows = json?.competizioni || [];
+    const total = Number(json?.record || 0);
+    const signature = rows.map(key).join('|');
+    branch.pagesRead++;
+    branch.rowsRead += rows.length;
+    branch.totalDeclared = Math.max(branch.totalDeclared, total || 0);
+
+    if (!rows.length) {
+      branch.termination = 'empty_page';
+      queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: 0, total, termination: branch.termination });
+      break;
+    }
+
+    if (signature && signature === previousSignature) {
+      branch.termination = 'repeated_page';
+      queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: rows.length, total, termination: branch.termination });
+      break;
+    }
+    previousSignature = signature;
+
+    for (const row of rows) {
+      if (reject(row)) continue;
+      const id = key(row);
+      branchIds.add(id);
+      if (!byId.has(id)) byId.set(id, row);
+      (coverage[id] ??= new Set()).add(`${PROVINCE_ID}:${window.label}`);
+    }
+
+    queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: rows.length, total });
+
+    if (rows.length < FETCH) {
+      branch.termination = 'short_page';
+      break;
+    }
+    if (total > 0 && skip + rows.length >= total) {
+      branch.termination = 'declared_total_reached';
+      break;
+    }
+    if (page === MAX_PAGES - 1) branch.termination = 'page_cap';
+  }
+
+  branch.uniqueRows = branchIds.size;
+  branch.saturated = branch.termination === 'page_cap' || branch.termination === 'repeated_page';
+
+  if (branch.saturated) {
+    const parts = splitWindow(window);
+    if (parts.length) {
+      branch.split = true;
+      branches.push(branch);
+      for (const part of parts) await runBranch(part);
+      return;
+    }
+    unresolvedSaturations++;
+  }
+  branches.push(branch);
+}
+
+for (const window of logicalWindows()) await runBranch(window);
+
+const tournaments = [...byId.values()].map(row => {
+  const startDate = iso(row.data_inizio);
+  const rawEnd = iso(row.data_fine);
+  const endDate = rawEnd === '1900-01-01' ? '' : rawEnd;
+  const id = key(row);
+  return {
+    circuit: 'fitp', competitionId: id, tournamentName: row.nome_torneo || '',
+    location: [row.citta, row.sigla_provincia || row.provincia].filter(Boolean).join(' '),
+    startDate, endDate, status: statusOf(startDate, endDate), disciplineId: String(row.id_disciplina || ''),
+    sourceCode: String(row.cod_fonte || ''), sourceName: row.id_fonte || '', categoryAge: row.cat_eta || '',
+    categoryClass: row.cat_class || '', tournamentType: row.tipo_torneo || '', club: row.tennisclub || '',
+    sourceUrl: 'https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=' + encodeURIComponent(id),
+    discoveryShard: `province_${PROVINCE_ID}`, coverageModes: [...(coverage[id] || new Set())].sort(), lastSeen: NOW
+  };
+}).filter(t => !t.endDate || t.endDate >= FROM).sort((a, b) => (a.startDate || '9999').localeCompare(b.startDate || '9999') || String(a.tournamentName || '').localeCompare(String(b.tournamentName || '')));
+
+const ids = new Set(tournaments.map(t => String(t.competitionId).toUpperCase()));
+const regression = Object.fromEntries(Object.entries(REGRESSION_IDS).map(([name, id]) => [name, ids.has(id)]));
+const status = errors.length ? 'fitp_province_shard_with_errors' : unresolvedSaturations ? 'fitp_province_shard_with_unresolved_saturations' : 'fitp_province_shard_complete';
+const out = {
+  version: 'cw-v3-fitp-province-shard-v2', generatedAt: NOW, status, provinceId: PROVINCE_ID,
+  source: 'One FITP province per shard. Non-overlapping 31-day root windows recursively split to one day only on a repeated page or page cap.',
+  coverageFrom: FROM, coverageUntil: isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS)),
+  branches: branches.length, queries: queries.length, tournamentsFound: tournaments.length,
+  unresolvedSaturations, regression, tournaments, errors
+};
+
+await writeJson(`dist/v3/shards/source_fitp_tournaments_province_${PROVINCE_ID}.json`, out);
+await writeJson(`dist/v3/shards/source_fitp_tournaments_province_${PROVINCE_ID}_audit.json`, { ...out, tournaments: undefined, queries, branches, sample: tournaments.slice(0, 200) });
+console.log(JSON.stringify({ ...out, tournaments: undefined }, null, 2));
+if (errors.length || unresolvedSaturations) process.exitCode = 1;
