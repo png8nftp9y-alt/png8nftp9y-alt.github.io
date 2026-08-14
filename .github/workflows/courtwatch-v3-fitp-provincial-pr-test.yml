@@ -1,0 +1,38 @@
+name: Court Watch v3 FITP provincial engine PR test
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/v3/discover-fitp-tournaments-shard.mjs'
+      - '.github/workflows/courtwatch-v3-fitp-provincial-pr-test.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  province-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        province: ['8', '17', '35', '108']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate source
+        run: node --check src/v3/discover-fitp-tournaments-shard.mjs
+      - name: Run representative province
+        env:
+          FITP_PROVINCE_ID: ${{ matrix.province }}
+        run: node src/v3/discover-fitp-tournaments-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fitp-provincial-pr-test-${{ matrix.province }}
+          path: |
+            dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}.json
+            dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}_audit.json
