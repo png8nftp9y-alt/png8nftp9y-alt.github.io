@@ -1,26 +1,43 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-14T04:10:39.070Z",
-  "status": "isolated_engine_merge_guarded_fitp_te_itf",
+  "generatedAt": "2026-08-14T18:27:21.924Z",
+  "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 25,
-    "tournamentEntries": 420,
-    "tournaments": 420,
+    "tournamentEntries": 380,
+    "tournaments": 380,
     "byCircuit": {
-      "fitp": 374,
-      "tennis-europe": 44,
+      "fitp": 378,
       "itf": 2
     },
     "warnings": 0,
-    "tennisEuropeVisible": 44,
-    "tennisEuropeAcceptanceConfirmed": 44,
-    "diagnostics": "green"
+    "tennisEuropeVisible": 0,
+    "tennisEuropeAcceptanceConfirmed": 0,
+    "diagnostics": "yellow"
   },
-  "sourceRefs": {
-    "fitp": "main",
-    "tennisEurope": "main",
-    "itf": "main"
+  "engines": {
+    "discoverFitp": {
+      "status": "fitp_individual_entries_complete_from_puc_any_list_card_strict_with_player_driven_candidate_rescue"
+    },
+    "discoverTennisEurope": {
+      "status": "tennis_europe_acceptance_complete",
+      "calendarMerge": "enabled_for_dated_official_acceptance_list_entries"
+    },
+    "discoverItf": {
+      "status": "seeded_pending_live_itf_scan"
+    },
+    "entries": {
+      "status": "built",
+      "file": "src/v3/entries-engine.mjs",
+      "method": "merge FITP + validated dated TE acceptance list/profile entries + ITF; no v1/v2/data.json"
+    },
+    "ordersOfPlay": {
+      "status": "active"
+    },
+    "results": {
+      "status": "active"
+    }
   },
   "warnings": []
 }
