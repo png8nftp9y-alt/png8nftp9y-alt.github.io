@@ -3,9 +3,9 @@ import fs from 'node:fs/promises';
 const VERSION='cw-v3-agenda-first';
 const COVERAGE_FROM='2025-12-18';
 const NOW=new Date().toISOString();
-const STABLE_FITP_REF=process.env.STABLE_FITP_REF||'55ff89a05c6bdff332045935be79cf49c40c9cbc';
-const TENNIS_EUROPE_REF=process.env.TENNIS_EUROPE_REF||'70ef3384f9159172265817b4e51dbc962c8b88e2';
-const ITF_REF=process.env.ITF_REF||STABLE_FITP_REF;
+const STABLE_FITP_REF=process.env.STABLE_FITP_REF||'main';
+const TENNIS_EUROPE_REF=process.env.TENNIS_EUROPE_REF||'main';
+const ITF_REF=process.env.ITF_REF||'main';
 const RAW='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io';
 const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
 const slug=v=>norm(v).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -15,7 +15,7 @@ async function writeJson(path,value){await fs.mkdir(path.split('/').slice(0,-1).
 function validDate(end){return !end||String(end)>=COVERAGE_FROM}
 function cleanTeName(row){let s=String(row.searchTournamentName||row.tournamentName||'').trim();s=s.replace(/^Tennis Europe\s*-\s*/i,'').replace(/\s*-\s*Events\s*$/i,'').trim();return s||row.tournamentName||''}
 function cleanTeLabel(row){const code=String(row.acceptanceCode||'').toUpperCase();const pos=Number(row.acceptancePosition||0);if(['MD','Q','A'].includes(code)&&pos>0)return `${code}-${pos}`;return String(row.calendarListLabel||'').replace(/^MD-0$/,'').trim()}
-function cleanLocation(row){let loc=String(row.location||'').trim();const id=String(row.competitionId||'').toUpperCase();const name=String(row.searchTournamentName||row.tournamentName||'');if(id==='154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4'||/Ljubicic Academy Open/i.test(name)||/^(inj|inj,)/i.test(loc))loc='Lošinj, Croatia';return loc}
+function cleanLocation(row){let loc=String(row.location||'').trim();const id=String(row.competitionId||'').toUpperCase();const name=String(row.searchTournamentName||row.tournamentName||'');if(id==='154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4'||/Ljubicic Academy Open/i.test(name)||/^(inj|losinj|lošinj)(?:,|\s|$)/i.test(loc))loc='Veli Lošinj, Croatia';return loc}
 function entry(row){const c=row.circuit;const calendarListLabel=c==='tennis-europe'?cleanTeLabel(row):(row.calendarListLabel||'');return {id:['entry',c,row.playerId,slug(row.competitionId||row.tournamentName)].join('__'),playerId:row.playerId||'',playerName:row.playerName||'',circuit:c,competitionId:row.competitionId||row.teProfileId||'',tournamentName:c==='tennis-europe'?cleanTeName(row):(row.tournamentName||''),location:c==='tennis-europe'?cleanLocation(row):(row.location||''),startDate:row.startDate||'',endDate:row.endDate||'',draws:row.draws||[],status:row.status||'detected',sourceQuality:row.sourceUrl?'official_source':'source_pending',sourceUrl:row.sourceUrl||'',lastSeen:row.lastSeen||NOW,engine:'v3-entries-from-isolated-engine-merge',acceptanceList:row.acceptanceList||'',acceptanceCode:row.acceptanceCode||'',acceptancePosition:row.acceptancePosition||null,calendarListLabel,acceptanceListUrl:row.acceptanceListUrl||'',acceptanceLastUpdated:row.acceptanceLastUpdated||'',acceptanceListPublished:row.acceptanceListPublished||false,entryStatus:row.entryStatus||''}}
 function toTournament(e){return {id:['tour',e.circuit,e.playerId,slug(e.competitionId||e.tournamentName)].join('__'),playerId:e.playerId,playerName:e.playerName,circuit:e.circuit,circuitColor:e.circuit==='fitp'?'blue':e.circuit==='tennis-europe'?'orange':'green',competitionId:e.competitionId,name:e.tournamentName,location:e.location,startDate:e.startDate,endDate:e.endDate,status:e.status,draws:e.draws,sourceUrl:e.sourceUrl,entrySourceQuality:e.sourceQuality,lastV3EntrySync:NOW,acceptanceList:e.acceptanceList,acceptanceCode:e.acceptanceCode,acceptancePosition:e.acceptancePosition,calendarListLabel:e.calendarListLabel,acceptanceListUrl:e.acceptanceListUrl,acceptanceLastUpdated:e.acceptanceLastUpdated,acceptanceListPublished:e.acceptanceListPublished,entryStatus:e.entryStatus}}
 function light(status,label,detail,critical=false){return {status,label,detail,critical}}
