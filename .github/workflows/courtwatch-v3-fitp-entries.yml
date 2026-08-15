@@ -33,6 +33,28 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Configure private R2 cache
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          if test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"; then
+            echo "R2_ACTIVE=1" >> "$GITHUB_ENV"
+            echo "R2_ACCOUNT_ID=$R2_ACCOUNT_ID" >> "$GITHUB_ENV"
+            echo "R2_BUCKET=$R2_BUCKET" >> "$GITHUB_ENV"
+            echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+            echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+            echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
+          else
+            echo "R2_ACTIVE=0" >> "$GITHUB_ENV"
+          fi
+      - name: Install R2 client and restore last-known-good cache
+        if: env.R2_ACTIVE == '1'
+        run: |
+          python -m pip install --disable-pip-version-check --quiet awscli
+          bash src/v3/fitp-r2-cache.sh restore
       - name: Match players against validated provincial catalog
         env:
           FITP_ENTRY_CONCURRENCY: '20'
@@ -42,6 +64,9 @@ jobs:
         run: node src/v3/entries-engine.mjs
       - name: Update last-known-good FITP calendar history
         run: node src/v3/maintain-fitp-calendar-history.mjs
+      - name: Publish verified heavy cache to R2
+        if: env.R2_ACTIVE == '1'
+        run: bash src/v3/fitp-r2-cache.sh publish
       - name: Publish validated player entries atomically
         run: |
           git config user.name courtwatch-bot
@@ -51,8 +76,6 @@ jobs:
             git reset --mixed origin/main
             git add \
               history/fitp_tournament_archive.json \
-              history/fitp_participant_cache.json.gz \
-              history/fitp_membership_index.json.gz \
               dist/v3/source_fitp_entries.json \
               dist/v3/source_fitp_entries_audit.json \
               dist/v3/players.json \
@@ -65,7 +88,18 @@ jobs:
               dist/v3/diagnostics.json \
               dist/v3/entries_log.json \
               history/player_tournaments.json \
-              history/audit.json
+              history/audit.json \
+              src/v3/fitp-r2-cache.sh \
+              .github/workflows/courtwatch-v3-fitp-entries.yml
+            if test "${R2_ACTIVE:-0}" = "1"; then
+              git rm -f --ignore-unmatch \
+                history/fitp_participant_cache.json.gz \
+                history/fitp_membership_index.json.gz
+            else
+              git add \
+                history/fitp_participant_cache.json.gz \
+                history/fitp_membership_index.json.gz
+            fi
             git rm -f --ignore-unmatch \
               history/fitp_participant_cache.json \
               history/fitp_membership_index.json
