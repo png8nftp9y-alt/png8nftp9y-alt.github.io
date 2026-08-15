@@ -1,6 +1,16 @@
 {
-  "generatedAt": "2026-08-13T16:54:12.780Z",
-  "today": "2026-08-13",
+  "generatedAt": "2026-08-15T20:52:51.463Z",
+  "today": "2026-08-15",
+  "summary": {
+    "appliedAt": "2026-08-15T20:52:51.463Z",
+    "today": "2026-08-15",
+    "rule": "From day -1 inspect official singles qualifying and main draws. A player found in either draw stays without an acceptance label. Absence removes Q only when qualifying is populated, MD only when main is populated, and A/WC only when both are populated. Missing or bye-only draws are inconclusive and preserve the player.",
+    "originalEntries": 44,
+    "entriesFound": 44,
+    "confirmedInDraw": 0,
+    "removedByReliableDrawAbsence": 0,
+    "inconclusiveKept": 43
+  },
   "audit": [
     {
       "playerId": "virginia-cereghini",
@@ -8,25 +18,93 @@
       "competitionId": "363DD8F1-E963-4D91-896B-A0F63F68EC62",
       "tournamentName": "44e PETITS AS LE MONDIAL WILSON",
       "code": "MD",
-      "daysFromStart": 201,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-96",
+      "event": "GS14",
+      "daysFromStart": 203,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=363DD8F1-E963-4D91-896B-A0F63F68EC62",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=363DD8F1-E963-4D91-896B-A0F63F68EC62",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=363DD8F1-E963-4D91-896B-A0F63F68EC62#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -37,25 +115,93 @@
       "competitionId": "5B85E9FC-D375-4BBB-B6BB-4387A8F73559",
       "tournamentName": "Bad Waltersdorf 2026 - Indoor",
       "code": "Q",
-      "daysFromStart": 173,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "Q-6",
+      "event": "GS14",
+      "daysFromStart": 175,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5B85E9FC-D375-4BBB-B6BB-4387A8F73559#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -66,25 +212,93 @@
       "competitionId": "154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
       "tournamentName": "Ljubicic Academy Open",
       "code": "MD",
-      "daysFromStart": 151,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-53",
+      "event": "GS14",
+      "daysFromStart": 147,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -95,25 +309,93 @@
       "competitionId": "154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
       "tournamentName": "Ljubicic Academy Open",
       "code": "MD",
-      "daysFromStart": 151,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-19",
+      "event": "BS14",
+      "daysFromStart": 147,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -124,25 +406,93 @@
       "competitionId": "154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
       "tournamentName": "Ljubicic Academy Open",
       "code": "MD",
-      "daysFromStart": 151,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-39",
+      "event": "GS14",
+      "daysFromStart": 147,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -153,25 +503,93 @@
       "competitionId": "33BF0A37-C87E-4261-A28A-498946F83558",
       "tournamentName": "Bulgaria U14",
       "code": "MD",
-      "daysFromStart": 110,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-37",
+      "event": "GS14",
+      "daysFromStart": 112,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=33BF0A37-C87E-4261-A28A-498946F83558",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=33BF0A37-C87E-4261-A28A-498946F83558",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=33BF0A37-C87E-4261-A28A-498946F83558#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -182,25 +600,93 @@
       "competitionId": "92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
       "tournamentName": "Torneo U14 - Pavia",
       "code": "Q",
-      "daysFromStart": 108,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "Q-21",
+      "event": "GS14",
+      "daysFromStart": 105,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -211,25 +697,93 @@
       "competitionId": "92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
       "tournamentName": "Torneo U14 - Pavia",
       "code": "A",
-      "daysFromStart": 108,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "A-16",
+      "event": "BS14",
+      "daysFromStart": 105,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -240,25 +794,93 @@
       "competitionId": "92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
       "tournamentName": "Torneo U14 - Pavia",
       "code": "A",
-      "daysFromStart": 108,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "A-9",
+      "event": "BS14",
+      "daysFromStart": 105,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -269,141 +891,93 @@
       "competitionId": "92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
       "tournamentName": "Torneo U14 - Pavia",
       "code": "Q",
-      "daysFromStart": 108,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "Q-4",
+      "event": "GS14",
+      "daysFromStart": 105,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
-      }
-    },
-    {
-      "playerId": "aila-zennaro",
-      "playerName": "Aila Zennaro",
-      "competitionId": "079DE5F9-FF49-47F1-A29D-92AB44CDD455",
-      "tournamentName": "59&#176; Torneo Avvenire",
-      "code": "MD",
-      "daysFromStart": 96,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      },
+      "main": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
           }
-        ]
-      }
-    },
-    {
-      "playerId": "giulia-scozzafava",
-      "playerName": "Giulia Scozzafava",
-      "competitionId": "079DE5F9-FF49-47F1-A29D-92AB44CDD455",
-      "tournamentName": "59&#176; Torneo Avvenire",
-      "code": "MD",
-      "daysFromStart": 96,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
-        "found": false,
-        "tried": [
+        ],
+        "drawLinks": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=main",
-            "status": 200,
-            "found": false
-          }
-        ]
-      }
-    },
-    {
-      "playerId": "nikola-kerkenyakov",
-      "playerName": "Nikola Nikolaev Kerkenyakov",
-      "competitionId": "079DE5F9-FF49-47F1-A29D-92AB44CDD455",
-      "tournamentName": "59&#176; Torneo Avvenire",
-      "code": "Q",
-      "daysFromStart": 96,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
-        "found": false,
-        "tried": [
-          {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=qualifying",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=qualifying",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=qualifying",
-            "status": 200,
-            "found": false
-          }
-        ]
-      }
-    },
-    {
-      "playerId": "virginia-cereghini",
-      "playerName": "Virginia Cereghini",
-      "competitionId": "079DE5F9-FF49-47F1-A29D-92AB44CDD455",
-      "tournamentName": "59&#176; Torneo Avvenire",
-      "code": "MD",
-      "daysFromStart": 96,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
-        "found": false,
-        "tried": [
-          {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455&cwdraw=main",
-            "status": 200,
-            "found": false
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=92334F75-8D74-4AAD-9E58-EDE940F5BCC5#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -414,25 +988,93 @@
       "competitionId": "A50EC59F-4B5E-406F-9C36-E5819A408A23",
       "tournamentName": "U14 Correggio - Memorial Marco Testi",
       "code": "Q",
-      "daysFromStart": 95,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "Q-8",
+      "event": "GS14",
+      "daysFromStart": 91,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -443,25 +1085,93 @@
       "competitionId": "A50EC59F-4B5E-406F-9C36-E5819A408A23",
       "tournamentName": "U14 Correggio - Memorial Marco Testi",
       "code": "MD",
-      "daysFromStart": 95,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-35",
+      "event": "BS14",
+      "daysFromStart": 91,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -472,25 +1182,93 @@
       "competitionId": "A50EC59F-4B5E-406F-9C36-E5819A408A23",
       "tournamentName": "U14 Correggio - Memorial Marco Testi",
       "code": "MD",
-      "daysFromStart": 95,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-32",
+      "event": "GS14",
+      "daysFromStart": 91,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -501,25 +1279,93 @@
       "competitionId": "A50EC59F-4B5E-406F-9C36-E5819A408A23",
       "tournamentName": "U14 Correggio - Memorial Marco Testi",
       "code": "MD",
-      "daysFromStart": 95,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-21",
+      "event": "BS14",
+      "daysFromStart": 91,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -530,25 +1376,93 @@
       "competitionId": "A50EC59F-4B5E-406F-9C36-E5819A408A23",
       "tournamentName": "U14 Correggio - Memorial Marco Testi",
       "code": "MD",
-      "daysFromStart": 95,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-13",
+      "event": "GS14",
+      "daysFromStart": 91,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=A50EC59F-4B5E-406F-9C36-E5819A408A23#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -559,25 +1473,93 @@
       "competitionId": "1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
       "tournamentName": "Torneo U14 - Pescara",
       "code": "MD",
-      "daysFromStart": 88,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-10",
+      "event": "BS14",
+      "daysFromStart": 84,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -588,25 +1570,384 @@
       "competitionId": "1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
       "tournamentName": "Torneo U14 - Pescara",
       "code": "MD",
-      "daysFromStart": 88,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-13",
+      "event": "GS14",
+      "daysFromStart": 84,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=1A40AC5D-E4AF-4588-9C73-DF950E32AE28#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      }
+    },
+    {
+      "playerId": "aila-zennaro",
+      "playerName": "Aila Zennaro",
+      "competitionId": "079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+      "tournamentName": "59° Torneo Avvenire",
+      "code": "MD",
+      "label": "MD-27",
+      "event": "GS14",
+      "daysFromStart": 77,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      }
+    },
+    {
+      "playerId": "giulia-scozzafava",
+      "playerName": "Giulia Scozzafava",
+      "competitionId": "079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+      "tournamentName": "59° Torneo Avvenire",
+      "code": "MD",
+      "label": "MD-35",
+      "event": "GS14",
+      "daysFromStart": 77,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      }
+    },
+    {
+      "playerId": "nikola-kerkenyakov",
+      "playerName": "Nikola Nikolaev Kerkenyakov",
+      "competitionId": "079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+      "tournamentName": "59° Torneo Avvenire",
+      "code": "Q",
+      "label": "Q-4",
+      "event": "BS14",
+      "daysFromStart": 77,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=079DE5F9-FF49-47F1-A29D-92AB44CDD455#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -615,27 +1956,95 @@
       "playerId": "aila-zennaro",
       "playerName": "Aila Zennaro",
       "competitionId": "6A379359-E8F3-42F4-9063-16EFB100DB7B",
-      "tournamentName": "Torneo Internazionale Under 16 - Citt&#224; di Crema",
+      "tournamentName": "Torneo Internazionale Under 16 - Città di Crema",
       "code": "Q",
-      "daysFromStart": 68,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "Q-11",
+      "event": "GS16",
+      "daysFromStart": 70,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=6A379359-E8F3-42F4-9063-16EFB100DB7B",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B#removecookies-tips",
+            "label": "More",
+            "score": 9,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B#removecookies-tips",
+            "text": "More",
+            "score": 9
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=6A379359-E8F3-42F4-9063-16EFB100DB7B",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B#removecookies-tips",
+            "label": "More",
+            "score": 9,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=6A379359-E8F3-42F4-9063-16EFB100DB7B#removecookies-tips",
+            "text": "More",
+            "score": 9
           }
         ]
       }
@@ -646,25 +2055,93 @@
       "competitionId": "8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA",
       "tournamentName": "EFS Logistics Junior Slovenia Open Under 16",
       "code": "MD",
-      "daysFromStart": 66,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-36",
+      "event": "GS16",
+      "daysFromStart": 63,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=8954BFEF-6BA1-4E9C-8EC2-C3658B6DA9FA#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -675,25 +2152,93 @@
       "competitionId": "99ACB026-700F-4BEE-A6F6-6B09D2502C76",
       "tournamentName": "Montreux U14",
       "code": "Q",
-      "daysFromStart": 47,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "Q-7",
+      "event": "GS14",
+      "daysFromStart": 49,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -704,25 +2249,93 @@
       "competitionId": "99ACB026-700F-4BEE-A6F6-6B09D2502C76",
       "tournamentName": "Montreux U14",
       "code": "Q",
-      "daysFromStart": 47,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "Q-10",
+      "event": "GS14",
+      "daysFromStart": 49,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=99ACB026-700F-4BEE-A6F6-6B09D2502C76#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -733,25 +2346,93 @@
       "competitionId": "64E38FA7-D4F4-4A03-B273-23E82B02124A",
       "tournamentName": "16.Makro 5 Junior Slovenia Open Under 14-powered by Mestna občina Koper",
       "code": "MD",
-      "daysFromStart": 40,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-30",
+      "event": "GS14",
+      "daysFromStart": 42,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -762,25 +2443,93 @@
       "competitionId": "64E38FA7-D4F4-4A03-B273-23E82B02124A",
       "tournamentName": "16.Makro 5 Junior Slovenia Open Under 14-powered by Mestna občina Koper",
       "code": "MD",
-      "daysFromStart": 40,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-39",
+      "event": "GS14",
+      "daysFromStart": 42,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -791,141 +2540,93 @@
       "competitionId": "64E38FA7-D4F4-4A03-B273-23E82B02124A",
       "tournamentName": "16.Makro 5 Junior Slovenia Open Under 14-powered by Mestna občina Koper",
       "code": "MD",
-      "daysFromStart": 40,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-20",
+      "event": "GS14",
+      "daysFromStart": 42,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
-      }
-    },
-    {
-      "playerId": "anna-gambarini",
-      "playerName": "Anna Gambarini",
-      "competitionId": "00523E1D-06C9-430A-B8B9-851B401381E3",
-      "tournamentName": "7&#176; MEMORIAL GAIO CAMPORESI",
-      "code": "MD",
-      "daysFromStart": 38,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      },
+      "main": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
           }
-        ]
-      }
-    },
-    {
-      "playerId": "daniele-gelli",
-      "playerName": "Daniele Gelli",
-      "competitionId": "00523E1D-06C9-430A-B8B9-851B401381E3",
-      "tournamentName": "7&#176; MEMORIAL GAIO CAMPORESI",
-      "code": "MD",
-      "daysFromStart": 38,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
-        "found": false,
-        "tried": [
+        ],
+        "drawLinks": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=main",
-            "status": 200,
-            "found": false
-          }
-        ]
-      }
-    },
-    {
-      "playerId": "filippo-vitali",
-      "playerName": "Filippo Vitali",
-      "competitionId": "00523E1D-06C9-430A-B8B9-851B401381E3",
-      "tournamentName": "7&#176; MEMORIAL GAIO CAMPORESI",
-      "code": "A",
-      "daysFromStart": 38,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
-        "found": false,
-        "tried": [
-          {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=qualifying",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=qualifying",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=qualifying",
-            "status": 200,
-            "found": false
-          }
-        ]
-      }
-    },
-    {
-      "playerId": "noemi-paganini",
-      "playerName": "Noemi Paganini",
-      "competitionId": "00523E1D-06C9-430A-B8B9-851B401381E3",
-      "tournamentName": "7&#176; MEMORIAL GAIO CAMPORESI",
-      "code": "MD",
-      "daysFromStart": 38,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
-        "found": false,
-        "tried": [
-          {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3&cwdraw=main",
-            "status": 200,
-            "found": false
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=64E38FA7-D4F4-4A03-B273-23E82B02124A#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -936,25 +2637,384 @@
       "competitionId": "DF3193A8-A3E6-4654-BC71-433D0501456C",
       "tournamentName": "Open de Pully TE U14",
       "code": "MD",
-      "daysFromStart": 33,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-6",
+      "event": "GS14",
+      "daysFromStart": 35,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=DF3193A8-A3E6-4654-BC71-433D0501456C",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C#removecookies-tips",
+            "label": "More",
+            "score": 9,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C#removecookies-tips",
+            "text": "More",
+            "score": 9
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=DF3193A8-A3E6-4654-BC71-433D0501456C",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C#removecookies-tips",
+            "label": "More",
+            "score": 9,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=DF3193A8-A3E6-4654-BC71-433D0501456C#removecookies-tips",
+            "text": "More",
+            "score": 9
+          }
+        ]
+      }
+    },
+    {
+      "playerId": "anna-gambarini",
+      "playerName": "Anna Gambarini",
+      "competitionId": "00523E1D-06C9-430A-B8B9-851B401381E3",
+      "tournamentName": "7° MEMORIAL GAIO CAMPORESI",
+      "code": "MD",
+      "label": "MD-25",
+      "event": "GS12",
+      "daysFromStart": 35,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      }
+    },
+    {
+      "playerId": "daniele-gelli",
+      "playerName": "Daniele Gelli",
+      "competitionId": "00523E1D-06C9-430A-B8B9-851B401381E3",
+      "tournamentName": "7° MEMORIAL GAIO CAMPORESI",
+      "code": "MD",
+      "label": "MD-22",
+      "event": "BS12",
+      "daysFromStart": 35,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      }
+    },
+    {
+      "playerId": "filippo-vitali",
+      "playerName": "Filippo Vitali",
+      "competitionId": "00523E1D-06C9-430A-B8B9-851B401381E3",
+      "tournamentName": "7° MEMORIAL GAIO CAMPORESI",
+      "code": "A",
+      "label": "A-2",
+      "event": "BS12",
+      "daysFromStart": 35,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -965,25 +3025,384 @@
       "competitionId": "5ECC8B89-2AD2-4AA2-8ADE-09C49E668970",
       "tournamentName": "Peter Hagedorn International",
       "code": "MD",
-      "daysFromStart": 33,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-4",
+      "event": "BS14",
+      "daysFromStart": 35,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=5ECC8B89-2AD2-4AA2-8ADE-09C49E668970#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      }
+    },
+    {
+      "playerId": "noemi-paganini",
+      "playerName": "Noemi Paganini",
+      "competitionId": "00523E1D-06C9-430A-B8B9-851B401381E3",
+      "tournamentName": "7° MEMORIAL GAIO CAMPORESI",
+      "code": "MD",
+      "label": "MD-17",
+      "event": "GS12",
+      "daysFromStart": 35,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=00523E1D-06C9-430A-B8B9-851B401381E3#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      }
+    },
+    {
+      "playerId": "aila-zennaro",
+      "playerName": "Aila Zennaro",
+      "competitionId": "60B383B6-49FE-4A33-9F20-629E32856200",
+      "tournamentName": "Torneo U14 - Sassuolo",
+      "code": "MD",
+      "label": "MD-15",
+      "event": "GS14",
+      "daysFromStart": 28,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      }
+    },
+    {
+      "playerId": "camilla-lingeri",
+      "playerName": "Camilla Lingeri",
+      "competitionId": "72B85BEB-F56D-48F3-AA67-88C1F293C970",
+      "tournamentName": "Austrian Youth Open Kufstein",
+      "code": "MD",
+      "label": "MD-34",
+      "event": "GS12",
+      "daysFromStart": 28,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -994,25 +3413,93 @@
       "competitionId": "72B85BEB-F56D-48F3-AA67-88C1F293C970",
       "tournamentName": "Austrian Youth Open Kufstein",
       "code": "MD",
-      "daysFromStart": 31,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-39",
+      "event": "BS12",
+      "daysFromStart": 28,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -1023,83 +3510,93 @@
       "competitionId": "72B85BEB-F56D-48F3-AA67-88C1F293C970",
       "tournamentName": "Austrian Youth Open Kufstein",
       "code": "MD",
-      "daysFromStart": 31,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-54",
+      "event": "BS12",
+      "daysFromStart": 28,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
-      }
-    },
-    {
-      "playerId": "gregorio-puccio",
-      "playerName": "Gregorio Puccio",
-      "competitionId": "72B85BEB-F56D-48F3-AA67-88C1F293C970",
-      "tournamentName": "Austrian Youth Open Kufstein",
-      "code": "MD",
-      "daysFromStart": 31,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      },
+      "main": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
           }
-        ]
-      }
-    },
-    {
-      "playerId": "aila-zennaro",
-      "playerName": "Aila Zennaro",
-      "competitionId": "60B383B6-49FE-4A33-9F20-629E32856200",
-      "tournamentName": "Torneo U14 - Sassuolo",
-      "code": "MD",
-      "daysFromStart": 26,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
-        "found": false,
-        "tried": [
+        ],
+        "drawLinks": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=main",
-            "status": 200,
-            "found": false
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -1110,25 +3607,190 @@
       "competitionId": "60B383B6-49FE-4A33-9F20-629E32856200",
       "tournamentName": "Torneo U14 - Sassuolo",
       "code": "Q",
-      "daysFromStart": 26,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "Q-5",
+      "event": "BS14",
+      "daysFromStart": 28,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=60B383B6-49FE-4A33-9F20-629E32856200",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      }
+    },
+    {
+      "playerId": "gregorio-puccio",
+      "playerName": "Gregorio Puccio",
+      "competitionId": "72B85BEB-F56D-48F3-AA67-88C1F293C970",
+      "tournamentName": "Austrian Youth Open Kufstein",
+      "code": "MD",
+      "label": "MD-35",
+      "event": "BS12",
+      "daysFromStart": 28,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=72B85BEB-F56D-48F3-AA67-88C1F293C970#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -1139,25 +3801,93 @@
       "competitionId": "60B383B6-49FE-4A33-9F20-629E32856200",
       "tournamentName": "Torneo U14 - Sassuolo",
       "code": "Q",
-      "daysFromStart": 26,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "Q-21",
+      "event": "BS14",
+      "daysFromStart": 28,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=60B383B6-49FE-4A33-9F20-629E32856200",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -1168,25 +3898,93 @@
       "competitionId": "60B383B6-49FE-4A33-9F20-629E32856200",
       "tournamentName": "Torneo U14 - Sassuolo",
       "code": "Q",
-      "daysFromStart": 26,
-      "decision": "removed_not_in_qualifying_draw",
-      "drawCheck": {
+      "label": "Q-1",
+      "event": "GS14",
+      "daysFromStart": 28,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=60B383B6-49FE-4A33-9F20-629E32856200",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200&cwdraw=qualifying",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=60B383B6-49FE-4A33-9F20-629E32856200#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -1197,25 +3995,93 @@
       "competitionId": "F7915804-D040-48E9-AFF6-17B4B9C1B952",
       "tournamentName": "Agno U14",
       "code": "MD",
-      "daysFromStart": 24,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-3",
+      "event": "GS14",
+      "daysFromStart": 21,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=F7915804-D040-48E9-AFF6-17B4B9C1B952",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=F7915804-D040-48E9-AFF6-17B4B9C1B952",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7915804-D040-48E9-AFF6-17B4B9C1B952#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -1226,25 +4092,93 @@
       "competitionId": "B43C14DB-7AB5-477D-B470-46FACAD7F187",
       "tournamentName": "Agno U16 (2)",
       "code": "MD",
-      "daysFromStart": 5,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
+      "label": "MD-4",
+      "event": "GS16",
+      "daysFromStart": 6,
+      "decision": "kept_draw_unpublished_empty_or_inconclusive",
+      "qualifying": {
         "found": false,
+        "reliable": false,
         "tried": [
           {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=B43C14DB-7AB5-477D-B470-46FACAD7F187",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
           },
           {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187&cwdraw=main",
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187",
             "status": 200,
-            "found": false
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187#removecookies-tips",
+            "text": "More",
+            "score": 6
+          }
+        ]
+      },
+      "main": {
+        "found": false,
+        "reliable": false,
+        "tried": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament?id=B43C14DB-7AB5-477D-B470-46FACAD7F187",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187",
+            "status": 200,
+            "kind": "base",
+            "found": false,
+            "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187#removecookies-tips",
+            "label": "More",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false
+          }
+        ],
+        "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=B43C14DB-7AB5-477D-B470-46FACAD7F187#removecookies-tips",
+            "text": "More",
+            "score": 6
           }
         ]
       }
@@ -1255,28 +4189,9 @@
       "competitionId": "45F5AB0E-DEBE-4B4D-BDCD-24D6A8AC90C4",
       "tournamentName": "Veurne Open by Vanlerberghe - Tennis Europe U12 2026",
       "code": "MD",
-      "daysFromStart": 2,
-      "decision": "removed_not_in_main_draw_after_2_days",
-      "drawCheck": {
-        "found": false,
-        "tried": [
-          {
-            "url": "https://te.tournamentsoftware.com/sport/events.aspx?id=45F5AB0E-DEBE-4B4D-BDCD-24D6A8AC90C4&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=45F5AB0E-DEBE-4B4D-BDCD-24D6A8AC90C4&cwdraw=main",
-            "status": 200,
-            "found": false
-          },
-          {
-            "url": "https://te.tournamentsoftware.com/sport/tournament.aspx?id=45F5AB0E-DEBE-4B4D-BDCD-24D6A8AC90C4&cwdraw=main",
-            "status": 200,
-            "found": false
-          }
-        ]
-      }
+      "event": "BS12",
+      "daysFromStart": -2,
+      "decision": "kept_pre_tournament_acceptance"
     }
   ]
 }
