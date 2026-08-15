@@ -21,7 +21,7 @@ read_pointer() {
 restore_current() {
   local work pointer generation
   work="$(mktemp -d)"
-  trap 'rm -rf "$work"' EXIT
+  trap 'rm -rf "${work:-}"' EXIT
   pointer="$work/current.json"
   if ! read_pointer current "$pointer"; then
     echo "R2 has no current FITP cache yet; using the repository bootstrap copy."
@@ -40,7 +40,7 @@ restore_current() {
 publish_generation() {
   local work cache_sha index_sha generation current_generation pointer
   work="$(mktemp -d)"
-  trap 'rm -rf "$work"' EXIT
+  trap 'rm -rf "${work:-}"' EXIT
   validate_local
   cache_sha="$(sha256sum "$CACHE_DIR/$CACHE_FILE" | cut -d' ' -f1)"
   index_sha="$(sha256sum "$CACHE_DIR/$INDEX_FILE" | cut -d' ' -f1)"
