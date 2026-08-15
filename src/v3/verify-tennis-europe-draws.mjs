@@ -67,7 +67,7 @@ async function acceptedCookie() {
   const cookies = cookiePair((first.headers.getSetCookie?.() || [first.headers.get('set-cookie') || '']).join(','));
   if ((first.status >= 300 && /cookiewall/i.test(first.headers.get('location') || '')) || /cookiewall|CookiePurposes|SettingsOpen/i.test(firstText)) {
     const body = new URLSearchParams({ ReturnUrl: '/tournaments', SettingsOpen: 'false' });
-    for (const value of ['1', '2', '3', '4']) body.append('CookiePurposes', value);
+    // Tournamentsoftware uses bit-valued purpose identifiers. The current\n    // consent form exposes 1, 2, 4 and 16 (not sequential 1..4 values).\n    for (const value of ['1', '2', '4', '16']) body.append('CookiePurposes', value);
     const saved = await fetch(BASE + '/cookiewall/Save', { method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: cookies.join('; ') }, body });
     cookies.push(...cookiePair((saved.headers.getSetCookie?.() || [saved.headers.get('set-cookie') || '']).join(',')));
   }
