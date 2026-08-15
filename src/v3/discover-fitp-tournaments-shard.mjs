@@ -107,8 +107,12 @@ function splitWindow(window) {
   const span = daysBetween(window.start, window.end) + 1;
   if (span <= MIN_SPLIT_DAYS) return [];
   const leftDays = Math.ceil(span / 2);
-  const leftEnd = addDays(window.start, leftDays - 1);
-  const rightStart = addDays(leftEnd, 1);
+  const midpoint = addDays(window.start, leftDays - 1);
+  const overlap = Math.min(ROOT_OVERLAP_DAYS, Math.max(0, span - 2));
+  const extendLeft = Math.floor(overlap / 2);
+  const extendRight = overlap - extendLeft;
+  const leftEnd = new Date(Math.min(window.end.getTime(), addDays(midpoint, extendLeft).getTime()));
+  const rightStart = new Date(Math.max(window.start.getTime(), addDays(midpoint, 1 - extendRight).getTime()));
   return [
     { label: window.label + 'A', start: new Date(window.start), end: leftEnd, depth: window.depth + 1 },
     { label: window.label + 'B', start: rightStart, end: new Date(window.end), depth: window.depth + 1 }
@@ -239,7 +243,7 @@ const regression = Object.fromEntries(Object.entries(REGRESSION_IDS).map(([name,
 const status = errors.length ? 'fitp_province_shard_with_errors' : unresolvedSaturations ? 'fitp_province_shard_with_unresolved_saturations' : 'fitp_province_shard_complete';
 const out = {
   version: 'cw-v3-fitp-province-shard-v2', generatedAt: NOW, status, provinceId: PROVINCE_ID,
-  source: `One FITP province per shard using the official FITP id_provincia value. 31-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages; repeated or prematurely empty incomplete pages trigger recursive time-window splits.`,
+  source: `One FITP province per shard using the official FITP id_provincia value. 31-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages; repeated or prematurely empty incomplete pages trigger recursively split time windows with adaptive overlap.`,
   coverageFrom: FROM, coverageUntil: isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS)),
   branches: branches.length, queries: queries.length, tournamentsFound: tournaments.length,
   unresolvedSaturations, regression, tournaments, errors
