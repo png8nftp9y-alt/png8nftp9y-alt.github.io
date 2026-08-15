@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'src/v3/discover-fitp-tournaments-shard.mjs'
+      - 'src/v3/update-fitp-player-history.mjs'
+      - 'src/v3/test-fitp-player-history.mjs'
       - '.github/workflows/courtwatch-v3-fitp-provincial-pr-test.yml'
 
 permissions:
@@ -24,7 +26,12 @@ jobs:
         with:
           node-version: '22'
       - name: Validate source
-        run: node --check src/v3/discover-fitp-tournaments-shard.mjs
+        run: |
+          node --check src/v3/discover-fitp-tournaments-shard.mjs
+          node --check src/v3/update-fitp-player-history.mjs
+          node --check src/v3/test-fitp-player-history.mjs
+      - name: Verify permanent FITP player history
+        run: node src/v3/test-fitp-player-history.mjs
       - name: Run representative province
         env:
           FITP_PROVINCE_ID: ${{ matrix.province }}
