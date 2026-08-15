@@ -8,6 +8,7 @@ const TENNIS = '4332';
 const FETCH = 100;
 const MAX_PAGES = 80;
 const ROOT_WINDOW_DAYS = 31;
+const ROOT_OVERLAP_DAYS = 21;
 const MIN_SPLIT_DAYS = 1;
 const HORIZON_DAYS = 730;
 const PROVINCE_ID = String(process.env.FITP_PROVINCE_ID || '');
@@ -95,8 +96,9 @@ function logicalWindows() {
   const limit = addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS);
   const windows = [];
   for (let cursor = new Date(start), index = 1; cursor <= limit; cursor = addDays(cursor, ROOT_WINDOW_DAYS), index++) {
-    const end = new Date(Math.min(limit.getTime(), addDays(cursor, ROOT_WINDOW_DAYS - 1).getTime()));
-    windows.push({ label: `window_${index}_${isoDate(cursor)}_${isoDate(end)}`, start: new Date(cursor), end, depth: 0 });
+    const coreEnd = new Date(Math.min(limit.getTime(), addDays(cursor, ROOT_WINDOW_DAYS - 1).getTime()));
+    const end = new Date(Math.min(limit.getTime(), addDays(coreEnd, ROOT_OVERLAP_DAYS).getTime()));
+    windows.push({ label: `window_${index}_${isoDate(cursor)}_${isoDate(coreEnd)}_plus_${ROOT_OVERLAP_DAYS}d`, start: new Date(cursor), end, coreEnd, depth: 0 });
   }
   return windows;
 }
@@ -231,7 +233,7 @@ const regression = Object.fromEntries(Object.entries(REGRESSION_IDS).map(([name,
 const status = errors.length ? 'fitp_province_shard_with_errors' : unresolvedSaturations ? 'fitp_province_shard_with_unresolved_saturations' : 'fitp_province_shard_complete';
 const out = {
   version: 'cw-v3-fitp-province-shard-v2', generatedAt: NOW, status, provinceId: PROVINCE_ID,
-  source: 'One FITP province per shard. Non-overlapping 31-day root windows recursively split to one day only on a repeated page or page cap.',
+  source: 'One FITP province per shard. 31-day root windows have a 21-day forward overlap; recursive splits never add overlap.',
   coverageFrom: FROM, coverageUntil: isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS)),
   branches: branches.length, queries: queries.length, tournamentsFound: tournaments.length,
   unresolvedSaturations, regression, tournaments, errors
