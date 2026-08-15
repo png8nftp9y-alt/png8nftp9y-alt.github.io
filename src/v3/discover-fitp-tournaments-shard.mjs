@@ -162,8 +162,10 @@ async function runBranch(window) {
     branch.totalDeclared = Math.max(branch.totalDeclared, total || 0);
 
     if (!rows.length) {
-      branch.termination = 'empty_page';
-      queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: 0, total, termination: branch.termination });
+      const incomplete = branch.totalDeclared > 0 && rawBranchIds.size < branch.totalDeclared;
+      const canSplit = daysBetween(window.start, window.end) > 0;
+      branch.termination = incomplete && canSplit ? 'incomplete_empty_page' : 'empty_page';
+      queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: 0, total, uniqueRawRows: rawBranchIds.size, termination: branch.termination });
       break;
     }
 
@@ -199,7 +201,7 @@ async function runBranch(window) {
   }
 
   branch.uniqueRows = branchIds.size;
-  branch.saturated = branch.termination === 'page_cap' || branch.termination === 'repeated_page';
+  branch.saturated = branch.termination === 'page_cap' || branch.termination === 'repeated_page' || branch.termination === 'incomplete_empty_page';
 
   if (branch.saturated) {
     const parts = splitWindow(window);
@@ -237,7 +239,7 @@ const regression = Object.fromEntries(Object.entries(REGRESSION_IDS).map(([name,
 const status = errors.length ? 'fitp_province_shard_with_errors' : unresolvedSaturations ? 'fitp_province_shard_with_unresolved_saturations' : 'fitp_province_shard_complete';
 const out = {
   version: 'cw-v3-fitp-province-shard-v2', generatedAt: NOW, status, provinceId: PROVINCE_ID,
-  source: `One FITP province per shard using the official FITP id_provincia value. 31-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages; repeated incomplete pages trigger recursive time-window splits.`,
+  source: `One FITP province per shard using the official FITP id_provincia value. 31-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages; repeated or prematurely empty incomplete pages trigger recursive time-window splits.`,
   coverageFrom: FROM, coverageUntil: isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS)),
   branches: branches.length, queries: queries.length, tournamentsFound: tournaments.length,
   unresolvedSaturations, regression, tournaments, errors
