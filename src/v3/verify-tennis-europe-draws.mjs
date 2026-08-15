@@ -56,19 +56,20 @@ async function req(url) {
       'accept-language': 'en-GB,en;q=0.9,it;q=0.8', cookie: DRAW_COOKIE,
     },
   });
-  return { status: r.status, text: await r.text() }; })();
+  return { status: r.status, finalUrl: r.url, text: await r.text() }; })();
   REQUEST_CACHE.set(url, request);
   return request;
 }
 function cookiePair(value) { return String(value || '').split(/,(?=\s*[^;]+=)/).map(x => x.split(';')[0].trim()).filter(Boolean); }
 async function acceptedCookie() {
   const first = await fetch(BASE + '/tournaments', { redirect: 'manual' });
-  const cookies = cookiePair(first.headers.get('set-cookie'));
-  if (first.status >= 300 && /cookiewall/i.test(first.headers.get('location') || '')) {
+  const firstText = await first.text();
+  const cookies = cookiePair((first.headers.getSetCookie?.() || [first.headers.get('set-cookie') || '']).join(','));
+  if ((first.status >= 300 && /cookiewall/i.test(first.headers.get('location') || '')) || /cookiewall|CookiePurposes|SettingsOpen/i.test(firstText)) {
     const body = new URLSearchParams({ ReturnUrl: '/tournaments', SettingsOpen: 'false' });
     for (const value of ['1', '2', '3', '4']) body.append('CookiePurposes', value);
     const saved = await fetch(BASE + '/cookiewall/Save', { method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: cookies.join('; ') }, body });
-    cookies.push(...cookiePair(saved.headers.get('set-cookie')));
+    cookies.push(...cookiePair((saved.headers.getSetCookie?.() || [saved.headers.get('set-cookie') || '']).join(',')));
   }
   return [...new Set(cookies)].join('; ');
 }
@@ -209,7 +210,7 @@ async function checkDraw(entry, wanted) {
       const evidence = r.status === 200 ? drawEvidence(r.text, wanted, entry, link.text + ' ' + link.url) : { relevant:false, populated:false, publishedEmpty:false };
       const found = evidence.populated && hasPlayer(r.text, entry.playerName);
       if (evidence.populated) reliable = true;
-      tried.push({ url: link.url, label: link.text, score: link.score, status: r.status, kind: link.directProbe?'numbered_draw_probe':'draw_link', found, reliableEvidence: evidence.populated, publishedEmpty: evidence.publishedEmpty, evidence });
+      tried.push({ url: link.url, finalUrl:r.finalUrl, label: link.text, score: link.score, status: r.status, kind: link.directProbe?'numbered_draw_probe':'draw_link', found, reliableEvidence: evidence.populated, publishedEmpty: evidence.publishedEmpty, evidence });
       if (found) return { found: true, reliable: true, tried, drawLinks: uniqueLinks.slice(0, 40) };
     } catch (error) {
       tried.push({ url: link.url, label: link.text, score: link.score, kind: 'draw_link', error: error.message });
