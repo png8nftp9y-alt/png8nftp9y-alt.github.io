@@ -1,8 +1,12 @@
 import fs from 'node:fs/promises';
+import {gzip,gunzip} from 'node:zlib';
+import {promisify} from 'node:util';
 
 const NOW=new Date().toISOString(), TODAY=NOW.slice(0,10), FROM='2025-12-18';
 const BASE='https://dp-myfit-test-function-v2.azurewebsites.net';
-const CACHE='history/fitp_participant_cache.json', INDEX='history/fitp_membership_index.json', ARCHIVE='history/fitp_tournament_archive.json';
+const CACHE='history/fitp_participant_cache.json.gz', INDEX='history/fitp_membership_index.json.gz', ARCHIVE='history/fitp_tournament_archive.json';
+const LEGACY_CACHE='history/fitp_participant_cache.json';
+const zip=promisify(gzip),unzip=promisify(gunzip);
 const CONCURRENCY=Math.max(1,Number(process.env.FITP_ENTRY_CONCURRENCY||20));
 const FORCE_FULL=process.env.FITP_FORCE_FULL_SCAN==='1';
 const MIN_CATALOG=Math.max(1,Number(process.env.FITP_MIN_CATALOG||5300));
@@ -12,6 +16,8 @@ const card=v=>String(v||'').replace(/\D+/g,'');
 const iso=v=>{const s=String(v||'');let m=s.match(/^(20\d{2})-(\d{2})-(\d{2})/);if(m)return m[0];m=s.match(/(\d{1,2})\D(\d{1,2})\D(20\d{2})/);return m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:''};
 async function readJson(p,f){try{return JSON.parse(await fs.readFile(p,'utf8'))}catch{return f}}
 async function writeJson(p,v,compact=false){await fs.mkdir(p.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(p,JSON.stringify(v,null,compact?0:2)+'\n')}
+async function readGzipJson(p,f){try{return JSON.parse((await unzip(await fs.readFile(p))).toString('utf8'))}catch{return f}}
+async function writeGzipJson(p,v){await fs.mkdir(p.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(p,await zip(JSON.stringify(v),{level:9}))}
 async function post(path,body,attempt=0){try{const r=await fetch(BASE+path,{method:'POST',signal:AbortSignal.timeout(25000),headers:{'content-type':'application/json','user-agent':'Mozilla/5.0 CourtWatch-v3-fitp-participant-cache/4.0','origin':'https://www.fitp.it','referer':'https://www.fitp.it/Tornei/Ricerca-tornei'},body:JSON.stringify(body)});const t=await r.text();if(!r.ok)throw Error(r.status+' '+t.slice(0,180));return t?JSON.parse(t):null}catch(e){if(attempt<2){await new Promise(r=>setTimeout(r,500*(2**attempt)));return post(path,body,attempt+1)}throw e}}
 function collect(node,draw,out=[]){if(!node||typeof node!=='object')return out;if(Array.isArray(node)){for(const x of node)collect(x,draw,out);return out}const name=[node.Name,node.FirstName,node.Nome].filter(Boolean).join(' '),surname=[node.Surname,node.LastName,node.Cognome].filter(Boolean).join(' ');const full1=`${name} ${surname}`.trim(),full2=`${surname} ${name}`.trim(),membershipCard=card(node.MembershipCard||node.Tessera||node.CardNumber||node.NumeroTessera||node.FitpCardNumber);if(full1||full2||membershipCard)out.push({full1,full2,membershipCard,ranking:node.Ranking||node.Classifica||'',subscriptionDate:node.SubscriptionDate||'',draw});for(const [k,v] of Object.entries(node)){if(!/result|score|winner|loser|match/i.test(k))collect(v,draw,out)}return out}
 function dedupe(rows){return [...new Map(rows.map(r=>[[r.membershipCard,norm(r.full1),norm(r.full2),r.draw].join('|'),r])).values()]}
@@ -25,7 +31,9 @@ function record(t){return{circuit:'fitp',competitionId:String(t.competitionId||'
 for(const t of map.tournaments){if(t.circuit!=='fitp'||!t.competitionId||String(t.sourceCode)!=='1')continue;const id=String(t.competitionId).toUpperCase(),old=archive.get(id);archive.set(id,{...old,...record(t),firstCatalogSeenAt:old?.firstCatalogSeenAt||NOW})}
 for(const id of VERIFIED)if(!archive.has(id))archive.set(id,record({competitionId:id,tournamentName:'Verified official P.U.C. competition'}));
 const tournaments=[...archive.values()].filter(t=>t.competitionId&&(!t.endDate||t.endDate>=FROM)).sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))||a.competitionId.localeCompare(b.competitionId));
-const previousCache=await readJson(CACHE,{tournaments:{}}), cached={...(previousCache.tournaments||{})};
+let previousCache=await readGzipJson(CACHE,null);
+if(!previousCache)previousCache=await readJson(LEGACY_CACHE,{tournaments:{}});
+const cached={...(previousCache.tournaments||{})};
 const currentIds=new Set(map.tournaments.filter(t=>t.circuit==='fitp'&&String(t.sourceCode)==='1').map(t=>String(t.competitionId).toUpperCase()));
 function needsRefresh(t){
   const old=cached[t.competitionId];
@@ -50,8 +58,8 @@ const byPlayer=unique.reduce((a,e)=>(a[e.playerId]=(a[e.playerId]||0)+1,a),{}),b
 const membershipIndex={};for(const [id,s] of Object.entries(cached))for(const q of s.participants||[]){if(!q.membershipCard)continue;const ids=membershipIndex[q.membershipCard]||(membershipIndex[q.membershipCard]=[]);if(!ids.includes(id))ids.push(id)}
 const out={version:'cw-v3-fitp-entry-cache-v1',generatedAt:NOW,status:errors.length?'fitp_entries_complete_from_cache_with_retained_refresh_errors':'fitp_entries_complete_from_versioned_participant_cache',source:'Validated provincial FITP catalog plus permanent official P.U.C. participant snapshots. Active/future tournaments refresh every run; concluded tournaments remain queryable for future player onboarding.',coverageFrom:FROM,tournamentsInput:tournaments.length,baseTournamentsInput:currentIds.size,archivedTournamentsInput:tournaments.length,participantSnapshots:Object.keys(cached).length,participantSnapshotsRefreshed:refreshed,participantSnapshotsReused:tournaments.length-refreshed,refreshQueue:queue.length,fullScan:FORCE_FULL||!Object.keys(previousCache.tournaments||{}).length,concurrency:CONCURRENCY,participantsScanned,participantsWithCard,entriesFound:unique.length,playersWithEntries:Object.keys(byPlayer).length,homonymRejected,verifiedCompetitionIds:VERIFIED,verifiedCompetitionEntryRescues:0,byPlayer,byMatchMethod:byMethod,byDiscoveryMethod:{fitp_permanent_tournament_archive_versioned_participant_cache_card_strict:unique.length},entries:unique,errors:errors.slice(0,200)};
 await writeJson(ARCHIVE,{version:'cw-v3-fitp-tournament-archive-v1',generatedAt:NOW,coverageFrom:FROM,currentCatalogGeneratedAt:map.generatedAt||'',currentCatalogTournaments:currentIds.size,archivedTournaments:tournaments.length,tournaments});
-await writeJson(CACHE,{version:'cw-v3-fitp-participant-cache-v1',generatedAt:NOW,coverageFrom:FROM,tournaments:cached},true);
-await writeJson(INDEX,{version:'cw-v3-fitp-membership-index-v1',generatedAt:NOW,coverageFrom:FROM,cards:membershipIndex},true);
+await writeGzipJson(CACHE,{version:'cw-v3-fitp-participant-cache-v1',generatedAt:NOW,coverageFrom:FROM,tournaments:cached});
+await writeGzipJson(INDEX,{version:'cw-v3-fitp-membership-index-v1',generatedAt:NOW,coverageFrom:FROM,cards:membershipIndex});
 await writeJson('dist/v3/source_fitp_entries.json',out);
 await writeJson('dist/v3/source_fitp_entries_audit.json',{...out,entries:undefined,refreshErrors:errors});
 console.log(JSON.stringify({...out,entries:undefined},null,2));
