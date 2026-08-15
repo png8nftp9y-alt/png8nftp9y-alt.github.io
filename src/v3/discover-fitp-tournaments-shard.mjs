@@ -12,6 +12,7 @@ const ROOT_OVERLAP_DAYS = 21;
 const MIN_SPLIT_DAYS = 1;
 const HORIZON_DAYS = 730;
 const PROVINCE_ID = String(process.env.FITP_PROVINCE_ID || '');
+const OMIT_END_DATE = process.env.FITP_OMIT_END_DATE === '1';
 
 if (!PROVINCE_ID) throw new Error('FITP_PROVINCE_ID is required for province-sharded discovery');
 
@@ -86,7 +87,7 @@ function payload(window, skip) {
   const value = basePayload();
   value.id_provincia = PROVINCE_ID;
   value.data_inizio = it(window.start);
-  value.data_fine = it(window.end);
+  value.data_fine = OMIT_END_DATE ? '' : it(window.end);
   value.rowstoskip = skip;
   return value;
 }
