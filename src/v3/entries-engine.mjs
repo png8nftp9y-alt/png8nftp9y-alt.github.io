@@ -29,6 +29,7 @@ function fitpTournamentDetail(fitpTournaments,mapAge){
 }
 const playersDoc=await readJson('players.json',{players:[]});
 const fitp=await readJson('dist/v3/source_fitp_entries.json',{entries:[]});
+const fitpHistory=await readJson('dist/v3/history/fitp_tournaments.json',{tournaments:[]});
 const fitpTournaments=await readJson('dist/v3/source_fitp_tournaments.json',{tournaments:[]});
 const te=await readJson('dist/v3/source_tennis_europe_entries.json',{entries:[]});
 const itf=await readJson('dist/v3/source_itf_entries.json',{entries:[]});
@@ -36,7 +37,10 @@ const agendaDoc=await readJson('dist/v3/agenda.json',{agenda:[]});
 const resultsDoc=await readJson('dist/v3/results.json',{results:[]});
 const opponentsDoc=await readJson('dist/v3/opponents.json',{opponents:[]});
 const teEntries=(te.entries||[]).map(entry).filter(e=>e.playerId&&e.startDate&&validDate(e.endDate));
-const entries=[...(fitp.entries||[]),...teEntries,...(itf.entries||[])].map(e=>e.circuit?e:entry(e)).filter(e=>e.playerId&&validDate(e.endDate));
+const archivedFitpRows=(fitpHistory.tournaments||[]).length?(fitpHistory.tournaments||[]):(fitp.entries||[]);
+const fitpEntries=archivedFitpRows.map(e=>e.circuit?e:entry({...e,circuit:'fitp'})).filter(e=>e.playerId);
+const itfEntries=(itf.entries||[]).map(e=>e.circuit?e:entry(e)).filter(e=>e.playerId&&validDate(e.endDate));
+const entries=[...fitpEntries,...teEntries,...itfEntries];
 const seen=new Set();
 const tournamentEntries=entries.filter(e=>{const k=[e.playerId,e.circuit,e.competitionId||e.tournamentName].join('|');if(seen.has(k))return false;seen.add(k);return true});
 const tournaments=tournamentEntries.map(toTournament);
