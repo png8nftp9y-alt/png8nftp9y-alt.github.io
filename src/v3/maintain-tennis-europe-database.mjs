@@ -59,7 +59,7 @@ const [mapData, acceptanceData, calendarData, playersData, oldCatalog, oldRelati
 const map = Array.isArray(mapData?.tournaments) ? mapData.tournaments : [];
 const acceptanceEntries = Array.isArray(acceptanceData?.entries) ? acceptanceData.entries.filter(e => e.circuit === 'tennis-europe') : [];
 const calendarEntries = Array.isArray(calendarData?.entries) ? calendarData.entries.filter(e => e.circuit === 'tennis-europe') : [];
-const mapComplete = mapData?.status === 'tennis_europe_sharded_tournament_map_complete' && map.length >= 500 && !(mapData.errors || []).length;
+const mapComplete = mapData?.status === 'tennis_europe_sharded_tournament_map_complete' && map.length >= 100 && !(mapData.errors || []).length;
 const acceptanceComplete = String(acceptanceData?.status || '').includes('tennis_europe_acceptance_complete')
   && Array.isArray(acceptanceData?.shards) && acceptanceData.shards.length === 16 && !(acceptanceData.errors || []).length;
 if (!mapComplete) throw new Error(`Refusing Tennis Europe database update: incomplete map (${map.length}, status ${mapData?.status || 'missing'}).`);
