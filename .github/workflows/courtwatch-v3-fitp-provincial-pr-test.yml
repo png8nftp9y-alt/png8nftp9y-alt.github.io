@@ -61,10 +61,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Remove stale checked-in shards
+        run: rm -rf dist/v3/shards
       - uses: actions/download-artifact@v4
         with:
           pattern: fitp-province-*
-          path: dist/v3/shards
+          path: .
           merge-multiple: true
       - name: Merge all 107 official provinces
         run: node src/v3/merge-fitp-tournament-shards.mjs
