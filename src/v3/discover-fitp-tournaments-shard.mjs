@@ -34,6 +34,7 @@ const iso = v => {
 };
 const norm = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
 const key = r => String(r?.guid || r?.competitionId || '').toUpperCase();
+const rawKey = r => `${key(r)}:${String(r?.id_torneo_digital || '')}`;
 
 async function writeJson(path, value) {
   await fs.mkdir(path.split('/').slice(0, -1).join('/'), { recursive: true });
@@ -138,6 +139,7 @@ async function runBranch(window) {
     errors: []
   };
   const branchIds = new Set();
+  const rawBranchIds = new Set();
   let previousSignature = '';
 
   for (let page = 0, skip = 0; page < MAX_PAGES; page++, skip += FETCH) {
@@ -154,7 +156,7 @@ async function runBranch(window) {
 
     const rows = json?.competizioni || [];
     const total = Number(json?.record || 0);
-    const signature = rows.map(key).join('|');
+    const signature = rows.map(rawKey).join('|');
     branch.pagesRead++;
     branch.rowsRead += rows.length;
     branch.totalDeclared = Math.max(branch.totalDeclared, total || 0);
@@ -165,9 +167,13 @@ async function runBranch(window) {
       break;
     }
 
-    if (signature && signature === previousSignature) {
-      branch.termination = total > 0 && skip >= total ? 'declared_total_exhausted' : 'repeated_page';
-      queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: rows.length, total, termination: branch.termination });
+    const repeated = signature && signature === previousSignature;
+    for (const row of rows) rawBranchIds.add(rawKey(row));
+    if (repeated) {
+      const incomplete = total > 0 && rawBranchIds.size < total;
+      const canSplit = daysBetween(window.start, window.end) > 0;
+      branch.termination = incomplete && canSplit ? 'repeated_page' : 'declared_total_exhausted';
+      queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: rows.length, total, uniqueRawRows: rawBranchIds.size, termination: branch.termination });
       break;
     }
     previousSignature = signature;
@@ -231,7 +237,7 @@ const regression = Object.fromEntries(Object.entries(REGRESSION_IDS).map(([name,
 const status = errors.length ? 'fitp_province_shard_with_errors' : unresolvedSaturations ? 'fitp_province_shard_with_unresolved_saturations' : 'fitp_province_shard_complete';
 const out = {
   version: 'cw-v3-fitp-province-shard-v2', generatedAt: NOW, status, provinceId: PROVINCE_ID,
-  source: `One FITP province per shard using the official FITP id_provincia value. 31-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages until FITP is exhausted.`,
+  source: `One FITP province per shard using the official FITP id_provincia value. 31-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages; repeated incomplete pages trigger recursive time-window splits.`,
   coverageFrom: FROM, coverageUntil: isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS)),
   branches: branches.length, queries: queries.length, tournamentsFound: tournaments.length,
   unresolvedSaturations, regression, tournaments, errors
