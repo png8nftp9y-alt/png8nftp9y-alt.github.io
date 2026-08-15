@@ -144,7 +144,9 @@ function drawHeading(html) {
 }
 function drawEvidence(html, wanted, entry, label = '') {
   const text = norm(clean(html));
-  const heading = norm(drawHeading(html) + ' ' + label);
+  const actualHeading = drawHeading(html);
+  const usefulLabel = /^direct draw\s+\d+$/i.test(String(label || '').trim()) ? '' : label;
+  const heading = norm(actualHeading + ' ' + usefulLabel);
   const { gender, age } = eventParts(entry);
   const doubles = /DOUBLES|DOPPIO|DOUBLE GARCONS|DOUBLE FILLES/.test(heading);
   const genderMismatch = (/GIRLS|WOMEN|FEMALE|FILLES|RAGAZZE/.test(heading) && gender === 'BS') || (/BOYS|MEN|MALE|GARCONS|RAGAZZI/.test(heading) && gender === 'GS');
@@ -152,7 +154,7 @@ function drawEvidence(html, wanted, entry, label = '') {
   const ageMismatch = ages.length > 0 && age && !ages.includes(age);
   const qualifying = /QUALIFYING|QUALIFICATION|QUALIFICAZIONE/.test(heading);
   const kindMatches = wanted === 'qualifying' ? qualifying : !qualifying;
-  const looks = pageLooksLikeDraw(html, wanted) || /DRAW|TABELLONE|KNOCK OUT|ELIMINATION/.test(heading);
+  const looks = pageLooksLikeDraw(html, wanted) || /DRAW|TABELLONE|KNOCK OUT|ELIMINATION/.test(norm(actualHeading));
   const relevant = looks && !doubles && !genderMismatch && !ageMismatch && kindMatches;
   const profileLinks = (html.match(/player-profile|\/player\//gi) || []).length;
   const countryPlayers = (text.match(/\b(ITA|FRA|GER|ESP|SUI|AUT|CRO|SLO|BEL|NED|GBR|CZE|SRB|POL|ROU|BUL|HUN|SVK|UKR|TUR|GRE)\b/g) || []).length;
