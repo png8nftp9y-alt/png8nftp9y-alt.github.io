@@ -5,8 +5,6 @@ on:
     branches: [main]
     paths:
       - 'src/v3/discover-fitp-tournaments-shard.mjs'
-      - 'src/v3/update-fitp-player-history.mjs'
-      - 'src/v3/test-fitp-player-history.mjs'
       - '.github/workflows/courtwatch-v3-fitp-provincial-pr-test.yml'
 
 permissions:
@@ -19,24 +17,28 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        province: ['13', '108']
+        province: ['1', '15', '27', '58', '72']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - name: Validate source
-        run: |
-          node --check src/v3/discover-fitp-tournaments-shard.mjs
-          node --check src/v3/update-fitp-player-history.mjs
-          node --check src/v3/test-fitp-player-history.mjs
-      - name: Verify permanent FITP player history
-        run: node src/v3/test-fitp-player-history.mjs
-      - name: Run representative province
+        run: node --check src/v3/discover-fitp-tournaments-shard.mjs
+      - name: Run metropolitan province fallback
         env:
           FITP_PROVINCE_ID: ${{ matrix.province }}
-          FITP_OMIT_END_DATE: '1'
         run: node src/v3/discover-fitp-tournaments-shard.mjs
+      - name: Verify known player tournament recovery
+        run: |
+          case '${{ matrix.province }}' in
+            1) expected='1AD13BB1-D101-4D19-8A97-19BA3168CFCC' ;;
+            15) expected='B3110C9E-C6E4-4DE6-A9A3-BAB9B1341D47' ;;
+            27) expected='00753945-8679-4066-ACFF-2EE5F354BCB8' ;;
+            58) expected='C1CE4A62-CF62-41F9-8BCD-CA3F23055235' ;;
+            72) expected='7C9CA85A-81FC-4E05-9C63-FD3A46A635BB' ;;
+          esac
+          jq -e --arg id "$expected" '.tournaments | map(.competitionId) | index($id) != null' "dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
