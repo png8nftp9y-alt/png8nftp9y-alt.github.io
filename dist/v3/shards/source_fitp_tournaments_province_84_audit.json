@@ -1,11 +1,11 @@
 {
   "version": "cw-v3-fitp-province-shard",
-  "generatedAt": "2026-08-14T23:51:53.836Z",
-  "status": "fitp_province_shard_with_unresolved_saturations",
+  "generatedAt": "2026-08-15T04:13:51.395Z",
+  "status": "fitp_province_shard_complete",
   "provinceId": "84",
   "source": "One visible GitHub Actions shard per FITP province. Each province shard runs rotating logical windows with 21-day overlap except first historical window; saturated branches auto-split.",
   "coverageFrom": "2025-12-18",
-  "coverageUntil": "2028-08-13",
+  "coverageUntil": "2028-08-14",
   "branches": [
     {
       "provinceId": "84",
@@ -18,328 +18,8 @@
       "depth": 0,
       "pagesRead": 1,
       "rowsRead": 8,
-      "totalDeclared": 15,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19A",
-      "logicalStart": "2025-12-18",
-      "logicalEnd": "2026-02-17",
-      "queryStart": "2025-12-18",
-      "queryEnd": "2026-02-17",
-      "level": "bimestre",
-      "depth": 1,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 4,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19AA",
-      "logicalStart": "2025-12-18",
-      "logicalEnd": "2026-01-18",
-      "queryStart": "2025-12-18",
-      "queryEnd": "2026-01-18",
-      "level": "split",
-      "depth": 2,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 2,
+      "totalDeclared": 8,
       "saturated": false,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19AB",
-      "logicalStart": "2026-01-18",
-      "logicalEnd": "2026-02-17",
-      "queryStart": "2025-12-28",
-      "queryEnd": "2026-02-17",
-      "level": "split",
-      "depth": 2,
-      "pagesRead": 1,
-      "rowsRead": 1,
-      "totalDeclared": 3,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19ABA",
-      "logicalStart": "2026-01-18",
-      "logicalEnd": "2026-02-02",
-      "queryStart": "2025-12-28",
-      "queryEnd": "2026-02-02",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 1,
-      "totalDeclared": 3,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19ABAA",
-      "logicalStart": "2026-01-18",
-      "logicalEnd": "2026-01-26",
-      "queryStart": "2025-12-28",
-      "queryEnd": "2026-01-26",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 1,
-      "totalDeclared": 1,
-      "saturated": false,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19ABAB",
-      "logicalStart": "2026-01-26",
-      "logicalEnd": "2026-02-02",
-      "queryStart": "2026-01-05",
-      "queryEnd": "2026-02-02",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 1,
-      "totalDeclared": 3,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19ABB",
-      "logicalStart": "2026-02-02",
-      "logicalEnd": "2026-02-17",
-      "queryStart": "2026-01-12",
-      "queryEnd": "2026-02-17",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 0,
-      "totalDeclared": 0,
-      "saturated": false,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19B",
-      "logicalStart": "2026-02-17",
-      "logicalEnd": "2026-04-19",
-      "queryStart": "2026-01-27",
-      "queryEnd": "2026-04-19",
-      "level": "bimestre",
-      "depth": 1,
-      "pagesRead": 1,
-      "rowsRead": 6,
-      "totalDeclared": 11,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BA",
-      "logicalStart": "2026-02-17",
-      "logicalEnd": "2026-03-20",
-      "queryStart": "2026-01-27",
-      "queryEnd": "2026-03-20",
-      "level": "split",
-      "depth": 2,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 5,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BAA",
-      "logicalStart": "2026-02-17",
-      "logicalEnd": "2026-03-05",
-      "queryStart": "2026-01-27",
-      "queryEnd": "2026-03-05",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 1,
-      "totalDeclared": 1,
-      "saturated": false,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BAB",
-      "logicalStart": "2026-03-05",
-      "logicalEnd": "2026-03-20",
-      "queryStart": "2026-02-12",
-      "queryEnd": "2026-03-20",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 5,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BABA",
-      "logicalStart": "2026-03-05",
-      "logicalEnd": "2026-03-13",
-      "queryStart": "2026-02-12",
-      "queryEnd": "2026-03-13",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 2,
-      "saturated": false,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BABB",
-      "logicalStart": "2026-03-13",
-      "logicalEnd": "2026-03-20",
-      "queryStart": "2026-02-20",
-      "queryEnd": "2026-03-20",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 4,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BB",
-      "logicalStart": "2026-03-20",
-      "logicalEnd": "2026-04-19",
-      "queryStart": "2026-02-27",
-      "queryEnd": "2026-04-19",
-      "level": "split",
-      "depth": 2,
-      "pagesRead": 1,
-      "rowsRead": 4,
-      "totalDeclared": 9,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBA",
-      "logicalStart": "2026-03-20",
-      "logicalEnd": "2026-04-04",
-      "queryStart": "2026-02-27",
-      "queryEnd": "2026-04-04",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 6,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBAA",
-      "logicalStart": "2026-03-20",
-      "logicalEnd": "2026-03-28",
-      "queryStart": "2026-02-27",
-      "queryEnd": "2026-03-28",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 1,
-      "totalDeclared": 3,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBAB",
-      "logicalStart": "2026-03-28",
-      "logicalEnd": "2026-04-04",
-      "queryStart": "2026-03-07",
-      "queryEnd": "2026-04-04",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 5,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBB",
-      "logicalStart": "2026-04-04",
-      "logicalEnd": "2026-04-19",
-      "queryStart": "2026-03-14",
-      "queryEnd": "2026-04-19",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 7,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBBA",
-      "logicalStart": "2026-04-04",
-      "logicalEnd": "2026-04-12",
-      "queryStart": "2026-03-14",
-      "queryEnd": "2026-04-12",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 6,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBBB",
-      "logicalStart": "2026-04-12",
-      "logicalEnd": "2026-04-19",
-      "queryStart": "2026-03-22",
-      "queryEnd": "2026-04-19",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 5,
-      "saturated": true,
       "split": false,
       "errors": []
     },
@@ -354,455 +34,7 @@
       "depth": 0,
       "pagesRead": 1,
       "rowsRead": 15,
-      "totalDeclared": 54,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19A",
-      "logicalStart": "2026-04-19",
-      "logicalEnd": "2026-06-19",
-      "queryStart": "2026-03-29",
-      "queryEnd": "2026-06-19",
-      "level": "bimestre",
-      "depth": 1,
-      "pagesRead": 1,
-      "rowsRead": 9,
-      "totalDeclared": 25,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AA",
-      "logicalStart": "2026-04-19",
-      "logicalEnd": "2026-05-20",
-      "queryStart": "2026-03-29",
-      "queryEnd": "2026-05-20",
-      "level": "split",
-      "depth": 2,
-      "pagesRead": 1,
-      "rowsRead": 6,
-      "totalDeclared": 20,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AAA",
-      "logicalStart": "2026-04-19",
-      "logicalEnd": "2026-05-05",
-      "queryStart": "2026-03-29",
-      "queryEnd": "2026-05-05",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 4,
-      "totalDeclared": 18,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AAAA",
-      "logicalStart": "2026-04-19",
-      "logicalEnd": "2026-04-27",
-      "queryStart": "2026-03-29",
-      "queryEnd": "2026-04-27",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 4,
-      "totalDeclared": 11,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AAAB",
-      "logicalStart": "2026-04-27",
-      "logicalEnd": "2026-05-05",
-      "queryStart": "2026-04-06",
-      "queryEnd": "2026-05-05",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 16,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AAB",
-      "logicalStart": "2026-05-05",
-      "logicalEnd": "2026-05-20",
-      "queryStart": "2026-04-14",
-      "queryEnd": "2026-05-20",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 10,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AABA",
-      "logicalStart": "2026-05-05",
-      "logicalEnd": "2026-05-13",
-      "queryStart": "2026-04-14",
-      "queryEnd": "2026-05-13",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 10,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AABB",
-      "logicalStart": "2026-05-13",
-      "logicalEnd": "2026-05-20",
-      "queryStart": "2026-04-22",
-      "queryEnd": "2026-05-20",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 6,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AB",
-      "logicalStart": "2026-05-20",
-      "logicalEnd": "2026-06-19",
-      "queryStart": "2026-04-29",
-      "queryEnd": "2026-06-19",
-      "level": "split",
-      "depth": 2,
-      "pagesRead": 1,
-      "rowsRead": 4,
-      "totalDeclared": 10,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABA",
-      "logicalStart": "2026-05-20",
-      "logicalEnd": "2026-06-04",
-      "queryStart": "2026-04-29",
-      "queryEnd": "2026-06-04",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 9,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABAA",
-      "logicalStart": "2026-05-20",
-      "logicalEnd": "2026-05-28",
-      "queryStart": "2026-04-29",
-      "queryEnd": "2026-05-28",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 8,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABAB",
-      "logicalStart": "2026-05-28",
-      "logicalEnd": "2026-06-04",
-      "queryStart": "2026-05-07",
-      "queryEnd": "2026-06-04",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 4,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABB",
-      "logicalStart": "2026-06-04",
-      "logicalEnd": "2026-06-19",
-      "queryStart": "2026-05-14",
-      "queryEnd": "2026-06-19",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 4,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABBA",
-      "logicalStart": "2026-06-04",
-      "logicalEnd": "2026-06-12",
-      "queryStart": "2026-05-14",
-      "queryEnd": "2026-06-12",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 4,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABBB",
-      "logicalStart": "2026-06-12",
-      "logicalEnd": "2026-06-19",
-      "queryStart": "2026-05-22",
-      "queryEnd": "2026-06-19",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 1,
-      "totalDeclared": 3,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19B",
-      "logicalStart": "2026-06-19",
-      "logicalEnd": "2026-08-19",
-      "queryStart": "2026-05-29",
-      "queryEnd": "2026-08-19",
-      "level": "bimestre",
-      "depth": 1,
-      "pagesRead": 1,
-      "rowsRead": 6,
-      "totalDeclared": 29,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BA",
-      "logicalStart": "2026-06-19",
-      "logicalEnd": "2026-07-20",
-      "queryStart": "2026-05-29",
-      "queryEnd": "2026-07-20",
-      "level": "split",
-      "depth": 2,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 26,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BAA",
-      "logicalStart": "2026-06-19",
-      "logicalEnd": "2026-07-05",
-      "queryStart": "2026-05-29",
-      "queryEnd": "2026-07-05",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 21,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BAAA",
-      "logicalStart": "2026-06-19",
-      "logicalEnd": "2026-06-27",
-      "queryStart": "2026-05-29",
-      "queryEnd": "2026-06-27",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 1,
-      "totalDeclared": 10,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BAAB",
-      "logicalStart": "2026-06-27",
-      "logicalEnd": "2026-07-05",
-      "queryStart": "2026-06-06",
-      "queryEnd": "2026-07-05",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 21,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BAB",
-      "logicalStart": "2026-07-05",
-      "logicalEnd": "2026-07-20",
-      "queryStart": "2026-06-14",
-      "queryEnd": "2026-07-20",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 26,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BABA",
-      "logicalStart": "2026-07-05",
-      "logicalEnd": "2026-07-13",
-      "queryStart": "2026-06-14",
-      "queryEnd": "2026-07-13",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 25,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BABB",
-      "logicalStart": "2026-07-13",
-      "logicalEnd": "2026-07-20",
-      "queryStart": "2026-06-22",
-      "queryEnd": "2026-07-20",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 1,
-      "totalDeclared": 23,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BB",
-      "logicalStart": "2026-07-20",
-      "logicalEnd": "2026-08-19",
-      "queryStart": "2026-06-29",
-      "queryEnd": "2026-08-19",
-      "level": "split",
-      "depth": 2,
-      "pagesRead": 1,
-      "rowsRead": 4,
-      "totalDeclared": 10,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BBA",
-      "logicalStart": "2026-07-20",
-      "logicalEnd": "2026-08-04",
-      "queryStart": "2026-06-29",
-      "queryEnd": "2026-08-04",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 9,
-      "saturated": true,
-      "split": true,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BBAA",
-      "logicalStart": "2026-07-20",
-      "logicalEnd": "2026-07-28",
-      "queryStart": "2026-06-29",
-      "queryEnd": "2026-07-28",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 8,
-      "saturated": true,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BBAB",
-      "logicalStart": "2026-07-28",
-      "logicalEnd": "2026-08-04",
-      "queryStart": "2026-07-07",
-      "queryEnd": "2026-08-04",
-      "level": "split",
-      "depth": 4,
-      "pagesRead": 1,
-      "rowsRead": 2,
-      "totalDeclared": 2,
-      "saturated": false,
-      "split": false,
-      "errors": []
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BBB",
-      "logicalStart": "2026-08-04",
-      "logicalEnd": "2026-08-19",
-      "queryStart": "2026-07-14",
-      "queryEnd": "2026-08-19",
-      "level": "split",
-      "depth": 3,
-      "pagesRead": 1,
-      "rowsRead": 3,
-      "totalDeclared": 3,
+      "totalDeclared": 15,
       "saturated": false,
       "split": false,
       "errors": []
@@ -817,8 +49,8 @@
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
-      "rowsRead": 12,
-      "totalDeclared": 12,
+      "rowsRead": 2,
+      "totalDeclared": 2,
       "saturated": false,
       "split": false,
       "errors": []
@@ -889,11 +121,11 @@
     },
     {
       "provinceId": "84",
-      "windowLabel": "window_8_2028-04-20_2028-08-13",
+      "windowLabel": "window_8_2028-04-20_2028-08-14",
       "logicalStart": "2028-04-20",
-      "logicalEnd": "2028-08-13",
+      "logicalEnd": "2028-08-14",
       "queryStart": "2028-03-30",
-      "queryEnd": "2028-08-13",
+      "queryEnd": "2028-08-14",
       "level": "quadrimestre",
       "depth": 0,
       "pagesRead": 1,
@@ -912,208 +144,8 @@
       "queryEnd": "2026-04-19",
       "skip": 0,
       "rows": 8,
-      "total": 15,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19A",
-      "queryStart": "2025-12-18",
-      "queryEnd": "2026-02-17",
-      "skip": 0,
-      "rows": 2,
-      "total": 4,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19AA",
-      "queryStart": "2025-12-18",
-      "queryEnd": "2026-01-18",
-      "skip": 0,
-      "rows": 2,
-      "total": 2,
+      "total": 8,
       "saturated": false
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19AB",
-      "queryStart": "2025-12-28",
-      "queryEnd": "2026-02-17",
-      "skip": 0,
-      "rows": 1,
-      "total": 3,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19ABA",
-      "queryStart": "2025-12-28",
-      "queryEnd": "2026-02-02",
-      "skip": 0,
-      "rows": 1,
-      "total": 3,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19ABAA",
-      "queryStart": "2025-12-28",
-      "queryEnd": "2026-01-26",
-      "skip": 0,
-      "rows": 1,
-      "total": 1,
-      "saturated": false
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19ABAB",
-      "queryStart": "2026-01-05",
-      "queryEnd": "2026-02-02",
-      "skip": 0,
-      "rows": 1,
-      "total": 3,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19ABB",
-      "queryStart": "2026-01-12",
-      "queryEnd": "2026-02-17",
-      "skip": 0,
-      "rows": 0,
-      "total": 0,
-      "saturated": false
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19B",
-      "queryStart": "2026-01-27",
-      "queryEnd": "2026-04-19",
-      "skip": 0,
-      "rows": 6,
-      "total": 11,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BA",
-      "queryStart": "2026-01-27",
-      "queryEnd": "2026-03-20",
-      "skip": 0,
-      "rows": 3,
-      "total": 5,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BAA",
-      "queryStart": "2026-01-27",
-      "queryEnd": "2026-03-05",
-      "skip": 0,
-      "rows": 1,
-      "total": 1,
-      "saturated": false
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BAB",
-      "queryStart": "2026-02-12",
-      "queryEnd": "2026-03-20",
-      "skip": 0,
-      "rows": 3,
-      "total": 5,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BABA",
-      "queryStart": "2026-02-12",
-      "queryEnd": "2026-03-13",
-      "skip": 0,
-      "rows": 2,
-      "total": 2,
-      "saturated": false
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BABB",
-      "queryStart": "2026-02-20",
-      "queryEnd": "2026-03-20",
-      "skip": 0,
-      "rows": 2,
-      "total": 4,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BB",
-      "queryStart": "2026-02-27",
-      "queryEnd": "2026-04-19",
-      "skip": 0,
-      "rows": 4,
-      "total": 9,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBA",
-      "queryStart": "2026-02-27",
-      "queryEnd": "2026-04-04",
-      "skip": 0,
-      "rows": 2,
-      "total": 6,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBAA",
-      "queryStart": "2026-02-27",
-      "queryEnd": "2026-03-28",
-      "skip": 0,
-      "rows": 1,
-      "total": 3,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBAB",
-      "queryStart": "2026-03-07",
-      "queryEnd": "2026-04-04",
-      "skip": 0,
-      "rows": 2,
-      "total": 5,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBB",
-      "queryStart": "2026-03-14",
-      "queryEnd": "2026-04-19",
-      "skip": 0,
-      "rows": 3,
-      "total": 7,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBBA",
-      "queryStart": "2026-03-14",
-      "queryEnd": "2026-04-12",
-      "skip": 0,
-      "rows": 3,
-      "total": 6,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_1_2025-12-18_2026-04-19BBBB",
-      "queryStart": "2026-03-22",
-      "queryEnd": "2026-04-19",
-      "skip": 0,
-      "rows": 3,
-      "total": 5,
-      "saturated": true
     },
     {
       "provinceId": "84",
@@ -1122,287 +154,7 @@
       "queryEnd": "2026-08-19",
       "skip": 0,
       "rows": 15,
-      "total": 54,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19A",
-      "queryStart": "2026-03-29",
-      "queryEnd": "2026-06-19",
-      "skip": 0,
-      "rows": 9,
-      "total": 25,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AA",
-      "queryStart": "2026-03-29",
-      "queryEnd": "2026-05-20",
-      "skip": 0,
-      "rows": 6,
-      "total": 20,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AAA",
-      "queryStart": "2026-03-29",
-      "queryEnd": "2026-05-05",
-      "skip": 0,
-      "rows": 4,
-      "total": 18,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AAAA",
-      "queryStart": "2026-03-29",
-      "queryEnd": "2026-04-27",
-      "skip": 0,
-      "rows": 4,
-      "total": 11,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AAAB",
-      "queryStart": "2026-04-06",
-      "queryEnd": "2026-05-05",
-      "skip": 0,
-      "rows": 2,
-      "total": 16,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AAB",
-      "queryStart": "2026-04-14",
-      "queryEnd": "2026-05-20",
-      "skip": 0,
-      "rows": 3,
-      "total": 10,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AABA",
-      "queryStart": "2026-04-14",
-      "queryEnd": "2026-05-13",
-      "skip": 0,
-      "rows": 3,
-      "total": 10,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AABB",
-      "queryStart": "2026-04-22",
-      "queryEnd": "2026-05-20",
-      "skip": 0,
-      "rows": 2,
-      "total": 6,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19AB",
-      "queryStart": "2026-04-29",
-      "queryEnd": "2026-06-19",
-      "skip": 0,
-      "rows": 4,
-      "total": 10,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABA",
-      "queryStart": "2026-04-29",
-      "queryEnd": "2026-06-04",
-      "skip": 0,
-      "rows": 3,
-      "total": 9,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABAA",
-      "queryStart": "2026-04-29",
-      "queryEnd": "2026-05-28",
-      "skip": 0,
-      "rows": 2,
-      "total": 8,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABAB",
-      "queryStart": "2026-05-07",
-      "queryEnd": "2026-06-04",
-      "skip": 0,
-      "rows": 2,
-      "total": 4,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABB",
-      "queryStart": "2026-05-14",
-      "queryEnd": "2026-06-19",
-      "skip": 0,
-      "rows": 2,
-      "total": 4,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABBA",
-      "queryStart": "2026-05-14",
-      "queryEnd": "2026-06-12",
-      "skip": 0,
-      "rows": 2,
-      "total": 4,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19ABBB",
-      "queryStart": "2026-05-22",
-      "queryEnd": "2026-06-19",
-      "skip": 0,
-      "rows": 1,
-      "total": 3,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19B",
-      "queryStart": "2026-05-29",
-      "queryEnd": "2026-08-19",
-      "skip": 0,
-      "rows": 6,
-      "total": 29,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BA",
-      "queryStart": "2026-05-29",
-      "queryEnd": "2026-07-20",
-      "skip": 0,
-      "rows": 3,
-      "total": 26,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BAA",
-      "queryStart": "2026-05-29",
-      "queryEnd": "2026-07-05",
-      "skip": 0,
-      "rows": 2,
-      "total": 21,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BAAA",
-      "queryStart": "2026-05-29",
-      "queryEnd": "2026-06-27",
-      "skip": 0,
-      "rows": 1,
-      "total": 10,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BAAB",
-      "queryStart": "2026-06-06",
-      "queryEnd": "2026-07-05",
-      "skip": 0,
-      "rows": 2,
-      "total": 21,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BAB",
-      "queryStart": "2026-06-14",
-      "queryEnd": "2026-07-20",
-      "skip": 0,
-      "rows": 3,
-      "total": 26,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BABA",
-      "queryStart": "2026-06-14",
-      "queryEnd": "2026-07-13",
-      "skip": 0,
-      "rows": 2,
-      "total": 25,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BABB",
-      "queryStart": "2026-06-22",
-      "queryEnd": "2026-07-20",
-      "skip": 0,
-      "rows": 1,
-      "total": 23,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BB",
-      "queryStart": "2026-06-29",
-      "queryEnd": "2026-08-19",
-      "skip": 0,
-      "rows": 4,
-      "total": 10,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BBA",
-      "queryStart": "2026-06-29",
-      "queryEnd": "2026-08-04",
-      "skip": 0,
-      "rows": 3,
-      "total": 9,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BBAA",
-      "queryStart": "2026-06-29",
-      "queryEnd": "2026-07-28",
-      "skip": 0,
-      "rows": 2,
-      "total": 8,
-      "saturated": true
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BBAB",
-      "queryStart": "2026-07-07",
-      "queryEnd": "2026-08-04",
-      "skip": 0,
-      "rows": 2,
-      "total": 2,
-      "saturated": false
-    },
-    {
-      "provinceId": "84",
-      "windowLabel": "window_2_2026-04-19_2026-08-19BBB",
-      "queryStart": "2026-07-14",
-      "queryEnd": "2026-08-19",
-      "skip": 0,
-      "rows": 3,
-      "total": 3,
+      "total": 15,
       "saturated": false
     },
     {
@@ -1411,8 +163,8 @@
       "queryStart": "2026-07-29",
       "queryEnd": "2026-12-19",
       "skip": 0,
-      "rows": 12,
-      "total": 12,
+      "rows": 2,
+      "total": 2,
       "saturated": false
     },
     {
@@ -1457,9 +209,9 @@
     },
     {
       "provinceId": "84",
-      "windowLabel": "window_8_2028-04-20_2028-08-13",
+      "windowLabel": "window_8_2028-04-20_2028-08-14",
       "queryStart": "2028-03-30",
-      "queryEnd": "2028-08-13",
+      "queryEnd": "2028-08-14",
       "skip": 0,
       "rows": 0,
       "total": 0,
@@ -1467,7 +219,7 @@
     }
   ],
   "tournamentsFound": 23,
-  "unresolvedSaturations": 19,
+  "unresolvedSaturations": 0,
   "regression": {
     "feniceBresciaLomb370": false,
     "rossoniKinderImperia": false,
@@ -1493,11 +245,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=083A8CB8-C5FA-458D-B6EB-7F12212ED9E6",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_1_2025-12-18_2026-04-19",
-        "84:window_1_2025-12-18_2026-04-19A",
-        "84:window_1_2025-12-18_2026-04-19AA"
+        "84:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1517,15 +267,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=45EE1E9D-5396-4616-B096-7C868114215A",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_1_2025-12-18_2026-04-19",
-        "84:window_1_2025-12-18_2026-04-19A",
-        "84:window_1_2025-12-18_2026-04-19AA",
-        "84:window_1_2025-12-18_2026-04-19AB",
-        "84:window_1_2025-12-18_2026-04-19ABA",
-        "84:window_1_2025-12-18_2026-04-19ABAA",
-        "84:window_1_2025-12-18_2026-04-19ABAB"
+        "84:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1545,14 +289,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=298E45BF-7071-42D3-8FC2-EF35DBB2ED58",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_1_2025-12-18_2026-04-19",
-        "84:window_1_2025-12-18_2026-04-19B",
-        "84:window_1_2025-12-18_2026-04-19BA",
-        "84:window_1_2025-12-18_2026-04-19BAA",
-        "84:window_1_2025-12-18_2026-04-19BAB",
-        "84:window_1_2025-12-18_2026-04-19BABA"
+        "84:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1572,14 +311,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=4E4883A7-6232-4A79-A444-779E7AE2395C",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_1_2025-12-18_2026-04-19",
-        "84:window_1_2025-12-18_2026-04-19B",
-        "84:window_1_2025-12-18_2026-04-19BA",
-        "84:window_1_2025-12-18_2026-04-19BAB",
-        "84:window_1_2025-12-18_2026-04-19BABA",
-        "84:window_1_2025-12-18_2026-04-19BABB"
+        "84:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1599,17 +333,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=D9C21431-A86D-4EBA-B5D8-5ADA7A6463B5",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_1_2025-12-18_2026-04-19",
-        "84:window_1_2025-12-18_2026-04-19B",
-        "84:window_1_2025-12-18_2026-04-19BA",
-        "84:window_1_2025-12-18_2026-04-19BAB",
-        "84:window_1_2025-12-18_2026-04-19BABB",
-        "84:window_1_2025-12-18_2026-04-19BB",
-        "84:window_1_2025-12-18_2026-04-19BBA",
-        "84:window_1_2025-12-18_2026-04-19BBAA",
-        "84:window_1_2025-12-18_2026-04-19BBAB"
+        "84:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1629,16 +355,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=497D01B7-D3BF-4240-92BB-AA0D02B6097A",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_1_2025-12-18_2026-04-19",
-        "84:window_1_2025-12-18_2026-04-19B",
-        "84:window_1_2025-12-18_2026-04-19BB",
-        "84:window_1_2025-12-18_2026-04-19BBA",
-        "84:window_1_2025-12-18_2026-04-19BBAB",
-        "84:window_1_2025-12-18_2026-04-19BBB",
-        "84:window_1_2025-12-18_2026-04-19BBBA",
-        "84:window_1_2025-12-18_2026-04-19BBBB"
+        "84:window_1_2025-12-18_2026-04-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1659,18 +378,9 @@
       "discoveryShard": "province_84",
       "coverageModes": [
         "84:window_1_2025-12-18_2026-04-19",
-        "84:window_1_2025-12-18_2026-04-19B",
-        "84:window_1_2025-12-18_2026-04-19BB",
-        "84:window_1_2025-12-18_2026-04-19BBB",
-        "84:window_1_2025-12-18_2026-04-19BBBA",
-        "84:window_1_2025-12-18_2026-04-19BBBB",
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19A",
-        "84:window_2_2026-04-19_2026-08-19AA",
-        "84:window_2_2026-04-19_2026-08-19AAA",
-        "84:window_2_2026-04-19_2026-08-19AAAA"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1691,18 +401,9 @@
       "discoveryShard": "province_84",
       "coverageModes": [
         "84:window_1_2025-12-18_2026-04-19",
-        "84:window_1_2025-12-18_2026-04-19B",
-        "84:window_1_2025-12-18_2026-04-19BB",
-        "84:window_1_2025-12-18_2026-04-19BBB",
-        "84:window_1_2025-12-18_2026-04-19BBBA",
-        "84:window_1_2025-12-18_2026-04-19BBBB",
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19A",
-        "84:window_2_2026-04-19_2026-08-19AA",
-        "84:window_2_2026-04-19_2026-08-19AAA",
-        "84:window_2_2026-04-19_2026-08-19AAAA"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1722,14 +423,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=C330E5B7-DD03-4548-9942-3401EEDEB3E2",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19A",
-        "84:window_2_2026-04-19_2026-08-19AA",
-        "84:window_2_2026-04-19_2026-08-19AAA",
-        "84:window_2_2026-04-19_2026-08-19AAAA",
-        "84:window_2_2026-04-19_2026-08-19AAAB"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1749,16 +445,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=513191F6-5DC6-47F6-B4EA-0355E66A8C05",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19A",
-        "84:window_2_2026-04-19_2026-08-19AA",
-        "84:window_2_2026-04-19_2026-08-19AAA",
-        "84:window_2_2026-04-19_2026-08-19AAAA",
-        "84:window_2_2026-04-19_2026-08-19AAAB",
-        "84:window_2_2026-04-19_2026-08-19AAB",
-        "84:window_2_2026-04-19_2026-08-19AABA"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1778,14 +467,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=C3D63149-20F8-42AB-AFD5-4D23AC54BCCD",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19A",
-        "84:window_2_2026-04-19_2026-08-19AA",
-        "84:window_2_2026-04-19_2026-08-19AAB",
-        "84:window_2_2026-04-19_2026-08-19AABA",
-        "84:window_2_2026-04-19_2026-08-19AABB"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1805,17 +489,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=C5F0AEA1-0217-482E-9B4B-8BB58A0D9E80",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19A",
-        "84:window_2_2026-04-19_2026-08-19AA",
-        "84:window_2_2026-04-19_2026-08-19AAB",
-        "84:window_2_2026-04-19_2026-08-19AABA",
-        "84:window_2_2026-04-19_2026-08-19AABB",
-        "84:window_2_2026-04-19_2026-08-19AB",
-        "84:window_2_2026-04-19_2026-08-19ABA",
-        "84:window_2_2026-04-19_2026-08-19ABAA"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1835,14 +511,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=77B24A6F-5857-4D75-AA1E-73E60B73491D",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19A",
-        "84:window_2_2026-04-19_2026-08-19AB",
-        "84:window_2_2026-04-19_2026-08-19ABA",
-        "84:window_2_2026-04-19_2026-08-19ABAA",
-        "84:window_2_2026-04-19_2026-08-19ABAB"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1862,15 +533,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=E7EF7C73-BF10-411D-9B97-46F18F7034AA",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19A",
-        "84:window_2_2026-04-19_2026-08-19AB",
-        "84:window_2_2026-04-19_2026-08-19ABA",
-        "84:window_2_2026-04-19_2026-08-19ABAB",
-        "84:window_2_2026-04-19_2026-08-19ABB",
-        "84:window_2_2026-04-19_2026-08-19ABBA"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1890,14 +555,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=B737C898-5905-4878-A99C-224C35488180",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19A",
-        "84:window_2_2026-04-19_2026-08-19AB",
-        "84:window_2_2026-04-19_2026-08-19ABB",
-        "84:window_2_2026-04-19_2026-08-19ABBA",
-        "84:window_2_2026-04-19_2026-08-19ABBB"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1917,16 +577,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=E37E78AC-9D78-42A9-AA47-27B80C072588",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19B",
-        "84:window_2_2026-04-19_2026-08-19BA",
-        "84:window_2_2026-04-19_2026-08-19BAA",
-        "84:window_2_2026-04-19_2026-08-19BAAA",
-        "84:window_2_2026-04-19_2026-08-19BAAB",
-        "84:window_2_2026-04-19_2026-08-19BAB",
-        "84:window_2_2026-04-19_2026-08-19BABA"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1946,15 +599,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=D4F9DB5B-A437-494C-8655-5817FDC8D1B0",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19B",
-        "84:window_2_2026-04-19_2026-08-19BA",
-        "84:window_2_2026-04-19_2026-08-19BAA",
-        "84:window_2_2026-04-19_2026-08-19BAAB",
-        "84:window_2_2026-04-19_2026-08-19BAB",
-        "84:window_2_2026-04-19_2026-08-19BABA"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -1974,16 +621,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=6EA8728A-2BD2-4618-99E0-6E8490448F04",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19B",
-        "84:window_2_2026-04-19_2026-08-19BA",
-        "84:window_2_2026-04-19_2026-08-19BAB",
-        "84:window_2_2026-04-19_2026-08-19BABB",
-        "84:window_2_2026-04-19_2026-08-19BB",
-        "84:window_2_2026-04-19_2026-08-19BBA",
-        "84:window_2_2026-04-19_2026-08-19BBAA"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -2003,15 +643,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=C2165406-31CA-4CF8-9C35-CADE907CE29A",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19B",
-        "84:window_2_2026-04-19_2026-08-19BB",
-        "84:window_2_2026-04-19_2026-08-19BBA",
-        "84:window_2_2026-04-19_2026-08-19BBAA",
-        "84:window_2_2026-04-19_2026-08-19BBAB",
-        "84:window_2_2026-04-19_2026-08-19BBB"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -2031,14 +665,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=4FA65483-DC23-445F-9206-BF9BADE5152B",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19B",
-        "84:window_2_2026-04-19_2026-08-19BB",
-        "84:window_2_2026-04-19_2026-08-19BBA",
-        "84:window_2_2026-04-19_2026-08-19BBAB",
-        "84:window_2_2026-04-19_2026-08-19BBB"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -2058,12 +687,9 @@
       "sourceUrl": "https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId=C8E882F8-89C1-4F77-ABF3-1801ECEB275F",
       "discoveryShard": "province_84",
       "coverageModes": [
-        "84:window_2_2026-04-19_2026-08-19",
-        "84:window_2_2026-04-19_2026-08-19B",
-        "84:window_2_2026-04-19_2026-08-19BB",
-        "84:window_2_2026-04-19_2026-08-19BBB"
+        "84:window_2_2026-04-19_2026-08-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -2085,7 +711,7 @@
       "coverageModes": [
         "84:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     },
     {
       "circuit": "fitp",
@@ -2107,7 +733,7 @@
       "coverageModes": [
         "84:window_3_2026-08-19_2026-12-19"
       ],
-      "lastSeen": "2026-08-14T23:51:53.836Z"
+      "lastSeen": "2026-08-15T04:13:51.395Z"
     }
   ]
 }
