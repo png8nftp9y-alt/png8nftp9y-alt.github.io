@@ -20,9 +20,24 @@ for(const term of TERMS){try{const r=await post('/api/v3/tornei/puc/list',listPa
 // Probe candidate list first, then all map until enough hits.
 const byId=new Map(tournaments.map(t=>[String(t.competitionId).toUpperCase(),t]));
 const ordered=[...candidateIds].map(id=>byId.get(id)||{competitionId:id,tournamentName:'candidate from list'}).concat(tournaments.filter(t=>!candidateIds.has(String(t.competitionId).toUpperCase())));
-const hits=[]; let checked=0;
-for(const t of ordered){try{const d=await post('/api/v3/puc/competizione/dettaglio',{competitionUid:t.competitionId});checked++;const participants=collectParticipants(d?.Tournaments||[]);for(const p of participants){const n1=norm(p.full1), n2=norm(p.full2);if(targetNorms.has(n1)||targetNorms.has(n2)||targetParts.every(part=>n1.includes(part))||targetParts.every(part=>n2.includes(part))){hits.push({competitionId:String(t.competitionId).toUpperCase(),tournamentName:d?.Description||t.tournamentName,location:[d?.Municipality,d?.Province].filter(Boolean).join(' '),startDate:d?.From||t.startDate,endDate:d?.To||t.endDate,participant:p});}}
-if(hits.length>=5)break;}catch(e){errors.push({stage:'detail',competitionId:t.competitionId,error:e.message})}}
+const hits=[]; let checked=0, nextIndex=0;
+async function worker(){
+  while(nextIndex<ordered.length&&hits.length<5){
+    const t=ordered[nextIndex++];
+    try{
+      const d=await post('/api/v3/puc/competizione/dettaglio',{competitionUid:t.competitionId});
+      checked++;
+      const participants=collectParticipants(d?.Tournaments||[]);
+      for(const p of participants){
+        const n1=norm(p.full1), n2=norm(p.full2);
+        if(targetNorms.has(n1)||targetNorms.has(n2)||targetParts.every(part=>n1.includes(part))||targetParts.every(part=>n2.includes(part))){
+          hits.push({competitionId:String(t.competitionId).toUpperCase(),tournamentName:d?.Description||t.tournamentName,location:[d?.Municipality,d?.Province].filter(Boolean).join(' '),startDate:d?.From||t.startDate,endDate:d?.To||t.endDate,participant:p});
+        }
+      }
+    }catch(e){errors.push({stage:'detail',competitionId:t.competitionId,error:e.message})}
+  }
+}
+await Promise.all(Array.from({length:16},worker));
 const cards=[...new Set(hits.map(h=>h.participant.membershipCard).filter(Boolean))];
 const out={generatedAt:NOW,target:TARGET,terms:TERMS,listHits:listHits.slice(0,50),candidateIds:[...candidateIds],detailsChecked:checked,hits,cards,errors:errors.slice(0,50)};
 const outputSlug=norm(TARGET).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
