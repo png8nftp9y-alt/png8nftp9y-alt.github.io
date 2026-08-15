@@ -7,7 +7,7 @@ const BASE = 'https://dp-myfit-test-function-v2.azurewebsites.net';
 const TENNIS = '4332';
 const FETCH = 100;
 const MAX_PAGES = 80;
-const ROOT_WINDOW_DAYS = 31;
+const ROOT_WINDOW_DAYS = 14;
 const ROOT_OVERLAP_DAYS = 31;
 const MIN_SPLIT_DAYS = 1;
 const HORIZON_DAYS = 730;
@@ -243,7 +243,7 @@ const regression = Object.fromEntries(Object.entries(REGRESSION_IDS).map(([name,
 const status = errors.length ? 'fitp_province_shard_with_errors' : unresolvedSaturations ? 'fitp_province_shard_with_unresolved_saturations' : 'fitp_province_shard_complete';
 const out = {
   version: 'cw-v3-fitp-province-shard-v2', generatedAt: NOW, status, provinceId: PROVINCE_ID,
-  source: `One FITP province per shard using the official FITP id_provincia value. 31-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages; repeated or prematurely empty incomplete pages trigger recursively split time windows with adaptive overlap.`,
+  source: `One FITP province per shard using the official FITP id_provincia value. ${ROOT_WINDOW_DAYS}-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages; repeated or prematurely empty incomplete pages trigger recursively split time windows with adaptive overlap.`,
   coverageFrom: FROM, coverageUntil: isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS)),
   branches: branches.length, queries: queries.length, tournamentsFound: tournaments.length,
   unresolvedSaturations, regression, tournaments, errors
