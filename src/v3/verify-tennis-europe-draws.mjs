@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 
 const NOW = new Date().toISOString();
-const TODAY = NOW.slice(0, 10);
+const TODAY = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const BASE = 'https://te.tournamentsoftware.com';
 const FILE = 'dist/v3/source_tennis_europe_entries.json';
 const REQUEST_CACHE = new Map();
