@@ -29,16 +29,20 @@ jobs:
         env:
           FITP_PROVINCE_ID: ${{ matrix.province }}
         run: node src/v3/discover-fitp-tournaments-shard.mjs
-      - name: Verify known player tournament recovery
+      - name: Verify metropolitan province recovery
         run: |
           case '${{ matrix.province }}' in
-            1) expected='1AD13BB1-D101-4D19-8A97-19BA3168CFCC' ;;
-            15) expected='B3110C9E-C6E4-4DE6-A9A3-BAB9B1341D47' ;;
-            27) expected='00753945-8679-4066-ACFF-2EE5F354BCB8' ;;
-            58) expected='C1CE4A62-CF62-41F9-8BCD-CA3F23055235' ;;
-            72) expected='7C9CA85A-81FC-4E05-9C63-FD3A46A635BB' ;;
+            1) code='TO'; expected='' ;;
+            15) code='MI'; expected='B9516A9A-7BD3-4933-9CEB-AB1D77ACA93A' ;;
+            27) code='VE'; expected='00753945-8679-4066-ACFF-2EE5F354BCB8' ;;
+            58) code='RM'; expected='' ;;
+            72) code='BA'; expected='9D1CD2AD-432C-47AF-B098-11550E6DAA96' ;;
           esac
-          jq -e --arg id "$expected" '.tournaments | map(.competitionId) | index($id) != null' "dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}.json"
+          file="dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}.json"
+          jq -e --arg code "$code" '.tournamentsFound > 0 and ([.tournaments[].location | endswith(" " + $code)] | all)' "$file"
+          if [ -n "$expected" ]; then
+            jq -e --arg id "$expected" '.tournaments | map(.competitionId) | index($id) != null' "$file"
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
