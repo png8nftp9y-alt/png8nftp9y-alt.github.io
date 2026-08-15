@@ -1,10 +1,10 @@
-startedAt=2026-08-15T20:50:09Z
-sourceSha=410b45feb9c4269fc4ec450616ba333ca0f3bf1d
-runId=31907759739
+startedAt=2026-08-15T22:49:45Z
+sourceSha=3d315fd0c2e282781026ba69cffe545abb445e90
+runId=31913141353
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-fitp-entry-cache-v1",
-  "generatedAt": "2026-08-15T20:50:09.476Z",
+  "generatedAt": "2026-08-15T22:49:45.746Z",
   "status": "fitp_entries_complete_from_versioned_participant_cache",
   "source": "Validated provincial FITP catalog plus permanent official P.U.C. participant snapshots. Active/future tournaments refresh every run; concluded tournaments remain queryable for future player onboarding.",
   "coverageFrom": "2025-12-18",
@@ -17,8 +17,8 @@ mode=consume-existing-source_fitp_tournaments
   "refreshQueue": 5763,
   "fullScan": true,
   "concurrency": 20,
-  "participantsScanned": 408123,
-  "participantsWithCard": 408123,
+  "participantsScanned": 408182,
+  "participantsWithCard": 408182,
   "entriesFound": 393,
   "playersWithEntries": 26,
   "homonymRejected": 12,
@@ -66,20 +66,21 @@ mode=consume-existing-source_fitp_tournaments
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-15T20:51:01.783Z",
+  "generatedAt": "2026-08-15T22:50:40.747Z",
   "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 26,
-    "tournamentEntries": 395,
-    "tournaments": 395,
+    "tournamentEntries": 440,
+    "tournaments": 440,
     "byCircuit": {
       "fitp": 393,
+      "tennis-europe": 45,
       "itf": 2
     },
     "warnings": 0,
-    "tennisEuropeVisible": 0,
-    "tennisEuropeAcceptanceConfirmed": 0,
+    "tennisEuropeVisible": 45,
+    "tennisEuropeAcceptanceConfirmed": 45,
     "diagnostics": "yellow"
   },
   "engines": {
@@ -87,7 +88,7 @@ fitpEntriesExit=0
       "status": "fitp_entries_complete_from_versioned_participant_cache"
     },
     "discoverTennisEurope": {
-      "status": "tennis_europe_acceptance_complete",
+      "status": "tennis_europe_acceptance_complete_draw_parser_v2_applied",
       "calendarMerge": "enabled_for_dated_official_acceptance_list_entries"
     },
     "discoverItf": {
@@ -108,4 +109,4 @@ fitpEntriesExit=0
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-15T20:51:01Z
+finishedAt=2026-08-15T22:50:41Z
