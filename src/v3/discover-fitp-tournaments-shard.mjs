@@ -12,9 +12,6 @@ const ROOT_OVERLAP_DAYS = 21;
 const MIN_SPLIT_DAYS = 1;
 const HORIZON_DAYS = 730;
 const PROVINCE_ID = String(process.env.FITP_PROVINCE_ID || '');
-const METROPOLITAN_FALLBACKS = { '1': 'TO', '15': 'MI', '27': 'VE', '58': 'RM', '72': 'BA' };
-const TARGET_PROVINCE_CODE = METROPOLITAN_FALLBACKS[PROVINCE_ID] || '';
-
 if (!PROVINCE_ID) throw new Error('FITP_PROVINCE_ID is required for province-sharded discovery');
 
 const REGRESSION_IDS = {
@@ -74,7 +71,6 @@ function reject(row) {
   if (!id || id === '11111111-1111-1111-1111-111111111111') return true;
   if (String(row.id_disciplina || '') !== TENNIS) return true;
   if (String(row.cod_fonte || '') !== '1') return true;
-  if (TARGET_PROVINCE_CODE && String(row.sigla_provincia || '').toUpperCase() !== TARGET_PROVINCE_CODE) return true;
   const name = norm([row.nome_torneo, row.name, row.descrizione, row.id_fonte].join(' '));
   return /TENNIS EUROPE|TE U\s?\d{2}|TENNIS EUROPE JUNIOR TOUR/.test(name);
 }
@@ -87,7 +83,7 @@ function statusOf(start, end) {
 
 function payload(window, skip) {
   const value = basePayload();
-  value.id_provincia = TARGET_PROVINCE_CODE ? '' : PROVINCE_ID;
+  value.id_provincia = PROVINCE_ID;
   value.data_inizio = it(window.start);
   value.data_fine = it(window.end);
   value.rowstoskip = skip;
@@ -236,10 +232,7 @@ const regression = Object.fromEntries(Object.entries(REGRESSION_IDS).map(([name,
 const status = errors.length ? 'fitp_province_shard_with_errors' : unresolvedSaturations ? 'fitp_province_shard_with_unresolved_saturations' : 'fitp_province_shard_complete';
 const out = {
   version: 'cw-v3-fitp-province-shard-v2', generatedAt: NOW, status, provinceId: PROVINCE_ID,
-  source: TARGET_PROVINCE_CODE
-    ? `FITP metropolitan fallback: national date-window scan filtered locally to ${TARGET_PROVINCE_CODE}.`
-    : 'One FITP province per shard. 31-day root windows have a 21-day forward overlap; recursive splits never add overlap.',
-  provinceCode: TARGET_PROVINCE_CODE,
+  source: 'One FITP province per shard using the official FITP id_provincia value. 31-day root windows have a 21-day forward overlap; recursive splits never add overlap.',
   coverageFrom: FROM, coverageUntil: isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS)),
   branches: branches.length, queries: queries.length, tournamentsFound: tournaments.length,
   unresolvedSaturations, regression, tournaments, errors
