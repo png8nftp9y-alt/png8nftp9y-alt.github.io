@@ -1,0 +1,42 @@
+name: Court Watch v3 Tennis Europe draw backfill once
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/courtwatch-v3-tennis-europe-draw-backfill-once.yml'
+permissions:
+  contents: write
+concurrency:
+  group: courtwatch-v3-tennis-europe-draw-backfill-once
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Audit all concluded tracked Tennis Europe entries
+        env:
+          TE_DRAW_BACKFILL: '1'
+          TE_DRAW_AUDIT_ONLY: '1'
+        run: |
+          cp dist/v3/source_tennis_europe_entries_sharded.json dist/v3/source_tennis_europe_entries.json
+          node src/v3/verify-tennis-europe-draws.mjs
+      - name: Publish audit only
+        run: |
+          set -euo pipefail
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          cp dist/v3/source_tennis_europe_draw_backfill_audit.json /tmp/te-draw-backfill.json
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/te-draw-backfill.json dist/v3/source_tennis_europe_draw_backfill_audit.json
+            git add dist/v3/source_tennis_europe_draw_backfill_audit.json
+            git commit -m 'Publish one-time Tennis Europe historical draw audit' || exit 0
+            git push origin HEAD:main && exit 0
+          done
+          exit 1

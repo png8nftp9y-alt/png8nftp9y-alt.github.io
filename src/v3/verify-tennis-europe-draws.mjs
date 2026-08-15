@@ -4,6 +4,9 @@ const NOW = new Date().toISOString();
 const TODAY = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const BASE = 'https://te.tournamentsoftware.com';
 const FILE = 'dist/v3/source_tennis_europe_entries.json';
+const BACKFILL = process.env.TE_DRAW_BACKFILL === '1';
+const AUDIT_ONLY = process.env.TE_DRAW_AUDIT_ONLY === '1';
+const AUDIT_FILE = BACKFILL ? 'dist/v3/source_tennis_europe_draw_backfill_audit.json' : 'dist/v3/source_tennis_europe_draw_audit.json';
 const REQUEST_CACHE = new Map();
 
 async function readJson(path, fallback) {
@@ -229,7 +232,8 @@ for (const entry of original) {
   let decision = 'kept_pre_tournament_acceptance';
 
   const tournamentStillActive = !entry.endDate || TODAY <= entry.endDate;
-  if (d >= -1 && tournamentStillActive) {
+  const historicalBackfillTarget = BACKFILL && entry.endDate && entry.endDate < TODAY;
+  if ((d >= -1 && tournamentStillActive) || historicalBackfillTarget) {
     const qualifying = await checkDraw(entry, 'qualifying');
     const main = await checkDraw(entry, 'main');
     if (qualifying.found || main.found) {
@@ -279,6 +283,8 @@ const output = {
   drawRules: {
     appliedAt: NOW,
     today: TODAY,
+    mode: BACKFILL ? 'one_time_historical_backfill' : 'live_t_minus_1',
+    auditOnly: AUDIT_ONLY,
     rule: 'From day -1 through tournament end inspect official singles qualifying and main draws. A player found in either draw stays permanently without an acceptance label. Absence removes the player only when both singles draws are populated and reliable. Missing, error, empty or bye-only draws are inconclusive and preserve the last valid acceptance state.',
     originalEntries: original.filter(e => e.circuit === 'tennis-europe').length,
     entriesFound: kept.filter(e => e.circuit === 'tennis-europe').length,
@@ -292,8 +298,8 @@ const output = {
   entries: kept,
 };
 
-await writeJson(FILE, output);
-await writeJson('dist/v3/source_tennis_europe_draw_audit.json', {
+if (!AUDIT_ONLY) await writeJson(FILE, output);
+await writeJson(AUDIT_FILE, {
   generatedAt: NOW,
   today: TODAY,
   summary: output.drawRules,
