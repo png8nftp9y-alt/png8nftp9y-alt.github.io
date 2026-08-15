@@ -37,8 +37,9 @@ const resultsDoc=await readJson('dist/v3/results.json',{results:[]});
 const opponentsDoc=await readJson('dist/v3/opponents.json',{opponents:[]});
 const teEntries=(te.entries||[]).map(entry).filter(e=>e.playerId&&e.startDate&&validDate(e.endDate));
 const entries=[...(fitp.entries||[]),...teEntries,...(itf.entries||[])].map(e=>e.circuit?e:entry(e)).filter(e=>e.playerId&&validDate(e.endDate));
-const seen=new Set();
-const tournamentEntries=entries.filter(e=>{const k=[e.playerId,e.circuit,e.competitionId||e.tournamentName].join('|');if(seen.has(k))return false;seen.add(k);return true});
+const acceptancePriority=e=>({MD:0,Q:1,A:2}[e.acceptanceCode]??3),acceptancePosition=e=>Number.isFinite(Number(e.acceptancePosition))?Number(e.acceptancePosition):Number.MAX_SAFE_INTEGER;
+const best=new Map();for(const e of entries){const k=[e.playerId,e.circuit,e.competitionId||e.tournamentName].join('|'),old=best.get(k);if(!old||acceptancePriority(e)<acceptancePriority(old)||(acceptancePriority(e)===acceptancePriority(old)&&acceptancePosition(e)<acceptancePosition(old)))best.set(k,e)}
+const tournamentEntries=[...best.values()].sort((a,b)=>(a.startDate||'9999').localeCompare(b.startDate||'9999')||String(a.competitionId||a.tournamentName).localeCompare(String(b.competitionId||b.tournamentName))||acceptancePriority(a)-acceptancePriority(b)||acceptancePosition(a)-acceptancePosition(b)||String(a.playerName).localeCompare(String(b.playerName)));
 const tournaments=tournamentEntries.map(toTournament);
 const byCircuit=tournamentEntries.reduce((a,e)=>{a[e.circuit]=(a[e.circuit]||0)+1;return a},{});
 const warnings=[];for(const e of tournamentEntries){if(e.circuit==='fitp'&&!e.competitionId)warnings.push('FITP senza P.U.C. id: '+e.playerName+' · '+e.tournamentName);if(e.circuit==='tennis-europe'&&!e.sourceUrl)warnings.push('TE senza URL ufficiale: '+e.playerName+' · '+e.tournamentName);if(e.circuit==='itf'&&!e.sourceUrl)warnings.push(e.circuit+' senza URL ufficiale: '+e.playerName+' · '+e.tournamentName)}
