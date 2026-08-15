@@ -50,7 +50,9 @@ jobs:
         if: always()
         with:
           name: fitp-province-${{ matrix.province }}
-          path: dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}*.json
+          path: |
+            dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}.json
+            dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}_audit.json
 
   merge-national-test:
     needs: province-test
