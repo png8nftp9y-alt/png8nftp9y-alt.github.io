@@ -7,9 +7,13 @@ const byId=new Map(), shards=[], errors=[];
 for(const f of files){const d=await readJson(`${dir}/${f}`,{});shards.push({file:f,shard:d.shard,status:d.status,tournamentsFound:(d.tournaments||[]).length,errors:(d.errors||[]).length});for(const t of d.tournaments||[]){if(!t.competitionId)continue;const cur=byId.get(t.competitionId)||{};const name=goodTitle(t.tournamentName)?t.tournamentName:(goodTitle(cur.tournamentName)?cur.tournamentName:t.searchTournamentName||cur.searchTournamentName||t.tournamentName);byId.set(t.competitionId,{...cur,...t,tournamentName:name,searchTournamentName:t.searchTournamentName||cur.searchTournamentName,location:t.location||cur.location,startDate:t.startDate||cur.startDate,endDate:t.endDate||cur.endDate,discoveryModes:[...new Set([...(cur.discoveryModes||[]),...(t.discoveryModes||[])])]});}}
 const tournaments=[...byId.values()].filter(t=>t.startDate&&(!t.endDate||t.endDate>=FROM)).sort((a,b)=>(a.startDate||'9999').localeCompare(b.startDate||'9999')||String(a.tournamentName).localeCompare(String(b.tournamentName)));
 const generic=tournaments.filter(t=>!goodTitle(t.tournamentName)).length;
-if(tournaments.length<100)errors.push({type:'too_few_tournaments',count:tournaments.length});
+if(files.length!==4)errors.push({type:'missing_tournament_shards',expected:4,files:files.length});
+for(const s of shards)if(s.status!=='te_tournament_shard_complete'||s.errors)errors.push({type:'invalid_tournament_shard',...s});
+if(tournaments.length<500)errors.push({type:'too_few_tournaments',count:tournaments.length,minimum:500});
+const incomplete=tournaments.filter(t=>!goodTitle(t.tournamentName)||!t.startDate||!t.endDate||!t.location).length;
+if(incomplete)errors.push({type:'incomplete_tournament_metadata',count:incomplete});
 if(generic>Math.max(10,Math.round(tournaments.length*.05)))errors.push({type:'too_many_generic_titles',generic,total:tournaments.length});
-const out={version:'cw-v3-agenda-first',generatedAt:NOW,status:errors.length?'tennis_europe_sharded_tournament_merge_blocked':'tennis_europe_sharded_tournament_map_complete',source:'Merged Tennis Europe country shards; preserves search-derived specific tournament title when official detail title is generic.',coverageFrom:FROM,shards,tournamentsFound:tournaments.length,genericTitleCount:generic,tournaments,errors};
+const out={version:'cw-v3-agenda-first',generatedAt:NOW,status:errors.length?'tennis_europe_sharded_tournament_merge_blocked':'tennis_europe_sharded_tournament_map_complete',source:'Merged overlapping Tennis Europe time shards; the last valid map is preserved if any shard or validation fails.',coverageFrom:FROM,shards,tournamentsFound:tournaments.length,genericTitleCount:generic,incompleteMetadataCount:incomplete,tournaments,errors};
 await writeJson('dist/v3/source_tennis_europe_tournaments_sharded.json',out);
 await writeJson('dist/v3/source_tennis_europe_tournaments_sharded_audit.json',{...out,tournaments:tournaments.slice(0,300)});
 console.log(JSON.stringify({...out,tournaments:undefined},null,2));

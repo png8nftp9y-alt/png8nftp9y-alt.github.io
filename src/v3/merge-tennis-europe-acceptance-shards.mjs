@@ -7,8 +7,9 @@ const entries=[],shards=[],errors=[];for(const f of files){const d=await readJso
 const dedup=[...new Map(entries.filter(e=>e.startDate&&(!e.endDate||e.endDate>=FROM)).map(e=>[`${e.playerId}|${e.competitionId}|${e.acceptanceEvent}|${e.acceptanceList}|${e.acceptancePosition||''}`,e])).values()];
 const byPlayer={},byAcceptance={};for(const e of dedup){byPlayer[e.playerId]=(byPlayer[e.playerId]||0)+1;byAcceptance[e.calendarListLabel||e.entryStatus]=(byAcceptance[e.calendarListLabel||e.entryStatus]||0)+1}
 const generic=dedup.filter(e=>!goodTitle(e.tournamentName)).length;
-if(files.length<4)errors.push({type:'missing_acceptance_shards',files:files.length});
-if(dedup.length<35)errors.push({type:'too_few_te_entries',entries:dedup.length,baseline:44});
+if(files.length!==16)errors.push({type:'missing_acceptance_shards',expected:16,files:files.length});
+for(const s of shards)if(s.status!=='te_acceptance_shard_complete'||s.errors)errors.push({type:'invalid_acceptance_shard',...s});
+if(dedup.length===0)errors.push({type:'zero_te_entries'});
 if(generic>Math.max(3,Math.round(dedup.length*.1)))errors.push({type:'too_many_generic_entry_titles',generic,total:dedup.length});
 for(const e of dedup){if(/\b\(OA\)/.test(e.acceptanceRow||'')&&/-(1)$/.test(e.calendarListLabel||'')&&!/^1\s/.test(e.acceptanceRow||''))errors.push({type:'oa_label_regression',player:e.playerName,row:e.acceptanceRow,label:e.calendarListLabel});}
 const out={version:'cw-v3-agenda-first',generatedAt:NOW,status:errors.length?'tennis_europe_sharded_acceptance_blocked':'tennis_europe_acceptance_complete',source:'Merged sharded acceptance output with guards for titles, counts and row-leading OA label parsing.',coverageFrom:FROM,shards,tournamentsChecked:shards.reduce((a,s)=>a+(s.tournamentsChecked||0),0),entriesFound:dedup.length,byPlayer,byAcceptance,entries:dedup.sort((a,b)=>(a.startDate||'9999').localeCompare(b.startDate||'9999')||a.playerName.localeCompare(b.playerName)),errors};

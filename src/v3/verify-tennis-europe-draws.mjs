@@ -182,53 +182,37 @@ for (const entry of original) {
   const d = daysFromStart(entry);
   let decision = 'kept_pre_tournament_acceptance';
 
-  if (wanted === 'qualifying' && d >= -1) {
-    const check = await checkDraw(entry, 'qualifying');
-    if (check.found) {
+  if (d >= -1) {
+    const qualifying = await checkDraw(entry, 'qualifying');
+    const main = await checkDraw(entry, 'main');
+    if (qualifying.found || main.found) {
+      const drawType = qualifying.found ? 'qualifying' : 'main';
       kept.push({
         ...entry,
         preDrawCalendarListLabel: entry.calendarListLabel,
         calendarListLabel: '',
         acceptanceCode: '',
         acceptancePosition: null,
-        entryStatus: 'started_confirmed_in_qualifying_draw',
+        entryStatus: `draw_confirmed_${drawType}`,
         calendarState: 'draw_confirmed',
         drawConfirmedAt: NOW,
         lastDrawCheck: NOW,
       });
-      decision = 'kept_qualifying_draw_confirmed';
-    } else if (check.reliable && d >= 0) {
-      decision = 'removed_not_in_reliable_qualifying_draw';
+      decision = `kept_${drawType}_draw_confirmed`;
     } else {
-      kept.push({ ...entry, calendarState: d >= 0 ? 'qualifying_draw_check_inconclusive' : 'qualifying_draw_check_pending', lastDrawCheck: NOW, drawVerificationInconclusive: true });
-      decision = check.reliable ? 'kept_qualifying_absent_before_start' : 'kept_qualifying_draw_inconclusive';
+      const remove = wanted === 'qualifying'
+        ? qualifying.reliable
+        : wanted === 'main'
+          ? main.reliable
+          : qualifying.reliable && main.reliable;
+      if (remove) {
+        decision = 'removed_absent_from_reliable_relevant_singles_draws';
+      } else {
+        kept.push({ ...entry, calendarState: 'draw_check_pending_or_empty', lastDrawCheck: NOW, drawVerificationInconclusive: true });
+        decision = 'kept_draw_unpublished_empty_or_inconclusive';
+      }
     }
-    audit.push({ playerId: entry.playerId, playerName: entry.playerName, competitionId: entry.competitionId, tournamentName: entry.tournamentName, code: entry.acceptanceCode, event: entry.acceptanceEvent, daysFromStart: d, decision, check });
-    continue;
-  }
-
-  if (wanted === 'main' && d >= 0) {
-    const check = await checkDraw(entry, 'main');
-    if (check.found) {
-      kept.push({
-        ...entry,
-        preDrawCalendarListLabel: entry.calendarListLabel,
-        calendarListLabel: '',
-        acceptanceCode: '',
-        acceptancePosition: null,
-        entryStatus: 'started_confirmed_in_main_draw',
-        calendarState: 'draw_confirmed',
-        drawConfirmedAt: NOW,
-        lastDrawCheck: NOW,
-      });
-      decision = 'kept_main_draw_confirmed';
-    } else if (check.reliable && d >= 2) {
-      decision = 'removed_not_in_reliable_main_draw_after_2_days';
-    } else {
-      kept.push({ ...entry, calendarState: d >= 2 ? 'main_draw_check_inconclusive_after_day_2' : 'main_draw_check_pending', lastDrawCheck: NOW, drawVerificationInconclusive: true });
-      decision = check.reliable ? 'kept_main_absent_until_day_2' : 'kept_main_draw_inconclusive';
-    }
-    audit.push({ playerId: entry.playerId, playerName: entry.playerName, competitionId: entry.competitionId, tournamentName: entry.tournamentName, code: entry.acceptanceCode, event: entry.acceptanceEvent, daysFromStart: d, decision, check });
+    audit.push({ playerId: entry.playerId, playerName: entry.playerName, competitionId: entry.competitionId, tournamentName: entry.tournamentName, code: entry.acceptanceCode, label: entry.calendarListLabel, event: entry.acceptanceEvent, daysFromStart: d, decision, qualifying, main });
     continue;
   }
 
@@ -252,7 +236,7 @@ const output = {
   drawRules: {
     appliedAt: NOW,
     today: TODAY,
-    rule: 'Draw parser v2: discover official TournamentSoftware draw links from tournament/events pages; Q/A checked from day -1 against qualifying draws; MD checked day 0..2 against main draws. Removal only when a draw page is parsed as reliable; inconclusive checks keep acceptance-list entries visible.',
+    rule: 'From day -1 inspect official singles qualifying and main draws. A player found in either draw stays without an acceptance label. Absence removes Q only when qualifying is populated, MD only when main is populated, and A/WC only when both are populated. Missing or bye-only draws are inconclusive and preserve the player.',
     originalEntries: original.filter(e => e.circuit === 'tennis-europe').length,
     entriesFound: kept.filter(e => e.circuit === 'tennis-europe').length,
     confirmedInDraw: confirmed.length,

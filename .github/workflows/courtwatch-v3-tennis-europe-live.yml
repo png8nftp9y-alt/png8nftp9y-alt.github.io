@@ -1,0 +1,76 @@
+name: Court Watch v3 Tennis Europe live entries
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/15 * * * *'
+  push:
+    paths:
+      - 'players.json'
+      - 'src/v3/discover-tennis-europe-acceptance-shard.mjs'
+      - 'src/v3/merge-tennis-europe-acceptance-shards.mjs'
+      - 'src/v3/verify-tennis-europe-draws.mjs'
+      - 'src/v3/validate-tennis-europe-live.mjs'
+      - '.github/workflows/courtwatch-v3-tennis-europe-live.yml'
+permissions:
+  contents: write
+concurrency:
+  group: courtwatch-v3-tennis-europe-live
+  cancel-in-progress: false
+jobs:
+  acceptance-shards:
+    name: Acceptance shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: TE_ACCEPTANCE_SHARD=${{ matrix.shard }} TE_ACCEPTANCE_TOTAL=16 TE_REQUEST_TIMEOUT_MS=12000 node src/v3/discover-tennis-europe-acceptance-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: te-acceptance-${{ matrix.shard }}
+          path: dist/v3/shards/tennis-europe/acceptance-${{ matrix.shard }}.json
+  publish-live:
+    runs-on: ubuntu-latest
+    needs: acceptance-shards
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist/v3/shards/tennis-europe
+          merge-multiple: true
+      - name: Merge, verify singles draws and rebuild calendar
+        run: |
+          set -euo pipefail
+          node src/v3/merge-tennis-europe-acceptance-shards.mjs
+          cp dist/v3/source_tennis_europe_entries_sharded.json dist/v3/source_tennis_europe_entries.json
+          node src/v3/verify-tennis-europe-draws.mjs
+          node src/v3/validate-tennis-europe-live.mjs
+          node src/v3/entries-engine.mjs
+      - name: Publish atomically, preserving last known good
+        run: |
+          set -euo pipefail
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          mkdir -p /tmp/te-live/dist/v3
+          for f in source_tennis_europe_entries_sharded.json source_tennis_europe_acceptance_sharded_audit.json source_tennis_europe_entries.json source_tennis_europe_draw_audit.json tournament_entries.json tournaments.json entries_tennis_europe.json sync_status.json diagnostics.json entries_log.json; do
+            test -f dist/v3/$f && cp dist/v3/$f /tmp/te-live/dist/v3/$f
+          done
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/te-live/dist/v3/* dist/v3/
+            git add dist/v3
+            git commit -m 'Publish validated Tennis Europe live entries' || exit 0
+            git push origin HEAD:main && exit 0
+          done
+          exit 1

@@ -1,140 +1,22 @@
-name: Court Watch v3 Tennis Europe staged pipeline
-
+name: Court Watch v3 Tennis Europe legacy control
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/30 * * * *'
-  push:
-    paths:
-      - 'courtwatch-v3-tennis-europe-trigger.json'
-      - 'src/v3/discover-tennis-europe-tournaments.mjs'
-      - 'src/v3/discover-tennis-europe-acceptance.mjs'
-      - 'src/v3/verify-tennis-europe-draws.mjs'
-      - '.github/workflows/courtwatch-v3-tennis-europe.yml'
-      - 'players.json'
-
+    - cron: '41 3 * * 1'
 permissions:
-  contents: write
-
-defaults:
-  run:
-    shell: bash
-
-concurrency:
-  group: courtwatch-v3-tennis-europe-staged
-  cancel-in-progress: false
-
+  contents: read
 jobs:
-  tournaments:
-    name: 1 - Discover Tennis Europe tournaments
+  control:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Discover tournaments
-        run: |
-          set -euo pipefail
-          mkdir -p dist/v3
-          : > courtwatch-v3-tennis-europe-tournaments-run.log
-          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-tennis-europe-tournaments-run.log
-          echo "sourceSha=${GITHUB_SHA}" >> courtwatch-v3-tennis-europe-tournaments-run.log
-          echo "runId=${GITHUB_RUN_ID}" >> courtwatch-v3-tennis-europe-tournaments-run.log
-          node src/v3/discover-tennis-europe-tournaments.mjs >> courtwatch-v3-tennis-europe-tournaments-run.log 2>&1
-          echo "tennisEuropeTournamentsExit=0" >> courtwatch-v3-tennis-europe-tournaments-run.log
-          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-tennis-europe-tournaments-run.log
-          cat courtwatch-v3-tennis-europe-tournaments-run.log
+        with: { node-version: '22' }
+      - run: node src/v3/discover-tennis-europe-tournaments.mjs
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: tennis-europe-tournaments
+          name: tennis-europe-legacy-control
           path: |
             dist/v3/source_tennis_europe_tournaments.json
             dist/v3/source_tennis_europe_tournaments_audit.json
-            courtwatch-v3-tennis-europe-tournaments-run.log
-
-  acceptance-publish:
-    name: 2 - Match acceptance lists and publish Tennis Europe only
-    needs: tournaments
-    runs-on: ubuntu-latest
-    timeout-minutes: 75
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - uses: actions/download-artifact@v4
-        with:
-          name: tennis-europe-tournaments
-      - name: Match acceptance lists
-        run: |
-          set -euo pipefail
-          mkdir -p dist/v3
-          : > courtwatch-v3-tennis-europe-acceptance-run.log
-          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-tennis-europe-acceptance-run.log
-          echo "sourceSha=${GITHUB_SHA}" >> courtwatch-v3-tennis-europe-acceptance-run.log
-          echo "runId=${GITHUB_RUN_ID}" >> courtwatch-v3-tennis-europe-acceptance-run.log
-          echo "mode=tennis-europe-source-only-no-global-calendar-merge" >> courtwatch-v3-tennis-europe-acceptance-run.log
-          node src/v3/discover-tennis-europe-acceptance.mjs >> courtwatch-v3-tennis-europe-acceptance-run.log 2>&1
-          echo "tennisEuropeAcceptanceExit=0" >> courtwatch-v3-tennis-europe-acceptance-run.log
-          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-tennis-europe-acceptance-run.log
-          cat courtwatch-v3-tennis-europe-acceptance-run.log
-          cat courtwatch-v3-tennis-europe-tournaments-run.log courtwatch-v3-tennis-europe-acceptance-run.log > courtwatch-v3-tennis-europe-run.log
-      - name: Commit Tennis Europe source outputs only
-        run: |
-          git config user.name courtwatch-bot
-          git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_tennis_europe_tournaments.json dist/v3/source_tennis_europe_tournaments_audit.json dist/v3/source_tennis_europe_entries.json dist/v3/source_tennis_europe_acceptance_audit.json courtwatch-v3-tennis-europe-run.log courtwatch-v3-tennis-europe-tournaments-run.log courtwatch-v3-tennis-europe-acceptance-run.log .github/workflows/courtwatch-v3-tennis-europe.yml src/v3/discover-tennis-europe-tournaments.mjs src/v3/discover-tennis-europe-acceptance.mjs || true
-          git commit -m "Publish Court Watch v3 Tennis Europe source data" || echo "No changes"
-          git pull --rebase origin main || true
-          git push origin HEAD:main || true
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: tennis-europe-acceptance
-          path: |
-            dist/v3/source_tennis_europe_tournaments.json
-            dist/v3/source_tennis_europe_tournaments_audit.json
-            dist/v3/source_tennis_europe_entries.json
-            dist/v3/source_tennis_europe_acceptance_audit.json
-            courtwatch-v3-tennis-europe-tournaments-run.log
-            courtwatch-v3-tennis-europe-acceptance-run.log
-            courtwatch-v3-tennis-europe-run.log
-
-  draw-verify:
-    name: 3 - Verify started Tennis Europe draws only
-    needs: acceptance-publish
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - uses: actions/download-artifact@v4
-        with:
-          name: tennis-europe-acceptance
-      - name: Verify draws
-        run: |
-          set -euo pipefail
-          mkdir -p dist/v3
-          : > courtwatch-v3-tennis-europe-draw-run.log
-          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-tennis-europe-draw-run.log
-          echo "sourceSha=${GITHUB_SHA}" >> courtwatch-v3-tennis-europe-draw-run.log
-          echo "runId=${GITHUB_RUN_ID}" >> courtwatch-v3-tennis-europe-draw-run.log
-          echo "mode=tennis-europe-source-only-no-global-calendar-merge" >> courtwatch-v3-tennis-europe-draw-run.log
-          node src/v3/verify-tennis-europe-draws.mjs >> courtwatch-v3-tennis-europe-draw-run.log 2>&1
-          echo "tennisEuropeDrawExit=0" >> courtwatch-v3-tennis-europe-draw-run.log
-          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-tennis-europe-draw-run.log
-          cat courtwatch-v3-tennis-europe-draw-run.log
-          cat courtwatch-v3-tennis-europe-tournaments-run.log courtwatch-v3-tennis-europe-acceptance-run.log courtwatch-v3-tennis-europe-draw-run.log > courtwatch-v3-tennis-europe-run.log
-      - name: Commit Tennis Europe draw source outputs only
-        run: |
-          git config user.name courtwatch-bot
-          git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_tennis_europe_entries.json dist/v3/source_tennis_europe_draw_audit.json courtwatch-v3-tennis-europe-run.log courtwatch-v3-tennis-europe-draw-run.log src/v3/verify-tennis-europe-draws.mjs || true
-          git commit -m "Verify Court Watch v3 Tennis Europe source data" || echo "No changes"
-          git pull --rebase origin main || true
-          git push origin HEAD:main || true
