@@ -8,7 +8,7 @@ const TENNIS = '4332';
 const FETCH = 100;
 const MAX_PAGES = 80;
 const ROOT_WINDOW_DAYS = 31;
-const ROOT_OVERLAP_DAYS = 21;
+const ROOT_OVERLAP_DAYS = 31;
 const MIN_SPLIT_DAYS = 1;
 const HORIZON_DAYS = 730;
 const PROVINCE_ID = String(process.env.FITP_PROVINCE_ID || '');
@@ -166,7 +166,7 @@ async function runBranch(window) {
     }
 
     if (signature && signature === previousSignature) {
-      branch.termination = 'repeated_page';
+      branch.termination = total > 0 && skip >= total ? 'declared_total_exhausted' : 'repeated_page';
       queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: rows.length, total, termination: branch.termination });
       break;
     }
@@ -182,12 +182,11 @@ async function runBranch(window) {
 
     queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: rows.length, total });
 
-    if (rows.length < FETCH) {
-      branch.termination = 'short_page';
-      break;
-    }
-    if (total > 0 && skip + rows.length >= total) {
-      branch.termination = 'declared_total_reached';
+    // FITP can return fewer than FETCH rows before all declared records have
+    // been exposed (notably in dense metropolitan searches). Keep paging until
+    // an empty page or a repeated page after the declared total is exhausted.
+    if (total <= 0 && rows.length < FETCH) {
+      branch.termination = 'short_page_without_total';
       break;
     }
     if (page === MAX_PAGES - 1) branch.termination = 'page_cap';
@@ -232,7 +231,7 @@ const regression = Object.fromEntries(Object.entries(REGRESSION_IDS).map(([name,
 const status = errors.length ? 'fitp_province_shard_with_errors' : unresolvedSaturations ? 'fitp_province_shard_with_unresolved_saturations' : 'fitp_province_shard_complete';
 const out = {
   version: 'cw-v3-fitp-province-shard-v2', generatedAt: NOW, status, provinceId: PROVINCE_ID,
-  source: 'One FITP province per shard using the official FITP id_provincia value. 31-day root windows have a 21-day forward overlap; recursive splits never add overlap.',
+  source: `One FITP province per shard using the official FITP id_provincia value. 31-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages until FITP is exhausted.`,
   coverageFrom: FROM, coverageUntil: isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS)),
   branches: branches.length, queries: queries.length, tournamentsFound: tournaments.length,
   unresolvedSaturations, regression, tournaments, errors
