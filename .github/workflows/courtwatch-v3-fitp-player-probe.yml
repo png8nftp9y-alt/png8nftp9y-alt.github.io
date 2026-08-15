@@ -25,7 +25,7 @@ jobs:
         run: |
           set +e
           : > courtwatch-v3-fitp-player-probe-run.log
-          FITP_PLAYER_NAME='GARIBALDI MATTIA' FITP_PLAYER_TERMS='GARIBALDI MATTIA,MATTIA GARIBALDI,GARIBALDI' node src/v3/probe-fitp-player-by-name.mjs >> courtwatch-v3-fitp-player-probe-run.log 2>&1
+          FITP_PLAYER_NAME='LOSA ANDREA' FITP_PLAYER_TERMS='LOSA ANDREA,ANDREA LOSA' node src/v3/probe-fitp-player-by-name.mjs >> courtwatch-v3-fitp-player-probe-run.log 2>&1
           code=$?
           echo "probeExit=$code" >> courtwatch-v3-fitp-player-probe-run.log
           cat courtwatch-v3-fitp-player-probe-run.log
@@ -35,7 +35,7 @@ jobs:
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/fitp_player_probe_mattia_garibaldi.json courtwatch-v3-fitp-player-probe-run.log .github/workflows/courtwatch-v3-fitp-player-probe.yml src/v3/probe-fitp-player-by-name.mjs
-          git commit -m "Probe Mattia Garibaldi FITP profile" || exit 0
+          git add dist/v3/fitp_player_probe_losa-andrea.json courtwatch-v3-fitp-player-probe-run.log .github/workflows/courtwatch-v3-fitp-player-probe.yml src/v3/probe-fitp-player-by-name.mjs
+          git commit -m "Probe Andrea Losa FITP profile" || exit 0
           git pull --rebase origin main || true
           git push origin HEAD:main || true
