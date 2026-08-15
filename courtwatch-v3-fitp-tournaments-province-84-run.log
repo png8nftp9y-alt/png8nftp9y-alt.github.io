@@ -1,19 +1,19 @@
-startedAt=2026-08-15T04:13:51Z
-sourceSha=6febbe8eea392162bb23521bcc2dd0960491dc4e
-runId=31860789797
+startedAt=2026-08-15T04:58:39Z
+sourceSha=3e4bd1f22665eac24ad25a52ff9604d9f7b887f8
+runId=31865707796
 province=84
 {
   "version": "cw-v3-fitp-province-shard",
-  "generatedAt": "2026-08-15T04:13:51.395Z",
-  "status": "fitp_province_shard_complete",
+  "generatedAt": "2026-08-15T04:58:39.204Z",
+  "status": "fitp_province_shard_with_unresolved_saturations",
   "provinceId": "84",
   "source": "One visible GitHub Actions shard per FITP province. Each province shard runs rotating logical windows with 21-day overlap except first historical window; saturated branches auto-split.",
   "coverageFrom": "2025-12-18",
   "coverageUntil": "2028-08-14",
-  "branches": 8,
-  "queries": 8,
+  "branches": 56,
+  "queries": 56,
   "tournamentsFound": 23,
-  "unresolvedSaturations": 0,
+  "unresolvedSaturations": 19,
   "regression": {
     "feniceBresciaLomb370": false,
     "rossoniKinderImperia": false,
@@ -21,5 +21,5 @@ province=84
   },
   "errors": []
 }
-exitCode=0
-finishedAt=2026-08-15T04:13:53Z
+exitCode=2
+finishedAt=2026-08-15T04:58:50Z
