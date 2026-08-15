@@ -31,11 +31,12 @@ const playersDoc=await readJson('players.json',{players:[]});
 const fitp=await readJson('dist/v3/source_fitp_entries.json',{entries:[]});
 const fitpTournaments=await readJson('dist/v3/source_fitp_tournaments.json',{tournaments:[]});
 const te=await readJson('dist/v3/source_tennis_europe_entries.json',{entries:[]});
+const teHistory=await readJson('dist/v3/source_tennis_europe_history_entries.json',{entries:[]});
 const itf=await readJson('dist/v3/source_itf_entries.json',{entries:[]});
 const agendaDoc=await readJson('dist/v3/agenda.json',{agenda:[]});
 const resultsDoc=await readJson('dist/v3/results.json',{results:[]});
 const opponentsDoc=await readJson('dist/v3/opponents.json',{opponents:[]});
-const teEntries=(te.entries||[]).map(entry).filter(e=>e.playerId&&e.startDate&&validDate(e.endDate));
+const teEntries=[...(te.entries||[]),...(teHistory.entries||[])].map(entry).filter(e=>e.playerId&&e.startDate&&validDate(e.endDate));
 const entries=[...(fitp.entries||[]),...teEntries,...(itf.entries||[])].map(e=>e.circuit?e:entry(e)).filter(e=>e.playerId&&validDate(e.endDate));
 const acceptancePriority=e=>({MD:0,Q:1,A:2}[e.acceptanceCode]??3),acceptancePosition=e=>Number.isFinite(Number(e.acceptancePosition))?Number(e.acceptancePosition):Number.MAX_SAFE_INTEGER;
 const best=new Map();for(const e of entries){const k=[e.playerId,e.circuit,e.competitionId||e.tournamentName].join('|'),old=best.get(k);if(!old||acceptancePriority(e)<acceptancePriority(old)||(acceptancePriority(e)===acceptancePriority(old)&&acceptancePosition(e)<acceptancePosition(old)))best.set(k,e)}

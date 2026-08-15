@@ -10,6 +10,8 @@ const DB_DIR = process.env.TE_DB_DIR || 'history';
 const CATALOG_FILE = path.join(DB_DIR, 'tennis_europe_tournament_catalog.json');
 const RELATIONS_FILE = path.join(DB_DIR, 'tennis_europe_player_tournament_db.json');
 const AUDIT_FILE = path.join(DB_DIR, 'tennis_europe_database_audit.json');
+const DRAW_AUDIT_FILE = process.env.TE_DRAW_AUDIT_PATH || 'dist/v3/source_tennis_europe_draw_audit.json';
+const HISTORY_ENTRIES_FILE = process.env.TE_HISTORY_ENTRIES_PATH || 'dist/v3/source_tennis_europe_history_entries.json';
 
 async function readJson(file, fallback = null) {
   try { return JSON.parse(await fs.readFile(file, 'utf8')); } catch { return fallback; }
@@ -51,9 +53,10 @@ function appendChange(timeline, snapshot) {
   return out;
 }
 
-const [mapData, acceptanceData, calendarData, playersData, oldCatalog, oldRelations] = await Promise.all([
+const [mapData, acceptanceData, calendarData, playersData, oldCatalog, oldRelations, drawAuditData] = await Promise.all([
   readJson(MAP_FILE), readJson(ACCEPTANCE_FILE), readJson(CALENDAR_FILE, { entries: [] }), readJson(PLAYERS_FILE, { players: [] }),
   readJson(CATALOG_FILE, { tournaments: {} }), readJson(RELATIONS_FILE, { relations: {} }),
+  readJson(DRAW_AUDIT_FILE, { audit: [] }),
 ]);
 
 const map = Array.isArray(mapData?.tournaments) ? mapData.tournaments : [];
@@ -88,6 +91,7 @@ for (const [id, t] of Object.entries(catalog)) if (!currentIds.has(id)) catalog[
 
 const monitored = new Set((playersData?.players || []).filter(p => (p.circuits || []).some(c => /tennis europe/i.test(c))).map(p => p.id));
 const calendarByKey = new Map(calendarEntries.map(e => [relationKey(e), e]));
+const drawByKey = new Map((drawAuditData?.audit || []).map(e => [[e.playerId, e.competitionId, e.event || 'singles'].join('|'), e]));
 const presentKeys = new Set();
 const relations = { ...(oldRelations?.relations || {}) };
 let changes = 0, withdrawals = 0;
@@ -97,6 +101,7 @@ for (const e of acceptanceEntries) {
   const key = relationKey(e); presentKeys.add(key);
   const previous = relations[key] || {};
   const visible = calendarByKey.get(key);
+  const draw = drawByKey.get(key);
   const snapshot = meaningfulSnapshot({ ...e, calendarState: visible?.calendarState || 'acceptance_list' });
   const timeline = appendChange(previous.timeline, snapshot);
   if (timeline.length !== (previous.timeline || []).length) changes++;
@@ -114,7 +119,8 @@ for (const e of acceptanceEntries) {
     calendarVisibleNow: Boolean(visible), calendarState: visible?.calendarState || 'acceptance_list',
     firstAcceptanceSeenAt: previous.firstAcceptanceSeenAt || iso(acceptanceData.generatedAt),
     lastAcceptanceSeenAt: iso(acceptanceData.generatedAt), acceptanceRemovedAt: null,
-    permanenceStatus: visible?.calendarState === 'draw_confirmed' ? 'draw_confirmed_candidate' : 'pending_t_minus_1_engine',
+    drawVerification: draw ? { checkedAt: drawAuditData.generatedAt || NOW, daysFromStart: draw.daysFromStart, decision: draw.decision, qualifying: draw.qualifying, main: draw.main } : previous.drawVerification,
+    permanenceStatus: previous.permanenceStatus === 'draw_confirmed_permanent' || visible?.calendarState === 'draw_confirmed' ? 'draw_confirmed_permanent' : String(draw?.decision || '').startsWith('removed_') ? 'rejected_by_complete_singles_draws' : 'pending_t_minus_1_engine',
     timeline,
   };
 }
@@ -143,13 +149,19 @@ const catalogOutput = {
   historicalTournamentCount: Object.keys(catalog).length, tournaments: catalog,
 };
 const relationValues = Object.values(relations);
+const permanentEntries = relationValues.filter(r => r.permanenceStatus === 'draw_confirmed_permanent').map(r => ({
+  playerId:r.playerId,playerName:r.playerName,circuit:'tennis-europe',competitionId:r.competitionId,tournamentName:r.tournamentName,
+  location:r.location,startDate:r.startDate,endDate:r.endDate,acceptanceEvent:r.acceptanceEvent,acceptanceCode:'',acceptancePosition:null,
+  calendarListLabel:'',entryStatus:'draw_confirmed_permanent_history',calendarState:'draw_confirmed',status:'detected',
+  sourceUrl:catalog[r.competitionId]?.eventsUrl||catalog[r.competitionId]?.sourceUrl||'',lastSeen:r.lastAcceptanceSeenAt||NOW,
+}));
 const relationsOutput = {
   version: 1, generatedAt: NOW, sourceGeneratedAt: acceptanceData.generatedAt,
   status: 'tennis_europe_player_tournament_database_complete',
   policy: 'Change-only timeline. Acceptance-list absence is recorded after a complete 16-shard scan. Calendar permanence remains pending until the T-1 singles draw verifier is finalized.',
   relationCount: relationValues.length, activeAcceptanceCount: relationValues.filter(r => r.activeInLatestAcceptance).length,
   calendarVisibleCount: relationValues.filter(r => r.calendarVisibleNow).length,
-  drawConfirmedCandidateCount: relationValues.filter(r => r.permanenceStatus === 'draw_confirmed_candidate').length,
+  drawConfirmedPermanentCount: permanentEntries.length,
   relations,
 };
 const audit = {
@@ -157,8 +169,8 @@ const audit = {
   mapSourceStatus: mapData.status, acceptanceSourceStatus: acceptanceData.status,
   currentTournaments: currentIds.size, historicalTournaments: Object.keys(catalog).length,
   acceptanceEntries: acceptanceEntries.length, calendarEntries: calendarEntries.length,
-  relations: relationValues.length, changesRecordedThisRun: changes, withdrawalsDetectedThisRun: withdrawals,
+  relations: relationValues.length, permanentCalendarEntries: permanentEntries.length, changesRecordedThisRun: changes, withdrawalsDetectedThisRun: withdrawals,
   calendarAuthorityChanged: false,
 };
-await Promise.all([writeJson(CATALOG_FILE, catalogOutput), writeJson(RELATIONS_FILE, relationsOutput), writeJson(AUDIT_FILE, audit)]);
+await Promise.all([writeJson(CATALOG_FILE, catalogOutput), writeJson(RELATIONS_FILE, relationsOutput), writeJson(AUDIT_FILE, audit), writeJson(HISTORY_ENTRIES_FILE,{version:1,generatedAt:NOW,status:'tennis_europe_permanent_draw_history_complete',entries:permanentEntries})]);
 console.log(JSON.stringify(audit, null, 2));

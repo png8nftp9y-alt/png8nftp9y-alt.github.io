@@ -4,6 +4,7 @@ const NOW = new Date().toISOString();
 const TODAY = NOW.slice(0, 10);
 const BASE = 'https://te.tournamentsoftware.com';
 const FILE = 'dist/v3/source_tennis_europe_entries.json';
+const REQUEST_CACHE = new Map();
 
 async function readJson(path, fallback) {
   try { return JSON.parse(await fs.readFile(path, 'utf8')); } catch { return fallback; }
@@ -43,15 +44,32 @@ function daysFromStart(entry) {
   return Math.floor((Date.parse(TODAY) - Date.parse(entry.startDate)) / 864e5);
 }
 async function req(url) {
-  const r = await fetch(url, {
+  if (REQUEST_CACHE.has(url)) return REQUEST_CACHE.get(url);
+  const request = (async () => { const r = await fetch(url, {
+    redirect: 'follow',
     headers: {
       'user-agent': 'Mozilla/5.0 CourtWatch-v3-tennis-europe-draw-parser/2.0',
       accept: 'text/html,*/*',
-      'accept-language': 'en-GB,en;q=0.9,it;q=0.8',
+      'accept-language': 'en-GB,en;q=0.9,it;q=0.8', cookie: DRAW_COOKIE,
     },
   });
-  return { status: r.status, text: await r.text() };
+  return { status: r.status, text: await r.text() }; })();
+  REQUEST_CACHE.set(url, request);
+  return request;
 }
+function cookiePair(value) { return String(value || '').split(/,(?=\s*[^;]+=)/).map(x => x.split(';')[0].trim()).filter(Boolean); }
+async function acceptedCookie() {
+  const first = await fetch(BASE + '/tournaments', { redirect: 'manual' });
+  const cookies = cookiePair(first.headers.get('set-cookie'));
+  if (first.status >= 300 && /cookiewall/i.test(first.headers.get('location') || '')) {
+    const body = new URLSearchParams({ ReturnUrl: '/tournaments', SettingsOpen: 'false' });
+    for (const value of ['1', '2', '3', '4']) body.append('CookiePurposes', value);
+    const saved = await fetch(BASE + '/cookiewall/Save', { method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: cookies.join('; ') }, body });
+    cookies.push(...cookiePair(saved.headers.get('set-cookie')));
+  }
+  return [...new Set(cookies)].join('; ');
+}
+const DRAW_COOKIE = await acceptedCookie();
 function linkList(html, baseUrl) {
   const out = [];
   const re = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
@@ -98,7 +116,7 @@ function drawLinkScore(link, entry, wanted) {
 function candidateDrawLinks(html, pageUrl, entry, wanted) {
   const links = linkList(html, pageUrl).filter(l => {
     const u = l.url.toLowerCase();
-    return u.includes('/sport/draw') || u.includes('/sport/matches') || u.includes('/sport/event') || /draw|qualifying|main/i.test(l.text);
+    return !/double|doubles|doppio/i.test(l.text) && (u.includes('/sport/draw') || u.includes('/sport/matches') || u.includes('/sport/event') || /draw|qualifying|main/i.test(l.text));
   });
   const ranked = links
     .map(l => ({ ...l, score: drawLinkScore(l, entry, wanted) }))
@@ -121,6 +139,17 @@ function pageLooksLikeDraw(html, wanted) {
   if (wanted === 'main' && /MAIN DRAW|ROUND|MATCH/.test(text)) return true;
   return false;
 }
+function populatedSinglesDraw(html, wanted, label = '') {
+  const text = norm(clean(html));
+  if (!pageLooksLikeDraw(html, wanted) || /DOUBLES|DOPPIO/.test(text)) return false;
+  const kind = norm(label);
+  if (wanted === 'qualifying' && !/QUALIFYING|QUALIFICATION|QUALIFICAZIONE/.test(kind)) return false;
+  if (wanted === 'main' && /QUALIFYING|QUALIFICATION|QUALIFICAZIONE/.test(kind) && !/MAIN/.test(kind)) return false;
+  const profileLinks = (html.match(/player-profile|\/player\//gi) || []).length;
+  const countryPlayers = (text.match(/\b(ITA|FRA|GER|ESP|SUI|AUT|CRO|SLO|BEL|NED|GBR|CZE|SRB|POL|ROU|BUL|HUN|SVK|UKR|TUR|GRE)\b/g) || []).length;
+  const byes = (text.match(/\bBYE\b/g) || []).length;
+  return profileLinks >= 2 || countryPlayers >= 2 || (profileLinks + countryPlayers > byes && profileLinks + countryPlayers >= 2);
+}
 async function checkDraw(entry, wanted) {
   const basePages = [...new Set([
     entry.eventsUrl || `${BASE}/sport/events.aspx?id=${entry.competitionId}`,
@@ -134,8 +163,8 @@ async function checkDraw(entry, wanted) {
   for (const url of basePages) {
     try {
       const r = await req(url);
-      const found = r.status === 200 && hasPlayer(r.text, entry.playerName);
-      const looks = r.status === 200 && pageLooksLikeDraw(r.text, wanted);
+      const found = false;
+      const looks = false;
       if (looks) reliable = true;
       tried.push({ url, status: r.status, kind: 'base', found, reliableEvidence: looks });
       if (found && looks) return { found: true, reliable: true, tried, drawLinks };
@@ -158,7 +187,7 @@ async function checkDraw(entry, wanted) {
     try {
       const r = await req(link.url);
       const found = r.status === 200 && hasPlayer(r.text, entry.playerName);
-      const looks = r.status === 200 && pageLooksLikeDraw(r.text, wanted);
+      const looks = r.status === 200 && populatedSinglesDraw(r.text, wanted, link.text + ' ' + link.url);
       if (looks) reliable = true;
       tried.push({ url: link.url, label: link.text, score: link.score, status: r.status, kind: 'draw_link', found, reliableEvidence: looks });
       if (found && looks) return { found: true, reliable: true, tried, drawLinks: uniqueLinks.slice(0, 20) };
@@ -182,7 +211,8 @@ for (const entry of original) {
   const d = daysFromStart(entry);
   let decision = 'kept_pre_tournament_acceptance';
 
-  if (d >= -1) {
+  const tournamentStillActive = !entry.endDate || TODAY <= entry.endDate;
+  if (d >= -1 && tournamentStillActive) {
     const qualifying = await checkDraw(entry, 'qualifying');
     const main = await checkDraw(entry, 'main');
     if (qualifying.found || main.found) {
@@ -200,11 +230,7 @@ for (const entry of original) {
       });
       decision = `kept_${drawType}_draw_confirmed`;
     } else {
-      const remove = wanted === 'qualifying'
-        ? qualifying.reliable
-        : wanted === 'main'
-          ? main.reliable
-          : qualifying.reliable && main.reliable;
+      const remove = qualifying.reliable && main.reliable;
       if (remove) {
         decision = 'removed_absent_from_reliable_relevant_singles_draws';
       } else {
@@ -236,7 +262,7 @@ const output = {
   drawRules: {
     appliedAt: NOW,
     today: TODAY,
-    rule: 'From day -1 inspect official singles qualifying and main draws. A player found in either draw stays without an acceptance label. Absence removes Q only when qualifying is populated, MD only when main is populated, and A/WC only when both are populated. Missing or bye-only draws are inconclusive and preserve the player.',
+    rule: 'From day -1 through tournament end inspect official singles qualifying and main draws. A player found in either draw stays permanently without an acceptance label. Absence removes the player only when both singles draws are populated and reliable. Missing, error, empty or bye-only draws are inconclusive and preserve the last valid acceptance state.',
     originalEntries: original.filter(e => e.circuit === 'tennis-europe').length,
     entriesFound: kept.filter(e => e.circuit === 'tennis-europe').length,
     confirmedInDraw: confirmed.length,
