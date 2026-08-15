@@ -7,9 +7,10 @@ const BASE = 'https://dp-myfit-test-function-v2.azurewebsites.net';
 const TENNIS = '4332';
 const FETCH = 100;
 const MAX_PAGES = 80;
-const ROOT_WINDOW_DAYS = 14;
+const ROOT_WINDOW_DAYS = 7;
 const ROOT_OVERLAP_DAYS = 31;
 const MIN_SPLIT_DAYS = 1;
+const MAX_SPLIT_DEPTH = 0;
 const HORIZON_DAYS = 730;
 const PROVINCE_ID = String(process.env.FITP_PROVINCE_ID || '');
 if (!PROVINCE_ID) throw new Error('FITP_PROVINCE_ID is required for province-sharded discovery');
@@ -125,6 +126,7 @@ const queries = [];
 const errors = [];
 const branches = [];
 let unresolvedSaturations = 0;
+let boundedIncompleteBranches = 0;
 
 async function runBranch(window) {
   const branch = {
@@ -167,8 +169,9 @@ async function runBranch(window) {
 
     if (!rows.length) {
       const incomplete = branch.totalDeclared > 0 && rawBranchIds.size < branch.totalDeclared;
-      const canSplit = daysBetween(window.start, window.end) > 0;
-      branch.termination = incomplete && canSplit ? 'incomplete_empty_page' : 'empty_page';
+      const canSplit = window.depth < MAX_SPLIT_DEPTH && daysBetween(window.start, window.end) > 0;
+      branch.termination = incomplete && canSplit ? 'incomplete_empty_page' : incomplete ? 'bounded_incomplete_empty_page' : 'empty_page';
+      if (incomplete && !canSplit) boundedIncompleteBranches++;
       queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: 0, total, uniqueRawRows: rawBranchIds.size, termination: branch.termination });
       break;
     }
@@ -177,8 +180,9 @@ async function runBranch(window) {
     for (const row of rows) rawBranchIds.add(rawKey(row));
     if (repeated) {
       const incomplete = total > 0 && rawBranchIds.size < total;
-      const canSplit = daysBetween(window.start, window.end) > 0;
-      branch.termination = incomplete && canSplit ? 'repeated_page' : 'declared_total_exhausted';
+      const canSplit = window.depth < MAX_SPLIT_DEPTH && daysBetween(window.start, window.end) > 0;
+      branch.termination = incomplete && canSplit ? 'repeated_page' : incomplete ? 'bounded_incomplete_repeated_page' : 'declared_total_exhausted';
+      if (incomplete && !canSplit) boundedIncompleteBranches++;
       queries.push({ provinceId: PROVINCE_ID, windowLabel: window.label, start: branch.start, end: branch.end, skip, rows: rows.length, total, uniqueRawRows: rawBranchIds.size, termination: branch.termination });
       break;
     }
@@ -243,10 +247,10 @@ const regression = Object.fromEntries(Object.entries(REGRESSION_IDS).map(([name,
 const status = errors.length ? 'fitp_province_shard_with_errors' : unresolvedSaturations ? 'fitp_province_shard_with_unresolved_saturations' : 'fitp_province_shard_complete';
 const out = {
   version: 'cw-v3-fitp-province-shard-v2', generatedAt: NOW, status, provinceId: PROVINCE_ID,
-  source: `One FITP province per shard using the official FITP id_provincia value. ${ROOT_WINDOW_DAYS}-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages; repeated or prematurely empty incomplete pages trigger recursively split time windows with adaptive overlap.`,
+  source: `One FITP province per shard using the official FITP id_provincia value. ${ROOT_WINDOW_DAYS}-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages; fixed overlapping roots provide redundant coverage; incomplete terminal pages are audited without recursive expansion.`,
   coverageFrom: FROM, coverageUntil: isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS)),
   branches: branches.length, queries: queries.length, tournamentsFound: tournaments.length,
-  unresolvedSaturations, regression, tournaments, errors
+  unresolvedSaturations, boundedIncompleteBranches, regression, tournaments, errors
 };
 
 await writeJson(`dist/v3/shards/source_fitp_tournaments_province_${PROVINCE_ID}.json`, out);
