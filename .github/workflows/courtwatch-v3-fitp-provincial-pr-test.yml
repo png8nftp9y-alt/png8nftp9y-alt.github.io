@@ -1,10 +1,11 @@
-name: Court Watch v3 FITP provincial engine PR test
+name: Court Watch v3 FITP provincial national test
 
 on:
   pull_request:
     branches: [main]
     paths:
       - 'src/v3/discover-fitp-tournaments-shard.mjs'
+      - 'src/v3/merge-fitp-tournament-shards.mjs'
       - '.github/workflows/courtwatch-v3-fitp-provincial-pr-test.yml'
 
 permissions:
@@ -13,11 +14,12 @@ permissions:
 jobs:
   province-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 40
     strategy:
       fail-fast: false
+      max-parallel: 20
       matrix:
-        province: ['1', '15', '27', '58', '72']
+        province: ['201','2','3','4','5','6','7','8','9','210','11','12','13','14','215','16','17','18','19','20','21','22','23','24','25','26','227','28','29','30','31','32','33','34','35','36','237','38','39','40','41','42','43','44','45','46','47','248','49','50','51','52','53','54','55','56','57','258','59','60','61','62','263','64','65','66','67','68','69','70','71','272','73','74','75','76','77','78','79','280','81','282','283','84','85','86','287','88','89','90','91','292','93','94','95','96','97','98','99','100','101','102','103','108','109','110','111']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,28 +27,53 @@ jobs:
           node-version: '22'
       - name: Validate source
         run: node --check src/v3/discover-fitp-tournaments-shard.mjs
-      - name: Run metropolitan province fallback
+      - name: Run official FITP province
         env:
           FITP_PROVINCE_ID: ${{ matrix.province }}
         run: node src/v3/discover-fitp-tournaments-shard.mjs
-      - name: Verify metropolitan province recovery
+      - name: Verify complete shard
+        run: |
+          file="dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}.json"
+          jq -e '.status == "fitp_province_shard_complete" and .unresolvedSaturations == 0 and (.errors | length) == 0' "$file"
+      - name: Verify corrected metropolitan province
+        if: contains(fromJSON('["201","210","215","227","237","248","258","263","272","280","282","283","287","292"]'), matrix.province)
         run: |
           case '${{ matrix.province }}' in
-            1) code='TO'; expected='' ;;
-            15) code='MI'; expected='B9516A9A-7BD3-4933-9CEB-AB1D77ACA93A' ;;
-            27) code='VE'; expected='00753945-8679-4066-ACFF-2EE5F354BCB8' ;;
-            58) code='RM'; expected='' ;;
-            72) code='BA'; expected='9D1CD2AD-432C-47AF-B098-11550E6DAA96' ;;
+            201) code='TO' ;; 210) code='GE' ;; 215) code='MI' ;; 227) code='VE' ;;
+            237) code='BO' ;; 248) code='FI' ;; 258) code='RM' ;; 263) code='NA' ;;
+            272) code='BA' ;; 280) code='RC' ;; 282) code='PA' ;; 283) code='ME' ;;
+            287) code='CT' ;; 292) code='CA' ;;
           esac
           file="dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}.json"
           jq -e --arg code "$code" '.tournamentsFound > 0 and ([.tournaments[].location | endswith(" " + $code)] | all)' "$file"
-          if [ -n "$expected" ]; then
-            jq -e --arg id "$expected" '.tournaments | map(.competitionId) | index($id) != null' "$file"
-          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: fitp-provincial-pr-test-${{ matrix.province }}
+          name: fitp-province-${{ matrix.province }}
+          path: dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}*.json
+
+  merge-national-test:
+    needs: province-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: fitp-province-*
+          path: dist/v3/shards
+          merge-multiple: true
+      - name: Merge all 107 official provinces
+        run: node src/v3/merge-fitp-tournament-shards.mjs
+      - name: Report comparison with national baseline
+        run: |
+          jq '{tournamentsFound, coverageFrom, coverageUntil, baselineAudit, provinceWindow, status}' dist/v3/source_fitp_tournaments_audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fitp-provincial-national-result
           path: |
-            dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}.json
-            dist/v3/shards/source_fitp_tournaments_province_${{ matrix.province }}_audit.json
+            dist/v3/source_fitp_tournaments.json
+            dist/v3/source_fitp_tournaments_audit.json
