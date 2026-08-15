@@ -1,2 +1,109 @@
-startedAt=2026-08-15T15:00:50Z
-sourceSha=1aa841f160976eece677c39bd5415b303471b0bb
+startedAt=2026-08-15T15:42:15Z
+sourceSha=f3d0119127622621b02061f6524a50fcfd768360
+{
+  "version": "cw-v3-fitp-entry-cache-v1",
+  "generatedAt": "2026-08-15T15:42:15.204Z",
+  "status": "fitp_entries_complete_from_versioned_participant_cache",
+  "source": "Validated provincial FITP catalog plus permanent official P.U.C. participant snapshots. Active/future tournaments refresh every run; concluded tournaments remain queryable for future player onboarding.",
+  "coverageFrom": "2025-12-18",
+  "tournamentsInput": 5763,
+  "baseTournamentsInput": 5763,
+  "archivedTournamentsInput": 5763,
+  "participantSnapshots": 5763,
+  "participantSnapshotsRefreshed": 5763,
+  "participantSnapshotsReused": 0,
+  "refreshQueue": 5763,
+  "fullScan": true,
+  "concurrency": 20,
+  "participantsScanned": 407803,
+  "participantsWithCard": 407803,
+  "entriesFound": 393,
+  "playersWithEntries": 26,
+  "homonymRejected": 12,
+  "verifiedCompetitionIds": [
+    "25C6CC33-AE3A-447E-A55B-FBE66FBAFC80",
+    "B3110C9E-C6E4-4DE6-A9A3-BAB9B1341D47"
+  ],
+  "verifiedCompetitionEntryRescues": 0,
+  "byPlayer": {
+    "francesco-renzulli": 18,
+    "nikola-kerkenyakov": 11,
+    "carlo-ghislotti": 13,
+    "matilde-mainetti": 9,
+    "manuel-natale": 29,
+    "niccolo-zanaga": 13,
+    "aila-zennaro": 12,
+    "virginia-cereghini": 7,
+    "martina-danesi": 11,
+    "filippo-vitali": 18,
+    "mattia-garibaldi": 20,
+    "nicholas-scappa": 8,
+    "pietro-sala": 3,
+    "noemi-paganini": 11,
+    "camilla-lingeri": 34,
+    "martina-busa": 10,
+    "daniele-gelli": 17,
+    "francesco-bocchio": 24,
+    "andrea-losa": 18,
+    "gregorio-puccio": 23,
+    "virginia-rossoni": 15,
+    "matteo-bocchio": 22,
+    "giulia-scozzafava": 6,
+    "edoardo-grimoldi": 12,
+    "anna-gambarini": 17,
+    "alessio-nava": 12
+  },
+  "byMatchMethod": {
+    "membership_card": 393
+  },
+  "byDiscoveryMethod": {
+    "fitp_permanent_tournament_archive_versioned_participant_cache_card_strict": 393
+  },
+  "errors": []
+}
+fitpExit=0
+{
+  "version": "cw-v3-agenda-first",
+  "generatedAt": "2026-08-15T15:43:50.911Z",
+  "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
+  "coverageFrom": "2025-12-18",
+  "checks": {
+    "players": 26,
+    "tournamentEntries": 395,
+    "tournaments": 395,
+    "byCircuit": {
+      "fitp": 393,
+      "itf": 2
+    },
+    "warnings": 0,
+    "tennisEuropeVisible": 0,
+    "tennisEuropeAcceptanceConfirmed": 0,
+    "diagnostics": "yellow"
+  },
+  "engines": {
+    "discoverFitp": {
+      "status": "fitp_entries_complete_from_versioned_participant_cache"
+    },
+    "discoverTennisEurope": {
+      "status": "tennis_europe_acceptance_complete",
+      "calendarMerge": "enabled_for_dated_official_acceptance_list_entries"
+    },
+    "discoverItf": {
+      "status": "seeded_pending_live_itf_scan"
+    },
+    "entries": {
+      "status": "built",
+      "file": "src/v3/entries-engine.mjs",
+      "method": "merge FITP + validated dated TE acceptance list/profile entries + ITF; no v1/v2/data.json"
+    },
+    "ordersOfPlay": {
+      "status": "active"
+    },
+    "results": {
+      "status": "active"
+    }
+  },
+  "warnings": []
+}
+entriesMergeExit=0
+finishedAt=2026-08-15T15:43:51Z
