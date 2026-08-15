@@ -116,7 +116,7 @@ function drawLinkScore(link, entry, wanted) {
 function candidateDrawLinks(html, pageUrl, entry, wanted) {
   const links = linkList(html, pageUrl).filter(l => {
     const u = l.url.toLowerCase();
-    return !/double|doubles|doppio/i.test(l.text) && (u.includes('/sport/draw') || u.includes('/sport/matches') || u.includes('/sport/event') || /draw|qualifying|main/i.test(l.text));
+    return !/double|doubles|doppio/i.test(l.text) && (u.includes('/sport/draw') || /\/tournament\/[^/]+\/draw\/\d+/i.test(u) || u.includes('/sport/matches') || u.includes('/sport/event') || /draw|qualifying|main/i.test(l.text));
   });
   const ranked = links
     .map(l => ({ ...l, score: drawLinkScore(l, entry, wanted) }))
@@ -139,20 +139,31 @@ function pageLooksLikeDraw(html, wanted) {
   if (wanted === 'main' && /MAIN DRAW|ROUND|MATCH/.test(text)) return true;
   return false;
 }
-function populatedSinglesDraw(html, wanted, label = '') {
+function drawHeading(html) {
+  return clean([...String(html || '').matchAll(/<(?:title|h1|h2|h3|h4)\b[^>]*>([\s\S]*?)<\/(?:title|h1|h2|h3|h4)>/gi)].map(m => m[1]).join(' '));
+}
+function drawEvidence(html, wanted, entry, label = '') {
   const text = norm(clean(html));
-  if (!pageLooksLikeDraw(html, wanted) || /DOUBLES|DOPPIO/.test(text)) return false;
-  const kind = norm(label);
-  if (wanted === 'qualifying' && !/QUALIFYING|QUALIFICATION|QUALIFICAZIONE/.test(kind)) return false;
-  if (wanted === 'main' && /QUALIFYING|QUALIFICATION|QUALIFICAZIONE/.test(kind) && !/MAIN/.test(kind)) return false;
+  const heading = norm(drawHeading(html) + ' ' + label);
+  const { gender, age } = eventParts(entry);
+  const doubles = /DOUBLES|DOPPIO|DOUBLE GARCONS|DOUBLE FILLES/.test(heading);
+  const genderMismatch = (/GIRLS|WOMEN|FEMALE|FILLES|RAGAZZE/.test(heading) && gender === 'BS') || (/BOYS|MEN|MALE|GARCONS|RAGAZZI/.test(heading) && gender === 'GS');
+  const ages = [...heading.matchAll(/(?:U|UNDER)\s*(12|14|16)/g)].map(m => m[1]);
+  const ageMismatch = ages.length > 0 && age && !ages.includes(age);
+  const qualifying = /QUALIFYING|QUALIFICATION|QUALIFICAZIONE/.test(heading);
+  const kindMatches = wanted === 'qualifying' ? qualifying : !qualifying;
+  const looks = pageLooksLikeDraw(html, wanted) || /DRAW|TABELLONE|KNOCK OUT|ELIMINATION/.test(heading);
+  const relevant = looks && !doubles && !genderMismatch && !ageMismatch && kindMatches;
   const profileLinks = (html.match(/player-profile|\/player\//gi) || []).length;
   const countryPlayers = (text.match(/\b(ITA|FRA|GER|ESP|SUI|AUT|CRO|SLO|BEL|NED|GBR|CZE|SRB|POL|ROU|BUL|HUN|SVK|UKR|TUR|GRE)\b/g) || []).length;
   const byes = (text.match(/\bBYE\b/g) || []).length;
-  return profileLinks >= 2 || countryPlayers >= 2 || (profileLinks + countryPlayers > byes && profileLinks + countryPlayers >= 2);
+  const populated = relevant && (profileLinks >= 2 || countryPlayers >= 2 || (profileLinks + countryPlayers > byes && profileLinks + countryPlayers >= 2));
+  return { relevant, populated, publishedEmpty: relevant && !populated, heading: drawHeading(html).slice(0, 300), profileLinks, countryPlayers, byes, doubles, genderMismatch, ageMismatch, qualifying };
 }
 async function checkDraw(entry, wanted) {
   const basePages = [...new Set([
     entry.eventsUrl || `${BASE}/sport/events.aspx?id=${entry.competitionId}`,
+    `${BASE}/tournament/${entry.competitionId}`,
     `${BASE}/sport/tournament.aspx?id=${entry.competitionId}`,
     `${BASE}/sport/draws.aspx?id=${entry.competitionId}`,
   ])];
@@ -182,22 +193,26 @@ async function checkDraw(entry, wanted) {
     seen.add(link.url);
     uniqueLinks.push(link);
   }
+  for (let draw = 1; draw <= 24; draw++) {
+    const url = `${BASE}/tournament/${entry.competitionId}/draw/${draw}`;
+    if (!seen.has(url)) { seen.add(url); uniqueLinks.push({ url, text: `direct draw ${draw}`, score: 1, directProbe: true }); }
+  }
 
-  for (const link of uniqueLinks.slice(0, 10)) {
+  for (const link of uniqueLinks.slice(0, 40)) {
     try {
       const r = await req(link.url);
-      const found = r.status === 200 && hasPlayer(r.text, entry.playerName);
-      const looks = r.status === 200 && populatedSinglesDraw(r.text, wanted, link.text + ' ' + link.url);
-      if (looks) reliable = true;
-      tried.push({ url: link.url, label: link.text, score: link.score, status: r.status, kind: 'draw_link', found, reliableEvidence: looks });
-      if (found && looks) return { found: true, reliable: true, tried, drawLinks: uniqueLinks.slice(0, 20) };
+      const evidence = r.status === 200 ? drawEvidence(r.text, wanted, entry, link.text + ' ' + link.url) : { relevant:false, populated:false, publishedEmpty:false };
+      const found = evidence.populated && hasPlayer(r.text, entry.playerName);
+      if (evidence.populated) reliable = true;
+      tried.push({ url: link.url, label: link.text, score: link.score, status: r.status, kind: link.directProbe?'numbered_draw_probe':'draw_link', found, reliableEvidence: evidence.populated, publishedEmpty: evidence.publishedEmpty, evidence });
+      if (found) return { found: true, reliable: true, tried, drawLinks: uniqueLinks.slice(0, 40) };
     } catch (error) {
       tried.push({ url: link.url, label: link.text, score: link.score, kind: 'draw_link', error: error.message });
     }
     await sleep(20);
   }
 
-  return { found: false, reliable, tried, drawLinks: uniqueLinks.slice(0, 20) };
+  return { found: false, reliable, tried, drawLinks: uniqueLinks.slice(0, 40) };
 }
 
 const data = await readJson(FILE, { entries: [] });
