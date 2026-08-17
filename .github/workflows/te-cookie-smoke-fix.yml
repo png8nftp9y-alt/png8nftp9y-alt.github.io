@@ -1,0 +1,53 @@
+name: Tennis Europe cookie smoke fix
+
+on:
+  push:
+    branches:
+      - fix/tennis-europe-cookie-smoke
+
+permissions:
+  contents: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Patch duplicated regex escape
+        id: patch
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('src/v3/verify-tennis-europe-draws.mjs')
+          s = p.read_text()
+          old = "matchAll(/<input\\\\b"
+          new = "matchAll(/<input\\b"
+          if old not in s:
+              print('Duplicated escape already absent; nothing to patch.')
+              with open(__import__('os').environ['GITHUB_OUTPUT'], 'a') as f:
+                  f.write('changed=false\n')
+          else:
+              s2 = s.replace(old, new, 1)
+              p.write_text(s2)
+              print('Replaced duplicated regex escape in CookiePurposes input parser.')
+              with open(__import__('os').environ['GITHUB_OUTPUT'], 'a') as f:
+                  f.write('changed=true\n')
+      - name: Verify syntax
+        if: steps.patch.outputs.changed == 'true'
+        run: node --check src/v3/verify-tennis-europe-draws.mjs
+      - name: Run verifier smoke path
+        if: steps.patch.outputs.changed == 'true'
+        run: node src/v3/verify-tennis-europe-draws.mjs
+      - name: Commit tested source fix to branch
+        if: steps.patch.outputs.changed == 'true'
+        run: |
+          git config user.name "CourtWatch diagnostic"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/v3/verify-tennis-europe-draws.mjs
+          git commit -m "Fix Tennis Europe CookiePurposes regex boundary"
+          git push origin HEAD:fix/tennis-europe-cookie-smoke
