@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const NOW = new Date().toISOString();
+const TODAY = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const MAP_FILE = process.env.TE_TOURNAMENT_MAP_PATH || 'dist/v3/source_tennis_europe_tournaments_sharded.json';
 const ACCEPTANCE_FILE = process.env.TE_ACCEPTANCE_ENTRIES_PATH || 'dist/v3/source_tennis_europe_entries_sharded.json';
 const CALENDAR_FILE = process.env.TE_CALENDAR_ENTRIES_PATH || 'dist/v3/source_tennis_europe_entries.json';
@@ -133,10 +134,12 @@ for (const [key, previous] of Object.entries(relations)) {
   }
   if (previous.activeInLatestAcceptance) {
     const snapshot = meaningfulSnapshot({}, 'acceptance_absent');
+    const concluded = Boolean(previous.endDate && previous.endDate < TODAY);
+    const rejectedByDraw = previous.permanenceStatus === 'rejected_by_complete_singles_draws';
     relations[key] = {
-      ...previous, activeInLatestAcceptance: false, calendarVisibleNow: false,
+      ...previous, activeInLatestAcceptance: false, calendarVisibleNow: concluded && !rejectedByDraw,
       monitoringStatus: 'absent_from_latest_complete_acceptance_scan', acceptanceRemovedAt: NOW,
-      permanenceStatus: previous.permanenceStatus === 'draw_confirmed_permanent' ? previous.permanenceStatus : 'not_on_live_calendar',
+      permanenceStatus: previous.permanenceStatus === 'draw_confirmed_permanent' ? previous.permanenceStatus : rejectedByDraw ? previous.permanenceStatus : concluded ? 'retained_pending_draw_verification' : 'not_on_live_calendar',
       timeline: appendChange(previous.timeline, snapshot),
     };
     changes++; withdrawals++;
@@ -155,13 +158,20 @@ const permanentEntries = relationValues.filter(r => r.permanenceStatus === 'draw
   calendarListLabel:'',entryStatus:'draw_confirmed_permanent_history',calendarState:'draw_confirmed',status:'detected',
   sourceUrl:catalog[r.competitionId]?.eventsUrl||catalog[r.competitionId]?.sourceUrl||'',lastSeen:r.lastAcceptanceSeenAt||NOW,
 }));
+const pendingVerificationEntries = relationValues.filter(r => r.permanenceStatus === 'retained_pending_draw_verification').map(r => ({
+  playerId:r.playerId,playerName:r.playerName,circuit:'tennis-europe',competitionId:r.competitionId,tournamentName:r.tournamentName,
+  location:r.location,startDate:r.startDate,endDate:r.endDate,acceptanceEvent:r.acceptanceEvent,acceptanceCode:r.acceptanceCode||'',acceptancePosition:r.acceptancePosition,
+  calendarListLabel:r.calendarListLabel||'',entryStatus:'historical_acceptance_retained_pending_draw_verification',calendarState:'draw_check_pending_or_empty',status:'detected',
+  sourceUrl:catalog[r.competitionId]?.eventsUrl||catalog[r.competitionId]?.sourceUrl||'',lastSeen:r.lastAcceptanceSeenAt||NOW,
+}));
+const historyEntries = [...permanentEntries, ...pendingVerificationEntries];
 const relationsOutput = {
   version: 1, generatedAt: NOW, sourceGeneratedAt: acceptanceData.generatedAt,
   status: 'tennis_europe_player_tournament_database_complete',
   policy: 'Change-only timeline. Acceptance-list absence is recorded after a complete 16-shard scan. Calendar permanence remains pending until the T-1 singles draw verifier is finalized.',
   relationCount: relationValues.length, activeAcceptanceCount: relationValues.filter(r => r.activeInLatestAcceptance).length,
   calendarVisibleCount: relationValues.filter(r => r.calendarVisibleNow).length,
-  drawConfirmedPermanentCount: permanentEntries.length,
+  drawConfirmedPermanentCount: permanentEntries.length, retainedPendingDrawVerificationCount: pendingVerificationEntries.length,
   relations,
 };
 const audit = {
@@ -169,8 +179,8 @@ const audit = {
   mapSourceStatus: mapData.status, acceptanceSourceStatus: acceptanceData.status,
   currentTournaments: currentIds.size, historicalTournaments: Object.keys(catalog).length,
   acceptanceEntries: acceptanceEntries.length, calendarEntries: calendarEntries.length,
-  relations: relationValues.length, permanentCalendarEntries: permanentEntries.length, changesRecordedThisRun: changes, withdrawalsDetectedThisRun: withdrawals,
+  relations: relationValues.length, permanentCalendarEntries: permanentEntries.length, retainedPendingDrawVerificationEntries: pendingVerificationEntries.length, changesRecordedThisRun: changes, withdrawalsDetectedThisRun: withdrawals,
   calendarAuthorityChanged: false,
 };
-await Promise.all([writeJson(CATALOG_FILE, catalogOutput), writeJson(RELATIONS_FILE, relationsOutput), writeJson(AUDIT_FILE, audit), writeJson(HISTORY_ENTRIES_FILE,{version:1,generatedAt:NOW,status:'tennis_europe_permanent_draw_history_complete',entries:permanentEntries})]);
+await Promise.all([writeJson(CATALOG_FILE, catalogOutput), writeJson(RELATIONS_FILE, relationsOutput), writeJson(AUDIT_FILE, audit), writeJson(HISTORY_ENTRIES_FILE,{version:1,generatedAt:NOW,status:'tennis_europe_calendar_history_complete',policy:'Concluded entries retain their last valid acceptance state while T-1 draw verification is missing or inconclusive. Only a reliable complete singles-draw rejection may remove them.',entries:historyEntries})]);
 console.log(JSON.stringify(audit, null, 2));

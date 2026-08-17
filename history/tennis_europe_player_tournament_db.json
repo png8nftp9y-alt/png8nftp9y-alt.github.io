@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-17T00:01:40.470Z",
+  "generatedAt": "2026-08-17T02:19:20.055Z",
   "sourceGeneratedAt": "2026-08-17T00:01:32.388Z",
   "status": "tennis_europe_player_tournament_database_complete",
   "policy": "Change-only timeline. Acceptance-list absence is recorded after a complete 16-shard scan. Calendar permanence remains pending until the T-1 singles draw verifier is finalized.",
@@ -2922,13 +2922,13 @@
       "acceptanceList": "Main",
       "isWildcard": false,
       "activeInLatestAcceptance": false,
-      "monitoringStatus": "absent_from_latest_complete_acceptance_scan",
-      "calendarVisibleNow": false,
+      "monitoringStatus": "historical_acceptance_retained_pending_draw_verification",
+      "calendarVisibleNow": true,
       "calendarState": "pre_tournament_acceptance",
       "firstAcceptanceSeenAt": "2026-08-15T21:36:35.315Z",
       "lastAcceptanceSeenAt": "2026-08-16T23:41:05.209Z",
       "acceptanceRemovedAt": "2026-08-17T00:01:40.470Z",
-      "permanenceStatus": "not_on_live_calendar",
+      "permanenceStatus": "retained_pending_draw_verification",
       "timeline": [
         {
           "at": "2026-08-15T21:38:51.071Z",
@@ -2981,13 +2981,13 @@
       "acceptanceList": "Main",
       "isWildcard": false,
       "activeInLatestAcceptance": false,
-      "monitoringStatus": "absent_from_latest_complete_acceptance_scan",
-      "calendarVisibleNow": false,
+      "monitoringStatus": "historical_acceptance_retained_pending_draw_verification",
+      "calendarVisibleNow": true,
       "calendarState": "pre_tournament_acceptance",
       "firstAcceptanceSeenAt": "2026-08-15T21:36:35.315Z",
       "lastAcceptanceSeenAt": "2026-08-16T23:41:05.209Z",
       "acceptanceRemovedAt": "2026-08-17T00:01:40.470Z",
-      "permanenceStatus": "not_on_live_calendar",
+      "permanenceStatus": "retained_pending_draw_verification",
       "timeline": [
         {
           "at": "2026-08-15T21:38:51.071Z",
@@ -4947,5 +4947,6 @@
         }
       ]
     }
-  }
+  },
+  "retainedPendingDrawVerificationCount": 2
 }

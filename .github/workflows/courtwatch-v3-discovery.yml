@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - 'src/v3/discover-fitp.mjs'
-      - 'src/v3/discover-tennis-europe.mjs'
       - 'src/v3/discover-itf.mjs'
       - 'src/v3/entries-engine.mjs'
       - 'courtwatch-v3-discovery-trigger.json'
@@ -26,8 +25,7 @@ jobs:
           set +e
           node src/v3/discover-fitp.mjs > courtwatch-v3-discovery-run.log 2>&1
           echo "fitpExit=$?" >> courtwatch-v3-discovery-run.log
-          node src/v3/discover-tennis-europe.mjs >> courtwatch-v3-discovery-run.log 2>&1
-          echo "teExit=$?" >> courtwatch-v3-discovery-run.log
+          echo "teSkipped=owned_by_sharded_tennis_europe_live_workflow" >> courtwatch-v3-discovery-run.log
           node src/v3/discover-itf.mjs >> courtwatch-v3-discovery-run.log 2>&1
           echo "itfExit=$?" >> courtwatch-v3-discovery-run.log
           node src/v3/entries-engine.mjs >> courtwatch-v3-discovery-run.log 2>&1
@@ -38,7 +36,7 @@ jobs:
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_fitp_entries.json dist/v3/source_tennis_europe_entries.json dist/v3/source_itf_entries.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/sync_status.json dist/v3/entries_log.json courtwatch-v3-discovery-run.log .github/workflows/courtwatch-v3-discovery.yml
+          git add dist/v3/source_fitp_entries.json dist/v3/source_itf_entries.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/sync_status.json dist/v3/entries_log.json courtwatch-v3-discovery-run.log .github/workflows/courtwatch-v3-discovery.yml
           git commit -m "Build Court Watch v3 ex novo discovery data" || exit 0
           git pull --rebase origin main || true
           git push origin HEAD:main || true
