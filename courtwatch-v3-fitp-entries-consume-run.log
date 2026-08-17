@@ -1,10 +1,10 @@
-startedAt=2026-08-17T11:44:42Z
-sourceSha=adde8a03a6df770da355ef373c3f62674c294b5e
-runId=32026391182
+startedAt=2026-08-17T19:46:43Z
+sourceSha=c7df91bf0926543a70b642a7925e0927c52a410f
+runId=32062217008
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-fitp-entry-cache-v1",
-  "generatedAt": "2026-08-17T11:44:42.798Z",
+  "generatedAt": "2026-08-17T19:46:43.596Z",
   "status": "fitp_entries_complete_from_versioned_participant_cache",
   "source": "Validated provincial FITP catalog plus permanent official P.U.C. participant snapshots. Active/future tournaments refresh every run; concluded tournaments remain queryable for future player onboarding.",
   "coverageFrom": "2025-12-18",
@@ -17,11 +17,11 @@ mode=consume-existing-source_fitp_tournaments
   "refreshQueue": 5766,
   "fullScan": true,
   "concurrency": 20,
-  "participantsScanned": 409886,
-  "participantsWithCard": 409886,
+  "participantsScanned": 410620,
+  "participantsWithCard": 410620,
   "entriesFound": 394,
   "playersWithEntries": 26,
-  "homonymRejected": 12,
+  "homonymRejected": 11,
   "verifiedCompetitionIds": [
     "25C6CC33-AE3A-447E-A55B-FBE66FBAFC80",
     "B3110C9E-C6E4-4DE6-A9A3-BAB9B1341D47"
@@ -66,21 +66,21 @@ mode=consume-existing-source_fitp_tournaments
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-17T11:45:44.752Z",
+  "generatedAt": "2026-08-17T19:47:37.807Z",
   "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 26,
-    "tournamentEntries": 439,
-    "tournaments": 439,
+    "tournamentEntries": 443,
+    "tournaments": 443,
     "byCircuit": {
       "fitp": 393,
-      "tennis-europe": 45,
+      "tennis-europe": 49,
       "itf": 1
     },
     "warnings": 0,
-    "tennisEuropeVisible": 45,
-    "tennisEuropeAcceptanceConfirmed": 45,
+    "tennisEuropeVisible": 50,
+    "tennisEuropeAcceptanceConfirmed": 49,
     "diagnostics": "yellow"
   },
   "engines": {
@@ -109,4 +109,4 @@ fitpEntriesExit=0
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-17T11:45:44Z
+finishedAt=2026-08-17T19:47:37Z
