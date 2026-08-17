@@ -1,25 +1,25 @@
-startedAt=2026-08-16T22:45:39Z
-sourceSha=63dbdcd3b456c0f17e12476821317f4a3d200d23
-runId=31977223479
+startedAt=2026-08-17T11:44:42Z
+sourceSha=adde8a03a6df770da355ef373c3f62674c294b5e
+runId=32026391182
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-fitp-entry-cache-v1",
-  "generatedAt": "2026-08-16T22:45:39.223Z",
+  "generatedAt": "2026-08-17T11:44:42.798Z",
   "status": "fitp_entries_complete_from_versioned_participant_cache",
   "source": "Validated provincial FITP catalog plus permanent official P.U.C. participant snapshots. Active/future tournaments refresh every run; concluded tournaments remain queryable for future player onboarding.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 5763,
-  "baseTournamentsInput": 5763,
-  "archivedTournamentsInput": 5763,
-  "participantSnapshots": 5763,
-  "participantSnapshotsRefreshed": 5763,
+  "tournamentsInput": 5766,
+  "baseTournamentsInput": 5766,
+  "archivedTournamentsInput": 5766,
+  "participantSnapshots": 5766,
+  "participantSnapshotsRefreshed": 5766,
   "participantSnapshotsReused": 0,
-  "refreshQueue": 5763,
+  "refreshQueue": 5766,
   "fullScan": true,
   "concurrency": 20,
-  "participantsScanned": 409251,
-  "participantsWithCard": 409251,
-  "entriesFound": 393,
+  "participantsScanned": 409886,
+  "participantsWithCard": 409886,
+  "entriesFound": 394,
   "playersWithEntries": 26,
   "homonymRejected": 12,
   "verifiedCompetitionIds": [
@@ -53,30 +53,30 @@ mode=consume-existing-source_fitp_tournaments
     "giulia-scozzafava": 6,
     "edoardo-grimoldi": 12,
     "anna-gambarini": 17,
-    "alessio-nava": 12
+    "alessio-nava": 13
   },
   "byMatchMethod": {
-    "membership_card": 393
+    "membership_card": 394
   },
   "byDiscoveryMethod": {
-    "fitp_permanent_tournament_archive_versioned_participant_cache_card_strict": 393
+    "fitp_permanent_tournament_archive_versioned_participant_cache_card_strict": 394
   },
   "errors": []
 }
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-16T22:46:23.985Z",
+  "generatedAt": "2026-08-17T11:45:44.752Z",
   "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 26,
-    "tournamentEntries": 440,
-    "tournaments": 440,
+    "tournamentEntries": 439,
+    "tournaments": 439,
     "byCircuit": {
       "fitp": 393,
       "tennis-europe": 45,
-      "itf": 2
+      "itf": 1
     },
     "warnings": 0,
     "tennisEuropeVisible": 45,
@@ -92,7 +92,7 @@ fitpEntriesExit=0
       "calendarMerge": "enabled_for_dated_official_acceptance_list_entries"
     },
     "discoverItf": {
-      "status": "seeded_pending_live_itf_scan"
+      "status": "complete"
     },
     "entries": {
       "status": "built",
@@ -109,4 +109,4 @@ fitpEntriesExit=0
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-16T22:46:24Z
+finishedAt=2026-08-17T11:45:44Z
