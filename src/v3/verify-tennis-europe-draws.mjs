@@ -73,13 +73,14 @@ async function acceptedCookie() {
   };
   const cookie = () => [...jar].map(([name, value]) => `${name}=${value}`).join('; ');
 
-  const first = await fetch(BASE + '/tournaments', { redirect: 'manual' });
+  const consentTarget = '/tournament/5173C79B-B05D-4157-AD04-CD4D4F68C4E7/draw/1';
+  const first = await fetch(BASE + consentTarget, { redirect: 'manual' });
   const firstText = await first.text();
   collect(first.headers);
   const location = first.headers.get('location') || '';
   COOKIE_SESSION_DIAGNOSTIC.first = { status: first.status, location, cookieNames: [...jar.keys()] };
   if ((first.status >= 300 && /cookiewall/i.test(location)) || /cookiewall|CookiePurposes|SettingsOpen/i.test(firstText)) {
-    const wallUrl = absUrl(location || '/cookiewall/?returnurl=%2Ftournaments');
+    const wallUrl = absUrl(location || '/cookiewall/?returnurl=' + encodeURIComponent(consentTarget));
     const wall = await fetch(wallUrl, { redirect: 'manual', headers: { cookie: cookie() } });
     const wallText = await wall.text();
     collect(wall.headers);
