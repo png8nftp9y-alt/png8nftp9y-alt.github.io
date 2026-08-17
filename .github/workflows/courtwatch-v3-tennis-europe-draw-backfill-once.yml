@@ -29,3 +29,10 @@ jobs:
       - name: Print audit summary and cases
         run: |
           node -e "const a=require('./dist/v3/source_tennis_europe_draw_backfill_audit.json'); console.log(JSON.stringify(a,null,2))"
+      - name: Upload audit result
+        uses: actions/upload-artifact@v4
+        with:
+          name: t1-current-main-readonly-audit
+          path: dist/v3/source_tennis_europe_draw_backfill_audit.json
+          if-no-files-found: error
+          retention-days: 7
