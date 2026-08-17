@@ -88,7 +88,7 @@ async function acceptedCookie() {
     COOKIE_SESSION_DIAGNOSTIC.wall = { status: wall.status, location: wall.headers.get('location') || '', cookieNames: [...jar.keys()] };
     const returnUrl = (/name=["']ReturnUrl["'][^>]*value=["']([^"']*)/i.exec(wallText) || [])[1] || '/tournaments';
     const settingsOpen = (/name=["']SettingsOpen["'][^>]*value=["']([^"']*)/i.exec(wallText) || [])[1] || 'false';
-    const purposeInputs = [...wallText.matchAll(/<input\\b[^>]*name=["']CookiePurposes["'][^>]*>/gi)].map(match => match[0]);
+    const purposeInputs = [...wallText.matchAll(/<input\b[^>]*name=["']CookiePurposes["'][^>]*>/gi)].map(match => match[0]);
     const purposes = purposeInputs.map(tag => (/value=["']([^"']+)/i.exec(tag) || [])[1]).filter(Boolean);
     if (!purposes.length) throw new Error('Tennis Europe cookie wall returned no consent purposes.');
     const body = new URLSearchParams({ ReturnUrl: returnUrl.replace(/&amp;/g, '&'), SettingsOpen: settingsOpen });
