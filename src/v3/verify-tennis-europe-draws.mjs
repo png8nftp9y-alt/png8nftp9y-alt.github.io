@@ -74,14 +74,15 @@ async function acceptedCookie() {
   const cookie = () => [...jar].map(([name, value]) => `${name}=${value}`).join('; ');
 
   const consentTarget = '/tournament/5173C79B-B05D-4157-AD04-CD4D4F68C4E7/draw/1';
-  const first = await fetch(BASE + consentTarget, { redirect: 'manual' });
+  const browserHeaders = { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/127.0 Safari/537.36', accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'accept-language': 'en-GB,en;q=0.9,it;q=0.8' };
+  const first = await fetch(BASE + consentTarget, { redirect: 'manual', headers: browserHeaders });
   const firstText = await first.text();
   collect(first.headers);
   const location = first.headers.get('location') || '';
   COOKIE_SESSION_DIAGNOSTIC.first = { status: first.status, location, cookieNames: [...jar.keys()] };
   if ((first.status >= 300 && /cookiewall/i.test(location)) || /cookiewall|CookiePurposes|SettingsOpen/i.test(firstText)) {
     const wallUrl = absUrl(location || '/cookiewall/?returnurl=' + encodeURIComponent(consentTarget));
-    const wall = await fetch(wallUrl, { redirect: 'manual', headers: { cookie: cookie() } });
+    const wall = await fetch(wallUrl, { redirect: 'manual', headers: { ...browserHeaders, cookie: cookie() } });
     const wallText = await wall.text();
     collect(wall.headers);
     COOKIE_SESSION_DIAGNOSTIC.wall = { status: wall.status, location: wall.headers.get('location') || '', cookieNames: [...jar.keys()] };
@@ -95,6 +96,7 @@ async function acceptedCookie() {
       method: 'POST',
       redirect: 'manual',
       headers: {
+        ...browserHeaders,
         'content-type': 'application/x-www-form-urlencoded',
         cookie: cookie(),
         origin: BASE,
