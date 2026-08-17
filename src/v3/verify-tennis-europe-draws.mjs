@@ -61,6 +61,7 @@ async function req(url) {
   return request;
 }
 function cookiePair(value) { return String(value || '').split(/,(?=\s*[^;]+=)/).map(x => x.split(';')[0].trim()).filter(Boolean); }
+const COOKIE_SESSION_DIAGNOSTIC = {};
 async function acceptedCookie() {
   const jar = new Map();
   const collect = headers => {
@@ -76,11 +77,13 @@ async function acceptedCookie() {
   const firstText = await first.text();
   collect(first.headers);
   const location = first.headers.get('location') || '';
+  COOKIE_SESSION_DIAGNOSTIC.first = { status: first.status, location, cookieNames: [...jar.keys()] };
   if ((first.status >= 300 && /cookiewall/i.test(location)) || /cookiewall|CookiePurposes|SettingsOpen/i.test(firstText)) {
     const wallUrl = absUrl(location || '/cookiewall/?returnurl=%2Ftournaments');
     const wall = await fetch(wallUrl, { redirect: 'manual', headers: { cookie: cookie() } });
     const wallText = await wall.text();
     collect(wall.headers);
+    COOKIE_SESSION_DIAGNOSTIC.wall = { status: wall.status, location: wall.headers.get('location') || '', cookieNames: [...jar.keys()] };
     const returnUrl = (/name=["']ReturnUrl["'][^>]*value=["']([^"']*)/i.exec(wallText) || [])[1] || '/tournaments';
     const settingsOpen = (/name=["']SettingsOpen["'][^>]*value=["']([^"']*)/i.exec(wallText) || [])[1] || 'false';
     const purposes = [...wallText.matchAll(/name=["']CookiePurposes["'][^>]*value=["']([^"']+)/gi)].map(match => match[1]);
@@ -99,6 +102,7 @@ async function acceptedCookie() {
       body,
     });
     collect(saved.headers);
+    COOKIE_SESSION_DIAGNOSTIC.saved = { status: saved.status, location: saved.headers.get('location') || '', purposes, cookieNames: [...jar.keys()] };
     if (saved.status >= 400) throw new Error(`Tennis Europe cookie consent failed with HTTP ${saved.status}.`);
   }
   return cookie();
@@ -110,6 +114,8 @@ const cookieSmoke = await fetch(COOKIE_SMOKE_URL, {
   headers: { 'user-agent': 'Mozilla/5.0 CourtWatch-v3-tennis-europe-cookie-smoke/1.0', accept: 'text/html,*/*', cookie: DRAW_COOKIE },
 });
 const cookieSmokeText = await cookieSmoke.text();
+COOKIE_SESSION_DIAGNOSTIC.smoke = { status: cookieSmoke.status, finalUrl: cookieSmoke.url, cookieNames: DRAW_COOKIE.split(';').map(x => x.split('=')[0].trim()).filter(Boolean) };
+console.log(JSON.stringify({ tennisEuropeCookieSession: COOKIE_SESSION_DIAGNOSTIC }, null, 2));
 if (/\/cookiewall\//i.test(cookieSmoke.url) || /name=["']CookiePurposes|SettingsOpen/i.test(cookieSmokeText)) {
   throw new Error('Tennis Europe cookie smoke test failed: draw request returned the cookie wall.');
 }
