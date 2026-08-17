@@ -62,18 +62,60 @@ async function req(url) {
 }
 function cookiePair(value) { return String(value || '').split(/,(?=\s*[^;]+=)/).map(x => x.split(';')[0].trim()).filter(Boolean); }
 async function acceptedCookie() {
+  const jar = new Map();
+  const collect = headers => {
+    const values = headers.getSetCookie?.() || [headers.get('set-cookie') || ''];
+    for (const pair of cookiePair(values.join(','))) {
+      const split = pair.indexOf('=');
+      if (split > 0) jar.set(pair.slice(0, split), pair.slice(split + 1));
+    }
+  };
+  const cookie = () => [...jar].map(([name, value]) => `${name}=${value}`).join('; ');
+
   const first = await fetch(BASE + '/tournaments', { redirect: 'manual' });
   const firstText = await first.text();
-  const cookies = cookiePair((first.headers.getSetCookie?.() || [first.headers.get('set-cookie') || '']).join(','));
-  if ((first.status >= 300 && /cookiewall/i.test(first.headers.get('location') || '')) || /cookiewall|CookiePurposes|SettingsOpen/i.test(firstText)) {
-    const body = new URLSearchParams({ ReturnUrl: '/tournaments', SettingsOpen: 'false' });
-    // Tournamentsoftware uses bit-valued purpose identifiers. The current\n    // consent form exposes 1, 2, 4 and 16 (not sequential 1..4 values).\n    for (const value of ['1', '2', '4', '16']) body.append('CookiePurposes', value);
-    const saved = await fetch(BASE + '/cookiewall/Save', { method: 'POST', redirect: 'manual', headers: { 'content-type': 'application/x-www-form-urlencoded', cookie: cookies.join('; ') }, body });
-    cookies.push(...cookiePair((saved.headers.getSetCookie?.() || [saved.headers.get('set-cookie') || '']).join(',')));
+  collect(first.headers);
+  const location = first.headers.get('location') || '';
+  if ((first.status >= 300 && /cookiewall/i.test(location)) || /cookiewall|CookiePurposes|SettingsOpen/i.test(firstText)) {
+    const wallUrl = absUrl(location || '/cookiewall/?returnurl=%2Ftournaments');
+    const wall = await fetch(wallUrl, { redirect: 'manual', headers: { cookie: cookie() } });
+    const wallText = await wall.text();
+    collect(wall.headers);
+    const returnUrl = (/name=["']ReturnUrl["'][^>]*value=["']([^"']*)/i.exec(wallText) || [])[1] || '/tournaments';
+    const settingsOpen = (/name=["']SettingsOpen["'][^>]*value=["']([^"']*)/i.exec(wallText) || [])[1] || 'false';
+    const purposes = [...wallText.matchAll(/name=["']CookiePurposes["'][^>]*value=["']([^"']+)/gi)].map(match => match[1]);
+    if (!purposes.length) throw new Error('Tennis Europe cookie wall returned no consent purposes.');
+    const body = new URLSearchParams({ ReturnUrl: returnUrl.replace(/&amp;/g, '&'), SettingsOpen: settingsOpen });
+    for (const value of purposes) body.append('CookiePurposes', value);
+    const saved = await fetch(BASE + '/cookiewall/Save', {
+      method: 'POST',
+      redirect: 'manual',
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        cookie: cookie(),
+        origin: BASE,
+        referer: wallUrl,
+      },
+      body,
+    });
+    collect(saved.headers);
+    if (saved.status >= 400) throw new Error(`Tennis Europe cookie consent failed with HTTP ${saved.status}.`);
   }
-  return [...new Set(cookies)].join('; ');
+  return cookie();
 }
 const DRAW_COOKIE = await acceptedCookie();
+const COOKIE_SMOKE_URL = BASE + '/tournament/5173C79B-B05D-4157-AD04-CD4D4F68C4E7/draw/1';
+const cookieSmoke = await fetch(COOKIE_SMOKE_URL, {
+  redirect: 'follow',
+  headers: { 'user-agent': 'Mozilla/5.0 CourtWatch-v3-tennis-europe-cookie-smoke/1.0', accept: 'text/html,*/*', cookie: DRAW_COOKIE },
+});
+const cookieSmokeText = await cookieSmoke.text();
+if (/\/cookiewall\//i.test(cookieSmoke.url) || /name=["']CookiePurposes|SettingsOpen/i.test(cookieSmokeText)) {
+  throw new Error('Tennis Europe cookie smoke test failed: draw request returned the cookie wall.');
+}
+if (!/BS14|Boys Singles 14|Main Draw/i.test(cookieSmokeText)) {
+  throw new Error('Tennis Europe cookie smoke test failed: known draw page was not readable.');
+}
 function linkList(html, baseUrl) {
   const out = [];
   const re = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
