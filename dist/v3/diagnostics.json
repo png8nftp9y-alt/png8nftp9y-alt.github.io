@@ -1,6 +1,6 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-17T00:01:40.522Z",
+  "generatedAt": "2026-08-17T02:07:57.030Z",
   "overall": "yellow",
   "legend": {
     "green": "ok",
@@ -11,7 +11,7 @@
     {
       "status": "green",
       "label": "FITP tornei",
-      "detail": "5763 tornei · 33h fa",
+      "detail": "5763 tornei · 35h fa",
       "critical": true
     },
     {
@@ -23,19 +23,19 @@
     {
       "status": "green",
       "label": "Tennis Europe",
-      "detail": "43 entry TE · acceptance 43 · liste 0/0",
+      "detail": "38 entry TE · acceptance 15 · liste 530/600",
       "critical": false
     },
     {
       "status": "green",
       "label": "ITF",
-      "detail": "4 entry · stato seeded_pending_live_itf_scan",
+      "detail": "1 entry · stato complete",
       "critical": false
     },
     {
       "status": "green",
       "label": "Calendario",
-      "detail": "438 tornei visibili · FITP 393 · TE 43 · ITF 2",
+      "detail": "431 tornei visibili · FITP 392 · TE 38 · ITF 1",
       "critical": true
     },
     {
@@ -59,13 +59,14 @@
     {
       "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 17/08/2026, 02:01:40",
+      "detail": "file v3 generati · ultimo merge 17/08/2026, 04:07:57",
       "critical": true
     }
   ],
   "raw": {
     "fitp": {
       "entriesFound": 393,
+      "externalCircuitEntriesExcludedFromCalendar": 1,
       "byPlayer": {
         "francesco-renzulli": 18,
         "nikola-kerkenyakov": 11,
@@ -101,72 +102,52 @@
       "verifiedCompetitionEntryRescues": 0
     },
     "calendar": {
-      "tournamentEntries": 438,
+      "tournamentEntries": 431,
       "byCircuit": {
-        "fitp": 393,
-        "tennis-europe": 43,
-        "itf": 2
+        "fitp": 392,
+        "tennis-europe": 38,
+        "itf": 1
       },
       "warnings": 0
     },
     "te": {
-      "status": "tennis_europe_acceptance_complete_draw_parser_v2_applied",
-      "entriesVisible": 43,
-      "acceptanceConfirmed": 43,
+      "status": "tennis_europe_acceptance_list_engine_complete",
+      "profileSeeds": 12,
+      "entriesVisible": 38,
+      "acceptanceConfirmed": 15,
       "byPlayer": {
-        "virginia-cereghini": 9,
-        "giulia-scozzafava": 6,
-        "nikola-kerkenyakov": 7,
-        "aila-zennaro": 9,
         "francesco-renzulli": 3,
-        "noemi-paganini": 1,
-        "anna-gambarini": 1,
+        "nikola-kerkenyakov": 6,
         "filippo-vitali": 1,
         "daniele-gelli": 2,
-        "camilla-lingeri": 1,
+        "edoardo-grimoldi": 1,
         "gregorio-puccio": 2,
-        "edoardo-grimoldi": 1
+        "aila-zennaro": 9,
+        "giulia-scozzafava": 5,
+        "noemi-paganini": 1,
+        "virginia-cereghini": 8
       },
       "byAcceptance": {
-        "A-96": 1,
-        "Q-6": 1,
-        "MD-39": 3,
-        "MD-53": 1,
-        "Q-19": 1,
-        "MD-37": 1,
-        "Q-4": 2,
-        "Q-21": 3,
-        "A-9": 1,
+        "MD-35": 2,
+        "MD-21": 1,
         "A-16": 1,
-        "MD-13": 2,
-        "Q-8": 1,
-        "Q-32": 1,
-        "Q-35": 2,
-        "Q-10": 2,
-        "WC": 1,
-        "Q-27": 1,
-        "A-4": 1,
-        "Q-11": 1,
-        "MD-36": 1,
-        "Q-7": 1,
-        "MD-20": 1,
-        "MD-30": 1,
-        "Q-17": 1,
-        "Q-25": 1,
+        "A-9": 1,
+        "MD-10": 1,
+        "Q-4": 1,
         "A-2": 1,
-        "A-22": 1,
-        "MD-6": 1,
-        "MD-15": 2,
-        "Q-1": 1,
-        "A-5": 1,
-        "MD-34": 1,
-        "MD-35": 1,
-        "MD-54": 1
+        "MD-22": 1,
+        "MD-4": 1,
+        "MD-39": 1,
+        "MD-54": 1,
+        "Q-21": 1,
+        "Q-5": 1,
+        "MD-15": 1,
+        "profile_seen_not_on_acceptance_list_yet": 23
       }
     },
     "itf": {
-      "status": "seeded_pending_live_itf_scan",
-      "entries": 4
+      "status": "complete",
+      "entries": 1
     }
   }
 }
