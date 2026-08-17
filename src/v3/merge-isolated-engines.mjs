@@ -13,6 +13,10 @@ async function readJson(path,fallback){try{return JSON.parse(await fs.readFile(p
 async function fetchJson(ref,path){const url=`${RAW}/${ref}/${path}`;const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw new Error(`fetch failed ${r.status} ${url}`);return r.json()}
 async function writeJson(path,value){await fs.mkdir(path.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(path,JSON.stringify(value,null,2)+'\n')}
 function validDate(end){return !end||String(end)>=COVERAGE_FROM}
+function externalTournamentInFitp(row){
+ const name=norm(row.tournamentName||row.name);
+ return String(row.circuit||'fitp').toLowerCase()==='fitp'&&/(^| )ITF( |$)|TENNIS EUROPE|TENNIS EUROPE JUNIOR TOUR/.test(name)
+}
 function cleanTeName(row){let s=String(row.searchTournamentName||row.tournamentName||'').trim();s=s.replace(/^Tennis Europe\s*-\s*/i,'').replace(/\s*-\s*Events\s*$/i,'').trim();return s||row.tournamentName||''}
 function cleanTeLabel(row){const code=String(row.acceptanceCode||'').toUpperCase();const pos=Number(row.acceptancePosition||0);if(['MD','Q','A'].includes(code)&&pos>0)return `${code}-${pos}`;return String(row.calendarListLabel||'').replace(/^MD-0$/,'').trim()}
 function cleanLocation(row){let loc=String(row.location||'').trim();const id=String(row.competitionId||'').toUpperCase();const name=String(row.searchTournamentName||row.tournamentName||'');if(id==='154CA6B7-2173-4DFE-ADA9-0E2CEF2DE8E4'||/Ljubicic Academy Open/i.test(name)||/^(inj|losinj|lošinj)(?:,|\s|$)/i.test(loc))loc='Veli Lošinj, Croatia';return loc}
@@ -33,7 +37,8 @@ const stableResults=await fetchJson(STABLE_FITP_REF,'dist/v3/results.json').catc
 const stableOpponents=await fetchJson(STABLE_FITP_REF,'dist/v3/opponents.json').catch(()=>({opponents:[]}));
 
 const teEntries=(te.entries||[]).map(r=>entry({...r,circuit:'tennis-europe'})).filter(e=>e.playerId&&e.startDate&&validDate(e.endDate));
-const fitpEntries=(fitp.entries||[]).map(e=>e.circuit?e:entry({...e,circuit:'fitp'})).filter(e=>e.playerId&&validDate(e.endDate));
+const fitpEntries=(fitp.entries||[]).map(e=>e.circuit?e:entry({...e,circuit:'fitp'})).filter(e=>e.playerId&&validDate(e.endDate)&&!externalTournamentInFitp(e));
+const fitpExternalExcluded=(fitp.entries||[]).length-fitpEntries.length;
 const itfEntries=(itf.entries||[]).map(e=>e.circuit?e:entry({...e,circuit:'itf'})).filter(e=>e.playerId&&validDate(e.endDate));
 const entries=[...fitpEntries,...teEntries,...itfEntries];
 const seen=new Set();
@@ -60,7 +65,7 @@ const diagnosticsItems=[
  light(warnings.length?'yellow':'green','Calendario',`${tournamentEntries.length} tornei visibili · FITP ${byCircuit.fitp||0} · TE ${byCircuit['tennis-europe']||0} · ITF ${byCircuit.itf||0}`,true),
  light('green','App/UI',`merge isolato ${new Date(NOW).toLocaleString('it-IT',{timeZone:'Europe/Rome'})}`,true)
 ];
-const diagnostics={version:VERSION,generatedAt:NOW,overall:worst(diagnosticsItems),legend:{green:'ok',yellow:'attenzione/parziale',red:'errore o motore incompleto'},items:diagnosticsItems,raw:{fitp:{entriesFound:fitp.entriesFound,ref:STABLE_FITP_REF},te:{entriesVisible:teEntries.length,acceptanceConfirmed:teAcceptance,byPlayer:te.byPlayer,byAcceptance:te.byAcceptance,ref:TENNIS_EUROPE_REF},itf:{entries:itfEntries.length,ref:ITF_REF},calendar:{tournamentEntries:tournamentEntries.length,byCircuit,warnings:warnings.length}}};
+const diagnostics={version:VERSION,generatedAt:NOW,overall:worst(diagnosticsItems),legend:{green:'ok',yellow:'attenzione/parziale',red:'errore o motore incompleto'},items:diagnosticsItems,raw:{fitp:{entriesFound:fitp.entriesFound,externalCircuitEntriesExcludedFromCalendar:fitpExternalExcluded,ref:STABLE_FITP_REF},te:{entriesVisible:teEntries.length,acceptanceConfirmed:teAcceptance,byPlayer:te.byPlayer,byAcceptance:te.byAcceptance,ref:TENNIS_EUROPE_REF},itf:{entries:itfEntries.length,ref:ITF_REF},calendar:{tournamentEntries:tournamentEntries.length,byCircuit,warnings:warnings.length}}};
 const syncStatus={version:VERSION,generatedAt:NOW,status:'isolated_engine_merge_guarded_fitp_te_itf',coverageFrom:COVERAGE_FROM,checks:{players:(playersDoc.players||[]).length,tournamentEntries:tournamentEntries.length,tournaments:tournaments.length,byCircuit,warnings:warnings.length,tennisEuropeVisible:teEntries.length,tennisEuropeAcceptanceConfirmed:teAcceptance,diagnostics:diagnostics.overall},sourceRefs:{fitp:STABLE_FITP_REF,tennisEurope:TENNIS_EUROPE_REF,itf:ITF_REF},warnings};
 await writeJson('dist/v3/players.json',{version:VERSION,generatedAt:NOW,players:playersDoc.players||[]});
 await writeJson('dist/v3/source_fitp_entries.json',fitp);
