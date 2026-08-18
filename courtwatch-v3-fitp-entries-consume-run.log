@@ -1,10 +1,10 @@
-startedAt=2026-08-18T20:54:39Z
-sourceSha=1bf739e77802cf7e8587a24ec170de9b31fb1a5f
-runId=32184873476
+startedAt=2026-08-18T22:54:52Z
+sourceSha=92fe95edf877bda754acd2b978b84872d92fa01e
+runId=32194867406
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-fitp-entry-cache-v1",
-  "generatedAt": "2026-08-18T20:54:39.410Z",
+  "generatedAt": "2026-08-18T22:54:52.140Z",
   "status": "fitp_entries_complete_from_versioned_participant_cache",
   "source": "Validated provincial FITP catalog plus permanent official P.U.C. participant snapshots. Active/future tournaments refresh every run; concluded tournaments remain queryable for future player onboarding.",
   "coverageFrom": "2025-12-18",
@@ -17,9 +17,9 @@ mode=consume-existing-source_fitp_tournaments
   "refreshQueue": 5775,
   "fullScan": true,
   "concurrency": 20,
-  "participantsScanned": 412234,
-  "participantsWithCard": 412234,
-  "entriesFound": 394,
+  "participantsScanned": 412322,
+  "participantsWithCard": 412322,
+  "entriesFound": 400,
   "playersWithEntries": 26,
   "homonymRejected": 11,
   "verifiedCompetitionIds": [
@@ -28,26 +28,26 @@ mode=consume-existing-source_fitp_tournaments
   ],
   "verifiedCompetitionEntryRescues": 0,
   "byPlayer": {
-    "francesco-renzulli": 18,
+    "francesco-renzulli": 19,
     "nikola-kerkenyakov": 11,
     "carlo-ghislotti": 13,
     "matilde-mainetti": 9,
-    "manuel-natale": 29,
+    "manuel-natale": 30,
     "niccolo-zanaga": 13,
     "aila-zennaro": 12,
     "virginia-cereghini": 7,
     "martina-danesi": 11,
-    "filippo-vitali": 18,
+    "filippo-vitali": 19,
     "mattia-garibaldi": 20,
     "nicholas-scappa": 8,
     "pietro-sala": 3,
     "noemi-paganini": 11,
-    "camilla-lingeri": 34,
+    "camilla-lingeri": 35,
     "martina-busa": 10,
-    "daniele-gelli": 17,
+    "daniele-gelli": 18,
     "francesco-bocchio": 24,
     "andrea-losa": 18,
-    "gregorio-puccio": 23,
+    "gregorio-puccio": 24,
     "virginia-rossoni": 15,
     "matteo-bocchio": 22,
     "giulia-scozzafava": 6,
@@ -56,25 +56,25 @@ mode=consume-existing-source_fitp_tournaments
     "alessio-nava": 13
   },
   "byMatchMethod": {
-    "membership_card": 394
+    "membership_card": 400
   },
   "byDiscoveryMethod": {
-    "fitp_permanent_tournament_archive_versioned_participant_cache_card_strict": 394
+    "fitp_permanent_tournament_archive_versioned_participant_cache_card_strict": 400
   },
   "errors": []
 }
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-18T20:55:43.775Z",
+  "generatedAt": "2026-08-18T22:55:38.799Z",
   "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 26,
-    "tournamentEntries": 442,
-    "tournaments": 442,
+    "tournamentEntries": 448,
+    "tournaments": 448,
     "byCircuit": {
-      "fitp": 393,
+      "fitp": 399,
       "tennis-europe": 48,
       "itf": 1
     },
@@ -109,4 +109,4 @@ fitpEntriesExit=0
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-18T20:55:43Z
+finishedAt=2026-08-18T22:55:38Z
