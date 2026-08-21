@@ -1,25 +1,25 @@
-startedAt=2026-08-20T22:50:23Z
-sourceSha=8f35f7cdc0527087ed554a6dbf05d125805a11ff
-runId=32426047796
+startedAt=2026-08-21T07:57:26Z
+sourceSha=c20de24556285fdb4e64ebe1d3859ee082c5e7fa
+runId=32460930864
 mode=consume-existing-source_fitp_tournaments
 {
   "version": "cw-v3-fitp-entry-cache-v1",
-  "generatedAt": "2026-08-20T22:50:23.573Z",
+  "generatedAt": "2026-08-21T07:57:26.819Z",
   "status": "fitp_entries_complete_from_versioned_participant_cache",
   "source": "Validated provincial FITP catalog plus permanent official P.U.C. participant snapshots. Active/future tournaments refresh every run; concluded tournaments remain queryable for future player onboarding.",
   "coverageFrom": "2025-12-18",
-  "tournamentsInput": 5794,
-  "baseTournamentsInput": 5794,
-  "archivedTournamentsInput": 5794,
-  "participantSnapshots": 5794,
-  "participantSnapshotsRefreshed": 5794,
+  "tournamentsInput": 5797,
+  "baseTournamentsInput": 5797,
+  "archivedTournamentsInput": 5797,
+  "participantSnapshots": 5797,
+  "participantSnapshotsRefreshed": 5797,
   "participantSnapshotsReused": 0,
-  "refreshQueue": 5794,
+  "refreshQueue": 5797,
   "fullScan": true,
   "concurrency": 20,
-  "participantsScanned": 415090,
-  "participantsWithCard": 415090,
-  "entriesFound": 405,
+  "participantsScanned": 415260,
+  "participantsWithCard": 415260,
+  "entriesFound": 406,
   "playersWithEntries": 26,
   "homonymRejected": 10,
   "verifiedCompetitionIds": [
@@ -47,7 +47,7 @@ mode=consume-existing-source_fitp_tournaments
     "daniele-gelli": 18,
     "francesco-bocchio": 24,
     "andrea-losa": 18,
-    "gregorio-puccio": 24,
+    "gregorio-puccio": 25,
     "virginia-rossoni": 15,
     "matteo-bocchio": 22,
     "giulia-scozzafava": 6,
@@ -56,25 +56,25 @@ mode=consume-existing-source_fitp_tournaments
     "alessio-nava": 14
   },
   "byMatchMethod": {
-    "membership_card": 405
+    "membership_card": 406
   },
   "byDiscoveryMethod": {
-    "fitp_permanent_tournament_archive_versioned_participant_cache_card_strict": 405
+    "fitp_permanent_tournament_archive_versioned_participant_cache_card_strict": 406
   },
   "errors": []
 }
 fitpEntriesExit=0
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-20T22:51:12.745Z",
+  "generatedAt": "2026-08-21T07:58:16.733Z",
   "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 26,
-    "tournamentEntries": 453,
-    "tournaments": 453,
+    "tournamentEntries": 454,
+    "tournaments": 454,
     "byCircuit": {
-      "fitp": 404,
+      "fitp": 405,
       "tennis-europe": 48,
       "itf": 1
     },
@@ -109,4 +109,4 @@ fitpEntriesExit=0
   "warnings": []
 }
 calendarMergeExit=0
-finishedAt=2026-08-20T22:51:12Z
+finishedAt=2026-08-21T07:58:16Z
