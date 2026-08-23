@@ -68,7 +68,7 @@ async function req(url, extraHeaders = {}) {
 async function drawDocument(url) {
   const page = await req(url);
   if (page.status !== 200) return { ...page, shellText: page.text, drawContentUrl: '' };
-  const action = ([...page.text.matchAll(/<form\b[^>]*action=["']([^"']*\/GetDrawContent[^"']*)/gi)][0] || [])[1] || '';
+  const action = ([...page.text.matchAll(/<form\b[^>]*action=["']([^"']*\/(?:GetDrawContent|GetStandings)[^"']*)/gi)][0] || [])[1] || '';
   if (!action) return { ...page, shellText: page.text, drawContentUrl: '' };
   const contentUrl = absUrl(action, page.finalUrl || url);
   const content = await req(contentUrl, {
