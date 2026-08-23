@@ -4,6 +4,7 @@ const NOW = new Date().toISOString();
 const TODAY = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 const BASE = 'https://te.tournamentsoftware.com';
 const FILE = 'dist/v3/source_tennis_europe_entries.json';
+const RELATIONS_FILE = 'history/tennis_europe_player_tournament_db.json';
 const BACKFILL = process.env.TE_DRAW_BACKFILL === '1';
 const AUDIT_ONLY = process.env.TE_DRAW_AUDIT_ONLY === '1';
 const AUDIT_FILE = BACKFILL ? 'dist/v3/source_tennis_europe_draw_backfill_audit.json' : 'dist/v3/source_tennis_europe_draw_audit.json';
@@ -374,8 +375,12 @@ async function checkDraw(entry, wanted) {
   return { found: false, reliable, publishedEmpty, populatedDrawInventory, tried, drawLinks: uniqueLinks.slice(0, 60) };
 }
 
-const data = await readJson(FILE, { entries: [] });
+const [data, relationsData] = await Promise.all([
+  readJson(FILE, { entries: [] }),
+  readJson(RELATIONS_FILE, { relations: {} }),
+]);
 const original = Array.isArray(data.entries) ? data.entries : [];
+const priorRelations = relationsData?.relations || {};
 const kept = [];
 const audit = [];
 
@@ -387,6 +392,25 @@ for (const entry of original) {
 
   const tournamentStillActive = !entry.endDate || TODAY <= entry.endDate;
   const historicalBackfillTarget = BACKFILL && entry.endDate && entry.endDate < TODAY;
+  const relationKey = [entry.playerId, entry.competitionId, entry.acceptanceEvent || entry.event || 'singles'].join('|');
+  const prior = priorRelations[relationKey];
+  if (!BACKFILL && entry.endDate && entry.endDate < TODAY && prior?.permanenceStatus === 'rejected_by_complete_singles_draws') {
+    decision = 'removed_existing_reliable_draw_rejection';
+    audit.push({ playerId: entry.playerId, playerName: entry.playerName, competitionId: entry.competitionId, tournamentName: entry.tournamentName, code: entry.acceptanceCode, event: entry.acceptanceEvent, daysFromStart: d, decision });
+    continue;
+  }
+  if (!BACKFILL && entry.endDate && entry.endDate < TODAY && prior?.permanenceStatus === 'draw_confirmed_permanent') {
+    kept.push({
+      ...entry,
+      preDrawCalendarListLabel: entry.preDrawCalendarListLabel || entry.calendarListLabel,
+      calendarListLabel: '', acceptanceCode: '', acceptancePosition: null,
+      entryStatus: 'draw_confirmed_permanent_history', calendarState: 'draw_confirmed',
+      drawConfirmedAt: prior.drawVerification?.checkedAt || entry.drawConfirmedAt || NOW,
+    });
+    decision = 'kept_existing_draw_confirmation';
+    audit.push({ playerId: entry.playerId, playerName: entry.playerName, competitionId: entry.competitionId, tournamentName: entry.tournamentName, code: entry.acceptanceCode, event: entry.acceptanceEvent, daysFromStart: d, decision });
+    continue;
+  }
   if ((d >= -1 && tournamentStillActive) || historicalBackfillTarget) {
     const qualifying = await checkDraw(entry, 'qualifying');
     const main = await checkDraw(entry, 'main');
