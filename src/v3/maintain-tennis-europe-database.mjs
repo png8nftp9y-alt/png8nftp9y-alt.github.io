@@ -95,7 +95,7 @@ const calendarByKey = new Map(calendarEntries.map(e => [relationKey(e), e]));
 const drawByKey = new Map((drawAuditData?.audit || []).map(e => [[e.playerId, e.competitionId, e.event || 'singles'].join('|'), e]));
 const presentKeys = new Set();
 const relations = { ...(oldRelations?.relations || {}) };
-let changes = 0, withdrawals = 0;
+let changes = 0, possiblePreTournamentWithdrawals = 0, historicalListDisappearances = 0, inTournamentListDisappearances = 0;
 
 for (const e of acceptanceEntries) {
   if (!e.playerId || !e.competitionId) continue;
@@ -132,17 +132,37 @@ for (const [key, previous] of Object.entries(relations)) {
     relations[key] = { ...previous, monitoringStatus: 'player_not_monitored', calendarVisibleNow: false };
     continue;
   }
+  if (!previous.activeInLatestAcceptance && previous.monitoringStatus === 'absent_from_latest_complete_acceptance_scan') {
+    const concluded = Boolean(previous.endDate && previous.endDate < TODAY);
+    const beforeStart = Boolean(previous.startDate && TODAY < previous.startDate);
+    const absenceKind = concluded
+      ? 'historical_acceptance_no_longer_returned'
+      : beforeStart
+        ? 'possible_pre_tournament_withdrawal_or_list_removal'
+        : 'acceptance_absent_during_tournament_draw_verification_required';
+    relations[key] = { ...previous, monitoringStatus: absenceKind, acceptanceAbsenceKind: absenceKind };
+    continue;
+  }
   if (previous.activeInLatestAcceptance) {
     const snapshot = meaningfulSnapshot({}, 'acceptance_absent');
     const concluded = Boolean(previous.endDate && previous.endDate < TODAY);
+    const beforeStart = Boolean(previous.startDate && TODAY < previous.startDate);
     const rejectedByDraw = previous.permanenceStatus === 'rejected_by_complete_singles_draws';
+    const absenceKind = concluded
+      ? 'historical_acceptance_no_longer_returned'
+      : beforeStart
+        ? 'possible_pre_tournament_withdrawal_or_list_removal'
+        : 'acceptance_absent_during_tournament_draw_verification_required';
     relations[key] = {
       ...previous, activeInLatestAcceptance: false, calendarVisibleNow: concluded && !rejectedByDraw,
-      monitoringStatus: 'absent_from_latest_complete_acceptance_scan', acceptanceRemovedAt: NOW,
+      monitoringStatus: absenceKind, acceptanceRemovedAt: NOW, acceptanceAbsenceKind: absenceKind,
       permanenceStatus: previous.permanenceStatus === 'draw_confirmed_permanent' ? previous.permanenceStatus : rejectedByDraw ? previous.permanenceStatus : concluded ? 'retained_pending_draw_verification' : 'not_on_live_calendar',
       timeline: appendChange(previous.timeline, snapshot),
     };
-    changes++; withdrawals++;
+    changes++;
+    if (concluded) historicalListDisappearances++;
+    else if (beforeStart) possiblePreTournamentWithdrawals++;
+    else inTournamentListDisappearances++;
   }
 }
 
@@ -179,7 +199,12 @@ const audit = {
   mapSourceStatus: mapData.status, acceptanceSourceStatus: acceptanceData.status,
   currentTournaments: currentIds.size, historicalTournaments: Object.keys(catalog).length,
   acceptanceEntries: acceptanceEntries.length, calendarEntries: calendarEntries.length,
-  relations: relationValues.length, permanentCalendarEntries: permanentEntries.length, retainedPendingDrawVerificationEntries: pendingVerificationEntries.length, changesRecordedThisRun: changes, withdrawalsDetectedThisRun: withdrawals,
+  relations: relationValues.length, permanentCalendarEntries: permanentEntries.length, retainedPendingDrawVerificationEntries: pendingVerificationEntries.length, changesRecordedThisRun: changes,
+  acceptanceAbsencesDetectedThisRun: possiblePreTournamentWithdrawals + historicalListDisappearances + inTournamentListDisappearances,
+  possiblePreTournamentWithdrawalsThisRun: possiblePreTournamentWithdrawals,
+  historicalListsNoLongerReturnedThisRun: historicalListDisappearances,
+  inTournamentAcceptanceDisappearancesThisRun: inTournamentListDisappearances,
+  withdrawalsDetectedThisRun: possiblePreTournamentWithdrawals,
   calendarAuthorityChanged: false,
 };
 await Promise.all([writeJson(CATALOG_FILE, catalogOutput), writeJson(RELATIONS_FILE, relationsOutput), writeJson(AUDIT_FILE, audit), writeJson(HISTORY_ENTRIES_FILE,{version:1,generatedAt:NOW,status:'tennis_europe_calendar_history_complete',policy:'Concluded entries retain their last valid acceptance state while T-1 draw verification is missing or inconclusive. Only a reliable complete singles-draw rejection may remove them.',entries:historyEntries})]);
