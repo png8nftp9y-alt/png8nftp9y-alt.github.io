@@ -182,6 +182,12 @@ if (!syntheticHistoricalEvidence.relevant || !syntheticHistoricalEvidence.popula
 if (!syntheticGroupEvidence.relevant || !syntheticGroupEvidence.populated) {
   throw new Error('Tennis Europe cookie smoke test failed: round-robin group fixture was not classified as a populated final phase.');
 }
+if (finalPhaseKind('<option selected>BS12 Round Robin Group A</option>', '', '/Draw/19/GetDrawContent', 'main') !== 'group') {
+  throw new Error('Tennis Europe phase smoke test failed: selected round-robin group was not classified as group.');
+}
+if (finalPhaseKind('<option selected>BS14 Main Draw</option>', '', '/Draw/1/GetDrawContent', 'main') !== 'main') {
+  throw new Error('Tennis Europe phase smoke test failed: standard main draw was misclassified as group.');
+}
 if (shouldRemoveAfterDrawChecks({ reliable:true, publishedEmpty:false }, { reliable:false, publishedEmpty:false })) {
   throw new Error('Tennis Europe decision smoke test failed: qualifying-only absence must remain pending.');
 }
@@ -268,6 +274,18 @@ function drawHeading(html) {
 function eventDrawHeading(html) {
   const headings = [...String(html || '').matchAll(/<(?:h1|h2|h3|h4)\b[^>]*>([\s\S]*?)<\/(?:h1|h2|h3|h4)>/gi)].map(m => clean(m[1])).filter(Boolean);
   return headings.find(value => /\b(?:BS|GS)\s*(?:12|14|16)\b|\b(?:BOYS|GIRLS)\s+SINGLES\b/i.test(value)) || '';
+}
+function selectedDrawHeading(html) {
+  const source = String(html || '');
+  const selectedOption = ([...source.matchAll(/<option\b([^>]*)>([\s\S]*?)<\/option>/gi)].find(m => /\bselected\b/i.test(m[1])) || [])[2] || '';
+  if (selectedOption) return clean(selectedOption);
+  const activeLink = ([...source.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/gi)].find(m => /aria-current=["'](?:page|true)["']|\b(?:active|selected)\b/i.test(m[1])) || [])[2] || '';
+  return clean(activeLink);
+}
+function finalPhaseKind(shellHtml, contentHtml, contentUrl, fallback = 'main') {
+  const selected = selectedDrawHeading(shellHtml);
+  const focused = `${selected} ${contentUrl || ''} ${String(contentHtml || '').slice(0, 4000)}`;
+  return /GetStandings|ROUND[ -]?ROBIN|\bGROUP\b|\bGIRONE\b|\bPOULE\b|roundrobin|group-standings/i.test(focused) ? 'group' : fallback;
 }
 function drawEvidence(html, wanted, entry, label = '') {
   const text = norm(clean(html));
@@ -364,7 +382,7 @@ async function checkDraw(entry, wanted) {
         }
       }
       if (found) {
-        const foundPhase = /ROUND ROBIN|GROUP|GIRONE/i.test(shellEventHeading || evidence.heading || '') ? 'group' : wanted;
+        const foundPhase = wanted === 'main' ? finalPhaseKind(r.shellText, r.text, r.drawContentUrl, 'main') : wanted;
         return { found: true, foundPhase, reliable: true, publishedEmpty, populatedDrawInventory, tried, drawLinks: uniqueLinks.slice(0, 60) };
       }
     } catch (error) {
