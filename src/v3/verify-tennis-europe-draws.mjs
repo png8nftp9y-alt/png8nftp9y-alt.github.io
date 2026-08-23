@@ -263,6 +263,10 @@ function pageLooksLikeDraw(html, wanted) {
 function drawHeading(html) {
   return clean([...String(html || '').matchAll(/<(?:title|h1|h2|h3|h4)\b[^>]*>([\s\S]*?)<\/(?:title|h1|h2|h3|h4)>/gi)].map(m => m[1]).join(' '));
 }
+function eventDrawHeading(html) {
+  const headings = [...String(html || '').matchAll(/<(?:h1|h2|h3|h4)\b[^>]*>([\s\S]*?)<\/(?:h1|h2|h3|h4)>/gi)].map(m => clean(m[1])).filter(Boolean);
+  return headings.find(value => /\b(?:BS|GS)\s*(?:12|14|16)\b|\b(?:BOYS|GIRLS)\s+SINGLES\b/i.test(value)) || '';
+}
 function drawEvidence(html, wanted, entry, label = '') {
   const text = norm(clean(html));
   const actualHeading = drawHeading(html);
@@ -334,7 +338,8 @@ async function checkDraw(entry, wanted) {
     const link = uniqueLinks[index];
     try {
       const r = await drawDocument(link.url);
-      const evidence = r.status === 200 ? drawEvidence(r.text, wanted, entry, `${drawHeading(r.shellText)} ${link.text} ${link.url}`) : { relevant:false, populated:false, publishedEmpty:false };
+      const shellEventHeading = eventDrawHeading(r.shellText);
+      const evidence = r.status === 200 ? drawEvidence(r.text, wanted, entry, shellEventHeading || link.text) : { relevant:false, populated:false, publishedEmpty:false };
       const concreteDrawRoute = /\/draw\/\d+(?:\/|$)/i.test(link.url) || (/\/sport\/draw\.aspx/i.test(link.url) && /[?&]draw=\d+/i.test(link.url));
       if (!concreteDrawRoute && evidence.publishedEmpty) {
         evidence.relevant = false;
