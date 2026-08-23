@@ -290,7 +290,9 @@ function drawEvidence(html, wanted, entry, label = '') {
 function shouldRemoveAfterDrawChecks(qualifying, main) {
   const anyRelevantEmpty = qualifying.publishedEmpty || main.publishedEmpty;
   // Qualifying absence is never final: a player may still enter the main draw.
-  // Removal requires a populated final singles phase (main draw or groups).
+  // Removal is allowed only after a populated final singles phase (main draw
+  // or round-robin groups) has also been checked and every relevant published
+  // phase is non-empty.
   return main.reliable && !anyRelevantEmpty;
 }
 async function checkDraw(entry, wanted) {
@@ -333,7 +335,9 @@ async function checkDraw(entry, wanted) {
     if (!seen.has(url)) { seen.add(url); uniqueLinks.push({ url, text: `direct draw ${draw}`, score: 1, directProbe: true }); }
   }
 
-  // Follow the official sibling-draw links exposed by each numbered page.
+  // Numbered routes can redirect to the first real draw. While visiting them,
+  // also collect the official sibling-draw links exposed by each draw page.
+  // This is required for tournaments whose overview does not list every event.
   for (let index = 0; index < uniqueLinks.length && index < 60; index++) {
     const link = uniqueLinks[index];
     try {
@@ -357,7 +361,10 @@ async function checkDraw(entry, wanted) {
           uniqueLinks.push(sibling);
         }
       }
-      if (found) return { found: true, reliable: true, publishedEmpty, populatedDrawInventory, tried, drawLinks: uniqueLinks.slice(0, 60) };
+      if (found) {
+        const foundPhase = /ROUND ROBIN|GROUP|GIRONE/i.test(shellEventHeading || evidence.heading || '') ? 'group' : wanted;
+        return { found: true, foundPhase, reliable: true, publishedEmpty, populatedDrawInventory, tried, drawLinks: uniqueLinks.slice(0, 60) };
+      }
     } catch (error) {
       tried.push({ url: link.url, label: link.text, score: link.score, kind: 'draw_link', error: error.message });
     }
@@ -384,7 +391,7 @@ for (const entry of original) {
     const qualifying = await checkDraw(entry, 'qualifying');
     const main = await checkDraw(entry, 'main');
     if (qualifying.found || main.found) {
-      const drawType = qualifying.found ? 'qualifying' : 'main';
+      const drawType = qualifying.found ? 'qualifying' : (main.foundPhase || 'main');
       kept.push({
         ...entry,
         preDrawCalendarListLabel: entry.calendarListLabel,
@@ -399,7 +406,8 @@ for (const entry of original) {
       decision = `kept_${drawType}_draw_confirmed`;
     } else {
       // Never remove solely because the player is absent from qualifying.
-      // A populated final singles phase is mandatory.
+      // The final singles phase (main draw or groups) must be populated too;
+      // any relevant empty/bye-only phase keeps the player pending.
       const remove = shouldRemoveAfterDrawChecks(qualifying, main);
       if (remove) {
         decision = 'removed_absent_from_reliable_relevant_singles_draws';
