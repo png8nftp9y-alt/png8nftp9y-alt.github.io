@@ -173,6 +173,22 @@ for (const [key, previous] of Object.entries(relations)) {
   }
 }
 
+// Remove stale cross-gender duplicates caused by an older event-switch
+// fallback. A monitored player cannot belong to both BS and GS for the same
+// tournament; the event present in the latest complete acceptance scan is the
+// authoritative one.
+for (const key of presentKeys) {
+  const current = relations[key];
+  const event = String(current?.acceptanceEvent || '').toUpperCase();
+  if (!/^(?:BS|GS)\d{2}$/.test(event)) continue;
+  const opposite = event.startsWith('BS') ? `GS${event.slice(2)}` : `BS${event.slice(2)}`;
+  const oppositeKey = [current.playerId, current.competitionId, opposite].join('|');
+  if (relations[oppositeKey] && !presentKeys.has(oppositeKey)) {
+    delete relations[oppositeKey];
+    changes++;
+  }
+}
+
 const catalogOutput = {
   version: 1, generatedAt: NOW, sourceGeneratedAt: mapData.generatedAt,
   status: 'tennis_europe_tournament_catalog_complete', currentTournamentCount: currentIds.size,
