@@ -40,7 +40,11 @@ function norm(v) {
   return String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
 }
 function absUrl(href, base = BASE) {
-  try { return new URL(String(href || '').replace(/&amp;/g, '&'), base).toString(); } catch { return ''; }
+  try {
+    const url = new URL(String(href || '').replace(/&amp;/g, '&'), base);
+    url.hash = '';
+    return url.toString();
+  } catch { return ''; }
 }
 function daysFromStart(entry) {
   if (!entry.startDate) return 999;
@@ -331,6 +335,11 @@ async function checkDraw(entry, wanted) {
     try {
       const r = await drawDocument(link.url);
       const evidence = r.status === 200 ? drawEvidence(r.text, wanted, entry, `${drawHeading(r.shellText)} ${link.text} ${link.url}`) : { relevant:false, populated:false, publishedEmpty:false };
+      const concreteDrawRoute = /\/draw\/\d+(?:\/|$)/i.test(link.url) || (/\/sport\/draw\.aspx/i.test(link.url) && /[?&]draw=\d+/i.test(link.url));
+      if (!concreteDrawRoute && evidence.publishedEmpty) {
+        evidence.relevant = false;
+        evidence.publishedEmpty = false;
+      }
       const found = evidence.populated && hasPlayer(r.text, entry.playerName);
       if (evidence.populated) reliable = true;
       if (evidence.publishedEmpty) publishedEmpty = true;
