@@ -47,6 +47,24 @@ jobs:
         with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
+      - name: Configure private R2 database
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          echo "R2_ACTIVE=1" >> "$GITHUB_ENV"
+          echo "R2_ACCOUNT_ID=$R2_ACCOUNT_ID" >> "$GITHUB_ENV"
+          echo "R2_BUCKET=$R2_BUCKET" >> "$GITHUB_ENV"
+          echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
+      - name: Restore verified Tennis Europe database from R2
+        run: |
+          python -m pip install --disable-pip-version-check --quiet awscli
+          bash src/v3/tennis-europe-r2-cache.sh restore
       - uses: actions/download-artifact@v4
         with:
           path: dist/v3/shards/tennis-europe
@@ -55,12 +73,15 @@ jobs:
         run: |
           set -euo pipefail
           node src/v3/merge-tennis-europe-acceptance-shards.mjs
+          node src/v3/merge-tennis-europe-participant-cache.mjs
           cp dist/v3/source_tennis_europe_entries_sharded.json dist/v3/source_tennis_europe_entries.json
           node src/v3/verify-tennis-europe-draws.mjs
           node src/v3/validate-tennis-europe-live.mjs
           node src/v3/maintain-tennis-europe-database.mjs
           node src/v3/validate-tennis-europe-system.mjs
           node src/v3/entries-engine.mjs
+      - name: Publish and verify heavy Tennis Europe database on R2
+        run: bash src/v3/tennis-europe-r2-cache.sh publish
       - name: Publish atomically, preserving last known good
         run: |
           set -euo pipefail
@@ -74,12 +95,15 @@ jobs:
           for f in tennis_europe_tournament_catalog.json tennis_europe_player_tournament_db.json tennis_europe_database_audit.json; do
             test -f history/$f && cp history/$f /tmp/te-live/history/$f
           done
+          cp history/tennis_europe_participant_database_audit.json /tmp/te-live/history/
           for attempt in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
             cp /tmp/te-live/dist/v3/* dist/v3/
             cp /tmp/te-live/history/* history/
             git add dist/v3 history/tennis_europe_tournament_catalog.json history/tennis_europe_player_tournament_db.json history/tennis_europe_database_audit.json
+            git add history/tennis_europe_participant_database_audit.json src/v3/tennis-europe-r2-cache.sh src/v3/merge-tennis-europe-participant-cache.mjs
+            git rm -f --ignore-unmatch history/tennis_europe_participant_cache.json.gz history/tennis_europe_participant_index.json.gz
             git commit -m 'Publish validated Tennis Europe live entries' || exit 0
             git push origin HEAD:main && exit 0
           done

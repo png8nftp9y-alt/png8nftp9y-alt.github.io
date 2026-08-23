@@ -5,13 +5,14 @@ async function readJson(path,fallback){try{return JSON.parse(await fs.readFile(p
 async function writeJson(path,value){await fs.mkdir(path.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(path,JSON.stringify(value,null,2)+'\n')}
 const key=e=>[e.playerId,e.competitionId,e.event||e.acceptanceEvent||'singles'].join('|');
 
-const [map,acceptance,source,liveAudit,historicalAudit,db]=await Promise.all([
+const [map,acceptance,source,liveAudit,historicalAudit,db,participantDb]=await Promise.all([
   readJson('dist/v3/source_tennis_europe_tournaments_sharded.json',{}),
   readJson('dist/v3/source_tennis_europe_entries_sharded.json',{}),
   readJson('dist/v3/source_tennis_europe_entries.json',{}),
   readJson('dist/v3/source_tennis_europe_draw_audit.json',{}),
   readJson('dist/v3/source_tennis_europe_draw_backfill_audit.json',{}),
   readJson('history/tennis_europe_player_tournament_db.json',{}),
+  readJson('history/tennis_europe_participant_database_audit.json',{}),
 ]);
 const errors=[], warnings=[];
 const mapRows=map.tournaments||[], acceptanceRows=(acceptance.entries||[]).filter(e=>e.circuit==='tennis-europe'), sourceRows=(source.entries||[]).filter(e=>e.circuit==='tennis-europe');
@@ -23,6 +24,7 @@ if(map.status!=='tennis_europe_sharded_tournament_map_complete'||mapRows.length<
 if(map.coverageFrom>TODAY||map.coverageUntil<TODAY)errors.push({type:'map_does_not_cover_today',coverageFrom:map.coverageFrom,coverageUntil:map.coverageUntil,today:TODAY});
 if(map.continuity&&map.continuity.status!=='ok')errors.push({type:'map_continuity_blocked',continuity:map.continuity});
 if(acceptance.status!=='tennis_europe_acceptance_complete'||(acceptance.shards||[]).length!==16||(acceptance.errors||[]).length)errors.push({type:'acceptance_incomplete',status:acceptance.status,shards:(acceptance.shards||[]).length,errors:(acceptance.errors||[]).length});
+if(participantDb.status!=='green'||participantDb.historicalTournamentSnapshots<100||participantDb.participantsRead<1000)errors.push({type:'participant_database_incomplete',status:participantDb.status,snapshots:participantDb.historicalTournamentSnapshots||0,participants:participantDb.participantsRead||0,errors:participantDb.errors||[]});
 const removedVisible=[...removedKeys].filter(k=>sourceKeys.has(k));if(removedVisible.length)errors.push({type:'historical_rejections_visible',count:removedVisible.length,keys:removedVisible});
 const confirmedWithLabel=sourceRows.filter(e=>confirmedKeys.has(key(e))&&e.calendarListLabel);if(confirmedWithLabel.length)errors.push({type:'confirmed_draws_regressed_to_acceptance_labels',count:confirmedWithLabel.length,keys:confirmedWithLabel.map(key)});
 const rejectedRelations=relations.filter(r=>r.permanenceStatus==='rejected_by_complete_singles_draws');
@@ -35,7 +37,7 @@ const oppositeDuplicates=[];for(const r of relations){const ev=String(r.acceptan
 if(oppositeDuplicates.length)errors.push({type:'cross_gender_duplicates',count:oppositeDuplicates.length,keys:[...new Set(oppositeDuplicates)]});
 const liveInconclusive=(liveAudit.audit||[]).filter(e=>String(e.decision||'').includes('inconclusive'));
 if(liveInconclusive.length)errors.push({type:'live_t_minus_1_inconclusive',count:liveInconclusive.length,keys:liveInconclusive.map(key)});
-const checks={mapTournaments:mapRows.length,mapCoverageFrom:map.coverageFrom||'',mapCoverageUntil:map.coverageUntil||'',continuityCycles:map.continuity?.consecutiveSuccessfulCycles||0,acceptanceEntries:acceptanceRows.length,calendarEntries:sourceRows.length,confirmed:historicalConfirmed.length,rejected:historicalRemoved.length,pending:pendingRelations.length,inconclusive:liveInconclusive.length};
+const checks={mapTournaments:mapRows.length,mapCoverageFrom:map.coverageFrom||'',mapCoverageUntil:map.coverageUntil||'',continuityCycles:map.continuity?.consecutiveSuccessfulCycles||0,acceptanceEntries:acceptanceRows.length,calendarEntries:sourceRows.length,confirmed:historicalConfirmed.length,rejected:historicalRemoved.length,pending:pendingRelations.length,inconclusive:liveInconclusive.length,participantSnapshots:participantDb.historicalTournamentSnapshots||0,participantsRead:participantDb.participantsRead||0,participantIds:participantDb.participantIds||0};
 if(checks.continuityCycles<2)warnings.push({type:'map_continuity_observation_in_progress',successfulCycles:checks.continuityCycles,requiredCycles:2});
 const output={version:1,generatedAt:NOW,status:errors.length?'red':warnings.length?'yellow':'green',checks,warnings,errors};
 await writeJson('dist/v3/tennis_europe_system_diagnostics.json',output);
