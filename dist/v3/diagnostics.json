@@ -1,6 +1,6 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-23T22:44:54.072Z",
+  "generatedAt": "2026-08-23T22:46:11.100Z",
   "overall": "yellow",
   "legend": {
     "green": "ok",
@@ -21,10 +21,10 @@
       "critical": true
     },
     {
-      "status": "green",
+      "status": "yellow",
       "label": "Tennis Europe",
-      "detail": "78 entry TE · acceptance 2 · liste 0/0",
-      "critical": false
+      "detail": "78 entry · T−1 0 confermati/0 esclusi · mappa 0 · continuità 0 cicli",
+      "critical": true
     },
     {
       "status": "green",
@@ -59,7 +59,7 @@
     {
       "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 24/08/2026, 00:44:54",
+      "detail": "file v3 generati · ultimo merge 24/08/2026, 00:46:11",
       "critical": true
     }
   ],
@@ -132,6 +132,15 @@
         "draw_confirmed_permanent_history": 38,
         "Q-15": 1,
         "MD-15": 1
+      },
+      "system": {
+        "status": "missing",
+        "checks": {},
+        "errors": [
+          {
+            "type": "missing_te_system_diagnostics"
+          }
+        ]
       }
     },
     "itf": {
