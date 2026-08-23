@@ -72,42 +72,64 @@ async function acceptedCookie() {
     }
   };
   const cookie = () => [...jar].map(([name, value]) => `${name}=${value}`).join('; ');
+  const browserHeaders = { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/127.0 Safari/537.36', accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'accept-language': 'en-GB,en;q=0.9,it;q=0.8' };
+  const visit = async (startUrl, options = {}) => {
+    let url = startUrl;
+    let method = options.method || 'GET';
+    let body = options.body;
+    const chain = [];
+    for (let hop = 0; hop < 6; hop++) {
+      const response = await fetch(url, {
+        method,
+        body,
+        redirect: 'manual',
+        headers: { ...browserHeaders, ...(options.headers || {}), cookie: cookie() },
+      });
+      collect(response.headers);
+      const text = await response.text();
+      const location = response.headers.get('location') || '';
+      chain.push({ status: response.status, url, location });
+      if (response.status < 300 || response.status >= 400 || !location) return { response, text, url, chain };
+      url = absUrl(location, url);
+      if (!url) return { response, text, url, chain };
+      if (response.status === 303 || ((response.status === 301 || response.status === 302) && method === 'POST')) {
+        method = 'GET';
+        body = undefined;
+      }
+    }
+    throw new Error('Tennis Europe cookie session exceeded redirect limit.');
+  };
+  const inputTags = html => [...String(html || '').matchAll(/<input\b[^>]*>/gi)].map(match => match[0]);
+  const attr = (tag, name) => (new RegExp(`${name}=["']([^"']*)`, 'i').exec(tag) || [])[1] || '';
 
   const consentTarget = '/tournament/5173C79B-B05D-4157-AD04-CD4D4F68C4E7/draw/1';
-  const browserHeaders = { 'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/127.0 Safari/537.36', accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'accept-language': 'en-GB,en;q=0.9,it;q=0.8' };
-  const first = await fetch(BASE + consentTarget, { redirect: 'manual', headers: browserHeaders });
-  const firstText = await first.text();
-  collect(first.headers);
-  const location = first.headers.get('location') || '';
-  COOKIE_SESSION_DIAGNOSTIC.first = { status: first.status, location, cookieNames: [...jar.keys()] };
-  if ((first.status >= 300 && /cookiewall/i.test(location)) || /cookiewall|CookiePurposes|SettingsOpen/i.test(firstText)) {
-    const wallUrl = absUrl(location || '/cookiewall/?returnurl=' + encodeURIComponent(consentTarget));
-    const wall = await fetch(wallUrl, { redirect: 'manual', headers: { ...browserHeaders, cookie: cookie() } });
-    const wallText = await wall.text();
-    collect(wall.headers);
-    COOKIE_SESSION_DIAGNOSTIC.wall = { status: wall.status, location: wall.headers.get('location') || '', cookieNames: [...jar.keys()] };
-    const returnUrl = (/name=["']ReturnUrl["'][^>]*value=["']([^"']*)/i.exec(wallText) || [])[1] || '/tournaments';
-    const settingsOpen = (/name=["']SettingsOpen["'][^>]*value=["']([^"']*)/i.exec(wallText) || [])[1] || 'false';
-    const purposeInputs = [...wallText.matchAll(/<input\b[^>]*name=["']CookiePurposes["'][^>]*>/gi)].map(match => match[0]);
-    const purposes = purposeInputs.map(tag => (/value=["']([^"']+)/i.exec(tag) || [])[1]).filter(Boolean);
-    if (!purposes.length) throw new Error('Tennis Europe cookie wall returned no consent purposes.');
+  const first = await visit(BASE + consentTarget);
+  const onWall = /\/cookiewall(?:\/|\?|$)/i.test(first.url) || /name=["']CookiePurposes|SettingsOpen/i.test(first.text);
+  COOKIE_SESSION_DIAGNOSTIC.first = { chain: first.chain, finalUrl: first.url, onWall, bodyLength: first.text.length, cookieNames: [...jar.keys()] };
+  if (onWall) {
+    const tags = inputTags(first.text);
+    const returnInput = tags.find(tag => /^ReturnUrl$/i.test(attr(tag, 'name')));
+    const settingsInput = tags.find(tag => /^SettingsOpen$/i.test(attr(tag, 'name')));
+    const purposeInputs = tags.filter(tag => /^CookiePurposes$/i.test(attr(tag, 'name')));
+    const availablePurposes = purposeInputs.map(tag => attr(tag, 'value')).filter(Boolean);
+    COOKIE_SESSION_DIAGNOSTIC.wall = { status: first.response.status, finalUrl: first.url, bodyLength: first.text.length, hasConsentForm: purposeInputs.length > 0, availablePurposes, cookieNames: [...jar.keys()] };
+    console.log(JSON.stringify({ tennisEuropeCookieSession: COOKIE_SESSION_DIAGNOSTIC }, null, 2));
+    if (!availablePurposes.includes('1')) throw new Error('Tennis Europe cookie wall returned no basic consent purpose.');
+    const returnUrl = attr(returnInput, 'value') || consentTarget;
+    const settingsOpen = attr(settingsInput, 'value') || 'false';
     const body = new URLSearchParams({ ReturnUrl: returnUrl.replace(/&amp;/g, '&'), SettingsOpen: settingsOpen });
-    for (const value of purposes) body.append('CookiePurposes', value);
-    const saved = await fetch(BASE + '/cookiewall/Save', {
+    body.append('CookiePurposes', '1');
+    const saved = await visit(BASE + '/cookiewall/Save', {
       method: 'POST',
-      redirect: 'manual',
       headers: {
-        ...browserHeaders,
         'content-type': 'application/x-www-form-urlencoded',
-        cookie: cookie(),
         origin: BASE,
-        referer: wallUrl,
+        referer: first.url,
       },
       body,
     });
-    collect(saved.headers);
-    COOKIE_SESSION_DIAGNOSTIC.saved = { status: saved.status, location: saved.headers.get('location') || '', purposes, cookieNames: [...jar.keys()] };
-    if (saved.status >= 400) throw new Error(`Tennis Europe cookie consent failed with HTTP ${saved.status}.`);
+    COOKIE_SESSION_DIAGNOSTIC.saved = { chain: saved.chain, finalUrl: saved.url, purpose: '1', cookieNames: [...jar.keys()] };
+    if (saved.response.status >= 400) throw new Error(`Tennis Europe cookie consent failed with HTTP ${saved.response.status}.`);
   }
   return cookie();
 }
