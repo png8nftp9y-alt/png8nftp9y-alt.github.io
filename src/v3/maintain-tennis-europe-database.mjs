@@ -121,7 +121,14 @@ for (const e of acceptanceEntries) {
     firstAcceptanceSeenAt: previous.firstAcceptanceSeenAt || iso(acceptanceData.generatedAt),
     lastAcceptanceSeenAt: iso(acceptanceData.generatedAt), acceptanceRemovedAt: null,
     drawVerification: draw ? { checkedAt: drawAuditData.generatedAt || NOW, daysFromStart: draw.daysFromStart, decision: draw.decision, qualifying: draw.qualifying, main: draw.main } : previous.drawVerification,
-    permanenceStatus: previous.permanenceStatus === 'draw_confirmed_permanent' || visible?.calendarState === 'draw_confirmed' ? 'draw_confirmed_permanent' : String(draw?.decision || '').startsWith('removed_') ? 'rejected_by_complete_singles_draws' : 'pending_t_minus_1_engine',
+    // A reliable rejection is authoritative even if an older run had already
+    // marked the relation permanent. This matters when a later-published final
+    // singles phase (main draw or groups) proves that the player is absent.
+    permanenceStatus: String(draw?.decision || '').startsWith('removed_')
+      ? 'rejected_by_complete_singles_draws'
+      : previous.permanenceStatus === 'draw_confirmed_permanent' || visible?.calendarState === 'draw_confirmed'
+        ? 'draw_confirmed_permanent'
+        : 'pending_t_minus_1_engine',
     timeline,
   };
 }
