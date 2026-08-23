@@ -140,13 +140,17 @@ const cookieSmoke = await fetch(COOKIE_SMOKE_URL, {
   headers: { 'user-agent': 'Mozilla/5.0 CourtWatch-v3-tennis-europe-cookie-smoke/1.0', accept: 'text/html,*/*', cookie: DRAW_COOKIE },
 });
 const cookieSmokeText = await cookieSmoke.text();
-COOKIE_SESSION_DIAGNOSTIC.smoke = { status: cookieSmoke.status, finalUrl: cookieSmoke.url, cookieNames: DRAW_COOKIE.split(';').map(x => x.split('=')[0].trim()).filter(Boolean) };
+const cookieSmokeEvidence = drawEvidence(cookieSmokeText, 'main', { acceptanceEvent: 'BS14' }, 'known empty BS14 main draw');
+COOKIE_SESSION_DIAGNOSTIC.smoke = { status: cookieSmoke.status, finalUrl: cookieSmoke.url, evidence: cookieSmokeEvidence, cookieNames: DRAW_COOKIE.split(';').map(x => x.split('=')[0].trim()).filter(Boolean) };
 console.log(JSON.stringify({ tennisEuropeCookieSession: COOKIE_SESSION_DIAGNOSTIC }, null, 2));
 if (/\/cookiewall\//i.test(cookieSmoke.url) || /name=["']CookiePurposes|SettingsOpen/i.test(cookieSmokeText)) {
   throw new Error('Tennis Europe cookie smoke test failed: draw request returned the cookie wall.');
 }
 if (!/BS14|Boys Singles 14|Main Draw/i.test(cookieSmokeText)) {
   throw new Error('Tennis Europe cookie smoke test failed: known draw page was not readable.');
+}
+if (!cookieSmokeEvidence.relevant || cookieSmokeEvidence.populated || !cookieSmokeEvidence.publishedEmpty || cookieSmokeEvidence.byes < 1) {
+  throw new Error('Tennis Europe cookie smoke test failed: known bye-only draw was not classified as published empty.');
 }
 function linkList(html, baseUrl) {
   const out = [];
