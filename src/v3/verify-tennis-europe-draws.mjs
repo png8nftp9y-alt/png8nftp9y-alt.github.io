@@ -155,6 +155,7 @@ const cookieSmokeText = cookieSmoke.text;
 const cookieSmokeEvidence = drawEvidence(cookieSmokeText, 'main', { acceptanceEvent: 'BS14' }, `${drawHeading(cookieSmoke.shellText)} known BS14 main draw`);
 const syntheticEmptyEvidence = drawEvidence(`<h1>BS14 - Boys Singles 14 Main Draw</h1>${'<div>Bye</div>'.repeat(64)}`, 'main', { acceptanceEvent: 'BS14' }, 'synthetic bye-only BS14 main draw');
 const syntheticHistoricalEvidence = drawEvidence(`<h1>BS14 - Boys Singles 14 Main Draw</h1><li data-asg-title="First PLAYER"></li><li data-asg-title="Second PLAYER"></li>`, 'main', { acceptanceEvent: 'BS14' }, 'synthetic historical embedded draw');
+const syntheticGroupEvidence = drawEvidence(`<h1>GS14 - Girls Singles 14 Round Robin Group A</h1><li data-asg-title="First PLAYER"></li><li data-asg-title="Second PLAYER"></li>`, 'main', { acceptanceEvent: 'GS14' }, 'synthetic populated group phase');
 COOKIE_SESSION_DIAGNOSTIC.smoke = { status: cookieSmoke.status, finalUrl: cookieSmoke.finalUrl, drawContentUrl: cookieSmoke.drawContentUrl, evidence: cookieSmokeEvidence, syntheticEmptyEvidence, cookieNames: DRAW_COOKIE.split(';').map(x => x.split('=')[0].trim()).filter(Boolean) };
 console.log(JSON.stringify({ tennisEuropeCookieSession: COOKIE_SESSION_DIAGNOSTIC }, null, 2));
 if (/\/cookiewall\//i.test(cookieSmoke.finalUrl) || /name=["']CookiePurposes|SettingsOpen/i.test(cookieSmokeText)) {
@@ -172,11 +173,25 @@ if (!syntheticEmptyEvidence.relevant || syntheticEmptyEvidence.populated || !syn
 if (!syntheticHistoricalEvidence.relevant || !syntheticHistoricalEvidence.populated || syntheticHistoricalEvidence.profileLinks !== 2) {
   throw new Error('Tennis Europe cookie smoke test failed: historical embedded draw fixture was not classified as populated.');
 }
+if (!syntheticGroupEvidence.relevant || !syntheticGroupEvidence.populated) {
+  throw new Error('Tennis Europe cookie smoke test failed: round-robin group fixture was not classified as a populated final phase.');
+}
+if (shouldRemoveAfterDrawChecks({ reliable:true, publishedEmpty:false }, { reliable:false, publishedEmpty:false })) {
+  throw new Error('Tennis Europe decision smoke test failed: qualifying-only absence must remain pending.');
+}
+if (!shouldRemoveAfterDrawChecks({ reliable:false, publishedEmpty:false }, { reliable:true, publishedEmpty:false })) {
+  throw new Error('Tennis Europe decision smoke test failed: populated final-phase absence was not removable.');
+}
+if (shouldRemoveAfterDrawChecks({ reliable:false, publishedEmpty:true }, { reliable:true, publishedEmpty:false })) {
+  throw new Error('Tennis Europe decision smoke test failed: an empty relevant phase must block removal.');
+}
 function linkList(html, baseUrl) {
   const out = [];
   const re = /<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
   let m;
   while ((m = re.exec(html))) out.push({ url: absUrl(m[1], baseUrl), text: clean(m[2]) });
+  const optionRe = /<option\b[^>]*value=["']([^"']+)["'][^>]*>([\s\S]*?)<\/option>/gi;
+  while ((m = optionRe.exec(html))) out.push({ url: absUrl(m[1], baseUrl), text: clean(m[2]) });
   return out;
 }
 function playerForms(name) {
@@ -218,7 +233,7 @@ function drawLinkScore(link, entry, wanted) {
 function candidateDrawLinks(html, pageUrl, entry, wanted) {
   const links = linkList(html, pageUrl).filter(l => {
     const u = l.url.toLowerCase();
-    return !/double|doubles|doppio/i.test(l.text) && (u.includes('/sport/draw') || /\/tournament\/[^/]+\/draw\/\d+/i.test(u) || u.includes('/sport/matches') || u.includes('/sport/event') || /draw|qualifying|main/i.test(l.text));
+    return !/double|doubles|doppio/i.test(l.text) && (u.includes('/sport/draw') || /\/tournament\/[^/]+\/draw\/\d+/i.test(u) || u.includes('/sport/matches') || u.includes('/sport/event') || /draw|qualifying|main|round robin|group|girone/i.test(l.text));
   });
   const ranked = links
     .map(l => ({ ...l, score: drawLinkScore(l, entry, wanted) }))
@@ -238,7 +253,7 @@ function pageLooksLikeDraw(html, wanted) {
   if (!text) return false;
   if (/PLAYER|ROUND|MATCH|SEED|DRAW|COURT|SCORE/.test(text) && /\b(ITA|FRA|GER|ESP|SUI|AUT|CRO|SLO|BEL|NED|GBR)\b/.test(text)) return true;
   if (wanted === 'qualifying' && /QUALIFYING|QUALIFICATION/.test(text) && /PLAYER|MATCH|ROUND/.test(text)) return true;
-  if (wanted === 'main' && /MAIN DRAW|ROUND|MATCH/.test(text)) return true;
+  if (wanted === 'main' && /MAIN DRAW|ROUND ROBIN|GROUP|GIRONE|ROUND|MATCH/.test(text)) return true;
   return false;
 }
 function drawHeading(html) {
@@ -265,10 +280,10 @@ function drawEvidence(html, wanted, entry, label = '') {
   return { relevant, populated, publishedEmpty: relevant && !populated, heading: drawHeading(html).slice(0, 300), profileLinks, countryPlayers, byes, doubles, genderMismatch, ageMismatch, qualifying };
 }
 function shouldRemoveAfterDrawChecks(qualifying, main) {
-  const anyRelevantReliable = qualifying.reliable || main.reliable;
   const anyRelevantEmpty = qualifying.publishedEmpty || main.publishedEmpty;
-  const eventMissingFromPopulatedInventory = !anyRelevantReliable && !anyRelevantEmpty && (qualifying.populatedDrawInventory || main.populatedDrawInventory);
-  return !anyRelevantEmpty && (anyRelevantReliable || eventMissingFromPopulatedInventory);
+  // Qualifying absence is never final: a player may still enter the main draw.
+  // Removal requires a populated final singles phase (main draw or groups).
+  return main.reliable && !anyRelevantEmpty;
 }
 async function checkDraw(entry, wanted) {
   const basePages = [...new Set([
@@ -369,6 +384,8 @@ for (const entry of original) {
       });
       decision = `kept_${drawType}_draw_confirmed`;
     } else {
+      // Never remove solely because the player is absent from qualifying.
+      // A populated final singles phase is mandatory.
       const remove = shouldRemoveAfterDrawChecks(qualifying, main);
       if (remove) {
         decision = 'removed_absent_from_reliable_relevant_singles_draws';
@@ -403,7 +420,7 @@ const output = {
     today: TODAY,
     mode: BACKFILL ? 'one_time_historical_backfill' : 'live_t_minus_1',
     auditOnly: AUDIT_ONLY,
-    rule: 'From day -1 through tournament end inspect official singles qualifying and main draws. A player found in either draw stays permanently without an acceptance label. Absence removes the player when every published relevant singles draw is populated and reliable, or when the requested singles event is absent from a populated official draw inventory. Missing, error, empty or bye-only relevant draws are inconclusive and preserve the last valid acceptance state.',
+    rule: 'From day -1 through tournament end inspect every official singles qualifying, main-draw and round-robin group phase. A player found in any compiled phase stays permanently without an acceptance label. Absence from qualifying alone never removes the player. Removal requires a compiled final singles phase (main draw or groups), no player occurrence in any compiled phase, and no relevant phase still empty, bye-only, missing or unreadable.',
     originalEntries: original.filter(e => e.circuit === 'tennis-europe').length,
     entriesFound: kept.filter(e => e.circuit === 'tennis-europe').length,
     confirmedInDraw: confirmed.length,
