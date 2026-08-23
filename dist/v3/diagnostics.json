@@ -1,6 +1,6 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-23T22:46:52.352Z",
+  "generatedAt": "2026-08-23T22:47:21.043Z",
   "overall": "yellow",
   "legend": {
     "green": "ok",
@@ -23,7 +23,7 @@
     {
       "status": "yellow",
       "label": "Tennis Europe",
-      "detail": "78 entry · T−1 0 confermati/0 esclusi · mappa 0 · continuità 0 cicli",
+      "detail": "78 entry · T−1 38 confermati/7 esclusi · mappa 598 · continuità 0 cicli",
       "critical": true
     },
     {
@@ -59,7 +59,7 @@
     {
       "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 24/08/2026, 00:46:52",
+      "detail": "file v3 generati · ultimo merge 24/08/2026, 00:47:21",
       "critical": true
     }
   ],
@@ -134,13 +134,29 @@
         "MD-15": 1
       },
       "system": {
-        "status": "missing",
-        "checks": {},
-        "errors": [
+        "version": 1,
+        "generatedAt": "2026-08-23T22:47:20.996Z",
+        "status": "yellow",
+        "checks": {
+          "mapTournaments": 598,
+          "mapCoverageFrom": "2025-12-26",
+          "mapCoverageUntil": "2028-08-22",
+          "continuityCycles": 0,
+          "acceptanceEntries": 47,
+          "calendarEntries": 40,
+          "confirmed": 38,
+          "rejected": 7,
+          "pending": 0,
+          "inconclusive": 0
+        },
+        "warnings": [
           {
-            "type": "missing_te_system_diagnostics"
+            "type": "map_continuity_observation_in_progress",
+            "successfulCycles": 0,
+            "requiredCycles": 2
           }
-        ]
+        ],
+        "errors": []
       }
     },
     "itf": {
