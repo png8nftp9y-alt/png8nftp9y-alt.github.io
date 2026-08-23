@@ -1,13 +1,10 @@
 name: Court Watch action execution probe
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 permissions: {contents: write}
 concurrency: {group: court-watch-action-probe,cancel-in-progress: true}
 jobs:
   probe:
-    if: ${{ !contains(github.event.head_commit.message, 'Build Court Watch v3 FITP entries and calendar') && !contains(github.event.head_commit.message, 'Court Watch action probe ran') }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -15,7 +12,7 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Run FITP rebuild through proven probe path
+      - name: Run FITP rebuild manually
         run: |
           set +e
           tmpLog="courtwatch-v3-fitp-entries-run.tmp.log"
@@ -23,7 +20,7 @@ jobs:
           echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$tmpLog"
           echo "sourceSha=${GITHUB_SHA}" >> "$tmpLog"
           echo "runId=${GITHUB_RUN_ID}" >> "$tmpLog"
-          echo "mode=probe-forced-fitp-rebuild-after-imperia-rescue" >> "$tmpLog"
+          echo "mode=manual-fitp-rebuild" >> "$tmpLog"
           node src/v3/discover-fitp-tournaments.mjs >> "$tmpLog" 2>&1
           fitpTournamentsCode=$?
           echo "fitpTournamentsExit=$fitpTournamentsCode" >> "$tmpLog"
