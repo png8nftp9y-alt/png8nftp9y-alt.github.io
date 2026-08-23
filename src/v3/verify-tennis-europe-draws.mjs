@@ -154,6 +154,7 @@ const cookieSmoke = await drawDocument(COOKIE_SMOKE_URL);
 const cookieSmokeText = cookieSmoke.text;
 const cookieSmokeEvidence = drawEvidence(cookieSmokeText, 'main', { acceptanceEvent: 'BS14' }, `${drawHeading(cookieSmoke.shellText)} known BS14 main draw`);
 const syntheticEmptyEvidence = drawEvidence(`<h1>BS14 - Boys Singles 14 Main Draw</h1>${'<div>Bye</div>'.repeat(64)}`, 'main', { acceptanceEvent: 'BS14' }, 'synthetic bye-only BS14 main draw');
+const syntheticHistoricalEvidence = drawEvidence(`<h1>BS14 - Boys Singles 14 Main Draw</h1><li data-asg-title="First PLAYER"></li><li data-asg-title="Second PLAYER"></li>`, 'main', { acceptanceEvent: 'BS14' }, 'synthetic historical embedded draw');
 COOKIE_SESSION_DIAGNOSTIC.smoke = { status: cookieSmoke.status, finalUrl: cookieSmoke.finalUrl, drawContentUrl: cookieSmoke.drawContentUrl, evidence: cookieSmokeEvidence, syntheticEmptyEvidence, cookieNames: DRAW_COOKIE.split(';').map(x => x.split('=')[0].trim()).filter(Boolean) };
 console.log(JSON.stringify({ tennisEuropeCookieSession: COOKIE_SESSION_DIAGNOSTIC }, null, 2));
 if (/\/cookiewall\//i.test(cookieSmoke.finalUrl) || /name=["']CookiePurposes|SettingsOpen/i.test(cookieSmokeText)) {
@@ -167,6 +168,9 @@ if (!cookieSmoke.drawContentUrl || !cookieSmokeEvidence.relevant || !cookieSmoke
 }
 if (!syntheticEmptyEvidence.relevant || syntheticEmptyEvidence.populated || !syntheticEmptyEvidence.publishedEmpty || syntheticEmptyEvidence.byes !== 64) {
   throw new Error('Tennis Europe cookie smoke test failed: bye-only draw fixture was not classified as published empty.');
+}
+if (!syntheticHistoricalEvidence.relevant || !syntheticHistoricalEvidence.populated || syntheticHistoricalEvidence.profileLinks !== 2) {
+  throw new Error('Tennis Europe cookie smoke test failed: historical embedded draw fixture was not classified as populated.');
 }
 function linkList(html, baseUrl) {
   const out = [];
@@ -254,11 +258,17 @@ function drawEvidence(html, wanted, entry, label = '') {
   const kindMatches = wanted === 'qualifying' ? qualifying : !qualifying;
   const looks = pageLooksLikeDraw(html, wanted) || /DRAW|TABELLONE|KNOCK OUT|ELIMINATION/.test(norm(actualHeading));
   const relevant = looks && !doubles && !genderMismatch && !ageMismatch && kindMatches;
-  const profileLinks = (html.match(/player-profile|\/player\/|\/sport\/player\.aspx|data-player-id=/gi) || []).length;
+  const profileLinks = (html.match(/player-profile|\/player\/|\/sport\/player\.aspx|data-player-id=|data-asg-title=/gi) || []).length;
   const countryPlayers = (text.match(/\b(ITA|FRA|GER|ESP|SUI|AUT|CRO|SLO|BEL|NED|GBR|CZE|SRB|POL|ROU|BUL|HUN|SVK|UKR|TUR|GRE)\b/g) || []).length;
   const byes = (text.match(/\bBYE\b/g) || []).length;
   const populated = relevant && (profileLinks >= 2 || countryPlayers >= 2 || (profileLinks + countryPlayers > byes && profileLinks + countryPlayers >= 2));
   return { relevant, populated, publishedEmpty: relevant && !populated, heading: drawHeading(html).slice(0, 300), profileLinks, countryPlayers, byes, doubles, genderMismatch, ageMismatch, qualifying };
+}
+function shouldRemoveAfterDrawChecks(qualifying, main) {
+  const anyRelevantReliable = qualifying.reliable || main.reliable;
+  const anyRelevantEmpty = qualifying.publishedEmpty || main.publishedEmpty;
+  const eventMissingFromPopulatedInventory = !anyRelevantReliable && !anyRelevantEmpty && (qualifying.populatedDrawInventory || main.populatedDrawInventory);
+  return !anyRelevantEmpty && (anyRelevantReliable || eventMissingFromPopulatedInventory);
 }
 async function checkDraw(entry, wanted) {
   const basePages = [...new Set([
@@ -270,6 +280,8 @@ async function checkDraw(entry, wanted) {
   const tried = [];
   const drawLinks = [];
   let reliable = false;
+  let publishedEmpty = false;
+  let populatedDrawInventory = false;
 
   for (const url of basePages) {
     try {
@@ -298,21 +310,32 @@ async function checkDraw(entry, wanted) {
     if (!seen.has(url)) { seen.add(url); uniqueLinks.push({ url, text: `direct draw ${draw}`, score: 1, directProbe: true }); }
   }
 
-  for (const link of uniqueLinks.slice(0, 40)) {
+  // Follow the official sibling-draw links exposed by each numbered page.
+  for (let index = 0; index < uniqueLinks.length && index < 60; index++) {
+    const link = uniqueLinks[index];
     try {
       const r = await drawDocument(link.url);
       const evidence = r.status === 200 ? drawEvidence(r.text, wanted, entry, `${drawHeading(r.shellText)} ${link.text} ${link.url}`) : { relevant:false, populated:false, publishedEmpty:false };
       const found = evidence.populated && hasPlayer(r.text, entry.playerName);
       if (evidence.populated) reliable = true;
+      if (evidence.publishedEmpty) publishedEmpty = true;
+      if (evidence.profileLinks >= 2 || evidence.countryPlayers >= 2) populatedDrawInventory = true;
       tried.push({ url: link.url, finalUrl:r.finalUrl, drawContentUrl:r.drawContentUrl, label: link.text, score: link.score, status: r.status, kind: link.directProbe?'numbered_draw_probe':'draw_link', found, reliableEvidence: evidence.populated, publishedEmpty: evidence.publishedEmpty, evidence });
-      if (found) return { found: true, reliable: true, tried, drawLinks: uniqueLinks.slice(0, 40) };
+      if (r.status === 200) {
+        for (const sibling of candidateDrawLinks(r.shellText || r.text, r.finalUrl || link.url, entry, wanted)) {
+          if (seen.has(sibling.url)) continue;
+          seen.add(sibling.url);
+          uniqueLinks.push(sibling);
+        }
+      }
+      if (found) return { found: true, reliable: true, publishedEmpty, populatedDrawInventory, tried, drawLinks: uniqueLinks.slice(0, 60) };
     } catch (error) {
       tried.push({ url: link.url, label: link.text, score: link.score, kind: 'draw_link', error: error.message });
     }
     await sleep(20);
   }
 
-  return { found: false, reliable, tried, drawLinks: uniqueLinks.slice(0, 40) };
+  return { found: false, reliable, publishedEmpty, populatedDrawInventory, tried, drawLinks: uniqueLinks.slice(0, 60) };
 }
 
 const data = await readJson(FILE, { entries: [] });
@@ -346,7 +369,7 @@ for (const entry of original) {
       });
       decision = `kept_${drawType}_draw_confirmed`;
     } else {
-      const remove = qualifying.reliable && main.reliable;
+      const remove = shouldRemoveAfterDrawChecks(qualifying, main);
       if (remove) {
         decision = 'removed_absent_from_reliable_relevant_singles_draws';
       } else {
@@ -380,7 +403,7 @@ const output = {
     today: TODAY,
     mode: BACKFILL ? 'one_time_historical_backfill' : 'live_t_minus_1',
     auditOnly: AUDIT_ONLY,
-    rule: 'From day -1 through tournament end inspect official singles qualifying and main draws. A player found in either draw stays permanently without an acceptance label. Absence removes the player only when both singles draws are populated and reliable. Missing, error, empty or bye-only draws are inconclusive and preserve the last valid acceptance state.',
+    rule: 'From day -1 through tournament end inspect official singles qualifying and main draws. A player found in either draw stays permanently without an acceptance label. Absence removes the player when every published relevant singles draw is populated and reliable, or when the requested singles event is absent from a populated official draw inventory. Missing, error, empty or bye-only relevant draws are inconclusive and preserve the last valid acceptance state.',
     originalEntries: original.filter(e => e.circuit === 'tennis-europe').length,
     entriesFound: kept.filter(e => e.circuit === 'tennis-europe').length,
     confirmedInDraw: confirmed.length,
