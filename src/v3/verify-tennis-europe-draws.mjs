@@ -46,19 +46,34 @@ function daysFromStart(entry) {
   if (!entry.startDate) return 999;
   return Math.floor((Date.parse(TODAY) - Date.parse(entry.startDate)) / 864e5);
 }
-async function req(url) {
-  if (REQUEST_CACHE.has(url)) return REQUEST_CACHE.get(url);
+async function req(url, extraHeaders = {}) {
+  const cacheKey = `${url}|${extraHeaders['x-requested-with'] || ''}`;
+  if (REQUEST_CACHE.has(cacheKey)) return REQUEST_CACHE.get(cacheKey);
   const request = (async () => { const r = await fetch(url, {
     redirect: 'follow',
     headers: {
       'user-agent': 'Mozilla/5.0 CourtWatch-v3-tennis-europe-draw-parser/2.0',
       accept: 'text/html,*/*',
-      'accept-language': 'en-GB,en;q=0.9,it;q=0.8', cookie: DRAW_COOKIE,
+      'accept-language': 'en-GB,en;q=0.9,it;q=0.8', cookie: DRAW_COOKIE, ...extraHeaders,
     },
   });
   return { status: r.status, finalUrl: r.url, text: await r.text() }; })();
-  REQUEST_CACHE.set(url, request);
+  REQUEST_CACHE.set(cacheKey, request);
   return request;
+}
+async function drawDocument(url) {
+  const page = await req(url);
+  if (page.status !== 200) return { ...page, shellText: page.text, drawContentUrl: '' };
+  const action = ([...page.text.matchAll(/<form\b[^>]*action=["']([^"']*\/GetDrawContent[^"']*)/gi)][0] || [])[1] || '';
+  if (!action) return { ...page, shellText: page.text, drawContentUrl: '' };
+  const contentUrl = absUrl(action, page.finalUrl || url);
+  const content = await req(contentUrl, {
+    'x-requested-with': 'XMLHttpRequest',
+    referer: page.finalUrl || url,
+    accept: 'text/html, */*; q=0.01',
+  });
+  if (content.status !== 200 || /404\s*-\s*Page not found/i.test(clean(content.text))) return { ...page, shellText: page.text, drawContentUrl: contentUrl };
+  return { ...content, shellText: page.text, drawContentUrl: contentUrl, finalUrl: page.finalUrl || url };
 }
 function cookiePair(value) { return String(value || '').split(/,(?=\s*[^;]+=)/).map(x => x.split(';')[0].trim()).filter(Boolean); }
 const COOKIE_SESSION_DIAGNOSTIC = {};
@@ -135,22 +150,23 @@ async function acceptedCookie() {
 }
 const DRAW_COOKIE = await acceptedCookie();
 const COOKIE_SMOKE_URL = BASE + '/tournament/5173C79B-B05D-4157-AD04-CD4D4F68C4E7/draw/1';
-const cookieSmoke = await fetch(COOKIE_SMOKE_URL, {
-  redirect: 'follow',
-  headers: { 'user-agent': 'Mozilla/5.0 CourtWatch-v3-tennis-europe-cookie-smoke/1.0', accept: 'text/html,*/*', cookie: DRAW_COOKIE },
-});
-const cookieSmokeText = await cookieSmoke.text();
-const cookieSmokeEvidence = drawEvidence(cookieSmokeText, 'main', { acceptanceEvent: 'BS14' }, 'known empty BS14 main draw');
-COOKIE_SESSION_DIAGNOSTIC.smoke = { status: cookieSmoke.status, finalUrl: cookieSmoke.url, evidence: cookieSmokeEvidence, cookieNames: DRAW_COOKIE.split(';').map(x => x.split('=')[0].trim()).filter(Boolean) };
+const cookieSmoke = await drawDocument(COOKIE_SMOKE_URL);
+const cookieSmokeText = cookieSmoke.text;
+const cookieSmokeEvidence = drawEvidence(cookieSmokeText, 'main', { acceptanceEvent: 'BS14' }, `${drawHeading(cookieSmoke.shellText)} known BS14 main draw`);
+const syntheticEmptyEvidence = drawEvidence(`<h1>BS14 - Boys Singles 14 Main Draw</h1>${'<div>Bye</div>'.repeat(64)}`, 'main', { acceptanceEvent: 'BS14' }, 'synthetic bye-only BS14 main draw');
+COOKIE_SESSION_DIAGNOSTIC.smoke = { status: cookieSmoke.status, finalUrl: cookieSmoke.finalUrl, drawContentUrl: cookieSmoke.drawContentUrl, evidence: cookieSmokeEvidence, syntheticEmptyEvidence, cookieNames: DRAW_COOKIE.split(';').map(x => x.split('=')[0].trim()).filter(Boolean) };
 console.log(JSON.stringify({ tennisEuropeCookieSession: COOKIE_SESSION_DIAGNOSTIC }, null, 2));
-if (/\/cookiewall\//i.test(cookieSmoke.url) || /name=["']CookiePurposes|SettingsOpen/i.test(cookieSmokeText)) {
+if (/\/cookiewall\//i.test(cookieSmoke.finalUrl) || /name=["']CookiePurposes|SettingsOpen/i.test(cookieSmokeText)) {
   throw new Error('Tennis Europe cookie smoke test failed: draw request returned the cookie wall.');
 }
-if (!/BS14|Boys Singles 14|Main Draw/i.test(cookieSmokeText)) {
+if (!/BS14|Boys Singles 14|Main Draw/i.test(cookieSmoke.shellText + ' ' + cookieSmokeText)) {
   throw new Error('Tennis Europe cookie smoke test failed: known draw page was not readable.');
 }
-if (!cookieSmokeEvidence.relevant || cookieSmokeEvidence.populated || !cookieSmokeEvidence.publishedEmpty || cookieSmokeEvidence.byes < 1) {
-  throw new Error('Tennis Europe cookie smoke test failed: known bye-only draw was not classified as published empty.');
+if (!cookieSmoke.drawContentUrl || !cookieSmokeEvidence.relevant || !cookieSmokeEvidence.populated) {
+  throw new Error('Tennis Europe cookie smoke test failed: populated asynchronous draw content was not classified correctly.');
+}
+if (!syntheticEmptyEvidence.relevant || syntheticEmptyEvidence.populated || !syntheticEmptyEvidence.publishedEmpty || syntheticEmptyEvidence.byes !== 64) {
+  throw new Error('Tennis Europe cookie smoke test failed: bye-only draw fixture was not classified as published empty.');
 }
 function linkList(html, baseUrl) {
   const out = [];
@@ -238,7 +254,7 @@ function drawEvidence(html, wanted, entry, label = '') {
   const kindMatches = wanted === 'qualifying' ? qualifying : !qualifying;
   const looks = pageLooksLikeDraw(html, wanted) || /DRAW|TABELLONE|KNOCK OUT|ELIMINATION/.test(norm(actualHeading));
   const relevant = looks && !doubles && !genderMismatch && !ageMismatch && kindMatches;
-  const profileLinks = (html.match(/player-profile|\/player\//gi) || []).length;
+  const profileLinks = (html.match(/player-profile|\/player\/|\/sport\/player\.aspx|data-player-id=/gi) || []).length;
   const countryPlayers = (text.match(/\b(ITA|FRA|GER|ESP|SUI|AUT|CRO|SLO|BEL|NED|GBR|CZE|SRB|POL|ROU|BUL|HUN|SVK|UKR|TUR|GRE)\b/g) || []).length;
   const byes = (text.match(/\bBYE\b/g) || []).length;
   const populated = relevant && (profileLinks >= 2 || countryPlayers >= 2 || (profileLinks + countryPlayers > byes && profileLinks + countryPlayers >= 2));
@@ -284,11 +300,11 @@ async function checkDraw(entry, wanted) {
 
   for (const link of uniqueLinks.slice(0, 40)) {
     try {
-      const r = await req(link.url);
-      const evidence = r.status === 200 ? drawEvidence(r.text, wanted, entry, link.text + ' ' + link.url) : { relevant:false, populated:false, publishedEmpty:false };
+      const r = await drawDocument(link.url);
+      const evidence = r.status === 200 ? drawEvidence(r.text, wanted, entry, `${drawHeading(r.shellText)} ${link.text} ${link.url}`) : { relevant:false, populated:false, publishedEmpty:false };
       const found = evidence.populated && hasPlayer(r.text, entry.playerName);
       if (evidence.populated) reliable = true;
-      tried.push({ url: link.url, finalUrl:r.finalUrl, label: link.text, score: link.score, status: r.status, kind: link.directProbe?'numbered_draw_probe':'draw_link', found, reliableEvidence: evidence.populated, publishedEmpty: evidence.publishedEmpty, evidence });
+      tried.push({ url: link.url, finalUrl:r.finalUrl, drawContentUrl:r.drawContentUrl, label: link.text, score: link.score, status: r.status, kind: link.directProbe?'numbered_draw_probe':'draw_link', found, reliableEvidence: evidence.populated, publishedEmpty: evidence.publishedEmpty, evidence });
       if (found) return { found: true, reliable: true, tried, drawLinks: uniqueLinks.slice(0, 40) };
     } catch (error) {
       tried.push({ url: link.url, label: link.text, score: link.score, kind: 'draw_link', error: error.message });
