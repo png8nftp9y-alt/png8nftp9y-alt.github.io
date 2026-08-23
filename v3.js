@@ -1,6 +1,8 @@
 const V3='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io/main/dist/v3/';
+const LAST_GOOD_CACHE='courtwatch-v3-last-good-v1';
 const FORMER_PLAYERS=new Set(['martina-busa','manuel-natale','pietro-sala','niccolo-zanaga']);
 const state={data:null,month:new Date(),agenda:new Date(),selected:new Set(),openPicker:null};
+let loadRunning=false;
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const iso=d=>{const x=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return x.toISOString().slice(0,10)},add=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x},monday=d=>add(d,-((d.getDay()+6)%7));
 const fmt=d=>new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(d);
@@ -13,7 +15,10 @@ const acceptanceRank=x=>({MD:0,Q:1,A:2}[String(x.acceptanceCode||x.calendarListL
 const active=t=>!['eliminated','excluded','withdrawn'].includes(String(t.status||'').toLowerCase())&&String(t.acceptanceList||'').toLowerCase()!=='withdrawn';
 const overlap=(t,a,b)=>active(t)&&(!t.startDate||t.startDate<=b)&&(!t.endDate||t.endDate>=a);
 const cityCountry=s=>{let v=String(s||'').replace(/^Tournaments\s+/i,'').trim();if(v.includes('|'))v=v.split('|').pop().trim();const m=v.match(/([\p{L}' .-]+,\s*[\p{L}' .-]+)(?:\s|$)/u);return (m?m[1]:v).trim()||'Città/stato da pubblicare'};
-async function v3json(path){const r=await fetch(V3+path+'?t='+Date.now(),{cache:'no-store',mode:'cors'});if(!r.ok)throw Error('File v3 mancante: '+path);return r.json()}
+async function v3json(path){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);try{const r=await fetch(V3+path+'?t='+Date.now(),{cache:'no-store',mode:'cors',signal:controller.signal});if(!r.ok)throw Error('File v3 mancante: '+path);return await r.json()}finally{clearTimeout(timer)}}
+function cachedData(){try{const saved=JSON.parse(localStorage.getItem(LAST_GOOD_CACHE)||'null');return saved&&Array.isArray(saved.players)&&saved.players.length&&Array.isArray(saved.tournaments)?saved:null}catch{return null}}
+function saveCachedData(data){try{localStorage.setItem(LAST_GOOD_CACHE,JSON.stringify(data))}catch(e){console.warn('Cache locale Court Watch non disponibile',e)}}
+function syncLabel(data,stale=false){const when=new Intl.DateTimeFormat('it-IT',{hour:'2-digit',minute:'2-digit'}).format(new Date(data.generatedAt||Date.now()));$('syncStatus').classList.toggle('stale',stale);$('syncStatus').textContent=(stale?'Ultimi dati salvati · ':'Live v3 · ')+when}
 function matchMeta(m){const isDouble=m.matchType==='doubles'||m.eventType==='doubles'||/doppio|double/i.test(`${m.draw||''} ${m.category||''} ${m.eventType||''} ${m.partner||''}`),op=m.opponentOptions?.length?m.opponentOptions.join(' oppure '):m.opponent;return{isDouble,op,condition:m.condition||m.note||''}}
 function opponentHtml(m,x){if(!x.op)return'Avversario da definire';const club=m.opponentClub?` · circolo ${esc(m.opponentClub)}`:'';const nat=m.opponentNationality?` · naz. ${esc(m.opponentNationality)}`:'';const ranking=m.opponentRanking?` · classifica ${esc(m.opponentRanking)}`:'';return`vs <span class="opponentName">${esc(x.op)}</span>${ranking}<span class="opponentClub">${club}${nat}</span>`}
 function mergeAgenda(agenda,matches){const byId=new Map(matches.map(m=>[m.id,m]));return agenda.map(a=>({...byId.get(a.matchId),...a}))}
@@ -31,5 +36,56 @@ function route(){const m=location.hash.match(/^#player\/(.+)$/);if(m&&state.data
 function openPicker(el){if(state.openPicker===el){el.blur();state.openPicker=null;return}state.openPicker=el;el.focus();if(el.showPicker)el.showPicker();else el.click()}
 function closePicker(el){el.blur();state.openPicker=null}
 function wire(){$('prevAgenda').onclick=()=>{state.agenda=add(state.agenda,-1);renderAgenda()};$('nextAgenda').onclick=()=>{state.agenda=add(state.agenda,1);renderAgenda()};$('agendaToday').onclick=()=>openPicker($('agendaPicker'));$('agendaPicker').onchange=e=>{if(e.target.value){state.agenda=new Date(e.target.value+'T12:00:00');renderAgenda()}closePicker(e.target)};$('agendaPicker').onblur=e=>{if(state.openPicker===e.target)state.openPicker=null};$('prevMonth').onclick=()=>{state.month=new Date(state.month.getFullYear(),state.month.getMonth()-1,1);renderCalendar()};$('nextMonth').onclick=()=>{state.month=new Date(state.month.getFullYear(),state.month.getMonth()+1,1);renderCalendar()};$('todayBtn').onclick=()=>openPicker($('monthPicker'));$('monthPicker').onchange=e=>{if(e.target.value){const [y,m]=e.target.value.split('-').map(Number);state.month=new Date(y,m-1,1);renderCalendar()}closePicker(e.target)};$('monthPicker').onblur=e=>{if(state.openPicker===e.target)state.openPicker=null};$('toggleAll').onclick=()=>{state.selected.size?state.selected.clear():state.data.players.forEach(p=>state.selected.add(p.id));renderHome()};$('backHome').onclick=()=>location.hash='';addEventListener('hashchange',route)}
-async function load(){try{const [players,tournaments,matches,agenda,results,opponents,entries,status,diagnostics]=await Promise.all([v3json('players.json'),v3json('tournaments.json'),v3json('matches.json'),v3json('agenda.json'),v3json('results.json'),v3json('opponents.json'),v3json('tournament_entries.json'),v3json('sync_status.json'),v3json('diagnostics.json').catch(()=>({overall:'yellow',items:[]}))]);const visiblePlayers=(players.players||[]).filter(p=>!FORMER_PLAYERS.has(p.id));const visibleIds=new Set(visiblePlayers.map(p=>p.id));state.data={players:visiblePlayers,tournaments:(tournaments.tournaments||[]).filter(x=>visibleIds.has(x.playerId)),matches:(matches.matches||[]).filter(x=>visibleIds.has(x.playerId)),agenda:mergeAgenda(agenda.agenda||[],matches.matches||[]).filter(x=>visibleIds.has(x.playerId)),results:(results.results||[]).filter(x=>visibleIds.has(x.playerId)),opponents:opponents.opponents||[],tournamentEntries:(entries.tournamentEntries||[]).filter(x=>visibleIds.has(x.playerId)),diagnostics,generatedAt:status.generatedAt||players.generatedAt||new Date().toISOString()};if(!state.selected.size)state.data.players.forEach(p=>state.selected.add(p.id));$('syncStatus').textContent='Live v3 · '+new Intl.DateTimeFormat('it-IT',{hour:'2-digit',minute:'2-digit'}).format(new Date(state.data.generatedAt));route()}catch(e){$('syncStatus').textContent='V3 non pronta';$('dailyAgenda').innerHTML='<div class="empty">File v3 separati non ancora disponibili. Attendo build v3.</div>';console.error(e)}}
+async function load(){
+  if(loadRunning)return;
+  loadRunning=true;
+  try{
+    const names=['players','tournaments','matches','agenda','results','opponents','entries','status','diagnostics'];
+    const files=['players.json','tournaments.json','matches.json','agenda.json','results.json','opponents.json','tournament_entries.json','sync_status.json','diagnostics.json'];
+    const settled=await Promise.allSettled(files.map(v3json));
+    const docs=Object.fromEntries(names.map((name,i)=>[name,settled[i].status==='fulfilled'?settled[i].value:null]));
+    if(!Array.isArray(docs.players?.players)||!docs.players.players.length)throw Error('Elenco giocatori essenziale non disponibile');
+    if(!Array.isArray(docs.tournaments?.tournaments))throw Error('Calendario tornei essenziale non disponibile');
+
+    const previous=state.data||cachedData()||{};
+    const visiblePlayers=docs.players.players.filter(p=>!FORMER_PLAYERS.has(p.id));
+    const visibleIds=new Set(visiblePlayers.map(p=>p.id));
+    const matches=Array.isArray(docs.matches?.matches)?docs.matches.matches:(previous.matches||[]);
+    const agenda=Array.isArray(docs.agenda?.agenda)?docs.agenda.agenda:(previous.agenda||[]);
+    const results=Array.isArray(docs.results?.results)?docs.results.results:(previous.results||[]);
+    const opponents=Array.isArray(docs.opponents?.opponents)?docs.opponents.opponents:(previous.opponents||[]);
+    const tournamentEntries=Array.isArray(docs.entries?.tournamentEntries)?docs.entries.tournamentEntries:(previous.tournamentEntries||[]);
+    const optionalFailures=settled.slice(2).filter(x=>x.status==='rejected').length;
+    const diagnostics=docs.diagnostics||previous.diagnostics||{overall:'yellow',items:[]};
+
+    state.data={
+      players:visiblePlayers,
+      tournaments:docs.tournaments.tournaments.filter(x=>visibleIds.has(x.playerId)),
+      matches:matches.filter(x=>visibleIds.has(x.playerId)),
+      agenda:mergeAgenda(agenda,matches).filter(x=>visibleIds.has(x.playerId)),
+      results:results.filter(x=>visibleIds.has(x.playerId)),
+      opponents,
+      tournamentEntries:tournamentEntries.filter(x=>visibleIds.has(x.playerId)),
+      diagnostics,
+      generatedAt:docs.status?.generatedAt||docs.players.generatedAt||docs.tournaments.generatedAt||previous.generatedAt||new Date().toISOString(),
+    };
+    saveCachedData(state.data);
+    if(!state.selected.size)state.data.players.forEach(p=>state.selected.add(p.id));
+    syncLabel(state.data,optionalFailures>0);
+    route();
+  }catch(e){
+    const fallback=state.data||cachedData();
+    if(fallback){
+      state.data=fallback;
+      if(!state.selected.size)state.data.players.forEach(p=>state.selected.add(p.id));
+      syncLabel(state.data,true);
+      route();
+    }else{
+      $('syncStatus').classList.add('stale');
+      $('syncStatus').textContent='Dati temporaneamente non disponibili';
+      $('dailyAgenda').innerHTML='<div class="empty">Il collegamento ai dati non è disponibile e su questo dispositivo non esiste ancora una copia valida.</div>';
+    }
+    console.error(e);
+  }finally{loadRunning=false}
+}
 wire();load();setInterval(load,30000);
