@@ -21,6 +21,7 @@ jobs:
       - name: Publish fast verified activity count
         run: |
           set -euo pipefail
+          test "$(jq -r .status dist/v3/itf_player_activity_fast_audit.json)" = complete || { echo 'Fast activity audit inconclusive; continuing with acceptance shards.'; exit 0; }
           git config user.name courtwatch-bot; git config user.email courtwatch-bot@users.noreply.github.com
           git add dist/v3/itf_player_activity_fast_audit.json
           git commit -m 'Publish fast ITF player activity count'
@@ -32,14 +33,14 @@ jobs:
     timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 4
       matrix: {shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Slow complete acceptance backfill
-        env: {ITF_REQUEST_TIMEOUT_MS: '30000', ITF_REQUEST_DELAY_MS: '1200'}
+        env: {ITF_REQUEST_TIMEOUT_MS: '30000', ITF_REQUEST_DELAY_MS: '2500'}
         run: ITF_ACCEPTANCE_SHARD=${{ matrix.shard }} ITF_ACCEPTANCE_TOTAL=16 node src/v3/discover-itf-acceptance-shard.mjs
       - uses: actions/upload-artifact@v4
         if: always()
