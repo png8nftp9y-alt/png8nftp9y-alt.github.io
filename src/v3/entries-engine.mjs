@@ -11,8 +11,16 @@ function externalTournamentInFitp(row){
  const name=norm(row.tournamentName||row.name);
  return String(row.circuit||'fitp').toLowerCase()==='fitp'&&/(^| )ITF( |$)|TENNIS EUROPE|TENNIS EUROPE JUNIOR TOUR/.test(name)
 }
+function addDaysIso(value,days){
+ const iso=String(value||'');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(iso))return '';
+ const date=new Date(`${iso}T00:00:00.000Z`);
+ if(!Number.isFinite(date.getTime()))return '';
+ date.setUTCDate(date.getUTCDate()+days);
+ return date.toISOString().slice(0,10);
+}
 function entry(row){const c=row.circuit;return {id:['entry',c,row.playerId,slug(row.competitionId||row.tournamentName)].join('__'),playerId:row.playerId||'',playerName:row.playerName||'',circuit:c,competitionId:row.competitionId||row.teProfileId||'',tournamentName:row.tournamentName||'',location:row.location||'',startDate:row.startDate||'',endDate:row.endDate||'',draws:row.draws||[],status:row.status||'detected',sourceQuality:row.sourceUrl?'official_source':'source_pending',sourceUrl:row.sourceUrl||'',lastSeen:row.lastSeen||NOW,engine:'v3-entries-from-ex-novo-discovery',acceptanceList:row.acceptanceList||'',acceptanceCode:row.acceptanceCode||'',acceptancePosition:row.acceptancePosition||null,calendarListLabel:row.calendarListLabel||'',acceptanceListUrl:row.acceptanceListUrl||'',acceptanceLastUpdated:row.acceptanceLastUpdated||'',acceptanceListPublished:row.acceptanceListPublished||false,entryStatus:row.entryStatus||''}}
-function toTournament(e){return {id:['tour',e.circuit,e.playerId,slug(e.competitionId||e.tournamentName)].join('__'),playerId:e.playerId,playerName:e.playerName,circuit:e.circuit,circuitColor:e.circuit==='fitp'?'blue':e.circuit==='tennis-europe'?'orange':'green',competitionId:e.competitionId,name:e.tournamentName,location:e.location,startDate:e.startDate,endDate:e.endDate,status:e.status,draws:e.draws,sourceUrl:e.sourceUrl,entrySourceQuality:e.sourceQuality,lastV3EntrySync:NOW,acceptanceList:e.acceptanceList,acceptanceCode:e.acceptanceCode,acceptancePosition:e.acceptancePosition,calendarListLabel:e.calendarListLabel,acceptanceListUrl:e.acceptanceListUrl,acceptanceLastUpdated:e.acceptanceLastUpdated,acceptanceListPublished:e.acceptanceListPublished,entryStatus:e.entryStatus}}
+function toTournament(e){const mapStartDate=e.circuit==='itf'?addDaysIso(e.startDate,2):e.startDate;return {id:['tour',e.circuit,e.playerId,slug(e.competitionId||e.tournamentName)].join('__'),playerId:e.playerId,playerName:e.playerName,circuit:e.circuit,circuitColor:e.circuit==='fitp'?'blue':e.circuit==='tennis-europe'?'orange':'green',competitionId:e.competitionId,name:e.tournamentName,location:e.location,startDate:mapStartDate||e.startDate,officialStartDate:e.startDate,endDate:e.endDate,status:e.status,draws:e.draws,sourceUrl:e.sourceUrl,entrySourceQuality:e.sourceQuality,lastV3EntrySync:NOW,acceptanceList:e.acceptanceList,acceptanceCode:e.acceptanceCode,acceptancePosition:e.acceptancePosition,calendarListLabel:e.calendarListLabel,acceptanceListUrl:e.acceptanceListUrl,acceptanceLastUpdated:e.acceptanceLastUpdated,acceptanceListPublished:e.acceptanceListPublished,entryStatus:e.entryStatus}}
 function ageHours(iso){const t=Date.parse(iso||'');return Number.isFinite(t)?(Date.now()-t)/36e5:null}
 function light(status,label,detail,critical=false){return {status,label,detail,critical}}
 function worst(items){if(items.some(x=>x.status==='red'&&x.critical))return 'red';if(items.some(x=>x.status==='red'))return 'yellow';if(items.some(x=>x.status==='yellow'))return 'yellow';return 'green'}
