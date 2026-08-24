@@ -1,0 +1,95 @@
+name: Court Watch v3 ITF fast results backfill
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-results-backfill-fast.yml']
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: courtwatch-v3-itf-backfill
+  cancel-in-progress: true
+
+jobs:
+  result-shard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Complete results in smaller resumable shards
+        env:
+          ITF_REQUEST_TIMEOUT_MS: '30000'
+          ITF_REQUEST_DELAY_MS: '2400'
+        run: ITF_RESULTS_SHARD=${{ matrix.shard }} ITF_RESULTS_TOTAL=32 node src/v3/discover-itf-results-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-fast-results-${{ matrix.shard }}
+          path: dist/v3/shards/itf/*-${{ matrix.shard }}*
+          retention-days: 7
+
+  publish:
+    needs: result-shard
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Configure R2
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          echo "R2_ACCOUNT_ID=$R2_ACCOUNT_ID" >> "$GITHUB_ENV"
+          echo "R2_BUCKET=$R2_BUCKET" >> "$GITHUB_ENV"
+          echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
+      - run: python -m pip install --quiet awscli && bash src/v3/itf-r2-cache.sh restore
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: itf-fast-results-*
+          path: dist/v3/shards/itf
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32787985907
+          pattern: itf-acceptance-*
+          path: dist/v3/shards/itf
+          merge-multiple: true
+      - name: Merge, validate and publish the complete database
+        run: |
+          set -euo pipefail
+          node src/v3/merge-itf-acceptance-shards.mjs
+          node src/v3/verify-itf-draws.mjs
+          node src/v3/maintain-itf-database.mjs
+          node src/v3/validate-itf-system.mjs
+          node src/v3/entries-engine.mjs
+          bash src/v3/itf-r2-cache.sh publish
+      - name: Publish audits and app data
+        run: |
+          set -euo pipefail
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json history/itf_tournament_catalog.json history/itf_player_tournament_db.json history/itf_database_audit.json
+          git commit -m 'Publish complete accelerated ITF results backfill'
+          git pull --rebase origin main
+          git push origin HEAD:main
