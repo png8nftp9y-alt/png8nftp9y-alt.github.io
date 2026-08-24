@@ -5,14 +5,14 @@ on:
     branches: [main]
     paths: ['.github/workflows/courtwatch-v3-itf-backfill.yml']
 permissions: {contents: write}
-concurrency: {group: courtwatch-v3-itf-backfill,cancel-in-progress: false}
+concurrency: {group: courtwatch-v3-itf-backfill,cancel-in-progress: true}
 jobs:
-  shard:
+  acceptance-shard:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: 2
       matrix: {shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]}
     steps:
       - uses: actions/checkout@v4
@@ -21,14 +21,48 @@ jobs:
       - name: Slow complete acceptance backfill
         env: {ITF_REQUEST_TIMEOUT_MS: '30000', ITF_REQUEST_DELAY_MS: '1200'}
         run: ITF_ACCEPTANCE_SHARD=${{ matrix.shard }} ITF_ACCEPTANCE_TOTAL=16 node src/v3/discover-itf-acceptance-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'itf-acceptance-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*'}
+  publish-count:
+    needs: acceptance-shard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'itf-acceptance-*', path: dist/v3/shards/itf, merge-multiple: true}
+      - run: node src/v3/merge-itf-acceptance-shards.mjs
+      - name: Publish verified 23-player count
+        run: |
+          set -euo pipefail
+          git config user.name courtwatch-bot; git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json
+          git commit -m 'Publish verified ITF player tournament count'
+          git pull --rebase origin main
+          git push origin HEAD:main
+  result-shard:
+    needs: acceptance-shard
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: {shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
       - name: Slow complete result backfill
         env: {ITF_REQUEST_TIMEOUT_MS: '30000', ITF_REQUEST_DELAY_MS: '1200'}
         run: ITF_RESULTS_SHARD=${{ matrix.shard }} ITF_RESULTS_TOTAL=16 node src/v3/discover-itf-results-shard.mjs
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: 'itf-backfill-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*'}
+        with: {name: 'itf-results-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*'}
   publish:
-    needs: shard
+    needs: [acceptance-shard, result-shard, publish-count]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -48,7 +82,7 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"; echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"; echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
       - run: python -m pip install --quiet awscli && bash src/v3/itf-r2-cache.sh restore
       - uses: actions/download-artifact@v4
-        with: {path: dist/v3/shards/itf, merge-multiple: true}
+        with: {pattern: 'itf-*', path: dist/v3/shards/itf, merge-multiple: true}
       - name: Validate and publish complete generation
         run: |
           set -euo pipefail
