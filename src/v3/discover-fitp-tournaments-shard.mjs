@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 
 const NOW = new Date().toISOString();
 const TODAY = NOW.slice(0, 10);
-const FROM = '2025-12-18';
+const HISTORY_FROM = '2025-12-18';
 const BASE = 'https://dp-myfit-test-function-v2.azurewebsites.net';
 const TENNIS = '4332';
 const FETCH = 100;
@@ -12,6 +12,7 @@ const ROOT_OVERLAP_DAYS = 31;
 const MIN_SPLIT_DAYS = 1;
 const MAX_SPLIT_DEPTH = 0;
 const HORIZON_DAYS = 730;
+const PAST_DAYS = Number(process.env.FITP_PAST_DAYS || 240);
 const PROVINCE_ID = String(process.env.FITP_PROVINCE_ID || '');
 if (!PROVINCE_ID) throw new Error('FITP_PROVINCE_ID is required for province-sharded discovery');
 
@@ -26,6 +27,7 @@ const addDays = (d, n) => new Date(d.getTime() + n * 864e5);
 const daysBetween = (a, b) => Math.round((b - a) / 864e5);
 const it = d => `${dd(d.getUTCDate())}/${dd(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
 const isoDate = d => d.toISOString().slice(0, 10);
+const FROM = isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), -PAST_DAYS));
 const iso = v => {
   const s = String(v || '');
   let m = s.match(/^(20\d{2})-(\d{2})-(\d{2})/);
@@ -248,7 +250,9 @@ const status = errors.length ? 'fitp_province_shard_with_errors' : unresolvedSat
 const out = {
   version: 'cw-v3-fitp-province-shard-v2', generatedAt: NOW, status, provinceId: PROVINCE_ID,
   source: `One FITP province per shard using the official FITP id_provincia value. ${ROOT_WINDOW_DAYS}-day root windows have a ${ROOT_OVERLAP_DAYS}-day forward overlap; recursive splits never add overlap. Pagination continues past premature short pages; fixed overlapping roots provide redundant coverage; incomplete terminal pages are audited without recursive expansion.`,
+  coverageMode: 'rolling_window_with_permanent_database', historyFrom: HISTORY_FROM,
   coverageFrom: FROM, coverageUntil: isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS)),
+  pastDays: PAST_DAYS, horizonDays: HORIZON_DAYS,
   branches: branches.length, queries: queries.length, tournamentsFound: tournaments.length,
   unresolvedSaturations, boundedIncompleteBranches, regression, tournaments, errors
 };

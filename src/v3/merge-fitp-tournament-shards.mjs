@@ -1,6 +1,14 @@
 import fs from 'node:fs/promises';
 
 const NOW = new Date().toISOString();
+const TODAY = NOW.slice(0, 10);
+const HISTORY_FROM = '2025-12-18';
+const PAST_DAYS = Number(process.env.FITP_PAST_DAYS || 240);
+const HORIZON_DAYS = Number(process.env.FITP_HORIZON_DAYS || 730);
+const addDays = (date, days) => new Date(date.getTime() + days * 864e5);
+const isoDate = date => date.toISOString().slice(0, 10);
+const expectedCoverageFrom = isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), -PAST_DAYS));
+const expectedCoverageUntil = isoDate(addDays(new Date(TODAY + 'T00:00:00Z'), HORIZON_DAYS));
 const PROVINCES = ['201','2','3','4','5','6','7','8','9','210','11','12','13','14','215','16','17','18','19','20','21','22','23','24','25','26','227','28','29','30','31','32','33','34','35','36','237','38','39','40','41','42','43','44','45','46','47','248','49','50','51','52','53','54','55','56','57','258','59','60','61','62','263','64','65','66','67','68','69','70','71','272','73','74','75','76','77','78','79','280','81','282','283','84','85','86','287','88','89','90','91','292','93','94','95','96','97','98','99','100','101','102','103','108','109','110','111'];
 const OWNER = 'png8nftp9y-alt';
 const REPO = 'png8nftp9y-alt.github.io';
@@ -43,16 +51,27 @@ const tournaments = [...provinceMap.values()].sort((a, b) => (a.startDate || '99
 const baselineOnly = [...baselineMap.values()].filter(t => !provinceMap.has(key(t)));
 const provinceOnly = tournaments.filter(t => !baselineMap.has(key(t)));
 const allShardsPresent = provinceStats.length === PROVINCES.length;
-const allShardsComplete = allShardsPresent && errors.length === 0;
 const coverageFrom = provinceStats.map(x => x.coverageFrom).filter(Boolean).sort()[0] || '';
 const coverageUntil = provinceStats.map(x => x.coverageUntil).filter(Boolean).sort().at(-1) || '';
+const coveragePairs = new Set(provinceStats.map(x => `${x.coverageFrom || ''}|${x.coverageUntil || ''}`));
+if (coveragePairs.size !== 1) errors.push({ type: 'inconsistent_rolling_coverage', coveragePairs: [...coveragePairs] });
+if (coverageFrom !== expectedCoverageFrom || coverageUntil !== expectedCoverageUntil) errors.push({ type: 'rolling_window_not_current', coverageFrom, coverageUntil, expectedCoverageFrom, expectedCoverageUntil });
+const previous = await readJson('dist/v3/source_fitp_tournaments.json', { tournaments: [] });
+const previousComparable = (previous.tournaments || []).filter(t => t.competitionId && (!t.endDate || t.endDate >= coverageFrom) && (!t.startDate || t.startDate <= coverageUntil));
+const currentIds = new Set(tournaments.map(key));
+const retainedPrevious = previousComparable.filter(t => currentIds.has(key(t))).length;
+const retentionRate = previousComparable.length ? retainedPrevious / previousComparable.length : 1;
+if (previousComparable.length >= 100 && retentionRate < .9) errors.push({ type: 'rolling_window_continuity_regression', previousComparable: previousComparable.length, retained: retainedPrevious, retentionRate });
+const allShardsComplete = allShardsPresent && errors.length === 0;
 const byStatus = group(tournaments, t => t.status);
 
 const audit = {
   version: 'cw-v3-fitp-province-sharded-v2', generatedAt: NOW,
   status: allShardsComplete ? 'fitp_province_sharded_complete' : 'fitp_province_sharded_incomplete',
   source: 'Province shards are the only catalog source. Historical baseline is comparison-only and is never merged into the official output.',
-  coverageFrom, coverageUntil,
+  coverageMode: 'rolling_window_with_permanent_database_and_cross_cycle_continuity', historyFrom: HISTORY_FROM,
+  coverageFrom, coverageUntil, pastDays: PAST_DAYS, horizonDays: HORIZON_DAYS,
+  continuity: { expectedCoverageFrom, expectedCoverageUntil, previousComparable: previousComparable.length, retained: retainedPrevious, retentionRate, rollingWindowAdvanced: coverageFrom === expectedCoverageFrom && coverageUntil === expectedCoverageUntil },
   provinceWindow: { expectedProvinceShards: PROVINCES.length, completedProvinceShards: provinceStats.length, completeProvinceShards: provinceStats.filter(x => x.status === 'fitp_province_shard_complete' && !x.unresolvedSaturations && !x.errors).length, queries: provinceStats.reduce((sum, x) => sum + (x.queries || 0), 0), tournamentsFound: tournaments.length },
   baselineAudit: { commit: BASELINE_COMMIT, count: baselineMap.size, url: BASELINE_URL, baselineOnly: baselineOnly.length, provinceOnly: provinceOnly.length, baselineOnlyByProvince: group(baselineOnly, provinceOf), baselineOnlyByMonth: group(baselineOnly, monthOf), provinceOnlyByProvince: group(provinceOnly, provinceOf), provinceOnlyByMonth: group(provinceOnly, monthOf) },
   quality: { provinceSharded: true, baselineMerged: false, allShardsPresent, allShardsComplete, provinceShards: provinceStats, individualOnly: true, tennisEuropeExcluded: true, itfExcluded: true },
