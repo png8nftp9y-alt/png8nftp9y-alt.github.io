@@ -12,6 +12,7 @@ on:
       - 'players.json'
       - 'dist/v3/source_fitp_tournaments.json'
       - 'src/v3/discover-fitp.mjs'
+      - 'src/v3/update-fitp-player-clubs.mjs'
       - 'src/v3/entries-engine.mjs'
       - 'src/v3/maintain-fitp-calendar-history.mjs'
       - 'src/v3/fitp-r2-cache.sh'
@@ -57,6 +58,8 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check --quiet awscli
           bash src/v3/fitp-r2-cache.sh restore
+      - name: Refresh official FITP rankings and clubs
+        run: node src/v3/update-fitp-player-clubs.mjs
       - name: Match players against validated provincial catalog
         env:
           FITP_ENTRY_CONCURRENCY: '20'
@@ -77,6 +80,8 @@ jobs:
             git fetch origin main
             git reset --mixed origin/main
             git add \
+              players.json \
+              dist/v3/fitp_player_clubs_recovered.json \
               history/fitp_tournament_archive.json \
               dist/v3/source_fitp_entries.json \
               dist/v3/source_fitp_entries_audit.json \
@@ -92,6 +97,7 @@ jobs:
               history/player_tournaments.json \
               history/audit.json \
               src/v3/fitp-r2-cache.sh \
+              src/v3/update-fitp-player-clubs.mjs \
               .github/workflows/courtwatch-v3-fitp-entries.yml
             if test "${R2_ACTIVE:-0}" = "1"; then
               git rm -f --ignore-unmatch \
