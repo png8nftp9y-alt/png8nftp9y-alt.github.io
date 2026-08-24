@@ -7,7 +7,6 @@ on:
     branches: [main]
     paths:
       - 'src/v3/merge-isolated-engines.mjs'
-      - 'courtwatch-v3-merge-isolated-trigger.json'
       - '.github/workflows/courtwatch-v3-merge-isolated.yml'
 permissions: {contents: write}
 concurrency:
@@ -28,19 +27,19 @@ jobs:
           ITF_REF: main
         run: |
           set -euo pipefail
-          : > courtwatch-v3-merge-isolated-run.log
-          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-merge-isolated-run.log
-          echo "sourceSha=${GITHUB_SHA}" >> courtwatch-v3-merge-isolated-run.log
-          echo "runId=${GITHUB_RUN_ID}" >> courtwatch-v3-merge-isolated-run.log
-          node src/v3/merge-isolated-engines.mjs >> courtwatch-v3-merge-isolated-run.log 2>&1
-          echo "mergeExit=0" >> courtwatch-v3-merge-isolated-run.log
-          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> courtwatch-v3-merge-isolated-run.log
-          cat courtwatch-v3-merge-isolated-run.log
+          : > /tmp/courtwatch-v3-merge-isolated-run.log
+          echo "startedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/courtwatch-v3-merge-isolated-run.log
+          echo "sourceSha=${GITHUB_SHA}" >> /tmp/courtwatch-v3-merge-isolated-run.log
+          echo "runId=${GITHUB_RUN_ID}" >> /tmp/courtwatch-v3-merge-isolated-run.log
+          node src/v3/merge-isolated-engines.mjs >> /tmp/courtwatch-v3-merge-isolated-run.log 2>&1
+          echo "mergeExit=0" >> /tmp/courtwatch-v3-merge-isolated-run.log
+          echo "finishedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> /tmp/courtwatch-v3-merge-isolated-run.log
+          cat /tmp/courtwatch-v3-merge-isolated-run.log
       - name: Commit guarded merged calendar
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_fitp_entries.json dist/v3/source_fitp_tournaments.json dist/v3/source_tennis_europe_entries.json dist/v3/source_tennis_europe_tournaments.json dist/v3/source_itf_entries.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/agenda.json dist/v3/matches.json dist/v3/results.json dist/v3/opponents.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json courtwatch-v3-merge-isolated-run.log src/v3/merge-isolated-engines.mjs .github/workflows/courtwatch-v3-merge-isolated.yml
+          git add dist/v3/source_fitp_entries.json dist/v3/source_fitp_tournaments.json dist/v3/source_tennis_europe_entries.json dist/v3/source_tennis_europe_tournaments.json dist/v3/source_itf_entries.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/agenda.json dist/v3/matches.json dist/v3/results.json dist/v3/opponents.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json src/v3/merge-isolated-engines.mjs .github/workflows/courtwatch-v3-merge-isolated.yml
           git commit -m "Publish guarded Court Watch v3 isolated calendar merge" || echo "No changes"
           git pull --rebase origin main || true
           git push origin HEAD:main || true

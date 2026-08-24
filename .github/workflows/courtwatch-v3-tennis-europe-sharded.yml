@@ -5,7 +5,6 @@ on:
     - cron: '17 */6 * * *'
   push:
     paths:
-      - 'courtwatch-v3-tennis-europe-sharded-trigger.json'
       - 'src/v3/discover-tennis-europe-tournaments-shard.mjs'
       - 'src/v3/merge-tennis-europe-tournament-shards.mjs'
       - '.github/workflows/courtwatch-v3-tennis-europe-sharded.yml'
