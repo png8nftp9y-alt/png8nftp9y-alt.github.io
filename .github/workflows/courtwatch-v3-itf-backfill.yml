@@ -7,7 +7,27 @@ on:
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-backfill,cancel-in-progress: true}
 jobs:
+  fast-player-count:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Resolve 23 official profiles and activity
+        env: {ITF_REQUEST_TIMEOUT_MS: '30000', ITF_REQUEST_DELAY_MS: '900'}
+        run: node src/v3/audit-itf-player-activity.mjs
+      - name: Publish fast verified activity count
+        run: |
+          set -euo pipefail
+          git config user.name courtwatch-bot; git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/itf_player_activity_fast_audit.json
+          git commit -m 'Publish fast ITF player activity count'
+          git pull --rebase origin main
+          git push origin HEAD:main
   acceptance-shard:
+    needs: fast-player-count
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
