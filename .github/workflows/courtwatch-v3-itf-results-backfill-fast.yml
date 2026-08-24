@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['.github/workflows/courtwatch-v3-itf-results-backfill-fast.yml']
+    paths: ['.github/workflows/courtwatch-v3-itf-results-backfill-fast.yml','src/v3/discover-itf-results-shard.mjs']
 
 permissions:
   contents: write
