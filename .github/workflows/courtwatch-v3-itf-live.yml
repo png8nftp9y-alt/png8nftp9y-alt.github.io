@@ -7,20 +7,24 @@ on:
     branches: [main]
     paths: ['players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/discover-itf-acceptance-shard.mjs','src/v3/discover-itf-results-shard.mjs','src/v3/merge-itf-acceptance-shards.mjs','src/v3/verify-itf-draws.mjs','src/v3/maintain-itf-database.mjs','src/v3/validate-itf-system.mjs','src/v3/itf-r2-cache.sh','.github/workflows/courtwatch-v3-itf-live.yml']
 permissions: {contents: write}
-concurrency: {group: courtwatch-v3-itf-live,cancel-in-progress: false}
+concurrency: {group: courtwatch-v3-itf-live,cancel-in-progress: true}
 jobs:
   shard:
     runs-on: ubuntu-latest
     timeout-minutes: 35
     strategy:
       fail-fast: false
+      max-parallel: 2
       matrix: {shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: ITF_ACCEPTANCE_SHARD=${{ matrix.shard }} ITF_ACCEPTANCE_TOTAL=16 node src/v3/discover-itf-acceptance-shard.mjs
-      - run: ITF_RESULTS_SHARD=${{ matrix.shard }} ITF_RESULTS_TOTAL=16 node src/v3/discover-itf-results-shard.mjs
+      - run: echo "ITF_REQUEST_DELAY_MS=650" >> "$GITHUB_ENV"
+      - name: Scan live acceptance window
+        run: ITF_SCAN_FROM=$(date -u -d '-21 days' +%F) ITF_SCAN_TO=$(date -u -d '+120 days' +%F) ITF_ACCEPTANCE_SHARD=${{ matrix.shard }} ITF_ACCEPTANCE_TOTAL=16 node src/v3/discover-itf-acceptance-shard.mjs
+      - name: Scan active and recent results
+        run: ITF_RESULTS_FROM=$(date -u -d '-35 days' +%F) ITF_RESULTS_TO=$(date -u -d '+7 days' +%F) ITF_RESULTS_SHARD=${{ matrix.shard }} ITF_RESULTS_TOTAL=16 node src/v3/discover-itf-results-shard.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: 'itf-live-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*'}
