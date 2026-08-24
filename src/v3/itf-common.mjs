@@ -1,0 +1,35 @@
+import fs from 'node:fs/promises';
+import crypto from 'node:crypto';
+
+export const NOW = new Date().toISOString();
+export const TODAY = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+export const FROM = process.env.ITF_COVERAGE_FROM || '2025-12-18';
+export const BASE = 'https://www.itftennis.com';
+export const API = `${BASE}/tennis/api/TournamentApi`;
+export const REGIONS = {
+  europe:['ALB','AND','ARM','AUT','AZE','BEL','BIH','BLR','BUL','CRO','CYP','CZE','DEN','ENG','ESP','EST','FIN','FRA','GBR','GEO','GER','GRE','HUN','IRL','ISL','ISR','ITA','KOS','LAT','LTU','LUX','MDA','MKD','MLT','MNE','MON','NED','NOR','POL','POR','ROU','RUS','SLO','SMR','SRB','SUI','SVK','SWE','TUR','UKR'],
+  americas:['ARG','ARU','BAH','BAR','BER','BOL','BRA','CAN','CHI','COL','CRC','CUB','CUR','DOM','ECU','ESA','FGU','GUA','GUY','HAI','HON','JAM','MEX','NCA','PAN','PAR','PER','PUR','SUR','TTO','URU','USA','VEN'],
+  asia_pacific:['AUS','BAN','BRN','CAM','CHN','FIJ','GUM','HKG','INA','IND','JPN','KAZ','KGZ','KOR','LAO','MAC','MAS','MDV','MGL','MYA','NEP','NZL','PAK','PHI','PNG','SIN','SRI','TGA','THA','TJK','TKM','TPE','UZB','VIE'],
+  africa_middle_east:['ALG','ANG','BOT','BRN','BUR','CMR','CIV','COD','CGO','EGY','ETH','GAB','GHA','IRQ','IRI','JOR','KEN','KSA','KUW','LBA','LES','MAD','MAR','MRI','MOZ','NAM','NGR','OMA','QAT','RSA','RWA','SEN','SEY','SUD','TAN','TOG','TUN','UAE','UGA','ZAM','ZIM']
+};
+
+export async function readJson(file,fallback={}){try{return JSON.parse(await fs.readFile(file,'utf8'))}catch{return fallback}}
+export async function writeJson(file,value){await fs.mkdir(file.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(file,JSON.stringify(value,null,2)+'\n')}
+export const clean=v=>String(v||'').replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&#39;|&apos;/gi,"'").replace(/&quot;/gi,'"').replace(/\s+/g,' ').trim();
+export const norm=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
+export const hash=v=>crypto.createHash('sha256').update(String(v)).digest().readUInt32BE(0);
+export const iso=d=>d.toISOString().slice(0,10);
+export const addDays=(d,n)=>new Date(d.getTime()+n*864e5);
+export function tournamentParts(url){const m=String(url||'').match(/\/en\/tournament\/([^/?#]+)\/([^/?#]+)\/(\d{4})\/([^/?#]+)(?:\/|$)/i);return m?{slug:m[1],country:m[2].toUpperCase(),year:m[3],competitionId:m[4].toUpperCase()}:null}
+export function tournamentBase(url){const p=tournamentParts(url);return p?`${BASE}/en/tournament/${p.slug}/${p.country.toLowerCase()}/${p.year}/${p.competitionId.toLowerCase()}/`:''}
+export function abs(href,base=BASE){try{return new URL(String(href||'').replace(/&amp;/g,'&'),base).toString()}catch{return''}}
+export function links(html,base){const out=[];let m;const re=/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;while((m=re.exec(html)))out.push({url:abs(m[1],base),text:clean(m[2]),index:m.index});return out}
+export function aliases(player){const values=[player.name,...(player.aliases||[])].map(norm).filter(x=>x.split(' ').length>1);for(const v of [...values])values.push(v.split(' ').reverse().join(' '));return [...new Set(values)]}
+export function matchPlayer(text,players){const n=norm(text);return players.find(p=>aliases(p).some(a=>n.includes(a)))||null}
+export function flatten(value,path=[],out=[]){if(Array.isArray(value)){value.forEach((v,i)=>flatten(v,[...path,String(i)],out));return out}if(value&&typeof value==='object'){out.push({path:path.join('.'),value});for(const [k,v] of Object.entries(value))flatten(v,[...path,k],out)}return out}
+export function field(obj,names){for(const [k,v] of Object.entries(obj||{}))if(names.some(n=>norm(k)===norm(n))&&['string','number','boolean'].includes(typeof v))return v;return''}
+export function personName(obj){return String(field(obj,['playerName','name','fullName','displayName','participantName','teamPlayerName'])||'').trim()}
+export function countryFor(t){return String(t.hostNationCode||t.countryCode||tournamentParts(t.sourceUrl)?.country||'').toUpperCase()}
+export function regionFor(country){for(const [region,codes] of Object.entries(REGIONS))if(codes.includes(String(country||'').toUpperCase()))return region;return'other'}
+export async function request(url,attempt=0){try{const r=await fetch(url,{redirect:'follow',signal:AbortSignal.timeout(Number(process.env.ITF_REQUEST_TIMEOUT_MS||20000)),headers:{'user-agent':'Mozilla/5.0 CourtWatch-v3-itf-global/1.0','accept':'application/json,text/html,*/*','accept-language':'en-GB,en;q=0.9'}});const text=await r.text();if((r.status===429||r.status>=500)&&attempt<3){await new Promise(x=>setTimeout(x,700*(attempt+1)));return request(url,attempt+1)}return{ok:r.ok,status:r.status,url:r.url||url,text,json:(()=>{try{return JSON.parse(text)}catch{return null}})()}}catch(e){if(attempt<2){await new Promise(x=>setTimeout(x,800*(attempt+1)));return request(url,attempt+1)}throw e}}
+export function entryKey(e){return`${e.playerId}|${e.competitionId}`}

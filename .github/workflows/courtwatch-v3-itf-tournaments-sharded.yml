@@ -1,0 +1,53 @@
+name: Court Watch v3 ITF global tournament map
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '37 */6 * * *'
+  push:
+    branches: [main]
+    paths: ['src/v3/itf-common.mjs','src/v3/discover-itf-tournaments-shard.mjs','src/v3/merge-itf-tournament-shards.mjs','.github/workflows/courtwatch-v3-itf-tournaments-sharded.yml']
+permissions: {contents: write}
+concurrency: {group: courtwatch-v3-itf-map,cancel-in-progress: false}
+jobs:
+  shard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      matrix: {region: [europe, americas, asia_pacific, africa_middle_east, other]}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: ITF_REGION_SHARD=${{ matrix.region }} node src/v3/discover-itf-tournaments-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'itf-tournaments-${{ matrix.region }}', path: 'dist/v3/shards/itf/tournaments-${{ matrix.region }}.json'}
+  publish:
+    needs: shard
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {path: dist/v3/shards/itf, merge-multiple: true}
+      - run: node src/v3/merge-itf-tournament-shards.mjs
+      - name: Publish atomically
+        run: |
+          set -euo pipefail
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          cp dist/v3/source_itf_tournaments.json /tmp/itf-map.json
+          cp dist/v3/source_itf_tournaments_audit.json /tmp/itf-map-audit.json
+          for attempt in 1 2 3; do
+            git fetch origin main; git reset --hard origin/main
+            cp /tmp/itf-map.json dist/v3/source_itf_tournaments.json
+            cp /tmp/itf-map-audit.json dist/v3/source_itf_tournaments_audit.json
+            git add dist/v3/source_itf_tournaments*.json
+            git commit -m 'Publish validated ITF global tournament map' || exit 0
+            git push origin HEAD:main && exit 0
+          done
+          exit 1
