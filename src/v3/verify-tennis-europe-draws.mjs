@@ -8,6 +8,7 @@ const RELATIONS_FILE = 'history/tennis_europe_player_tournament_db.json';
 const HISTORICAL_AUDIT_FILE = 'dist/v3/source_tennis_europe_draw_backfill_audit.json';
 const BACKFILL = process.env.TE_DRAW_BACKFILL === '1';
 const AUDIT_ONLY = process.env.TE_DRAW_AUDIT_ONLY === '1';
+const TARGET_PLAYER_ID = String(process.env.TE_DRAW_PLAYER_ID || '').trim();
 const AUDIT_FILE = BACKFILL ? 'dist/v3/source_tennis_europe_draw_backfill_audit.json' : 'dist/v3/source_tennis_europe_draw_audit.json';
 const REQUEST_CACHE = new Map();
 
@@ -409,6 +410,20 @@ const audit = [];
 
 for (const entry of original) {
   if (entry.circuit !== 'tennis-europe') { kept.push(entry); continue; }
+  if (TARGET_PLAYER_ID && entry.playerId !== TARGET_PLAYER_ID) {
+    kept.push(entry);
+    audit.push({
+      playerId: entry.playerId,
+      playerName: entry.playerName,
+      competitionId: entry.competitionId,
+      tournamentName: entry.tournamentName,
+      code: entry.acceptanceCode,
+      event: entry.acceptanceEvent,
+      daysFromStart: daysFromStart(entry),
+      decision: 'skipped_targeted_backfill_other_player',
+    });
+    continue;
+  }
   const wanted = drawTypeWanted(entry);
   const d = daysFromStart(entry);
   let decision = 'kept_pre_tournament_acceptance';
@@ -492,6 +507,7 @@ const output = {
     today: TODAY,
     mode: BACKFILL ? 'one_time_historical_backfill' : 'live_t_minus_1',
     auditOnly: AUDIT_ONLY,
+    targetPlayerId: TARGET_PLAYER_ID || null,
     rule: 'From day -1 through tournament end inspect every official singles qualifying, main-draw and round-robin group phase. A player found in any compiled phase stays permanently without an acceptance label. Absence from qualifying alone never removes the player. Removal requires a compiled final singles phase (main draw or groups), no player occurrence in any compiled phase, and no relevant phase still empty, bye-only, missing or unreadable.',
     originalEntries: original.filter(e => e.circuit === 'tennis-europe').length,
     entriesFound: kept.filter(e => e.circuit === 'tennis-europe').length,
