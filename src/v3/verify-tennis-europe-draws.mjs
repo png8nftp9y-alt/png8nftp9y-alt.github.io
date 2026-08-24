@@ -429,12 +429,15 @@ for (const entry of original) {
   let decision = 'kept_pre_tournament_acceptance';
 
   const tournamentStillActive = !entry.endDate || TODAY <= entry.endDate;
-  const historicalBackfillTarget = BACKFILL && entry.endDate && entry.endDate < TODAY;
   const relationKey = [entry.playerId, entry.competitionId, entry.acceptanceEvent || entry.event || 'singles'].join('|');
   const prior = priorRelations[relationKey];
   const historicalDecision = historicalDecisions.get(relationKey);
   const previouslyRejected = String(historicalDecision?.decision || '').startsWith('removed_') || prior?.permanenceStatus === 'rejected_by_complete_singles_draws';
   const previouslyConfirmed = String(historicalDecision?.decision || '').includes('confirmed') || prior?.permanenceStatus === 'draw_confirmed_permanent';
+  const historicalBackfillTarget = Boolean(
+    entry.endDate && entry.endDate < TODAY &&
+    (BACKFILL || (!previouslyRejected && !previouslyConfirmed))
+  );
   if (!BACKFILL && entry.endDate && entry.endDate < TODAY && previouslyRejected) {
     decision = 'removed_existing_reliable_draw_rejection';
     audit.push({ playerId: entry.playerId, playerName: entry.playerName, competitionId: entry.competitionId, tournamentName: entry.tournamentName, code: entry.acceptanceCode, event: entry.acceptanceEvent, daysFromStart: d, decision });
