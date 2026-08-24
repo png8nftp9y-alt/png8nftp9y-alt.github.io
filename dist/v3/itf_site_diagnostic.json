@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T22:00:23.988Z",
+  "generatedAt": "2026-08-24T22:01:52.755Z",
   "page": "https://www.itftennis.com/en/tournament-calendar/world-tennis-tour-juniors-calendar/?categories=All&startdate=2026-08",
   "status": 200,
   "finalUrl": "https://www.itftennis.com/en/tournament-calendar/world-tennis-tour-juniors-calendar/?categories=All&startdate=2026-08",
@@ -18,14 +18,15 @@
     "https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js",
     "https://www.instagram.com/embed.js",
     "https://widgets.itf-production.sports-data.stadion.io/itf-widget-sdk.umd.js",
-    "https://www.itftennis.com/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=1&cb=885445498"
+    "https://www.itftennis.com/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=1&cb=406308663"
   ],
   "assets": [
     {
       "url": "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
       "status": 200,
-      "length": 125392,
-      "tokens": []
+      "length": 125391,
+      "tokens": [],
+      "snippets": []
     },
     {
       "url": "https://itftennis-ep.azureedge.net/media/assets/bundle.js?key=@assemblyVersion",
@@ -49,25 +50,35 @@
         "/tennis/api/TournamentApi/GetOrderOfPlay",
         "/tennis/Api/TournamentApi/GetResultsRoundUp?take=",
         "/tennis/Api/TournamentApi/GetResultsRoundUpFilters?circuitCode="
+      ],
+      "snippets": [
+        "or]=function(){return this}),o;function l(o){return function(l){return function(o){if(n)throw new TypeError(\"Generator is already executing.\");for(;i;)try{if(n=1,a&&(r=2&o[0]?a.return:o[0]?a.throw||((r=a.return)&&r.call(a),0):a.next)&&!(r=r.call(a,o[1])).done)return r;switch(a=0,r&&(o=[2&o[0],r.value]),o[0]){case 0:case 1:r=o;break;case 4:return i.label++,{value:o[1],done:!1};case 5:i.label++,a=o[1],o=[0];continue;case 7:o=i.ops.pop(),i.trys.pop();continue;default:if(!(r=(r=i.trys).length>0&&r[r.length-1])&&(6===o[0]||2===o[0])){i=0;continue}if(3===o[0]&&(!r||o[1]>r[0]&&o[1]<r[3])){i.label=o[1];break}if(6===o[0]&&i.label<r[1]){i.label=r[1],r=o;break}if(r&&i.label<r[2]){i.label=r[2],i.ops.push(o);break}r[2]&&i.ops.pop(),i.trys.pop();continue}o=t.call(e,i)}catch(e){o=[6,e],a=0}finally{n=r=0}if(5&o[0])throw o[1];return{value:o[0]?o[1]:void 0,done:!0}}([o,l])}}},s=\"/tennis/api/TournamentApi/GetAcceptanceList\",u=\"/tennis/api/TournamentApi/GetCalendarFilters\",c=function(e){return i(void 0,void 0,void 0,function(){var t;return l(this,function(n){switch(n.label){case 0:return[4,fetch(\"/tennis/Api/TournamentApi/GetResultsRibbon\",{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:JSON.stringify(e)})];case 1:return(t=n.sent()).ok?[4,t.json()]:[3,3];case 2:return[2,n.sent()];case 3:throw Error(t.statusText)}})})},d=function(e){var t=e.q,n=void 0===t?\"\":t,a=e.skip,r=void 0===a?0:a,i=e.take,l=void 0===i?10:i,s=e.startDate,u=void 0===s?\"\":s,c=e.endDate,d=void 0===c?\"\":c,f=e.tourCode,m=void 0===f?\"\":f,p=e.doorness,h=void 0===p?\"\":p,y=e.categories,b=void 0===y?\"\":y,_=e.isOrderAscending,g=void 0===_||_,v=e.orderField,k=void 0===v?\"\":v,M=e.surfaceCodes,S=void 0===M?\"\":M,w=e.zoneCode,D=void 0===w?\"\":w,E=e.nationCodes,L=void 0===E?\"\":E,T=e.drawFormat;return fetch(\"/tennis/api/TournamentApi/GetCalendar?circuitCode=\"+m+\"&searchString=\"+n+\"&skip=\"+r+(l?\"&take=\"+l:\"\")+\"&nationCodes=\"+L+\"&zoneCodes=\"+D+\"&dateFrom=\"+u+\"&dateTo=\"+d+\"&indoorOutdoor=\"+h+\"&categories=\"+b+\"&isOrderAscending=\"+g+\"&orderField=\"+k+\"&surfaceCodes=\"+S+\"&singlesDrawFormat=\"+(void 0===T?\"\":T)).then(o.a).then(function(e){return e.json()})};function f(e){var t=e.tournamentKey,n=e.circuitCode,a=e.playerTypeCode,r=e.ageCategoryCode,o=e.matchTypeCode;return i(this,void 0,void 0,function(){var e;return l(this,function(i){switch(i.label){case 0:return[4,fetch(s+\"?tournamentKey=\"+t+\"&circuitCode=\"+n+(a?\"&pla",
+        "List\",u=\"/tennis/api/TournamentApi/GetCalendarFilters\",c=function(e){return i(void 0,void 0,void 0,function(){var t;return l(this,function(n){switch(n.label){case 0:return[4,fetch(\"/tennis/Api/TournamentApi/GetResultsRibbon\",{method:\"POST\",headers:{\"Content-Type\":\"application/json\"},body:JSON.stringify(e)})];case 1:return(t=n.sent()).ok?[4,t.json()]:[3,3];case 2:return[2,n.sent()];case 3:throw Error(t.statusText)}})})},d=function(e){var t=e.q,n=void 0===t?\"\":t,a=e.skip,r=void 0===a?0:a,i=e.take,l=void 0===i?10:i,s=e.startDate,u=void 0===s?\"\":s,c=e.endDate,d=void 0===c?\"\":c,f=e.tourCode,m=void 0===f?\"\":f,p=e.doorness,h=void 0===p?\"\":p,y=e.categories,b=void 0===y?\"\":y,_=e.isOrderAscending,g=void 0===_||_,v=e.orderField,k=void 0===v?\"\":v,M=e.surfaceCodes,S=void 0===M?\"\":M,w=e.zoneCode,D=void 0===w?\"\":w,E=e.nationCodes,L=void 0===E?\"\":E,T=e.drawFormat;return fetch(\"/tennis/api/TournamentApi/GetCalendar?circuitCode=\"+m+\"&searchString=\"+n+\"&skip=\"+r+(l?\"&take=\"+l:\"\")+\"&nationCodes=\"+L+\"&zoneCodes=\"+D+\"&dateFrom=\"+u+\"&dateTo=\"+d+\"&indoorOutdoor=\"+h+\"&categories=\"+b+\"&isOrderAscending=\"+g+\"&orderField=\"+k+\"&surfaceCodes=\"+S+\"&singlesDrawFormat=\"+(void 0===T?\"\":T)).then(o.a).then(function(e){return e.json()})};function f(e){var t=e.tournamentKey,n=e.circuitCode,a=e.playerTypeCode,r=e.ageCategoryCode,o=e.matchTypeCode;return i(this,void 0,void 0,function(){var e;return l(this,function(i){switch(i.label){case 0:return[4,fetch(s+\"?tournamentKey=\"+t+\"&circuitCode=\"+n+(a?\"&playerTypeCode=\"+a:\"\")+(r?\"&ageCategoryCode=\"+r:\"\")+(o?\"&matchTypeCode=\"+o:\"\"),{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(e=i.sent()).ok?[4,e.json()]:[3,3];case 2:return[2,i.sent()];case 3:throw Error(e.statusText)}})})}function m(e,t,n){return i(this,void 0,void 0,function(){var a;return l(this,function(r){switch(r.label){case 0:return[4,fetch(u+\"?circuitCode=\"+e+\"&dateFrom=\"+t+\"&dateTo=\"+n,{method:\"GET\",headers:{\"Content-Type\":\"application/json\"},cache:\"no-cache\"})];case 1:return(a=r.sent()).ok?[4,a.json()]:[3,3];case 2:return[2,r.sent()];case 3:throw Error(a.statusText)}})})}var p=function(e){return fetch(\"/tennis/Api/TournamentApi/GetQualificationFilters?\"+r.a.stringify(e)).then(o.a).then(function(e){return e.json()})},h=function(e){var t={tournamentKey:e.tournamentKey,ageCategoryCode:e.AgeCategories,matchTypeCode:e.MatchTypes,playerTypeCode:e.PlayerTypes,circuitCode:",
+        "or]=function(){return this}),o;function l(o){return function(l){return function(o){if(n)throw new TypeError(\"Generator is already executing.\");for(;i;)try{if(n=1,a&&(r=2&o[0]?a.return:o[0]?a.throw||((r=a.return)&&r.call(a),0):a.next)&&!(r=r.call(a,o[1])).done)return r;switch(a=0,r&&(o=[2&o[0],r.value]),o[0]){case 0:case 1:r=o;break;case 4:return i.label++,{value:o[1],done:!1};case 5:i.label++,a=o[1],o=[0];continue;case 7:o=i.ops.pop(),i.trys.pop();continue;default:if(!(r=(r=i.trys).length>0&&r[r.length-1])&&(6===o[0]||2===o[0])){i=0;continue}if(3===o[0]&&(!r||o[1]>r[0]&&o[1]<r[3])){i.label=o[1];break}if(6===o[0]&&i.label<r[1]){i.label=r[1],r=o;break}if(r&&i.label<r[2]){i.label=r[2],i.ops.push(o);break}r[2]&&i.ops.pop(),i.trys.pop();continue}o=t.call(e,i)}catch(e){o=[6,e],a=0}finally{n=r=0}if(5&o[0])throw o[1];return{value:o[0]?o[1]:void 0,done:!0}}([o,l])}}},l=\"/tennis/api/TournamentApi/GetDrawsheet\",s=\"/tennis/api/TournamentApi/GetEventFilters\",u=\"/tennis/api/TournamentApi/GetTieMatches\",c=\"/tennis/api/TournamentApi/GetMastersChampionshipEventFilters\";function d(e,t,n){return void 0===n&&(n=\"N\"),o(this,void 0,void 0,function(){var a,o;return i(this,function(i){switch(i.label){case 0:return a=Object.assign({tournamentId:t,tourType:n,weekNumber:0},e),[4,fetch(l+\"?\"+r.a.stringify(a),{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(o=i.sent()).ok?[4,o.json()]:[3,3];case 2:return[2,i.sent()];case 3:throw Error(o.statusText)}})})}function f(e){var t=e.year,n=e.tourType;return o(this,void 0,void 0,function(){var e;return i(this,function(a){switch(a.label){case 0:return[4,fetch(c+\"?\"+r.a.stringify({year:t,tourType:n}),{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(e=a.sent()).ok?[4,e.json()]:[3,3];case 2:return[2,a.sent()];case 3:throw Error(e.statusText)}})})}function m(e){return o(this,void 0,void 0,function(){var t;return i(this,function(n){switch(n.label){case 0:return[4,fetch(s+\"?tournamentKey=\"+e,{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(t=n.sent()).ok?[4,t.json()]:[3,3];case 2:return[2,n.sent()];case 3:throw Error(t.statusText)}})})}function p(e,t){return o(this,void 0,void 0,function(){var n;return i(this,function(a){switch(a.label){case 0:return[4,fetch(u+\"?\"+r.a.stringify({tieId:e,side1CountryCode:t}),{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:r",
+        "){return function(l){return function(o){if(n)throw new TypeError(\"Generator is already executing.\");for(;i;)try{if(n=1,a&&(r=2&o[0]?a.return:o[0]?a.throw||((r=a.return)&&r.call(a),0):a.next)&&!(r=r.call(a,o[1])).done)return r;switch(a=0,r&&(o=[2&o[0],r.value]),o[0]){case 0:case 1:r=o;break;case 4:return i.label++,{value:o[1],done:!1};case 5:i.label++,a=o[1],o=[0];continue;case 7:o=i.ops.pop(),i.trys.pop();continue;default:if(!(r=(r=i.trys).length>0&&r[r.length-1])&&(6===o[0]||2===o[0])){i=0;continue}if(3===o[0]&&(!r||o[1]>r[0]&&o[1]<r[3])){i.label=o[1];break}if(6===o[0]&&i.label<r[1]){i.label=r[1],r=o;break}if(r&&i.label<r[2]){i.label=r[2],i.ops.push(o);break}r[2]&&i.ops.pop(),i.trys.pop();continue}o=t.call(e,i)}catch(e){o=[6,e],a=0}finally{n=r=0}if(5&o[0])throw o[1];return{value:o[0]?o[1]:void 0,done:!0}}([o,l])}}},l=\"/tennis/api/TournamentApi/GetDrawsheet\",s=\"/tennis/api/TournamentApi/GetEventFilters\",u=\"/tennis/api/TournamentApi/GetTieMatches\",c=\"/tennis/api/TournamentApi/GetMastersChampionshipEventFilters\";function d(e,t,n){return void 0===n&&(n=\"N\"),o(this,void 0,void 0,function(){var a,o;return i(this,function(i){switch(i.label){case 0:return a=Object.assign({tournamentId:t,tourType:n,weekNumber:0},e),[4,fetch(l+\"?\"+r.a.stringify(a),{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(o=i.sent()).ok?[4,o.json()]:[3,3];case 2:return[2,i.sent()];case 3:throw Error(o.statusText)}})})}function f(e){var t=e.year,n=e.tourType;return o(this,void 0,void 0,function(){var e;return i(this,function(a){switch(a.label){case 0:return[4,fetch(c+\"?\"+r.a.stringify({year:t,tourType:n}),{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(e=a.sent()).ok?[4,e.json()]:[3,3];case 2:return[2,a.sent()];case 3:throw Error(e.statusText)}})})}function m(e){return o(this,void 0,void 0,function(){var t;return i(this,function(n){switch(n.label){case 0:return[4,fetch(s+\"?tournamentKey=\"+e,{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(t=n.sent()).ok?[4,t.json()]:[3,3];case 2:return[2,n.sent()];case 3:throw Error(t.statusText)}})})}function p(e,t){return o(this,void 0,void 0,function(){var n;return i(this,function(a){switch(a.label){case 0:return[4,fetch(u+\"?\"+r.a.stringify({tieId:e,side1CountryCode:t}),{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(n=a.sent()).ok?[4,n.json()]:[3,3];cas",
+        "hrow new TypeError(\"Generator is already executing.\");for(;i;)try{if(n=1,a&&(r=2&o[0]?a.return:o[0]?a.throw||((r=a.return)&&r.call(a),0):a.next)&&!(r=r.call(a,o[1])).done)return r;switch(a=0,r&&(o=[2&o[0],r.value]),o[0]){case 0:case 1:r=o;break;case 4:return i.label++,{value:o[1],done:!1};case 5:i.label++,a=o[1],o=[0];continue;case 7:o=i.ops.pop(),i.trys.pop();continue;default:if(!(r=(r=i.trys).length>0&&r[r.length-1])&&(6===o[0]||2===o[0])){i=0;continue}if(3===o[0]&&(!r||o[1]>r[0]&&o[1]<r[3])){i.label=o[1];break}if(6===o[0]&&i.label<r[1]){i.label=r[1],r=o;break}if(r&&i.label<r[2]){i.label=r[2],i.ops.push(o);break}r[2]&&i.ops.pop(),i.trys.pop();continue}o=t.call(e,i)}catch(e){o=[6,e],a=0}finally{n=r=0}if(5&o[0])throw o[1];return{value:o[0]?o[1]:void 0,done:!0}}([o,l])}}},l=\"/tennis/api/TournamentApi/GetDrawsheet\",s=\"/tennis/api/TournamentApi/GetEventFilters\",u=\"/tennis/api/TournamentApi/GetTieMatches\",c=\"/tennis/api/TournamentApi/GetMastersChampionshipEventFilters\";function d(e,t,n){return void 0===n&&(n=\"N\"),o(this,void 0,void 0,function(){var a,o;return i(this,function(i){switch(i.label){case 0:return a=Object.assign({tournamentId:t,tourType:n,weekNumber:0},e),[4,fetch(l+\"?\"+r.a.stringify(a),{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(o=i.sent()).ok?[4,o.json()]:[3,3];case 2:return[2,i.sent()];case 3:throw Error(o.statusText)}})})}function f(e){var t=e.year,n=e.tourType;return o(this,void 0,void 0,function(){var e;return i(this,function(a){switch(a.label){case 0:return[4,fetch(c+\"?\"+r.a.stringify({year:t,tourType:n}),{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(e=a.sent()).ok?[4,e.json()]:[3,3];case 2:return[2,a.sent()];case 3:throw Error(e.statusText)}})})}function m(e){return o(this,void 0,void 0,function(){var t;return i(this,function(n){switch(n.label){case 0:return[4,fetch(s+\"?tournamentKey=\"+e,{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(t=n.sent()).ok?[4,t.json()]:[3,3];case 2:return[2,n.sent()];case 3:throw Error(t.statusText)}})})}function p(e,t){return o(this,void 0,void 0,function(){var n;return i(this,function(a){switch(a.label){case 0:return[4,fetch(u+\"?\"+r.a.stringify({tieId:e,side1CountryCode:t}),{method:\"GET\",headers:{\"Content-Type\":\"application/json\"}})];case 1:return(n=a.sent()).ok?[4,n.json()]:[3,3];case 2:return[2,a.sent()];case 3:throw Error(n.st"
       ]
     },
     {
       "url": "https://unpkg.com/react@18.3.1/umd/react.development.js",
       "status": 200,
       "length": 109931,
-      "tokens": []
+      "tokens": [],
+      "snippets": []
     },
     {
       "url": "https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js",
       "status": 200,
       "length": 1080205,
-      "tokens": []
+      "tokens": [],
+      "snippets": []
     },
     {
       "url": "https://www.instagram.com/embed.js",
       "status": 200,
       "length": 105620,
-      "tokens": []
+      "tokens": [],
+      "snippets": []
     },
     {
       "url": "https://widgets.itf-production.sports-data.stadion.io/itf-widget-sdk.umd.js",
@@ -79,13 +90,15 @@
         "https://www.daviscup.com/en/draws-results/tie.aspx?id=${(ze=c==null?void",
         "https://www.itftennis.com/tournament/${u==null?void",
         "https://www.itftennis.com/tournament/${c==null?void"
-      ]
+      ],
+      "snippets": []
     },
     {
-      "url": "https://www.itftennis.com/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=1&cb=885445498",
+      "url": "https://www.itftennis.com/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=1&cb=406308663",
       "status": 200,
-      "length": 84746,
-      "tokens": []
+      "length": 82216,
+      "tokens": [],
+      "snippets": []
     }
   ]
 }
