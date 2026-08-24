@@ -1,0 +1,23 @@
+name: Temporary ITF site endpoint diagnostic
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/v3/diagnose-itf-site.mjs','.github/workflows/temp-itf-site-diagnostic.yml']
+permissions: {contents: write}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node src/v3/diagnose-itf-site.mjs
+      - run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/itf_site_diagnostic.json
+          git commit -m 'Record temporary ITF endpoint diagnostic' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
