@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-24T22:01:52.755Z",
+  "generatedAt": "2026-08-24T22:04:00.986Z",
   "page": "https://www.itftennis.com/en/tournament-calendar/world-tennis-tour-juniors-calendar/?categories=All&startdate=2026-08",
   "status": 200,
   "finalUrl": "https://www.itftennis.com/en/tournament-calendar/world-tennis-tour-juniors-calendar/?categories=All&startdate=2026-08",
   "contentType": "text/html; charset=utf-8",
-  "htmlLength": 181273,
-  "hasIncapsula": true,
+  "htmlLength": 181274,
+  "hasIncapsulaChallenge": false,
   "tournamentLinks": [
     "https://www.itftennis.com/en/tournament/2025-itf-world-tennis-tour-junior-finals/chn/2025/j-jm-chn-2025-001/media-and-resources/",
     "https://www.itftennis.com/en/tournament/bnp-paribas-world-team-cup/usa/2026/wc-wwtc-usa-01a-2026/player-entries/",
@@ -18,13 +18,13 @@
     "https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js",
     "https://www.instagram.com/embed.js",
     "https://widgets.itf-production.sports-data.stadion.io/itf-widget-sdk.umd.js",
-    "https://www.itftennis.com/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=1&cb=406308663"
+    "https://www.itftennis.com/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=1&cb=1562285484"
   ],
   "assets": [
     {
       "url": "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
       "status": 200,
-      "length": 125391,
+      "length": 125498,
       "tokens": [],
       "snippets": []
     },
@@ -94,11 +94,43 @@
       "snippets": []
     },
     {
-      "url": "https://www.itftennis.com/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=1&cb=406308663",
+      "url": "https://www.itftennis.com/_Incapsula_Resource?SWJIYLWA=719d34d31c8e3a6e6fffd425f7e032f3&ns=1&cb=1562285484",
       "status": 200,
-      "length": 82216,
+      "length": 81390,
       "tokens": [],
       "snippets": []
+    }
+  ],
+  "apiTests": [
+    {
+      "circuitCode": "JT",
+      "url": "https://www.itftennis.com/tennis/api/TournamentApi/GetCalendar?circuitCode=JT&searchString=&skip=0&take=100&nationCodes=ITA&zoneCodes=&dateFrom=2025-12-18&dateTo=2026-12-31&indoorOutdoor=&categories=&isOrderAscending=true&orderField=StartDate&surfaceCodes=&singlesDrawFormat=",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "length": 7628,
+      "jsonType": "object",
+      "jsonSample": "{\"url\":\"/en/tournament-calendar/world-tennis-tour-juniors-calendar/\",\"items\":[{\"tournamentName\":\"J200 Florence\",\"dates\":\"01 Apr to 06 Apr 2026\",\"location\":\"FLORENCE\",\"category\":\"J200\",\"prizeMoney\":\"\",\"liveLink\":\"\",\"surfaceDesc\":\"Clay\",\"surfaceCode\":\"C\",\"tourStatusCode\":null,\"tourStatusDesc\":null,\"indoorOrOutDoor\":\"Outdoor\",\"isRecognised\":false,\"recognisedTournamentLink\":\"/en/about-us/governance/tournament-recognition/home/\",\"id\":0,\"name\":\"J200 Florence\",\"promotionalName\":\"49th CITY OF FLORENCE\",\"hostNation\":\"Italy\",\"hostNationCode\":\"ITA\",\"venue\":\"FLORENCE\",\"startDate\":\"2026-04-01T00:00:00\",\"endDate\":\"2026-04-06T00:00:00\",\"tournamentKey\":\"J-J200-ITA-2026-002\",\"tennisCategoryCode\":\"JT\",\"tournamentLink\":\"/en/tournament/j200-florence/ita/2026/j-j200-ita-2026-002/\",\"hospitality\":null,\"year\":2026,\"liveStreamingUrl\":\"\"},{\"tournamentName\":\"J200 Salsomaggiore\",\"dates\":\"27 Apr to 03 May 2026\",\"location\":\"SALSOMAGGIORE\",\"category\":\"J200\",\"prizeMoney\":\"\",\"liveLink\":\"\",\"surfaceDesc\":\"Clay\",\"surfaceCode\":\"C\",\"tourStatusCode\":null,\"tourStatusDesc\":null,\"indoorOrOutDoor\":\"Outdoor\",\"isRecognised\":false,\"recognisedTournamentLink\":\"/en/about-us/governance/tournament-recognition/home/\",\"id\":0,\"name\":\"J200 Salsomaggiore\",\"promotionalName\":\"BAYER JUNIOR INTERNATIONAL TOURNAMENT\",\"hostNation\":\"Italy\",\"hostNationCode\":\"ITA\",\"venue\":\"SALSOMAGGIORE\",\"startDate\":\"2026-04-27T00:00:00\",\"endDate\":\"2026-05-03T00:00:00\",\"tournamentKey\":\"J-J200-ITA-2026-001\",\"tennisCategoryCode\":\"JT\",\"tournamentLink\":\"/en/tournament/j200-salsomaggiore/ita/2026/j-j200-ita-2026-001/\",\"hospitality\":null,\"year\":2026,\"liveStreamingUrl\":\"\"},{\"tournamentName\":\"J200 Prato\",\"dates\":\"05 May to 09 May 2026\",\"location\":\"Prato\",\"category\":\"J200\",\"prizeMoney\":\"\",\"liveLink\":\"\",\"surfaceDesc\":\"Clay\",\"surfaceCode\":\"C\",\"tourStatusCode\":null,\"tourStatusDesc\":null,\"indoorOrOutDoor\":\"Outdoor\",\"isRecognised\":false,\"recognisedTournamentLink\":\"/en/about-us/governance/tournament-recognition/home/\",\"id\":0,\"name\":\"J200 Prato\",\"promotionalName\":\"Città di Prato\",\"hostNation\":\"Italy\",\"hostNationCode\":\"ITA\",\"venue\":\"Prato\",\"startDate\":\"2026-05-05T00:00:00\",\"endDate\":\"2026-05-09T00:00:00\",\"tournamentKey\":\"J-J200-ITA-2026-003\",\"tennisCategoryCode\":\"JT\",\"tournamentLink\":\"/en/tournament/j200-prato/ita/2026/j-j200-ita-2026-003/\",\"hospitality\":null,\"year\":2026,\"liveStreamingUrl\":\"\"},{\"tournamentName\":\"J300 Santa Croce Sull’Arno\",\"dates\":\"11 May to 16 May 2026\",\"location\":\"Santa Croce Sull’Arno\",\"category\":\"J300\",\"prizeMoney\":\"\",\"liveLink\":\"\",\"surfaceDesc\":\"Clay\",\"surfaceCode\":\"C\",\"tourStatusCode\":null,\"tourStatusDesc\":null,\"indoorOrOutDoor\":\"Outdoor\",\"isRecognised\":false,\"recognisedTournamentLink\":\"/en/about-us/governance/tournament-recognition/home/\",\"id\":0,\"name\":\"J300 Santa Croce Sull’Arno\",\"promotionalName\":\"Città di Santa Croce - Mauro Sabatini\",\"hostNation\":\"Italy\",\"hostNationCode\":\"ITA\",\"venue\":\"Santa Croce Sull’Arno\",\"startDate\":\"2026-05-11T00:00:00\",\"endDate\":\"2026-05-16T00:00:00\",\"tournamentKey\":\"J-J300-ITA-2026-001\",\"tennisCategoryCode\":\"JT\",\"tournamentLink\":\"/en/tournament/j300-santa-croce-sullarno/ita/2026/j-j300-ita-2026-001/\",\"hospitality\":null,\"year\":2026,\"liveStreamingUrl\":\"\"},{\"tournamentName\":\"J500 Milan\",\"dates\":\"18 May to 24 May 2026\",\"location\":\"Milan\",\"category\":\"J500\",\"prizeMoney\":\"\",\"liveLink\":\"\",\"surfaceDesc\":\"Clay\",\"surfaceCode\":\"C\",\"tourStatusCode\":null,\"tourStatusDesc\":null,\"indoorOrOutDoor\":\"Outdoor\",\"isRecognised\":false,\"recognisedTournamentLink\":\"/en/about-us/governance/tournament-recognition/home/\",\"id\":0,\"name\":\"J500 Milan\",\"promotionalName\":\"Trofeo Bonfiglio-Internazionali d'Italia Juniores\",\"hostNation\":\"Italy\",\"hostNationCode\":\"ITA\",\"venue\":\"Milan\",\"startDate\":\"2026-05-18T00:00:00\",\"endDate\":\"2026-05-24T00:00:00\",\"tournamentKey\":\"J-J500-ITA-2026-001\",\"tennisCategoryCode\":\"JT\",\"tournamentLink\":\"/en/tournament/j500-milan/ita/2026/j-j500-ita-2026-001/\",\"hospitality\":null,\"year\":2026,\"liveStreamingUrl\":\"\"},{\"tournamentName\":\"J30 Cuneo\",\"dates\":\"10 Aug to 15 Aug 2026\",\"location\":\"CUNEO\",\"category\":\"J30\",\"prizeMoney\":\"\",\"liveLink\":\"\",\"surfaceDesc\":\"Clay\",\"surfaceCode\":\"C\",\"tourStatusCode\":null,\"tourStatusDesc\":null,\"indoorOrOutDoor\":\"Outdoor\",\"isRecognised\":false,\"recognisedTournamentLink\":\"/en/about-us/governance/tournament-recognition/home/\",\"id\":0,\"name\":\"J30 Cuneo\",\"promotionalName\":\"J30 CUNEO\",\"hostNation\":\"Italy\",\"hostNationCode\":\"ITA\",\"venue\":\"CUNEO\",\"startDate\":\"2026-08-10T00:00:00\",\"endDate\":\"2026-08-15T00:00:00\",\"tournamentKey\":\"J-J30-ITA-2026-002\",\"tennisCategoryCode\":\"JT\",\"tournamentLink\":\"/en/tournament/j30-cuneo/ita/2026/j-j30-ita-2026-002/\",\"hospitality\":null,\"year\":2026,\"liveStreamingUrl\":\"\"},{\"tournamentName\":\"J30 Livorno\",\"dates\":\"18 Aug to 23 Aug 2026\",\"location\":\"Livorno\",\"category\":\"J30\",\"prizeMoney\":\"\",\"liveLink\":\"\",\"surfaceDesc\":\"Clay\",\"surfaceCode\":\"C\",\"tourStatusCode\":null,\"tourStatusDesc\":null,\"indoorOrOutDoor\":\"Outdoor\",\"isRecognised\":false,\"recognisedTournamentLink\":\"/en/about-us/governance/tournament-recognition/home/\",\"id\":0,\"name\":\"J30 Livorno\",\"promotionalName\":\"5° TORNEO INTERNAZIONALE CITTA' DI LIVORNO\",\"hostNation\":\"Italy\",\"hostNationCode\":\"ITA\",\"venue\":\"Livorno\",\"startDate\":\"2026-08-18T00:00:00\",\"endDate\":\"2026-08-23T00:00:00\",\"tournamentKey\":\"J-J30-ITA-2026-001\",\"tennisCategoryCode\":\"JT\",\"tournamentLink\":\"/en/tournament/j30-livorno/ita/2026/j-j30-ita-2026-001/\",\"hospitality\":null,\"year\":2026,\"liveStreamingUrl\":\"\"},{\"tournamentName\":\"J100 Palermo\",\"dates\":\"07 Sep to 13 Sep 2026\",\"location\":\"PALERMO\",\"category\":\"J100\",\"prizeMoney\":\"\",\"liveLink\":\"\",\"surfaceDesc\":\"Clay\",\"surfaceCode\":\"C\",\"tourStatusCode\":null,\"tourStatusDesc\":null,\"indoorOrOutDoor\":\"Outdoor\",\"isRecognised\":false,\"recognisedTournamentLink\":\"/en/about-us/governance/tournament-recognition/home/\",\"id\":0,\"name\":\"J100 Palermo\",\"promotionalName\":\"12° TORNEO INTERNAZIONALE U18 \\\"TROFEO ANTONINO MERCADANTE\\\"\",\"hostNation\":\"Italy\",\"hostNationCode\":\"ITA\",\"venue\":\"PALERMO\",\"startDate\":\"2026-09-07T00:00:00\",\"endDate\":\"2026-09-13T00:00:00\",\"tournamentKey\":\"J-J100-ITA-2026-001\",\"tennisCategoryCode\":\"JT\",\"tournamentLink\":\"/en/tournament/j100-palermo/ita/2026/j-j100-ita-2026-001/\",\"hospitality\":null,\"year\":2026,\"liveStreamingUrl\":\"\"},{\"tournamentName\":\"J60 Pescara\",\"dates\":\"28 Sep to 03 Oct 2026\",\"location\":\"PESCARA\",\"category\":\"J60\",\"prizeMoney\":\"\",\"liveLink\":\"\",\"surfaceDesc\":\"Clay\",\"surfaceCode\":\"C\",\"tourStatusCode\":null,\"tourStatusDesc\":null,\"indoorOrOutDoor\":\"Outdoor\",\"isRecognised\":false,\"recognisedTournamentLink\":\"/en/about-us/governance/tournament-recognition/home/\",\"id\":0,\"name\":\"J60 Pescara\",\"promotionalName\":\"J60 PESCARA\",\"hostNation\":\"Italy\",\"hostNationCode\":\"ITA\",\"venue\":\"PESCARA\",\"startDate\":\"2026-09-28T00:00:00\",\"endDate\":\"2026-10-03T00:00:00\",\"tournamentKey\":\"J-J60-ITA-2026-001\",\"tennisCategoryCode\":\"JT\",\"tournamentLink\":\"/en/tournament/j60-pescara/ita/2026/j-j60-ita-2026-001/\",\"hospitality\":null,\"year\":2026,\"liveStreamingUrl\":\"\"},{\"tournamentName\":\"J60 Bari\",\"dates\":\"05 Oct to 11 Oct 2026\",\"location\":\"bari\",\"category\":\"J60\",\"prizeMoney\":\"\",\"liveLink\":\"\",\"surfaceDesc\":\"Hard\",\"surfaceCode\":\"H\",\"tourStatusCode\":null,\"tourStatusDesc\":null,\"indoorOrOutDoor\":\"Outdoor\",\"isRecognised\":false,\"recognisedTournamentLink\":\"/en/about-us/governance/tournament-recognition/home/\",\"id\":0,\"name\":\"J60 Bari\",\"promotionalName\":\"J60 BARI\",\"hostNation\":\"Italy\",\"hostNationCode\":\"ITA\",\"venue\":\"bari\",\"startDate\":\"2026-10-05T00:00:00\",\"endDate\":\"2026-10-11T00:00:00\",\"tournamentKey\":\"J-J60-ITA-2026-002\",\"tennisCategoryCode\":\"JT\",\"tournamentLink\":\"/en/tournament/j60-bari/ita/2026/j-j60-ita-2026-002/\",\"hospitality\":null,\"year\":2026,\"liveStreamingUrl\":\"\"}],\"totalItems\":10}",
+      "textSample": ""
+    },
+    {
+      "circuitCode": "JW",
+      "url": "https://www.itftennis.com/tennis/api/TournamentApi/GetCalendar?circuitCode=JW&searchString=&skip=0&take=100&nationCodes=ITA&zoneCodes=&dateFrom=2025-12-18&dateTo=2026-12-31&indoorOutdoor=&categories=&isOrderAscending=true&orderField=StartDate&surfaceCodes=&singlesDrawFormat=",
+      "status": 500,
+      "contentType": "application/json; charset=utf-8",
+      "length": 47,
+      "jsonType": "object",
+      "jsonSample": "{\"Message\":\"An unexpected error has occurred.\"}",
+      "textSample": ""
+    },
+    {
+      "circuitCode": "",
+      "url": "https://www.itftennis.com/tennis/api/TournamentApi/GetCalendar?circuitCode=&searchString=&skip=0&take=100&nationCodes=ITA&zoneCodes=&dateFrom=2025-12-18&dateTo=2026-12-31&indoorOutdoor=&categories=&isOrderAscending=true&orderField=StartDate&surfaceCodes=&singlesDrawFormat=",
+      "status": 500,
+      "contentType": "application/json; charset=utf-8",
+      "length": 47,
+      "jsonType": "object",
+      "jsonSample": "{\"Message\":\"An unexpected error has occurred.\"}",
+      "textSample": ""
     }
   ]
 }
