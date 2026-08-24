@@ -2,7 +2,7 @@ name: Court Watch v3 ITF live database
 on:
   workflow_dispatch:
   schedule:
-    - cron: '7,22,37,52 * * * *'
+    - cron: '*/14 * * * *'
   push:
     branches: [main]
     paths: ['players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/discover-itf-acceptance-shard.mjs','src/v3/discover-itf-results-shard.mjs','src/v3/merge-itf-acceptance-shards.mjs','src/v3/verify-itf-draws.mjs','src/v3/maintain-itf-database.mjs','src/v3/validate-itf-system.mjs','src/v3/itf-r2-cache.sh','.github/workflows/courtwatch-v3-itf-live.yml']
