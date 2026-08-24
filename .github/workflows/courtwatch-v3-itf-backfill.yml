@@ -1,6 +1,9 @@
 name: Court Watch v3 ITF complete backfill
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-backfill.yml']
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-backfill,cancel-in-progress: false}
 jobs:
