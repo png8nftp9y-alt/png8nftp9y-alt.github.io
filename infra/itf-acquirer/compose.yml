@@ -1,0 +1,13 @@
+services:
+  itf-acquirer:
+    build: .
+    restart: unless-stopped
+    shm_size: 1gb
+    ports:
+      - "127.0.0.1:8788:8788"
+    environment:
+      ITF_ACQUIRER_TOKEN: ${ITF_ACQUIRER_TOKEN}
+      ITF_BROWSER_PROFILE_DIR: /data/chrome-profile
+      ITF_BROWSER_CACHE_DIR: /data/response-cache
+    volumes:
+      - ./data:/data
