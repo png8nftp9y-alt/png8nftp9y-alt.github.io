@@ -27,7 +27,7 @@ jobs:
           run-id: 32871885023
           pattern: itf-history-draw-00-*
           path: dist/v3/shards/itf/draw-tasks
-          merge-multiple: true
+          # Keep one directory per artifact; the audit walks recursively.
       - name: Audit 256 draw tasks
         env:
           ITF_BATCH: '00'
