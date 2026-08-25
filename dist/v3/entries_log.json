@@ -1,7 +1,7 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-25T23:00:32.068Z",
-  "status": "isolated_engine_merge_guarded_fitp_te_itf",
+  "generatedAt": "2026-08-25T23:02:23.448Z",
+  "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 27,
@@ -13,14 +13,32 @@
       "itf": 5
     },
     "warnings": 0,
-    "tennisEuropeVisible": 46,
+    "tennisEuropeVisible": 89,
     "tennisEuropeAcceptanceConfirmed": 3,
-    "diagnostics": "green"
+    "diagnostics": "yellow"
   },
-  "sourceRefs": {
-    "fitp": "main",
-    "tennisEurope": "main",
-    "itf": "main"
+  "engines": {
+    "discoverFitp": {
+      "status": "fitp_entries_complete_from_versioned_participant_cache"
+    },
+    "discoverTennisEurope": {
+      "status": "tennis_europe_acceptance_complete_draw_parser_v2_applied",
+      "calendarMerge": "enabled_for_dated_official_acceptance_list_entries"
+    },
+    "discoverItf": {
+      "status": "itf_acceptance_complete_with_historical_draw_backfill"
+    },
+    "entries": {
+      "status": "built",
+      "file": "src/v3/entries-engine.mjs",
+      "method": "merge FITP + validated dated TE acceptance list/profile entries + ITF; no v1/v2/data.json"
+    },
+    "ordersOfPlay": {
+      "status": "active"
+    },
+    "results": {
+      "status": "active"
+    }
   },
   "warnings": []
 }
