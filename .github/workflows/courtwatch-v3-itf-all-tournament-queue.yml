@@ -1,0 +1,60 @@
+name: Court Watch v3 ITF complete tournament queue
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-all-tournament-queue.yml','src/v3/run-itf-tournament-queue-worker.mjs']
+permissions: {contents: read,actions: read}
+concurrency: {group: courtwatch-v3-itf-complete-queue,cancel-in-progress: false}
+jobs:
+  queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: {worker: [0,1]}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32805208035,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
+      - name: Process assigned tournaments sequentially
+        env: {ITF_QUEUE_WORKER: '${{ matrix.worker }}',ITF_QUEUE_WORKERS: '2',ITF_QUEUE_DELAY_MS: '3000',ITF_REQUEST_TIMEOUT_MS: '30000',ITF_REQUEST_DELAY_MS: '2400'}
+        run: node src/v3/run-itf-tournament-queue-worker.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-complete-queue-${{ matrix.worker }}
+          path: |
+            dist/v3/shards/itf/tournament-*.json.gz
+            dist/v3/itf-queue-worker-${{ matrix.worker }}.json
+          retention-days: 14
+  review:
+    needs: queue
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32805208035,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'itf-complete-queue-*',path: 'dist/v3',merge-multiple: true}
+      - run: |
+          node src/v3/apply-itf-result-retries.mjs
+          node src/v3/discover-itf-draw-entries.mjs
+        env: {ITF_PATCH_MODE: tournament,ITF_PATCH_DIR: 'dist/v3/shards/itf',ITF_ALLOW_RESIDUAL: '1'}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-complete-queue-review
+          path: |
+            dist/v3/source_itf_entries.json
+            dist/v3/source_itf_draw_entry_discovery_audit.json
+            dist/v3/source_itf_retry_audit.json
+            dist/v3/itf-queue-worker-*.json
+            dist/v3/shards/itf/results-*.json.gz
+          retention-days: 14
