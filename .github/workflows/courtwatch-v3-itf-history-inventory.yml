@@ -20,9 +20,10 @@ jobs:
         with: {node-version: '22'}
       - name: Inventory one concluded tournament
         env:
-          ITF_TOURNAMENT_INDEX: ${{ matrix.slot + 0 }}
+          ITF_TOURNAMENT_SLOT: ${{ matrix.slot }}
+          ITF_TOURNAMENT_OFFSET: '0'
           ITF_REQUEST_TIMEOUT_MS: '30000'
-        run: node src/v3/inventory-itf-history-tournament.mjs
+        run: ITF_TOURNAMENT_INDEX=$((ITF_TOURNAMENT_SLOT + ITF_TOURNAMENT_OFFSET)) node src/v3/inventory-itf-history-tournament.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -42,9 +43,10 @@ jobs:
         with: {node-version: '22'}
       - name: Inventory one concluded tournament
         env:
-          ITF_TOURNAMENT_INDEX: ${{ matrix.slot + 200 }}
+          ITF_TOURNAMENT_SLOT: ${{ matrix.slot }}
+          ITF_TOURNAMENT_OFFSET: '200'
           ITF_REQUEST_TIMEOUT_MS: '30000'
-        run: node src/v3/inventory-itf-history-tournament.mjs
+        run: ITF_TOURNAMENT_INDEX=$((ITF_TOURNAMENT_SLOT + ITF_TOURNAMENT_OFFSET)) node src/v3/inventory-itf-history-tournament.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -64,9 +66,10 @@ jobs:
         with: {node-version: '22'}
       - name: Inventory one concluded tournament
         env:
-          ITF_TOURNAMENT_INDEX: ${{ matrix.slot + 400 }}
+          ITF_TOURNAMENT_SLOT: ${{ matrix.slot }}
+          ITF_TOURNAMENT_OFFSET: '400'
           ITF_REQUEST_TIMEOUT_MS: '30000'
-        run: node src/v3/inventory-itf-history-tournament.mjs
+        run: ITF_TOURNAMENT_INDEX=$((ITF_TOURNAMENT_SLOT + ITF_TOURNAMENT_OFFSET)) node src/v3/inventory-itf-history-tournament.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -86,9 +89,10 @@ jobs:
         with: {node-version: '22'}
       - name: Inventory one concluded tournament
         env:
-          ITF_TOURNAMENT_INDEX: ${{ matrix.slot + 600 }}
+          ITF_TOURNAMENT_SLOT: ${{ matrix.slot }}
+          ITF_TOURNAMENT_OFFSET: '600'
           ITF_REQUEST_TIMEOUT_MS: '30000'
-        run: node src/v3/inventory-itf-history-tournament.mjs
+        run: ITF_TOURNAMENT_INDEX=$((ITF_TOURNAMENT_SLOT + ITF_TOURNAMENT_OFFSET)) node src/v3/inventory-itf-history-tournament.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
