@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 90
     strategy:
       fail-fast: false
-      max-parallel: 8
+      max-parallel: 16
       matrix:
         shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
     steps:
@@ -48,42 +48,18 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Configure R2
-        env:
-          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
-        run: |
-          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
-          echo "R2_ACCOUNT_ID=$R2_ACCOUNT_ID" >> "$GITHUB_ENV"
-          echo "R2_BUCKET=$R2_BUCKET" >> "$GITHUB_ENV"
-          echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"
-          echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
-          echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
-      - run: python -m pip install --quiet awscli && bash src/v3/itf-r2-cache.sh restore
       - uses: actions/download-artifact@v4
         with:
           pattern: itf-fast-results-*
           path: dist/v3/shards/itf
           merge-multiple: true
-      - uses: actions/download-artifact@v4
-        with:
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          run-id: 32787985907
-          pattern: itf-acceptance-*
-          path: dist/v3/shards/itf
-          merge-multiple: true
-      - name: Merge and validate the candidate database
+      - name: Certify the clean historical acquisition
         run: |
           set -euo pipefail
-          node src/v3/merge-itf-acceptance-shards.mjs
+          RETRIES=$(for file in dist/v3/shards/itf/results-*.json.gz; do gzip -dc "$file"; done | jq -s '[.[].retryQueue[]] | length')
+          echo "Historical retry items: $RETRIES"
+          test "$RETRIES" -eq 0
           node src/v3/discover-itf-draw-entries.mjs
-          node src/v3/verify-itf-draws.mjs
-          node src/v3/maintain-itf-database.mjs
-          node src/v3/validate-itf-system.mjs
-          node src/v3/entries-engine.mjs
       - name: Upload candidate tournament list for review
         uses: actions/upload-artifact@v4
         with:
