@@ -3,7 +3,7 @@ import {chromium} from 'playwright';
 import {eventCombinations,readJson} from './itf-common.mjs';
 const id=String(process.env.ITF_COMPETITION_ID||'J-J30-POR-2026-001');
 const map=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]}),t=(map.tournaments||[]).find(x=>x.competitionId===id);if(!t)throw new Error('tournament_not_found');
-const browser=await chromium.launch({headless:true,args:['--disable-blink-features=AutomationControlled']});
+const browser=await chromium.launch({headless:false,args:['--disable-blink-features=AutomationControlled']});
 const context=await browser.newContext({locale:'en-GB',timezoneId:'Europe/Rome',userAgent:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'});
 const page=await context.newPage();
 async function settle(){await page.goto(t.sourceUrl,{waitUntil:'domcontentloaded',timeout:60000});await page.waitForTimeout(3500)}
