@@ -19,15 +19,22 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Download all batch 00 draw artifacts
-        uses: actions/download-artifact@v4
-        with:
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          run-id: 32871885023
-          pattern: itf-history-draw-00-*
-          path: dist/v3/shards/itf/draw-tasks
-          # Keep one directory per artifact; the audit walks recursively.
+      - name: Download exactly all 256 batch 00 artifacts via paginated API
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: '32871885023'
+          EXPECTED: '256'
+        run: |
+          set -euo pipefail
+          mkdir -p dist/v3/shards/itf/draw-tasks /tmp/itf-draw-zips
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN}/artifacts?per_page=100"             --jq '.artifacts[] | select(.name | startswith("itf-history-draw-00-")) | [.id,.name] | @tsv'             > /tmp/itf-draw-artifacts.tsv
+          count=$(wc -l < /tmp/itf-draw-artifacts.tsv)
+          test "$count" -eq "$EXPECTED"
+          while IFS=$'\t' read -r id name; do
+            gh api -H 'Accept: application/vnd.github+json'               "repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}/zip" > "/tmp/itf-draw-zips/${id}.zip"
+            mkdir -p "dist/v3/shards/itf/draw-tasks/${name}"
+            unzip -q "/tmp/itf-draw-zips/${id}.zip" -d "dist/v3/shards/itf/draw-tasks/${name}"
+          done < /tmp/itf-draw-artifacts.tsv
       - name: Audit 256 draw tasks
         env:
           ITF_BATCH: '00'
