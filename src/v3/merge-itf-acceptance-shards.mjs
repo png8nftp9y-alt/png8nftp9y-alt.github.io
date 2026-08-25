@@ -6,13 +6,10 @@ const dir='dist/v3/shards/itf',TOTAL=Number(process.env.ITF_ACCEPTANCE_TOTAL||16
 for(let i=0;i<TOTAL;i++){
   const d=await readJson(`${dir}/acceptance-${i}.json`,null);
   if(!d){errors.push({type:'missing_acceptance_shard',shard:i});continue}
-  const shardErrors=(d.errors||[]).length,blockingLimit=Math.max(5,(d.tournamentsChecked||0)*.15);
-  shards.push({shard:i,status:d.status,tournamentsChecked:d.tournamentsChecked,participantsFound:d.participantsFound,entriesFound:d.entriesFound,errors:shardErrors,blockingLimit});
-  // The shard process itself treats anti-bot/API misses within this threshold
-  // as retryable. The merge must use the same rule instead of rejecting every
-  // valid `partial` shard.
-  if(shardErrors>blockingLimit)errors.push({type:'acceptance_shard_over_blocking_error_limit',shard:i,status:d.status,shardErrors,blockingLimit});
-  else if(shardErrors)warnings.push({type:'acceptance_shard_retryable_errors',shard:i,shardErrors,blockingLimit});
+  const shardErrors=(d.errors||[]).length,retryable=(d.retryQueue||[]).length;
+  shards.push({shard:i,status:d.status,tournamentsChecked:d.tournamentsChecked,participantsFound:d.participantsFound,entriesFound:d.entriesFound,errors:shardErrors,retryable});
+  if(String(d.status).includes('blocked'))errors.push({type:'acceptance_shard_blocked',shard:i,status:d.status,shardErrors});
+  else if(retryable)warnings.push({type:'acceptance_shard_retry_queue',shard:i,retryable});
   entries.push(...(d.entries||[]));
   try{participants.push(...JSON.parse(gunzipSync(await fs.readFile(`${dir}/participants-${i}.json.gz`))).participants)}catch{errors.push({type:'missing_participant_shard',shard:i})}
 }
