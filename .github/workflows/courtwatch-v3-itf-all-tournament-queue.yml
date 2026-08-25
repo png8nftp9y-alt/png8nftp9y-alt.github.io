@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32805208035,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32805787865,pattern: 'itf-complete-queue-review',path: 'dist/v3',merge-multiple: true}
       - name: Process assigned tournaments sequentially
         env: {ITF_QUEUE_WORKER: '${{ matrix.worker }}',ITF_QUEUE_WORKERS: '2',ITF_QUEUE_DELAY_MS: '3000',ITF_REQUEST_TIMEOUT_MS: '30000',ITF_REQUEST_DELAY_MS: '2400'}
         run: node src/v3/run-itf-tournament-queue-worker.mjs
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32805208035,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32805787865,pattern: 'itf-complete-queue-review',path: 'dist/v3',merge-multiple: true}
       - uses: actions/download-artifact@v4
         with: {pattern: 'itf-complete-queue-*',path: 'dist/v3',merge-multiple: true}
       - run: |
