@@ -1,0 +1,56 @@
+name: Court Watch v3 ITF targeted results retry review
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-results-retry-review.yml','src/v3/retry-itf-result-queue-shard.mjs','src/v3/apply-itf-result-retries.mjs']
+permissions: {contents: read, actions: read}
+concurrency: {group: courtwatch-v3-itf-targeted-retry,cancel-in-progress: true}
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix: {shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32794205074
+          pattern: itf-fast-results-*
+          path: dist/v3/shards/itf
+          merge-multiple: true
+      - name: Retry only unresolved tournaments
+        env: {ITF_REQUEST_TIMEOUT_MS: '30000', ITF_REQUEST_DELAY_MS: '2400'}
+        run: ITF_RETRY_SHARD=${{ matrix.shard }} ITF_RETRY_TOTAL=32 node src/v3/retry-itf-result-queue-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'itf-targeted-retry-${{ matrix.shard }}', path: 'dist/v3/shards/itf/retry-${{ matrix.shard }}.json.gz', retention-days: 14}
+  review:
+    needs: retry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {github-token: '${{ github.token }}', repository: '${{ github.repository }}', run-id: 32794205074, pattern: 'itf-fast-results-*', path: dist/v3/shards/itf, merge-multiple: true}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'itf-targeted-retry-*', path: dist/v3/shards/itf, merge-multiple: true}
+      - run: |
+          node src/v3/apply-itf-result-retries.mjs
+          node src/v3/discover-itf-draw-entries.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-targeted-retry-review
+          path: |
+            dist/v3/source_itf_entries.json
+            dist/v3/source_itf_draw_entry_discovery_audit.json
+            dist/v3/shards/itf/retry-*.json.gz
+          retention-days: 14
