@@ -29,4 +29,4 @@ const audit={version:1,generatedAt:new Date().toISOString(),batch,expected,artif
 await fs.mkdir('dist/v3/audits',{recursive:true});
 await fs.writeFile(`dist/v3/audits/itf-history-draw-batch-${batch}.json`,JSON.stringify(audit,null,2)+'\n');
 console.log(JSON.stringify({...audit,retryTasks:undefined,unreadableFiles:undefined}));
-if(audit.missing||audit.unreadable)process.exitCode=2;
+if(audit.retry||audit.missing||audit.unreadable)process.exitCode=2;
