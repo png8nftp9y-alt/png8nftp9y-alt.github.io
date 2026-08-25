@@ -2,12 +2,17 @@ import fs from 'node:fs/promises';
 import {gunzipSync,gzipSync} from 'node:zlib';
 import {NOW,readJson,writeJson} from './itf-common.mjs';
 
-const dir='dist/v3/shards/itf',TOTAL=Number(process.env.ITF_ACCEPTANCE_TOTAL||16),entries=[],participants=[],shards=[],errors=[];
+const dir='dist/v3/shards/itf',TOTAL=Number(process.env.ITF_ACCEPTANCE_TOTAL||16),entries=[],participants=[],shards=[],errors=[],warnings=[];
 for(let i=0;i<TOTAL;i++){
   const d=await readJson(`${dir}/acceptance-${i}.json`,null);
   if(!d){errors.push({type:'missing_acceptance_shard',shard:i});continue}
-  shards.push({shard:i,status:d.status,tournamentsChecked:d.tournamentsChecked,participantsFound:d.participantsFound,entriesFound:d.entriesFound,errors:(d.errors||[]).length});
-  if(!String(d.status).includes('complete'))errors.push({type:'incomplete_acceptance_shard',shard:i,status:d.status});
+  const shardErrors=(d.errors||[]).length,blockingLimit=Math.max(5,(d.tournamentsChecked||0)*.15);
+  shards.push({shard:i,status:d.status,tournamentsChecked:d.tournamentsChecked,participantsFound:d.participantsFound,entriesFound:d.entriesFound,errors:shardErrors,blockingLimit});
+  // The shard process itself treats anti-bot/API misses within this threshold
+  // as retryable. The merge must use the same rule instead of rejecting every
+  // valid `partial` shard.
+  if(shardErrors>blockingLimit)errors.push({type:'acceptance_shard_over_blocking_error_limit',shard:i,status:d.status,shardErrors,blockingLimit});
+  else if(shardErrors)warnings.push({type:'acceptance_shard_retryable_errors',shard:i,shardErrors,blockingLimit});
   entries.push(...(d.entries||[]));
   try{participants.push(...JSON.parse(gunzipSync(await fs.readFile(`${dir}/participants-${i}.json.gz`))).participants)}catch{errors.push({type:'missing_participant_shard',shard:i})}
 }
@@ -29,7 +34,7 @@ for(const [key,target] of Object.entries(targets)){
   else if(target.acceptanceEntry)visible.set(key,target.acceptanceEntry);
 }
 const unique=[...visible.values()].sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))||String(a.playerName).localeCompare(String(b.playerName)));
-const out={version:3,generatedAt:NOW,status:errors.length?'itf_acceptance_merge_blocked':'itf_acceptance_complete',shards,tournamentsChecked:shards.reduce((a,s)=>a+s.tournamentsChecked,0),participantsFound:participants.length,currentAcceptanceEntries:current.length,entriesFound:unique.length,entries:unique,errors};
+const out={version:4,generatedAt:NOW,status:errors.length?'itf_acceptance_merge_blocked':warnings.length?'itf_acceptance_complete_with_retryable_errors':'itf_acceptance_complete',shards,tournamentsChecked:shards.reduce((a,s)=>a+s.tournamentsChecked,0),participantsFound:participants.length,currentAcceptanceEntries:current.length,entriesFound:unique.length,entries:unique,warnings,errors};
 await writeJson('dist/v3/source_itf_entries.json',out);
 await writeJson('dist/v3/source_itf_acceptance_audit.json',{...out,entries:unique.slice(0,300)});
 await writeJson('history/itf_draw_target_db.json',{version:2,generatedAt:NOW,status:'itf_draw_target_database_complete',rule:'Same T-1 decision as Tennis Europe; retain the last official acceptance locally because ITF removes it when draws are published.',targetCount:Object.keys(targets).length,targets});
