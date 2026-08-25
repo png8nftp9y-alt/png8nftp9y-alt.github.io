@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['.github/workflows/courtwatch-v3-itf-results-backfill-fast.yml','src/v3/discover-itf-results-shard.mjs']
+    paths: ['.github/workflows/courtwatch-v3-itf-results-backfill-fast.yml','src/v3/discover-itf-results-shard.mjs','src/v3/discover-itf-draw-entries.mjs']
 
 permissions:
   contents: write
@@ -79,6 +79,7 @@ jobs:
         run: |
           set -euo pipefail
           node src/v3/merge-itf-acceptance-shards.mjs
+          node src/v3/discover-itf-draw-entries.mjs
           node src/v3/verify-itf-draws.mjs
           node src/v3/maintain-itf-database.mjs
           node src/v3/validate-itf-system.mjs
@@ -89,7 +90,7 @@ jobs:
           set -euo pipefail
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json history/itf_tournament_catalog.json history/itf_player_tournament_db.json history/itf_database_audit.json
+          git add dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/source_itf_draw_entry_discovery_audit.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json history/itf_tournament_catalog.json history/itf_player_tournament_db.json history/itf_database_audit.json
           git commit -m 'Publish complete accelerated ITF results backfill'
           git pull --rebase origin main
           git push origin HEAD:main
