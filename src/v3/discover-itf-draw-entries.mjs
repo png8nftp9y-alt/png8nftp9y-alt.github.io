@@ -3,6 +3,7 @@ import {gunzipSync} from 'node:zlib';
 import {NOW,aliases,norm,readJson,writeJson} from './itf-common.mjs';
 
 const dir='dist/v3/shards/itf';
+const historicalTMinusOne=process.env.ITF_HISTORICAL_T_MINUS_ONE==='1';
 const sourceFile='dist/v3/source_itf_entries.json';
 const source=await readJson(sourceFile,{entries:[]});
 const map=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]});
@@ -34,7 +35,7 @@ for(const file of files){
 const merged=new Map((source.entries||[]).map(e=>[`${e.playerId}|${e.competitionId}`,e]));
 for(const [key,entry] of discovered)merged.set(key,entry);
 const entries=[...merged.values()].sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))||String(a.playerName).localeCompare(String(b.playerName)));
-await writeJson(sourceFile,{...source,version:3,generatedAt:NOW,entriesFound:entries.length,drawEntriesDiscovered:discovered.size,entries});
-await writeJson('dist/v3/source_itf_draw_entry_discovery_audit.json',{version:1,generatedAt:NOW,status:errors.length?'itf_draw_entry_discovery_with_errors':'itf_draw_entry_discovery_complete',resultShardFiles:files.length,matchesRead,namesRead,trackedPlayersFound:discovered.size,entries:[...discovered.values()],errors});
+await writeJson(sourceFile,{...source,version:3,generatedAt:NOW,entriesFound:entries.length,drawEntriesDiscovered:discovered.size,drawDiscoveryMode:historicalTMinusOne?'historical_t_minus_1_exception':'live_draw_discovery',entries});
+await writeJson('dist/v3/source_itf_draw_entry_discovery_audit.json',{version:2,generatedAt:NOW,status:errors.length?'itf_draw_entry_discovery_with_errors':'itf_draw_entry_discovery_complete',mode:historicalTMinusOne?'historical_t_minus_1_exception':'live_draw_discovery',rule:historicalTMinusOne?'For tournaments already concluded since 2025-12-18, T-1 is exceptionally considered matured: all published draws and groups are scanned even when the acceptance list is no longer available. Hits are stored as draw_confirmed in the same ITF player-tournament database used by live T-1.':'Live draw discovery for monitored ITF tournaments.',resultShardFiles:files.length,matchesRead,namesRead,trackedPlayersFound:discovered.size,entries:[...discovered.values()],errors});
 console.log(JSON.stringify({resultShardFiles:files.length,matchesRead,namesRead,trackedPlayersFound:discovered.size,errors:errors.length},null,2));
 if(errors.length)process.exitCode=2;
