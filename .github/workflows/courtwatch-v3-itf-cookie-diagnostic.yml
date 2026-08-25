@@ -1,0 +1,32 @@
+name: Court Watch v3 ITF cookie session diagnostic
+on:
+  workflow_dispatch:
+    inputs:
+      tournament:
+        description: ITF competition ID
+        required: false
+        default: J-J100-ITA-2026-001
+  push:
+    branches: [main]
+    paths:
+      - src/v3/diagnose-itf-cookie-session.mjs
+      - .github/workflows/courtwatch-v3-itf-cookie-diagnostic.yml
+permissions: {contents: read}
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Bootstrap ITF session and read one draw
+        env:
+          ITF_DIAGNOSTIC_TOURNAMENT: ${{ inputs.tournament || 'J-J100-ITA-2026-001' }}
+        run: node src/v3/diagnose-itf-cookie-session.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-cookie-session-diagnostic
+          path: dist/v3/itf_cookie_session_diagnostic.json
+          retention-days: 7
