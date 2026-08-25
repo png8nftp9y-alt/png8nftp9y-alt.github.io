@@ -1,0 +1,32 @@
+name: Court Watch v3 ITF inventory merge
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-inventory-merge.yml']
+permissions: {contents: read,actions: read}
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32868353005
+          pattern: itf-inventory-*
+          path: dist/v3/shards/itf/inventory
+          merge-multiple: true
+      - run: node src/v3/build-itf-history-draw-queue.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-history-draw-queue
+          path: |
+            dist/v3/itf_history_draw_queue.json
+            dist/v3/shards/itf/inventory/*.json
+          retention-days: 14
