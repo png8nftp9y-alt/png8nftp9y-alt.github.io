@@ -21,10 +21,10 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804860537,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32805208035,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
       - id: matrix
         env:
-          ITF_BATCH_OFFSET: ${{ inputs.batch_offset || '16' }}
+          ITF_BATCH_OFFSET: ${{ inputs.batch_offset || '32' }}
           ITF_BATCH_LIMIT: ${{ inputs.batch_limit || '16' }}
         run: node src/v3/build-itf-tournament-retry-matrix.mjs
   tournament:
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804860537,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32805208035,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
       - name: Read one tournament
         env: {ITF_RETRY_COMPETITION_ID: '${{ matrix.competitionId }}',ITF_REQUEST_TIMEOUT_MS: '30000',ITF_REQUEST_DELAY_MS: '2400'}
         run: node src/v3/retry-itf-result-queue-shard.mjs
@@ -56,7 +56,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804860537,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32805208035,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
       - uses: actions/download-artifact@v4
         with: {pattern: 'itf-tournament-*',path: 'dist/v3/current-patches',merge-multiple: true}
       - run: |
