@@ -1,49 +1,26 @@
 import fs from 'node:fs/promises';
 import {gunzipSync,gzipSync} from 'node:zlib';
+import crypto from 'node:crypto';
 import {NOW,readJson,writeJson} from './itf-common.mjs';
-
-const dir='dist/v3/shards/itf',TOTAL=Number(process.env.ITF_ACCEPTANCE_TOTAL||16),entries=[],withdrawals=[],participants=[],shards=[],errors=[],warnings=[];
-for(let i=0;i<TOTAL;i++){
-  const d=await readJson(`${dir}/acceptance-${i}.json`,null);
-  if(!d){errors.push({type:'missing_acceptance_shard',shard:i});continue}
-  const shardErrors=(d.errors||[]).length,retryable=(d.retryQueue||[]).length;
-  shards.push({shard:i,status:d.status,tournamentsChecked:d.tournamentsChecked,participantsFound:d.participantsFound,entriesFound:d.entriesFound,withdrawalsFound:(d.withdrawals||[]).length,errors:shardErrors,retryable});
-  if(String(d.status).includes('blocked'))errors.push({type:'acceptance_shard_blocked',shard:i,status:d.status,shardErrors});
-  else if(retryable)warnings.push({type:'acceptance_shard_retry_queue',shard:i,retryable});
-  entries.push(...(d.entries||[]));
-  withdrawals.push(...(d.withdrawals||[]));
-  try{participants.push(...JSON.parse(gunzipSync(await fs.readFile(`${dir}/participants-${i}.json.gz`))).participants)}catch{errors.push({type:'missing_participant_shard',shard:i})}
-}
-
+const dir='dist/v3/shards/itf',TOTAL=Number(process.env.ITF_ACCEPTANCE_TOTAL||16),entries=[],withdrawals=[],participants=[],scanned=new Set(),shards=[],errors=[];
+for(let i=0;i<TOTAL;i++){const d=await readJson(`${dir}/acceptance-${i}.json`,null);if(!d){errors.push({type:'missing_acceptance_shard',shard:i});continue}shards.push({shard:i,status:d.status,tournamentsChecked:d.tournamentsChecked,participantsFound:d.participantsFound,entriesFound:d.entriesFound,withdrawalsFound:(d.withdrawals||[]).length,retriesUsed:d.retriesUsed||0,errors:(d.errors||[]).length});if(d.status!=='itf_acceptance_shard_complete'||(d.errors||[]).length)errors.push({type:'acceptance_shard_incomplete',shard:i,status:d.status,errors:d.errors||[]});for(const id of d.scannedTournamentIds||[])scanned.add(id);entries.push(...(d.entries||[]));withdrawals.push(...(d.withdrawals||[]));try{participants.push(...JSON.parse(gunzipSync(await fs.readFile(`${dir}/participants-${i}.json.gz`))).participants)}catch{errors.push({type:'missing_participant_shard',shard:i})}}
+if(errors.length){const out={version:6,generatedAt:NOW,status:'itf_acceptance_merge_blocked',shards,errors};await writeJson('dist/v3/source_itf_acceptance_audit.json',out);console.error(JSON.stringify(out,null,2));process.exit(2)}
 const withdrawnByKey=new Map(withdrawals.map(e=>[`${e.playerId}|${e.competitionId}`,e]));
 const current=[...new Map(entries.map(e=>[`${e.playerId}|${e.competitionId}`,e])).entries()].filter(([key])=>!withdrawnByKey.has(key)).map(([,entry])=>entry);
 await fs.mkdir('history',{recursive:true});
 const oldTargets=await readJson('history/itf_draw_target_db.json',{targets:{}}),targets={...(oldTargets.targets||{})};
-for(const e of current){
-  const key=`${e.playerId}|${e.competitionId}`,old=targets[key]||{};
-  targets[key]={...old,...e,acceptanceEntry:e,drawDecision:'pending',firstSeenInAcceptanceAt:old.firstSeenInAcceptanceAt||e.lastSeen||NOW,lastSeenInAcceptanceAt:e.lastSeen||NOW};
-}
-for(const [key,withdrawal] of withdrawnByKey){
-  const old=targets[key]||{};
-  targets[key]={...old,...withdrawal,drawDecision:'removed',removalReason:'withdrawn',withdrawnAt:withdrawal.withdrawnAt||NOW,lastDrawCheckedAt:NOW};
-}
-
-// ITF removes the online acceptance list when draws begin. Preserve the last
-// official acceptance record so the map follows the same state machine as TE.
-// An explicit withdrawn status always overrides both acceptance and draw history.
-const visible=new Map(current.map(e=>[`${e.playerId}|${e.competitionId}`,e]));
-for(const [key,target] of Object.entries(targets)){
-  if(visible.has(key)||target.drawDecision==='removed'||withdrawnByKey.has(key))continue;
-  if(target.drawDecision==='confirmed'&&target.drawEntry)visible.set(key,target.drawEntry);
-  else if(target.acceptanceEntry)visible.set(key,target.acceptanceEntry);
-}
+for(const e of current){const key=`${e.playerId}|${e.competitionId}`,old=targets[key]||{};targets[key]={...old,...e,acceptanceEntry:e,drawDecision:old.drawDecision==='confirmed'?'confirmed':'pending',firstSeenInAcceptanceAt:old.firstSeenInAcceptanceAt||e.lastSeen||NOW,lastSeenInAcceptanceAt:e.lastSeen||NOW}}
+for(const [key,withdrawal] of withdrawnByKey){const old=targets[key]||{};targets[key]={...old,...withdrawal,drawDecision:'removed',removalReason:'withdrawn',withdrawnAt:withdrawal.withdrawnAt||NOW,lastDrawCheckedAt:NOW}}
+const visible=new Map(current.map(e=>[`${e.playerId}|${e.competitionId}`,e]));for(const [key,target] of Object.entries(targets)){if(visible.has(key)||target.drawDecision==='removed'||withdrawnByKey.has(key))continue;if(target.drawDecision==='confirmed'&&target.drawEntry)visible.set(key,target.drawEntry);else if(target.acceptanceEntry)visible.set(key,target.acceptanceEntry)}
 const unique=[...visible.values()].sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))||String(a.playerName).localeCompare(String(b.playerName)));
-const out={version:5,generatedAt:NOW,status:errors.length?'itf_acceptance_merge_blocked':warnings.length?'itf_acceptance_complete_with_retryable_errors':'itf_acceptance_complete',shards,tournamentsChecked:shards.reduce((a,s)=>a+s.tournamentsChecked,0),participantsFound:participants.length,currentAcceptanceEntries:current.length,withdrawalsFound:withdrawnByKey.size,entriesFound:unique.length,entries:unique,withdrawals:[...withdrawnByKey.values()],warnings,errors};
-await writeJson('dist/v3/source_itf_entries.json',out);
-await writeJson('dist/v3/source_itf_acceptance_audit.json',{...out,entries:unique.slice(0,300)});
-await writeJson('history/itf_draw_target_db.json',{version:3,generatedAt:NOW,status:'itf_draw_target_database_complete',rule:'Same T-1 decision as Tennis Europe; retain the last official acceptance locally because ITF removes it when draws are published. Explicit withdrawn status removes the player-tournament entry from the map.',targetCount:Object.keys(targets).length,targets});
-let old=[];try{old=JSON.parse(gunzipSync(await fs.readFile('history/itf_participant_cache.json.gz'))).participants||[]}catch{}
-const permanent=[...new Map([...old,...participants].map(p=>[[p.competitionId,p.worldTennisId||p.name,p.acceptanceCode,p.entryStatus].join('|'),p])).values()];
-await fs.writeFile('history/itf_participant_cache.json.gz',gzipSync(JSON.stringify({version:3,generatedAt:NOW,participants:permanent})));
-console.log(JSON.stringify({...out,entries:undefined,withdrawals:undefined,drawTargets:Object.keys(targets).length,permanentParticipants:permanent.length},null,2));
-if(errors.length)process.exit(2);
+let oldDoc={version:4,generatedAt:null,participants:[]},cacheExists=true;try{oldDoc=JSON.parse(gunzipSync(await fs.readFile('history/itf_participant_cache.json.gz')))}catch{cacheExists=false}
+const oldRows=oldDoc.participants||[],byOld=new Map(),byNew=new Map();for(const p of oldRows){if(!byOld.has(p.competitionId))byOld.set(p.competitionId,[]);byOld.get(p.competitionId).push(p)}for(const p of participants){if(!byNew.has(p.competitionId))byNew.set(p.competitionId,[]);byNew.get(p.competitionId).push(p)}
+const signature=rows=>JSON.stringify(rows.map(p=>({id:p.worldTennisId||p.id||'',name:p.name||'',code:p.acceptanceCode||'',position:p.acceptancePosition??null,status:p.entryStatus||'',gender:p.gender||''})).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))));
+const changed=[];for(const id of scanned){const next=byNew.get(id)||[],old=byOld.get(id)||[];if(next.length&&signature(next)!==signature(old))changed.push(id)}
+let permanent=oldRows;if(!cacheExists||changed.length){const replace=new Set(changed);permanent=[...oldRows.filter(p=>!replace.has(p.competitionId)),...participants.filter(p=>replace.has(p.competitionId))];await fs.writeFile('history/itf_participant_cache.json.gz',gzipSync(JSON.stringify({version:4,generatedAt:NOW,participants:permanent})));}
+const cacheSha=crypto.createHash('sha256').update(await fs.readFile('history/itf_participant_cache.json.gz')).digest('hex');
+const out={version:6,generatedAt:NOW,status:'itf_acceptance_complete',shards,tournamentsChecked:shards.reduce((a,s)=>a+s.tournamentsChecked,0),participantsFound:participants.length,currentAcceptanceEntries:current.length,withdrawalsFound:withdrawnByKey.size,entriesFound:unique.length,entries:unique,withdrawals:[...withdrawnByKey.values()],cache:{permanentParticipants:permanent.length,changed:changed.length>0,changedTournaments:changed,sha256:cacheSha},errors:[]};
+await writeJson('dist/v3/source_itf_entries.json',out);await writeJson('dist/v3/source_itf_acceptance_audit.json',{...out,entries:unique.slice(0,300)});
+await writeJson('history/itf_draw_target_db.json',{version:4,generatedAt:NOW,status:'itf_draw_target_database_complete',rule:'Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.',targetCount:Object.keys(targets).length,targets});
+await writeJson('history/itf_participant_cache_audit.json',{version:1,generatedAt:NOW,status:'complete',scannedTournaments:scanned.size,participantsRead:participants.length,permanentParticipants:permanent.length,changedTournaments:changed,cacheSha256:cacheSha});
+console.log(JSON.stringify({...out,entries:undefined,withdrawals:undefined,drawTargets:Object.keys(targets).length},null,2));
