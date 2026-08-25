@@ -22,10 +22,11 @@ jobs:
         env:
           ITF_COMPETITION_ID: ${{ matrix.competition }}
           ITF_REQUEST_TIMEOUT_MS: '30000'
-          ITF_REQUEST_DELAY_MS: '5000'
-        run: node src/v3/scan-itf-history-tournament.mjs
+          ITF_REQUEST_DELAY_MS: '900'
+          ITF_EVENT_KEY: 'G-D-M-KO'
+        run: node src/v3/scan-itf-history-event.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: itf-fresh-runner-${{ matrix.competition }}
-          path: dist/v3/shards/itf/history-tournaments/*.json.gz
+          path: dist/v3/itf_event_proof.json.gz
