@@ -5,15 +5,15 @@ on:
     branches: [main]
     paths: ['.github/workflows/courtwatch-v3-itf-all-tournament-queue.yml','src/v3/run-itf-tournament-queue-worker.mjs']
 permissions: {contents: read,actions: read}
-concurrency: {group: courtwatch-v3-itf-complete-queue,cancel-in-progress: false}
+concurrency: {group: courtwatch-v3-itf-complete-queue,cancel-in-progress: true}
 jobs:
   queue:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     strategy:
       fail-fast: false
-      max-parallel: 2
-      matrix: {worker: [0,1]}
+      max-parallel: 16
+      matrix: {worker: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,7 +21,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32805787865,pattern: 'itf-complete-queue-review',path: 'dist/v3',merge-multiple: true}
       - name: Process assigned tournaments sequentially
-        env: {ITF_QUEUE_WORKER: '${{ matrix.worker }}',ITF_QUEUE_WORKERS: '2',ITF_QUEUE_DELAY_MS: '3000',ITF_REQUEST_TIMEOUT_MS: '30000',ITF_REQUEST_DELAY_MS: '2400'}
+        env: {ITF_QUEUE_WORKER: '${{ matrix.worker }}',ITF_QUEUE_WORKERS: '16',ITF_QUEUE_DELAY_MS: '3000',ITF_REQUEST_TIMEOUT_MS: '30000',ITF_REQUEST_DELAY_MS: '2400'}
         run: node src/v3/run-itf-tournament-queue-worker.mjs
       - uses: actions/upload-artifact@v4
         if: always()
