@@ -1,6 +1,9 @@
 name: Court Watch v3 ITF historical draws batch 13
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-history-draws-13.yml']
   workflow_run:
     workflows: ["Court Watch v3 ITF historical draws batch 12"]
     types: [completed]
