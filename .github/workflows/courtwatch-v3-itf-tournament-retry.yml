@@ -21,10 +21,10 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804083809,pattern: 'itf-targeted-retry-review',path: 'dist/v3',merge-multiple: true}
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804860537,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
       - id: matrix
         env:
-          ITF_BATCH_OFFSET: ${{ inputs.batch_offset || '0' }}
+          ITF_BATCH_OFFSET: ${{ inputs.batch_offset || '16' }}
           ITF_BATCH_LIMIT: ${{ inputs.batch_limit || '16' }}
         run: node src/v3/build-itf-tournament-retry-matrix.mjs
   tournament:
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804083809,pattern: 'itf-targeted-retry-review',path: 'dist/v3',merge-multiple: true}
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804860537,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
       - name: Read one tournament
         env: {ITF_RETRY_COMPETITION_ID: '${{ matrix.competitionId }}',ITF_REQUEST_TIMEOUT_MS: '30000',ITF_REQUEST_DELAY_MS: '2400'}
         run: node src/v3/retry-itf-result-queue-shard.mjs
@@ -56,16 +56,16 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804083809,pattern: 'itf-targeted-retry-review',path: 'dist/v3',merge-multiple: true}
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804860537,pattern: 'itf-tournament-batch-review',path: 'dist/v3',merge-multiple: true}
       - uses: actions/download-artifact@v4
-        with: {pattern: 'itf-tournament-*',path: 'dist/v3/shards/itf',merge-multiple: true}
+        with: {pattern: 'itf-tournament-*',path: 'dist/v3/current-patches',merge-multiple: true}
       - run: |
           set +e
           node src/v3/apply-itf-result-retries.mjs
           status=$?
           node src/v3/discover-itf-draw-entries.mjs
           exit "$status"
-        env: {ITF_PATCH_MODE: tournament}
+        env: {ITF_PATCH_MODE: tournament,ITF_PATCH_DIR: 'dist/v3/current-patches',ITF_ALLOW_RESIDUAL: '1'}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -75,5 +75,4 @@ jobs:
             dist/v3/source_itf_draw_entry_discovery_audit.json
             dist/v3/source_itf_retry_audit.json
             dist/v3/shards/itf/results-*.json.gz
-            dist/v3/shards/itf/tournament-*.json.gz
           retention-days: 14
