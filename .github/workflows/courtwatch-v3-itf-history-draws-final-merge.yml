@@ -1,0 +1,106 @@
+name: Court Watch v3 ITF historical draws final merge
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-history-draws-final-merge.yml']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: courtwatch-v3-itf-history-draws-final-merge
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - { batch: '00', run: '32874462736', expected: '256' }
+          - { batch: '01', run: '32896109894', expected: '256' }
+          - { batch: '02', run: '32896113757', expected: '256' }
+          - { batch: '03', run: '32896116399', expected: '256' }
+          - { batch: '04', run: '32896117590', expected: '256' }
+          - { batch: '05', run: '32896118481', expected: '256' }
+          - { batch: '06', run: '32896120799', expected: '256' }
+          - { batch: '07', run: '32896124630', expected: '256' }
+          - { batch: '08', run: '32896126988', expected: '256' }
+          - { batch: '09', run: '32896129268', expected: '256' }
+          - { batch: '10', run: '32896131786', expected: '256' }
+          - { batch: '11', run: '32896135650', expected: '256' }
+          - { batch: '12', run: '32896138175', expected: '256' }
+          - { batch: '13', run: '32896140308', expected: '256' }
+          - { batch: '14', run: '32896143433', expected: '256' }
+          - { batch: '15', run: '32896144674', expected: '256' }
+          - { batch: '16', run: '32896146769', expected: '195' }
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect certified draw artifacts for batch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ matrix.run }}
+          BATCH: ${{ matrix.batch }}
+          EXPECTED: ${{ matrix.expected }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist/v3/shards/itf/draw-tasks /tmp/itf-zips
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN}/artifacts?per_page=100" \
+            --jq ".artifacts[] | select(.name | startswith(\"itf-history-draw-${BATCH}-\")) | [.id,.name] | @tsv" \
+            > /tmp/artifacts.tsv
+          count=$(wc -l < /tmp/artifacts.tsv)
+          test "$count" -eq "$EXPECTED"
+          while IFS=$'\t' read -r id name; do
+            gh api -H 'Accept: application/vnd.github+json' \
+              "repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}/zip" > "/tmp/itf-zips/${id}.zip"
+            unzip -q "/tmp/itf-zips/${id}.zip" -d dist/v3/shards/itf/draw-tasks
+          done < /tmp/artifacts.tsv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-history-draw-bundle-${{ matrix.batch }}
+          path: dist/v3/shards/itf/draw-tasks/*.json.gz
+          retention-days: 14
+
+  merge:
+    needs: collect
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: itf-history-draw-bundle-*
+          path: dist/v3/shards/itf/draw-tasks
+          merge-multiple: true
+      - name: Require all 4291 certified draws
+        env:
+          ITF_EXPECTED_TASKS: '4291'
+        run: node src/v3/merge-itf-history-draw-tasks.mjs
+      - name: Find tracked players and build tournament count
+        env:
+          ITF_HISTORICAL_T_MINUS_ONE: '1'
+        run: |
+          set -euo pipefail
+          node src/v3/discover-itf-draw-entries.mjs
+          node src/v3/maintain-itf-database.mjs
+          node src/v3/report-itf-history-player-tournaments.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-history-final-merge
+          path: |
+            dist/v3/audits/itf-history-draw-merge.json
+            dist/v3/audits/itf-history-player-tournaments.json
+            dist/v3/source_itf_entries.json
+            dist/v3/source_itf_draw_entry_discovery_audit.json
+            history/itf_player_tournament_db.json
+            history/itf_database_audit.json
+          retention-days: 14
