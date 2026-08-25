@@ -44,14 +44,21 @@ jobs:
       - uses: actions/download-artifact@v4
         with: {pattern: 'itf-targeted-retry-*', path: dist/v3/shards/itf, merge-multiple: true}
       - run: |
+          set +e
           node src/v3/apply-itf-result-retries.mjs
+          retry_status=$?
           node src/v3/discover-itf-draw-entries.mjs
+          discovery_status=$?
+          if [ "$retry_status" -ne 0 ]; then exit "$retry_status"; fi
+          exit "$discovery_status"
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: itf-targeted-retry-review
           path: |
             dist/v3/source_itf_entries.json
             dist/v3/source_itf_draw_entry_discovery_audit.json
             dist/v3/source_itf_retry_audit.json
+            dist/v3/shards/itf/results-*.json.gz
             dist/v3/shards/itf/retry-*.json.gz
           retention-days: 14
