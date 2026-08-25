@@ -1,0 +1,73 @@
+name: Court Watch v3 ITF shard 4 rescue
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-shard4-rescue.yml']
+permissions: {contents: read,actions: read}
+concurrency: {group: courtwatch-v3-itf-shard4-rescue,cancel-in-progress: true}
+jobs:
+  tournament-slice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix:
+        shard: [4,36,68,100,132,164,196,228,260,292,324,356,388,420,452,484]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Read isolated historical tournament slice
+        env:
+          ITF_REQUEST_TIMEOUT_MS: '30000'
+          ITF_REQUEST_DELAY_MS: '2400'
+        run: ITF_RESULTS_FROM=2025-12-18 ITF_RESULTS_TO=2026-08-23 ITF_RESULTS_SHARD=${{ matrix.shard }} ITF_RESULTS_TOTAL=512 node src/v3/discover-itf-results-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-shard4-rescue-${{ matrix.shard }}
+          path: dist/v3/shards/itf/*-${{ matrix.shard }}*
+          retention-days: 7
+  review:
+    needs: tournament-slice
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32863254569
+          pattern: itf-fast-results-*
+          path: dist/v3/shards/itf
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: itf-shard4-rescue-*
+          path: dist/v3/shards/itf
+          merge-multiple: true
+      - name: Certify all historical T-1 reads
+        run: |
+          set -euo pipefail
+          RETRIES=$(for file in dist/v3/shards/itf/results-*.json.gz; do gzip -dc "$file"; done | jq -s '[.[].retryQueue[]] | length')
+          echo "Historical retry items: $RETRIES"
+          test "$RETRIES" -eq 0
+          ITF_HISTORICAL_T_MINUS_ONE=1 node src/v3/discover-itf-draw-entries.mjs
+          node src/v3/maintain-itf-database.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-shard4-rescue-review
+          path: |
+            dist/v3/source_itf_entries.json
+            dist/v3/source_itf_draw_entry_discovery_audit.json
+            history/itf_player_tournament_db.json
+            history/itf_database_audit.json
+            dist/v3/shards/itf/results-*.json.gz
+          retention-days: 14
