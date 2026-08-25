@@ -1,0 +1,40 @@
+name: Court Watch v3 ITF historical draws batch 00 review
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-history-draws-00-review.yml']
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download all batch 00 draw artifacts
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32871885023
+          pattern: itf-history-draw-00-*
+          path: dist/v3/shards/itf/draw-tasks
+          merge-multiple: true
+      - name: Audit 256 draw tasks
+        env:
+          ITF_BATCH: '00'
+          ITF_EXPECTED_TASKS: '256'
+        run: node src/v3/audit-itf-history-draw-batch.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-history-draw-batch-00-audit
+          path: dist/v3/audits/itf-history-draw-batch-00.json
+          retention-days: 14
