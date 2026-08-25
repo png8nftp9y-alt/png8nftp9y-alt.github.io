@@ -1,0 +1,23 @@
+name: Court Watch v3 ITF browser session proof
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/v3/diagnose-itf-browser-session.mjs','.github/workflows/courtwatch-v3-itf-browser-session-proof.yml']
+permissions: {contents: read}
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --no-save playwright@1.55.0
+      - run: npx playwright install --with-deps chromium
+      - name: Read every draw in one browser session
+        env: {ITF_COMPETITION_ID: J-J30-POR-2026-001}
+        run: node src/v3/diagnose-itf-browser-session.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: itf-browser-session-proof,path: dist/v3/itf_browser_session_diagnostic.json}
