@@ -8,6 +8,9 @@ on:
     paths: ['players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/discover-itf-acceptance-shard.mjs','src/v3/discover-itf-results-shard.mjs','src/v3/discover-itf-draw-entries.mjs','src/v3/merge-itf-acceptance-shards.mjs','src/v3/verify-itf-draws.mjs','src/v3/maintain-itf-database.mjs','src/v3/validate-itf-system.mjs','src/v3/itf-r2-cache.sh','.github/workflows/courtwatch-v3-itf-live.yml']
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-live,cancel-in-progress: true}
+env:
+  ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL }}
+  ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
 jobs:
   shard:
     runs-on: ubuntu-latest
