@@ -28,7 +28,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: 'itf-live-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*'}
-  publish:
+  review:
     needs: shard
     runs-on: ubuntu-latest
     timeout-minutes: 35
@@ -50,7 +50,7 @@ jobs:
       - run: python -m pip install --quiet awscli && bash src/v3/itf-r2-cache.sh restore
       - uses: actions/download-artifact@v4
         with: {path: dist/v3/shards/itf, merge-multiple: true}
-      - name: Merge, T-1, database and app
+      - name: Merge, T-1 and validate candidate data
         run: |
           set -euo pipefail
           node src/v3/merge-itf-acceptance-shards.mjs
@@ -59,20 +59,17 @@ jobs:
           node src/v3/maintain-itf-database.mjs
           node src/v3/validate-itf-system.mjs
           node src/v3/entries-engine.mjs
-          bash src/v3/itf-r2-cache.sh publish
-      - name: Publish atomically
-        run: |
-          set -euo pipefail
-          git config user.name courtwatch-bot; git config user.email courtwatch-bot@users.noreply.github.com
-          mkdir -p /tmp/itf-live/dist/v3 /tmp/itf-live/history
-          cp dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json /tmp/itf-live/dist/v3/
-          cp history/itf_draw_target_db.json history/itf_tournament_catalog.json history/itf_player_tournament_db.json history/itf_database_audit.json /tmp/itf-live/history/
-          for attempt in 1 2 3; do
-            git fetch origin main; git reset --hard origin/main
-            cp /tmp/itf-live/dist/v3/* dist/v3/; cp /tmp/itf-live/history/* history/
-            git add dist/v3 history/itf_draw_target_db.json history/itf_tournament_catalog.json history/itf_player_tournament_db.json history/itf_database_audit.json
-            git rm -f --ignore-unmatch history/itf_participant_cache.json.gz history/itf_players_database.json.gz history/itf_results_database.json.gz
-            git commit -m 'Publish validated ITF live database' || exit 0
-            git push origin HEAD:main && exit 0
-          done
-          exit 1
+      - name: Upload candidate tournament list for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: itf-live-candidate-review
+          path: |
+            dist/v3/source_itf_entries.json
+            dist/v3/source_itf_acceptance_audit.json
+            dist/v3/source_itf_draw_entry_discovery_audit.json
+            dist/v3/source_itf_draw_audit.json
+            dist/v3/entries_itf.json
+            history/itf_draw_target_db.json
+            history/itf_player_tournament_db.json
+            history/itf_database_audit.json
+          retention-days: 14

@@ -39,7 +39,7 @@ jobs:
           path: dist/v3/shards/itf/*-${{ matrix.shard }}*
           retention-days: 7
 
-  publish:
+  review:
     needs: result-shard
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -75,7 +75,7 @@ jobs:
           pattern: itf-acceptance-*
           path: dist/v3/shards/itf
           merge-multiple: true
-      - name: Merge, validate and publish the complete database
+      - name: Merge and validate the candidate database
         run: |
           set -euo pipefail
           node src/v3/merge-itf-acceptance-shards.mjs
@@ -84,13 +84,15 @@ jobs:
           node src/v3/maintain-itf-database.mjs
           node src/v3/validate-itf-system.mjs
           node src/v3/entries-engine.mjs
-          bash src/v3/itf-r2-cache.sh publish
-      - name: Publish audits and app data
-        run: |
-          set -euo pipefail
-          git config user.name courtwatch-bot
-          git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/source_itf_draw_entry_discovery_audit.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json history/itf_draw_target_db.json history/itf_tournament_catalog.json history/itf_player_tournament_db.json history/itf_database_audit.json
-          git commit -m 'Publish complete accelerated ITF results backfill'
-          git pull --rebase origin main
-          git push origin HEAD:main
+      - name: Upload candidate tournament list for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: itf-backfill-candidate-review
+          path: |
+            dist/v3/source_itf_entries.json
+            dist/v3/source_itf_draw_entry_discovery_audit.json
+            dist/v3/source_itf_draw_audit.json
+            dist/v3/entries_itf.json
+            history/itf_player_tournament_db.json
+            history/itf_database_audit.json
+          retention-days: 14
