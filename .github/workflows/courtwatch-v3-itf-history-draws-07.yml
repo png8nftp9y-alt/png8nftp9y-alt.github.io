@@ -27,20 +27,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Download certified 4291-task queue
-        uses: actions/download-artifact@v4
-        with:
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          run-id: 32870688827
-          name: itf-history-complete-draw-queue
-          path: dist/v3
-      - name: Acquire one isolated draw
+      - name: Acquire one isolated draw from local certified batch
         env:
-          ITF_DRAW_TASK_SLOT: ${{ matrix.slot }}
-          ITF_DRAW_TASK_OFFSET: '1792'
+          ITF_DRAW_TASK_INDEX: ${{ matrix.slot }}
+          ITF_DRAW_TASK_FILE: 'src/v3/itf-history-draw-batch-07.json'
           ITF_REQUEST_TIMEOUT_MS: '30000'
-        run: ITF_DRAW_TASK_INDEX=$((ITF_DRAW_TASK_SLOT + ITF_DRAW_TASK_OFFSET)) node src/v3/acquire-itf-history-draw-task.mjs
+        run: node src/v3/acquire-itf-history-draw-task.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
