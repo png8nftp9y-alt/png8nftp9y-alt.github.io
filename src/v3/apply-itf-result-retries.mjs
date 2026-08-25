@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import {gunzipSync,gzipSync} from 'node:zlib';
-const dir='dist/v3/shards/itf',patches=[];
-for(const f of await fs.readdir(dir))if(/^retry-\d+\.json\.gz$/.test(f))patches.push(JSON.parse(gunzipSync(await fs.readFile(`${dir}/${f}`))));
+const dir='dist/v3/shards/itf',patches=[],patchPattern=process.env.ITF_PATCH_MODE==='tournament'?/^tournament-[A-Za-z0-9._-]+\.json\.gz$/:/^(?:retry-\d+|tournament-[A-Za-z0-9._-]+)\.json\.gz$/;
+for(const f of await fs.readdir(dir))if(patchPattern.test(f))patches.push(JSON.parse(gunzipSync(await fs.readFile(`${dir}/${f}`))));
 if(!patches.length)throw new Error('No ITF retry artifacts found.');
 if(patches.some(p=>p.version!==2))throw new Error('Refusing retry artifacts without section-level resolution metadata.');
 const retryKey=x=>x.event?`${x.competitionId}|draw|${x.event}`:`${x.competitionId}|events`,resolved=new Set(patches.flatMap(p=>p.resolvedKeys||[])),replacements=new Map();
