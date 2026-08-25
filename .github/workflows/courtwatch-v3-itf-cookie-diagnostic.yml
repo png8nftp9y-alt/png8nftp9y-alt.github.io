@@ -20,6 +20,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - name: Validate ITF common module syntax
+        run: node --check src/v3/itf-common.mjs
       - name: Bootstrap ITF session and read one draw
         env:
           ITF_DIAGNOSTIC_TOURNAMENT: ${{ inputs.tournament || 'J-J100-DOM-2026-004' }}
