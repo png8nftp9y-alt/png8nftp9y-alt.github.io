@@ -4,9 +4,6 @@ on:
   push:
     branches: [main]
     paths: ['.github/workflows/courtwatch-v3-itf-history-draws-15.yml']
-  workflow_run:
-    workflows: ["Court Watch v3 ITF historical draws batch 14"]
-    types: [completed]
 
 permissions:
   contents: read
@@ -18,7 +15,6 @@ concurrency:
 
 jobs:
   draw:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 12
     strategy:
@@ -41,9 +37,10 @@ jobs:
           path: dist/v3
       - name: Acquire one isolated draw
         env:
-          ITF_DRAW_TASK_INDEX: ${{ 3840 + matrix.slot }}
+          ITF_DRAW_TASK_SLOT: ${{ matrix.slot }}
+          ITF_DRAW_TASK_OFFSET: '3840'
           ITF_REQUEST_TIMEOUT_MS: '30000'
-        run: node src/v3/acquire-itf-history-draw-task.mjs
+        run: ITF_DRAW_TASK_INDEX=$((ITF_DRAW_TASK_SLOT + ITF_DRAW_TASK_OFFSET)) node src/v3/acquire-itf-history-draw-task.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
