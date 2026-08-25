@@ -14,18 +14,32 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32901751658
+          pattern: 'itf-history-draw-bundle-0[0-3]'
+          path: dist/v3/shards/itf/draw-tasks
+          merge-multiple: true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-history-draw-bundle-seed-00-03
+          path: dist/v3/shards/itf/draw-tasks/*.json.gz
+          retention-days: 14
+
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 1
       matrix:
         include:
-          - { batch: '00', run: '32871885023', expected: '256' }
-          - { batch: '01', run: '32896109894', expected: '256' }
-          - { batch: '02', run: '32896113757', expected: '256' }
-          - { batch: '03', run: '32896116399', expected: '256' }
           - { batch: '04', run: '32896117590', expected: '256' }
           - { batch: '05', run: '32896118481', expected: '256' }
           - { batch: '06', run: '32896120799', expected: '256' }
@@ -41,7 +55,7 @@ jobs:
           - { batch: '16', run: '32896146769', expected: '195' }
     steps:
       - uses: actions/checkout@v4
-      - name: Collect certified draw artifacts for batch
+      - name: Collect one certified batch with rate-limit backoff
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_RUN: ${{ matrix.run }}
@@ -50,14 +64,26 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist/v3/shards/itf/draw-tasks /tmp/itf-zips
-          gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN}/artifacts?per_page=100" \
-            --jq ".artifacts[] | select(.name | startswith(\"itf-history-draw-${BATCH}-\")) | [.id,.name] | @tsv" \
-            > /tmp/artifacts.tsv
+          for attempt in $(seq 1 90); do
+            if gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN}/artifacts?per_page=100" \
+              --jq ".artifacts[] | select(.name | startswith(\"itf-history-draw-${BATCH}-\")) | [.id,.name] | @tsv" \
+              > /tmp/artifacts.tsv; then break; fi
+            test "$attempt" -lt 90
+            sleep 60
+          done
           count=$(wc -l < /tmp/artifacts.tsv)
           test "$count" -eq "$EXPECTED"
           while IFS=$'\t' read -r id name; do
-            gh api -H 'Accept: application/vnd.github+json' \
-              "repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}/zip" > "/tmp/itf-zips/${id}.zip"
+            ok=0
+            for attempt in $(seq 1 90); do
+              if gh api -H 'Accept: application/vnd.github+json' \
+                "repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}/zip" > "/tmp/itf-zips/${id}.zip"; then
+                ok=1
+                break
+              fi
+              sleep 60
+            done
+            test "$ok" -eq 1
             unzip -q "/tmp/itf-zips/${id}.zip" -d dist/v3/shards/itf/draw-tasks
           done < /tmp/artifacts.tsv
       - uses: actions/upload-artifact@v4
@@ -67,7 +93,7 @@ jobs:
           retention-days: 14
 
   merge:
-    needs: collect
+    needs: [seed, collect]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
