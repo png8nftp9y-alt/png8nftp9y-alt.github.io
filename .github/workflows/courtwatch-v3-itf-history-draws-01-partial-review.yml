@@ -1,0 +1,47 @@
+name: Court Watch v3 ITF historical draws batch 01 partial review
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-history-draws-01-partial-review.yml']
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download exactly 153 existing batch 01 artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: '32872732932'
+          EXPECTED: '153'
+        run: |
+          set -euo pipefail
+          mkdir -p dist/v3/shards/itf/draw-tasks /tmp/itf-draw-zips
+          gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${SOURCE_RUN}/artifacts?per_page=100"             --jq '.artifacts[] | select(.name | startswith("itf-history-draw-01-")) | [.id,.name] | @tsv'             > /tmp/itf-draw-artifacts.tsv
+          count=$(wc -l < /tmp/itf-draw-artifacts.tsv)
+          test "$count" -eq "$EXPECTED"
+          while IFS=$'\t' read -r id name; do
+            gh api -H 'Accept: application/vnd.github+json'               "repos/${GITHUB_REPOSITORY}/actions/artifacts/${id}/zip" > "/tmp/itf-draw-zips/${id}.zip"
+            mkdir -p "dist/v3/shards/itf/draw-tasks/${name}"
+            unzip -q "/tmp/itf-draw-zips/${id}.zip" -d "dist/v3/shards/itf/draw-tasks/${name}"
+          done < /tmp/itf-draw-artifacts.tsv
+      - name: Audit 153 completed slots
+        env:
+          ITF_BATCH: '01-partial'
+          ITF_EXPECTED_TASKS: '153'
+        run: node src/v3/audit-itf-history-draw-batch.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-history-draw-batch-01-partial-audit
+          path: dist/v3/audits/itf-history-draw-batch-01-partial.json
+          retention-days: 14
