@@ -1,0 +1,65 @@
+name: Court Watch v3 ITF historical T-1 engine
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/v3/scan-itf-history-tournament.mjs','src/v3/run-itf-history-worker.mjs','src/v3/merge-itf-history-tournaments.mjs','.github/workflows/courtwatch-v3-itf-history-engine.yml']
+permissions: {contents: read}
+concurrency: {group: courtwatch-v3-itf-history-engine,cancel-in-progress: true}
+jobs:
+  worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix:
+        worker: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Process independent tournaments
+        env:
+          ITF_HISTORY_WORKER: '${{ matrix.worker }}'
+          ITF_HISTORY_WORKERS: '32'
+          ITF_TOURNAMENT_TIMEOUT_MS: '240000'
+          ITF_REQUEST_TIMEOUT_MS: '30000'
+          ITF_REQUEST_DELAY_MS: '900'
+        run: node src/v3/run-itf-history-worker.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-history-worker-${{ matrix.worker }}
+          path: |
+            dist/v3/shards/itf/history-tournaments/*.json.gz
+            dist/v3/shards/itf/history-workers/*.json
+          retention-days: 14
+  review:
+    needs: worker
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'itf-history-worker-*',path: dist/v3/shards/itf,merge-multiple: true}
+      - name: Certify and match historical T-1
+        run: |
+          set -euo pipefail
+          node src/v3/merge-itf-history-tournaments.mjs
+          ITF_HISTORICAL_T_MINUS_ONE=1 node src/v3/discover-itf-draw-entries.mjs
+          node src/v3/maintain-itf-database.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-history-engine-review
+          path: |
+            dist/v3/itf_history_engine_audit.json
+            dist/v3/source_itf_entries.json
+            dist/v3/source_itf_draw_entry_discovery_audit.json
+            history/itf_player_tournament_db.json
+            history/itf_database_audit.json
+          retention-days: 14
