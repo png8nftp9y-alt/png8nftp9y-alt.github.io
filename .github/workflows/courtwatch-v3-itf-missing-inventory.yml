@@ -1,0 +1,80 @@
+name: Court Watch v3 ITF missing inventory recovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-missing-inventory.yml']
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: courtwatch-v3-itf-missing-inventory
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      max-parallel: 32
+      matrix:
+        slot: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve missing tournament
+        run: node -e "const x=require('./src/v3/itf-history-missing-inventory.json');require('fs').appendFileSync(process.env.GITHUB_ENV,'ITF_COMPETITION_ID='+x.missing[Number(process.env.SLOT)]+'\\n')"
+        env:
+          SLOT: ${{ matrix.slot }}
+      - name: Inventory missing tournament
+        env:
+          ITF_REQUEST_TIMEOUT_MS: '30000'
+        run: node src/v3/inventory-itf-history-tournament.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-inventory-recovery-${{ matrix.slot }}
+          path: dist/v3/shards/itf/inventory/*.json
+          retention-days: 14
+
+  review:
+    needs: recover
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download 599 completed inventories
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: 32869802974
+          name: itf-history-draw-queue
+          path: dist/v3
+      - name: Download recovered inventories
+        uses: actions/download-artifact@v4
+        with:
+          pattern: itf-inventory-recovery-*
+          path: dist/v3/shards/itf/inventory
+          merge-multiple: true
+      - name: Require complete inventory and build draw queue
+        run: |
+          node src/v3/build-itf-history-draw-queue.mjs
+          node -e "const q=require('./dist/v3/itf_history_draw_queue.json');if(q.missing.length||q.retry.length)throw new Error('inventory_not_complete missing='+q.missing.length+' retry='+q.retry.length)"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-history-complete-draw-queue
+          path: |
+            dist/v3/itf_history_draw_queue.json
+            dist/v3/shards/itf/inventory/*.json
+          retention-days: 14
