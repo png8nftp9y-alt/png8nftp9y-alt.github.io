@@ -1,20 +1,25 @@
 name: Court Watch v3 ITF inventory merge
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/courtwatch-v3-itf-inventory-merge.yml']
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
 
 # Separate merge avoids blocking behind the 800-job inventory matrix.
-permissions: {contents: read,actions: read}
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   merge:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.head_sha == '66b6775f7654477909588b38d67eedaaa3f62e85' || github.event.workflow_run.head_sha == 'PLACEHOLDER_HEAD_SHA'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: {node-version: '22'}
+        with:
+          node-version: '22'
       - uses: actions/download-artifact@v4
         with:
           github-token: ${{ github.token }}
