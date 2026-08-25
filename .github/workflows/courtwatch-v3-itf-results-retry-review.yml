@@ -24,7 +24,7 @@ jobs:
           repository: ${{ github.repository }}
           run-id: 32803629820
           pattern: itf-targeted-retry-review
-          path: .
+          path: dist/v3
           merge-multiple: true
       - name: Retry only unresolved tournaments
         env: {ITF_REQUEST_TIMEOUT_MS: '30000', ITF_REQUEST_DELAY_MS: '2400'}
@@ -40,7 +40,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {github-token: '${{ github.token }}', repository: '${{ github.repository }}', run-id: 32803629820, pattern: 'itf-targeted-retry-review', path: '.', merge-multiple: true}
+        with: {github-token: '${{ github.token }}', repository: '${{ github.repository }}', run-id: 32803629820, pattern: 'itf-targeted-retry-review', path: 'dist/v3', merge-multiple: true}
       - uses: actions/download-artifact@v4
         with: {pattern: 'itf-targeted-retry-*', path: dist/v3/shards/itf, merge-multiple: true}
       - run: |
