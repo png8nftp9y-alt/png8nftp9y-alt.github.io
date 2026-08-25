@@ -59,7 +59,8 @@ jobs:
           RETRIES=$(for file in dist/v3/shards/itf/results-*.json.gz; do gzip -dc "$file"; done | jq -s '[.[].retryQueue[]] | length')
           echo "Historical retry items: $RETRIES"
           test "$RETRIES" -eq 0
-          node src/v3/discover-itf-draw-entries.mjs
+          ITF_HISTORICAL_T_MINUS_ONE=1 node src/v3/discover-itf-draw-entries.mjs
+          node src/v3/maintain-itf-database.mjs
       - name: Upload candidate tournament list for review
         uses: actions/upload-artifact@v4
         with:
@@ -71,4 +72,6 @@ jobs:
             dist/v3/entries_itf.json
             history/itf_player_tournament_db.json
             history/itf_database_audit.json
+            history/itf_players_database.json.gz
+            history/itf_results_database.json.gz
           retention-days: 14
