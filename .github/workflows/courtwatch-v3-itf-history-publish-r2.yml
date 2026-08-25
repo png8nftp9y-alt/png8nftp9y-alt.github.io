@@ -39,11 +39,16 @@ jobs:
         run: |
           set -euo pipefail
           endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
-          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/pointers/current.json" /tmp/current.json --only-show-errors
-          generation="$(jq -er .generation /tmp/current.json)"
+          if aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/pointers/current.json" /tmp/current.json --only-show-errors 2>/dev/null; then
+            generation="$(jq -er .generation /tmp/current.json)"
+          else
+            generation="$(sha256sum history/itf_player_tournament_db.json history/itf_historical_player_tournaments.json | sha256sum | cut -d' ' -f1)"
+            jq -n --arg generation "$generation" --arg at "$(date -u +%FT%TZ)" '{schemaVersion:1,generation:$generation,createdAt:$at}' > /tmp/current.json
+          fi
           aws --endpoint-url "$endpoint" s3 cp history/itf_player_tournament_db.json "s3://$R2_BUCKET/itf/database/generations/$generation/itf_player_tournament_db.json" --only-show-errors
           aws --endpoint-url "$endpoint" s3 cp history/itf_historical_player_tournaments.json "s3://$R2_BUCKET/itf/database/generations/$generation/itf_historical_player_tournaments.json" --only-show-errors
           aws --endpoint-url "$endpoint" s3 cp history/itf_player_tournament_db.json "s3://$R2_BUCKET/itf/database/current/itf_player_tournament_db.json" --only-show-errors
           aws --endpoint-url "$endpoint" s3 cp history/itf_historical_player_tournaments.json "s3://$R2_BUCKET/itf/database/current/itf_historical_player_tournaments.json" --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp /tmp/current.json "s3://$R2_BUCKET/itf/database/pointers/current.json" --only-show-errors
           aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/current/itf_player_tournament_db.json" /tmp/verify.json --only-show-errors
           jq -e '.relationCount==4 and .audit.missing==0 and .audit.retry==0 and .audit.unreadable==0' /tmp/verify.json
