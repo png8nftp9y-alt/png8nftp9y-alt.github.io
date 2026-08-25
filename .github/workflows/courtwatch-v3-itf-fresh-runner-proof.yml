@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        competition: [J-J60-MEX-2026-002,J-J100-RSA-2026-001,J-J30-POR-2026-001]
+        competition: [J-J30-POR-2026-001]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,7 +22,7 @@ jobs:
         env:
           ITF_COMPETITION_ID: ${{ matrix.competition }}
           ITF_REQUEST_TIMEOUT_MS: '30000'
-          ITF_REQUEST_DELAY_MS: '900'
+          ITF_REQUEST_DELAY_MS: '5000'
         run: node src/v3/scan-itf-history-tournament.mjs
       - uses: actions/upload-artifact@v4
         if: always()
