@@ -1,0 +1,49 @@
+name: Court Watch v3 publish certified ITF history to R2
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'history/itf_historical_player_tournaments.json'
+      - 'history/itf_player_tournament_db.json'
+      - '.github/workflows/courtwatch-v3-itf-history-publish-r2.yml'
+permissions: {contents: read}
+concurrency: {group: courtwatch-v3-itf-history-publish-r2,cancel-in-progress: false}
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate certified history
+        run: |
+          set -euo pipefail
+          jq -e '.status=="itf_historical_draw_backfill_complete" and .audit.expected==4291 and .audit.complete==4291 and .audit.missing==0 and .audit.retry==0 and .audit.unreadable==0 and (.entries|length)==4' history/itf_historical_player_tournaments.json
+          jq -e '.status=="itf_player_tournament_database_complete" and .relationCount==4' history/itf_player_tournament_db.json
+      - name: Configure R2
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          echo "R2_ACCOUNT_ID=$R2_ACCOUNT_ID" >> "$GITHUB_ENV"
+          echo "R2_BUCKET=$R2_BUCKET" >> "$GITHUB_ENV"
+          echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
+          python -m pip install --quiet awscli
+      - name: Publish historical relations in current ITF generation
+        run: |
+          set -euo pipefail
+          endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/pointers/current.json" /tmp/current.json --only-show-errors
+          generation="$(jq -er .generation /tmp/current.json)"
+          aws --endpoint-url "$endpoint" s3 cp history/itf_player_tournament_db.json "s3://$R2_BUCKET/itf/database/generations/$generation/itf_player_tournament_db.json" --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp history/itf_historical_player_tournaments.json "s3://$R2_BUCKET/itf/database/generations/$generation/itf_historical_player_tournaments.json" --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp history/itf_player_tournament_db.json "s3://$R2_BUCKET/itf/database/current/itf_player_tournament_db.json" --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp history/itf_historical_player_tournaments.json "s3://$R2_BUCKET/itf/database/current/itf_historical_player_tournaments.json" --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/current/itf_player_tournament_db.json" /tmp/verify.json --only-show-errors
+          jq -e '.relationCount==4 and .audit.missing==0 and .audit.retry==0 and .audit.unreadable==0' /tmp/verify.json
