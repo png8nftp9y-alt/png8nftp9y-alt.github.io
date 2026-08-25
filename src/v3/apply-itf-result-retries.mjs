@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import {gunzipSync,gzipSync} from 'node:zlib';
-const dir='dist/v3/shards/itf',patches=[],patchPattern=process.env.ITF_PATCH_MODE==='tournament'?/^tournament-[A-Za-z0-9._-]+\.json\.gz$/:/^(?:retry-\d+|tournament-[A-Za-z0-9._-]+)\.json\.gz$/;
-for(const f of await fs.readdir(dir))if(patchPattern.test(f))patches.push(JSON.parse(gunzipSync(await fs.readFile(`${dir}/${f}`))));
+const dir='dist/v3/shards/itf',patchDir=process.env.ITF_PATCH_DIR||dir,patches=[],patchPattern=process.env.ITF_PATCH_MODE==='tournament'?/^tournament-[A-Za-z0-9._-]+\.json\.gz$/:/^(?:retry-\d+|tournament-[A-Za-z0-9._-]+)\.json\.gz$/;
+for(const f of await fs.readdir(patchDir))if(patchPattern.test(f))patches.push(JSON.parse(gunzipSync(await fs.readFile(`${patchDir}/${f}`))));
 if(!patches.length)throw new Error('No ITF retry artifacts found.');
 if(patches.some(p=>p.version!==2))throw new Error('Refusing retry artifacts without section-level resolution metadata.');
 const retryKey=x=>x.event?`${x.competitionId}|draw|${x.event}`:`${x.competitionId}|events`,resolved=new Set(patches.flatMap(p=>p.resolvedKeys||[])),replacements=new Map();
@@ -17,4 +17,4 @@ for(const f of await fs.readdir(dir))if(/^results-\d+\.json\.gz$/.test(f)){
 }
 if(replacements.size)throw new Error(`${replacements.size} retry replacements could not be assigned to an original result shard.`);
 const audit={version:3,generatedAt:new Date().toISOString(),status:remainingRetries?'itf_section_retry_incomplete':'itf_section_retry_complete',patches:patches.length,originalRetries,resolvedRetries,remainingRetries,summary:{populated:sections.filter(x=>x.status==='populated').length,publishedEmptyPending:sections.filter(x=>x.status==='published_empty_pending').length,concludedEmptyAnomalies:sections.filter(x=>x.status==='published_empty_anomaly').length,missingOrUnreadable:sections.filter(x=>x.status==='missing_or_unreadable').length},sections};
-await fs.writeFile('dist/v3/source_itf_retry_audit.json',JSON.stringify(audit,null,2)+'\n');console.log(JSON.stringify({...audit.summary,patches:patches.length,originalRetries,resolvedRetries,remainingRetries,status:audit.status},null,2));if(remainingRetries)process.exitCode=2;
+await fs.writeFile('dist/v3/source_itf_retry_audit.json',JSON.stringify({...audit,reviewMode:process.env.ITF_ALLOW_RESIDUAL==='1'?'incremental_batch':'final_certification'},null,2)+'\n');console.log(JSON.stringify({...audit.summary,patches:patches.length,originalRetries,resolvedRetries,remainingRetries,status:audit.status},null,2));if(remainingRetries&&process.env.ITF_ALLOW_RESIDUAL!=='1')process.exitCode=2;
