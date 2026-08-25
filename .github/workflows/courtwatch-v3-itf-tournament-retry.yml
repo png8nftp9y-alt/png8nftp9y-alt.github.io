@@ -1,0 +1,79 @@
+name: Court Watch v3 ITF one tournament per shard
+on:
+  workflow_dispatch:
+    inputs:
+      batch_offset: {description: 'Offset in residual tournament list',required: false,default: '0'}
+      batch_limit: {description: 'Tournaments in this batch (max 256)',required: false,default: '16'}
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-tournament-retry.yml','src/v3/build-itf-tournament-retry-matrix.mjs']
+permissions: {contents: read,actions: read}
+concurrency: {group: courtwatch-v3-itf-one-tournament-review,cancel-in-progress: false}
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      remaining: ${{ steps.matrix.outputs.remaining_tournaments }}
+      selected: ${{ steps.matrix.outputs.selected_tournaments }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804083809,pattern: 'itf-targeted-retry-review',path: 'dist/v3',merge-multiple: true}
+      - id: matrix
+        env:
+          ITF_BATCH_OFFSET: ${{ inputs.batch_offset || '0' }}
+          ITF_BATCH_LIMIT: ${{ inputs.batch_limit || '16' }}
+        run: node src/v3/build-itf-tournament-retry-matrix.mjs
+  tournament:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804083809,pattern: 'itf-targeted-retry-review',path: 'dist/v3',merge-multiple: true}
+      - name: Read one tournament
+        env: {ITF_RETRY_COMPETITION_ID: '${{ matrix.competitionId }}',ITF_REQUEST_TIMEOUT_MS: '30000',ITF_REQUEST_DELAY_MS: '2400'}
+        run: node src/v3/retry-itf-result-queue-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'itf-tournament-${{ matrix.competitionId }}',path: 'dist/v3/shards/itf/tournament-${{ matrix.competitionId }}.json.gz',retention-days: 14}
+  review:
+    needs: [prepare,tournament]
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {github-token: '${{ github.token }}',repository: '${{ github.repository }}',run-id: 32804083809,pattern: 'itf-targeted-retry-review',path: 'dist/v3',merge-multiple: true}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'itf-tournament-*',path: 'dist/v3/shards/itf',merge-multiple: true}
+      - run: |
+          set +e
+          node src/v3/apply-itf-result-retries.mjs
+          status=$?
+          node src/v3/discover-itf-draw-entries.mjs
+          exit "$status"
+        env: {ITF_PATCH_MODE: tournament}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-tournament-batch-review
+          path: |
+            dist/v3/source_itf_entries.json
+            dist/v3/source_itf_draw_entry_discovery_audit.json
+            dist/v3/source_itf_retry_audit.json
+            dist/v3/shards/itf/results-*.json.gz
+            dist/v3/shards/itf/tournament-*.json.gz
+          retention-days: 14
