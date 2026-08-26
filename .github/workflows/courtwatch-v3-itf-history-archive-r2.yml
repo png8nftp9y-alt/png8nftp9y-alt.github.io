@@ -1,0 +1,121 @@
+name: Court Watch v3 archive 4291 ITF historical draws to R2
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-v3-itf-history-archive-r2.yml']
+permissions: {actions: read, contents: read}
+concurrency: {group: courtwatch-v3-itf-history-archive-r2,cancel-in-progress: false}
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure R2
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          echo "R2_ACCOUNT_ID=$R2_ACCOUNT_ID" >> "$GITHUB_ENV"; echo "R2_BUCKET=$R2_BUCKET" >> "$GITHUB_ENV"
+          echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"; echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"; echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
+          python -m pip install --quiet awscli
+      - name: Download the 17 certified block bundles
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/itf-artifacts /tmp/itf-stage /tmp/itf-archives
+          cat > /tmp/artifacts.tsv <<'EOF'
+          00 9583611090 256
+          01 9583327584 256
+          02 9583273821 256
+          03 9583304628 256
+          04 9583330745 256
+          05 9583312315 256
+          06 9583392118 256
+          07 9583398473 256
+          08 9583413017 256
+          09 9583409774 256
+          10 9583428463 256
+          11 9583439977 256
+          12 9583492747 256
+          13 9583469700 256
+          14 9583460646 256
+          15 9583474233 256
+          16 9583524367 195
+          EOF
+          while read -r block artifact expected; do
+            zip="/tmp/itf-artifacts/$block.zip"
+            ok=0
+            for attempt in 1 2 3 4 5 6 7 8; do
+              code="$(curl -L -sS -o "$zip" -w '%{http_code}' -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/$GITHUB_REPOSITORY/actions/artifacts/$artifact/zip" || true)"
+              if test "$code" = 200 && unzip -tq "$zip" >/dev/null 2>&1; then ok=1; break; fi
+              echo "block=$block artifact=$artifact attempt=$attempt http=$code; waiting for GitHub quota"
+              sleep $((attempt*30))
+            done
+            test "$ok" = 1
+            mkdir -p "/tmp/itf-stage/$block"
+            unzip -q "$zip" -d "/tmp/unzip-$block"
+            find "/tmp/unzip-$block" -type f -name '*.json.gz' -exec cp {} "/tmp/itf-stage/$block/" \;
+            actual="$(find "/tmp/itf-stage/$block" -maxdepth 1 -type f -name '*.json.gz' | wc -l)"
+            test "$actual" -eq "$expected"
+            find "/tmp/itf-stage/$block" -type f -name '*.json.gz' -print0 | xargs -0 -n1 gzip -t
+            tar --sort=name --mtime='UTC 2025-12-18' --owner=0 --group=0 --numeric-owner -czf "/tmp/itf-archives/block-$block.tar.gz" -C "/tmp/itf-stage/$block" .
+          done < /tmp/artifacts.tsv
+          test "$(find /tmp/itf-stage -mindepth 2 -maxdepth 2 -type f -name '*.json.gz' | wc -l)" -eq 4291
+      - name: Build certified manifest
+        run: |
+          set -euo pipefail
+          jq -n '{schemaVersion:1,status:"itf_history_draw_archive_complete",coverageFrom:"2025-12-18",expected:4291,complete:4291,missing:0,retry:0,unreadable:0,blocks:[]}' > /tmp/manifest.json
+          while read -r block artifact expected; do
+            file="/tmp/itf-archives/block-$block.tar.gz"
+            sha="$(sha256sum "$file"|cut -d' ' -f1)"
+            size="$(stat -c%s "$file")"
+            jq --arg block "$block" --argjson artifact "$artifact" --argjson count "$expected" --arg sha "$sha" --argjson size "$size" '.blocks += [{block:$block,sourceArtifactId:$artifact,count:$count,sha256:$sha,sizeBytes:$size}]' /tmp/manifest.json > /tmp/m && mv /tmp/m /tmp/manifest.json
+          done < /tmp/artifacts.tsv
+          generation="$(jq -r '.blocks[].sha256' /tmp/manifest.json|sha256sum|cut -d' ' -f1)"
+          jq --arg generation "$generation" --arg at "$(date -u +%FT%TZ)" '.generation=$generation|.createdAt=$at' /tmp/manifest.json > /tmp/m && mv /tmp/m /tmp/manifest.json
+          jq -e '.expected==4291 and .complete==4291 and (.blocks|map(.count)|add)==4291 and (.blocks|length)==17' /tmp/manifest.json
+          echo "ITF_HISTORY_GENERATION=$generation" >> "$GITHUB_ENV"
+      - name: Upload archives and pointer to R2
+        run: |
+          set -euo pipefail
+          endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+          prefix="itf/history-draws"
+          for file in /tmp/itf-archives/block-*.tar.gz; do
+            aws --endpoint-url "$endpoint" s3 cp "$file" "s3://$R2_BUCKET/$prefix/generations/$ITF_HISTORY_GENERATION/blocks/$(basename "$file")" --only-show-errors
+          done
+          aws --endpoint-url "$endpoint" s3 cp /tmp/manifest.json "s3://$R2_BUCKET/$prefix/generations/$ITF_HISTORY_GENERATION/manifest.json" --only-show-errors
+          if aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/pointers/current.json" /tmp/old-current.json --only-show-errors 2>/dev/null; then
+            aws --endpoint-url "$endpoint" s3 cp /tmp/old-current.json "s3://$R2_BUCKET/$prefix/pointers/backup-1.json" --only-show-errors
+          fi
+          jq -n --arg generation "$ITF_HISTORY_GENERATION" --arg at "$(date -u +%FT%TZ)" '{schemaVersion:1,generation:$generation,createdAt:$at,expected:4291,complete:4291}' > /tmp/current.json
+          aws --endpoint-url "$endpoint" s3 cp /tmp/current.json "s3://$R2_BUCKET/$prefix/pointers/current.json" --only-show-errors
+      - name: Download from R2 and certify 4291
+        run: |
+          set -euo pipefail
+          endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+          prefix="itf/history-draws"
+          mkdir -p /tmp/r2-verify
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/generations/$ITF_HISTORY_GENERATION/manifest.json" /tmp/r2-manifest.json --only-show-errors
+          while read -r block sha count; do
+            file="/tmp/r2-verify/block-$block.tar.gz"
+            aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/generations/$ITF_HISTORY_GENERATION/blocks/block-$block.tar.gz" "$file" --only-show-errors
+            test "$(sha256sum "$file"|cut -d' ' -f1)" = "$sha"
+            test "$(tar -tzf "$file"|grep -c '\.json.gz$')" -eq "$count"
+          done < <(jq -r '.blocks[]|[.block,.sha256,.count]|@tsv' /tmp/r2-manifest.json)
+          test "$(jq '[.blocks[].count]|add' /tmp/r2-manifest.json)" -eq 4291
+          jq -n --arg generation "$ITF_HISTORY_GENERATION" --arg at "$(date -u +%FT%TZ)" '{schemaVersion:1,status:"verified_from_r2",generation:$generation,verifiedAt:$at,expected:4291,complete:4291,missing:0,checksumErrors:0,blocks:17}' > /tmp/r2-verification.json
+          aws --endpoint-url "$endpoint" s3 cp /tmp/r2-verification.json "s3://$R2_BUCKET/$prefix/generations/$ITF_HISTORY_GENERATION/verification.json" --only-show-errors
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-history-r2-certification
+          path: |
+            /tmp/manifest.json
+            /tmp/r2-verification.json
+          retention-days: 90
