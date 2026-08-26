@@ -1,7 +1,7 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-08-25T23:59:54.130Z",
-  "overall": "yellow",
+  "generatedAt": "2026-08-26T00:01:48.206Z",
+  "overall": "green",
   "legend": {
     "green": "ok",
     "yellow": "attenzione/parziale",
@@ -11,25 +11,25 @@
     {
       "status": "green",
       "label": "FITP tornei",
-      "detail": "5699 tornei · 20h fa",
+      "detail": "5699 tornei sorgente · ref main",
       "critical": true
     },
     {
       "status": "green",
       "label": "FITP iscrizioni",
-      "detail": "426 entry · tessera 426/426 · rescue 0",
+      "detail": "425 entry FITP",
       "critical": true
     },
     {
       "status": "green",
       "label": "Tennis Europe",
-      "detail": "46 presenze · T−1 38/7 · mappa 598 · DB 528 liste/0 ID · continuità 11",
+      "detail": "46 entry TE · acceptance 3",
       "critical": true
     },
     {
-      "status": "yellow",
+      "status": "green",
       "label": "ITF",
-      "detail": "9 entry · live 5 · storico 4 · stato itf_acceptance_complete_with_historical_draw_backfill",
+      "detail": "5 entry",
       "critical": false
     },
     {
@@ -40,26 +40,8 @@
     },
     {
       "status": "green",
-      "label": "Agenda/OOP",
-      "detail": "109 voci · motore attivo",
-      "critical": false
-    },
-    {
-      "status": "green",
-      "label": "Risultati",
-      "detail": "54 risultati · motore attivo",
-      "critical": false
-    },
-    {
-      "status": "yellow",
-      "label": "Avversari",
-      "detail": "0 record · da completare 0",
-      "critical": false
-    },
-    {
-      "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 26/08/2026, 01:59:54",
+      "detail": "merge isolato 26/08/2026, 02:01:48",
       "critical": true
     }
   ],
@@ -67,53 +49,10 @@
     "fitp": {
       "entriesFound": 426,
       "externalCircuitEntriesExcludedFromCalendar": 1,
-      "byPlayer": {
-        "francesco-renzulli": 19,
-        "nikola-kerkenyakov": 11,
-        "carlo-ghislotti": 12,
-        "matilde-mainetti": 9,
-        "manuel-natale": 30,
-        "niccolo-zanaga": 14,
-        "aila-zennaro": 12,
-        "virginia-cereghini": 7,
-        "martina-danesi": 11,
-        "filippo-vitali": 19,
-        "mattia-garibaldi": 24,
-        "nicholas-scappa": 8,
-        "darko-sartori": 16,
-        "pietro-sala": 3,
-        "noemi-paganini": 11,
-        "camilla-lingeri": 36,
-        "martina-busa": 10,
-        "daniele-gelli": 18,
-        "francesco-bocchio": 24,
-        "andrea-losa": 18,
-        "gregorio-puccio": 28,
-        "virginia-rossoni": 16,
-        "matteo-bocchio": 21,
-        "giulia-scozzafava": 6,
-        "edoardo-grimoldi": 12,
-        "anna-gambarini": 17,
-        "alessio-nava": 14
-      },
-      "byMatchMethod": {
-        "membership_card": 426
-      },
-      "homonymRejected": 10,
-      "verifiedCompetitionEntryRescues": 0
-    },
-    "calendar": {
-      "tournamentEntries": 476,
-      "byCircuit": {
-        "fitp": 425,
-        "tennis-europe": 46,
-        "itf": 5
-      },
-      "warnings": 0
+      "ref": "main"
     },
     "te": {
-      "status": "tennis_europe_acceptance_complete_draw_parser_v2_applied",
-      "entriesVisible": 89,
+      "entriesVisible": 46,
       "acceptanceConfirmed": 3,
       "byPlayer": {
         "virginia-cereghini": 10,
@@ -136,34 +75,20 @@
         "Q-10": 1,
         "MD-9": 1
       },
-      "system": {
-        "version": 1,
-        "generatedAt": "2026-08-25T23:59:54.086Z",
-        "status": "green",
-        "checks": {
-          "mapTournaments": 598,
-          "mapCoverageFrom": "2025-12-28",
-          "mapCoverageUntil": "2028-08-24",
-          "continuityCycles": 11,
-          "acceptanceEntries": 54,
-          "calendarEntries": 46,
-          "confirmed": 38,
-          "rejected": 7,
-          "pending": 0,
-          "inconclusive": 0,
-          "participantSnapshots": 528,
-          "participantsRead": 96428,
-          "participantIds": 0
-        },
-        "warnings": [],
-        "errors": []
-      }
+      "ref": "main"
     },
     "itf": {
-      "status": "itf_acceptance_complete_with_historical_draw_backfill",
-      "entries": 9,
-      "liveEntries": 5,
-      "historicalEntries": 4
+      "entries": 5,
+      "ref": "main"
+    },
+    "calendar": {
+      "tournamentEntries": 476,
+      "byCircuit": {
+        "fitp": 425,
+        "tennis-europe": 46,
+        "itf": 5
+      },
+      "warnings": 0
     }
   }
 }
