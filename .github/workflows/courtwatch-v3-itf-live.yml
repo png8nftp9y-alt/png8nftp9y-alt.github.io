@@ -29,6 +29,7 @@ jobs:
           ITF_ACCEPTANCE_TOTAL: 16
         run: ITF_SCAN_FROM=$(date -u -d '-21 days' +%F) ITF_SCAN_TO=$(date -u -d '+120 days' +%F) node src/v3/discover-itf-acceptance-shard.mjs
       - name: Scan monitored active and recent results
+        continue-on-error: true
         run: ITF_RESULTS_MONITORED_ONLY=1 ITF_RESULTS_FROM=$(date -u -d '-35 days' +%F) ITF_RESULTS_TO=$(date -u -d '+7 days' +%F) ITF_RESULTS_SHARD=${{ matrix.shard }} ITF_RESULTS_TOTAL=16 node src/v3/discover-itf-results-shard.mjs
       - uses: actions/upload-artifact@v4
         if: always()
