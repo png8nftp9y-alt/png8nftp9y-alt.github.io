@@ -105,7 +105,7 @@ jobs:
           git add dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json history/itf_participant_cache_audit.json
           if git diff --cached --quiet; then echo "No validated ITF changes"; exit 0; fi
           git commit -m "Publish validated ITF live entries and map"
-          git pull --rebase origin main
+          git pull --rebase --autostash origin main
           git push origin HEAD:main
       - name: Upload validation evidence
         uses: actions/upload-artifact@v4
