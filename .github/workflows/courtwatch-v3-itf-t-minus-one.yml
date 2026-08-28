@@ -10,6 +10,7 @@ permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: true}
 jobs:
   review:
+    concurrency: {group: courtwatch-v3-itf-publish,cancel-in-progress: false}
     runs-on: ubuntu-latest
     timeout-minutes: 13
     steps:
