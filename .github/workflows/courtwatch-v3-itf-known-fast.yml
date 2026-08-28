@@ -1,0 +1,121 @@
+name: Court Watch v3 ITF known labels fast
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '4,18,32,46 * * * *'
+  push:
+    branches: [main]
+    paths: ['players.json','dist/v3/source_itf_tournaments.json','history/itf_historical_player_tournaments.json','src/v3/itf-common.mjs','src/v3/discover-itf-acceptance-shard.mjs','src/v3/retry-itf-acceptance-shard.mjs','src/v3/merge-itf-acceptance-shards.mjs','src/v3/maintain-itf-database.mjs','src/v3/validate-itf-system.mjs','src/v3/entries-engine.mjs','src/v3/itf-r2-cache.sh','.github/workflows/courtwatch-v3-itf-known-fast.yml']
+permissions: {contents: write}
+concurrency: {group: courtwatch-v3-itf-known-fast,cancel-in-progress: true}
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: {shard: [0,1,2,3]}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Scan live acceptance and withdrawn status
+        continue-on-error: true
+        env:
+          ITF_REQUEST_DELAY_MS: 650
+          ITF_ACCEPTANCE_MAX_ATTEMPTS: 5
+          ITF_ACCEPTANCE_KNOWN_ONLY: 1
+          ITF_ACCEPTANCE_SHARD: ${{ matrix.shard }}
+          ITF_ACCEPTANCE_TOTAL: 4
+        run: ITF_SCAN_FROM=$(date -u -d '-21 days' +%F) ITF_SCAN_TO=$(date -u -d '+42 days' +%F) node src/v3/discover-itf-acceptance-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: 'itf-acceptance-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*', retention-days: 2}
+  retry_acceptance:
+    needs: acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: {shard: [0,1,2,3]}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {name: 'itf-acceptance-${{ matrix.shard }}', path: dist/v3/shards/itf}
+      - name: Retry only unreadable acceptance lists
+        env:
+          ITF_REQUEST_DELAY_MS: 900
+          ITF_ACCEPTANCE_RETRY_ATTEMPTS: 8
+          ITF_ACCEPTANCE_SHARD: ${{ matrix.shard }}
+          ITF_ACCEPTANCE_TOTAL: 4
+        run: node src/v3/retry-itf-acceptance-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: 'itf-acceptance-retry-${{ matrix.shard }}'
+          path: |
+            dist/v3/shards/itf/acceptance-${{ matrix.shard }}.json
+            dist/v3/shards/itf/participants-${{ matrix.shard }}.json.gz
+          retention-days: 2
+  review:
+    needs: retry_acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 13
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Configure R2
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          echo "R2_ACCOUNT_ID=$R2_ACCOUNT_ID" >> "$GITHUB_ENV"; echo "R2_BUCKET=$R2_BUCKET" >> "$GITHUB_ENV"
+          echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"; echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"; echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
+          python -m pip install --quiet awscli
+          bash src/v3/itf-r2-cache.sh restore
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'itf-acceptance-[0-9]*', path: dist/v3/shards/itf, merge-multiple: true}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'itf-acceptance-retry-*', path: dist/v3/shards/itf, merge-multiple: true}
+      - name: Publish acceptance and apply withdrawn
+        env:
+          ITF_REQUEST_DELAY_MS: 1200
+        run: |
+          set -euo pipefail
+          ITF_ACCEPTANCE_TOTAL=4 node src/v3/merge-itf-acceptance-shards.mjs
+          node src/v3/maintain-itf-database.mjs
+          node src/v3/validate-itf-system.mjs
+          node src/v3/entries-engine.mjs
+      - name: Publish changed database generation to R2
+        run: bash src/v3/itf-r2-cache.sh publish
+      - name: Commit validated ITF database and map
+        run: |
+          set -euo pipefail
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json history/itf_participant_cache_audit.json
+          if git diff --cached --quiet; then echo "No validated ITF changes"; exit 0; fi
+          git commit -m "Publish validated ITF live entries and map"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Upload validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: itf-live-validated
+          path: |
+            dist/v3/source_itf_acceptance_audit.json
+            dist/v3/source_itf_draw_audit.json
+            dist/v3/itf_system_diagnostics.json
+            history/itf_participant_cache_audit.json
+            history/itf_database_audit.json
+          retention-days: 14
