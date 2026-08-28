@@ -62,6 +62,7 @@ jobs:
             dist/v3/shards/itf/participants-${{ matrix.shard }}.json.gz
           retention-days: 2
   review:
+    concurrency: {group: courtwatch-v3-itf-publish,cancel-in-progress: false}
     needs: retry_acceptance
     runs-on: ubuntu-latest
     timeout-minutes: 13
