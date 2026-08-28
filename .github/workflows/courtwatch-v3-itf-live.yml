@@ -1,11 +1,11 @@
-name: Court Watch v3 ITF live database
+name: Court Watch v3 ITF acceptance discovery 42d
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/14 * * * *'
+    - cron: '0,14,28,42,56 * * * *'
   push:
     branches: [main]
-    paths: ['players.json','dist/v3/source_itf_tournaments.json','history/itf_historical_player_tournaments.json','src/v3/itf-common.mjs','src/v3/discover-itf-acceptance-shard.mjs','src/v3/retry-itf-acceptance-shard.mjs','src/v3/merge-itf-acceptance-shards.mjs','src/v3/verify-itf-draws.mjs','src/v3/maintain-itf-database.mjs','src/v3/validate-itf-system.mjs','src/v3/entries-engine.mjs','src/v3/itf-r2-cache.sh','.github/workflows/courtwatch-v3-itf-live.yml']
+    paths: ['players.json','dist/v3/source_itf_tournaments.json','history/itf_historical_player_tournaments.json','src/v3/itf-common.mjs','src/v3/discover-itf-acceptance-shard.mjs','src/v3/retry-itf-acceptance-shard.mjs','src/v3/merge-itf-acceptance-shards.mjs','src/v3/maintain-itf-database.mjs','src/v3/validate-itf-system.mjs','src/v3/entries-engine.mjs','src/v3/itf-r2-cache.sh','.github/workflows/courtwatch-v3-itf-live.yml']
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-live,cancel-in-progress: true}
 jobs:
@@ -27,7 +27,7 @@ jobs:
           ITF_ACCEPTANCE_MAX_ATTEMPTS: 5
           ITF_ACCEPTANCE_SHARD: ${{ matrix.shard }}
           ITF_ACCEPTANCE_TOTAL: 16
-        run: ITF_SCAN_FROM=$(date -u -d '-21 days' +%F) ITF_SCAN_TO=$(date -u -d '+120 days' +%F) node src/v3/discover-itf-acceptance-shard.mjs
+        run: ITF_SCAN_FROM=$(date -u -d '-21 days' +%F) ITF_SCAN_TO=$(date -u -d '+42 days' +%F) node src/v3/discover-itf-acceptance-shard.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: 'itf-acceptance-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*', retention-days: 2}
@@ -85,13 +85,12 @@ jobs:
         with: {pattern: 'itf-acceptance-[0-9]*', path: dist/v3/shards/itf, merge-multiple: true}
       - uses: actions/download-artifact@v4
         with: {pattern: 'itf-acceptance-retry-*', path: dist/v3/shards/itf, merge-multiple: true}
-      - name: Publish acceptance, apply withdrawn and verify T-1
+      - name: Publish acceptance and apply withdrawn
         env:
           ITF_REQUEST_DELAY_MS: 1200
         run: |
           set -euo pipefail
           node src/v3/merge-itf-acceptance-shards.mjs
-          node src/v3/verify-itf-draws.mjs
           node src/v3/maintain-itf-database.mjs
           node src/v3/validate-itf-system.mjs
           node src/v3/entries-engine.mjs
