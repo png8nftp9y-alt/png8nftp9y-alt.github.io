@@ -3,7 +3,12 @@ name: Court Watch v3 Tennis Europe live entries
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/15 * * * *'
+    - cron: '7,22,37,52 * * * *'
+  workflow_run:
+    workflows:
+      - Court Watch v3 FITP player entries
+      - Court Watch v3 ITF live database
+    types: [completed]
   push:
     paths:
       - 'players.json'
@@ -21,7 +26,33 @@ concurrency:
   group: courtwatch-v3-tennis-europe-live
   cancel-in-progress: false
 jobs:
+  freshness-gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.freshness.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: freshness
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" != "workflow_run" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'dist/v3/tennis_europe_system_diagnostics.json';
+          let run = true;
+          if (fs.existsSync(path)) {
+            const generatedAt = Date.parse(JSON.parse(fs.readFileSync(path, 'utf8')).generatedAt || '');
+            run = !Number.isFinite(generatedAt) || Date.now() - generatedAt >= 20 * 60 * 1000;
+          }
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `run=${run}\n`);
+          NODE
   acceptance-shards:
+    needs: freshness-gate
+    if: needs.freshness-gate.outputs.run == 'true'
     name: Acceptance shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
