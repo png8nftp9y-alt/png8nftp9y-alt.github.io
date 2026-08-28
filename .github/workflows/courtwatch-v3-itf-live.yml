@@ -68,7 +68,7 @@ jobs:
     timeout-minutes: 13
     strategy:
       fail-fast: false
-      max-parallel: 8
+      max-parallel: 2
       matrix: {shard: [0,1,2,3,4,5,6,7]}
     steps:
       - uses: actions/checkout@v4
@@ -78,7 +78,8 @@ jobs:
         with: {pattern: 'itf-live-[0-9]*', path: dist/v3/shards/itf, merge-multiple: true}
       - name: Retry only unreadable result sections
         env:
-          ITF_REQUEST_DELAY_MS: 900
+          ITF_REQUEST_DELAY_MS: 1200
+          ITF_RESULT_SECTION_ATTEMPTS: 3
           ITF_RETRY_SHARD: ${{ matrix.shard }}
           ITF_RETRY_TOTAL: 8
         run: node src/v3/retry-itf-result-queue-shard.mjs
