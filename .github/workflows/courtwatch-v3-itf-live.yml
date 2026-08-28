@@ -5,11 +5,11 @@ on:
     - cron: '*/14 * * * *'
   push:
     branches: [main]
-    paths: ['players.json','dist/v3/source_itf_tournaments.json','history/itf_historical_player_tournaments.json','src/v3/itf-common.mjs','src/v3/discover-itf-acceptance-shard.mjs','src/v3/discover-itf-results-shard.mjs','src/v3/retry-itf-acceptance-shard.mjs','src/v3/retry-itf-result-queue-shard.mjs','src/v3/apply-itf-result-retries.mjs','src/v3/discover-itf-draw-entries.mjs','src/v3/merge-itf-acceptance-shards.mjs','src/v3/verify-itf-draws.mjs','src/v3/maintain-itf-database.mjs','src/v3/validate-itf-system.mjs','src/v3/entries-engine.mjs','src/v3/itf-r2-cache.sh','.github/workflows/courtwatch-v3-itf-live.yml']
+    paths: ['players.json','dist/v3/source_itf_tournaments.json','history/itf_historical_player_tournaments.json','src/v3/itf-common.mjs','src/v3/discover-itf-acceptance-shard.mjs','src/v3/retry-itf-acceptance-shard.mjs','src/v3/merge-itf-acceptance-shards.mjs','src/v3/verify-itf-draws.mjs','src/v3/maintain-itf-database.mjs','src/v3/validate-itf-system.mjs','src/v3/entries-engine.mjs','src/v3/itf-r2-cache.sh','.github/workflows/courtwatch-v3-itf-live.yml']
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-live,cancel-in-progress: true}
 jobs:
-  shard:
+  acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 13
     strategy:
@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Scan complete live acceptance window
+      - name: Scan live acceptance and withdrawn status
         continue-on-error: true
         env:
           ITF_REQUEST_DELAY_MS: 650
@@ -28,26 +28,23 @@ jobs:
           ITF_ACCEPTANCE_SHARD: ${{ matrix.shard }}
           ITF_ACCEPTANCE_TOTAL: 16
         run: ITF_SCAN_FROM=$(date -u -d '-21 days' +%F) ITF_SCAN_TO=$(date -u -d '+120 days' +%F) node src/v3/discover-itf-acceptance-shard.mjs
-      - name: Scan monitored active and recent results
-        continue-on-error: true
-        run: ITF_RESULTS_MONITORED_ONLY=1 ITF_RESULTS_FROM=$(date -u -d '-35 days' +%F) ITF_RESULTS_TO=$(date -u -d '+7 days' +%F) ITF_RESULTS_SHARD=${{ matrix.shard }} ITF_RESULTS_TOTAL=16 node src/v3/discover-itf-results-shard.mjs
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: 'itf-live-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*', retention-days: 2}
-  retry:
-    needs: shard
+        with: {name: 'itf-acceptance-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*', retention-days: 2}
+  retry_acceptance:
+    needs: acceptance
     runs-on: ubuntu-latest
     timeout-minutes: 13
     strategy:
       fail-fast: false
-      max-parallel: 16
+      max-parallel: 8
       matrix: {shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {name: 'itf-live-${{ matrix.shard }}', path: dist/v3/shards/itf}
+        with: {name: 'itf-acceptance-${{ matrix.shard }}', path: dist/v3/shards/itf}
       - name: Retry only unreadable acceptance lists
         env:
           ITF_REQUEST_DELAY_MS: 900
@@ -57,40 +54,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: 'itf-live-retry-${{ matrix.shard }}'
+          name: 'itf-acceptance-retry-${{ matrix.shard }}'
           path: |
             dist/v3/shards/itf/acceptance-${{ matrix.shard }}.json
             dist/v3/shards/itf/participants-${{ matrix.shard }}.json.gz
           retention-days: 2
-  retry_results:
-    needs: shard
-    runs-on: ubuntu-latest
-    timeout-minutes: 13
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix: {shard: [0,1,2,3,4,5,6,7]}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: {node-version: '22'}
-      - uses: actions/download-artifact@v4
-        with: {pattern: 'itf-live-[0-9]*', path: dist/v3/shards/itf, merge-multiple: true}
-      - name: Retry only unreadable result sections
-        env:
-          ITF_REQUEST_DELAY_MS: 1200
-          ITF_RESULT_SECTION_ATTEMPTS: 3
-          ITF_RETRY_SHARD: ${{ matrix.shard }}
-          ITF_RETRY_TOTAL: 8
-        run: node src/v3/retry-itf-result-queue-shard.mjs
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: 'itf-result-retry-${{ matrix.shard }}'
-          path: 'dist/v3/shards/itf/retry-${{ matrix.shard }}.json.gz'
-          retention-days: 2
   review:
-    needs: [retry, retry_results]
+    needs: retry_acceptance
     runs-on: ubuntu-latest
     timeout-minutes: 13
     steps:
@@ -112,17 +82,15 @@ jobs:
           python -m pip install --quiet awscli
           bash src/v3/itf-r2-cache.sh restore
       - uses: actions/download-artifact@v4
-        with: {pattern: 'itf-live-[0-9]*', path: dist/v3/shards/itf, merge-multiple: true}
+        with: {pattern: 'itf-acceptance-[0-9]*', path: dist/v3/shards/itf, merge-multiple: true}
       - uses: actions/download-artifact@v4
-        with: {pattern: 'itf-live-retry-*', path: dist/v3/shards/itf, merge-multiple: true}
-      - uses: actions/download-artifact@v4
-        with: {pattern: 'itf-result-retry-*', path: dist/v3/shards/itf, merge-multiple: true}
-      - name: Merge, T-1, validate and build map
+        with: {pattern: 'itf-acceptance-retry-*', path: dist/v3/shards/itf, merge-multiple: true}
+      - name: Publish acceptance, apply withdrawn and verify T-1
+        env:
+          ITF_REQUEST_DELAY_MS: 1200
         run: |
           set -euo pipefail
-          node src/v3/apply-itf-result-retries.mjs
           node src/v3/merge-itf-acceptance-shards.mjs
-          node src/v3/discover-itf-draw-entries.mjs
           node src/v3/verify-itf-draws.mjs
           node src/v3/maintain-itf-database.mjs
           node src/v3/validate-itf-system.mjs
@@ -134,7 +102,7 @@ jobs:
           set -euo pipefail
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          git add dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/source_itf_retry_audit.json dist/v3/source_itf_draw_entry_discovery_audit.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json history/itf_participant_cache_audit.json
+          git add dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json history/itf_participant_cache_audit.json
           if git diff --cached --quiet; then echo "No validated ITF changes"; exit 0; fi
           git commit -m "Publish validated ITF live entries and map"
           git pull --rebase origin main
@@ -145,7 +113,6 @@ jobs:
           name: itf-live-validated
           path: |
             dist/v3/source_itf_acceptance_audit.json
-            dist/v3/source_itf_retry_audit.json
             dist/v3/source_itf_draw_audit.json
             dist/v3/itf_system_diagnostics.json
             history/itf_participant_cache_audit.json
