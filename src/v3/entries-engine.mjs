@@ -40,7 +40,7 @@ function fitpTournamentDetail(fitpTournaments,mapAge){
  return `${found} tornei · ${ageText}${errorText}`;
 }
 const playersDoc=await readJson('players.json',{players:[]});
-const formerDoc=await readJson('former-players.json',{players:[]}),formerPlayerIds=new Set((formerDoc.players||[]).map(player=>player.id)),activePlayers=(playersDoc.players||[]).filter(player=>!formerPlayerIds.has(player.id));
+const activePlayers=playersDoc.players||[],activePlayerIds=new Set(activePlayers.map(player=>player.id));
 const fitp=await readJson('dist/v3/source_fitp_entries.json',{entries:[]});
 const fitpTournaments=await readJson('dist/v3/source_fitp_tournaments.json',{tournaments:[]});
 const te=await readJson('dist/v3/source_tennis_europe_entries.json',{entries:[]});
@@ -55,7 +55,7 @@ const teEntries=[...(te.entries||[]),...(teHistory.entries||[])].map(entry).filt
 const fitpEntries=(fitp.entries||[]).map(e=>e.circuit?e:entry({...e,circuit:'fitp'})).filter(e=>e.playerId&&validDate(e.endDate)&&!externalTournamentInFitp(e));
 const fitpExternalExcluded=(fitp.entries||[]).length-fitpEntries.length;
 const itfEntries=[...(itfHistory.entries||[]),...(itf.entries||[])];
-const entries=[...fitpEntries,...teEntries,...itfEntries].map(e=>e.circuit?e:entry(e)).filter(e=>e.playerId&&!formerPlayerIds.has(e.playerId)&&validDate(e.endDate));
+const entries=[...fitpEntries,...teEntries,...itfEntries].map(e=>e.circuit?e:entry(e)).filter(e=>e.playerId&&activePlayerIds.has(e.playerId)&&validDate(e.endDate));
 const acceptancePriority=e=>({MD:0,Q:1,A:2}[e.acceptanceCode]??3),acceptancePosition=e=>Number.isFinite(Number(e.acceptancePosition))?Number(e.acceptancePosition):Number.MAX_SAFE_INTEGER;
 const best=new Map();for(const e of entries){const k=[e.playerId,e.circuit,e.competitionId||e.tournamentName].join('|'),old=best.get(k);if(!old||acceptancePriority(e)<acceptancePriority(old)||(acceptancePriority(e)===acceptancePriority(old)&&acceptancePosition(e)<acceptancePosition(old)))best.set(k,e)}
 const tournamentEntries=[...best.values()].sort((a,b)=>(a.startDate||'9999').localeCompare(b.startDate||'9999')||String(a.competitionId||a.tournamentName).localeCompare(String(b.competitionId||b.tournamentName))||acceptancePriority(a)-acceptancePriority(b)||acceptancePosition(a)-acceptancePosition(b)||String(a.playerName).localeCompare(String(b.playerName)));

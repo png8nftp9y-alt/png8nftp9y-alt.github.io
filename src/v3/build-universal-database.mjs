@@ -4,17 +4,13 @@ import {UNIVERSAL_VERSION,compact,ensureIsoDate,normalizeCircuit,sourceRef,stabl
 const NOW=new Date().toISOString(),OUT=process.env.COURTWATCH_UNIVERSAL_OUT||'dist/v3/universal';
 const readJson=async(file,fallback)=>{try{return JSON.parse(await fs.readFile(file,'utf8'))}catch{return fallback}};
 const writeJson=async(file,value)=>{await fs.mkdir(path.dirname(file),{recursive:true});await fs.writeFile(file,JSON.stringify(value,null,2)+'\n')};
-const [playersDoc,formerDoc,entriesDoc,agendaDoc,resultsDoc]=await Promise.all([
- readJson('players.json',{players:[]}),readJson('former-players.json',{players:[]}),
- readJson('dist/v3/tournament_entries.json',{tournamentEntries:[]}),
+const [playersDoc,entriesDoc,agendaDoc,resultsDoc]=await Promise.all([
+ readJson('players.json',{players:[]}),readJson('dist/v3/tournament_entries.json',{tournamentEntries:[]}),
  readJson('dist/v3/agenda.json',{agenda:[]}),readJson('dist/v3/results.json',{results:[]})
 ]);
-const formerIds=new Set((formerDoc.players||[]).map(p=>p.id)),playerSourceById=new Map();
-for(const p of playersDoc.players||[])playerSourceById.set(p.id||p.name,p);
-for(const p of formerDoc.players||[]){const key=p.id||p.name,old=playerSourceById.get(key)||{};playerSourceById.set(key,{...old,...p,aliases:[...new Set([...(old.aliases||[]),...(p.aliases||[])])]})}
-const players=uniqueById([...playerSourceById.values()].map(p=>compact({
+const players=uniqueById((playersDoc.players||[]).map(p=>compact({
  id:stableId('player','courtwatch',p.id||p.name),courtwatchId:p.id||'',displayName:p.name||'',
- aliases:[...new Set([p.name,...(p.aliases||[])].filter(Boolean))],club:p.club||'',active:!formerIds.has(p.id),
+ aliases:[...new Set([p.name,...(p.aliases||[])].filter(Boolean))],club:p.club||'',active:true,
  identifiers:{fitpMembershipCard:p.membershipCard||'',tennisEuropePlayerId:p.profileSync?.tennisEurope?.profileId||'',itfWorldTennisId:p.profileSync?.itf?.worldTennisId||p.worldTennisId||''},
  circuits:[...new Set((p.circuits||[]).map(v=>{try{return normalizeCircuit(v)}catch{return String(v||'').toLowerCase()}}))],
  provenance:[sourceRef('manual',p.id||p.name,'',NOW)]
