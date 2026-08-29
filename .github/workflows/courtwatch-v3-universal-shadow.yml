@@ -1,0 +1,40 @@
+name: Court Watch v3 universal schema shadow
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'players.json'
+      - 'former-players.json'
+      - 'dist/v3/tournament_entries.json'
+      - 'dist/v3/agenda.json'
+      - 'dist/v3/results.json'
+      - 'src/v3/universal-data-model.mjs'
+      - 'src/v3/build-universal-database.mjs'
+      - 'src/v3/validate-universal-database.mjs'
+      - 'docs/courtwatch-universal-schema-v1.md'
+      - '.github/workflows/courtwatch-v3-universal-shadow.yml'
+permissions: {contents: read}
+concurrency: {group: courtwatch-v3-universal-shadow,cancel-in-progress: true}
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check syntax
+        run: |
+          node --check src/v3/universal-data-model.mjs
+          node --check src/v3/build-universal-database.mjs
+          node --check src/v3/validate-universal-database.mjs
+      - name: Build universal shadow database
+        run: node src/v3/build-universal-database.mjs
+      - name: Validate identities references and coverage
+        run: node src/v3/validate-universal-database.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: courtwatch-universal-shadow
+          path: dist/v3/universal
+          retention-days: 14
