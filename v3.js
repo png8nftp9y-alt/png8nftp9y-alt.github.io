@@ -1,4 +1,5 @@
 const V3='/dist/v3/';
+const APP_API='https://courtwatch-app-api.ckrk9ggvrb.workers.dev/v1/app-snapshot';
 const LAST_GOOD_CACHE='courtwatch-v3-last-good-v1';
 const FORMER_PLAYERS=new Set(['martina-busa','manuel-natale','pietro-sala','niccolo-zanaga']);
 const state={data:null,month:new Date(),agenda:new Date(),selected:new Set(),openPicker:null};
@@ -16,6 +17,7 @@ const active=t=>!['eliminated','excluded','withdrawn'].includes(String(t.status|
 const overlap=(t,a,b)=>active(t)&&(!t.startDate||t.startDate<=b)&&(!t.endDate||t.endDate>=a);
 const cityCountry=s=>{let v=String(s||'').replace(/^Tournaments\s+/i,'').trim();if(v.includes('|'))v=v.split('|').pop().trim();const m=v.match(/([\p{L}' .-]+,\s*[\p{L}' .-]+)(?:\s|$)/u);return (m?m[1]:v).trim()||'Città/stato da pubblicare'};
 async function v3json(path){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);try{const r=await fetch(V3+path+'?t='+Date.now(),{cache:'no-store',mode:'cors',signal:controller.signal});if(!r.ok)throw Error('File v3 mancante: '+path);return await r.json()}finally{clearTimeout(timer)}}
+async function apiProjection(){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6000);try{const r=await fetch(APP_API+'?t='+Date.now(),{cache:'no-store',mode:'cors',signal:controller.signal});if(!r.ok)throw Error('API Court Watch non disponibile');const data=await r.json();if(!Array.isArray(data.players)||!data.players.length||!Array.isArray(data.tournaments))throw Error('Proiezione API incompleta');return data}finally{clearTimeout(timer)}}
 function cachedData(){try{const saved=JSON.parse(localStorage.getItem(LAST_GOOD_CACHE)||'null');return saved&&Array.isArray(saved.players)&&saved.players.length&&Array.isArray(saved.tournaments)?saved:null}catch{return null}}
 function saveCachedData(data){try{localStorage.setItem(LAST_GOOD_CACHE,JSON.stringify(data))}catch(e){console.warn('Cache locale Court Watch non disponibile',e)}}
 function syncLabel(data,stale=false){const when=new Intl.DateTimeFormat('it-IT',{hour:'2-digit',minute:'2-digit'}).format(new Date(data.generatedAt||Date.now()));$('syncStatus').classList.toggle('stale',stale);$('syncStatus').textContent=(stale?'Ultimi dati salvati · ':'Live v3 · ')+when}
@@ -48,7 +50,8 @@ async function load(){
     if(!Array.isArray(docs.tournaments?.tournaments))throw Error('Calendario tornei essenziale non disponibile');
 
     const previous=state.data||cachedData()||{};
-    const visiblePlayers=docs.players.players.filter(p=>!FORMER_PLAYERS.has(p.id));
+    let projection=null;try{projection=await apiProjection()}catch(error){console.warn('Fallback JSON Court Watch attivo',error)}
+    const visiblePlayers=(projection?.players||docs.players.players).filter(p=>!FORMER_PLAYERS.has(p.id));
     const visibleIds=new Set(visiblePlayers.map(p=>p.id));
     const matches=Array.isArray(docs.matches?.matches)?docs.matches.matches:(previous.matches||[]);
     const agenda=Array.isArray(docs.agenda?.agenda)?docs.agenda.agenda:(previous.agenda||[]);
@@ -60,7 +63,7 @@ async function load(){
 
     state.data={
       players:visiblePlayers,
-      tournaments:docs.tournaments.tournaments.filter(x=>visibleIds.has(x.playerId)),
+      tournaments:(projection?.tournaments||docs.tournaments.tournaments).filter(x=>visibleIds.has(x.playerId)),
       matches:matches.filter(x=>visibleIds.has(x.playerId)),
       agenda:mergeAgenda(agenda,matches).filter(x=>visibleIds.has(x.playerId)),
       results:results.filter(x=>visibleIds.has(x.playerId)),
