@@ -105,18 +105,21 @@ jobs:
           snapshot=/tmp/courtwatch-itf-publish
           rm -rf "$snapshot"
           mkdir -p "$snapshot"
-          for file in \
-            dist/v3/source_itf_entries.json \\
-            dist/v3/source_itf_acceptance_audit.json \\
-            dist/v3/source_itf_draw_audit.json \\
-            dist/v3/itf_system_diagnostics.json \\
-            history/itf_draw_target_db.json \\
-            history/itf_player_tournament_db.json \\
-            history/itf_database_audit.json \\
-            history/itf_participant_cache_audit.json; do \\
-            test -f "$file" || continue \\
-            mkdir -p "$snapshot/$(dirname "$file")" \\
-            cp "$file" "$snapshot/$file"; done
+          files=(
+            "dist/v3/source_itf_entries.json"
+            "dist/v3/source_itf_acceptance_audit.json"
+            "dist/v3/source_itf_draw_audit.json"
+            "dist/v3/itf_system_diagnostics.json"
+            "history/itf_draw_target_db.json"
+            "history/itf_player_tournament_db.json"
+            "history/itf_database_audit.json"
+            "history/itf_participant_cache_audit.json"
+          )
+          for file in "${files[@]}"; do
+            test -f "$file" || continue
+            mkdir -p "$snapshot/$(dirname "$file")"
+            cp "$file" "$snapshot/$file"
+          done
           for attempt in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
