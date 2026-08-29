@@ -9,8 +9,10 @@ const [playersDoc,formerDoc,entriesDoc,agendaDoc,resultsDoc]=await Promise.all([
  readJson('dist/v3/tournament_entries.json',{tournamentEntries:[]}),
  readJson('dist/v3/agenda.json',{agenda:[]}),readJson('dist/v3/results.json',{results:[]})
 ]);
-const formerIds=new Set((formerDoc.players||[]).map(p=>p.id));
-const players=uniqueById([...(playersDoc.players||[]),...(formerDoc.players||[])].map(p=>compact({
+const formerIds=new Set((formerDoc.players||[]).map(p=>p.id)),playerSourceById=new Map();
+for(const p of playersDoc.players||[])playerSourceById.set(p.id||p.name,p);
+for(const p of formerDoc.players||[]){const key=p.id||p.name,old=playerSourceById.get(key)||{};playerSourceById.set(key,{...old,...p,aliases:[...new Set([...(old.aliases||[]),...(p.aliases||[])])]})}
+const players=uniqueById([...playerSourceById.values()].map(p=>compact({
  id:stableId('player','courtwatch',p.id||p.name),courtwatchId:p.id||'',displayName:p.name||'',
  aliases:[...new Set([p.name,...(p.aliases||[])].filter(Boolean))],club:p.club||'',active:!formerIds.has(p.id),
  identifiers:{fitpMembershipCard:p.membershipCard||'',tennisEuropePlayerId:p.profileSync?.tennisEurope?.profileId||'',itfWorldTennisId:p.profileSync?.itf?.worldTennisId||p.worldTennisId||''},
