@@ -1,0 +1,14 @@
+{
+  "name": "courtwatch-app-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/index.js && node --check scripts/configure-d1.mjs && node --check scripts/generate-seed.mjs && node --check scripts/verify-d1.mjs",
+    "configure": "node scripts/configure-d1.mjs",
+    "seed": "node scripts/generate-seed.mjs",
+    "verify": "node scripts/verify-d1.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.33.1"
+  }
+}
