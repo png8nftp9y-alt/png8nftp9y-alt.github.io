@@ -1,0 +1,12 @@
+{
+  "name": "courtwatch-cloudflare-watchdog",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  },
+  "scripts": {
+    "check": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy --minify"
+  }
+}
