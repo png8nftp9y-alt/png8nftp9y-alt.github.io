@@ -1,131 +1,25 @@
 {
   "version": 4,
-  "generatedAt": "2026-08-29T04:18:52.196Z",
+  "generatedAt": "2026-08-29T14:50:47.816Z",
   "today": "2026-08-29",
   "status": "itf_t_minus_one_all_players_complete",
   "summary": {
     "mode": "live_t_minus_1_all_itf_players",
     "eligiblePlayers": 1,
-    "dueTournaments": 26,
-    "tournamentsChecked": 26,
-    "completeTournaments": 2,
-    "pendingTournaments": 24,
+    "dueTournaments": 24,
+    "tournamentsChecked": 24,
+    "completeTournaments": 1,
+    "pendingTournaments": 23,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "drawRequests": 18,
+    "drawRequests": 10,
     "preTMinusOneDrawRequests": 0
   },
   "audit": [
     {
-      "competitionId": "J-J200-CZE-2026-002",
-      "tournamentName": "J200 Rakovnik",
-      "decision": "complete",
-      "playersFound": [],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 108,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 52,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 108,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 30,
-              "error": null
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
-    },
-    {
-      "competitionId": "J-J200-SRB-2026-001",
-      "tournamentName": "J200 Belgrade",
-      "decision": "complete",
-      "playersFound": [],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 62,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 56,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 62,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 50,
-              "error": null
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
-    },
-    {
       "competitionId": "J-J30-BDI-2026-002",
       "tournamentName": "J30 Bujumbura",
-      "decision": "pending",
+      "decision": "complete",
       "playersFound": [],
       "families": [
         {
@@ -146,6 +40,53 @@
         },
         {
           "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 9,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 44,
+              "error": null
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
+    },
+    {
+      "competitionId": "J-J30-MDV-2026-004",
+      "tournamentName": "J30 Male",
+      "decision": "pending",
+      "playersFound": [],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 14,
+              "error": null
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
           "populated": false,
           "events": [
             {
@@ -163,19 +104,27 @@
               "event": "G-S-M-KO",
               "players": 0,
               "error": "GetDrawsheet_incapsula_challenge"
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
             }
           ]
         }
       ],
       "eventFailure": null
-    },
-    {
-      "competitionId": "J-J30-MDV-2026-004",
-      "tournamentName": "J30 Male",
-      "decision": "pending",
-      "playersFound": [],
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
     },
     {
       "competitionId": "J-J30-MEX-2026-011",
@@ -198,63 +147,8 @@
       "tournamentName": "J30 Panama",
       "decision": "pending",
       "playersFound": [],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 14,
-              "error": null
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 16,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 14,
-              "error": null
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
     },
     {
       "competitionId": "J-J30-ROU-2026-003",
