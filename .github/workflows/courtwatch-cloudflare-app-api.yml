@@ -7,6 +7,7 @@ on:
     paths:
       - 'cloudflare/app-api/**'
       - 'dist/v3/universal/**'
+      - 'src/v3/verify-cloudflare-api-parity.mjs'
       - '.github/workflows/courtwatch-cloudflare-app-api.yml'
 
 permissions:
@@ -47,4 +48,14 @@ jobs:
       - name: Validate Worker API
         run: npx wrangler deploy --dry-run --config wrangler.generated.jsonc
       - name: Deploy Worker API
-        run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
+        id: deploy
+        run: |
+          npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc 2>&1 | tee deploy-output.txt
+          API_URL=$(sed -n 's/.*\(https:\/\/[^[:space:]]*\.workers\.dev\).*/\1/p' deploy-output.txt | tail -1)
+          test -n "$API_URL"
+          echo "api_url=$API_URL" >> "$GITHUB_OUTPUT"
+      - name: Verify live API and legacy app parity
+        env:
+          API_BASE: ${{ steps.deploy.outputs.api_url }}
+        working-directory: .
+        run: node src/v3/verify-cloudflare-api-parity.mjs
