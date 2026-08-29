@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-08-29T21:50:46.196Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-08-29T22:30:44.332Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
   "targets": {
@@ -885,11 +885,56 @@
     },
     "J-J30-SVK-2026-003": {
       "competitionId": "J-J30-SVK-2026-003",
-      "decision": "pending",
-      "checkedAt": "2026-08-29T21:20:45.295Z",
+      "decision": "complete",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
       "playersFound": 0,
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 110,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 33,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 110,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 20,
+              "error": null
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
     },
     "J-J30-TJK-2026-005": {
       "competitionId": "J-J30-TJK-2026-005",
@@ -958,10 +1003,55 @@
     "J-J60-SLO-2026-001": {
       "competitionId": "J-J60-SLO-2026-001",
       "decision": "pending",
-      "checkedAt": "2026-08-29T21:20:45.295Z",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
       "playersFound": 0,
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 110,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
     },
     "J-J60-SUI-2026-001": {
       "competitionId": "J-J60-SUI-2026-001",
@@ -974,7 +1064,7 @@
     "J-J60-TTO-2026-002": {
       "competitionId": "J-J60-TTO-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-08-29T21:20:45.295Z",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
       "playersFound": 0,
       "families": [],
       "eventFailure": "GetEventFilters_incapsula_challenge"
@@ -990,7 +1080,7 @@
     "J-J100-HUN-2026-002": {
       "competitionId": "J-J100-HUN-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-08-29T21:20:45.295Z",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
       "playersFound": 0,
       "families": [],
       "eventFailure": "GetEventFilters_incapsula_challenge"
@@ -998,7 +1088,7 @@
     "J-J200-AUS-2026-002": {
       "competitionId": "J-J200-AUS-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-08-29T21:20:45.295Z",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
       "playersFound": 0,
       "families": [],
       "eventFailure": "GetEventFilters_incapsula_challenge"
@@ -1006,7 +1096,7 @@
     "J-J30-KOS-2026-002": {
       "competitionId": "J-J30-KOS-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-08-29T21:20:45.295Z",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
       "playersFound": 0,
       "families": [],
       "eventFailure": "GetEventFilters_incapsula_challenge"
@@ -1014,7 +1104,7 @@
     "J-J60-TUN-2026-005": {
       "competitionId": "J-J60-TUN-2026-005",
       "decision": "pending",
-      "checkedAt": "2026-08-29T21:20:45.295Z",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
       "playersFound": 0,
       "families": [],
       "eventFailure": "GetEventFilters_incapsula_challenge"
@@ -1022,7 +1112,199 @@
     "J-J300-CAN-2026-001": {
       "competitionId": "J-J300-CAN-2026-001",
       "decision": "pending",
-      "checkedAt": "2026-08-29T21:20:45.295Z",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J100-ESP-2026-008": {
+      "competitionId": "J-J100-ESP-2026-008",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J100-RSA-2026-005": {
+      "competitionId": "J-J100-RSA-2026-005",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J200-KAZ-2026-001": {
+      "competitionId": "J-J200-KAZ-2026-001",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-ARG-2026-003": {
+      "competitionId": "J-J30-ARG-2026-003",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-DEN-2026-004": {
+      "competitionId": "J-J30-DEN-2026-004",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-ECU-2026-005": {
+      "competitionId": "J-J30-ECU-2026-005",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-GER-2026-005": {
+      "competitionId": "J-J30-GER-2026-005",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-GHA-2026-005": {
+      "competitionId": "J-J30-GHA-2026-005",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-HON-2026-005": {
+      "competitionId": "J-J30-HON-2026-005",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-IND-2026-006": {
+      "competitionId": "J-J30-IND-2026-006",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-MEX-2026-009": {
+      "competitionId": "J-J30-MEX-2026-009",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-ROU-2026-004": {
+      "competitionId": "J-J30-ROU-2026-004",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-SLO-2026-003": {
+      "competitionId": "J-J30-SLO-2026-003",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-SRB-2026-003": {
+      "competitionId": "J-J30-SRB-2026-003",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-TJK-2026-006": {
+      "competitionId": "J-J30-TJK-2026-006",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-TPE-2026-002": {
+      "competitionId": "J-J30-TPE-2026-002",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-USA-2026-005": {
+      "competitionId": "J-J30-USA-2026-005",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J30-USA-2026-006": {
+      "competitionId": "J-J30-USA-2026-006",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J60-BUL-2026-002": {
+      "competitionId": "J-J60-BUL-2026-002",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J60-CHI-2026-001": {
+      "competitionId": "J-J60-CHI-2026-001",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J60-COL-2026-001": {
+      "competitionId": "J-J60-COL-2026-001",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J60-FRA-2026-006": {
+      "competitionId": "J-J60-FRA-2026-006",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J60-LAT-2026-004": {
+      "competitionId": "J-J60-LAT-2026-004",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
+      "playersFound": 0,
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
+    },
+    "J-J60-SUI-2026-002": {
+      "competitionId": "J-J60-SUI-2026-002",
+      "decision": "pending",
+      "checkedAt": "2026-08-29T22:30:44.332Z",
       "playersFound": 0,
       "families": [],
       "eventFailure": "GetEventFilters_incapsula_challenge"
