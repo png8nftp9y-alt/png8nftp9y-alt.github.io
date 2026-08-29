@@ -20,7 +20,7 @@ export default{
       if(path==='/v1/players')return json({players:await all(env,'players','WHERE active=1 ORDER BY display_name')});
       if(path==='/v1/tournaments'){const circuit=url.searchParams.get('circuit');return json({tournaments:await all(env,'tournaments',circuit?'WHERE circuit=? ORDER BY start_date':'',circuit?[circuit]:[])})}
       if(path==='/v1/entries'){const playerId=url.searchParams.get('playerId');return json({entries:await all(env,'entries',playerId?'WHERE player_id=?':'',playerId?[playerId]:[])})}
-      if(path==='/v1/app-snapshot'){const[players,tournaments,entries,schedules,manifest]=await Promise.all([all(env,'players'),all(env,'tournaments'),all(env,'entries'),all(env,'schedules'),env.DB.prepare("SELECT * FROM generations WHERE id='current'").first()]);return json(appSnapshot(players,tournaments,entries,schedules,manifest||{}))}
+      if(path==='/v1/app-snapshot'){const[players,tournaments,matches,manifest]=await Promise.all([all(env,'app_players','ORDER BY seq'),all(env,'app_tournaments','ORDER BY seq'),all(env,'app_matches','ORDER BY seq'),env.DB.prepare("SELECT * FROM generations WHERE id='current'").first()]);return json({generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players,tournaments,matches})}
       return json({error:'not_found'},404);
     }catch(error){console.error(error);return json({error:'internal_error'},500)}
   },
