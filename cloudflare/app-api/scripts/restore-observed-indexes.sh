@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+readonly ITF_MIN_PERMANENT_PARTICIPANTS=10000
 mkdir -p tmp/observed
 get_object(){ npx wrangler r2 object get "$R2_BUCKET/$1" --remote --config wrangler.generated.jsonc --file "$2"; }
 restore_file(){
@@ -18,18 +19,18 @@ restore_itf(){
     if ! get_object "itf/database/pointers/$slot.json" "$pointer"; then continue; fi
     generation="$(jq -er .generation "$pointer")"
     candidate="tmp/observed/itf-$slot.json.gz"
-    get_object "itf/database/generations/$generation/itf_participant_cache.json.gz" "$candidate"
+    if ! get_object "itf/database/generations/$generation/itf_participant_cache.json.gz" "$candidate"; then continue; fi
     gzip -t "$candidate"
     count="$(gzip -cd "$candidate" | jq -r '(.participants // []) | length')"
-    if test "$count" -gt 0; then
+    if test "$count" -ge "$ITF_MIN_PERMANENT_PARTICIPANTS"; then
       cp "$candidate" tmp/observed/itf_participant_cache.json.gz
       printf '%s' "$slot" > tmp/observed/itf-source-slot.txt
       echo "Selected ITF $slot with $count permanent participants."
       return
     fi
-    echo "Rejected empty ITF $slot participant cache." >&2
+    echo "Rejected ITF $slot: $count participants, minimum $ITF_MIN_PERMANENT_PARTICIPANTS." >&2
   done
-  echo "No non-empty ITF participant cache in current or backups." >&2
+  echo "No complete ITF participant cache in current or backups." >&2
   exit 1
 }
 restore_itf
