@@ -1,0 +1,31 @@
+name: Court Watch Tennis Europe OOP parser proof
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/prove-tennis-europe-oop-parser.mjs'
+      - '.github/workflows/courtwatch-tennis-europe-oop-parser-proof.yml'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-tennis-europe-oop-parser-proof
+  cancel-in-progress: true
+jobs:
+  prove-parser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Parse official OOP, results and all participants
+        run: node src/v3/prove-tennis-europe-oop-parser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tennis-europe-oop-parser-proof
+          path: dist/v3/tennis_europe_oop_parser_proof.json
+          if-no-files-found: error
+          retention-days: 7
