@@ -29,6 +29,8 @@ jobs:
         if: always()
         with:
           name: tennis-europe-oop-route-diagnostic
-          path: dist/v3/tennis_europe_oop_route_diagnostic.json
+          path: |
+            dist/v3/tennis_europe_oop_route_diagnostic.json
+            dist/v3/tennis-europe-oop-html/*.html
           if-no-files-found: error
           retention-days: 7
