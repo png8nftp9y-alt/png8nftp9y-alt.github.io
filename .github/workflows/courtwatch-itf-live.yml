@@ -1,11 +1,6 @@
-name: Court Watch ITF live data
+name: Court Watch ITF legacy diagnostic (manual)
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['itf-entries.mjs','courtwatch-finalize.mjs','players.json','former-players.json','.github/workflows/courtwatch-itf-live.yml']
-  schedule:
-    - cron: '*/10 * * * *'
 permissions: {contents: write}
 concurrency: {group: court-watch-itf-live,cancel-in-progress: true}
 jobs:
