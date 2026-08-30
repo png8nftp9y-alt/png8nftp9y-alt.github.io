@@ -73,7 +73,16 @@ jobs:
         run: |
           for sql_file in seed-tennis-europe-oop/*.sql; do
             echo "Importing $sql_file"
-            npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"
+            imported=0
+            for attempt in 1 2 3 4; do
+              if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"; then
+                imported=1
+                break
+              fi
+              echo "Retry $attempt for $sql_file after transient D1 import state"
+              sleep $((attempt * 8))
+            done
+            test "$imported" -eq 1
           done
       - name: Verify Tennis Europe D1 parity
         run: node scripts/verify-tennis-europe-agenda-d1.mjs
