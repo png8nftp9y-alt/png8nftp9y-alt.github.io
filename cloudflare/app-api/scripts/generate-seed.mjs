@@ -22,6 +22,6 @@ const appMatches=[];
 appPlayers.forEach((r,i)=>sql.push(`INSERT INTO app_players(seq,id,payload) VALUES(${i+1},${esc(r.id)},${payload(r)});`));
 appTournaments.forEach((r,i)=>sql.push(`INSERT INTO app_tournaments(seq,player_id,competition_id,circuit,payload) VALUES(${i+1},${esc(r.playerId)},${esc(r.competitionId)},${esc(circuit(r))},${payload(r)});`));
 appMatches.forEach((r,i)=>sql.push(`INSERT INTO app_matches(seq,player_id,competition_id,match_date,payload) VALUES(${i+1},${esc(r.playerId)},${esc(r.competitionId)},${esc(r.date)},${payload(r)});`));
-const counts={...manifest.counts,observedPlayers:(observed.players||[]).length,observedByCircuit:observed.counts||{},appPlayers:appPlayers.length,appTournaments:appTournaments.length,appMatches:appMatches.length};
+const counts={...manifest.counts,observedPlayers:(observed.players||[]).length,observedByCircuit:observed.counts||{},observedSources:observed.sources||{},appPlayers:appPlayers.length,appTournaments:appTournaments.length,appMatches:appMatches.length};
 sql.push(`INSERT OR REPLACE INTO generations(id,generated_at,schema_version,status,counts_json) VALUES('current',${esc(manifest.generatedAt)},${esc(manifest.version)},'green',${esc(JSON.stringify(counts))});`);
 await fs.writeFile(out,sql.join('\n')+'\n');console.log(JSON.stringify({output:out,counts}));
