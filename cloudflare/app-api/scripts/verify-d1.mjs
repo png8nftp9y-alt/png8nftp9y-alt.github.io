@@ -30,5 +30,5 @@ const run=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote'
 const parsed=JSON.parse(run.stdout),row=parsed.flatMap(x=>x.results||[])[0]||{},errors=[];
 for(const [key,value] of Object.entries(expected))if(Number(row[key])!==Number(value))errors.push(`${key}: D1=${row[key]} expected=${value}`);
 const observed={total:Number(row.observedPlayers),fitp:Number(row.observedFitp),tennisEurope:Number(row.observedTe),itf:Number(row.observedItf)};
-if(observed.total<=Number(manifest.counts.players)||Object.values(observed).slice(1).some(n=>n<1))errors.push('observed player index incomplete: '+JSON.stringify(observed));
+if(observed.total<=Number(manifest.counts.players)||observed.fitp<50000||observed.tennisEurope<5000||observed.itf<5000)errors.push('observed player index incomplete: '+JSON.stringify(observed));
 if(errors.length)throw new Error('D1 parity failed: '+errors.join('; '));console.log(JSON.stringify({status:'green',schema:manifest.version,counts:expected,observedPlayers:observed}));
