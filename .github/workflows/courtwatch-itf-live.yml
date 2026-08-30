@@ -17,19 +17,24 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: '22', cache: 'npm'}
-      - run: npm ci || true
-      - name: Sync ITF official only
+      - run: npm ci
+      - name: Sync and validate ITF official only
         run: |
-          set +e
+          set -euo pipefail
           : > /tmp/itf-live.log
-          timeout 360 node run-with-former.mjs itf-entries.mjs >> /tmp/itf-live.log 2>&1; ITF=$?
-          timeout 60 node run-with-former.mjs courtwatch-finalize.mjs >> /tmp/itf-live.log 2>&1; FINALIZE=$?
-          exit 0
+          timeout 360 node run-with-former.mjs itf-entries.mjs 2>&1 | tee -a /tmp/itf-live.log
+          timeout 60 node run-with-former.mjs courtwatch-finalize.mjs 2>&1 | tee -a /tmp/itf-live.log
+          node -e "const fs=require('fs');const x=JSON.parse(fs.readFileSync('itf-sync.json','utf8'));if(x.errors?.length)throw Error('ITF sync contains '+x.errors.length+' errors');"
       - name: Publish ITF data
         run: |
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
           git add data.json itf-sync.json
-          git commit -m 'Update Court Watch ITF live data' || exit 0
-          git pull --rebase origin main || true
-          git push origin HEAD:main || true
+          git diff --cached --quiet && exit 0
+          git commit -m 'Update Court Watch ITF live data'
+          for attempt in 1 2 3; do
+            git pull --rebase origin main
+            git push origin HEAD:main && exit 0
+            sleep $((attempt * 3))
+          done
+          exit 1
