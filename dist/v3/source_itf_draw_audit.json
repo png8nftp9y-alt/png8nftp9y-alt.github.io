@@ -1,24 +1,82 @@
 {
   "version": 4,
-  "generatedAt": "2026-08-29T23:20:51.211Z",
+  "generatedAt": "2026-08-30T01:20:59.440Z",
   "today": "2026-08-30",
   "status": "itf_t_minus_one_all_players_complete",
   "summary": {
     "mode": "live_t_minus_1_all_itf_players",
     "eligiblePlayers": 1,
-    "dueTournaments": 31,
-    "tournamentsChecked": 31,
+    "dueTournaments": 30,
+    "tournamentsChecked": 30,
     "completeTournaments": 1,
-    "pendingTournaments": 30,
+    "pendingTournaments": 29,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "drawRequests": 9,
+    "drawRequests": 13,
     "preTMinusOneDrawRequests": 0
   },
   "audit": [
     {
-      "competitionId": "J-J60-SLO-2026-001",
-      "tournamentName": "J60 Domzale",
+      "competitionId": "J-J60-TTO-2026-002",
+      "tournamentName": "J60 Tacarigua",
+      "decision": "pending",
+      "playersFound": [],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 14,
+              "error": null
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 10,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 50,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": null
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
+    },
+    {
+      "competitionId": "J-J100-HUN-2026-002",
+      "tournamentName": "J100 Budapest",
       "decision": "complete",
       "playersFound": [],
       "families": [
@@ -39,7 +97,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 77,
+              "players": 66,
               "error": null
             }
           ]
@@ -61,7 +119,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 34,
+              "players": 9,
               "error": null
             }
           ]
@@ -70,8 +128,8 @@
       "eventFailure": null
     },
     {
-      "competitionId": "J-J60-TTO-2026-002",
-      "tournamentName": "J60 Tacarigua",
+      "competitionId": "J-J200-AUS-2026-002",
+      "tournamentName": "J200 Sydney",
       "decision": "pending",
       "playersFound": [],
       "families": [
@@ -81,13 +139,8 @@
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 14,
+              "players": 108,
               "error": null
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
             }
           ]
         },
@@ -126,22 +179,6 @@
         }
       ],
       "eventFailure": null
-    },
-    {
-      "competitionId": "J-J100-HUN-2026-002",
-      "tournamentName": "J100 Budapest",
-      "decision": "pending",
-      "playersFound": [],
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
-    },
-    {
-      "competitionId": "J-J200-AUS-2026-002",
-      "tournamentName": "J200 Sydney",
-      "decision": "pending",
-      "playersFound": [],
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
     },
     {
       "competitionId": "J-J30-KOS-2026-002",
