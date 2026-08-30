@@ -9,6 +9,7 @@ on:
       - 'history/tennis_europe_tournament_catalog.json'
       - 'src/v3/run-tennis-europe-oop-live.mjs'
       - 'src/v3/compare-tennis-europe-oop-live.mjs'
+      - 'src/v3/project-tennis-europe-courtwatch-matches.mjs'
       - 'src/v3/tennis-europe-oop-r2.sh'
       - '.github/workflows/courtwatch-tennis-europe-oop-live.yml'
 permissions:
@@ -54,6 +55,8 @@ jobs:
           fi
       - name: Acquire OOP and results from T-minus-one
         run: node src/v3/run-tennis-europe-oop-live.mjs
+      - name: Build auditable Court Watch player projection
+        run: node src/v3/project-tennis-europe-courtwatch-matches.mjs
       - name: Audit changes from previous green snapshot
         run: node src/v3/compare-tennis-europe-oop-live.mjs
       - name: Publish verified generational snapshot to R2
@@ -65,5 +68,6 @@ jobs:
           path: |
             dist/v3/tennis_europe_oop_live.json
             dist/v3/tennis_europe_oop_live_transitions.json
+            dist/v3/tennis_europe_courtwatch_matches.json
           if-no-files-found: error
           retention-days: 7
