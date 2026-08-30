@@ -8,8 +8,10 @@ on:
     paths:
       - 'history/tennis_europe_tournament_catalog.json'
       - 'src/v3/run-tennis-europe-oop-live.mjs'
+      - 'src/v3/compare-tennis-europe-oop-live.mjs'
       - '.github/workflows/courtwatch-tennis-europe-oop-live.yml'
 permissions:
+  actions: read
   contents: read
 concurrency:
   group: courtwatch-tennis-europe-oop-live
@@ -23,12 +25,25 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Restore previous successful live snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          previous=$(gh run list --repo "${{ github.repository }}" --workflow courtwatch-tennis-europe-oop-live.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+          if [ -n "$previous" ]; then
+            mkdir -p dist/v3/previous-tennis-europe-oop
+            gh run download "$previous" --repo "${{ github.repository }}" --name tennis-europe-oop-live --dir dist/v3/previous-tennis-europe-oop
+          fi
       - name: Acquire OOP and results from T-minus-one
         run: node src/v3/run-tennis-europe-oop-live.mjs
+      - name: Audit changes from previous green snapshot
+        run: node src/v3/compare-tennis-europe-oop-live.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: tennis-europe-oop-live
-          path: dist/v3/tennis_europe_oop_live.json
+          path: |
+            dist/v3/tennis_europe_oop_live.json
+            dist/v3/tennis_europe_oop_live_transitions.json
           if-no-files-found: error
           retention-days: 7
