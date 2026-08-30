@@ -77,23 +77,6 @@ jobs:
         run: |
           npm run seed
           npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file seed-universal.sql
-      - name: Build and import relational Europe OOP generation
-        run: |
-          npm run seed:te-oop
-          npm run seed:te-candidates
-          for sql_file in seed-tennis-europe-oop/*.sql; do
-            echo "Importing $sql_file"
-            imported=0
-            for attempt in 1 2 3 4; do
-              if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"; then
-                imported=1
-                break
-              fi
-              echo "Retry $attempt for $sql_file after transient D1 import state"
-              sleep $((attempt * 8))
-            done
-            test "$imported" -eq 1
-          done
       - name: Verify D1 parity with universal and Europe OOP manifests
         run: npm run verify
       - name: Validate Worker API
