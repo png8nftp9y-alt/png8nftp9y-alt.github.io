@@ -77,6 +77,10 @@ jobs:
         run: |
           npm run seed
           npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file seed-universal.sql
+      - name: Build read-only Europe parity manifests
+        run: |
+          npm run seed:te-oop
+          npm run seed:te-candidates
       - name: Verify D1 parity with universal and Europe OOP manifests
         run: npm run verify
       - name: Validate Worker API
