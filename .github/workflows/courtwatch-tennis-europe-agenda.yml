@@ -22,8 +22,8 @@ permissions:
   actions: read
 
 concurrency:
-  group: courtwatch-tennis-europe-agenda-d1
-  cancel-in-progress: true
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
 
 jobs:
   import-verify-deploy:
