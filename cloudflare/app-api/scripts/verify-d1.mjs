@@ -12,7 +12,8 @@ const expected={
   matches:nonTe(matches,'matches')+oop.counts.matches,
   results:nonTe(results,'results')+oop.counts.completed,
   teOopTournaments:oop.counts.tournaments,teMatches:oop.counts.matches,teSchedules:oop.counts.matches,
-  teResults:oop.counts.completed,tePlayers:oop.counts.players,teParticipants:oop.counts.participants,\n  candidateRelations:candidates.counts.playerMatchOccurrences,candidateUniqueMatches:candidates.counts.uniqueMatches
+  teResults:oop.counts.completed,tePlayers:oop.counts.players,teParticipants:oop.counts.participants,
+  candidateRelations:candidates.counts.playerMatchOccurrences,candidateUniqueMatches:candidates.counts.uniqueMatches
 };
 const query=`SELECT
 (SELECT COUNT(*) FROM players) players,(SELECT COUNT(*) FROM tournaments) tournaments,(SELECT COUNT(*) FROM entries) entries,
@@ -21,7 +22,8 @@ const query=`SELECT
 (SELECT COUNT(*) FROM matches WHERE circuit='tennis-europe') teMatches,
 (SELECT COUNT(*) FROM schedules WHERE circuit='tennis-europe') teSchedules,
 (SELECT COUNT(*) FROM results WHERE circuit='tennis-europe') teResults,
-(SELECT COUNT(*) FROM tennis_europe_players) tePlayers,(SELECT COUNT(*) FROM match_participants) teParticipants,\n(SELECT COUNT(*) FROM app_match_candidates) candidateRelations,(SELECT COUNT(DISTINCT match_id) FROM app_match_candidates) candidateUniqueMatches,
+(SELECT COUNT(*) FROM tennis_europe_players) tePlayers,(SELECT COUNT(*) FROM match_participants) teParticipants,
+(SELECT COUNT(*) FROM app_match_candidates) candidateRelations,(SELECT COUNT(DISTINCT match_id) FROM app_match_candidates) candidateUniqueMatches,
 (SELECT COUNT(*) FROM observed_players) observedPlayers,
 (SELECT COUNT(*) FROM observed_players WHERE circuit='fitp') observedFitp,
 (SELECT COUNT(*) FROM observed_players WHERE circuit='tennis-europe') observedTe,
