@@ -1,0 +1,32 @@
+name: Court Watch Tennis Europe OOP inventory
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'history/tennis_europe_tournament_catalog.json'
+      - 'src/v3/build-tennis-europe-oop-inventory.mjs'
+      - '.github/workflows/courtwatch-tennis-europe-oop-inventory.yml'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-tennis-europe-oop-inventory
+  cancel-in-progress: true
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build complete Europe OOP queue from 18 December 2025
+        run: node src/v3/build-tennis-europe-oop-inventory.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tennis-europe-oop-inventory
+          path: dist/v3/tennis_europe_oop_inventory.json
+          if-no-files-found: error
+          retention-days: 14
