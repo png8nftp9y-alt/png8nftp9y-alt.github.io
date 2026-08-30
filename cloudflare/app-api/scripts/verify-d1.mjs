@@ -13,7 +13,8 @@ const expected={
   results:nonTe(results,'results')+oop.counts.completed,
   teOopTournaments:oop.counts.tournaments,teMatches:oop.counts.matches,teSchedules:oop.counts.matches,
   teResults:oop.counts.completed,tePlayers:oop.counts.players,teParticipants:oop.counts.participants,
-  candidateRelations:candidates.counts.playerMatchOccurrences,candidateUniqueMatches:candidates.counts.uniqueMatches
+  candidateRelations:candidates.counts.playerMatchOccurrences,candidateUniqueMatches:candidates.counts.uniqueMatches,
+  appMatches:candidates.counts.playerMatchOccurrences,appUniqueMatches:candidates.counts.uniqueMatches,appInvalid:0
 };
 const query=`SELECT
 (SELECT COUNT(*) FROM players) players,(SELECT COUNT(*) FROM tournaments) tournaments,(SELECT COUNT(*) FROM entries) entries,
@@ -24,6 +25,9 @@ const query=`SELECT
 (SELECT COUNT(*) FROM results WHERE circuit='tennis-europe') teResults,
 (SELECT COUNT(*) FROM tennis_europe_players) tePlayers,(SELECT COUNT(*) FROM match_participants) teParticipants,
 (SELECT COUNT(*) FROM app_match_candidates) candidateRelations,(SELECT COUNT(DISTINCT match_id) FROM app_match_candidates) candidateUniqueMatches,
+(SELECT COUNT(*) FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe') appMatches,
+(SELECT COUNT(DISTINCT json_extract(payload,'$.matchId')) FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe') appUniqueMatches,
+(SELECT COUNT(*) FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe' AND (COALESCE(json_extract(payload,'$.playerId'),'')='' OR COALESCE(json_extract(payload,'$.matchId'),'')='' OR COALESCE(json_extract(payload,'$.date'),'')='' OR COALESCE(json_extract(payload,'$.tournamentName'),'')='' OR COALESCE(json_extract(payload,'$.opponent'),'')='' OR COALESCE(json_extract(payload,'$.round'),'')='' OR (json_extract(payload,'$.status')='completed' AND COALESCE(json_extract(payload,'$.result'),'')=''))) appInvalid,
 (SELECT COUNT(*) FROM observed_players) observedPlayers,
 (SELECT COUNT(*) FROM observed_players WHERE circuit='fitp') observedFitp,
 (SELECT COUNT(*) FROM observed_players WHERE circuit='tennis-europe') observedTe,
