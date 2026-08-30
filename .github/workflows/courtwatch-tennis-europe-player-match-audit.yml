@@ -21,7 +21,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Check audit source\n        run: node --check src/v3/audit-tennis-europe-courtwatch-history.mjs\n      - name: Configure private R2 reads
+      - name: Check audit source
+        run: node --check src/v3/audit-tennis-europe-courtwatch-history.mjs
+      - name: Configure private R2 reads
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
