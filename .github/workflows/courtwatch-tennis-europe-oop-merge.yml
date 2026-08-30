@@ -1,0 +1,46 @@
+name: Court Watch Tennis Europe OOP historical merge
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Successful backfill workflow run ID
+        required: false
+        default: '33324600811'
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/merge-tennis-europe-oop-backfill.mjs'
+      - '.github/workflows/courtwatch-tennis-europe-oop-merge.yml'
+permissions:
+  actions: read
+  contents: read
+concurrency:
+  group: courtwatch-tennis-europe-oop-merge
+  cancel-in-progress: true
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN_ID: ${{ github.event.inputs.source_run_id || '33324600811' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download every validated backfill shard
+        run: |
+          mkdir -p dist/v3/downloaded-tennis-europe-oop
+          gh run download "$SOURCE_RUN_ID" --repo "${{ github.repository }}" --dir dist/v3/downloaded-tennis-europe-oop --pattern 'tennis-europe-oop-backfill-*'
+      - name: Merge and certify the complete historical archive
+        env:
+          TE_OOP_SOURCE_RUN_ID: ${{ env.SOURCE_RUN_ID }}
+        run: node src/v3/merge-tennis-europe-oop-backfill.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tennis-europe-oop-historical-merged
+          path: dist/v3/tennis_europe_oop_historical.json
+          if-no-files-found: error
+          retention-days: 14
