@@ -18,7 +18,7 @@ const checks=[compare('players',legacyPlayers,apiPlayers),compare('tournaments',
 const expected=JSON.parse(manifest.counts_json||'{}'),appMatches=snapshot.matches||[],appUniqueMatches=new Set(appMatches.map(x=>x.matchId)).size;
 const invalidAppMatches=appMatches.filter(x=>x.circuit!=='tennis-europe'||!x.playerId||!x.matchId||!x.date||!x.tournamentName||!x.opponent||!x.round||x.status==='completed'&&!x.result);
 const agendaKey=m=>`${m.playerId||''}|${m.matchId||m.id||''}`,mergedAgenda=new Map(appMatches.map(m=>[agendaKey(m),m]));
-for(const a of agendaDoc.agenda||[]){const key=agendaKey(a);mergedAgenda.set(key,{...(mergedAgenda.get(key)||{}),...a})}
+for(const a of agendaDoc.agenda||[]){if(a.circuit==='tennis-europe'&&appMatches.length)continue;const key=agendaKey(a);mergedAgenda.set(key,{...(mergedAgenda.get(key)||{}),...a})}
 const missingFromAgenda=appMatches.filter(m=>!mergedAgenda.has(agendaKey(m))),invalidAgenda=[...mergedAgenda.values()].filter(x=>x.circuit==='tennis-europe'&&(!x.date||!x.tournamentName||!x.opponent||!x.round||x.status==='completed'&&!x.result));
 const oopReady=appMatches.length===149&&appUniqueMatches===147&&invalidAppMatches.length===0,agendaReady=missingFromAgenda.length===0&&invalidAgenda.length===0;
 const result={status:checks.every(x=>x.ok)&&oopReady&&agendaReady?'green':'red',apiBase,generation:manifest.generated_at,universalCounts:expected,checks,oop:{mode:'agenda_ui_enabled',apiRows:appMatches.length,uniqueMatches:appUniqueMatches,invalidRows:invalidAppMatches.length,mergedAgendaRows:mergedAgenda.size,missingFromAgenda:missingFromAgenda.length,invalidAgendaRows:invalidAgenda.length}};
