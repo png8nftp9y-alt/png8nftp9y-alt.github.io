@@ -25,10 +25,10 @@ for(const match of matchMap.values())for(const player of match.players||[]){cons
 }}
 if(ambiguous.length)throw new Error('Ambiguous Court Watch Europe candidates: '+JSON.stringify(ambiguous));
 const rows=[...candidates.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.playerId.localeCompare(b.playerId)||a.matchId.localeCompare(b.matchId));
-const sql=['PRAGMA foreign_keys=ON;','DELETE FROM app_match_candidates;'];for(const r of rows)sql.push(`INSERT INTO app_match_candidates(courtwatch_id,match_id,competition_id,match_date,status,payload) VALUES(${esc(r.playerId)},${esc(r.matchId)},${esc(r.competitionId)},${esc(r.date)},${esc(r.status)},${payload(r)});`);
+const sql=['PRAGMA foreign_keys=ON;','DELETE FROM app_match_candidates;'];for(const r of rows)sql.push(`INSERT OR REPLACE INTO app_match_candidates(courtwatch_id,match_id,competition_id,match_date,status,payload) VALUES(${esc(r.playerId)},${esc(r.matchId)},${esc(r.competitionId)},${esc(r.date)},${esc(r.status)},${payload(r)});`);
 await fs.writeFile(path.join('seed-tennis-europe-oop','04-app-match-candidates.sql'),sql.join('\n')+'\n');
 const appSql=['PRAGMA foreign_keys=ON;',`DELETE FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe';`];
-for(const r of rows)appSql.push(`INSERT INTO app_matches(player_id,competition_id,match_date,payload) VALUES(${esc(r.playerId)},${esc(r.competitionId)},${esc(r.date)},${payload(r)});`);
+for(const r of rows)appSql.push(`INSERT OR REPLACE INTO app_matches(player_id,competition_id,match_date,payload) VALUES(${esc(r.playerId)},${esc(r.competitionId)},${esc(r.date)},${payload(r)});`);
 await fs.writeFile(path.join('seed-tennis-europe-oop','05-app-matches.sql'),appSql.join('\n')+'\n');
 const uniqueMatches=new Set(rows.map(x=>x.matchId)).size,completed=rows.filter(x=>x.status==='completed').length,scheduled=rows.filter(x=>x.status==='scheduled').length;
 const missingAgendaFields=rows.filter(x=>!x.id||!x.playerId||!x.matchId||!x.date||!x.tournamentName||!x.opponent||!x.round||x.status==='completed'&&!x.result);
