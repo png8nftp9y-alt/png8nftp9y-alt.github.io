@@ -40,6 +40,11 @@ jobs:
         run: npm run configure
       - name: Apply D1 migrations
         run: npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+      - name: Rebuild current universal projection
+        working-directory: .
+        run: |
+          node src/v3/build-universal-database.mjs
+          node src/v3/validate-universal-database.mjs
       - name: Build and import universal generation
         run: |
           npm run seed
