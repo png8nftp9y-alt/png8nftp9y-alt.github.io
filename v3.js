@@ -52,8 +52,9 @@ async function load(){
     const previous=state.data||cachedData()||{};
     let projection=null;try{projection=await apiProjection()}catch(error){console.warn('Fallback JSON Court Watch attivo',error)}
     const jsonGeneration=Math.max(...[docs.players?.generatedAt,docs.tournaments?.generatedAt].map(Date.parse).filter(Number.isFinite),0),apiGeneration=Date.parse(projection?.generatedAt||'');
-    if(projection&&jsonGeneration&&(!Number.isFinite(apiGeneration)||apiGeneration<jsonGeneration)){console.warn('D1 in sincronizzazione: uso temporaneo dei JSON più recenti');projection=null}
-    const visiblePlayers=(projection?.players||docs.players.players).filter(p=>!FORMER_PLAYERS.has(p.id));
+    const universalProjectionFresh=projection&&(!jsonGeneration||(Number.isFinite(apiGeneration)&&apiGeneration>=jsonGeneration));
+    if(projection&&!universalProjectionFresh)console.warn('Indice universale D1 in sincronizzazione: uso temporaneo dei JSON per giocatori e tornei; i match di circuito restano dalla API');
+    const visiblePlayers=((universalProjectionFresh&&projection?.players)||docs.players.players).filter(p=>!FORMER_PLAYERS.has(p.id));
     const visibleIds=new Set(visiblePlayers.map(p=>p.id));
     const matches=Array.isArray(projection?.matches)?projection.matches:Array.isArray(docs.matches?.matches)?docs.matches.matches:(previous.matches||[]);
     const agenda=Array.isArray(docs.agenda?.agenda)?docs.agenda.agenda:(previous.agenda||[]);
@@ -65,7 +66,7 @@ async function load(){
 
     state.data={
       players:visiblePlayers,
-      tournaments:(projection?.tournaments||docs.tournaments.tournaments).filter(x=>visibleIds.has(x.playerId)),
+      tournaments:((universalProjectionFresh&&projection?.tournaments)||docs.tournaments.tournaments).filter(x=>visibleIds.has(x.playerId)),
       matches:matches.filter(x=>visibleIds.has(x.playerId)),
       agenda:mergeAgenda(agenda,matches).filter(x=>visibleIds.has(x.playerId)),
       results:results.filter(x=>visibleIds.has(x.playerId)),
