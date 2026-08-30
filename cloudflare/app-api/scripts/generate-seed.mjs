@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 const base='../../dist/v3/universal',out='seed-universal.sql';
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
-const [manifest,players,tournaments,entries,schedules,matches,results,legacy,playerConfig,observed]=await Promise.all([
+const [manifest,players,tournaments,entries,schedules,matches,results,legacy,mapDoc,playerConfig,observed]=await Promise.all([
   ...['manifest','players','tournaments','entries','schedules','matches','results'].map(name=>read(`${base}/${name}.json`)),
-  read('../../data.json'),read('../../players.json'),read('observed-players.json'),
+  read('../../data.json'),read('../../dist/v3/tournaments.json'),read('../../players.json'),read('observed-players.json'),
 ]);
 const esc=value=>`'${String(value??'').replaceAll("'","''")}'`,payload=row=>esc(JSON.stringify(row));
 const circuit=row=>{const s=String(row.circuit||row.sourceId||row.sourceName||'').toLowerCase();return s.includes('tennis-europe')||s.includes('tennis europe')?'tennis-europe':s.includes('itf')?'itf':'fitp'};
@@ -17,7 +17,7 @@ for(const r of matches.matches||[])sql.push(`INSERT INTO matches(id,tournament_i
 for(const r of results.results||[])sql.push(`INSERT INTO results(id,tournament_id,match_id,circuit,played_date,payload) VALUES(${esc(r.id)},${esc(r.tournamentId)},${esc(r.matchId)},${esc(r.circuit)},${esc(r.playedDate)},${payload(r)});`);
 const configPlayers=[...new Map((playerConfig.players||[]).map(p=>[p.id,p])).values()],allowed=new Set(configPlayers.map(p=>p.id)),legacyById=new Map((legacy.players||[]).map(p=>[p.id,p]));
 const appPlayers=configPlayers.map(p=>({...p,...(legacyById.get(p.id)||{})}));
-const appTournaments=(legacy.tournaments||[]).filter(row=>allowed.has(row.playerId));
+const appTournaments=(mapDoc.tournaments||[]).filter(row=>allowed.has(row.playerId));
 const appMatches=[];
 appPlayers.forEach((r,i)=>sql.push(`INSERT INTO app_players(seq,id,payload) VALUES(${i+1},${esc(r.id)},${payload(r)});`));
 appTournaments.forEach((r,i)=>sql.push(`INSERT INTO app_tournaments(seq,player_id,competition_id,circuit,payload) VALUES(${i+1},${esc(r.playerId)},${esc(r.competitionId)},${esc(circuit(r))},${payload(r)});`));
