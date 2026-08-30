@@ -20,8 +20,8 @@ const fitp=await readGz('tmp/observed/fitp_participant_cache.json.gz');
 for(const snapshot of Object.values(fitp.tournaments||{}))for(const p of snapshot.participants||[])add('fitp',p.membershipCard,p.full1||p.full2,1,{ranking:p.ranking||'',lastObservedAt:snapshot.fetchedAt||fitp.generatedAt||now});
 const te=await readGz('tmp/observed/tennis_europe_participant_index.json.gz');
 for(const [name,refs] of Object.entries(te.byName||{})){const first=(refs||[])[0]||{};add('tennis-europe',first.participantId,first.playerName||name,(refs||[]).length,{lastObservedAt:te.generatedAt||now})}
-const itf=await readGz('tmp/observed/itf_players_database.json.gz');
-for(const p of itf.players||[]){const name=p.name||p.playerName||[p.firstName,p.lastName].filter(Boolean).join(' '),id=p.id||p.playerId||p.worldTennisId||p.worldTennisNumber||'';add('itf',id,name,Number(p.observations)||1,{nationality:p.nationality||p.country||'',lastObservedAt:p.lastObservedAt||itf.generatedAt||now})}
+const itf=await readGz('tmp/observed/itf_participant_cache.json.gz');
+for(const p of itf.participants||[]){const name=p.name||p.playerName||[p.firstName,p.lastName].filter(Boolean).join(' '),id=p.worldTennisId||p.id||p.playerId||p.worldTennisNumber||'';add('itf',id,name,1,{nationality:p.nationality||p.country||'',lastObservedAt:p.observedAt||itf.generatedAt||now})}
 const players=[...rows.values()].sort((a,b)=>a.circuit.localeCompare(b.circuit)||a.displayName.localeCompare(b.displayName));
 const counts=Object.fromEntries(['fitp','tennis-europe','itf'].map(c=>[c,players.filter(p=>p.circuit===c).length]));
 await fs.writeFile('observed-players.json',JSON.stringify({version:1,generatedAt:now,counts,total:players.length,players})+'\n');

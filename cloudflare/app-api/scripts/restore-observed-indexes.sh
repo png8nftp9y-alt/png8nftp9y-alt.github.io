@@ -11,4 +11,4 @@ restore_file(){
 }
 restore_file fitp/cache fitp_participant_cache.json.gz
 restore_file tennis-europe/cache tennis_europe_participant_index.json.gz
-restore_file itf/database itf_players_database.json.gz
+restore_file itf/database itf_participant_cache.json.gz
