@@ -9,6 +9,7 @@ on:
       - 'history/tennis_europe_tournament_catalog.json'
       - 'src/v3/run-tennis-europe-oop-live.mjs'
       - 'src/v3/compare-tennis-europe-oop-live.mjs'
+      - 'src/v3/tennis-europe-oop-r2.sh'
       - '.github/workflows/courtwatch-tennis-europe-oop-live.yml'
 permissions:
   actions: read
@@ -25,10 +26,27 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Configure private R2 snapshot storage
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          echo "R2_ACCOUNT_ID=$R2_ACCOUNT_ID" >> "$GITHUB_ENV"
+          echo "R2_BUCKET=$R2_BUCKET" >> "$GITHUB_ENV"
+          echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
+          python -m pip install --disable-pip-version-check --quiet awscli
+      - name: Restore previous snapshot from R2
+        run: bash src/v3/tennis-europe-oop-r2.sh restore
       - name: Restore previous successful live snapshot
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          test -f dist/v3/previous-tennis-europe-oop/tennis_europe_oop_live.json && exit 0
           previous=$(gh run list --repo "${{ github.repository }}" --workflow courtwatch-tennis-europe-oop-live.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
           if [ -n "$previous" ]; then
             mkdir -p dist/v3/previous-tennis-europe-oop
@@ -38,6 +56,8 @@ jobs:
         run: node src/v3/run-tennis-europe-oop-live.mjs
       - name: Audit changes from previous green snapshot
         run: node src/v3/compare-tennis-europe-oop-live.mjs
+      - name: Publish verified generational snapshot to R2
+        run: bash src/v3/tennis-europe-oop-r2.sh publish
       - uses: actions/upload-artifact@v4
         if: always()
         with:
