@@ -1,6 +1,11 @@
 name: Court Watch Tennis Europe OOP historical backfill
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/backfill-tennis-europe-oop-shard.mjs'
+      - '.github/workflows/courtwatch-tennis-europe-oop-backfill.yml'
 permissions:
   contents: read
 concurrency:
