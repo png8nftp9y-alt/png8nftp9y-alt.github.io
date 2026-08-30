@@ -1,0 +1,93 @@
+name: Court Watch Tennis Europe agenda D1
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Court Watch Tennis Europe OOP and results live']
+    types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare/app-api/scripts/generate-tennis-europe-oop-seed.mjs'
+      - 'cloudflare/app-api/scripts/generate-tennis-europe-app-candidates.mjs'
+      - 'cloudflare/app-api/scripts/restore-tennis-europe-oop.sh'
+      - 'cloudflare/app-api/scripts/verify-tennis-europe-agenda-d1.mjs'
+      - 'cloudflare/app-api/migrations/0006_tennis_europe_oop.sql'
+      - 'cloudflare/app-api/migrations/0007_app_match_candidates.sql'
+      - 'src/v3/verify-cloudflare-api-parity.mjs'
+      - 'v3.js'
+      - '.github/workflows/courtwatch-tennis-europe-agenda.yml'
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: courtwatch-tennis-europe-agenda-d1
+  cancel-in-progress: true
+
+jobs:
+  import-verify-deploy:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Configure Tennis Europe R2 reads
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
+          python -m pip install --disable-pip-version-check --quiet awscli
+      - run: npm install
+      - name: Check Tennis Europe sources
+        run: |
+          node --check scripts/generate-tennis-europe-oop-seed.mjs
+          node --check scripts/generate-tennis-europe-app-candidates.mjs
+          node --check scripts/verify-tennis-europe-agenda-d1.mjs
+      - name: Create or reuse Court Watch D1
+        run: node scripts/configure-d1.mjs
+      - name: Apply shared schema migrations
+        run: npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+      - name: Restore verified Tennis Europe archives only
+        run: bash scripts/restore-tennis-europe-oop.sh
+      - name: Build Tennis Europe relational and agenda seeds
+        run: |
+          node scripts/generate-tennis-europe-oop-seed.mjs
+          node scripts/generate-tennis-europe-app-candidates.mjs
+      - name: Import Tennis Europe rows only
+        run: |
+          for sql_file in seed-tennis-europe-oop/*.sql; do
+            echo "Importing $sql_file"
+            npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"
+          done
+      - name: Verify Tennis Europe D1 parity
+        run: node scripts/verify-tennis-europe-agenda-d1.mjs
+      - name: Validate Worker API
+        run: npx wrangler deploy --dry-run --config wrangler.generated.jsonc
+      - name: Deploy Worker API
+        id: deploy
+        run: |
+          npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc 2>&1 | tee deploy-output.txt
+          API_URL=$(sed -n 's/.*\(https:\/\/[^[:space:]]*\.workers\.dev\).*/\1/p' deploy-output.txt | tail -1)
+          test -n "$API_URL"
+          echo "api_url=$API_URL" >> "$GITHUB_OUTPUT"
+      - name: Verify Europe API and daily agenda
+        env:
+          API_BASE: ${{ steps.deploy.outputs.api_url }}
+        working-directory: .
+        run: node src/v3/verify-cloudflare-api-parity.mjs
