@@ -6,6 +6,12 @@ on:
     branches: [main]
     paths:
       - 'cloudflare/app-api/**'
+      - '!cloudflare/app-api/scripts/generate-tennis-europe-oop-seed.mjs'
+      - '!cloudflare/app-api/scripts/generate-tennis-europe-app-candidates.mjs'
+      - '!cloudflare/app-api/scripts/restore-tennis-europe-oop.sh'
+      - '!cloudflare/app-api/scripts/verify-tennis-europe-agenda-d1.mjs'
+      - '!cloudflare/app-api/migrations/0006_tennis_europe_oop.sql'
+      - '!cloudflare/app-api/migrations/0007_app_match_candidates.sql'
       - 'dist/v3/universal/**'
       - 'data.json'
       - 'players.json'
@@ -13,7 +19,6 @@ on:
       - 'dist/v3/tournaments.json'
       - 'dist/v3/agenda.json'
       - 'dist/v3/results.json'
-      - 'src/v3/verify-cloudflare-api-parity.mjs'
       - '.github/workflows/courtwatch-cloudflare-app-api.yml'
 
 permissions:
