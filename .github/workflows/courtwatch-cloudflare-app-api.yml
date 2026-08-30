@@ -74,7 +74,7 @@ jobs:
           npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file seed-universal.sql
       - name: Build and import relational Europe OOP generation
         run: |
-          npm run seed:te-oop
+          npm run seed:te-oop\n          npm run seed:te-candidates
           for sql_file in seed-tennis-europe-oop/*.sql; do
             echo "Importing $sql_file"
             npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"
