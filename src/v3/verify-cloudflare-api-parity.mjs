@@ -1,11 +1,11 @@
 import fs from 'node:fs/promises';
 const apiBase=String(process.env.API_BASE||'').replace(/\/$/,'');if(!apiBase)throw new Error('Missing API_BASE');
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
-const [health,manifest,snapshot,mapDoc,playersDoc]=await Promise.all([
+const [health,manifest,snapshot,mapDoc,playersDoc,agendaDoc]=await Promise.all([
   fetch(apiBase+'/health',{headers:{'Cache-Control':'no-cache'}}).then(r=>r.json()),
   fetch(apiBase+'/v1/manifest',{headers:{'Cache-Control':'no-cache'}}).then(r=>r.json()),
   fetch(apiBase+'/v1/app-snapshot',{headers:{'Cache-Control':'no-cache'}}).then(r=>r.json()),
-  read('dist/v3/tournaments.json'),read('players.json'),
+  read('dist/v3/tournaments.json'),read('players.json'),read('dist/v3/agenda.json'),
 ]);
 if(health.status!=='green')throw new Error('API health is not green: '+JSON.stringify(health));
 const allowed=new Set((playersDoc.players||[]).map(p=>p.id));
@@ -17,6 +17,9 @@ function compare(label,left,right){const a=new Set(left),b=new Set(right),missin
 const checks=[compare('players',legacyPlayers,apiPlayers),compare('tournaments',legacyTournaments,apiTournaments)];
 const expected=JSON.parse(manifest.counts_json||'{}'),appMatches=snapshot.matches||[],appUniqueMatches=new Set(appMatches.map(x=>x.matchId)).size;
 const invalidAppMatches=appMatches.filter(x=>x.circuit!=='tennis-europe'||!x.playerId||!x.matchId||!x.date||!x.tournamentName||!x.opponent||!x.round||x.status==='completed'&&!x.result);
-const oopReady=appMatches.length===149&&appUniqueMatches===147&&invalidAppMatches.length===0;
-const result={status:checks.every(x=>x.ok)&&oopReady?'green':'red',apiBase,generation:manifest.generated_at,universalCounts:expected,checks,oop:{mode:'d1_projection_ready_pending_agenda_ui',apiRows:appMatches.length,uniqueMatches:appUniqueMatches,invalidRows:invalidAppMatches.length}};
+const agendaKey=m=>`${m.playerId||''}|${m.matchId||m.id||''}`,mergedAgenda=new Map(appMatches.map(m=>[agendaKey(m),m]));
+for(const a of agendaDoc.agenda||[]){const key=agendaKey(a);mergedAgenda.set(key,{...(mergedAgenda.get(key)||{}),...a})}
+const missingFromAgenda=appMatches.filter(m=>!mergedAgenda.has(agendaKey(m))),invalidAgenda=[...mergedAgenda.values()].filter(x=>x.circuit==='tennis-europe'&&(!x.date||!x.tournamentName||!x.opponent||!x.round||x.status==='completed'&&!x.result));
+const oopReady=appMatches.length===149&&appUniqueMatches===147&&invalidAppMatches.length===0,agendaReady=missingFromAgenda.length===0&&invalidAgenda.length===0;
+const result={status:checks.every(x=>x.ok)&&oopReady&&agendaReady?'green':'red',apiBase,generation:manifest.generated_at,universalCounts:expected,checks,oop:{mode:'agenda_ui_enabled',apiRows:appMatches.length,uniqueMatches:appUniqueMatches,invalidRows:invalidAppMatches.length,mergedAgendaRows:mergedAgenda.size,missingFromAgenda:missingFromAgenda.length,invalidAgendaRows:invalidAgenda.length}};
 console.log(JSON.stringify(result,null,2));if(result.status!=='green')throw new Error('Live API parity is not complete');
