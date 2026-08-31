@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.52**
+Revisione documento: **2026-08-31.53**
+
+- 31 agosto 2026 — Rafforzata la pianificazione locale contro Mac spento/logout: il LaunchAgent usa ora `run-backup-if-due.sh`, viene valutato la domenica alle 04:30 e anche al successivo login (`RunAtLoad`). Se `latest.txt` indica un backup riuscito con meno di sei giorni, termina senza scaricare; se la copia manca o è scaduta, esegue immediatamente il backup completo. Un appuntamento perso viene quindi recuperato al primo accesso dell'utente, senza duplicare copie recenti.
 
 - 31 agosto 2026 — Installazione locale settimanale completata con successo sul Mac dell'utente: plist `com.courtwatch.weekly-backup` validato da `plutil`, LaunchAgent caricato e pianificato ogni domenica alle 04:30 ora locale. Log persistenti in `~/CourtWatch-backup/logs/weekly.log` e `weekly-error.log`. Obiettivo backup locale concluso: prima copia D1+R2 verificata e aggiornamento ricorrente configurato.
 
