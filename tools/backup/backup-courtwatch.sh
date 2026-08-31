@@ -6,6 +6,12 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly REPO_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 readonly DEFAULT_BACKUP_ROOT="$REPO_DIR/.courtwatch-backups"
 readonly BACKUP_ROOT="${1:-$DEFAULT_BACKUP_ROOT}"
+readonly CONFIG_FILE="${COURTWATCH_BACKUP_CONFIG:-$HOME/.courtwatch-backup.env}"
+
+if test -f "$CONFIG_FILE"; then
+  # shellcheck disable=SC1090
+  source "$CONFIG_FILE"
+fi
 
 case "$BACKUP_ROOT" in
   /|"$HOME"|"$REPO_DIR") echo "Refusing unsafe backup root: $BACKUP_ROOT" >&2; exit 2 ;;
@@ -17,8 +23,10 @@ done
 
 : "${R2_ACCOUNT_ID:?Set R2_ACCOUNT_ID}"
 : "${R2_BUCKET:?Set R2_BUCKET}"
-: "${AWS_ACCESS_KEY_ID:?Set AWS_ACCESS_KEY_ID}"
-: "${AWS_SECRET_ACCESS_KEY:?Set AWS_SECRET_ACCESS_KEY}"
+if test -z "${AWS_PROFILE:-}"; then
+  : "${AWS_ACCESS_KEY_ID:?Set AWS_ACCESS_KEY_ID or AWS_PROFILE}"
+  : "${AWS_SECRET_ACCESS_KEY:?Set AWS_SECRET_ACCESS_KEY or AWS_PROFILE}"
+fi
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-auto}"
 
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
