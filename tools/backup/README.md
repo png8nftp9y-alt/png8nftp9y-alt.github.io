@@ -91,7 +91,7 @@ Su macOS, dopo la prima copia completa verificata, installare il job settimanale
 bash tools/backup/install-weekly-backup-macos.sh
 ```
 
-Il job viene eseguito ogni domenica alle 04:30 ora locale e scrive i log in `~/CourtWatch-backup/logs/`. L'installazione non avvia immediatamente un nuovo backup.
+Il job viene controllato ogni domenica alle 04:30 ora locale e anche al caricamento del LaunchAgent dopo login/riavvio. `run-backup-if-due.sh` esegue la copia soltanto se l'ultimo backup riuscito ha almeno sei giorni o non esiste; in caso contrario termina senza scaricare nulla. In questo modo un'esecuzione persa a Mac spento viene recuperata al primo login successivo. I log sono in `~/CourtWatch-backup/logs/`.
 
 ## Ripristino
 
