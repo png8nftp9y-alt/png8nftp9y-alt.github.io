@@ -1,6 +1,11 @@
+Warning: truncated output (original token count: 53690)
+Total output lines: 1468
+
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.36**
+Revisione documento: **2026-08-31.37**
+
+- 31 agosto 2026 — Dopo la correzione della proprietà bidirezionale dello stato ITF, la rotazione T−1 è risultata sana ma il database corrente contava 55 tornei controllati: 15 completi e 40 pending, dei quali 37 con almeno una challenge Incapsula e 3 con sezioni ufficiali ancora non popolate. Storico (4.291/4.291) e flussi acceptance restano invariati e certificati. Aggiunto un fallback browser limitato al workflow `Court Watch v3 ITF T-1 complete draws`: il lettore HTTP/cookie rimane primario; solo quando EventFilters o Drawsheet falliscono, `read-itf-draws-browser.mjs` apre una sessione Chromium ordinaria sul torneo e ripete le API dalla stessa sessione. Audit elevato a versione 6 con `browserFallbacks` e `browserRecoveries`. Le regole conservative non cambiano: se una famiglia resta vuota o illeggibile, il torneo rimane pending e nessun giocatore viene rimosso. Il fallback deve essere certificato dal nuovo run T−1 prima di considerare risolta la convergenza ITF.
 
 - 28 agosto 2026 — Implementata l'architettura ITF live completa a quattro flussi. Lo scanner acceptance supporta ora `ITF_ACCEPTANCE_KNOWN_ONLY=1` per aggiornare rapidamente soltanto tornei/relazioni già note (commit `16f30e3134a0402bb938f9f8ff5fff69b0bf0fac`). Creato `verify-itf-t-minus-one-all-players.mjs`: seleziona tornei arrivati a T−1 o attivi non ancora certificati, scarica ogni sezione singolare una volta, confronta localmente tutti i giocatori CourtWatch abilitati ITF, aggiunge anche wild card/on-site alternate mai comparse in acceptance, conferma senza etichetta i presenti, conserva le entry se il tabellone è incompleto e rimuove soltanto assenze certificate; i tornei completi sono memorizzati nel database di stato per non essere riscaricati (commit `9c2793c9763520df341af029bd7e7a02b3a62d8a`). Il vecchio live è ora `Court Watch v3 ITF acceptance discovery 42d`, ogni 14 minuti, finestra +42 giorni (commit `8a5d4b28273d900b5ac6771116195c55bba3683b`). Aggiunti `Court Watch v3 ITF known labels fast`, quattro shard ogni 14 minuti sfalsati, per etichette/posizioni/withdrawn noti (commit `18984123f3526b684dac21641552472a11e58f7d`); `Court Watch v3 ITF acceptance safety 120d`, una volta al giorno alle 03:17 UTC (commit `af2f96d727d6a4eaad409402215e07f440d85cff`); `Court Watch v3 ITF T-1 complete draws`, ogni 14 minuti sfalsati (commit `3997004e6ef185819c38ff4d94c32740bbae7239`). Le acquisizioni hanno concurrency separate; soltanto i job `review`/pubblicazione condividono il gruppo seriale `courtwatch-v3-itf-publish`, evitando scritture R2 concorrenti (commit finali `b6e167c7`, `4c771822`, `058be94e`, `12a0efa3`). Run di verifica: discovery 42d `33134834216` (run 64), known fast `33134835298` (run 2), safety 120d `33134836054` (run 2), T−1 completo `33134837341` (run 2). Nessun polling: l'utente comunica gli esiti.
 
@@ -906,108 +911,7 @@ La data d'inizio mostrata in mappa viene anticipata di due giorni rispetto alla 
 
 ### Permanenza in mappa durante il controllo ITF
 
-Un torneo già inserito tramite acceptance list non deve sparire dalla mappa per la sola assenza temporanea del giocatore nei tabelloni disponibili. Da T−1 la relazione resta `pending` finché tutti i tabelloni/gruppi rilevanti e attesi non risultano pubblicati, popolati e leggibili. Se il giocatore compare in almeno uno di essi, il torneo rimane senza etichetta. La rimozione è consentita soltanto dopo la pubblicazione e verifica completa di tutti i tabelloni rilevanti e dopo aver accertato che il giocatore non compare in nessuno. Qualsiasi tabellone mancante, vuoto, illeggibile o non ancora pubblicato blocca la rimozione.
-
-### Diagnosi definitiva della lettura ITF e protezione anti-bot
-
-Una richiesta diretta di controllo a `GetEventFilters` ha restituito HTTP 200 con `content-type: text/html` e una pagina di 212 byte contenente `_Incapsula_Resource`, invece del JSON. Un secondo test con una sessione Chrome reale sulla pagina ufficiale del torneo ha mostrato il blocco Imperva `Additional security check is required` con hCaptcha. La causa delle risposte `GetEventFilters_200` e `GetDrawsheet_200` è quindi una protezione anti-bot, non un tabellone ufficiale vuoto e non un errore di parsing ordinario. La verifica non è stata aggirata né automatizzata.
-
-Il commit locale `6c6bf87` e l'HEAD remoto finale `4cf2fc528c0e78bc9af72447c178dd132b01026b` introducono:
-
-- riconoscimento esplicito di Incapsula/Imperva e stato `incapsula_challenge`;
-- nessun retry immediato ripetuto sulla stessa pagina di challenge;
-- separazione tra JSON valido, HTML, non-JSON e blocco Incapsula;
-- per tornei conclusi, un tabellone senza nomi diventa `published_empty_anomaly` e resta irrisolto;
-- salvataggio dell'audit e dei result shard anche quando la review blocca la certificazione;
-- esecuzione del matcher anche in presenza di residui, seguita da fallimento bloccante e artifact sempre disponibile.
-
-Questa modifica non risolve né aggira Imperva, ma impedisce falsi positivi, retry inutili e perdita dello stato intermedio. Il motore live resta sicuro: in presenza di challenge o tabelloni incerti conserva il torneo in mappa come pending e non rimuove il giocatore. Nessuna pubblicazione R2/mappa è inclusa nel workflow.
-
-Il run `32803629820` ha completato tutti i 32 shard in circa quattro minuti e ha prodotto l'artifact persistente di review. Esito: 166 sezioni popolate, 14 anomalie vuote di tornei conclusi, 93 letture mancanti/illeggibili nel ciclo, 90 retry originari risolti e 1.004 lacune residue. Il matcher sullo stato ancora incompleto non ha trovato titolari e non è considerato definitivo.
-
-Il workflow è stato quindi modificato per ripartire dall'artifact completo del run `32803629820`, contenente i result shard già fusi, invece che dai 32 artifact originari. Commit remoto `17da8f5e81bef431deb2931c0cf8e9487e1eb997`; secondo ciclo progressivo `32803984471`. Nessuna pubblicazione R2/mappa.
-
-Il run `32803984471` è fallito immediatamente in tutti i 32 shard per un errore di percorso dell'artifact: l'archivio espone `shards/itf/...`, ma era stato scaricato nella root, mentre gli script cercano `dist/v3/shards/itf`. Nessuna richiesta ITF è stata eseguita e nessun progresso è stato perso. Il percorso è stato corretto da `.` a `dist/v3` nel commit remoto `39252d71e0005739b988f7a4d23568e187742b5e`. Run sostitutivo: `32804083809`.
-
-Il run sostitutivo `32804083809` ha completato con successo tutti i 32 shard; soltanto la review finale è fallita, correttamente, per residui reali. Nel secondo ciclo progressivo sono state recuperate 163 sezioni popolate, 2 vuote ancora future/pending, 20 anomalie vuote concluse e 61 letture mancanti; 57 retry sono stati risolti. Le lacune residue sono 1.014 su 625 tornei: 652 riferite a sezioni evento e 362 a inventari evento. La composizione diagnostica mostra 994 blocchi Incapsula (`933 GetEventFilters`, includendo retry di sezioni il cui inventario non è leggibile, e `61 GetDrawsheet`) più 20 tabelloni conclusi senza nomi. Ripetere immediatamente lo stesso ciclo non può garantire convergenza finché Imperva continua a presentare la challenge; il fallimento della review è quindi un blocco dati deliberato e non uno shard failure.
-
-### Backfill con uno shard logico per torneo
-
-È stata implementata la strategia richiesta di un singolo shard logico e artifact per torneo. Il workflow `courtwatch-v3-itf-tournament-retry.yml` costruisce una matrice dalla lista dei tornei residui, assegna un solo `competitionId` a ogni job, limita la concorrenza a due tornei, conserva separatamente lo stato delle singole sezioni del torneo e fonde esclusivamente gli artifact del lotto corrente nello stato persistente precedente. Supporta lotti fino a 256 tornei tramite `batch_offset` e `batch_limit`; il primo push avvia un lotto pilota di 16.
-
-Controlli locali superati: sintassi dei tre script, parsing YAML, generazione matrice e `git diff --check`. Commit locale `4b14a6d`, HEAD remoto finale `63ac0f82c778f21806169c82aaf4553dd737c449`. Primo run per-torneo: `32804860537`. Massimo due job contemporanei, nessuna pubblicazione R2/mappa.
-
-Il primo lotto `32804860537` ha completato con successo prepare e tutti i 16 shard per torneo. La sola review risultava rossa perché applicava erroneamente il requisito globale zero-residui a un lotto incrementale. Il lotto ha recuperato 54 sezioni popolate, risolto 26 retry e ridotto i residui globali da 1.014 a 994. Non si tratta quindi di un fallimento dei nuovi shard.
-
-Il commit remoto `c08efb4cd947ada5686ebd4af37c76282f4c179d` separa i significati: una review incrementale è verde se gli artifact selezionati vengono acquisiti e fusi correttamente, pur mantenendo nell'audit lo stato globale incompleto; soltanto la certificazione finale richiede zero residui. Gli artifact del lotto corrente sono ora scaricati in una directory patch separata, evitando di riapplicare quelli precedenti. Il nuovo lotto usa come base l'artifact persistente `32804860537`, parte dall'offset 16 e non include gli artifact patch precedenti nel nuovo checkpoint. Run: `32805208035`.
-
-Il run `32805208035` ha completato con successo prepare, tutti i 16 shard per torneo e la review incrementale. Ha acquisito 62 sezioni popolate, risolto 31 retry e ridotto i residui globali da 994 a 969; 6 letture del lotto sono rimaste mancanti e nessun titolare è stato trovato nel lotto. L'artifact persistente `9547977256` è la nuova base. Il commit remoto `1b0d852b15cecbe1a6f61e81ddf732e376759599` avanza al lotto successivo con offset 32. Run: `32805562833`.
-
-### Coda automatica completa dei tornei residui
-
-Per eliminare l'avanzamento manuale degli offset è stato aggiunto il workflow `courtwatch-v3-itf-all-tournament-queue.yml`. Tutti i tornei ancora presenti nella retry queue vengono distribuiti deterministicamente fra due worker. Ogni worker li elabora in sequenza, ma ogni torneo continua a produrre un artifact/shard autonomo `tournament-<competitionId>.json.gz`. Fra due tornei viene applicata una pausa di tre secondi; restano attive al massimo due letture concorrenti. Il worker continua sugli altri tornei anche se un singolo torneo non è leggibile, poi la review fonde tutti gli artifact e produce un nuovo checkpoint globale.
-
-La base è l'artifact verde `32805208035`; non viene eseguita alcuna pubblicazione R2/mappa. Controlli locali superati: sintassi Node, parsing YAML e `git diff --check`. Commit locale `96dd9b3`, HEAD remoto finale `a85aebc7e9d605d9eb4bb7aedbddeb1d58d4f671`. Run completo: `32805787865`.
-
-### Review riutilizzando gli artifact già completati
-
-La modifica del validatore aveva riattivato inutilmente la matrice live perché `validate-itf-system.mjs` era incluso nei trigger `push` del workflow. Per non attendere il nuovo ciclo, sono stati scaricati e riutilizzati direttamente tutti i 16 artifact validi del run `32794205080`.
-
-La review è stata rieseguita con il validatore corretto e ha terminato con `itf_system_complete`, zero errori: 1.058 tornei nel catalogo, 444 tornei live controllati, 15.651 partecipanti, 1 entry corrente. Il candidato live trovato è Martina Danesi al `J100 Palermo` (`J-J100-ITA-2026-001`), 07–13/09/2026, acceptance ufficiale `A-68`.
-
-Nessun dato è stato pubblicato su R2, database pubblico o mappa. Il backfill storico resta necessario per ottenere i tornei conclusi dal 18/12/2025 e non deve essere confuso con l'unico candidato live.
-
-### Esito della prima review storica completa
-
-Il run storico `32794205074` ha completato con successo tutti i 32 result shard, zero shard falliti. La review GitHub ha elaborato 1.058 tornei, 9.574 giocatori, 27.062 incontri e 58.224 occorrenze di nomi, ma è stata eseguita sul commit precedente alla correzione del validatore e ha quindi segnalato erroneamente `t_minus_1_missing`.
-
-I 32 artifact sono stati riutilizzati localmente con il validatore corretto: `itf_system_complete`, zero errori tecnici. Tuttavia il matcher non ha trovato alcuno dei 23 titolari. Il controllo di copertura su J30 Cuneo ha individuato la causa concreta: il torneo è presente, 53 incontri sono stati acquisiti, ma il tabellone/gruppo singolare femminile principale `G-S-M-RR` è rimasto nella retry queue con `GetDrawsheet_200` non JSON. Martina Danesi non può quindi essere né confermata né esclusa usando il dataset corrente.
-
-Conclusione operativa: lo storico non è ancora pubblicabile. Devono essere ritentate in modo mirato le sole sezioni presenti nelle retry queue, senza rilanciare i 32 shard completi; finché J30 Cuneo e le altre sezioni irrisolte non vengono acquisite, il conteggio zero non è considerato valido.
-
-### Retry storico mirato
-
-L'analisi dei 32 artifact storici ha contato 1.001 elementi nella retry queue, distribuiti su 665 tornei distinti: 429 errori `EventFilters` e 572 singoli tabelloni/sezioni non leggibili. J30 Cuneo contiene 3 retry: `G-S-M-RR`, `G-S-Q-KO` e `G-D-M-KO`.
-
-Il commit `72ac328f6b58ae33bd02be28418f11ba113e0c39` (`Retry only unresolved ITF historical draws`) aggiunge una pipeline separata che non ripete i 32 shard completi:
-
-- scarica gli artifact validi del run storico `32794205074`;
-- estrae soltanto i tornei presenti nelle retry queue;
-- distribuisce 665 tornei su 32 retry shard, massimo 16 concorrenti;
-- riacquisisce `EventFilters` e tabelloni delle sole lacune;
-- fonde i nuovi incontri con i 27.062 già acquisiti, rimuovendo duplicati;
-- riesegue il matcher dei 23 titolari e produce un artifact di review, senza pubblicazione.
-
-Il run mirato è `32797946885`. L'esito deve riportare retry iniziali, tornei risolti e retry residui; Cuneo viene usato come test specifico di copertura.
-
-### Correzione finale dello stato review live
-
-La review del run live `32794205080` ha completato merge acceptance, scoperta tabelloni, verifica T−1 e manutenzione database. Il log riportava 1.058 tornei nel catalogo, 444 tornei live controllati, 15.651 partecipanti e 1 entry corrente. Il fallimento avveniva esclusivamente in `validate-itf-system.mjs`, che conteneva ancora due confronti obsoleti: richiedeva lo stato esatto `itf_acceptance_complete` e il mode esatto `live_t_minus_1`.
-
-Il commit `83fdc6c5031eb140a8a2aa43b3f7f24f5874f679` (`Accept current ITF review completion states`) aggiorna il validatore:
-
-- accetta tutti gli stati validi che iniziano con `itf_acceptance_complete`;
-- riconosce tutti i mode T−1 validi che iniziano con `live_t_minus_1`, incluso `live_t_minus_1_same_as_tennis_europe`;
-- continua a bloccare stati incompleti, artifact mancanti e database non valido;
-- nessun dato viene pubblicato perché la pipeline resta in modalità review.
-
-Verifiche: sintassi Node e `git diff --check` superati.
-## 2026-08-25 — Riapertura obbligatoria backfill storico ITF
-
-- Il backfill storico precedente (run `32805787865`) non viene considerato definitivo: era stato eseguito prima dell'introduzione della sessione cookie persistente ITF.
-- Riscontro già estratto dall'audit storico: Martina Danesi in `J30 Nis` (`J-J30-SRB-2026-002`, 20–26 aprile 2026), stato `draw_confirmed`.
-- Riscontro live già noto separatamente: Martina Danesi in `J100 Palermo` (7–13 settembre 2026), acceptance `A-68`.
-- Audit storico pre-correzione: 178 sezioni popolate, 4 vuote pendenti, 28 anomalie concluse vuote (21 tornei), 146 sezioni mancanti/illeggibili distribuite su 48 tornei. Le ultime due categorie devono essere riesaminate e non costituiscono una certificazione finale.
-- Aggiornato `.github/workflows/courtwatch-v3-itf-all-tournament-queue.yml` affinché usi come base l'artifact `itf-complete-queue-review` del run `32805787865`, quindi elabori soltanto i residui con il nuovo bootstrap cookie di `itf-common.mjs`.
-- Commit remoto: `1537d6de7ab0e7682581a10469256b80bd0af0f7` (`Retry ITF historical residuals with cookie session`). La modifica del workflow avvia automaticamente il nuovo controllo storico.
-- Criterio operativo: nessun elemento `missing_or_unreadable` può essere trattato come verificato; gli esiti ammessi a chiusura sono tabellone popolato oppure stato ufficiale documentato (annullato/non disputato/assenza effettiva del tabellone).
-- Verifica della coda reale: 1.028 riferimenti residui su 579 tornei distinti; 854 errori erano `GetEventFilters_incapsula_challenge`, 146 `GetDrawsheet_incapsula_challenge`, 28 sezioni concluse senza nomi. Il dato dei 48 tornei riguardava soltanto il secondo gruppo, non l'intera coda.
-- Ottimizzazione pubblicata con commit `adcea03e20cb1e08002e66a26340f995cd011147` (`Parallelize ITF historical residual verification`): worker aumentati da 2 a 16, matrice `0..15`, circa 36 tornei per worker, `cancel-in-progress: true` per le esecuzioni successive. Run parallelo creato: `32861858137`; resta in attesa della liberazione del gruppo di concorrenza da parte del run seriale `32860626895`.
-- Decisione successiva: abbandonare la certificazione basata sulla vecchia retry queue e ricostruire integralmente lo storico ITF dal 18 dicembre 2025. Il numero 579 indicava esclusivamente i tornei presenti nella vecchia coda tecnica (526 con errore EventFilters, 48 con errore Drawsheet, 21 con sezioni vuote; 16 tornei appartenevano sia al gruppo Drawsheet sia al gruppo vuoto), non tornei dei 23 giocatori.
-- Commit `15310836938b1a05ad76744905ab9a2f9a662469` (`Rebuild ITF history from clean shards`): il workflow `courtwatch-v3-itf-results-backfill-fast.yml` non ripristina più cache R2, non scarica vecchi artifact acceptance/results, esegue 32 shard da zero con 16 concorrenti e non pubblica dati. La review richiede `retryQueue == 0` prima di eseguire il matcher dei 23 titolari. Run pulito: `32862152722`.
-- Regola chiarita dall'utente: poiché per i tornei iniziati/conclusi l'acceptance ITF non è più disponibile, per tutti i tornei ITF conclusi dal 18 dicembre 2025 a oggi si considera eccezionalmente maturato il controllo T−1 e si leggono tutti i tabelloni e gruppi, senza limitarsi ai tornei precedentemente monitorati. Il matcher cerca i 23 titolari nell'intero dataset; una relazione viene creata solo con presenza effettiva nei tabelloni.
-- Commit `645e1d040a6ca0eb1f37aea4d156b04e4f03b261`: `discover-itf-draw-entries.mjs` registra esplicitamente la modalità `historical_t_minus_1_exception` e scrive i risultati come `draw_confirmed` nello stesso flusso ITF live.
-- Commit `2079c60c02286a62dfb6294944efc4aff6b3d79e`: la review pulita esegue il matcher con `ITF_HISTORICAL_T_MINUS_ONE=1`, poi aggiorna tramite `maintain-itf-database.mjs` gli stessi database `itf_player_tournament_db`, giocatori e risultati usati dal motore T−1. Nessuna pubblicazione automatica. Run sostitutivo: `32862536274`.
+Un torneo già inserito tramite acceptance list non deve sparire dalla mappa per la sola assenza temporanea del giocatore nei tabelloni disponibili. Da T−1 la relazione resta `pending` finché tutti i tabelloni/gruppi rilevanti e attesi non risultano pubblicati, popolati e leggibili. Se il giocatore compare in almeno uno di essi, il torneo rimane senza etichetta. La rimozione è consentita soltanto dopo la pubblicazione e verifica completa di tutti i tabelloni rilevanti e dopo aver accertato che il giocatore non compare in nessuno. Qualsiasi tabellone mancante, vuoto, illeggibile o non ancora pubblicato blocca la rimoz…3690 tokens truncated…e il matcher con `ITF_HISTORICAL_T_MINUS_ONE=1`, poi aggiorna tramite `maintain-itf-database.mjs` gli stessi database `itf_player_tournament_db`, giocatori e risultati usati dal motore T−1. Nessuna pubblicazione automatica. Run sostitutivo: `32862536274`.
 - Esito run `32862536274`: tutti i 32 shard hanno completato con successo, ma la review ha correttamente fallito perché ha contato 720 retry. Diagnosi su shard 0: 19 tornei assegnati, 1 letto e 18 `GetEventFilters_incapsula_challenge`; il cookie jar globale veniva riutilizzato tra tornei diversi.
 - Commit `a3488f2cb516c20f8ff6f6511524649f6a0de439`: sessione Imperva isolata per torneo (`ITF_COOKIE_JAR.clear()` all'inizio del bootstrap), fino a tre bootstrap completi per `GetEventFilters`, propagazione della `sourceUrl` nelle combinazioni e nuovo bootstrap automatico anche durante `GetDrawsheet` se ricompare la challenge.
 - Commit `eba74b37cd1e272754f891cee445953f2c12ee6a`: aggiunto `src/v3/itf-common.mjs` ai trigger del backfill pulito e avviata la nuova ricostruzione completa. Run: `32863254569`.
