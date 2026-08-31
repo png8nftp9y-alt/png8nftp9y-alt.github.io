@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.49**
+Revisione documento: **2026-08-31.50**
+
+- 31 agosto 2026 — Certificata la prima copia locale D1: export SQL 225 MB, SQLite generato, `PRAGMA integrity_check=ok`, 20 tabelle applicative locali uguali alle 20 remote e checksum SHA-256 prodotti. Completato lo script per l'obiettivo di disaster recovery: oltre a `fitp/cache`, `itf/database` e OOP Europe, copia ora anche `itf/history-draws` e `tennis-europe/cache`. Il processo fallisce se uno dei sei prefissi è vuoto o se lo storico ITF contiene meno dei 17 blocchi certificati. Token R2 di sola lettura creato dall'utente; prima copia R2 e automazione settimanale ancora da eseguire.
 
 - 31 agosto 2026 — Il primo collaudo granulare, run `33437099244`, è terminato verde ma non ha recuperato nuove sezioni: 4 artifact, 4 richieste, 0 nuove cache, 18 tornei completi. Il conteggio 32 tecnici/5 pubblicazione era inoltre falsato perché `deferred_isolated_section` (sezione intenzionalmente assegnata a un altro runner/ciclo) veniva contato come errore tecnico; il merge ora esclude esplicitamente tale marcatore dalla classificazione. La strategia granulare non viene dichiarata risolutiva sulla base di questo run; Incapsula resta il problema aperto.
 
