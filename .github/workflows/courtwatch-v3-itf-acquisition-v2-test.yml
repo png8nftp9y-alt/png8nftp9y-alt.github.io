@@ -1,6 +1,11 @@
 name: Court Watch ITF acquisition v2 test
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - test/itf-acquisition-v2
+    paths:
+      - .github/workflows/courtwatch-v3-itf-acquisition-v2-test.yml
 permissions:
   contents: read
 concurrency:
