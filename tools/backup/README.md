@@ -85,6 +85,14 @@ Eseguire una volta alla settimana sul computer o NAS locale. Su macOS/Linux si p
 
 Il computer deve essere acceso e connesso. Per eliminare automaticamente le copie giornaliere più vecchie di 30 giorni, impostare esplicitamente `COURTWATCH_PRUNE=1`. Senza questa variabile non viene eliminato nulla.
 
+Su macOS, dopo la prima copia completa verificata, installare il job settimanale `launchd`:
+
+```bash
+bash tools/backup/install-weekly-backup-macos.sh
+```
+
+Il job viene eseguito ogni domenica alle 04:30 ora locale e scrive i log in `~/CourtWatch-backup/logs/`. L'installazione non avvia immediatamente un nuovo backup.
+
 ## Ripristino
 
 La copia SQLite serve per consultazione e verifica. L'export SQL compresso può essere decompresso e importato in una nuova istanza D1 dopo una verifica manuale. Non eseguire mai il ripristino direttamente sul database operativo senza una copia aggiuntiva e un controllo dei conteggi.
