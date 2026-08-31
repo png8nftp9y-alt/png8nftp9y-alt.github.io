@@ -12,9 +12,9 @@ concurrency:
   group: courtwatch-itf-acquisition-v2-test
   cancel-in-progress: false
 jobs:
-  inspect-current-t1:
+  real-section-probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,50 +23,40 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Identify current T-1 implementation
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Run one real ITF tournament section probe
+        env:
+          ITF_REQUEST_DELAY_MS: 1800
+          ITF_REQUEST_TIMEOUT_MS: 20000
+          ITF_V2_COMPETITION_ID: J-J30-ITA-2026-002
+          ITF_V2_TOURNAMENT_NAME: J30 Cuneo
+          ITF_V2_SOURCE_URL: https://www.itftennis.com/en/tournament/j30-cuneo/ita/2026/j-j30-ita-2026-002/
+          ITF_V2_SECTION_SLOT: 0
+        run: node src/v3/itf-acquisition-v2-probe.mjs
+      - name: Verify probe classification
         shell: bash
         run: |
           set -euo pipefail
-          echo "branch=$(git branch --show-current)"
-          echo "commit=$(git rev-parse HEAD)"
-          test -f .github/workflows/courtwatch-v3-itf-t-minus-one.yml
-          echo '--- T-1 workflow references ---'
-          grep -nE 'node |\.mjs|\.json|R2|draw|section|pending|technical' .github/workflows/courtwatch-v3-itf-t-minus-one.yml || true
-      - name: Build isolated v2 inventory
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p ops/itf-v2/out
           python3 - <<'PY'
-          from pathlib import Path
-          import json,re
-          wf_path=Path('.github/workflows/courtwatch-v3-itf-t-minus-one.yml')
-          wf=wf_path.read_text()
-          # Only executable repository dependencies are required at checkout time.
-          # JSON/state paths in the workflow include generated artifacts, snapshots and /tmp files.
-          scripts=sorted(set(re.findall(r'\bnode\s+([A-Za-z0-9_./-]+\.(?:mjs|js))\b',wf)))
-          existing=[x for x in scripts if Path(x).is_file()]
-          missing=[x for x in scripts if not Path(x).is_file()]
-          all_refs=sorted(set(re.findall(r'[A-Za-z0-9_./-]+\.(?:json|mjs|js)',wf)))
-          runtime_refs=[x for x in all_refs if x.startswith('/tmp/') or x.startswith('snapshot/')]
-          data_refs=[x for x in all_refs if x.endswith('.json') and x not in runtime_refs]
-          out={
-            'mode':'read_only_test',
-            'workflow':str(wf_path),
-            'executable_dependencies':scripts,
-            'existing_executable_dependencies':existing,
-            'missing_executable_dependencies':missing,
-            'data_or_generated_references':data_refs,
-            'runtime_references':runtime_refs
-          }
-          Path('ops/itf-v2/out/inventory.json').write_text(json.dumps(out,indent=2)+'\n')
-          print(json.dumps(out,indent=2))
-          if missing:
-              raise SystemExit('Missing executable T-1 dependencies: '+', '.join(missing))
+          import json
+          p='ops/itf-v2/out/section-probe.json'
+          data=json.load(open(p))
+          allowed={'complete','not_published','blocked_incapsula','network_error','invalid_response'}
+          assert data['mode']=='read_only_single_tournament_single_section'
+          assert data['status'] in allowed
+          print(json.dumps(data,indent=2))
           PY
-      - name: Upload v2 inventory artifact
-        uses: actions/upload-artifact@v4
+      - name: Prove no repository publication
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git branch --show-current)" = "test/itf-acquisition-v2"
+          git status --short
+          test -f ops/itf-v2/out/section-probe.json
+      - uses: actions/upload-artifact@v4
         with:
-          name: itf-acquisition-v2-inventory
-          path: ops/itf-v2/out/inventory.json
+          name: itf-acquisition-v2-real-section-probe
+          path: ops/itf-v2/out/section-probe.json
           if-no-files-found: error
+          retention-days: 14
