@@ -5,11 +5,38 @@ on:
     - cron: '*/5 * * * *'
   push:
     branches: [main]
-    paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/read-itf-draws-browser.mjs','src/v3/verify-itf-t-minus-one-all-players.mjs','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
+    paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/read-itf-draws-browser.mjs','src/v3/verify-itf-t-minus-one-all-players.mjs','src/v3/merge-itf-t1-isolated-runners.mjs','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: true}
 jobs:
+  acquire:
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: {shard: [0, 1]}
+    runs-on: ubuntu-latest
+    timeout-minutes: 11
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci --ignore-scripts
+      - name: Acquire one due tournament on an isolated runner
+        env:
+          ITF_REQUEST_DELAY_MS: 1800
+          ITF_T1_MAX_TOURNAMENTS: 1
+          ITF_T1_SHARD_INDEX: ${{ matrix.shard }}
+        run: node src/v3/verify-itf-t-minus-one-all-players.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-t1-acquire-${{ matrix.shard }}
+          path: |
+            dist/v3/source_itf_entries.json
+            dist/v3/source_itf_draw_audit.json
+            history/itf_draw_target_db.json
+          retention-days: 7
   review:
+    needs: acquire
     concurrency: {group: courtwatch-v3-itf-publish,cancel-in-progress: false}
     runs-on: ubuntu-latest
     timeout-minutes: 13
@@ -18,8 +45,8 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Install browser client
-        run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'itf-t1-acquire-*', path: patches}
       - name: Configure R2
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -33,13 +60,10 @@ jobs:
           echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"; echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"; echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
           python -m pip install --quiet awscli
           bash src/v3/itf-r2-cache.sh restore
-      - name: Check every due draw against all ITF players
-        env:
-          ITF_REQUEST_DELAY_MS: 1800
-          ITF_T1_MAX_TOURNAMENTS: 2
+      - name: Merge isolated acquisitions and validate decisions
         run: |
           set -euo pipefail
-          node src/v3/verify-itf-t-minus-one-all-players.mjs
+          node src/v3/merge-itf-t1-isolated-runners.mjs
           node src/v3/maintain-itf-database.mjs
           node src/v3/validate-itf-system.mjs
           node src/v3/entries-engine.mjs
@@ -51,24 +75,11 @@ jobs:
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
           snapshot=/tmp/courtwatch-itf-publish
-          rm -rf "$snapshot"
-          mkdir -p "$snapshot"
-          files=(
-            "dist/v3/source_itf_entries.json"
-            "dist/v3/source_itf_draw_audit.json"
-            "dist/v3/itf_system_diagnostics.json"
-            "history/itf_draw_target_db.json"
-            "history/itf_player_tournament_db.json"
-            "history/itf_database_audit.json"
-          )
-          for file in "${files[@]}"; do
-            test -f "$file" || continue
-            mkdir -p "$snapshot/$(dirname "$file")"
-            cp "$file" "$snapshot/$file"
-          done
+          rm -rf "$snapshot"; mkdir -p "$snapshot"
+          files=("dist/v3/source_itf_entries.json" "dist/v3/source_itf_draw_audit.json" "dist/v3/itf_system_diagnostics.json" "history/itf_draw_target_db.json" "history/itf_player_tournament_db.json" "history/itf_database_audit.json")
+          for file in "${files[@]}"; do test -f "$file" || continue; mkdir -p "$snapshot/$(dirname "$file")"; cp "$file" "$snapshot/$file"; done
           for attempt in 1 2 3; do
-            git fetch origin main
-            git reset --hard origin/main
+            git fetch origin main; git reset --hard origin/main
             cp history/itf_draw_target_db.json /tmp/itf-current-state.json
             cp "$snapshot/history/itf_draw_target_db.json" /tmp/itf-incoming-state.json
             cp -R "$snapshot"/* ./
