@@ -39,6 +39,7 @@ const query=`SELECT
 const run=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',query,'--json'],{encoding:'utf8'});
 if(run.status!==0)throw new Error(run.stderr||run.stdout);
 const parsed=JSON.parse(run.stdout),row=parsed.flatMap(x=>x.results||[])[0]||{},errors=[];
-for(const [key,value] of Object.entries(expected))if(Number(row[key])!==value)errors.push(`${key}: D1=${row[key]} expected=${value}`);
+const incremental=oop.incremental===true||candidates.incremental===true;
+for(const [key,value] of Object.entries(expected)){const actual=Number(row[key]);if(key==='appInvalid'){if(actual!==value)errors.push(`${key}: D1=${actual} expected=${value}`)}else if(incremental?actual<value:actual!==value)errors.push(`${key}: D1=${actual} expected${incremental?'>=':'='}${value}`)}
 if(errors.length)throw new Error('Tennis Europe D1 parity failed: '+errors.join('; '));
-console.log(JSON.stringify({status:'green',circuit:'tennis-europe',counts:expected}));
+console.log(JSON.stringify({status:'green',circuit:'tennis-europe',incremental,counts:expected}));
