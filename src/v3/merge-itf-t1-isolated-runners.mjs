@@ -10,11 +10,7 @@ const artifactDirs=await findArtifacts(root);if(!artifactDirs.length)throw new E
 for(const dir of artifactDirs){
  const audit=await readJson(path.join(dir,'dist/v3/source_itf_draw_audit.json'),{}),incomingSource=await readJson(path.join(dir,'dist/v3/source_itf_entries.json'),{entries:[]}),incomingTarget=await readJson(path.join(dir,'history/itf_draw_target_db.json'),{targets:{},tournaments:{}});cachedSectionsUsed+=Number(audit.summary?.cachedSectionsUsed||0);newSectionsCached+=Number(audit.summary?.newSectionsCached||0);drawRequests+=Number(audit.summary?.drawRequests||0);browserFallbacks+=Number(audit.summary?.browserFallbacks||0);browserRecoveries+=Number(audit.summary?.browserRecoveries||0);
  for(const tournamentAudit of audit.audit||[]){
-  const id=tournamentAudit.competitionId;if(!id)continue;audits.push(tournamentAudit);if(incomingTarget.tournaments?.[id]){
-   const previous=tournaments[id]||{},incoming=incomingTarget.tournaments[id],eventCache={...(previous.eventCache||{}),...(incoming.eventCache||{})};
-   const eventInventory=Array.isArray(incoming.eventInventory)&&incoming.eventInventory.length?incoming.eventInventory:(previous.eventInventory||[]),declaredSections=eventInventory.length,acquiredSections=eventInventory.filter(item=>eventCache[item.event]?.populated).length,missingSections=Math.max(0,declaredSections-acquiredSections),decision=declaredSections>0&&missingSections===0?'complete':'pending';
-   tournaments[id]={...previous,...incoming,decision,declaredSections,acquiredSections,missingSections,eventInventory,eventFailure:decision==='complete'?null:incoming.eventFailure,eventCache};
-  }
+  const id=tournamentAudit.competitionId;if(!id)continue;audits.push(tournamentAudit);if(incomingTarget.tournaments?.[id]){const previous=tournaments[id]||{},incoming=incomingTarget.tournaments[id];tournaments[id]={...previous,...incoming,eventCache:{...(previous.eventCache||{}),...(incoming.eventCache||{})}}}
   for(const [key,value] of Object.entries(incomingTarget.targets||{}))if(value?.competitionId===id)targets[key]=value;
   const incomingEntries=new Map((incomingSource.entries||[]).filter(entry=>entry.competitionId===id).map(entry=>[`${entry.playerId}|${entry.competitionId}`,entry]));for(const [key,value] of incomingEntries)entries.set(key,value);
   for(const [key,value] of [...entries])if(value.competitionId===id&&!incomingEntries.has(key)&&incomingTarget.targets?.[key]?.removalReason==='draw_absent_verified')entries.delete(key);
