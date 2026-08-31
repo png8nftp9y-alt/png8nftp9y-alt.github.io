@@ -1,22 +1,22 @@
 {
   "version": 9,
-  "generatedAt": "2026-08-31T20:31:04.677Z",
+  "generatedAt": "2026-08-31T20:44:51.873Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_cumulative_all_sections_merge",
-    "isolatedArtifacts": 2,
-    "tournamentsChecked": 2,
+    "isolatedArtifacts": 4,
+    "tournamentsChecked": 4,
     "completeTournaments": 0,
-    "pendingTournaments": 2,
+    "pendingTournaments": 4,
     "cachedSectionsUsed": 0,
-    "newSectionsCached": 2,
-    "drawRequests": 16,
-    "browserFallbacks": 2,
+    "newSectionsCached": 0,
+    "drawRequests": 4,
+    "browserFallbacks": 0,
     "browserRecoveries": 0,
     "globalCompleteTournaments": 18,
     "globalPendingTotal": 37,
-    "globalPendingTechnical": 31,
-    "globalPendingPublication": 6,
+    "globalPendingTechnical": 32,
+    "globalPendingPublication": 5,
     "technicalPendingCompetitionIds": [
       "J-J30-MDV-2026-004",
       "J-J30-MEX-2026-011",
@@ -38,6 +38,7 @@
       "J-J30-DEN-2026-004",
       "J-J30-ECU-2026-005",
       "J-J30-GER-2026-005",
+      "J-J30-GHA-2026-005",
       "J-J30-HON-2026-005",
       "J-J30-ROU-2026-004",
       "J-J30-SLO-2026-003",
@@ -52,7 +53,6 @@
     ],
     "publicationPendingCompetitionIds": [
       "J-J60-TTO-2026-002",
-      "J-J30-GHA-2026-005",
       "J-J30-MEX-2026-009",
       "J-J30-TPE-2026-002",
       "J-J30-USA-2026-005",
@@ -61,8 +61,8 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-DEN-2026-004",
-      "tournamentName": "J30 Frederiksberg",
+      "competitionId": "J-J30-GER-2026-005",
+      "tournamentName": "J30 Augsburg",
       "decision": "pending",
       "playersFound": [],
       "families": [
@@ -78,18 +78,18 @@
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             }
           ]
         },
         {
           "family": "B-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 40,
-              "error": null
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -100,7 +100,7 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -111,12 +111,12 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -127,7 +127,7 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -138,16 +138,101 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         }
       ],
-      "eventFailure": "browser_fallback:browser_incapsula_challenge"
+      "eventFailure": null
     },
     {
-      "competitionId": "J-J30-ECU-2026-005",
-      "tournamentName": "J30 AMBATO",
+      "competitionId": "J-J30-GER-2026-005",
+      "tournamentName": "J30 Augsburg",
+      "decision": "pending",
+      "playersFound": [],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
+    },
+    {
+      "competitionId": "J-J30-GHA-2026-005",
+      "tournamentName": "J30 Accra",
       "decision": "pending",
       "playersFound": [],
       "families": [
@@ -163,18 +248,18 @@
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             }
           ]
         },
         {
           "family": "B-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
-              "error": null
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -185,7 +270,7 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -196,12 +281,7 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": null
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -212,7 +292,7 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -223,12 +303,92 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         }
       ],
-      "eventFailure": "browser_fallback:browser_incapsula_challenge"
+      "eventFailure": null
+    },
+    {
+      "competitionId": "J-J30-GHA-2026-005",
+      "tournamentName": "J30 Accra",
+      "decision": "pending",
+      "playersFound": [],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
     }
   ]
 }
