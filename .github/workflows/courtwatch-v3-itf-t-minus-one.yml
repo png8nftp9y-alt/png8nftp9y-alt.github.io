@@ -5,7 +5,7 @@ on:
     - cron: '*/5 * * * *'
   push:
     branches: [main]
-    paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/verify-itf-t-minus-one-all-players.mjs','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
+    paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/read-itf-draws-browser.mjs','src/v3/verify-itf-t-minus-one-all-players.mjs','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: true}
 jobs:
@@ -18,6 +18,8 @@ jobs:
         with: {fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - name: Install browser client
+        run: npm ci --ignore-scripts
       - name: Configure R2
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
