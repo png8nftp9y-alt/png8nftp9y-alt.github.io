@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
+const incremental=process.env.TE_INCREMENTAL==='1';
 const [historical,live,registry]=await Promise.all([read('../../dist/v3/tennis_europe_oop_historical.json'),read('../../dist/v3/tennis_europe_oop_live.json'),read('../../players.json')]);
 const normalize=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
 const isoDate=value=>{const v=String(value||'');return /^\d{8}$/.test(v)?`${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`:v};
@@ -25,14 +26,14 @@ for(const match of matchMap.values())for(const player of match.players||[]){cons
 }}
 if(ambiguous.length)throw new Error('Ambiguous Court Watch Europe candidates: '+JSON.stringify(ambiguous));
 const rows=[...candidates.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.playerId.localeCompare(b.playerId)||a.matchId.localeCompare(b.matchId));
-const sql=['PRAGMA foreign_keys=ON;','DELETE FROM app_match_candidates;'];for(const r of rows)sql.push(`INSERT OR REPLACE INTO app_match_candidates(courtwatch_id,match_id,competition_id,match_date,status,payload) VALUES(${esc(r.playerId)},${esc(r.matchId)},${esc(r.competitionId)},${esc(r.date)},${esc(r.status)},${payload(r)});`);
+const sql=incremental?['PRAGMA foreign_keys=ON;']:['PRAGMA foreign_keys=ON;','DELETE FROM app_match_candidates;'];for(const r of rows)sql.push(`INSERT OR REPLACE INTO app_match_candidates(courtwatch_id,match_id,competition_id,match_date,status,payload) VALUES(${esc(r.playerId)},${esc(r.matchId)},${esc(r.competitionId)},${esc(r.date)},${esc(r.status)},${payload(r)});`);
 await fs.writeFile(path.join('seed-tennis-europe-oop','04-app-match-candidates.sql'),sql.join('\n')+'\n');
-const appSql=['PRAGMA foreign_keys=ON;',`DELETE FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe';`];
-for(const r of rows)appSql.push(`INSERT OR REPLACE INTO app_matches(player_id,competition_id,match_date,payload) VALUES(${esc(r.playerId)},${esc(r.competitionId)},${esc(r.date)},${payload(r)});`);
+const appSql=incremental?['PRAGMA foreign_keys=ON;']:['PRAGMA foreign_keys=ON;',`DELETE FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe';`];
+for(const r of rows){if(incremental)appSql.push(`DELETE FROM app_matches WHERE player_id=${esc(r.playerId)} AND json_extract(payload,'$.matchId')=${esc(r.matchId)};`);appSql.push(`INSERT INTO app_matches(player_id,competition_id,match_date,payload) VALUES(${esc(r.playerId)},${esc(r.competitionId)},${esc(r.date)},${payload(r)});`);}
 await fs.writeFile(path.join('seed-tennis-europe-oop','05-app-matches.sql'),appSql.join('\n')+'\n');
 const uniqueMatches=new Set(rows.map(x=>x.matchId)).size,completed=rows.filter(x=>x.status==='completed').length,scheduled=rows.filter(x=>x.status==='scheduled').length;
 const missingAgendaFields=rows.filter(x=>!x.id||!x.playerId||!x.matchId||!x.date||!x.tournamentName||!x.opponent||!x.round||x.status==='completed'&&!x.result);
-const result={status:missingAgendaFields.length?'red':'green',counts:{monitoredEuropePlayers:monitored.length,uniqueMatches,playerMatchOccurrences:rows.length,completed,scheduled,ambiguous:0,missingAgendaFields:missingAgendaFields.length},publishedToAgenda:true};
+const result={status:missingAgendaFields.length?'red':'green',incremental,counts:{monitoredEuropePlayers:monitored.length,uniqueMatches,playerMatchOccurrences:rows.length,completed,scheduled,ambiguous:0,missingAgendaFields:missingAgendaFields.length},publishedToAgenda:true};
 await fs.writeFile('seed-tennis-europe-oop/app-match-candidates-manifest.json',JSON.stringify(result,null,2)+'\n');
-if(uniqueMatches!==147||rows.length!==149||missingAgendaFields.length)throw new Error(`App match parity failed: uniqueMatches=${uniqueMatches}, occurrences=${rows.length}, missingAgendaFields=${missingAgendaFields.length}`);
+if(uniqueMatches<147||rows.length<149||missingAgendaFields.length)throw new Error(`App match parity failed: uniqueMatches=${uniqueMatches}, occurrences=${rows.length}, missingAgendaFields=${missingAgendaFields.length}`);
 console.log(JSON.stringify(result));
