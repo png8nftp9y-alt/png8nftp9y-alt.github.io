@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-08-31T22:54:03.324Z",
+  "generatedAt": "2026-08-31T23:38:36.511Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
@@ -3574,7 +3574,7 @@
     "J-J30-USA-2026-006": {
       "competitionId": "J-J30-USA-2026-006",
       "decision": "pending",
-      "checkedAt": "2026-08-31T17:40:35.733Z",
+      "checkedAt": "2026-08-31T23:37:57.134Z",
       "playersFound": 0,
       "families": [
         {
@@ -3584,7 +3584,7 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "B-S-M-RR",
@@ -3595,12 +3595,23 @@
         },
         {
           "family": "B-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
-              "error": null
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -3611,12 +3622,12 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -3627,17 +3638,146 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         }
       ],
-      "eventFailure": "browser_fallback:browser_incapsula_challenge"
+      "eventFailure": null,
+      "declaredSections": 8,
+      "acquiredSections": 0,
+      "missingSections": 8,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "tournamentId": 1100204661,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-mckinney/usa/2026/j-j30-usa-2026-006/"
+          }
+        },
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "combo": {
+            "tournamentId": 1100204661,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-mckinney/usa/2026/j-j30-usa-2026-006/"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "tournamentId": 1100204661,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-mckinney/usa/2026/j-j30-usa-2026-006/"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "tournamentId": 1100204661,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-mckinney/usa/2026/j-j30-usa-2026-006/"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "tournamentId": 1100204661,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-mckinney/usa/2026/j-j30-usa-2026-006/"
+          }
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "combo": {
+            "tournamentId": 1100204661,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-mckinney/usa/2026/j-j30-usa-2026-006/"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "tournamentId": 1100204661,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-mckinney/usa/2026/j-j30-usa-2026-006/"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "tournamentId": 1100204661,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-mckinney/usa/2026/j-j30-usa-2026-006/"
+          }
+        }
+      ],
+      "eventCache": {}
     },
     "J-J60-BUL-2026-002": {
       "competitionId": "J-J60-BUL-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-08-31T17:40:32.286Z",
+      "checkedAt": "2026-08-31T23:38:00.622Z",
       "playersFound": 0,
       "families": [
         {
@@ -3647,7 +3787,7 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "B-S-M-RR",
@@ -3658,12 +3798,23 @@
         },
         {
           "family": "B-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 40,
-              "error": null
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -3674,12 +3825,12 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -3690,12 +3841,141 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         }
       ],
-      "eventFailure": "browser_fallback:browser_incapsula_challenge"
+      "eventFailure": null,
+      "declaredSections": 8,
+      "acquiredSections": 0,
+      "missingSections": 8,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "tournamentId": 1100204251,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-burgas/bul/2026/j-j60-bul-2026-002/"
+          }
+        },
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "combo": {
+            "tournamentId": 1100204251,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-burgas/bul/2026/j-j60-bul-2026-002/"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "tournamentId": 1100204251,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-burgas/bul/2026/j-j60-bul-2026-002/"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "tournamentId": 1100204251,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-burgas/bul/2026/j-j60-bul-2026-002/"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "tournamentId": 1100204251,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-burgas/bul/2026/j-j60-bul-2026-002/"
+          }
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "combo": {
+            "tournamentId": 1100204251,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-burgas/bul/2026/j-j60-bul-2026-002/"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "tournamentId": 1100204251,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-burgas/bul/2026/j-j60-bul-2026-002/"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "tournamentId": 1100204251,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-burgas/bul/2026/j-j60-bul-2026-002/"
+          }
+        }
+      ],
+      "eventCache": {}
     },
     "J-J60-CHI-2026-001": {
       "competitionId": "J-J60-CHI-2026-001",
