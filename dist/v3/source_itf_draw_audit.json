@@ -1,44 +1,28 @@
 {
-  "version": 6,
-  "generatedAt": "2026-08-31T14:14:46.033Z",
-  "today": "2026-08-31",
+  "version": 7,
+  "generatedAt": "2026-08-31T14:26:48.218Z",
   "status": "itf_t_minus_one_pending_retry",
   "summary": {
-    "mode": "live_t_minus_1_rate_limited_queue_with_browser_fallback",
-    "eligiblePlayers": 1,
-    "dueTournaments": 23,
-    "batchLimit": 2,
+    "mode": "live_t_minus_1_isolated_runner_merge",
+    "isolatedArtifacts": 2,
     "tournamentsChecked": 2,
-    "completeTournaments": 0,
-    "pendingTournaments": 2,
-    "challengeTournaments": 1,
-    "browserFallbacks": 1,
-    "browserRecoveries": 0,
-    "queueRemaining": 23,
-    "confirmedInDraw": 0,
-    "removedByReliableDrawAbsence": 0,
-    "drawRequests": 5,
-    "preTMinusOneDrawRequests": 0
+    "completeTournaments": 1,
+    "pendingTournaments": 1
   },
   "audit": [
     {
-      "competitionId": "J-J30-GHA-2026-005",
-      "tournamentName": "J30 Accra",
-      "decision": "pending",
+      "competitionId": "J-J30-IND-2026-006",
+      "tournamentName": "J30 Bengaluru",
+      "decision": "complete",
       "playersFound": [],
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": null
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
+              "players": 40,
               "error": null
             }
           ]
@@ -49,7 +33,60 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 56,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 42,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 55,
+              "error": null
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
+    },
+    {
+      "competitionId": "J-J30-MEX-2026-009",
+      "tournamentName": "J30 Chihuahua",
+      "decision": "pending",
+      "playersFound": [],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 32,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 24,
               "error": null
             }
           ]
@@ -78,14 +115,6 @@
         }
       ],
       "eventFailure": null
-    },
-    {
-      "competitionId": "J-J30-HON-2026-005",
-      "tournamentName": "J30 Tegucigalpa",
-      "decision": "pending",
-      "playersFound": [],
-      "families": [],
-      "eventFailure": "browser_fallback:browser_incapsula_challenge"
     }
   ]
 }
