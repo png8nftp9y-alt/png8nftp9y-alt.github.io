@@ -11,14 +11,7 @@ const eventKey=c=>[c.playerTypeCode,c.matchTypeCode,c.eventClassificationCode,c.
 function names(json){const out=[];for(const group of[...(json.koGroups||[]),...(json.rrGroups||[])])for(const round of group.rounds||group.matchesByRound||[])for(const match of round.matches||[])for(const team of match.teams||[])for(const raw of team.players||[]){const player=playerFromApi(raw);if(player.name)out.push({id:player.id,name:player.name})}return out}
 for(const tournament of due){
  const previousState=tournamentStates[tournament.competitionId]||{},eventCache={...(previousState.eventCache||{})};
- tournamentsChecked++;
- let combos=Array.isArray(previousState.eventInventory)?previousState.eventInventory:[],eventFailure=null;
- try{
-  const discovered=await tournamentEvents(tournament);
-  if(discovered.length)combos=discovered;
-  else if(!combos.length)eventFailure='event_inventory_not_published';
- }catch(error){eventFailure=error.message}
- const eventInventory=combos.map(combo=>({event:eventKey(combo),family:familyKey(combo),combo}));
+ tournamentsChecked++;let combos=[],eventFailure=null;try{combos=await tournamentEvents(tournament)}catch(error){eventFailure=error.message}
  const missingCombos=combos.filter(combo=>!eventCache[eventKey(combo)]?.populated),selectedEvent=sectionMode&&missingCombos.length?eventKey(missingCombos[sectionSlot%missingCombos.length]):null;
  let outcomes=[];for(const combo of combos){const event=eventKey(combo),cached=eventCache[event];if(cached?.populated&&Array.isArray(cached.players)){cachedSectionsUsed++;outcomes.push({combo,event,family:familyKey(combo),players:cached.players,populated:true,cached:true});continue}if(sectionMode&&event!==selectedEvent){outcomes.push({combo,event,family:familyKey(combo),players:[],populated:false,error:'deferred_isolated_section'});continue}drawRequests++;try{const found=names(await drawsheet(combo));outcomes.push({combo,event,family:familyKey(combo),players:found,populated:found.length>0})}catch(error){outcomes.push({combo,event,family:familyKey(combo),players:[],populated:false,error:error.message})}}
  if(!sectionMode&&(eventFailure||outcomes.some(outcome=>outcome.error))){
@@ -26,17 +19,14 @@ for(const tournament of due){
  }
  for(const outcome of outcomes)if(outcome.populated&&!outcome.cached){eventCache[outcome.event]={family:outcome.family,populated:true,players:outcome.players,storedAt:NOW};newSectionsCached++}
  const families=new Map();for(const outcome of outcomes){const family=families.get(outcome.family)||{populated:false,events:[]};family.populated ||= outcome.populated;family.events.push({event:outcome.event,players:outcome.players.length,error:outcome.error||null});families.set(outcome.family,family)}
- const familyAudit=[...families].map(([family,value])=>({family,...value}));
- const acquiredSections=combos.filter(combo=>eventCache[eventKey(combo)]?.populated||outcomes.find(outcome=>outcome.event===eventKey(combo))?.populated).length,missingSections=Math.max(0,combos.length-acquiredSections);
- if(/incapsula/i.test(eventFailure||'')||familyAudit.some(family=>family.events.some(event=>/incapsula/i.test(event.error||''))))challengeTournaments++;
- const complete=combos.length>0&&!eventFailure&&missingSections===0&&outcomes.length===combos.length&&outcomes.every(outcome=>outcome.populated),foundPlayers=new Map();
+ const familyAudit=[...families].map(([family,value])=>({family,...value}));if(/incapsula/i.test(eventFailure||'')||familyAudit.some(family=>family.events.some(event=>/incapsula/i.test(event.error||''))))challengeTournaments++;const complete=combos.length>0&&!eventFailure&&familyAudit.length>0&&familyAudit.every(family=>family.populated),foundPlayers=new Map();
  for(const outcome of outcomes)for(const raw of outcome.players)for(const player of players)if(aliases(player).some(alias=>norm(raw.name)===alias))foundPlayers.set(player.id,{player,raw});
  for(const {player,raw} of foundPlayers.values()){
   const key=player.id+'|'+tournament.competitionId,old=entries.get(key)||targets[key]?.acceptanceEntry||{},drawEntry={...old,playerId:player.id,playerName:player.name,worldTennisId:String(raw.id||old.worldTennisId||''),circuit:'itf',competitionId:tournament.competitionId,tournamentName:tournament.tournamentName,location:tournament.location||old.location||'',startDate:tournament.startDate,endDate:tournament.endDate,category:tournament.category||old.category||'',sourceUrl:tournament.sourceUrl||old.sourceUrl||'',preDrawCalendarListLabel:old.preDrawCalendarListLabel||old.calendarListLabel||'',acceptanceCode:'',acceptancePosition:null,calendarListLabel:'',entryStatus:'draw_confirmed',calendarState:'draw_confirmed',drawConfirmedAt:NOW,lastSeen:NOW};entries.set(key,drawEntry);targets[key]={...(targets[key]||{}),acceptanceEntry:targets[key]?.acceptanceEntry||null,drawDecision:'confirmed',drawEntry,lastDrawCheckedAt:NOW};confirmed++;
  }
  if(complete)for(const [key,entry] of [...entries])if(entry.competitionId===tournament.competitionId&&!foundPlayers.has(entry.playerId)&&entry.calendarState!=='draw_confirmed'&&!entry.historicalBackfill){entries.delete(key);targets[key]={...(targets[key]||{}),...entry,drawDecision:'removed',removalReason:'draw_absent_verified',removedAt:NOW,lastDrawCheckedAt:NOW};removed++}
- tournamentStates[tournament.competitionId]={competitionId:tournament.competitionId,decision:complete?'complete':'pending',checkedAt:NOW,playersFound:foundPlayers.size,declaredSections:combos.length,acquiredSections,missingSections,eventInventory,families:familyAudit,eventFailure,eventCache};if(complete)completeTournaments++;else pendingTournaments++;
- audit.push({competitionId:tournament.competitionId,tournamentName:tournament.tournamentName,decision:complete?'complete':'pending',playersFound:[...foundPlayers.keys()],declaredSections:combos.length,acquiredSections,missingSections,sections:eventInventory.map(item=>({event:item.event,family:item.family,acquired:Boolean(eventCache[item.event]?.populated)})),families:familyAudit,eventFailure});
+ tournamentStates[tournament.competitionId]={competitionId:tournament.competitionId,decision:complete?'complete':'pending',checkedAt:NOW,playersFound:foundPlayers.size,families:familyAudit,eventFailure,eventCache};if(complete)completeTournaments++;else pendingTournaments++;
+ audit.push({competitionId:tournament.competitionId,tournamentName:tournament.tournamentName,decision:complete?'complete':'pending',playersFound:[...foundPlayers.keys()],families:familyAudit,eventFailure});
 }
 const visible=[...entries.values()].sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))||String(a.playerName).localeCompare(String(b.playerName)));
 await writeJson(sourceFile,{...source,version:8,generatedAt:NOW,status:'itf_acceptance_complete_state_machine',entriesFound:visible.length,entries:visible});
