@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 50352)
+Total output lines: 1361
+
 Warning: truncated output (original token count: 50254)
 Total output lines: 1366
 
@@ -6,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.44**
+Revisione documento: **2026-08-31.45**
+
+- 31 agosto 2026 — Estesa su richiesta dell'utente l'acquisizione cumulativa T−1 a tutte le sezioni ufficiali restituite da `GetEventFilters`, non soltanto al singolare: singolare, doppio, qualificazioni, main draw e strutture KO/RR alternative. Ogni sezione popolata viene conservata immediatamente; le sezioni mancanti/vuote/illeggibili restano da ritentare. La certificazione di completezza continua a operare per famiglia, considerando sufficiente una struttura popolata quando KO e RR sono alternative della stessa famiglia. Aggiornato anche il merge dei runner affinché conservi nell'audit finale `cachedSectionsUsed`, `newSectionsCached`, `drawRequests`, `browserFallbacks` e `browserRecoveries`. Il run cumulativo precedente `33431586297` era verde e aveva portato lo stato a 18 completi, 37 pending e 29 pending con traccia Incapsula.
 
 - 31 agosto 2026 — Ambito ITF confermato dall'utente: ogni sezione valida ricevuta dal motore T−1 deve essere salvata immediatamente nello stesso ciclo, anche quando il resto del torneo rimane pending. In questa fase la persistenza serve esclusivamente a certificare presenza/assenza dei giocatori CourtWatch nei tabelloni; ordine di gioco, orari, campi, avversari, risultati e punteggi saranno affrontati successivamente con motori separati.
 
@@ -883,24 +888,7 @@ Su richiesta di mantenere l'architettura esistente, l'adattatore opzionale è st
 
 Il secondo run `32857036648` su J100 Punta Cana concluso è riuscito completamente: pagina torneo e redirect letti nella stessa sessione, 5 cookie conservati, `GetEventFilters` JSON da 2.226 byte con 6 combinazioni e `GetDrawsheet` JSON da 31.756 byte. Questo dimostra che il modello di sessione già usato per Tennis Europe è applicabile agli endpoint ITF.
 
-Il commit `a032731306c877126174fa82c008486d6c3b0da5` integra nel motore ITF il bootstrap della pagina torneo, cookie jar condiviso nel processo, redirect manuali, cookie Imperva/Azure, Referer e intestazioni XHR coerenti prima di `GetEventFilters` e `GetDrawsheet`. La logica T−1, le decisioni di mappa e il database non cambiano. Il run diagnostico `32857218656` ha superato sia `node --check` sul modulo integrato sia la lettura completa del tabellone di prova. Il workflow live completo avviato dal commit resta la verifica di scala.
-
-### Precisazione sulla completezza dei tornei annullati
-
-Lo stato `CANCELLED` non implica automaticamente l'assenza di tabelloni. Un torneo può essere annullato dopo la pubblicazione di uno o più draw e può quindi conservare tabelloni, incontri o risultati ufficiali acquisibili.
-
-Di conseguenza, la completezza ITF non deve essere determinata dal solo stato del torneo né dalla sola assenza di elementi nella retry queue. Per ciascun torneo, incluso ogni torneo annullato, bisogna verificare direttamente:
-
-- quali eventi e tabelloni risultano attesi/pubblicati;
-- che ogni tabellone pubblicato sia stato acquisito;
-- che siano presenti tutti gli incontri e i risultati effettivamente pubblicati;
-- che non rimangano sezioni mancanti, vuote per errore o in retry.
-
-La precedente distinzione automatica tra 38 tornei disputati e 7 annullati non costituisce quindi una certificazione di completezza. I 45 tornei indicano soltanto assenza di retry rilevati e devono essere sottoposti alla verifica strutturale dei tabelloni, compresi i sette con stato `CANCELLED`.
-
-### Allineamento retry ITF al modello Tennis Europe
-
-È stato individuato un difetto nella prima p…254 tokens truncated…e il matcher con `ITF_HISTORICAL_T_MINUS_ONE=1`, poi aggiorna tramite `maintain-itf-database.mjs` gli stessi database `itf_player_tournament_db`, giocatori e risultati usati dal motore T−1. Nessuna pubblicazione automatica. Run sostitutivo: `32862536274`.
+Il commit `a032731306c877126174fa82c008486d6c3b0da5` integra nel motore ITF il bootstrap della pagina torneo, cookie jar condiviso nel processo, redirect manuali, cookie Imperva/Azure, Referer e intestazioni XHR coerenti prima di `GetEventFilters` e `GetDrawsheet`. La logica T−1, le decisioni di mappa e il database non cam…352 tokens truncated…e il matcher con `ITF_HISTORICAL_T_MINUS_ONE=1`, poi aggiorna tramite `maintain-itf-database.mjs` gli stessi database `itf_player_tournament_db`, giocatori e risultati usati dal motore T−1. Nessuna pubblicazione automatica. Run sostitutivo: `32862536274`.
 - Esito run `32862536274`: tutti i 32 shard hanno completato con successo, ma la review ha correttamente fallito perché ha contato 720 retry. Diagnosi su shard 0: 19 tornei assegnati, 1 letto e 18 `GetEventFilters_incapsula_challenge`; il cookie jar globale veniva riutilizzato tra tornei diversi.
 - Commit `a3488f2cb516c20f8ff6f6511524649f6a0de439`: sessione Imperva isolata per torneo (`ITF_COOKIE_JAR.clear()` all'inizio del bootstrap), fino a tre bootstrap completi per `GetEventFilters`, propagazione della `sourceUrl` nelle combinazioni e nuovo bootstrap automatico anche durante `GetDrawsheet` se ricompare la challenge.
 - Commit `eba74b37cd1e272754f891cee445953f2c12ee6a`: aggiunto `src/v3/itf-common.mjs` ai trigger del backfill pulito e avviata la nuova ricostruzione completa. Run: `32863254569`.
