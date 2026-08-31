@@ -40,15 +40,29 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import json,re
-          wf=Path('.github/workflows/courtwatch-v3-itf-t-minus-one.yml').read_text()
-          refs=sorted(set(re.findall(r'[A-Za-z0-9_./-]+\.(?:mjs|js|json)',wf)))
-          existing=[x for x in refs if Path(x).exists()]
-          missing=[x for x in refs if not Path(x).exists()]
-          out={'mode':'read_only_test','workflow':'.github/workflows/courtwatch-v3-itf-t-minus-one.yml','references':refs,'existing':existing,'missing':missing}
+          wf_path=Path('.github/workflows/courtwatch-v3-itf-t-minus-one.yml')
+          wf=wf_path.read_text()
+          # Only executable repository dependencies are required at checkout time.
+          # JSON/state paths in the workflow include generated artifacts, snapshots and /tmp files.
+          scripts=sorted(set(re.findall(r'\bnode\s+([A-Za-z0-9_./-]+\.(?:mjs|js))\b',wf)))
+          existing=[x for x in scripts if Path(x).is_file()]
+          missing=[x for x in scripts if not Path(x).is_file()]
+          all_refs=sorted(set(re.findall(r'[A-Za-z0-9_./-]+\.(?:json|mjs|js)',wf)))
+          runtime_refs=[x for x in all_refs if x.startswith('/tmp/') or x.startswith('snapshot/')]
+          data_refs=[x for x in all_refs if x.endswith('.json') and x not in runtime_refs]
+          out={
+            'mode':'read_only_test',
+            'workflow':str(wf_path),
+            'executable_dependencies':scripts,
+            'existing_executable_dependencies':existing,
+            'missing_executable_dependencies':missing,
+            'data_or_generated_references':data_refs,
+            'runtime_references':runtime_refs
+          }
           Path('ops/itf-v2/out/inventory.json').write_text(json.dumps(out,indent=2)+'\n')
           print(json.dumps(out,indent=2))
           if missing:
-              raise SystemExit('Referenced T-1 files missing: '+', '.join(missing))
+              raise SystemExit('Missing executable T-1 dependencies: '+', '.join(missing))
           PY
       - name: Upload v2 inventory artifact
         uses: actions/upload-artifact@v4
