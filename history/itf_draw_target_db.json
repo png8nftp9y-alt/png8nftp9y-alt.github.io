@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-08-31T15:31:37.507Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-08-31T16:01:51.050Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
   "targets": {
@@ -1994,19 +1994,119 @@
     },
     "J-J30-SRB-2026-003": {
       "competitionId": "J-J30-SRB-2026-003",
-      "decision": "pending",
-      "checkedAt": "2026-08-31T11:10:51.319Z",
+      "decision": "complete",
+      "checkedAt": "2026-08-31T16:00:34.194Z",
       "playersFound": 0,
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 79,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 78,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 71,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 31,
+              "error": null
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
     },
     "J-J30-TJK-2026-006": {
       "competitionId": "J-J30-TJK-2026-006",
       "decision": "pending",
-      "checkedAt": "2026-08-31T11:10:51.319Z",
+      "checkedAt": "2026-08-31T16:00:34.107Z",
       "playersFound": 0,
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": null
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 37,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": null
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        }
+      ],
+      "eventFailure": "browser_fallback:browser_incapsula_challenge"
     },
     "J-J30-TPE-2026-002": {
       "competitionId": "J-J30-TPE-2026-002",
