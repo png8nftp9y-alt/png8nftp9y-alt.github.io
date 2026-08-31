@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.46**
+Revisione documento: **2026-08-31.47**
+
+- 31 agosto 2026 — Eliminata la regressione che riportava indietro audit e stato ITF T−1. Prova dalla cronologia Git: il commit T−1 `53a1d273` aveva pubblicato alle 19:52 UTC l'audit v9, poi il commit acceptance `c24fbcc1` lo aveva sostituito alle 20:01 con lo snapshot v8 delle 19:45. Corretti congiuntamente `known-fast`, `live` e `safety-120d`: gli snapshot acceptance non includono più `source_itf_draw_audit.json` né la vecchia diagnostica; tutti e tre fondono `itf_draw_target_db.json` in modalità `acceptance`, conservando integralmente i `tournaments` correnti; la diagnostica viene rigenerata dopo il merge contro l'audit T−1 presente su `main`. Da ora acceptance possiede soltanto target/etichette/withdrawn, mentre T−1 è l'unico proprietario di audit e stati dei tabelloni. Validazione YAML e controllo sintattico superati.
 
 - 31 agosto 2026 — Fissato il criterio definitivo di chiusura ITF T−1: gli unici dati mancanti ammessi sono sezioni ufficiali non ancora pubblicate o realmente incomplete. Il merge calcola ora sull'intero database quattro conteggi distinti (`globalCompleteTournaments`, `globalPendingTotal`, `globalPendingTechnical`, `globalPendingPublication`) e conserva gli ID nelle due classi. Incapsula, errori di rete/parsing e sezioni disponibili ma non acquisite sono `pending tecnico`: il sistema continua a pubblicare immediatamente ogni sezione valida recuperata, ma la diagnostica resta `itf_system_operational_not_certified` e `fullyCertified=false` finché il conteggio tecnico non arriva a zero. Soltanto con zero pending tecnici può risultare certificato, anche se rimangono tabelloni ufficiali incompleti (`itf_system_certified_with_incomplete_publication`).
 
