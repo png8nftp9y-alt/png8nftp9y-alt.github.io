@@ -50,6 +50,8 @@ endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
 prefixes=(
   "fitp/cache"
   "itf/database"
+  "itf/history-draws"
+  "tennis-europe/cache"
   "tennis-europe/oop-history"
   "tennis-europe/oop-live"
 )
@@ -59,6 +61,12 @@ for prefix in "${prefixes[@]}"; do
   aws --endpoint-url "$endpoint" s3 sync "s3://$R2_BUCKET/$prefix/" "$target/" --only-show-errors
 done
 
+itf_history_blocks="$(find "$snapshot_dir/r2/itf/history-draws" -type f -name 'block-*.tar.gz' | wc -l | tr -d ' ')"
+test "$itf_history_blocks" -ge 17 || { echo "Incomplete ITF historical archive: expected at least 17 blocks, found $itf_history_blocks" >&2; exit 2; }
+for prefix in "${prefixes[@]}"; do
+  test -n "$(find "$snapshot_dir/r2/$prefix" -type f -print -quit)" || { echo "Empty R2 backup prefix: $prefix" >&2; exit 2; }
+done
+
 manifest="$snapshot_dir/manifest.txt"
 {
   echo "created_at_utc=$timestamp"
@@ -66,6 +74,7 @@ manifest="$snapshot_dir/manifest.txt"
   echo "sqlite_tables=$table_count"
   echo "r2_bucket=$R2_BUCKET"
   echo "r2_prefixes=${prefixes[*]}"
+  echo "itf_history_blocks=$itf_history_blocks"
   find "$snapshot_dir" -type f ! -name manifest.txt -print0 | sort -z |
     while IFS= read -r -d '' file; do
       printf '%s  %s\n' "$(sha256_file "$file")" "${file#$snapshot_dir/}"
