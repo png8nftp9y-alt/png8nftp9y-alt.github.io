@@ -102,16 +102,19 @@ jobs:
           set -euo pipefail
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          ITF_FILES="dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json dist/v3/entries_itf.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json history/itf_participant_cache_audit.json"
+          ITF_FILES="dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/entries_itf.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json history/itf_participant_cache_audit.json"
           tar -cf "$RUNNER_TEMP/itf-validated.tar" $ITF_FILES
+          cp history/itf_draw_target_db.json "$RUNNER_TEMP/itf-incoming-state.json"
           published=false
           for attempt in 1 2 3 4 5; do
             git fetch origin main
             git reset --hard origin/main
+            cp history/itf_draw_target_db.json "$RUNNER_TEMP/itf-current-state.json"
             tar -xf "$RUNNER_TEMP/itf-validated.tar"
+            node src/v3/merge-itf-draw-target-ownership.mjs acceptance "$RUNNER_TEMP/itf-current-state.json" "$RUNNER_TEMP/itf-incoming-state.json" history/itf_draw_target_db.json
             node src/v3/validate-itf-system.mjs
             node src/v3/entries-engine.mjs
-            git add $ITF_FILES dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json
+            git add $ITF_FILES dist/v3/itf_system_diagnostics.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json
             if git diff --cached --quiet; then echo "No validated ITF changes"; published=true; break; fi
             git commit -m "Publish validated ITF live entries and map"
             if git push origin HEAD:main; then published=true; break; fi
