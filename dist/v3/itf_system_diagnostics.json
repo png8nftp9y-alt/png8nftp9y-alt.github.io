@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T12:50:47.386Z",
+  "generatedAt": "2026-08-31T13:31:18.181Z",
   "status": "itf_system_complete",
   "checks": {
     "tournaments": 1065,
@@ -7,15 +7,18 @@
     "players": 0,
     "results": 0,
     "tMinus1": {
-      "mode": "live_t_minus_1_all_itf_players",
+      "mode": "live_t_minus_1_rate_limited_queue",
       "eligiblePlayers": 1,
       "dueTournaments": 23,
-      "tournamentsChecked": 23,
+      "batchLimit": 2,
+      "tournamentsChecked": 2,
       "completeTournaments": 0,
-      "pendingTournaments": 23,
+      "pendingTournaments": 2,
+      "challengeTournaments": 0,
+      "queueRemaining": 23,
       "confirmedInDraw": 0,
       "removedByReliableDrawAbsence": 0,
-      "drawRequests": 27,
+      "drawRequests": 10,
       "preTMinusOneDrawRequests": 0
     }
   },
