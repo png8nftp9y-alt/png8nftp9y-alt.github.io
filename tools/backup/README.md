@@ -34,6 +34,14 @@ Autenticare Wrangler una volta:
 npx wrangler login
 ```
 
+Configurazione guidata consigliata (rileva l'Account ID da Wrangler, crea il profilo AWS locale e prova il bucket in sola lettura):
+
+```bash
+bash tools/backup/setup-courtwatch-r2.sh
+```
+
+Le credenziali rimangono nel profilo AWS locale; lo script salva in `~/.courtwatch-backup.env` soltanto Account ID, bucket e nome del profilo.
+
 Configurare R2 nella sessione:
 
 ```bash
