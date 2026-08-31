@@ -6,14 +6,19 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/courtwatch-cloudflare-access-audit.yml'
+      - 'ops/cloudflare-access-audit-request.json'
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: courtwatch-cloudflare-access-audit
+  cancel-in-progress: false
 
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: cloudflare/app-api
@@ -24,22 +29,27 @@ jobs:
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: npm install
       - name: Configure D1
         run: npm run configure
-      - name: Audit D1 schema
+      - name: Audit D1 schema and row counts
         run: |
           mkdir -p audit
-          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name;" --json > audit/d1-tables.json
+          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name <> '_cf_KV' ORDER BY name;" --json > audit/d1-tables.json
           node - <<'NODE'
           const fs=require('fs');
           const {spawnSync}=require('child_process');
           const parsed=JSON.parse(fs.readFileSync('audit/d1-tables.json','utf8'));
-          const names=parsed.flatMap(x=>x.results||[]).map(x=>x.name).filter(Boolean);
+          const rows=parsed.flatMap(x=>x.results||[]).filter(x=>x.name);
+          const names=rows.map(x=>x.name);
           const counts={};
+          const schema={};
+          for(const row of rows) schema[row.name]=row.sql||null;
           for(const name of names){
             const ident='"'+name.replaceAll('"','""')+'"';
             const run=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',`SELECT COUNT(*) AS n FROM ${ident};`,'--json'],{encoding:'utf8'});
@@ -47,10 +57,11 @@ jobs:
             const out=JSON.parse(run.stdout);
             counts[name]=Number(out.flatMap(x=>x.results||[])[0]?.n||0);
           }
-          fs.writeFileSync('audit/d1-summary.json',JSON.stringify({status:'green',tableCount:names.length,tables:names,rowCounts:counts},null,2)+'\n');
-          console.log(JSON.stringify({d1:'green',tableCount:names.length,tables:names}));
+          if(names.length!==20) throw new Error(`Expected 20 Court Watch application tables, found ${names.length}: ${names.join(', ')}`);
+          fs.writeFileSync('audit/d1-summary.json',JSON.stringify({status:'green',applicationTableCount:names.length,tables:names,rowCounts:counts,schema},null,2)+'\n');
+          console.log(JSON.stringify({d1:'green',applicationTableCount:names.length,tables:names}));
           NODE
-      - name: Audit R2 access
+      - name: Audit R2 required archive prefixes
         env:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
@@ -62,8 +73,49 @@ jobs:
           python -m pip install --disable-pip-version-check --quiet awscli
           ENDPOINT="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
           aws s3api head-bucket --bucket "$R2_BUCKET" --endpoint-url "$ENDPOINT"
-          aws s3api list-objects-v2 --bucket "$R2_BUCKET" --max-keys 1 --endpoint-url "$ENDPOINT" > audit/r2-summary.json
-          echo '{"r2":"green"}'
+          node - <<'NODE'
+          const fs=require('fs');
+          const {spawnSync}=require('child_process');
+          const account=process.env.R2_ACCOUNT_ID,bucket=process.env.R2_BUCKET;
+          const endpoint=`https://${account}.r2.cloudflarestorage.com`;
+          const prefixes=['fitp/cache','itf/database','itf/history-draws','tennis-europe/cache','tennis-europe/oop-history','tennis-europe/oop-live'];
+          const counts={};
+          for(const prefix of prefixes){
+            const run=spawnSync('aws',['s3api','list-objects-v2','--bucket',bucket,'--prefix',prefix+'/', '--endpoint-url',endpoint,'--output','json'],{encoding:'utf8'});
+            if(run.status!==0) throw new Error(run.stderr||run.stdout);
+            const out=JSON.parse(run.stdout||'{}');
+            const objects=out.Contents||[];
+            counts[prefix]=objects.length;
+            if(objects.length===0) throw new Error(`Empty required R2 prefix: ${prefix}`);
+          }
+          const hist=spawnSync('aws',['s3api','list-objects-v2','--bucket',bucket,'--prefix','itf/history-draws/', '--endpoint-url',endpoint,'--output','json'],{encoding:'utf8'});
+          if(hist.status!==0) throw new Error(hist.stderr||hist.stdout);
+          const historyObjects=(JSON.parse(hist.stdout||'{}').Contents||[]).map(x=>x.Key||'');
+          const historyBlocks=historyObjects.filter(k=>/(^|\/)block-[^/]*\.tar\.gz$/.test(k)).length;
+          if(historyBlocks<17) throw new Error(`Incomplete ITF history: ${historyBlocks} blocks, expected at least 17`);
+          fs.writeFileSync('audit/r2-summary.json',JSON.stringify({status:'green',requiredPrefixes:prefixes,prefixObjectCounts:counts,itfHistoryBlocks:historyBlocks},null,2)+'\n');
+          console.log(JSON.stringify({r2:'green',prefixObjectCounts:counts,itfHistoryBlocks:historyBlocks}));
+          NODE
+      - name: Publish latest audit result to repository
+        working-directory: .
+        run: |
+          mkdir -p ops
+          node - <<'NODE'
+          const fs=require('fs');
+          const d1=JSON.parse(fs.readFileSync('cloudflare/app-api/audit/d1-summary.json','utf8'));
+          const r2=JSON.parse(fs.readFileSync('cloudflare/app-api/audit/r2-summary.json','utf8'));
+          const result={status:'green',generatedAt:new Date().toISOString(),sourceCommit:process.env.GITHUB_SHA,d1,r2};
+          fs.writeFileSync('ops/cloudflare-access-audit-result.json',JSON.stringify(result,null,2)+'\n');
+          NODE
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add ops/cloudflare-access-audit-result.json
+          if git diff --cached --quiet; then
+            echo 'Audit result unchanged.'
+          else
+            git commit -m 'Record Cloudflare access audit result'
+            git push
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: courtwatch-cloudflare-access-audit
