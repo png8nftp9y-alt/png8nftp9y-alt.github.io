@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.48**
+Revisione documento: **2026-08-31.49**
+
+- 31 agosto 2026 — Il primo collaudo granulare, run `33437099244`, è terminato verde ma non ha recuperato nuove sezioni: 4 artifact, 4 richieste, 0 nuove cache, 18 tornei completi. Il conteggio 32 tecnici/5 pubblicazione era inoltre falsato perché `deferred_isolated_section` (sezione intenzionalmente assegnata a un altro runner/ciclo) veniva contato come errore tecnico; il merge ora esclude esplicitamente tale marcatore dalla classificazione. La strategia granulare non viene dichiarata risolutiva sulla base di questo run; Incapsula resta il problema aperto.
 
 - 31 agosto 2026 — Poiché il primo run post-correzione (`33436282033`) ha certificato la persistenza dell'audit v9 ma ha lasciato invariati 18 completi, 31 pending tecnici e 6 pending di pubblicazione, l'acquisizione T−1 è stata resa granulare per sezione. Quattro runner isolati elaborano due tornei e, per ciascuno, due sole sezioni mancanti su sessioni separate; la pressione scende dalle 16 richieste tabellone del run precedente a un massimo di 4, mentre aumentano le origini/sessioni indipendenti. Il merge unisce esplicitamente `eventCache` quando due artifact riguardano lo stesso torneo, impedendo perdite tra successi paralleli. Storico, acceptance, withdrawn, database, mappa e regole decisionali non sono modificati.
 
