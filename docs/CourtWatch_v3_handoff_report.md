@@ -1,9 +1,14 @@
+Warning: truncated output (original token count: 50254)
+Total output lines: 1366
+
 Warning: truncated output (original token count: 54598)
 Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.42**
+Revisione documento: **2026-08-31.43**
+
+- 31 agosto 2026 — Individuata e implementata una strategia ITF alternativa senza infrastruttura esterna: completezza cumulativa per singola sezione del tabellone. Poiché Incapsula è intermittente, ogni sezione singolare popolata letta con successo viene conservata nel database T−1 con partecipanti e timestamp; i cicli successivi la riusano senza richiederla nuovamente e ritentano soltanto le sezioni vuote, mancanti o illeggibili. Il torneo può quindi diventare completo sommando letture affidabili ottenute in run diversi, senza richiedere che tutte le API rispondano nello stesso ciclo. Audit elevato a versione 8 con `cachedSectionsUsed` e `newSectionsCached`. HTML, challenge, JSON non valido e sezioni vuote non vengono memorizzati come completi; le regole conservative di conferma/rimozione restano invariate. Il collegamento sperimentale a un acquisitore esterno non è stato pubblicato.
 
 - 31 agosto 2026 — Controllo successivo della convergenza ITF a runner isolati: ultimo run verificato `33428144909` verde. Stato globale 55 tornei, 17 completi e 38 pending; 30 pending conservano almeno una traccia Incapsula. Rispetto alla prima certificazione isolata: completi 16→17, pending 39→38, pending Incapsula 34→30. Il ciclo più recente ha lasciato entrambi i tornei del lotto pending, ma la tendenza complessiva resta positiva. Chiarito inoltre che il deploy Agenda–Calendario `33429196588` era stato cancellato dalla concurrency perché sostituito dal commit successivo; il deploy finale `33429216693` è riuscito.
 
@@ -893,19 +898,7 @@ La precedente distinzione automatica tra 38 tornei disputati e 7 annullati non c
 
 ### Allineamento retry ITF al modello Tennis Europe
 
-È stato individuato un difetto nella prima pipeline di retry ITF: il merge raggruppava le correzioni per `competitionId` e poteva eliminare tutte le lacune di un torneo dopo aver recuperato anche un solo tabellone. Questo comportamento non garantiva la completezza per sezione.
-
-Il commit locale `b2e2349` (`Track ITF retries per draw section`) introduce il tracciamento per singolo tabellone:
-
-- `populated`: risposta ufficiale acquisita con almeno un nome di giocatore;
-- `published_empty`: risposta ufficiale acquisita ma senza nomi di giocatori, incluso un tabellone composto soltanto da bye;
-- `missing_or_unreadable`: sezione non acquisita, che resta nella retry queue;
-- ogni retry è identificato da torneo e specifica combinazione evento/tabellone;
-- il merge elimina soltanto la lacuna corrispondente alla sezione realmente recuperata;
-- l'audit finale riporta separatamente sezioni popolate, pubblicate vuote e mancanti/illeggibili;
-- la review termina con errore se rimane anche un solo retry residuo.
-
-Controlli locali s…4598 tokens truncated…e il matcher con `ITF_HISTORICAL_T_MINUS_ONE=1`, poi aggiorna tramite `maintain-itf-database.mjs` gli stessi database `itf_player_tournament_db`, giocatori e risultati usati dal motore T−1. Nessuna pubblicazione automatica. Run sostitutivo: `32862536274`.
+È stato individuato un difetto nella prima p…254 tokens truncated…e il matcher con `ITF_HISTORICAL_T_MINUS_ONE=1`, poi aggiorna tramite `maintain-itf-database.mjs` gli stessi database `itf_player_tournament_db`, giocatori e risultati usati dal motore T−1. Nessuna pubblicazione automatica. Run sostitutivo: `32862536274`.
 - Esito run `32862536274`: tutti i 32 shard hanno completato con successo, ma la review ha correttamente fallito perché ha contato 720 retry. Diagnosi su shard 0: 19 tornei assegnati, 1 letto e 18 `GetEventFilters_incapsula_challenge`; il cookie jar globale veniva riutilizzato tra tornei diversi.
 - Commit `a3488f2cb516c20f8ff6f6511524649f6a0de439`: sessione Imperva isolata per torneo (`ITF_COOKIE_JAR.clear()` all'inizio del bootstrap), fino a tre bootstrap completi per `GetEventFilters`, propagazione della `sourceUrl` nelle combinazioni e nuovo bootstrap automatico anche durante `GetDrawsheet` se ricompare la challenge.
 - Commit `eba74b37cd1e272754f891cee445953f2c12ee6a`: aggiunto `src/v3/itf-common.mjs` ai trigger del backfill pulito e avviata la nuova ricostruzione completa. Run: `32863254569`.
