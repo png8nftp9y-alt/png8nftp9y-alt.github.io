@@ -1,0 +1,53 @@
+name: Court Watch ITF acquisition v2 test
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-itf-acquisition-v2-test
+  cancel-in-progress: false
+jobs:
+  inspect-current-t1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: test/itf-acquisition-v2
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Identify current T-1 implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "branch=$(git branch --show-current)"
+          echo "commit=$(git rev-parse HEAD)"
+          test -f .github/workflows/courtwatch-v3-itf-t-minus-one.yml
+          echo '--- T-1 workflow references ---'
+          grep -nE 'node |\.mjs|\.json|R2|draw|section|pending|technical' .github/workflows/courtwatch-v3-itf-t-minus-one.yml || true
+      - name: Build isolated v2 inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ops/itf-v2/out
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re
+          wf=Path('.github/workflows/courtwatch-v3-itf-t-minus-one.yml').read_text()
+          refs=sorted(set(re.findall(r'[A-Za-z0-9_./-]+\.(?:mjs|js|json)',wf)))
+          existing=[x for x in refs if Path(x).exists()]
+          missing=[x for x in refs if not Path(x).exists()]
+          out={'mode':'read_only_test','workflow':'.github/workflows/courtwatch-v3-itf-t-minus-one.yml','references':refs,'existing':existing,'missing':missing}
+          Path('ops/itf-v2/out/inventory.json').write_text(json.dumps(out,indent=2)+'\n')
+          print(json.dumps(out,indent=2))
+          if missing:
+              raise SystemExit('Referenced T-1 files missing: '+', '.join(missing))
+          PY
+      - name: Upload v2 inventory artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: itf-acquisition-v2-inventory
+          path: ops/itf-v2/out/inventory.json
+          if-no-files-found: error
