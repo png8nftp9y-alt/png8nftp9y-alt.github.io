@@ -40,19 +40,24 @@ sha256_file() {
   fi
 }
 
-echo "Exporting remote D1 database. Cloudflare may briefly serialize database requests."
-cd "$REPO_DIR/cloudflare/app-api"
-test -d node_modules || npm install
-sql_file="$snapshot_dir/d1/courtwatch-app.sql"
-npx wrangler d1 export "$DATABASE_NAME" --remote --output "$sql_file"
+if test "${COURTWATCH_R2_ONLY:-0}" = "1"; then
+  echo "R2-only mode: preserving the existing certified D1 backup."
+  table_count="existing-certified-copy"
+else
+  echo "Exporting remote D1 database. Cloudflare may briefly serialize database requests."
+  cd "$REPO_DIR/cloudflare/app-api"
+  test -d node_modules || npm install
+  sql_file="$snapshot_dir/d1/courtwatch-app.sql"
+  npx wrangler d1 export "$DATABASE_NAME" --remote --output "$sql_file"
 
-sqlite_file="$snapshot_dir/d1/courtwatch-app.sqlite"
-sqlite3 "$sqlite_file" < "$sql_file"
-test "$(sqlite3 "$sqlite_file" 'PRAGMA integrity_check;')" = "ok"
-table_count="$(sqlite3 "$sqlite_file" "SELECT count(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';")"
-test "$table_count" -gt 0
-gzip -n "$sql_file"
-gzip -n "$sqlite_file"
+  sqlite_file="$snapshot_dir/d1/courtwatch-app.sqlite"
+  sqlite3 "$sqlite_file" < "$sql_file"
+  test "$(sqlite3 "$sqlite_file" 'PRAGMA integrity_check;')" = "ok"
+  table_count="$(sqlite3 "$sqlite_file" "SELECT count(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';")"
+  test "$table_count" -gt 0
+  gzip -n "$sql_file"
+  gzip -n "$sqlite_file"
+fi
 
 endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
 prefixes=(
@@ -98,4 +103,5 @@ if test "${COURTWATCH_PRUNE:-0}" = "1"; then
 fi
 
 echo "Backup complete: $snapshot_dir"
-echo "SQLite integrity: ok; tables: $table_count"
+if test "${COURTWATCH_R2_ONLY:-0}" = "1"; then echo "D1: existing certified copy preserved; R2 archive verified."
+else echo "SQLite integrity: ok; tables: $table_count"; fi
