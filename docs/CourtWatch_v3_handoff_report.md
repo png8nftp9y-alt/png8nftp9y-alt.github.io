@@ -1,9 +1,11 @@
-Warning: truncated output (original token count: 53893)
-Total output lines: 1470
+Warning: truncated output (original token count: 54109)
+Total output lines: 1472
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.38**
+Revisione documento: **2026-08-31.39**
+
+- 31 agosto 2026 — Riscritta l'acquisizione ITF T−1 come pipeline isolata a due fasi. Due job `acquire` su runner GitHub distinti elaborano un solo torneo ciascuno, mantengono il limite complessivo di due tornei per ciclo e producono artifact separati; il job `review`, serializzato con le altre pubblicazioni ITF, ripristina il database R2 corrente, fonde esclusivamente gli stati dei tornei acquisiti, riesegue validazione e proiezione e pubblica atomicamente. Aggiunti `ITF_T1_SHARD_INDEX`, audit v7 e `merge-itf-t1-isolated-runners.mjs`; fallback browser disponibile per ogni runner. Il merge è stato provato localmente con due artifact senza perdita delle entry non coinvolte. Obiettivo del nuovo collaudo: misurare se la separazione degli indirizzi/runner riduce i pending Incapsula; la macchina decisionale e le regole di rimozione restano invariate.
 
 - 31 agosto 2026 — Primo collaudo del fallback browser T−1, run `33401448501`, tecnicamente verde ma non risolutivo: 23 tornei dovuti, lotto di 2, 0 completi, 2 pending, 1 fallback browser e 0 recuperi; 5 richieste tabellone, nessuna conferma/rimozione. Il database resta a 55 stati, 15 completi e 40 pending; 36 pending conservano almeno una traccia Incapsula. Decisione: non riscrivere la macchina decisionale T−1, che resta corretta e conservativa; separare invece acquisizione e decisione in una coda persistente con unità per torneo, runner isolati e snapshot riutilizzabili. Se runner GitHub e browser standard restano bloccati, la convergenza richiede un'origine di acquisizione stabile e autorizzata esterna a GitHub Actions; aumentare tentativi o concorrenza non è considerato una soluzione.
 
@@ -905,11 +907,7 @@ La correzione è stata caricata su `main` tramite tre aggiornamenti sequenziali,
 
 Il nuovo run corretto è `32799635578`. Al primo controllo risultava `queued`, senza conclusione disponibile; pertanto il funzionamento end-to-end non è ancora certificato. Il run precedente verde non viene considerato valido come prova di completezza a causa dei 925 residui nascosti dal vecchio merge.
 
-Il run `32799635578` ha poi completato tutti i 32 shard e la review ha correttamente bloccato la certificazione: 822 sezioni popolate, 116 pubblicate senza nomi, 555 mancanti/illeggibili, 375 retry originari risolti e 1.164 lacune residue complessive dopo la scoperta di ulteriori sezioni. Per un torneo concluso, una sezione attesa e realmente disputata non può essere considerata completa se non contiene nomi. Le 116 sezioni vuote devono quindi restare anomale/pending finché non viene stabilito che l'evento non fu disputato o che la combinazione restituita dall'API non corrisponde a un tabellone reale; non possono contribuire alla certificazione automatica di completezza.
-
-### Regola temporale ITF definitiva
-
-La data d'inizio mostrata in mappa viene anticipata di due giorni rispetto alla data ufficiale ITF, mentre la data di fine resta invariata. Il controllo T−1 parte un giorno prima di questo inizio anticipato. Esempio definitivo: data ITF 10 settembre, inizio mappa 8 settembre, controllo dei tabelloni dal 7 settembre. Il calcolo già presente in `verify-itf-draws.mjs` (`shiftedSta…3893 tokens truncated…e il matcher con `ITF_HISTORICAL_T_MINUS_ONE=1`, poi aggiorna tramite `maintain-itf-database.mjs` gli stessi database `itf_player_tournament_db`, giocatori e risultati usati dal motore T−1. Nessuna pubblicazione automatica. Run sostitutivo: `32862536274`.
+Il run `32799635578` ha poi completato tutti i 32 shard e la review ha correttamente bloccato la certificazione: 822 sezioni popolate, 116 pubblicate senza nomi, 555 mancanti/illeggibili, 375 retry originari risolti e 1.164 lacune residue …4109 tokens truncated…e il matcher con `ITF_HISTORICAL_T_MINUS_ONE=1`, poi aggiorna tramite `maintain-itf-database.mjs` gli stessi database `itf_player_tournament_db`, giocatori e risultati usati dal motore T−1. Nessuna pubblicazione automatica. Run sostitutivo: `32862536274`.
 - Esito run `32862536274`: tutti i 32 shard hanno completato con successo, ma la review ha correttamente fallito perché ha contato 720 retry. Diagnosi su shard 0: 19 tornei assegnati, 1 letto e 18 `GetEventFilters_incapsula_challenge`; il cookie jar globale veniva riutilizzato tra tornei diversi.
 - Commit `a3488f2cb516c20f8ff6f6511524649f6a0de439`: sessione Imperva isolata per torneo (`ITF_COOKIE_JAR.clear()` all'inizio del bootstrap), fino a tre bootstrap completi per `GetEventFilters`, propagazione della `sourceUrl` nelle combinazioni e nuovo bootstrap automatico anche durante `GetDrawsheet` se ricompare la challenge.
 - Commit `eba74b37cd1e272754f891cee445953f2c12ee6a`: aggiunto `src/v3/itf-common.mjs` ai trigger del backfill pulito e avviata la nuova ricostruzione completa. Run: `32863254569`.
