@@ -1,6 +1,6 @@
 {
   "version": 4,
-  "generatedAt": "2026-08-31T08:40:51.621Z",
+  "generatedAt": "2026-08-31T05:00:48.474Z",
   "today": "2026-08-31",
   "status": "itf_t_minus_one_all_players_complete",
   "summary": {
@@ -12,7 +12,7 @@
     "pendingTournaments": 23,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "drawRequests": 10,
+    "drawRequests": 6,
     "preTMinusOneDrawRequests": 0
   },
   "audit": [
@@ -72,7 +72,7 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": null
+              "error": "GetDrawsheet_incapsula_challenge"
             }
           ]
         }
@@ -84,53 +84,8 @@
       "tournamentName": "J30 Frederiksberg",
       "decision": "pending",
       "playersFound": [],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 0,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 32,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 32,
-              "error": null
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
+      "families": [],
+      "eventFailure": "GetEventFilters_incapsula_challenge"
     },
     {
       "competitionId": "J-J30-ECU-2026-005",
