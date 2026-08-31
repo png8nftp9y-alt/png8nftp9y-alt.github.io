@@ -12,8 +12,13 @@ jobs:
   acquire:
     strategy:
       fail-fast: false
-      max-parallel: 2
-      matrix: {shard: [0, 1]}
+      max-parallel: 4
+      matrix:
+        include:
+          - {shard: 0, section: 0}
+          - {shard: 0, section: 1}
+          - {shard: 1, section: 0}
+          - {shard: 1, section: 1}
     runs-on: ubuntu-latest
     timeout-minutes: 11
     steps:
@@ -21,15 +26,16 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22', cache: npm}
       - run: npm ci --ignore-scripts
-      - name: Acquire one due tournament on an isolated runner
+      - name: Acquire one missing draw section on an isolated runner
         env:
           ITF_REQUEST_DELAY_MS: 1800
           ITF_T1_MAX_TOURNAMENTS: 1
           ITF_T1_SHARD_INDEX: ${{ matrix.shard }}
+          ITF_T1_SECTION_SLOT: ${{ matrix.section }}
         run: node src/v3/verify-itf-t-minus-one-all-players.mjs
       - uses: actions/upload-artifact@v4
         with:
-          name: itf-t1-acquire-${{ matrix.shard }}
+          name: itf-t1-acquire-${{ matrix.shard }}-${{ matrix.section }}
           path: |
             dist/v3/source_itf_entries.json
             dist/v3/source_itf_draw_audit.json
