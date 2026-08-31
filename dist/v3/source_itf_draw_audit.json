@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-08-31T13:58:57.964Z",
+  "generatedAt": "2026-08-31T13:30:54.438Z",
   "today": "2026-08-31",
   "status": "itf_t_minus_one_pending_retry",
   "summary": {
@@ -11,17 +11,17 @@
     "tournamentsChecked": 2,
     "completeTournaments": 0,
     "pendingTournaments": 2,
-    "challengeTournaments": 2,
+    "challengeTournaments": 0,
     "queueRemaining": 23,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "drawRequests": 6,
+    "drawRequests": 10,
     "preTMinusOneDrawRequests": 0
   },
   "audit": [
     {
-      "competitionId": "J-J30-ECU-2026-005",
-      "tournamentName": "J30 AMBATO",
+      "competitionId": "J-J30-ARG-2026-003",
+      "tournamentName": "J30 San Miguel de Tucumán",
       "decision": "pending",
       "playersFound": [],
       "families": [
@@ -47,7 +47,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 44,
               "error": null
             }
           ]
@@ -75,7 +75,7 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": null
             }
           ]
         }
@@ -83,12 +83,57 @@
       "eventFailure": null
     },
     {
-      "competitionId": "J-J30-GER-2026-005",
-      "tournamentName": "J30 Augsburg",
+      "competitionId": "J-J30-DEN-2026-004",
+      "tournamentName": "J30 Frederiksberg",
       "decision": "pending",
       "playersFound": [],
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 40,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 33,
+              "error": null
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
     }
   ]
 }
