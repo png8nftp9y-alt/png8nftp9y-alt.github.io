@@ -12,7 +12,7 @@ concurrency:
   group: courtwatch-itf-acquisition-v2-test
   cancel-in-progress: false
 jobs:
-  real-t-minus-one-probe:
+  in-progress-probe:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -25,13 +25,13 @@ jobs:
           node-version: '22'
           cache: npm
       - run: npm ci --ignore-scripts
-      - name: Run one actual T-1 ITF section probe
+      - name: Run one ITF section from a tournament currently in progress
         env:
           ITF_REQUEST_DELAY_MS: 1800
           ITF_REQUEST_TIMEOUT_MS: 20000
           ITF_V2_SECTION_SLOT: 0
         run: node src/v3/itf-acquisition-v2-probe.mjs
-      - name: Verify actual T-1 classification
+      - name: Verify in-progress classification
         shell: bash
         run: |
           set -euo pipefail
@@ -40,8 +40,8 @@ jobs:
           p='ops/itf-v2/out/section-probe.json'
           data=json.load(open(p))
           allowed={'complete','not_published','blocked_incapsula','network_error','invalid_response'}
-          assert data['mode']=='read_only_real_t_minus_one_single_section'
-          assert data['tournament']['tMinusOneDate']==data['today']
+          assert data['mode']=='read_only_in_progress_single_section'
+          assert data['tournament']['officialStartDate'] <= data['today'] <= data['tournament']['officialEndDate']
           assert data['status'] in allowed
           print(json.dumps(data,indent=2))
           PY
@@ -53,8 +53,7 @@ jobs:
           test -f ops/itf-v2/out/section-probe.json
       - uses: actions/upload-artifact@v4
         with:
-          name: itf-acquisition-v2-real-t-minus-one-probe
+          name: itf-acquisition-v2-in-progress-probe
           path: ops/itf-v2/out/section-probe.json
           if-no-files-found: error
           retention-days: 14
-# trigger: corrected-real-t-minus-one-probe
