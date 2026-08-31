@@ -11,19 +11,22 @@ for(const x of live.tournaments||[])tournamentMap.set(x.competitionId,x);
 const matchMap=new Map((historical.matches||[]).map(x=>[x.id,x]));
 for(const x of live.matches||[])matchMap.set(x.id,x);
 const tournaments=[...tournamentMap.values()],matches=[...matchMap.values()].sort((a,b)=>String(a.date).localeCompare(String(b.date))||a.id.localeCompare(b.id));
+const incremental=process.env.TE_INCREMENTAL==='1',importTournaments=incremental?(live.tournaments||[]):tournaments,importMatches=incremental?(live.matches||[]):matches;
 const identities=new Map();
 for(const match of matches)for(const player of match.players||[]){const key=`${player.nationality||''}|${norm(player.name)}`,date=isoDate(match.date),old=identities.get(key)||{identityKey:key,displayName:player.name,normalizedName:norm(player.name),nationality:player.nationality||'',occurrences:0,firstMatchDate:date,lastMatchDate:date};old.occurrences++;if(date<old.firstMatchDate)old.firstMatchDate=date;if(date>old.lastMatchDate)old.lastMatchDate=date;identities.set(key,old)}
 const dir='seed-tennis-europe-oop';await fs.rm(dir,{recursive:true,force:true});await fs.mkdir(dir,{recursive:true});
-const reset=['PRAGMA foreign_keys=ON;','DELETE FROM match_participants;','DELETE FROM tennis_europe_players;','DELETE FROM results WHERE circuit=\'tennis-europe\';','DELETE FROM schedules WHERE circuit=\'tennis-europe\';','DELETE FROM matches WHERE circuit=\'tennis-europe\';',"DELETE FROM tournaments WHERE id LIKE 'te-oop:%';"];
+const reset=incremental?['PRAGMA foreign_keys=ON;']:['PRAGMA foreign_keys=ON;','DELETE FROM match_participants;','DELETE FROM tennis_europe_players;','DELETE FROM results WHERE circuit=\'tennis-europe\';','DELETE FROM schedules WHERE circuit=\'tennis-europe\';','DELETE FROM matches WHERE circuit=\'tennis-europe\';',"DELETE FROM tournaments WHERE id LIKE 'te-oop:%';"];
 await fs.writeFile(path.join(dir,'00-reset.sql'),reset.join('\n')+'\n');
 const tournamentSql=['PRAGMA foreign_keys=ON;'];
-for(const t of tournaments){const id=`te-oop:${t.competitionId}`,compact={...t};delete compact.matches;tournamentSql.push(`INSERT OR REPLACE INTO tournaments(id,circuit,source_tournament_id,start_date,end_date,payload) VALUES(${esc(id)},'tennis-europe',${esc(t.competitionId)},${esc(t.startDate)},${esc(t.endDate)},${payload(compact)});`)}
+for(const t of importTournaments){const id=`te-oop:${t.competitionId}`,compact={...t};delete compact.matches;tournamentSql.push(`INSERT OR REPLACE INTO tournaments(id,circuit,source_tournament_id,start_date,end_date,payload) VALUES(${esc(id)},'tennis-europe',${esc(t.competitionId)},${esc(t.startDate)},${esc(t.endDate)},${payload(compact)});`)}
 await fs.writeFile(path.join(dir,'01-tournaments.sql'),tournamentSql.join('\n')+'\n');
-const playerRows=[...identities.values()],playerChunk=500;
+const importIdentityKeys=new Set();for(const match of importMatches)for(const player of match.players||[])importIdentityKeys.add(`${player.nationality||''}|${norm(player.name)}`);
+const playerRows=[...identities.values()].filter(p=>!incremental||importIdentityKeys.has(p.identityKey)),playerChunk=500;
 for(let start=0,index=0;start<playerRows.length;start+=playerChunk,index++){const sql=['PRAGMA foreign_keys=ON;'];for(const p of playerRows.slice(start,start+playerChunk))sql.push(`INSERT OR REPLACE INTO tennis_europe_players(identity_key,display_name,normalized_name,nationality,occurrences,first_match_date,last_match_date,payload) VALUES(${esc(p.identityKey)},${esc(p.displayName)},${esc(p.normalizedName)},${esc(p.nationality)},${p.occurrences},${esc(p.firstMatchDate)},${esc(p.lastMatchDate)},${payload(p)});`);await fs.writeFile(path.join(dir,`02-players-${String(index).padStart(2,'0')}.sql`),sql.join('\n')+'\n')}
-const shardCount=64,shards=Array.from({length:shardCount},()=>['PRAGMA foreign_keys=ON;']);
-for(let i=0;i<matches.length;i++){
- const m=matches[i],date=isoDate(m.date),tid=`te-oop:${m.competitionId}`,s=shards[i%shardCount],winner=new Set((m.winnerPlayerIds||[]).map(String));
+const shardCount=incremental?8:64,shards=Array.from({length:shardCount},()=>['PRAGMA foreign_keys=ON;']);
+for(let i=0;i<importMatches.length;i++){
+ const m=importMatches[i],date=isoDate(m.date),tid=`te-oop:${m.competitionId}`,s=shards[i%shardCount],winner=new Set((m.winnerPlayerIds||[]).map(String));
+ if(incremental){s.push(`DELETE FROM match_participants WHERE match_id=${esc(m.id)};`);s.push(`DELETE FROM results WHERE match_id=${esc(m.id)};`);s.push(`DELETE FROM schedules WHERE match_id=${esc(m.id)};`)}
  s.push(`INSERT OR REPLACE INTO matches(id,tournament_id,circuit,played_date,payload) VALUES(${esc(m.id)},${esc(tid)},'tennis-europe',${esc(date)},${payload(m)});`);
  s.push(`INSERT OR REPLACE INTO schedules(id,tournament_id,match_id,circuit,local_date,payload) VALUES(${esc(`oop:${m.id}`)},${esc(tid)},${esc(m.id)},'tennis-europe',${esc(date)},${payload({date,time:m.time||'',court:m.court||'',event:m.event||'',round:m.round||'',status:m.status,sourceUrl:m.sourceUrl})});`);
  if(m.status==='completed')s.push(`INSERT OR REPLACE INTO results(id,tournament_id,match_id,circuit,played_date,payload) VALUES(${esc(`result:${m.id}`)},${esc(tid)},${esc(m.id)},'tennis-europe',${esc(date)},${payload({score:m.score||'',winnerTeamIndex:m.winnerTeamIndex,winnerPlayerIds:m.winnerPlayerIds||[],status:m.status,sourceUrl:m.sourceUrl})});`);
@@ -33,4 +36,4 @@ for(let i=0;i<matches.length;i++){
 for(let i=0;i<shards.length;i++)await fs.writeFile(path.join(dir,`03-matches-${String(i).padStart(2,'0')}.sql`),shards[i].join('\n')+'\n');
 const counts={historicalMatches:(historical.matches||[]).length,liveMatches:(live.matches||[]).length,matches:matches.length,tournaments:tournaments.length,players:identities.size,completed:matches.filter(x=>x.status==='completed').length,scheduled:matches.filter(x=>x.status==='scheduled').length,participants:matches.reduce((n,x)=>n+(x.players||[]).length,0)};
 const fileCount=2+Math.ceil(playerRows.length/playerChunk)+shardCount;
-await fs.writeFile(path.join(dir,'manifest.json'),JSON.stringify({status:'green',counts},null,2)+'\n');console.log(JSON.stringify({status:'green',counts,files:fileCount}));
+await fs.writeFile(path.join(dir,'manifest.json'),JSON.stringify({status:'green',incremental,counts,imported:{tournaments:importTournaments.length,matches:importMatches.length,players:playerRows.length}},null,2)+'\n');console.log(JSON.stringify({status:'green',incremental,counts,imported:{tournaments:importTournaments.length,matches:importMatches.length,players:playerRows.length},files:fileCount}));
