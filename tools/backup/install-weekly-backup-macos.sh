@@ -20,7 +20,7 @@ cat > "$PLIST" <<EOF
   <key>ProgramArguments</key>
   <array>
     <string>/bin/bash</string>
-    <string>$REPO_DIR/tools/backup/backup-courtwatch.sh</string>
+    <string>$REPO_DIR/tools/backup/run-backup-if-due.sh</string>
     <string>$BACKUP_ROOT</string>
   </array>
   <key>WorkingDirectory</key><string>$REPO_DIR</string>
@@ -32,6 +32,7 @@ cat > "$PLIST" <<EOF
     <key>Hour</key><integer>4</integer>
     <key>Minute</key><integer>30</integer>
   </dict>
+  <key>RunAtLoad</key><true/>
   <key>StandardOutPath</key><string>$BACKUP_ROOT/logs/weekly.log</string>
   <key>StandardErrorPath</key><string>$BACKUP_ROOT/logs/weekly-error.log</string>
 </dict>
@@ -43,6 +44,6 @@ launchctl bootout "gui/$USER_ID/$LABEL" 2>/dev/null || true
 launchctl bootstrap "gui/$USER_ID" "$PLIST"
 launchctl print "gui/$USER_ID/$LABEL" >/dev/null
 
-echo "Weekly CourtWatch backup installed: Sunday at 04:30 local time."
+echo "Weekly CourtWatch backup installed: Sunday at 04:30 local time, with catch-up at the next login if overdue."
 echo "LaunchAgent: $PLIST"
 echo "Logs: $BACKUP_ROOT/logs/weekly.log and weekly-error.log"
