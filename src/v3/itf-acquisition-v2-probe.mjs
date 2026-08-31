@@ -1,13 +1,28 @@
 import fs from 'node:fs/promises';
-import {tournamentEvents,drawsheet,playerFromApi} from './itf-common.mjs';
+import {tournamentEvents,drawsheet,playerFromApi,readJson,TODAY} from './itf-common.mjs';
 
-const tournament={
-  competitionId:process.env.ITF_V2_COMPETITION_ID||'J-J30-ITA-2026-002',
-  tournamentName:process.env.ITF_V2_TOURNAMENT_NAME||'J30 Cuneo',
-  sourceUrl:process.env.ITF_V2_SOURCE_URL||'https://www.itftennis.com/en/tournament/j30-cuneo/ita/2026/j-j30-ita-2026-002/'
-};
 const sectionSlot=Math.max(0,Number(process.env.ITF_V2_SECTION_SLOT||0));
 const startedAt=new Date().toISOString();
+const targetDb=await readJson('history/itf_draw_target_db.json',{targets:{},tournaments:{}});
+const candidates=[];
+for(const target of Object.values(targetDb.targets||{})){
+  const acceptance=target.acceptanceEntry||target;
+  if(!acceptance?.competitionId||!acceptance?.sourceUrl)continue;
+  if(String(target.drawDecision||'')==='removed'||String(target.entryStatus||'')==='withdrawn')continue;
+  const officialStart=String(target.officialStartDate||acceptance.officialStartDate||acceptance.startDate||'').slice(0,10);
+  if(!officialStart)continue;
+  const qualificationStart=String(target.qualificationStartDate||acceptance.qualificationStartDate||'').slice(0,10);
+  const operationalStart=qualificationStart||officialStart;
+  const tMinusOne=new Date(Date.parse(`${operationalStart}T00:00:00Z`)-864e5).toISOString().slice(0,10);
+  if(tMinusOne!==TODAY)continue;
+  candidates.push({competitionId:acceptance.competitionId,tournamentName:acceptance.tournamentName||target.tournamentName||acceptance.competitionId,sourceUrl:acceptance.sourceUrl,officialStartDate:officialStart,qualificationStartDate:qualificationStart||null,operationalStartDate:operationalStart,tMinusOneDate:tMinusOne});
+}
+const unique=[...new Map(candidates.map(x=>[x.competitionId,x])).values()].sort((a,b)=>a.competitionId.localeCompare(b.competitionId));
+if(!unique.length){
+  console.error(JSON.stringify({status:'no_real_t_minus_one_target',today:TODAY},null,2));
+  process.exit(3);
+}
+const tournament=unique[0];
 const classify=message=>{
   const m=String(message||'');
   if(/incapsula/i.test(m))return'blocked_incapsula';
@@ -16,7 +31,7 @@ const classify=message=>{
   return'invalid_response';
 };
 function participantCount(json){let count=0;const walk=v=>{if(Array.isArray(v)){for(const x of v)walk(x);return}if(!v||typeof v!=='object')return;if(Array.isArray(v.players))for(const p of v.players){const pp=playerFromApi(p);if(pp.name)count++}for(const x of Object.values(v))if(x&&typeof x==='object')walk(x)};walk(json);return count}
-let result={version:1,mode:'read_only_single_tournament_single_section',startedAt,tournament,sectionSlot,status:'invalid_response'};
+let result={version:2,mode:'read_only_real_t_minus_one_single_section',startedAt,today:TODAY,tournament,eligibleTMinusOneTargets:unique.length,sectionSlot,status:'invalid_response'};
 try{
   const combos=await tournamentEvents(tournament);
   if(!combos.length)throw new Error('event_filters_empty');
@@ -26,13 +41,8 @@ try{
     const json=await drawsheet(combo);
     const participants=participantCount(json);
     result={...result,status:participants>0?'complete':'not_published',event,participants,eventCount:combos.length,finishedAt:new Date().toISOString()};
-  }catch(error){
-    result={...result,status:classify(error.message),event,error:error.message,eventCount:combos.length,finishedAt:new Date().toISOString()};
-  }
-}catch(error){
-  result={...result,status:classify(error.message),error:error.message,finishedAt:new Date().toISOString()};
-}
+  }catch(error){result={...result,status:classify(error.message),event,error:error.message,eventCount:combos.length,finishedAt:new Date().toISOString()}}
+}catch(error){result={...result,status:classify(error.message),error:error.message,finishedAt:new Date().toISOString()}}
 await fs.mkdir('ops/itf-v2/out',{recursive:true});
 await fs.writeFile('ops/itf-v2/out/section-probe.json',JSON.stringify(result,null,2)+'\n');
 console.log(JSON.stringify(result,null,2));
-if(!['complete','not_published','blocked_incapsula','network_error','invalid_response'].includes(result.status))process.exitCode=2;
