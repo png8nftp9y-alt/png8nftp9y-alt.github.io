@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.51**
+Revisione documento: **2026-08-31.52**
+
+- 31 agosto 2026 — Installazione locale settimanale completata con successo sul Mac dell'utente: plist `com.courtwatch.weekly-backup` validato da `plutil`, LaunchAgent caricato e pianificato ogni domenica alle 04:30 ora locale. Log persistenti in `~/CourtWatch-backup/logs/weekly.log` e `weekly-error.log`. Obiettivo backup locale concluso: prima copia D1+R2 verificata e aggiornamento ricorrente configurato.
 
 - 31 agosto 2026 — Completata e verificata la prima copia locale esterna: snapshot R2 `20260831T212914Z` con tutti i sei prefissi, almeno 17 blocchi storici ITF e manifest; la copia D1 certificata precedente è stata preservata. Rinnovato il login OAuth Wrangler e ricertificata la visibilità remota di `courtwatch-app`. Aggiunto installer macOS `launchd` per backup completo settimanale ogni domenica alle 04:30, con profilo R2 locale e log separati; l'installazione non lancia immediatamente una nuova copia.
 
