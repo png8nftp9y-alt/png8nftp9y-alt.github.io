@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.45**
+Revisione documento: **2026-08-31.46**
+
+- 31 agosto 2026 — Fissato il criterio definitivo di chiusura ITF T−1: gli unici dati mancanti ammessi sono sezioni ufficiali non ancora pubblicate o realmente incomplete. Il merge calcola ora sull'intero database quattro conteggi distinti (`globalCompleteTournaments`, `globalPendingTotal`, `globalPendingTechnical`, `globalPendingPublication`) e conserva gli ID nelle due classi. Incapsula, errori di rete/parsing e sezioni disponibili ma non acquisite sono `pending tecnico`: il sistema continua a pubblicare immediatamente ogni sezione valida recuperata, ma la diagnostica resta `itf_system_operational_not_certified` e `fullyCertified=false` finché il conteggio tecnico non arriva a zero. Soltanto con zero pending tecnici può risultare certificato, anche se rimangono tabelloni ufficiali incompleti (`itf_system_certified_with_incomplete_publication`).
 
 - 31 agosto 2026 — Estesa su richiesta dell'utente l'acquisizione cumulativa T−1 a tutte le sezioni ufficiali restituite da `GetEventFilters`, non soltanto al singolare: singolare, doppio, qualificazioni, main draw e strutture KO/RR alternative. Ogni sezione popolata viene conservata immediatamente; le sezioni mancanti/vuote/illeggibili restano da ritentare. La certificazione di completezza continua a operare per famiglia, considerando sufficiente una struttura popolata quando KO e RR sono alternative della stessa famiglia. Aggiornato anche il merge dei runner affinché conservi nell'audit finale `cachedSectionsUsed`, `newSectionsCached`, `drawRequests`, `browserFallbacks` e `browserRecoveries`. Il run cumulativo precedente `33431586297` era verde e aveva portato lo stato a 18 completi, 37 pending e 29 pending con traccia Incapsula.
 
