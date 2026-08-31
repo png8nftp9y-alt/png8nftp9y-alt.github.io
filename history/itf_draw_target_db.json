@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-08-31T19:38:39.727Z",
+  "generatedAt": "2026-08-31T19:45:49.109Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
@@ -1510,7 +1510,7 @@
     "J-J30-ARG-2026-003": {
       "competitionId": "J-J30-ARG-2026-003",
       "decision": "pending",
-      "checkedAt": "2026-08-31T13:30:54.438Z",
+      "checkedAt": "2026-08-31T19:44:10.704Z",
       "playersFound": 0,
       "families": [
         {
@@ -1541,6 +1541,17 @@
           ]
         },
         {
+          "family": "B-D-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 32,
+              "error": null
+            }
+          ]
+        },
+        {
           "family": "G-S-M",
           "populated": false,
           "events": [
@@ -1552,7 +1563,7 @@
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "GetDrawsheet_incapsula_challenge"
             }
           ]
         },
@@ -1563,12 +1574,343 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": null
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "browser_fallback:browser_incapsula_challenge",
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "players": [
+            {
+              "id": "800798567",
+              "name": "Manuel Paniagua Alexenicer"
+            },
+            {
+              "id": "800799452",
+              "name": "Joaquin Bello"
+            },
+            {
+              "id": "800794827",
+              "name": "Santiago Malatini"
+            },
+            {
+              "id": "800874928",
+              "name": "Santiago Mirgone"
+            },
+            {
+              "id": "800838000",
+              "name": "Nuno Paez Soares Martins"
+            },
+            {
+              "id": "800702655",
+              "name": "Mateo Victor Fontanes Lepore"
+            },
+            {
+              "id": "800798181",
+              "name": "Bautista Rodriguez"
+            },
+            {
+              "id": "800759686",
+              "name": "Matheus Machado Brasil"
+            },
+            {
+              "id": "800801485",
+              "name": "Gonzalo Fonzo"
+            },
+            {
+              "id": "800820498",
+              "name": "Pedro Giunta Lucero"
+            },
+            {
+              "id": "800806288",
+              "name": "Bruno Graef"
+            },
+            {
+              "id": "800764926",
+              "name": "Bernardo Andrade Belitardo"
+            },
+            {
+              "id": "800784569",
+              "name": "Lucas Gutierrez Parrillo"
+            },
+            {
+              "id": "800702658",
+              "name": "VALENTIN VICTOR FONTANES LEPORE"
+            },
+            {
+              "id": "800875778",
+              "name": "Augusto Lemos Quirino"
+            },
+            {
+              "id": "800779872",
+              "name": "Manu Eztala"
+            },
+            {
+              "id": "800792603",
+              "name": "Benicio Vallejos"
+            },
+            {
+              "id": "800755204",
+              "name": "Agustin Di Fulvio"
+            },
+            {
+              "id": "800819795",
+              "name": "Juan Eztala"
+            },
+            {
+              "id": "800781084",
+              "name": "Mike Gregersen"
+            },
+            {
+              "id": "800674069",
+              "name": "Joao Guilherme Faggioni"
+            },
+            {
+              "id": "800791720",
+              "name": "Santiago Martinez Espeche"
+            },
+            {
+              "id": "800793505",
+              "name": "Axikaer Lukasihairui"
+            },
+            {
+              "id": "800874620",
+              "name": "Ian Romay"
+            },
+            {
+              "id": "800825189",
+              "name": "Antonio Guarita"
+            },
+            {
+              "id": "800827046",
+              "name": "Matias Ignacio Sobrero"
+            },
+            {
+              "id": "800758835",
+              "name": "Cristobal Marconi"
+            },
+            {
+              "id": "800859654",
+              "name": "Facundo Wagner"
+            },
+            {
+              "id": "800798567",
+              "name": "Manuel Paniagua Alexenicer"
+            },
+            {
+              "id": "800799452",
+              "name": "Joaquin Bello"
+            },
+            {
+              "id": "800874928",
+              "name": "Santiago Mirgone"
+            },
+            {
+              "id": "800838000",
+              "name": "Nuno Paez Soares Martins"
+            },
+            {
+              "id": "800798181",
+              "name": "Bautista Rodriguez"
+            },
+            {
+              "id": "800759686",
+              "name": "Matheus Machado Brasil"
+            },
+            {
+              "id": "800820498",
+              "name": "Pedro Giunta Lucero"
+            },
+            {
+              "id": "800806288",
+              "name": "Bruno Graef"
+            },
+            {
+              "id": "800784569",
+              "name": "Lucas Gutierrez Parrillo"
+            },
+            {
+              "id": "800779872",
+              "name": "Manu Eztala"
+            },
+            {
+              "id": "800792603",
+              "name": "Benicio Vallejos"
+            },
+            {
+              "id": "800819795",
+              "name": "Juan Eztala"
+            },
+            {
+              "id": "800674069",
+              "name": "Joao Guilherme Faggioni"
+            },
+            {
+              "id": "800793505",
+              "name": "Axikaer Lukasihairui"
+            },
+            {
+              "id": "800825189",
+              "name": "Antonio Guarita"
+            },
+            {
+              "id": "800758835",
+              "name": "Cristobal Marconi"
+            }
+          ],
+          "storedAt": "2026-08-31T19:44:10.704Z"
+        },
+        "B-D-M-KO": {
+          "family": "B-D-M",
+          "populated": true,
+          "players": [
+            {
+              "id": "800739272",
+              "name": "Genaro Bartolucci"
+            },
+            {
+              "id": "800677655",
+              "name": "Benjamin Conca Lapasset"
+            },
+            {
+              "id": "800752482",
+              "name": "Juan Ignacio Assi"
+            },
+            {
+              "id": "800716356",
+              "name": "Mateo Francisco Perlo"
+            },
+            {
+              "id": "800674069",
+              "name": "Joao Guilherme Faggioni"
+            },
+            {
+              "id": "800759686",
+              "name": "Matheus Machado Brasil"
+            },
+            {
+              "id": "800743236",
+              "name": "Isaias jesus alejandro Gimenez"
+            },
+            {
+              "id": "800768401",
+              "name": "Benicio Madeo Roggero"
+            },
+            {
+              "id": "800784092",
+              "name": "Octavio Calvetty"
+            },
+            {
+              "id": "800790950",
+              "name": "Joaquin Pringles"
+            },
+            {
+              "id": "800779872",
+              "name": "Manu Eztala"
+            },
+            {
+              "id": "800798567",
+              "name": "Manuel Paniagua Alexenicer"
+            },
+            {
+              "id": "800702203",
+              "name": "Maximo Augusto Belotti Garcia"
+            },
+            {
+              "id": "800709638",
+              "name": "Gaston Valdecantos"
+            },
+            {
+              "id": "800778427",
+              "name": "Lisandro Gama Castro"
+            },
+            {
+              "id": "800695708",
+              "name": "Manu Seijas-Wright"
+            },
+            {
+              "id": "800877156",
+              "name": "Abner Robertino Calderon"
+            },
+            {
+              "id": "800820498",
+              "name": "Pedro Giunta Lucero"
+            },
+            {
+              "id": "800791565",
+              "name": "Tomas Herrera"
+            },
+            {
+              "id": "800819802",
+              "name": "Facundo Ruben Leiva Chapero"
+            },
+            {
+              "id": "800711933",
+              "name": "Valentino Ezequiel Ancasi"
+            },
+            {
+              "id": "800759858",
+              "name": "Augusto felix Prato menso"
+            },
+            {
+              "id": "800775640",
+              "name": "Pedro Bergamini Taicher"
+            },
+            {
+              "id": "800784197",
+              "name": "Jack-Matteo Post"
+            },
+            {
+              "id": "800825189",
+              "name": "Antonio Guarita"
+            },
+            {
+              "id": "800784569",
+              "name": "Lucas Gutierrez Parrillo"
+            },
+            {
+              "id": "800742866",
+              "name": "Santino Rosendo Aranda"
+            },
+            {
+              "id": "800792603",
+              "name": "Benicio Vallejos"
+            },
+            {
+              "id": "800783606",
+              "name": "Ulises Arisio"
+            },
+            {
+              "id": "800806288",
+              "name": "Bruno Graef"
+            },
+            {
+              "id": "800677738",
+              "name": "FRANCISCO FORMICA ARREGUEZ"
+            },
+            {
+              "id": "800755527",
+              "name": "Simon Giambastiani"
+            }
+          ],
+          "storedAt": "2026-08-31T19:44:10.704Z"
+        }
+      }
     },
     "J-J30-DEN-2026-004": {
       "competitionId": "J-J30-DEN-2026-004",
@@ -4051,10 +4393,256 @@
     "J-J30-SVK-2026-004": {
       "competitionId": "J-J30-SVK-2026-004",
       "decision": "pending",
-      "checkedAt": "2026-08-31T11:10:51.319Z",
+      "checkedAt": "2026-08-31T19:44:13.051Z",
       "playersFound": 0,
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": null
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 40,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": null
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        }
+      ],
+      "eventFailure": "browser_fallback:browser_incapsula_challenge",
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "players": [
+            {
+              "id": "800721514",
+              "name": "Oleksandr Kachan"
+            },
+            {
+              "id": "800738262",
+              "name": "Michal Chyla"
+            },
+            {
+              "id": "800679930",
+              "name": "Boris Toevis"
+            },
+            {
+              "id": "800723392",
+              "name": "Richard Paluga"
+            },
+            {
+              "id": "800706048",
+              "name": "Leonard Nipca"
+            },
+            {
+              "id": "800679378",
+              "name": "Thomas Worm Mortensen"
+            },
+            {
+              "id": "800671446",
+              "name": "Timotej Turoci"
+            },
+            {
+              "id": "800797096",
+              "name": "Dmitij Psenicny"
+            },
+            {
+              "id": "800727681",
+              "name": "Matus Jager"
+            },
+            {
+              "id": "800671467",
+              "name": "Filip Kolodzej"
+            },
+            {
+              "id": "800748752",
+              "name": "Mikulas Srsen"
+            },
+            {
+              "id": "800855039",
+              "name": "Daniel Slavik"
+            },
+            {
+              "id": "800689463",
+              "name": "Richard Herman"
+            },
+            {
+              "id": "800704112",
+              "name": "Michal Gallo"
+            },
+            {
+              "id": "800748758",
+              "name": "Tomas Srsen"
+            },
+            {
+              "id": "800668454",
+              "name": "Christian Valalik"
+            },
+            {
+              "id": "800859271",
+              "name": "Jan Dorko"
+            },
+            {
+              "id": "800743571",
+              "name": "Azat Mamedgulyyev"
+            },
+            {
+              "id": "800670286",
+              "name": "Adam Andel"
+            },
+            {
+              "id": "800826167",
+              "name": "Daniel Levkanic"
+            },
+            {
+              "id": "800797252",
+              "name": "Oleh Leshchukh"
+            },
+            {
+              "id": "800646090",
+              "name": "Michal Krotky"
+            },
+            {
+              "id": "800657211",
+              "name": "Nazarii Dmyterchuk"
+            },
+            {
+              "id": "800746828",
+              "name": "Matus Strba"
+            },
+            {
+              "id": "800721514",
+              "name": "Oleksandr Kachan"
+            },
+            {
+              "id": "800738262",
+              "name": "Michal Chyla"
+            },
+            {
+              "id": "800723392",
+              "name": "Richard Paluga"
+            },
+            {
+              "id": "800706048",
+              "name": "Leonard Nipca"
+            },
+            {
+              "id": "800671446",
+              "name": "Timotej Turoci"
+            },
+            {
+              "id": "800797096",
+              "name": "Dmitij Psenicny"
+            },
+            {
+              "id": "800671467",
+              "name": "Filip Kolodzej"
+            },
+            {
+              "id": "800855039",
+              "name": "Daniel Slavik"
+            },
+            {
+              "id": "800689463",
+              "name": "Richard Herman"
+            },
+            {
+              "id": "800748758",
+              "name": "Tomas Srsen"
+            },
+            {
+              "id": "800668454",
+              "name": "Christian Valalik"
+            },
+            {
+              "id": "800743571",
+              "name": "Azat Mamedgulyyev"
+            },
+            {
+              "id": "800670286",
+              "name": "Adam Andel"
+            },
+            {
+              "id": "800797252",
+              "name": "Oleh Leshchukh"
+            },
+            {
+              "id": "800646090",
+              "name": "Michal Krotky"
+            },
+            {
+              "id": "800657211",
+              "name": "Nazarii Dmyterchuk"
+            }
+          ],
+          "storedAt": "2026-08-31T19:44:13.051Z"
+        }
+      }
     }
   }
 }
