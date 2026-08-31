@@ -3,22 +3,14 @@ set -euo pipefail
 
 readonly PROFILE="courtwatch-r2"
 readonly BUCKET="courtwatch-archive"
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly REPO_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 readonly CONFIG_FILE="$HOME/.courtwatch-backup.env"
 
-for command in aws npx; do
+for command in aws; do
   command -v "$command" >/dev/null || { echo "Missing dependency: $command" >&2; exit 2; }
 done
 
 account_id="${R2_ACCOUNT_ID:-}"
-if test -z "$account_id"; then
-  whoami_output="$(cd "$REPO_DIR/cloudflare/app-api" && npx wrangler whoami 2>/dev/null || true)"
-  account_id="$(printf '%s\n' "$whoami_output" | grep -Eo '[0-9a-fA-F]{32}' | head -n 1 || true)"
-fi
-if ! [[ "$account_id" =~ ^[0-9a-fA-F]{32}$ ]]; then
-  read -r -p "Cloudflare Account ID: " account_id
-fi
+if ! [[ "$account_id" =~ ^[0-9a-fA-F]{32}$ ]]; then read -r -p "Cloudflare Account ID: " account_id; fi
 [[ "$account_id" =~ ^[0-9a-fA-F]{32}$ ]] || { echo "Invalid Cloudflare Account ID" >&2; exit 2; }
 
 read -r -p "New R2 Access Key ID: " access_key
