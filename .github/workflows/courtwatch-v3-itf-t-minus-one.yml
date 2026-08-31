@@ -67,7 +67,10 @@ jobs:
           for attempt in 1 2 3; do
             git fetch origin main
             git reset --hard origin/main
+            cp history/itf_draw_target_db.json /tmp/itf-current-state.json
+            cp "$snapshot/history/itf_draw_target_db.json" /tmp/itf-incoming-state.json
             cp -R "$snapshot"/* ./
+            node src/v3/merge-itf-draw-target-ownership.mjs t-minus-one /tmp/itf-current-state.json /tmp/itf-incoming-state.json history/itf_draw_target_db.json
             node src/v3/entries-engine.mjs
             git add dist/v3/source_itf_entries.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json
             if git diff --cached --quiet; then echo "No validated ITF T-1 changes"; exit 0; fi
