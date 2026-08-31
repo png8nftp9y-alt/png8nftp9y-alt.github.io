@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-08-31T20:21:12.019Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-08-31T20:31:04.677Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
   "targets": {
@@ -1915,7 +1915,7 @@
     "J-J30-DEN-2026-004": {
       "competitionId": "J-J30-DEN-2026-004",
       "decision": "pending",
-      "checkedAt": "2026-08-31T13:30:54.438Z",
+      "checkedAt": "2026-08-31T20:29:18.423Z",
       "playersFound": 0,
       "families": [
         {
@@ -1924,6 +1924,11 @@
           "events": [
             {
               "event": "B-S-M-KO",
+              "players": 0,
+              "error": null
+            },
+            {
+              "event": "B-S-M-RR",
               "players": 0,
               "error": null
             }
@@ -1941,6 +1946,17 @@
           ]
         },
         {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
           "family": "G-S-M",
           "populated": false,
           "events": [
@@ -1948,27 +1964,212 @@
               "event": "G-S-M-KO",
               "players": 0,
               "error": null
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
             }
           ]
         },
         {
           "family": "G-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 33,
-              "error": null
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "browser_fallback:browser_incapsula_challenge",
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "players": [
+            {
+              "id": "800653429",
+              "name": "Nicolai Bjercke Johnsen"
+            },
+            {
+              "id": "800703897",
+              "name": "Villum Thorsted Riddersholm"
+            },
+            {
+              "id": "800683694",
+              "name": "Johannes Vilsoe"
+            },
+            {
+              "id": "800688849",
+              "name": "Benjamin Herbert Kamps"
+            },
+            {
+              "id": "800679448",
+              "name": "Anders Elfving Navarro"
+            },
+            {
+              "id": "800603751",
+              "name": "Nicolai Schoelin"
+            },
+            {
+              "id": "800753870",
+              "name": "David Gerremo Diedrichs"
+            },
+            {
+              "id": "800781287",
+              "name": "Rasmus Kjaer Skovgaard"
+            },
+            {
+              "id": "800679684",
+              "name": "Tristan Brogaard"
+            },
+            {
+              "id": "800648454",
+              "name": "Thore Thomsen"
+            },
+            {
+              "id": "800679513",
+              "name": "Philip OEstergaard"
+            },
+            {
+              "id": "800734243",
+              "name": "Alfred Figge"
+            },
+            {
+              "id": "800735585",
+              "name": "William Gronli Andresen"
+            },
+            {
+              "id": "800717443",
+              "name": "Leo Kurttila"
+            },
+            {
+              "id": "800765335",
+              "name": "Sebastian H Hammeleff"
+            },
+            {
+              "id": "800702352",
+              "name": "Louie Waldemar Jessen"
+            },
+            {
+              "id": "800731508",
+              "name": "Sebastian Wolfsberg"
+            },
+            {
+              "id": "800679410",
+              "name": "Sebastian Sehic Rasmussen"
+            },
+            {
+              "id": "800680293",
+              "name": "Oscar Grant-Rosendahl"
+            },
+            {
+              "id": "800762500",
+              "name": "Felix Palm"
+            },
+            {
+              "id": "800712925",
+              "name": "Didrik Roos"
+            },
+            {
+              "id": "800679760",
+              "name": "Casper Molich Hoff Pallesen"
+            },
+            {
+              "id": "800679278",
+              "name": "thiago aiello"
+            },
+            {
+              "id": "800651412",
+              "name": "Shivam Shiv Patel"
+            },
+            {
+              "id": "800653429",
+              "name": "Nicolai Bjercke Johnsen"
+            },
+            {
+              "id": "800703897",
+              "name": "Villum Thorsted Riddersholm"
+            },
+            {
+              "id": "800688849",
+              "name": "Benjamin Herbert Kamps"
+            },
+            {
+              "id": "800603751",
+              "name": "Nicolai Schoelin"
+            },
+            {
+              "id": "800753870",
+              "name": "David Gerremo Diedrichs"
+            },
+            {
+              "id": "800781287",
+              "name": "Rasmus Kjaer Skovgaard"
+            },
+            {
+              "id": "800648454",
+              "name": "Thore Thomsen"
+            },
+            {
+              "id": "800734243",
+              "name": "Alfred Figge"
+            },
+            {
+              "id": "800735585",
+              "name": "William Gronli Andresen"
+            },
+            {
+              "id": "800717443",
+              "name": "Leo Kurttila"
+            },
+            {
+              "id": "800702352",
+              "name": "Louie Waldemar Jessen"
+            },
+            {
+              "id": "800731508",
+              "name": "Sebastian Wolfsberg"
+            },
+            {
+              "id": "800680293",
+              "name": "Oscar Grant-Rosendahl"
+            },
+            {
+              "id": "800762500",
+              "name": "Felix Palm"
+            },
+            {
+              "id": "800679760",
+              "name": "Casper Molich Hoff Pallesen"
+            },
+            {
+              "id": "800651412",
+              "name": "Shivam Shiv Patel"
+            }
+          ],
+          "storedAt": "2026-08-31T20:29:18.423Z"
+        }
+      }
     },
     "J-J30-ECU-2026-005": {
       "competitionId": "J-J30-ECU-2026-005",
       "decision": "pending",
-      "checkedAt": "2026-08-31T13:58:57.964Z",
+      "checkedAt": "2026-08-31T20:29:24.379Z",
       "playersFound": 0,
       "families": [
         {
@@ -1999,6 +2200,17 @@
           ]
         },
         {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
           "family": "G-S-M",
           "populated": false,
           "events": [
@@ -2010,7 +2222,7 @@
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "GetDrawsheet_incapsula_challenge"
             }
           ]
         },
@@ -2024,9 +2236,93 @@
               "error": "GetDrawsheet_incapsula_challenge"
             }
           ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "browser_fallback:browser_incapsula_challenge",
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "players": [
+            {
+              "id": "800654519",
+              "name": "Emiliano Vela"
+            },
+            {
+              "id": "800877549",
+              "name": "Juan Diego Castillo Viera"
+            },
+            {
+              "id": "800788012",
+              "name": "Fernando Barrenechea"
+            },
+            {
+              "id": "800742719",
+              "name": "JUAN FIGUEROA"
+            },
+            {
+              "id": "800821144",
+              "name": "Esteban Vega"
+            },
+            {
+              "id": "800654593",
+              "name": "Lucca Roman-Wright"
+            },
+            {
+              "id": "800693869",
+              "name": "Bruno Cabezas"
+            },
+            {
+              "id": "800687416",
+              "name": "Felipe Lujan Nanez"
+            },
+            {
+              "id": "800655774",
+              "name": "Jose Fernando Villagomez Rodriguez"
+            },
+            {
+              "id": "800760001",
+              "name": "Mathias David Vinueza Arturo"
+            },
+            {
+              "id": "800783979",
+              "name": "Lorenzo Vasquez"
+            },
+            {
+              "id": "800668476",
+              "name": "Alejandro Osorio Naranjo"
+            },
+            {
+              "id": "800715080",
+              "name": "Rafael Andrade"
+            },
+            {
+              "id": "800842314",
+              "name": "Samuel Gabriel Avila Avila"
+            },
+            {
+              "id": "800693793",
+              "name": "Matias Hernandez Ramirez"
+            },
+            {
+              "id": "800715316",
+              "name": "NICOLAS MAXIMILIANO CHAVEZ AMORETTI"
+            }
+          ],
+          "storedAt": "2026-08-31T20:29:24.379Z"
+        }
+      }
     },
     "J-J30-GER-2026-005": {
       "competitionId": "J-J30-GER-2026-005",
