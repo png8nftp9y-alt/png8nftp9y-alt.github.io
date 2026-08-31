@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-08-31T13:52:17.392Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-08-31T13:58:57.964Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
   "targets": {
@@ -1626,15 +1626,70 @@
     "J-J30-ECU-2026-005": {
       "competitionId": "J-J30-ECU-2026-005",
       "decision": "pending",
-      "checkedAt": "2026-08-31T11:10:51.319Z",
+      "checkedAt": "2026-08-31T13:58:57.964Z",
       "playersFound": 0,
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": null
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 16,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": null
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
     },
     "J-J30-GER-2026-005": {
       "competitionId": "J-J30-GER-2026-005",
       "decision": "pending",
-      "checkedAt": "2026-08-31T11:10:51.319Z",
+      "checkedAt": "2026-08-31T13:58:57.964Z",
       "playersFound": 0,
       "families": [],
       "eventFailure": "GetEventFilters_incapsula_challenge"
