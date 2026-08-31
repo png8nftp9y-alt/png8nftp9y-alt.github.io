@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.47**
+Revisione documento: **2026-08-31.48**
+
+- 31 agosto 2026 — Poiché il primo run post-correzione (`33436282033`) ha certificato la persistenza dell'audit v9 ma ha lasciato invariati 18 completi, 31 pending tecnici e 6 pending di pubblicazione, l'acquisizione T−1 è stata resa granulare per sezione. Quattro runner isolati elaborano due tornei e, per ciascuno, due sole sezioni mancanti su sessioni separate; la pressione scende dalle 16 richieste tabellone del run precedente a un massimo di 4, mentre aumentano le origini/sessioni indipendenti. Il merge unisce esplicitamente `eventCache` quando due artifact riguardano lo stesso torneo, impedendo perdite tra successi paralleli. Storico, acceptance, withdrawn, database, mappa e regole decisionali non sono modificati.
 
 - 31 agosto 2026 — Eliminata la regressione che riportava indietro audit e stato ITF T−1. Prova dalla cronologia Git: il commit T−1 `53a1d273` aveva pubblicato alle 19:52 UTC l'audit v9, poi il commit acceptance `c24fbcc1` lo aveva sostituito alle 20:01 con lo snapshot v8 delle 19:45. Corretti congiuntamente `known-fast`, `live` e `safety-120d`: gli snapshot acceptance non includono più `source_itf_draw_audit.json` né la vecchia diagnostica; tutti e tre fondono `itf_draw_target_db.json` in modalità `acceptance`, conservando integralmente i `tournaments` correnti; la diagnostica viene rigenerata dopo il merge contro l'audit T−1 presente su `main`. Da ora acceptance possiede soltanto target/etichette/withdrawn, mentre T−1 è l'unico proprietario di audit e stati dei tabelloni. Validazione YAML e controllo sintattico superati.
 
