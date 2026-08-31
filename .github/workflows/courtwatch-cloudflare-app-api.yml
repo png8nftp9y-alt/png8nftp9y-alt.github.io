@@ -76,7 +76,19 @@ jobs:
       - name: Build and import universal generation
         run: |
           npm run seed
-          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file seed-universal.sql
+          for sql_file in seed-universal/*.sql; do
+            echo "Importing $sql_file"
+            imported=0
+            for attempt in 1 2 3 4; do
+              if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"; then
+                imported=1
+                break
+              fi
+              echo "Retry $attempt for $sql_file after transient D1 state"
+              sleep $((attempt * 5))
+            done
+            test "$imported" -eq 1
+          done
       - name: Build read-only Europe parity manifests
         run: |
           npm run seed:te-oop
