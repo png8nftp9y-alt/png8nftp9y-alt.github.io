@@ -2,7 +2,7 @@ name: Court Watch v3 ITF T-1 complete draws
 on:
   workflow_dispatch:
   schedule:
-    - cron: '8,22,36,50 * * * *'
+    - cron: '*/5 * * * *'
   push:
     branches: [main]
     paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/verify-itf-t-minus-one-all-players.mjs','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
@@ -33,7 +33,8 @@ jobs:
           bash src/v3/itf-r2-cache.sh restore
       - name: Check every due draw against all ITF players
         env:
-          ITF_REQUEST_DELAY_MS: 1200
+          ITF_REQUEST_DELAY_MS: 1800
+          ITF_T1_MAX_TOURNAMENTS: 2
         run: |
           set -euo pipefail
           node src/v3/verify-itf-t-minus-one-all-players.mjs
