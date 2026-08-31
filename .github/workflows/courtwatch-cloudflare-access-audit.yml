@@ -18,7 +18,7 @@ concurrency:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: cloudflare/app-api
@@ -61,6 +61,18 @@ jobs:
           fs.writeFileSync('audit/d1-summary.json',JSON.stringify({status:'green',applicationTableCount:names.length,tables:names,rowCounts:counts,schema},null,2)+'\n');
           console.log(JSON.stringify({d1:'green',applicationTableCount:names.length,tables:names}));
           NODE
+      - name: Fingerprint current D1 contents
+        run: |
+          rm -f audit/courtwatch-current.sql audit/courtwatch-current.sqlite
+          npx wrangler d1 export courtwatch-app --remote --config wrangler.generated.jsonc --output audit/courtwatch-current.sql
+          sqlite3 audit/courtwatch-current.sqlite < audit/courtwatch-current.sql
+          python3 ../../tools/backup/fingerprint-sqlite.py audit/courtwatch-current.sqlite --output audit/d1-fingerprints.json
+          python3 - <<'PY'
+          import json
+          p=json.load(open('audit/d1-fingerprints.json'))
+          assert p['status']=='green' and p['integrity']=='ok' and p['applicationTableCount']==20, p
+          print(json.dumps({'fingerprints':'green','applicationTableCount':p['applicationTableCount'],'globalSha256':p['globalSha256']}))
+          PY
       - name: Audit R2 required archive prefixes
         env:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -103,6 +115,7 @@ jobs:
           node - <<'NODE'
           const fs=require('fs');
           const d1=JSON.parse(fs.readFileSync('cloudflare/app-api/audit/d1-summary.json','utf8'));
+          d1.fingerprints=JSON.parse(fs.readFileSync('cloudflare/app-api/audit/d1-fingerprints.json','utf8'));
           const r2=JSON.parse(fs.readFileSync('cloudflare/app-api/audit/r2-summary.json','utf8'));
           const result={status:'green',generatedAt:new Date().toISOString(),sourceCommit:process.env.GITHUB_SHA,d1,r2};
           fs.writeFileSync('ops/cloudflare-access-audit-result.json',JSON.stringify(result,null,2)+'\n');
@@ -119,5 +132,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: courtwatch-cloudflare-access-audit
-          path: cloudflare/app-api/audit/*.json
+          path: |
+            cloudflare/app-api/audit/d1-summary.json
+            cloudflare/app-api/audit/d1-fingerprints.json
+            cloudflare/app-api/audit/r2-summary.json
           if-no-files-found: error
