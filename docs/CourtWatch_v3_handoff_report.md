@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.50**
+Revisione documento: **2026-08-31.51**
+
+- 31 agosto 2026 — Completata e verificata la prima copia locale esterna: snapshot R2 `20260831T212914Z` con tutti i sei prefissi, almeno 17 blocchi storici ITF e manifest; la copia D1 certificata precedente è stata preservata. Rinnovato il login OAuth Wrangler e ricertificata la visibilità remota di `courtwatch-app`. Aggiunto installer macOS `launchd` per backup completo settimanale ogni domenica alle 04:30, con profilo R2 locale e log separati; l'installazione non lancia immediatamente una nuova copia.
 
 - 31 agosto 2026 — Certificata la prima copia locale D1: export SQL 225 MB, SQLite generato, `PRAGMA integrity_check=ok`, 20 tabelle applicative locali uguali alle 20 remote e checksum SHA-256 prodotti. Completato lo script per l'obiettivo di disaster recovery: oltre a `fitp/cache`, `itf/database` e OOP Europe, copia ora anche `itf/history-draws` e `tennis-europe/cache`. Il processo fallisce se uno dei sei prefissi è vuoto o se lo storico ITF contiene meno dei 17 blocchi certificati. Token R2 di sola lettura creato dall'utente; prima copia R2 e automazione settimanale ancora da eseguire.
 
