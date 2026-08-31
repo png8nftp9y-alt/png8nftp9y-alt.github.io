@@ -1,7 +1,7 @@
 {
   "status": "green",
-  "generatedAt": "2026-08-31T22:06:27.263Z",
-  "sourceCommit": "6254d728a2520d091e9081306f376587bc7d1c23",
+  "generatedAt": "2026-08-31T22:13:06.750Z",
+  "sourceCommit": "b352d172ce0d42c30e427ef46c5bbc5b147158d9",
   "d1": {
     "status": "green",
     "applicationTableCount": 20,
@@ -70,6 +70,94 @@
       "tennis_europe_players": "CREATE TABLE tennis_europe_players (\n  identity_key TEXT PRIMARY KEY,\n  display_name TEXT NOT NULL,\n  normalized_name TEXT NOT NULL,\n  nationality TEXT,\n  occurrences INTEGER NOT NULL DEFAULT 1,\n  first_match_date TEXT,\n  last_match_date TEXT,\n  payload TEXT NOT NULL\n)",
       "tournaments": "CREATE TABLE tournaments (\n  id TEXT PRIMARY KEY,\n  circuit TEXT NOT NULL,\n  source_tournament_id TEXT NOT NULL,\n  start_date TEXT,\n  end_date TEXT,\n  payload TEXT NOT NULL\n)",
       "user_player_profiles": "CREATE TABLE user_player_profiles (\n  id TEXT PRIMARY KEY,\n  user_id TEXT NOT NULL REFERENCES app_users(id),\n  observed_source_key TEXT NOT NULL REFERENCES observed_players(source_key),\n  relationship TEXT NOT NULL DEFAULT 'follows' CHECK(relationship IN ('self','guardian','coach','follows')),\n  alerts_enabled INTEGER NOT NULL DEFAULT 1,\n  created_at TEXT NOT NULL,\n  updated_at TEXT NOT NULL,\n  payload TEXT NOT NULL DEFAULT '{}',\n  UNIQUE(user_id,observed_source_key)\n)"
+    },
+    "fingerprints": {
+      "status": "green",
+      "integrity": "ok",
+      "applicationTableCount": 20,
+      "tables": {
+        "admin_audit": {
+          "rows": 0,
+          "sha256": "e75a517d093d13e49071b03e3a667164f73aec4db0a2432a2c673ab84ba13992"
+        },
+        "app_match_candidates": {
+          "rows": 149,
+          "sha256": "84c274d1f4eedb9daee9e5f2423c917ceeacbe2c192e527dcda7bca240ca6f08"
+        },
+        "app_matches": {
+          "rows": 149,
+          "sha256": "9374ea14b96fd801f8d59406efd6ab0fe6563ec3c30bcee69aaf26e769967ff5"
+        },
+        "app_players": {
+          "rows": 23,
+          "sha256": "a872c95cc51c8f4b54ea1e535c2de7124bff6fb281652462af46d03a8c254501"
+        },
+        "app_state": {
+          "rows": 0,
+          "sha256": "f52eb1ae7ff95da8ebecc592be1abf42c97b05bfd95f8999531c36a0c7f69e78"
+        },
+        "app_tournaments": {
+          "rows": 418,
+          "sha256": "c3153cda4f719155338f0a05c3e75936ff2a8ffaeeddf5d790fc2e9b8b1deb2e"
+        },
+        "app_users": {
+          "rows": 0,
+          "sha256": "36e72a59c0566ed4e80f5455913a7449145e4ef12a9f2dfab1fa5dcd7d5b5e7e"
+        },
+        "d1_migrations": {
+          "rows": 7,
+          "sha256": "04e9e1e143510ffd0b156f6e3b6649a2959dba9804add0f51a60b18bcad9ad49"
+        },
+        "entries": {
+          "rows": 418,
+          "sha256": "f004b818b412bf04f92cadb9aa6443e61f4bbc50f0712bb8d8d43cf908f2906c"
+        },
+        "generations": {
+          "rows": 1,
+          "sha256": "b967d8cf7f6b03cf805edd6343f81868141a44713f4d6512495fd885962908a3"
+        },
+        "manual_overrides": {
+          "rows": 0,
+          "sha256": "1e951bd496960fd47c7ecb108f50baae954dba61cfd35817bcf9e20fccf7b29b"
+        },
+        "match_participants": {
+          "rows": 116226,
+          "sha256": "37a64ffaf1ac780180376b86a3b9202c1785180df3db3b3aadfce2355e6b5a2d"
+        },
+        "matches": {
+          "rows": 47786,
+          "sha256": "edf6e6e552db5cbf2d386cad704ca090bb9d50ae7a8624b8351c50fe6b341e28"
+        },
+        "observed_players": {
+          "rows": 97223,
+          "sha256": "aa5d7e9b43f6f66b6186dc9d3d77a8c0246a55b5318112102b70e440af0225fb"
+        },
+        "players": {
+          "rows": 23,
+          "sha256": "f662061970bb76417558cb11ebd9e099a3ebedeef33d575ddfc8883f72728496"
+        },
+        "results": {
+          "rows": 47330,
+          "sha256": "a8d2fb5444f99e1f0f2badef5726bae90bd6963cfef66c0a45e6d13e5c4d08ae"
+        },
+        "schedules": {
+          "rows": 47838,
+          "sha256": "6a4e4bd19ed83adf8c0545951fb6217388f6b8e85c77ff4136a5790188fa136d"
+        },
+        "tennis_europe_players": {
+          "rows": 10677,
+          "sha256": "6b5058cc4ba14700f75850765daaed98e496cdd7a1d1b6d4b4396a51f444d078"
+        },
+        "tournaments": {
+          "rows": 663,
+          "sha256": "5666acfc3150e1edaaec1a5ec273c626171c44e3ac692f9c08bdb360ef049b9e"
+        },
+        "user_player_profiles": {
+          "rows": 0,
+          "sha256": "b1f0b91cc149e0e28362673e704d4e207f65d60bad5fe8e7f2eb0fdc443f1ef9"
+        }
+      },
+      "globalSha256": "9640bbe60ff23bce2b55a970b6bcee3fddd122ab4ca531e6f9df61220459e267"
     }
   },
   "r2": {
