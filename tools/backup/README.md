@@ -67,6 +67,12 @@ Per salvare su un disco esterno:
 bash tools/backup/backup-courtwatch.sh "/Volumes/Backup/CourtWatch"
 ```
 
+Se D1 è già stato esportato e certificato, completare soltanto la copia R2 senza richiamare Wrangler:
+
+```bash
+COURTWATCH_R2_ONLY=1 bash tools/backup/backup-courtwatch.sh "/percorso/backup"
+```
+
 Su Windows è consigliato WSL; indicare un percorso montato, per esempio `/mnt/d/CourtWatch-backup`.
 
 ## Pianificazione consigliata
