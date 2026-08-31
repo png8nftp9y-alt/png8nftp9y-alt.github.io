@@ -1,6 +1,6 @@
 {
   "version": 9,
-  "generatedAt": "2026-08-31T20:47:56.906Z",
+  "generatedAt": "2026-08-31T21:31:43.968Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_cumulative_all_sections_merge",
@@ -9,14 +9,14 @@
     "completeTournaments": 0,
     "pendingTournaments": 4,
     "cachedSectionsUsed": 0,
-    "newSectionsCached": 4,
+    "newSectionsCached": 0,
     "drawRequests": 4,
     "browserFallbacks": 0,
     "browserRecoveries": 0,
     "globalCompleteTournaments": 18,
     "globalPendingTotal": 37,
-    "globalPendingTechnical": 29,
-    "globalPendingPublication": 8,
+    "globalPendingTechnical": 27,
+    "globalPendingPublication": 10,
     "technicalPendingCompetitionIds": [
       "J-J30-MDV-2026-004",
       "J-J30-MEX-2026-011",
@@ -37,8 +37,6 @@
       "J-J30-ARG-2026-003",
       "J-J30-DEN-2026-004",
       "J-J30-ECU-2026-005",
-      "J-J30-ROU-2026-004",
-      "J-J30-SLO-2026-003",
       "J-J30-TJK-2026-006",
       "J-J30-USA-2026-006",
       "J-J60-BUL-2026-002",
@@ -54,6 +52,8 @@
       "J-J30-GHA-2026-005",
       "J-J30-HON-2026-005",
       "J-J30-MEX-2026-009",
+      "J-J30-ROU-2026-004",
+      "J-J30-SLO-2026-003",
       "J-J30-TPE-2026-002",
       "J-J30-USA-2026-005",
       "J-J60-FRA-2026-006"
@@ -61,19 +61,24 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-HON-2026-005",
-      "tournamentName": "J30 Tegucigalpa",
+      "competitionId": "J-J30-SLO-2026-003",
+      "tournamentName": "J30 Musrka Sobota",
       "decision": "pending",
       "playersFound": [],
       "families": [
         {
           "family": "B-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 32,
+              "players": 0,
               "error": null
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -107,132 +112,9 @@
               "event": "G-S-M-KO",
               "players": 0,
               "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-D-M",
-          "populated": false,
-          "events": [
+            },
             {
-              "event": "G-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
-    },
-    {
-      "competitionId": "J-J30-HON-2026-005",
-      "tournamentName": "J30 Tegucigalpa",
-      "decision": "pending",
-      "playersFound": [],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 8,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-D-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-D-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
-    },
-    {
-      "competitionId": "J-J30-MEX-2026-009",
-      "tournamentName": "J30 Chihuahua",
-      "decision": "pending",
-      "playersFound": [],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 32,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "B-D-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
+              "event": "G-S-M-RR",
               "players": 0,
               "error": "deferred_isolated_section"
             }
@@ -264,8 +146,8 @@
       "eventFailure": null
     },
     {
-      "competitionId": "J-J30-MEX-2026-009",
-      "tournamentName": "J30 Chihuahua",
+      "competitionId": "J-J30-SLO-2026-003",
+      "tournamentName": "J30 Musrka Sobota",
       "decision": "pending",
       "playersFound": [],
       "families": [
@@ -277,17 +159,22 @@
               "event": "B-S-M-KO",
               "players": 0,
               "error": "deferred_isolated_section"
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": null
             }
           ]
         },
         {
           "family": "B-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 24,
-              "error": null
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -308,6 +195,181 @@
           "events": [
             {
               "event": "G-S-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
+    },
+    {
+      "competitionId": "J-J30-ROU-2026-004",
+      "tournamentName": "J30 Iasi",
+      "decision": "pending",
+      "playersFound": [],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": null
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
+    },
+    {
+      "competitionId": "J-J30-ROU-2026-004",
+      "tournamentName": "J30 Iasi",
+      "decision": "pending",
+      "playersFound": [],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            },
+            {
+              "event": "G-S-M-RR",
               "players": 0,
               "error": "deferred_isolated_section"
             }
