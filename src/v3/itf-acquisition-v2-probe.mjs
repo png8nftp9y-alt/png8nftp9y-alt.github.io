@@ -9,17 +9,15 @@ for(const target of Object.values(targetDb.targets||{})){
   const acceptance=target.acceptanceEntry||target;
   if(!acceptance?.competitionId||!acceptance?.sourceUrl)continue;
   if(String(target.drawDecision||'')==='removed'||String(target.entryStatus||'')==='withdrawn')continue;
-  const officialStart=String(target.officialStartDate||acceptance.officialStartDate||acceptance.startDate||'').slice(0,10);
-  if(!officialStart)continue;
-  const qualificationStart=String(target.qualificationStartDate||acceptance.qualificationStartDate||'').slice(0,10);
-  const operationalStart=qualificationStart||officialStart;
-  const tMinusOne=new Date(Date.parse(`${operationalStart}T00:00:00Z`)-864e5).toISOString().slice(0,10);
-  if(tMinusOne!==TODAY)continue;
-  candidates.push({competitionId:acceptance.competitionId,tournamentName:acceptance.tournamentName||target.tournamentName||acceptance.competitionId,sourceUrl:acceptance.sourceUrl,officialStartDate:officialStart,qualificationStartDate:qualificationStart||null,operationalStartDate:operationalStart,tMinusOneDate:tMinusOne});
+  const start=String(target.officialStartDate||acceptance.officialStartDate||acceptance.startDate||'').slice(0,10);
+  const end=String(target.officialEndDate||acceptance.officialEndDate||acceptance.endDate||'').slice(0,10);
+  if(!start||!end)continue;
+  if(!(start<=TODAY&&TODAY<=end))continue;
+  candidates.push({competitionId:acceptance.competitionId,tournamentName:acceptance.tournamentName||target.tournamentName||acceptance.competitionId,sourceUrl:acceptance.sourceUrl,officialStartDate:start,officialEndDate:end});
 }
 const unique=[...new Map(candidates.map(x=>[x.competitionId,x])).values()].sort((a,b)=>a.competitionId.localeCompare(b.competitionId));
 if(!unique.length){
-  console.error(JSON.stringify({status:'no_real_t_minus_one_target',today:TODAY},null,2));
+  console.error(JSON.stringify({status:'no_itf_tournament_in_progress',today:TODAY},null,2));
   process.exit(3);
 }
 const tournament=unique[0];
@@ -31,7 +29,7 @@ const classify=message=>{
   return'invalid_response';
 };
 function participantCount(json){let count=0;const walk=v=>{if(Array.isArray(v)){for(const x of v)walk(x);return}if(!v||typeof v!=='object')return;if(Array.isArray(v.players))for(const p of v.players){const pp=playerFromApi(p);if(pp.name)count++}for(const x of Object.values(v))if(x&&typeof x==='object')walk(x)};walk(json);return count}
-let result={version:2,mode:'read_only_real_t_minus_one_single_section',startedAt,today:TODAY,tournament,eligibleTMinusOneTargets:unique.length,sectionSlot,status:'invalid_response'};
+let result={version:3,mode:'read_only_in_progress_single_section',startedAt,today:TODAY,tournament,eligibleInProgressTargets:unique.length,sectionSlot,status:'invalid_response'};
 try{
   const combos=await tournamentEvents(tournament);
   if(!combos.length)throw new Error('event_filters_empty');
