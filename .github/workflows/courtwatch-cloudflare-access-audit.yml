@@ -1,0 +1,71 @@
+name: Court Watch Cloudflare access audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-cloudflare-access-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - name: Configure D1
+        run: npm run configure
+      - name: Audit D1 schema
+        run: |
+          mkdir -p audit
+          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name;" --json > audit/d1-tables.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const {spawnSync}=require('child_process');
+          const parsed=JSON.parse(fs.readFileSync('audit/d1-tables.json','utf8'));
+          const names=parsed.flatMap(x=>x.results||[]).map(x=>x.name).filter(Boolean);
+          const counts={};
+          for(const name of names){
+            const ident='"'+name.replaceAll('"','""')+'"';
+            const run=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',`SELECT COUNT(*) AS n FROM ${ident};`,'--json'],{encoding:'utf8'});
+            if(run.status!==0) throw new Error(run.stderr||run.stdout);
+            const out=JSON.parse(run.stdout);
+            counts[name]=Number(out.flatMap(x=>x.results||[])[0]?.n||0);
+          }
+          fs.writeFileSync('audit/d1-summary.json',JSON.stringify({status:'green',tableCount:names.length,tables:names,rowCounts:counts},null,2)+'\n');
+          console.log(JSON.stringify({d1:'green',tableCount:names.length,tables:names}));
+          NODE
+      - name: Audit R2 access
+        env:
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          export AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID"
+          export AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
+          export AWS_DEFAULT_REGION=auto
+          python -m pip install --disable-pip-version-check --quiet awscli
+          ENDPOINT="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          aws s3api head-bucket --bucket "$R2_BUCKET" --endpoint-url "$ENDPOINT"
+          aws s3api list-objects-v2 --bucket "$R2_BUCKET" --max-keys 1 --endpoint-url "$ENDPOINT" > audit/r2-summary.json
+          echo '{"r2":"green"}'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: courtwatch-cloudflare-access-audit
+          path: cloudflare/app-api/audit/*.json
+          if-no-files-found: error
