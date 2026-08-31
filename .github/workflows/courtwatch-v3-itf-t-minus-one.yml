@@ -7,7 +7,7 @@ on:
     branches: [main]
     paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/read-itf-draws-browser.mjs','src/v3/verify-itf-t-minus-one-all-players.mjs','src/v3/merge-itf-t1-isolated-runners.mjs','.github/workflows/courtwatch-v3-itf-known-fast.yml','.github/workflows/courtwatch-v3-itf-live.yml','.github/workflows/courtwatch-v3-itf-safety-120d.yml','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
 permissions: {contents: write}
-concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: true}
+concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: false}
 jobs:
   acquire:
     strategy:
@@ -34,6 +34,7 @@ jobs:
           ITF_T1_SECTION_SLOT: ${{ matrix.section }}
         run: node src/v3/verify-itf-t-minus-one-all-players.mjs
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: itf-t1-acquire-${{ matrix.shard }}-${{ matrix.section }}
           path: |
