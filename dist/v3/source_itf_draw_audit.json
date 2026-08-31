@@ -1,6 +1,6 @@
 {
   "version": 7,
-  "generatedAt": "2026-08-31T16:52:21.036Z",
+  "generatedAt": "2026-08-31T15:12:48.843Z",
   "status": "itf_t_minus_one_pending_retry",
   "summary": {
     "mode": "live_t_minus_1_isolated_runner_merge",
@@ -11,8 +11,8 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-TPE-2026-002",
-      "tournamentName": "J30 Taoyuan",
+      "competitionId": "J-J30-ROU-2026-004",
+      "tournamentName": "J30 Iasi",
       "decision": "pending",
       "playersFound": [],
       "families": [
@@ -38,7 +38,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 48,
+              "players": 40,
               "error": null
             }
           ]
@@ -61,12 +61,12 @@
         },
         {
           "family": "G-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 39,
-              "error": null
+              "players": 0,
+              "error": "browser_incapsula_challenge"
             }
           ]
         }
@@ -74,8 +74,8 @@
       "eventFailure": null
     },
     {
-      "competitionId": "J-J30-USA-2026-005",
-      "tournamentName": "J30 Minneapolis",
+      "competitionId": "J-J30-SLO-2026-003",
+      "tournamentName": "J30 Musrka Sobota",
       "decision": "pending",
       "playersFound": [],
       "families": [
@@ -101,7 +101,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 10,
+              "players": 16,
               "error": null
             }
           ]
@@ -121,9 +121,20 @@
               "error": null
             }
           ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge"
+            }
+          ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "browser_fallback:browser_incapsula_challenge"
     }
   ]
 }
