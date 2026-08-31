@@ -1,27 +1,29 @@
 {
-  "version": 5,
-  "generatedAt": "2026-08-31T13:30:54.438Z",
+  "version": 6,
+  "generatedAt": "2026-08-31T14:14:46.033Z",
   "today": "2026-08-31",
   "status": "itf_t_minus_one_pending_retry",
   "summary": {
-    "mode": "live_t_minus_1_rate_limited_queue",
+    "mode": "live_t_minus_1_rate_limited_queue_with_browser_fallback",
     "eligiblePlayers": 1,
     "dueTournaments": 23,
     "batchLimit": 2,
     "tournamentsChecked": 2,
     "completeTournaments": 0,
     "pendingTournaments": 2,
-    "challengeTournaments": 0,
+    "challengeTournaments": 1,
+    "browserFallbacks": 1,
+    "browserRecoveries": 0,
     "queueRemaining": 23,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "drawRequests": 10,
+    "drawRequests": 5,
     "preTMinusOneDrawRequests": 0
   },
   "audit": [
     {
-      "competitionId": "J-J30-ARG-2026-003",
-      "tournamentName": "J30 San Miguel de Tucumán",
+      "competitionId": "J-J30-GHA-2026-005",
+      "tournamentName": "J30 Accra",
       "decision": "pending",
       "playersFound": [],
       "families": [
@@ -47,23 +49,18 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 44,
+              "players": 16,
               "error": null
             }
           ]
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": null
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
+              "players": 32,
               "error": null
             }
           ]
@@ -83,57 +80,12 @@
       "eventFailure": null
     },
     {
-      "competitionId": "J-J30-DEN-2026-004",
-      "tournamentName": "J30 Frederiksberg",
+      "competitionId": "J-J30-HON-2026-005",
+      "tournamentName": "J30 Tegucigalpa",
       "decision": "pending",
       "playersFound": [],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 0,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 40,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 33,
-              "error": null
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
+      "families": [],
+      "eventFailure": "browser_fallback:browser_incapsula_challenge"
     }
   ]
 }
