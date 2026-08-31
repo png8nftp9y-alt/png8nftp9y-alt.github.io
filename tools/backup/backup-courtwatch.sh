@@ -55,6 +55,17 @@ else
   test "$(sqlite3 "$sqlite_file" 'PRAGMA integrity_check;')" = "ok"
   table_count="$(sqlite3 "$sqlite_file" "SELECT count(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';")"
   test "$table_count" -gt 0
+
+  row_counts_file="$snapshot_dir/d1/row-counts.tsv"
+  : > "$row_counts_file"
+  while IFS= read -r table; do
+    escaped_table="${table//\"/\"\"}"
+    rows="$(sqlite3 "$sqlite_file" "SELECT COUNT(*) FROM \"$escaped_table\";")"
+    printf '%s\t%s\n' "$table" "$rows" >> "$row_counts_file"
+  done < <(sqlite3 "$sqlite_file" "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name;")
+  test "$(wc -l < "$row_counts_file" | tr -d ' ')" = "$table_count"
+  sqlite3 "$sqlite_file" '.schema' > "$snapshot_dir/d1/schema.sql"
+
   gzip -n "$sql_file"
   gzip -n "$sqlite_file"
 fi
@@ -85,6 +96,10 @@ manifest="$snapshot_dir/manifest.txt"
   echo "created_at_utc=$timestamp"
   echo "database=$DATABASE_NAME"
   echo "sqlite_tables=$table_count"
+  if test "${COURTWATCH_R2_ONLY:-0}" != "1"; then
+    echo "d1_row_counts=d1/row-counts.tsv"
+    echo "d1_schema=d1/schema.sql"
+  fi
   echo "r2_bucket=$R2_BUCKET"
   echo "r2_prefixes=${prefixes[*]}"
   echo "itf_history_blocks=$itf_history_blocks"
@@ -104,4 +119,4 @@ fi
 
 echo "Backup complete: $snapshot_dir"
 if test "${COURTWATCH_R2_ONLY:-0}" = "1"; then echo "D1: existing certified copy preserved; R2 archive verified."
-else echo "SQLite integrity: ok; tables: $table_count"; fi
+else echo "SQLite integrity: ok; tables: $table_count; row counts and schema recorded."; fi
