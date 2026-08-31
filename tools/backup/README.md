@@ -10,9 +10,13 @@ Ogni esecuzione salva:
 - database SQLite locale apribile con DB Browser for SQLite, DBeaver o `sqlite3`;
 - prefisso R2 `fitp/cache`;
 - prefisso R2 `itf/database`;
+- prefisso R2 `itf/history-draws`, inclusi i 17 blocchi certificati dei 4.291 tabelloni;
+- prefisso R2 `tennis-europe/cache`;
 - prefissi R2 `tennis-europe/oop-history` e `tennis-europe/oop-live`;
 - manifest con checksum SHA-256;
 - verifica SQLite `PRAGMA integrity_check`.
+
+Il backup termina con errore se uno dei sei prefissi R2 è vuoto o se lo storico ITF contiene meno di 17 blocchi.
 
 Le copie vengono salvate per impostazione predefinita in `.courtwatch-backups/`, che non deve essere pubblicata nel repository.
 
