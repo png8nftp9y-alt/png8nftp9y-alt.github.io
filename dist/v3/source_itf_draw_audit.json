@@ -1,6 +1,6 @@
 {
   "version": 9,
-  "generatedAt": "2026-08-31T20:44:51.873Z",
+  "generatedAt": "2026-08-31T20:47:56.906Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_cumulative_all_sections_merge",
@@ -9,14 +9,14 @@
     "completeTournaments": 0,
     "pendingTournaments": 4,
     "cachedSectionsUsed": 0,
-    "newSectionsCached": 0,
+    "newSectionsCached": 4,
     "drawRequests": 4,
     "browserFallbacks": 0,
     "browserRecoveries": 0,
     "globalCompleteTournaments": 18,
     "globalPendingTotal": 37,
-    "globalPendingTechnical": 32,
-    "globalPendingPublication": 5,
+    "globalPendingTechnical": 29,
+    "globalPendingPublication": 8,
     "technicalPendingCompetitionIds": [
       "J-J30-MDV-2026-004",
       "J-J30-MEX-2026-011",
@@ -37,9 +37,6 @@
       "J-J30-ARG-2026-003",
       "J-J30-DEN-2026-004",
       "J-J30-ECU-2026-005",
-      "J-J30-GER-2026-005",
-      "J-J30-GHA-2026-005",
-      "J-J30-HON-2026-005",
       "J-J30-ROU-2026-004",
       "J-J30-SLO-2026-003",
       "J-J30-TJK-2026-006",
@@ -53,6 +50,9 @@
     ],
     "publicationPendingCompetitionIds": [
       "J-J60-TTO-2026-002",
+      "J-J30-GER-2026-005",
+      "J-J30-GHA-2026-005",
+      "J-J30-HON-2026-005",
       "J-J30-MEX-2026-009",
       "J-J30-TPE-2026-002",
       "J-J30-USA-2026-005",
@@ -61,108 +61,18 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-GER-2026-005",
-      "tournamentName": "J30 Augsburg",
+      "competitionId": "J-J30-HON-2026-005",
+      "tournamentName": "J30 Tegucigalpa",
       "decision": "pending",
       "playersFound": [],
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": null
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "B-D-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-D-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
-    },
-    {
-      "competitionId": "J-J30-GER-2026-005",
-      "tournamentName": "J30 Augsburg",
-      "decision": "pending",
-      "playersFound": [],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
+              "players": 32,
               "error": null
             }
           ]
@@ -197,20 +107,68 @@
               "event": "G-S-M-KO",
               "players": 0,
               "error": "deferred_isolated_section"
-            },
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
             {
-              "event": "G-S-M-RR",
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
+    },
+    {
+      "competitionId": "J-J30-HON-2026-005",
+      "tournamentName": "J30 Tegucigalpa",
+      "decision": "pending",
+      "playersFound": [],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
               "players": 0,
               "error": "deferred_isolated_section"
             }
           ]
         },
         {
-          "family": "G-S-Q",
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 8,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
           "populated": false,
           "events": [
             {
-              "event": "G-S-Q-KO",
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
               "players": 0,
               "error": "deferred_isolated_section"
             }
@@ -231,24 +189,19 @@
       "eventFailure": null
     },
     {
-      "competitionId": "J-J30-GHA-2026-005",
-      "tournamentName": "J30 Accra",
+      "competitionId": "J-J30-MEX-2026-009",
+      "tournamentName": "J30 Chihuahua",
       "decision": "pending",
       "playersFound": [],
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
+              "players": 32,
               "error": null
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -311,8 +264,8 @@
       "eventFailure": null
     },
     {
-      "competitionId": "J-J30-GHA-2026-005",
-      "tournamentName": "J30 Accra",
+      "competitionId": "J-J30-MEX-2026-009",
+      "tournamentName": "J30 Chihuahua",
       "decision": "pending",
       "playersFound": [],
       "families": [
@@ -324,22 +277,17 @@
               "event": "B-S-M-KO",
               "players": 0,
               "error": "deferred_isolated_section"
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": null
             }
           ]
         },
         {
           "family": "B-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
+              "players": 24,
+              "error": null
             }
           ]
         },
