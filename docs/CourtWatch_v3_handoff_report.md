@@ -6,7 +6,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.43**
+Revisione documento: **2026-08-31.44**
+
+- 31 agosto 2026 — Ambito ITF confermato dall'utente: ogni sezione valida ricevuta dal motore T−1 deve essere salvata immediatamente nello stesso ciclo, anche quando il resto del torneo rimane pending. In questa fase la persistenza serve esclusivamente a certificare presenza/assenza dei giocatori CourtWatch nei tabelloni; ordine di gioco, orari, campi, avversari, risultati e punteggi saranno affrontati successivamente con motori separati.
 
 - 31 agosto 2026 — Individuata e implementata una strategia ITF alternativa senza infrastruttura esterna: completezza cumulativa per singola sezione del tabellone. Poiché Incapsula è intermittente, ogni sezione singolare popolata letta con successo viene conservata nel database T−1 con partecipanti e timestamp; i cicli successivi la riusano senza richiederla nuovamente e ritentano soltanto le sezioni vuote, mancanti o illeggibili. Il torneo può quindi diventare completo sommando letture affidabili ottenute in run diversi, senza richiedere che tutte le API rispondano nello stesso ciclo. Audit elevato a versione 8 con `cachedSectionsUsed` e `newSectionsCached`. HTML, challenge, JSON non valido e sezioni vuote non vengono memorizzati come completi; le regole conservative di conferma/rimozione restano invariate. Il collegamento sperimentale a un acquisitore esterno non è stato pubblicato.
 
