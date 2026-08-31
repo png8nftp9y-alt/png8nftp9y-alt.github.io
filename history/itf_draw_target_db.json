@@ -1,7 +1,7 @@
 {
-  "version": 6,
-  "generatedAt": "2026-08-31T11:53:46.235Z",
-  "status": "itf_live_state_database_complete",
+  "version": 7,
+  "generatedAt": "2026-08-31T11:54:45.091Z",
+  "status": "itf_draw_target_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
   "targets": {
@@ -470,9 +470,9 @@
       "drawDecision": "removed",
       "firstSeenInAcceptanceAt": "2026-08-24T23:10:15.704Z",
       "lastSeenInAcceptanceAt": "2026-08-24T23:10:15.704Z",
-      "withdrawnAt": "2026-08-31T10:40:32.711Z",
+      "withdrawnAt": "2026-08-31T11:40:34.256Z",
       "removalReason": "withdrawn",
-      "lastDrawCheckedAt": "2026-08-31T10:52:26.521Z",
+      "lastDrawCheckedAt": "2026-08-31T11:54:45.091Z",
       "qualificationStartDate": "2026-09-06"
     }
   },
@@ -1510,7 +1510,7 @@
     "J-J30-ARG-2026-003": {
       "competitionId": "J-J30-ARG-2026-003",
       "decision": "pending",
-      "checkedAt": "2026-08-31T11:53:46.235Z",
+      "checkedAt": "2026-08-31T11:10:51.319Z",
       "playersFound": 0,
       "families": [
         {
@@ -1563,7 +1563,7 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": null
             }
           ]
         }
@@ -1573,10 +1573,55 @@
     "J-J30-DEN-2026-004": {
       "competitionId": "J-J30-DEN-2026-004",
       "decision": "pending",
-      "checkedAt": "2026-08-31T11:53:46.235Z",
+      "checkedAt": "2026-08-31T11:10:51.319Z",
       "playersFound": 0,
-      "families": [],
-      "eventFailure": "GetEventFilters_incapsula_challenge"
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 40,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": null
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 33,
+              "error": null
+            }
+          ]
+        }
+      ],
+      "eventFailure": null
     },
     "J-J30-ECU-2026-005": {
       "competitionId": "J-J30-ECU-2026-005",
