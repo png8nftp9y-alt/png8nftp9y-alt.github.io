@@ -18,7 +18,7 @@ for(const dir of artifactDirs){
 }
 const visible=[...entries.values()].sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))||String(a.playerName).localeCompare(String(b.playerName))),completeTournaments=audits.filter(item=>item.decision==='complete').length,pendingTournaments=audits.length-completeTournaments,generatedAt=new Date().toISOString();
 const tournamentValues=Object.values(tournaments),globalCompleteTournaments=tournamentValues.filter(item=>item?.decision==='complete').length,globalPending=tournamentValues.filter(item=>item?.decision==='pending');
-const hasTechnicalFailure=item=>Boolean(item?.eventFailure)||(item?.families||[]).some(family=>(family.events||[]).some(event=>Boolean(event.error)));
+const hasTechnicalFailure=item=>Boolean(item?.eventFailure)||(item?.families||[]).some(family=>(family.events||[]).some(event=>Boolean(event.error)&&event.error!=='deferred_isolated_section'));
 const globalPendingTechnical=globalPending.filter(hasTechnicalFailure),globalPendingPublication=globalPending.filter(item=>!hasTechnicalFailure(item));
 const certificationStatus=globalPendingTechnical.length?'itf_t_minus_one_technical_pending':globalPendingPublication.length?'itf_t_minus_one_publication_pending':'itf_t_minus_one_complete';
 await writeJson(sourceFile,{...source,version:8,generatedAt,status:'itf_acceptance_complete_state_machine',entriesFound:visible.length,entries:visible});
