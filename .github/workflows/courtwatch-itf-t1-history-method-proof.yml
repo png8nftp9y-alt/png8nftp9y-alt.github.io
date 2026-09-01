@@ -1,0 +1,115 @@
+name: Court Watch ITF historical-method T-1 bridge proof
+on:
+  workflow_dispatch:
+  push:
+    branches: ['test/itf-t1-history-engine']
+    paths:
+      - 'src/v3/build-itf-bridge-draw-queue.mjs'
+      - '.github/workflows/courtwatch-itf-t1-history-method-proof.yml'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-itf-t1-history-method-proof
+  cancel-in-progress: false
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      max-parallel: 17
+      matrix:
+        competition_id: ['J-J30-MDV-2026-004','J-J30-MEX-2026-011','J-J30-MKD-2026-003','J-J30-PAN-2026-002','J-J30-ROU-2026-003','J-J30-TJK-2026-005','J-J300-USA-2026-003','J-J60-BRA-2026-004','J-J60-CHI-2026-003','J-J60-CHN-2026-011','J-J60-IND-2026-007','J-J60-MAC-2026-001','J-J60-SGP-2026-005','J-J60-SUI-2026-001','J-J100-ESP-2026-006','J-J60-TTO-2026-002','J-J60-TUN-2026-005']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Inventory one bridge tournament exactly as history
+        env:
+          ITF_COMPETITION_ID: ${{ matrix.competition_id }}
+          ITF_REQUEST_TIMEOUT_MS: '30000'
+          ITF_REQUEST_DELAY_MS: '1800'
+        run: node src/v3/inventory-itf-history-tournament.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-bridge-inventory-${{ matrix.competition_id }}
+          path: dist/v3/shards/itf/inventory/*.json
+          if-no-files-found: error
+          retention-days: 14
+  queue:
+    needs: inventory
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.queue.outputs.matrix }}
+      expected: ${{ steps.queue.outputs.expected }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: itf-bridge-inventory-*
+          path: dist/v3/shards/itf/inventory
+          merge-multiple: true
+      - id: queue
+        run: node src/v3/build-itf-bridge-draw-queue.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-bridge-complete-draw-queue
+          path: dist/v3/itf_bridge_draw_queue.json
+          if-no-files-found: error
+          retention-days: 14
+  acquire:
+    needs: queue
+    if: needs.queue.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      max-parallel: 32
+      matrix: ${{ fromJSON(needs.queue.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Acquire one isolated bridge draw exactly as history
+        env:
+          ITF_DRAW_TASK_JSON: ${{ toJSON(fromJSON(format('"{0}"', matrix.task))) }}
+          ITF_REQUEST_TIMEOUT_MS: '30000'
+        run: |
+          export ITF_DRAW_TASK_JSON="$(printf '%s' "$ITF_DRAW_TASK_JSON" | base64 --decode)"
+          node src/v3/acquire-itf-history-draw-task.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-bridge-draw-${{ matrix.index }}
+          path: dist/v3/shards/itf/draw-tasks/*.json.gz
+          if-no-files-found: error
+          retention-days: 14
+  review:
+    needs: [queue, acquire]
+    if: always() && needs.queue.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: itf-bridge-draw-*
+          path: dist/v3/shards/itf/draw-tasks
+          merge-multiple: true
+      - name: Certify complete bridge draw acquisition
+        env:
+          ITF_EXPECTED_TASKS: ${{ needs.queue.outputs.expected }}
+        run: node src/v3/merge-itf-history-draw-tasks.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-bridge-history-method-proof
+          path: |
+            dist/v3/audits/itf-history-draw-merge.json
+            dist/v3/shards/itf/results-0.json.gz
+          if-no-files-found: error
+          retention-days: 14
