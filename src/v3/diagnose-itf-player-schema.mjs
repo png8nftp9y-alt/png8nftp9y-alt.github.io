@@ -18,7 +18,7 @@ const diagnostics=[];
 for(const task of tasks){
  try{
   const json=await drawsheet(task),drawMatches=matches(json),rawPlayers=drawMatches.flatMap(match=>match.teams||[]).flatMap(team=>team.players||[]);
-  diagnostics.push({competitionId:task.competitionId,event:task.event,status:'read',matches:drawMatches.length,playerReferences:rawPlayers.length,samples:rawPlayers.slice(0,4),samplePaths:paths(rawPlayers[0]||{})});
+  diagnostics.push({competitionId:task.competitionId,event:task.event,status:'read',matches:drawMatches.length,playerReferences:rawPlayers.length,samples:rawPlayers.slice(0,4),samplePaths:paths(rawPlayers[0]||{}),teamSample:drawMatches[0]?.teams?.[0]||null,teamPaths:paths(drawMatches[0]?.teams?.[0]||{}),matchSample:drawMatches[0]||null,matchPaths:paths(drawMatches[0]||{})});
  }catch(error){diagnostics.push({competitionId:task.competitionId,event:task.event,status:'technical_error',error:error.message,matches:0,playerReferences:0,samples:[],samplePaths:[]})}
 }
 await mkdir('dist/v3',{recursive:true});
