@@ -1,26 +1,26 @@
 {
   "version": 11,
-  "generatedAt": "2026-09-01T02:21:37.451Z",
+  "generatedAt": "2026-09-01T03:12:18.402Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 1,
-    "pendingTournaments": 0,
-    "declaredSections": 6,
-    "requestedSections": 6,
+    "completeTournaments": 0,
+    "pendingTournaments": 1,
+    "declaredSections": 8,
+    "requestedSections": 8,
     "acquiredSections": 6,
-    "missingSections": 0,
+    "missingSections": 2,
     "newSectionsCached": 6,
-    "retrySections": 0,
+    "retrySections": 2,
     "technicalErrorSections": 0,
-    "notPublishedOrIncompleteSections": 0,
+    "notPublishedOrIncompleteSections": 2,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 22,
-    "globalPendingTotal": 38,
+    "globalPendingTotal": 39,
     "globalPendingTechnical": 18,
-    "globalPendingPublication": 20,
+    "globalPendingPublication": 21,
     "technicalPendingCompetitionIds": [
       "J-J30-MEX-2026-011",
       "J-J30-MKD-2026-003",
@@ -61,19 +61,25 @@
       "J-J60-FRA-2026-006",
       "J-J60-LAT-2026-004",
       "J-J30-AUS-2026-004",
-      "J-J30-POL-2026-004"
+      "J-J30-POL-2026-004",
+      "J-J30-EGY-2026-001"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J100-UAE-2026-001",
-      "tournamentName": "J100 Fujairah",
-      "decision": "complete",
+      "competitionId": "J-J30-EGY-2026-001",
+      "tournamentName": "J30 Cairo",
+      "decision": "pending",
       "playersFound": [],
-      "declaredSections": 6,
+      "declaredSections": 8,
       "acquiredSections": 6,
-      "missingSections": 0,
+      "missingSections": 2,
       "sections": [
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "acquired": false
+        },
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
@@ -88,6 +94,11 @@
           "event": "B-D-M-KO",
           "family": "B-D-M",
           "acquired": true
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "acquired": false
         },
         {
           "event": "G-S-M-KO",
@@ -111,8 +122,14 @@
           "populated": true,
           "events": [
             {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete"
+            },
+            {
               "event": "B-S-M-KO",
-              "players": 32,
+              "players": 8,
               "error": null,
               "failureType": null
             }
@@ -124,7 +141,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 27,
+              "players": 32,
               "error": null,
               "failureType": null
             }
@@ -147,8 +164,14 @@
           "populated": true,
           "events": [
             {
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete"
+            },
+            {
               "event": "G-S-M-KO",
-              "players": 32,
+              "players": 8,
               "error": null,
               "failureType": null
             }
@@ -160,7 +183,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 14,
+              "players": 32,
               "error": null,
               "failureType": null
             }
@@ -172,7 +195,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 28,
+              "players": 32,
               "error": null,
               "failureType": null
             }
