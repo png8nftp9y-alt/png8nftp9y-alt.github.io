@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-09-01T19:36:50.284Z",
+  "generatedAt": "2026-09-01T20:03:41.425Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
@@ -29989,7 +29989,7 @@
     "J-J30-ARG-2026-003": {
       "competitionId": "J-J30-ARG-2026-003",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:36:49.157Z",
+      "checkedAt": "2026-09-01T20:03:40.672Z",
       "playersFound": 0,
       "families": [
         {
@@ -36561,7 +36561,7 @@
     "J-J30-SLO-2026-003": {
       "competitionId": "J-J30-SLO-2026-003",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:24:50.962Z",
+      "checkedAt": "2026-09-01T20:03:40.802Z",
       "playersFound": 0,
       "families": [
         {
@@ -36571,9 +36571,9 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "B-S-M-RR",
@@ -36617,9 +36617,9 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "G-S-M-RR",
@@ -36650,14 +36650,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -36924,13 +36924,31 @@
             }
           ],
           "storedAt": "2026-09-01T10:12:22.772Z"
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T20:03:40.802Z",
+          "storedAt": "2026-09-01T20:03:40.802Z",
+          "resolution": "round_robin_knockout_ignored"
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T20:03:40.802Z",
+          "storedAt": "2026-09-01T20:03:40.802Z",
+          "resolution": "round_robin_knockout_ignored"
         }
       },
       "declaredSections": 8,
       "acquiredSections": 2,
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 6,
+      "unusedAlternativeSections": 2,
+      "resolvedSections": 4,
+      "missingSections": 4,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -37118,7 +37136,7 @@
     "J-J30-TJK-2026-006": {
       "competitionId": "J-J30-TJK-2026-006",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:24:51.058Z",
+      "checkedAt": "2026-09-01T20:03:40.917Z",
       "playersFound": 0,
       "families": [
         {
@@ -37128,9 +37146,9 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "B-S-M-RR",
@@ -37174,9 +37192,9 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "G-S-M-RR",
@@ -37207,14 +37225,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -37611,13 +37629,31 @@
             }
           ],
           "storedAt": "2026-09-01T11:02:24.677Z"
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T20:03:40.917Z",
+          "storedAt": "2026-09-01T20:03:40.917Z",
+          "resolution": "round_robin_knockout_ignored"
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T20:03:40.917Z",
+          "storedAt": "2026-09-01T20:03:40.917Z",
+          "resolution": "round_robin_knockout_ignored"
         }
       },
       "declaredSections": 8,
       "acquiredSections": 2,
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 6,
+      "unusedAlternativeSections": 2,
+      "resolvedSections": 4,
+      "missingSections": 4,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -37752,7 +37788,7 @@
     "J-J30-TPE-2026-002": {
       "competitionId": "J-J30-TPE-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:24:51.150Z",
+      "checkedAt": "2026-09-01T20:03:41.016Z",
       "playersFound": 0,
       "families": [
         {
@@ -37762,9 +37798,9 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "B-S-M-RR",
@@ -37808,9 +37844,9 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "G-S-M-RR",
@@ -37841,14 +37877,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -38415,13 +38451,31 @@
             }
           ],
           "storedAt": "2026-09-01T11:02:24.766Z"
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T20:03:41.016Z",
+          "storedAt": "2026-09-01T20:03:41.016Z",
+          "resolution": "round_robin_knockout_ignored"
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T20:03:41.016Z",
+          "storedAt": "2026-09-01T20:03:41.016Z",
+          "resolution": "round_robin_knockout_ignored"
         }
       },
       "declaredSections": 8,
       "acquiredSections": 2,
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 6,
+      "unusedAlternativeSections": 2,
+      "resolvedSections": 4,
+      "missingSections": 4,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -38556,7 +38610,7 @@
     "J-J30-USA-2026-005": {
       "competitionId": "J-J30-USA-2026-005",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:31:56.354Z",
+      "checkedAt": "2026-09-01T20:03:41.116Z",
       "playersFound": 0,
       "families": [
         {
@@ -38891,7 +38945,7 @@
     "J-J30-USA-2026-006": {
       "competitionId": "J-J30-USA-2026-006",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:31:56.453Z",
+      "checkedAt": "2026-09-01T20:03:41.220Z",
       "playersFound": 0,
       "families": [
         {
@@ -39463,7 +39517,7 @@
     "J-J60-BUL-2026-002": {
       "competitionId": "J-J60-BUL-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:31:56.551Z",
+      "checkedAt": "2026-09-01T20:03:41.318Z",
       "playersFound": 0,
       "families": [
         {
@@ -40115,7 +40169,7 @@
     "J-J60-CHI-2026-001": {
       "competitionId": "J-J60-CHI-2026-001",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:31:56.652Z",
+      "checkedAt": "2026-09-01T20:03:41.425Z",
       "playersFound": 0,
       "families": [
         {
