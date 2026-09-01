@@ -1,19 +1,19 @@
 {
   "version": 14,
-  "generatedAt": "2026-09-01T06:54:01.869Z",
+  "generatedAt": "2026-09-01T07:42:41.976Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
     "completeTournaments": 1,
     "pendingTournaments": 0,
-    "declaredSections": 7,
-    "requestedSections": 2,
-    "acquiredSections": 5,
+    "declaredSections": 8,
+    "requestedSections": 8,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 2,
-    "resolvedSections": 7,
+    "resolvedSections": 8,
     "missingSections": 0,
-    "newSectionsCached": 0,
+    "newSectionsCached": 6,
     "newTerminalAlternatives": 2,
     "retrySections": 0,
     "technicalErrorSections": 0,
@@ -21,19 +21,11 @@
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 32,
-    "globalPendingTotal": 34,
-    "globalPendingTechnical": 13,
-    "globalPendingPublication": 21,
+    "globalCompleteTournaments": 39,
+    "globalPendingTotal": 27,
+    "globalPendingTechnical": 5,
+    "globalPendingPublication": 22,
     "technicalPendingCompetitionIds": [
-      "J-J30-TJK-2026-005",
-      "J-J300-USA-2026-003",
-      "J-J60-BRA-2026-004",
-      "J-J60-CHI-2026-003",
-      "J-J60-CHN-2026-011",
-      "J-J60-IND-2026-007",
-      "J-J60-MAC-2026-001",
-      "J-J60-SGP-2026-005",
       "J-J60-SUI-2026-001",
       "J-J60-TUN-2026-005",
       "J-J30-DEN-2026-004",
@@ -43,6 +35,7 @@
     "publicationPendingCompetitionIds": [
       "J-J30-MDV-2026-004",
       "J-J30-PAN-2026-002",
+      "J-J30-TJK-2026-005",
       "J-J60-TTO-2026-002",
       "J-J30-ARG-2026-003",
       "J-J30-GER-2026-005",
@@ -66,14 +59,14 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-CRC-2026-002",
-      "tournamentName": "J60 San Jose",
+      "competitionId": "J-J60-SGP-2026-005",
+      "tournamentName": "J60 Singapore",
       "decision": "complete",
       "playersFound": [],
-      "declaredSections": 7,
-      "acquiredSections": 5,
+      "declaredSections": 8,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 2,
-      "resolvedSections": 7,
+      "resolvedSections": 8,
       "missingSections": 0,
       "sections": [
         {
@@ -119,6 +112,13 @@
           "status": "unused_alternative_structure"
         },
         {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "acquired": true,
@@ -153,7 +153,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 19,
+              "players": 16,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -166,7 +166,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 30,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -194,12 +194,25 @@
           ]
         },
         {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 16,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
           "family": "G-D-M",
           "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 26,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
