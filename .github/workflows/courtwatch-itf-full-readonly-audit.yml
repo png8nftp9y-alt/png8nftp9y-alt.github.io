@@ -1,0 +1,131 @@
+name: Court Watch ITF full read-only audit
+on:
+  push:
+    branches: ['test/itf-engine-order']
+    paths: ['.github/workflows/courtwatch-itf-full-readonly-audit.yml']
+permissions: {contents: read}
+jobs:
+  select:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+      selected: ${{ steps.select.outputs.selected }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - id: select
+        env:
+          ITF_T1_TOURNAMENT_BATCH: 100
+        run: node src/v3/build-itf-t1-tournament-matrix.mjs
+  inventory:
+    needs: select
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJSON(needs.select.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - if: matrix.skip != true
+        continue-on-error: true
+        env:
+          ITF_COMPETITION_ID: ${{ matrix.competitionId }}
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUEST_DELAY_MS: 1800
+        run: node src/v3/inventory-itf-history-tournament.mjs
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.skip != true
+        with:
+          name: full-audit-inventory-${{ matrix.index }}
+          path: dist/v3/shards/itf/inventory/*.json
+          if-no-files-found: error
+  queue:
+    needs: [select, inventory]
+    if: always() && needs.select.outputs.selected != '0'
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.queue.outputs.matrix }}
+      tasks: ${{ steps.queue.outputs.tasks }}
+      tournaments: ${{ steps.queue.outputs.tournaments }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'full-audit-inventory-*', path: dist/v3/shards/itf/inventory, merge-multiple: true}
+      - id: queue
+        run: node src/v3/build-itf-t1-draw-batch.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: full-audit-queue
+          path: |
+            dist/v3/itf_t1_draw_batch.json
+            dist/v3/shards/itf/t1-inventory/*.json
+          if-no-files-found: error
+  acquire:
+    needs: queue
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix: ${{ fromJSON(needs.queue.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci --ignore-scripts
+      - if: matrix.skip != true
+        continue-on-error: true
+        env:
+          ITF_DRAW_TASK_B64: ${{ matrix.task }}
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUIRE_POPULATED_DRAW: 1
+        run: |
+          export ITF_DRAW_TASK_JSON="$(printf '%s' "$ITF_DRAW_TASK_B64" | base64 --decode)"
+          node src/v3/acquire-itf-history-draw-task.mjs
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.skip != true
+        with:
+          name: full-audit-draw-${{ matrix.index }}
+          path: dist/v3/shards/itf/draw-tasks/*.json.gz
+          if-no-files-found: error
+  audit:
+    needs: [queue, acquire]
+    if: always() && needs.queue.outputs.tournaments != '0'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {name: full-audit-queue, path: dist/v3}
+      - uses: actions/download-artifact@v4
+        if: needs.queue.outputs.tasks != '0'
+        with: {pattern: 'full-audit-draw-*', path: draw-tasks, merge-multiple: true}
+      - name: Merge in disposable runner only
+        run: |
+          set -euo pipefail
+          mkdir -p dist/v3/audits/itf-full-readonly
+          for inventory in dist/v3/shards/itf/t1-inventory/*.json; do
+            cp "$inventory" dist/v3/itf_t1_section_inventory.json
+            node src/v3/merge-itf-t1-history-method.mjs
+            id="$(jq -r .competitionId "$inventory")"
+            cp dist/v3/source_itf_draw_audit.json "dist/v3/audits/itf-full-readonly/$id.json"
+          done
+      - name: Produce final pending lists and enforce technical gate
+        run: node src/v3/gate-itf-t1-run.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-full-readonly-audit
+          path: |
+            dist/v3/source_itf_draw_audit.json
+            dist/v3/itf_t1_run_gate.json
+            dist/v3/audits/itf-full-readonly/*.json
+            history/itf_draw_target_db.json
+          retention-days: 14
