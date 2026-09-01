@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-01.58**
+Revisione documento: **2026-09-01.59**
+
+- 1 settembre 2026 — Secondo audit storico read-only, run `33460318995`, verde: tutte le 452 strutture RR senza giocatori hanno un KO popolato nella stessa famiglia e sono quindi alternative ufficiali non utilizzate, non tabelloni mancanti. Resta una sola anomalia non coperta, `J-J30-FIN-2026-004__G-S-Q-KO`: l'artifact contiene 24 match e 96 riferimenti giocatore, ma nessun nome estratto dal vecchio parser. L'archivio è completo a livello di famiglie ufficiali salvo questa singola estrazione nominativa, da recuperare senza modificare gli artifact originali.
 
 - 1 settembre 2026 — Audit read-only rigoroso dell'archivio storico ITF, run `33460108446`, completato sui 4.291/4.291 artifact R2 con checksum validi, 0 mancanti, 0 retry e 0 illeggibili. Con il nuovo criterio “almeno un giocatore”, 3.838 sezioni risultano popolate e 453 senza giocatori. Le sezioni vuote sono 235 `B-S-M-RR`, 217 `G-S-M-RR` e una `G-S-Q-KO`; le 452 RR hanno anche zero match e appaiono strutture alternative non utilizzate, mentre `J-J30-FIN-2026-004__G-S-Q-KO` contiene 24 match ma zero giocatori estratti e richiede indagine mirata. Lo storico resta integro come archivio tecnico 4.291/4.291, ma non viene più definito 100% popolato finché le alternative RR non sono incrociate con i corrispondenti KO e l'anomalia FIN non è risolta.
 
