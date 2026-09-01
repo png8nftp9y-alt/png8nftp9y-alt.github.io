@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-01.57**
+Revisione documento: **2026-09-01.58**
+
+- 1 settembre 2026 — Audit read-only rigoroso dell'archivio storico ITF, run `33460108446`, completato sui 4.291/4.291 artifact R2 con checksum validi, 0 mancanti, 0 retry e 0 illeggibili. Con il nuovo criterio “almeno un giocatore”, 3.838 sezioni risultano popolate e 453 senza giocatori. Le sezioni vuote sono 235 `B-S-M-RR`, 217 `G-S-M-RR` e una `G-S-Q-KO`; le 452 RR hanno anche zero match e appaiono strutture alternative non utilizzate, mentre `J-J30-FIN-2026-004__G-S-Q-KO` contiene 24 match ma zero giocatori estratti e richiede indagine mirata. Lo storico resta integro come archivio tecnico 4.291/4.291, ma non viene più definito 100% popolato finché le alternative RR non sono incrociate con i corrispondenti KO e l'anomalia FIN non è risolta.
 
 - 1 settembre 2026 — Primo ciclo produttivo dopo il gate anti-vuoto, run `33459104367`, verde: J100 Istanbul ha dichiarato 6 sezioni, tutte 6 realmente popolate e persistite; 0 retry, 0 errori tecnici e 0 sezioni non pubblicate/incomplete. Il totale globale è salito a 21 tornei completi. I 17 tornei del buco restano esplicitamente non certificati finché non saranno rielaborati e salvati nel database con questa stessa regola rigorosa; la precedente prova read-only 125/125 non viene usata come prova di persistenza.
 
