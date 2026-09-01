@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-01.56**
+Revisione documento: **2026-09-01.57**
+
+- 1 settembre 2026 — Primo ciclo produttivo dopo il gate anti-vuoto, run `33459104367`, verde: J100 Istanbul ha dichiarato 6 sezioni, tutte 6 realmente popolate e persistite; 0 retry, 0 errori tecnici e 0 sezioni non pubblicate/incomplete. Il totale globale è salito a 21 tornei completi. I 17 tornei del buco restano esplicitamente non certificati finché non saranno rielaborati e salvati nel database con questa stessa regola rigorosa; la precedente prova read-only 125/125 non viene usata come prova di persistenza.
 
 - 1 settembre 2026 — Correzione dei tabelloni vuoti certificata sul torneo in corso J30 San Miguel de Tucumán, run `33458855019` verde: 8 sezioni dichiarate, 3 già acquisite preservate, soltanto 5 richieste; tutte e 5 le risposte senza giocatori sono rimaste `not_published_or_incomplete`, 0 errori tecnici, 0 rimozioni e decisione correttamente `pending` 3/8. Il motore operativo richiede ora contenuto popolato prima di salvare una sezione come acquisita e distingue esplicitamente `technical_error` da `not_published_or_incomplete`. Correzione pubblicata con commit `4c9a97fa`.
 
