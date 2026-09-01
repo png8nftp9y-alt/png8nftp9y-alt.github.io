@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-09-01T00:21:32.718Z",
+  "generatedAt": "2026-09-01T00:25:06.755Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
@@ -1510,7 +1510,7 @@
     "J-J30-ARG-2026-003": {
       "competitionId": "J-J30-ARG-2026-003",
       "decision": "pending",
-      "checkedAt": "2026-08-31T19:44:10.704Z",
+      "checkedAt": "2026-09-01T00:24:30.055Z",
       "playersFound": 0,
       "families": [
         {
@@ -1520,7 +1520,7 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "B-S-M-RR",
@@ -1558,12 +1558,12 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -1574,7 +1574,7 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -1585,12 +1585,12 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         }
       ],
-      "eventFailure": "browser_fallback:browser_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1910,7 +1910,124 @@
           ],
           "storedAt": "2026-08-31T19:44:10.704Z"
         }
-      }
+      },
+      "declaredSections": 8,
+      "acquiredSections": 2,
+      "missingSections": 6,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        }
+      ]
     },
     "J-J30-DEN-2026-004": {
       "competitionId": "J-J30-DEN-2026-004",
@@ -5507,7 +5624,7 @@
     "J-J30-AUS-2026-004": {
       "competitionId": "J-J30-AUS-2026-004",
       "decision": "pending",
-      "checkedAt": "2026-08-31T19:37:37.235Z",
+      "checkedAt": "2026-09-01T00:24:32.822Z",
       "playersFound": 0,
       "families": [
         {
@@ -5517,7 +5634,7 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "B-S-M-RR",
@@ -5538,18 +5655,29 @@
           ]
         },
         {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
           "family": "G-S-M",
           "populated": false,
           "events": [
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -5560,12 +5688,23 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         }
       ],
-      "eventFailure": "browser_fallback:browser_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -5766,7 +5905,124 @@
           ],
           "storedAt": "2026-08-31T19:37:37.235Z"
         }
-      }
+      },
+      "declaredSections": 8,
+      "acquiredSections": 1,
+      "missingSections": 7,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "tournamentId": 1100203396,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-adelaide/aus/2026/j-j30-aus-2026-004/"
+          }
+        },
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "combo": {
+            "tournamentId": 1100203396,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-adelaide/aus/2026/j-j30-aus-2026-004/"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "tournamentId": 1100203396,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-adelaide/aus/2026/j-j30-aus-2026-004/"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "tournamentId": 1100203396,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-adelaide/aus/2026/j-j30-aus-2026-004/"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "tournamentId": 1100203396,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-adelaide/aus/2026/j-j30-aus-2026-004/"
+          }
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "combo": {
+            "tournamentId": 1100203396,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-adelaide/aus/2026/j-j30-aus-2026-004/"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "tournamentId": 1100203396,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-adelaide/aus/2026/j-j30-aus-2026-004/"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "tournamentId": 1100203396,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-adelaide/aus/2026/j-j30-aus-2026-004/"
+          }
+        }
+      ]
     },
     "J-J30-SVK-2026-004": {
       "competitionId": "J-J30-SVK-2026-004",
