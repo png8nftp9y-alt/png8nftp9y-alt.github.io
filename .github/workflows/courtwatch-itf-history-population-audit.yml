@@ -1,0 +1,65 @@
+name: Court Watch ITF historical population audit
+on:
+  push:
+    branches: ['test/itf-history-population-audit']
+    paths:
+      - 'src/v3/audit-itf-history-population.mjs'
+      - '.github/workflows/courtwatch-itf-history-population-audit.yml'
+permissions: {contents: read}
+concurrency: {group: courtwatch-itf-history-population-audit,cancel-in-progress: false}
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Configure R2
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          echo "R2_ACCOUNT_ID=$R2_ACCOUNT_ID" >> "$GITHUB_ENV"
+          echo "R2_BUCKET=$R2_BUCKET" >> "$GITHUB_ENV"
+          echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
+          python -m pip install --quiet awscli
+      - name: Restore and verify all certified historical blocks
+        run: |
+          set -euo pipefail
+          endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+          prefix="itf/history-draws"
+          mkdir -p dist/v3/shards/itf/draw-tasks history-blocks
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/pointers/current.json" current.json --only-show-errors
+          generation="$(jq -er .generation current.json)"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/generations/$generation/manifest.json" manifest.json --only-show-errors
+          jq -e '.expected==4291 and (.blocks|length)==17' manifest.json
+          while IFS=$'\t' read -r block sha count; do
+            archive="history-blocks/block-$block.tar.gz"
+            aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/generations/$generation/blocks/block-$block.tar.gz" "$archive" --only-show-errors
+            test "$(sha256sum "$archive"|cut -d' ' -f1)" = "$sha"
+            mkdir -p "history-blocks/$block"
+            tar -xzf "$archive" -C "history-blocks/$block"
+            test "$(find "history-blocks/$block" -type f -name '*.json.gz'|wc -l)" -eq "$count"
+          done < <(jq -r '.blocks[]|[.block,.sha256,.count]|@tsv' manifest.json)
+          find history-blocks -mindepth 2 -type f -name '*.json.gz' -exec cp {} dist/v3/shards/itf/draw-tasks/ \;
+          test "$(find dist/v3/shards/itf/draw-tasks -type f -name '*.json.gz'|wc -l)" -eq 4291
+      - name: Audit every historical draw for real population
+        env:
+          ITF_EXPECTED_TASKS: 4291
+        run: node src/v3/audit-itf-history-population.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-history-population-audit
+          path: |
+            dist/v3/audits/itf-history-population-audit.json
+            manifest.json
+          if-no-files-found: error
+          retention-days: 30
