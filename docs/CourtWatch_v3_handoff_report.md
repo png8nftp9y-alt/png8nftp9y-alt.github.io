@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-01.54**
+Revisione documento: **2026-09-01.55**
+
+- 1 settembre 2026 — Primo ciclo operativo del nuovo T−1 storico, run `33457808699`, certificato verde. J60 Arlon: 6 tabelloni dichiarati, 6 richiesti, 6 acquisiti e salvati, 0 mancanti e 0 retry; torneo passato a `complete`. Lo stato globale è salito a 19 tornei completi e conserva 38 pending (37 tecnici e 1 di pubblicazione), che restano nella coda persistente e saranno elaborati uno per ciclo senza ritentare i tabelloni già acquisiti.
 
 - 1 settembre 2026 — Certificato in prova il riuso integrale del metodo storico per i tabelloni T−1: run `33457103374` verde sui 17 tornei conclusi rimasti nel buco, 125 tabelloni dichiarati, 125 artifact unici e completi, 0 retry, 0 mancanti e 0 illeggibili. Preparata l'integrazione operativa: inventario ITF completo, un runner isolato per tabellone con `acquire-itf-history-draw-task.mjs`, conservazione cumulativa dei successi e retry esclusivo dei falliti. I pending non escono più dalla coda alla data finale. Nessun endpoint OOP o risultati viene interrogato dal flusso.
 
