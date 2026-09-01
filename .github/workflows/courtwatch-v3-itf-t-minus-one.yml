@@ -3,49 +3,96 @@ on:
   workflow_dispatch:
     inputs:
       competition_id:
-        description: Optional pending competition ID for a targeted test/run
+        description: Optional comma-separated pending competition IDs
         required: false
         type: string
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0,15,30,45 * * * *'
   push:
     branches: [main]
-    paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/build-itf-t1-section-matrix.mjs','src/v3/acquire-itf-history-draw-task.mjs','src/v3/merge-itf-t1-history-method.mjs','.github/workflows/courtwatch-v3-itf-known-fast.yml','.github/workflows/courtwatch-v3-itf-live.yml','.github/workflows/courtwatch-v3-itf-safety-120d.yml','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
+    paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/build-itf-t1-tournament-matrix.mjs','src/v3/build-itf-t1-draw-batch.mjs','src/v3/inventory-itf-history-tournament.mjs','src/v3/acquire-itf-history-draw-task.mjs','src/v3/merge-itf-t1-history-method.mjs','.github/workflows/courtwatch-v3-itf-known-fast.yml','.github/workflows/courtwatch-v3-itf-live.yml','.github/workflows/courtwatch-v3-itf-safety-120d.yml','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: false}
 jobs:
-  inventory:
+  select:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 5
     outputs:
-      matrix: ${{ steps.inventory.outputs.matrix }}
-      competition_id: ${{ steps.inventory.outputs.competition_id }}
-      declared: ${{ steps.inventory.outputs.declared }}
-      requested: ${{ steps.inventory.outputs.requested }}
+      matrix: ${{ steps.select.outputs.matrix }}
+      selected: ${{ steps.select.outputs.selected }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: {node-version: '22', cache: npm}
-      - run: npm ci --ignore-scripts
-      - id: inventory
-        name: Enumerate all declared sections for one due tournament
+        with: {node-version: '22'}
+      - id: select
+        name: Select up to eight pending or newly due tournaments
         env:
-          ITF_REQUEST_DELAY_MS: 1800
-          ITF_T1_COMPETITION_ID: ${{ inputs.competition_id || '' }}
-        run: node src/v3/build-itf-t1-section-matrix.mjs
+          ITF_T1_TOURNAMENT_BATCH: 8
+          ITF_T1_COMPETITION_IDS: ${{ inputs.competition_id || '' }}
+        run: node src/v3/build-itf-t1-tournament-matrix.mjs
       - uses: actions/upload-artifact@v4
-        if: steps.inventory.outputs.competition_id != ''
         with:
-          name: itf-t1-section-inventory
-          path: dist/v3/itf_t1_section_inventory.json
+          name: itf-t1-tournament-batch
+          path: dist/v3/itf_t1_tournament_batch.json
+          retention-days: 14
+  inventory:
+    needs: select
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix: ${{ fromJSON(needs.select.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Inventory one tournament exactly as history
+        if: matrix.skip != true
+        continue-on-error: true
+        env:
+          ITF_COMPETITION_ID: ${{ matrix.competitionId }}
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUEST_DELAY_MS: 1800
+        run: node src/v3/inventory-itf-history-tournament.mjs
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.skip != true
+        with:
+          name: itf-t1-inventory-${{ matrix.index }}
+          path: dist/v3/shards/itf/inventory/*.json
+          if-no-files-found: error
+          retention-days: 7
+  queue:
+    needs: [select, inventory]
+    if: always() && needs.select.outputs.selected != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    outputs:
+      matrix: ${{ steps.queue.outputs.matrix }}
+      tasks: ${{ steps.queue.outputs.tasks }}
+      tournaments: ${{ steps.queue.outputs.tournaments }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'itf-t1-inventory-*', path: dist/v3/shards/itf/inventory, merge-multiple: true}
+      - id: queue
+        run: node src/v3/build-itf-t1-draw-batch.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-t1-draw-batch
+          path: |
+            dist/v3/itf_t1_draw_batch.json
+            dist/v3/shards/itf/t1-inventory/*.json
           if-no-files-found: error
           retention-days: 14
   acquire:
-    needs: inventory
+    needs: queue
     strategy:
       fail-fast: false
       max-parallel: 16
-      matrix: ${{ fromJSON(needs.inventory.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.queue.outputs.matrix) }}
     runs-on: ubuntu-latest
     timeout-minutes: 11
     steps:
@@ -55,6 +102,7 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Acquire exactly one missing draw with the historical engine
         if: matrix.skip != true
+        continue-on-error: true
         env:
           ITF_DRAW_TASK_B64: ${{ matrix.task }}
           ITF_REQUEST_TIMEOUT_MS: 30000
@@ -62,16 +110,26 @@ jobs:
         run: |
           export ITF_DRAW_TASK_JSON="$(printf '%s' "$ITF_DRAW_TASK_B64" | base64 --decode)"
           node src/v3/acquire-itf-history-draw-task.mjs
-      - uses: actions/upload-artifact@v4
+      - id: upload_draw
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
         if: always() && matrix.skip != true
         with:
           name: itf-t1-draw-${{ matrix.index }}
           path: dist/v3/shards/itf/draw-tasks/*.json.gz
           if-no-files-found: error
           retention-days: 7
+      - name: Retry transient artifact upload
+        uses: actions/upload-artifact@v4
+        if: always() && matrix.skip != true && steps.upload_draw.outcome == 'failure'
+        with:
+          name: itf-t1-draw-retry-${{ matrix.index }}
+          path: dist/v3/shards/itf/draw-tasks/*.json.gz
+          if-no-files-found: error
+          retention-days: 7
   review:
-    needs: [inventory, acquire]
-    if: always() && needs.inventory.outputs.competition_id != ''
+    needs: [queue, acquire]
+    if: always() && needs.queue.outputs.tournaments != '0'
     concurrency: {group: courtwatch-v3-itf-publish,cancel-in-progress: false}
     runs-on: ubuntu-latest
     timeout-minutes: 13
@@ -81,8 +139,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
-        with: {name: 'itf-t1-section-inventory', path: dist/v3}
+        with: {name: 'itf-t1-draw-batch', path: dist/v3}
       - uses: actions/download-artifact@v4
+        if: needs.queue.outputs.tasks != '0'
         with: {pattern: 'itf-t1-draw-*', path: draw-tasks, merge-multiple: true}
       - name: Configure R2
         env:
@@ -100,7 +159,13 @@ jobs:
       - name: Merge isolated acquisitions and validate decisions
         run: |
           set -euo pipefail
-          node src/v3/merge-itf-t1-history-method.mjs
+          mkdir -p dist/v3/audits/itf-t1-batch
+          for inventory in dist/v3/shards/itf/t1-inventory/*.json; do
+            cp "$inventory" dist/v3/itf_t1_section_inventory.json
+            node src/v3/merge-itf-t1-history-method.mjs
+            id="$(jq -r .competitionId "$inventory")"
+            cp dist/v3/source_itf_draw_audit.json "dist/v3/audits/itf-t1-batch/$id.json"
+          done
           node src/v3/maintain-itf-database.mjs
           node src/v3/validate-itf-system.mjs
           node src/v3/entries-engine.mjs
@@ -133,6 +198,7 @@ jobs:
           name: itf-t-minus-one-validated
           path: |
             dist/v3/source_itf_draw_audit.json
+            dist/v3/audits/itf-t1-batch/*.json
             dist/v3/itf_system_diagnostics.json
             history/itf_database_audit.json
           retention-days: 14

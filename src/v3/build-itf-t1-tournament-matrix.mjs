@@ -1,0 +1,9 @@
+import fs from 'node:fs/promises';
+import {TODAY,readJson,writeJson} from './itf-common.mjs';
+
+const map=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]}),state=await readJson('history/itf_draw_target_db.json',{tournaments:{}}),tomorrow=new Date(Date.parse(TODAY+'T00:00:00Z')+864e5).toISOString().slice(0,10),limit=Math.max(1,Math.min(16,Number(process.env.ITF_T1_TOURNAMENT_BATCH||8))),requested=String(process.env.ITF_T1_COMPETITION_IDS||'').split(',').map(value=>value.trim().toUpperCase()).filter(Boolean);
+const eligible=(map.tournaments||[]).filter(t=>{const previous=state.tournaments?.[t.competitionId];return previous?.decision==='pending'||(!previous&&t.startDate<=tomorrow&&t.endDate>=TODAY)}).filter(t=>!requested.length||requested.includes(String(t.competitionId).toUpperCase())).sort((a,b)=>Number(b.endDate<TODAY)-Number(a.endDate<TODAY)||String(a.endDate).localeCompare(String(b.endDate))||String(state.tournaments?.[a.competitionId]?.checkedAt||'').localeCompare(String(state.tournaments?.[b.competitionId]?.checkedAt||''))||String(a.competitionId).localeCompare(String(b.competitionId)));
+const selected=eligible.slice(0,limit),matrix={include:selected.length?selected.map((t,index)=>({index,competitionId:t.competitionId})):[{skip:true,index:0,competitionId:'none'}]};
+await writeJson('dist/v3/itf_t1_tournament_batch.json',{version:1,generatedAt:new Date().toISOString(),today:TODAY,batchLimit:limit,eligible:eligible.length,selected:selected.map(t=>({competitionId:t.competitionId,tournamentName:t.tournamentName,startDate:t.startDate,endDate:t.endDate,previousDecision:state.tournaments?.[t.competitionId]?.decision||null}))});
+if(process.env.GITHUB_OUTPUT)await fs.appendFile(process.env.GITHUB_OUTPUT,'matrix='+JSON.stringify(matrix)+'\nselected='+selected.length+'\n');
+console.log(JSON.stringify({today:TODAY,batchLimit:limit,eligible:eligible.length,selected:selected.map(t=>t.competitionId)},null,2));
