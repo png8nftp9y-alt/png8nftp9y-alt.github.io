@@ -1,24 +1,24 @@
 {
   "version": 14,
-  "generatedAt": "2026-09-01T08:32:25.953Z",
+  "generatedAt": "2026-09-01T09:22:26.450Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 1,
-    "pendingTournaments": 0,
-    "declaredSections": 8,
-    "requestedSections": 8,
-    "acquiredSections": 6,
-    "unusedAlternativeSections": 2,
-    "resolvedSections": 8,
-    "missingSections": 0,
-    "newSectionsCached": 6,
-    "newTerminalAlternatives": 2,
-    "retrySections": 0,
+    "completeTournaments": 0,
+    "pendingTournaments": 1,
+    "declaredSections": 7,
+    "requestedSections": 1,
+    "acquiredSections": 5,
+    "unusedAlternativeSections": 1,
+    "resolvedSections": 6,
+    "missingSections": 1,
+    "newSectionsCached": 0,
+    "newTerminalAlternatives": 0,
+    "retrySections": 1,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 0,
+    "notPublishedOrIncompleteSections": 1,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 41,
@@ -57,15 +57,15 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-TUN-2026-005",
-      "tournamentName": "J60 Megrine",
-      "decision": "complete",
+      "competitionId": "J-J60-TTO-2026-002",
+      "tournamentName": "J60 Tacarigua",
+      "decision": "pending",
       "playersFound": [],
-      "declaredSections": 8,
-      "acquiredSections": 6,
-      "unusedAlternativeSections": 2,
-      "resolvedSections": 8,
-      "missingSections": 0,
+      "declaredSections": 7,
+      "acquiredSections": 5,
+      "unusedAlternativeSections": 1,
+      "resolvedSections": 6,
+      "missingSections": 1,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -103,18 +103,11 @@
           "status": "acquired"
         },
         {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": false,
-          "resolved": true,
-          "status": "unused_alternative_structure"
-        },
-        {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "G-D-M-KO",
@@ -151,7 +144,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 10,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -164,7 +157,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 26,
+              "players": 28,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -177,30 +170,23 @@
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 8,
+              "players": 20,
               "error": null,
               "failureType": null,
-              "resolved": true
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
               "resolved": true
             }
           ]
         },
         {
           "family": "G-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 16,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -210,7 +196,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 24,
+              "players": 20,
               "error": null,
               "failureType": null,
               "resolved": true
