@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-01.66**
+Revisione documento: **2026-09-01.67**
+
+- 1 settembre 2026 — Il primo collaudo read-only delle sezioni inesistenti, run 33492650181, è risultato rosso esclusivamente per un gate di cardinalità obsoleto: il workflow pretendeva 8 tornei, mentre il selettore ne aveva correttamente inclusi 6 perché due ID richiesti erano già completi. La funzione verificata ha avuto esito corretto: Dushanbe e Tacarigua hanno richiesto zero sezioni, registrato una `declared_but_unused` ciascuno, raggiunto missing=0 e decisione complete; zero errori tecnici. Il gate confronta ora il totale aggregato con il numero effettivamente selezionato. Nuovo collaudo read-only: run 33493010050.
 
 - 1 settembre 2026 — Su indicazione verificata dell'utente, J-J30-TJK-2026-005__G-S-Q-KO (Dushanbe) e J-J60-TTO-2026-002__G-S-Q-KO (Tacarigua) non corrispondono a qualificazioni realmente disputate. Preparata la classificazione terminale esplicita `declared_but_unused`: le due sezioni restano contabilizzate rispetto all'inventario ITF, ma vengono tolte dalla coda e non sono più richieste; nessun torneo o tabellone valido viene cancellato. Collaudo read-only avviato sul run 33492650181, con gate esatto di due sezioni terminali e zero errori tecnici; promozione produttiva subordinata al verde comunicato dall'utente.
 
