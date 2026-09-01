@@ -1,6 +1,6 @@
 {
   "version": 15,
-  "generatedAt": "2026-09-01T17:33:26.512Z",
+  "generatedAt": "2026-09-01T18:22:32.753Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,18 +9,18 @@
     "pendingTournaments": 1,
     "declaredSections": 8,
     "requestedSections": 6,
-    "acquiredSections": 2,
+    "acquiredSections": 4,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 2,
-    "missingSections": 6,
-    "newSectionsCached": 0,
+    "resolvedSections": 4,
+    "missingSections": 4,
+    "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "retrySections": 6,
+    "retrySections": 4,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 6,
+    "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 44,
@@ -56,16 +56,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-TPE-2026-002",
-      "tournamentName": "J30 Taoyuan",
+      "competitionId": "J-J60-COL-2026-001",
+      "tournamentName": "J60 Cartagena",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 8,
-      "acquiredSections": 2,
+      "acquiredSections": 4,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 6,
+      "resolvedSections": 4,
+      "missingSections": 4,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -91,9 +91,9 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-M-KO",
@@ -119,9 +119,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -151,7 +151,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 32,
+              "players": 16,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -160,14 +160,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -197,7 +197,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 23,
+              "players": 12,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -206,14 +206,14 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 30,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
