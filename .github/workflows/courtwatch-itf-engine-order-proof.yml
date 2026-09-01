@@ -5,6 +5,10 @@ on:
     paths:
       - 'src/v3/itf-known-unused-draws.mjs'
       - 'src/v3/gate-itf-t1-run.mjs'
+      - 'src/v3/itf-draw-identity.mjs'
+      - 'src/v3/inventory-itf-history-tournament.mjs'
+      - 'src/v3/acquire-itf-history-draw-task.mjs'
+      - 'src/v3/build-itf-t1-draw-batch.mjs'
       - '.github/workflows/courtwatch-v3-itf-t-minus-one.yml'
       - '.github/workflows/courtwatch-itf-engine-order-proof.yml'
 permissions: {contents: read}
@@ -18,6 +22,8 @@ jobs:
         with: {node-version: '22'}
       - name: Verify terminal draw registry
         run: node -e "import('./src/v3/itf-known-unused-draws.mjs').then(({isKnownUnusedDraw:f})=>{for(const [id,event] of [['J-J30-FIN-2026-004','G-S-Q-KO'],['J-J30-TJK-2026-005','G-S-Q-KO'],['J-J60-TTO-2026-002','G-S-Q-KO']])if(!f(id,event))throw Error('missing terminal '+id);for(const id of ['J-J30-MDV-2026-004','J-J30-PAN-2026-002'])if(f(id,'G-S-Q-KO'))throw Error('real draw marked unused '+id)})"
+      - name: Verify homonymous draws remain distinct
+        run: node -e "import('./src/v3/itf-draw-identity.mjs').then(({indexSections})=>{const base={playerTypeCode:'G',matchTypeCode:'S',eventClassificationCode:'Q',drawsheetStructureCode:'KO',tournamentId:123};const rows=indexSections([{...base,weekNumber:0},{...base,weekNumber:1}]);if(rows.length!==2||rows[0].sectionId===rows[1].sectionId)throw Error('homonymous ITF draws collapsed')})"
       - name: Verify green and technical gates
         run: |
           mkdir -p dist/v3
