@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-01.68**
+Revisione documento: **2026-09-01.69**
+
+- 1 settembre 2026 — Diagnosi schema ITF certificata dai run read-only 33533931183 e 33534091031. Male, Panama e Finlandia non presentano un difetto di normalizzazione: l'endpoint restituisce rispettivamente 8, 8 e 24 match scheletro, tutti `To be played`, con ogni elemento `team.players` nullo, punteggi nulli, nessun vincitore e nessun risultato. La griglia può essere visibile sul sito, ma non contiene un tabellone realmente compilato. Per i tornei conclusi queste sezioni devono essere terminali `declared_but_unused`, non pending di pubblicazione e non errori tecnici. Aggiunti Male e Panama al registro terminale T−1; Finlandia viene riclassificata nello storico come scheletro ufficiale non utilizzato. Collaudo read-only con quattro terminali esatti avviato nel run 33534321942 prima della promozione produttiva.
 
 - 1 settembre 2026 — Chiusura produttiva del buco per le sezioni inesistenti certificata dal run 33533384990 e persistita nel commit automatico 3704ef78: Dushanbe e Tacarigua sono completi con una `declared_but_unused` ciascuno, zero richieste residue e zero errori tecnici nel lotto. Stato globale emesso dal run: 44 tornei completi, 22 pending, dei quali 2 tecnici (J-J30-DEN-2026-004 e J-J30-SVK-2026-004) e 20 classificati come pubblicazione. Nel buco restano soltanto Male e Panama, i cui G-S-Q-KO contengono match ma non nomi normalizzati. Avviata una diagnosi read-only dello schema grezzo su Male, Panama e sull'anomalia storica Finlandia; obiettivo successivo: correggere il parser, rielaborare le tre sezioni e produrre l'elenco completo dei pending residui con motivo verificabile dall'utente.
 
