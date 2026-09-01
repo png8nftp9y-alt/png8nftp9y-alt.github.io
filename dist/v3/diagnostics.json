@@ -1,6 +1,6 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-09-01T08:12:01.950Z",
+  "generatedAt": "2026-09-01T08:11:49.677Z",
   "overall": "yellow",
   "legend": {
     "green": "ok",
@@ -23,19 +23,19 @@
     {
       "status": "green",
       "label": "Tennis Europe",
-      "detail": "43 presenze · T−1 38/7 · mappa 598 · DB 528 liste/0 ID · continuità 28",
+      "detail": "46 presenze · T−1 38/7 · mappa 598 · DB 528 liste/0 ID · continuità 28",
       "critical": true
     },
     {
       "status": "green",
       "label": "ITF",
-      "detail": "4 presenze in mappa · acceptance correnti 0 · storico 4 · withdrawn 1 · stato itf_acceptance_complete",
+      "detail": "4 presenze in mappa · acceptance correnti 0 · storico 4 · withdrawn 1 · stato itf_acceptance_complete_state_machine",
       "critical": false
     },
     {
       "status": "green",
       "label": "Calendario",
-      "detail": "418 tornei visibili · FITP 369 · TE 45 · ITF 4",
+      "detail": "419 tornei visibili · FITP 369 · TE 46 · ITF 4",
       "critical": true
     },
     {
@@ -59,7 +59,7 @@
     {
       "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 01/09/2026, 10:12:01",
+      "detail": "file v3 generati · ultimo merge 01/09/2026, 10:11:49",
       "critical": true
     }
   ],
@@ -99,25 +99,25 @@
       "verifiedCompetitionEntryRescues": 0
     },
     "calendar": {
-      "tournamentEntries": 418,
+      "tournamentEntries": 419,
       "byCircuit": {
         "fitp": 369,
-        "tennis-europe": 45,
+        "tennis-europe": 46,
         "itf": 4
       },
       "warnings": 0
     },
     "te": {
       "status": "tennis_europe_acceptance_complete_draw_parser_v2_applied",
-      "entriesVisible": 87,
-      "acceptanceConfirmed": 1,
+      "entriesVisible": 90,
+      "acceptanceConfirmed": 2,
       "byPlayer": {
-        "virginia-cereghini": 9,
+        "virginia-cereghini": 10,
         "giulia-scozzafava": 6,
         "nikola-kerkenyakov": 5,
-        "aila-zennaro": 8,
+        "aila-zennaro": 9,
         "francesco-renzulli": 1,
-        "darko-sartori": 5,
+        "darko-sartori": 6,
         "noemi-paganini": 1,
         "anna-gambarini": 2,
         "filippo-vitali": 1,
@@ -127,27 +127,28 @@
         "edoardo-grimoldi": 1
       },
       "byAcceptance": {
-        "draw_confirmed_permanent_history": 41,
+        "draw_confirmed_permanent_history": 43,
         "draw_confirmed_qualifying": 1,
-        "Q-10": 1
+        "Q-10": 1,
+        "MD-7": 1
       },
       "system": {
         "version": 1,
-        "generatedAt": "2026-09-01T07:25:59.168Z",
+        "generatedAt": "2026-09-01T08:11:49.642Z",
         "status": "green",
         "checks": {
           "mapTournaments": 598,
           "mapCoverageFrom": "2026-01-04",
           "mapCoverageUntil": "2028-08-31",
           "continuityCycles": 28,
-          "acceptanceEntries": 51,
-          "calendarEntries": 43,
+          "acceptanceEntries": 54,
+          "calendarEntries": 46,
           "confirmed": 38,
           "rejected": 7,
           "pending": 0,
           "inconclusive": 0,
           "participantSnapshots": 528,
-          "participantsRead": 92269,
+          "participantsRead": 98123,
           "participantIds": 0
         },
         "warnings": [],
@@ -155,7 +156,7 @@
       }
     },
     "itf": {
-      "status": "itf_acceptance_complete",
+      "status": "itf_acceptance_complete_state_machine",
       "mapEntries": 4,
       "currentAcceptanceEntries": 0,
       "historicalEntries": 4,
