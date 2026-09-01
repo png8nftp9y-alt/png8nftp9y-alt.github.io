@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-09-01T00:16:26.942Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-09-01T00:21:32.718Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
   "targets": {
@@ -4152,7 +4152,7 @@
     "J-J60-FRA-2026-006": {
       "competitionId": "J-J60-FRA-2026-006",
       "decision": "pending",
-      "checkedAt": "2026-08-31T19:00:32.316Z",
+      "checkedAt": "2026-09-01T00:20:33.024Z",
       "playersFound": 0,
       "families": [
         {
@@ -4162,7 +4162,7 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "B-S-M-RR",
@@ -4173,12 +4173,23 @@
         },
         {
           "family": "B-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 34,
-              "error": null
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -4189,33 +4200,45 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             }
           ]
         },
         {
           "family": "G-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 14,
-              "error": null
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": null,
+      "eventCache": {}
     },
     "J-J60-LAT-2026-004": {
       "competitionId": "J-J60-LAT-2026-004",
       "decision": "pending",
-      "checkedAt": "2026-08-31T19:00:39.416Z",
+      "checkedAt": "2026-09-01T00:20:35.639Z",
       "playersFound": 0,
       "families": [
         {
@@ -4225,7 +4248,7 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "B-S-M-RR",
@@ -4236,12 +4259,23 @@
         },
         {
           "family": "B-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 34,
-              "error": null
+              "players": 0,
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -4252,12 +4286,12 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -4268,12 +4302,24 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "deferred_isolated_section"
             }
           ]
         }
       ],
-      "eventFailure": "browser_fallback:browser_incapsula_challenge"
+      "eventFailure": null,
+      "eventCache": {}
     },
     "J-J60-SUI-2026-002": {
       "competitionId": "J-J60-SUI-2026-002",
