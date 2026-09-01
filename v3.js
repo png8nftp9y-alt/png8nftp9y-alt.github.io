@@ -28,7 +28,8 @@ async function v3json(path){const controller=new AbortController(),timer=setTime
 async function apiProjection(){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),6000);try{const r=await fetch(APP_API+'?t='+Date.now(),{cache:'no-store',mode:'cors',signal:controller.signal});if(!r.ok)throw Error('API Court Watch non disponibile');const data=await r.json();if(!Array.isArray(data.players)||!data.players.length||!Array.isArray(data.tournaments)||!Array.isArray(data.matches))throw Error('Proiezione API incompleta');return data}finally{clearTimeout(timer)}}
 function cachedData(){try{const saved=JSON.parse(localStorage.getItem(LAST_GOOD_CACHE)||'null');return saved&&Array.isArray(saved.players)&&saved.players.length&&Array.isArray(saved.tournaments)?saved:null}catch{return null}}
 function saveCachedData(data){try{localStorage.setItem(LAST_GOOD_CACHE,JSON.stringify(data))}catch(e){console.warn('Cache locale Court Watch non disponibile',e)}}
-function syncLabel(data,stale=false){const when=new Intl.DateTimeFormat('it-IT',{hour:'2-digit',minute:'2-digit'}).format(new Date(data.generatedAt||Date.now()));$('syncStatus').classList.toggle('stale',stale);$('syncStatus').textContent=(stale?'Ultimi dati salvati · ':'Live v3 · ')+when}
+function syncLabel(data,fallback=false){const status=$('syncStatus'),alert=$('dataAlert'),stamp=Date.parse(data.generatedAt||''),when=new Intl.DateTimeFormat('it-IT',{hour:'2-digit',minute:'2-digit'}).format(new Date(Number.isFinite(stamp)?stamp:Date.now())),age=Number.isFinite(stamp)?Date.now()-stamp:Infinity;alert.hidden=true;alert.textContent='';status.className='status';if(fallback){status.hidden=false;status.classList.add('fallback');status.textContent='Aggiornamento in corso · visualizzata l’ultima copia disponibile · '+when;return}if(!Number.isFinite(stamp)||age>30*60*1000){status.hidden=false;status.classList.add('delay');status.textContent='Dati aggiornati con ritardo · ultimo aggiornamento '+when;return}status.hidden=true;status.textContent=''}
+function unavailableLabel(){const status=$('syncStatus'),alert=$('dataAlert');status.hidden=true;status.textContent='';alert.hidden=false;alert.textContent='Dati temporaneamente non disponibili. Riprova più tardi.'}
 function matchMeta(m){const isDouble=m.matchType==='doubles'||m.eventType==='doubles'||/doppio|double/i.test(`${m.draw||''} ${m.category||''} ${m.eventType||''} ${m.partner||''}`),op=m.opponentOptions?.length?m.opponentOptions.join(' oppure '):m.opponent;return{isDouble,op,condition:m.condition||m.note||''}}
 function opponentHtml(m,x){if(!x.op)return'Avversario da definire';const club=m.opponentClub?` · circolo ${esc(readableText(m.opponentClub))}`:'',nat=m.opponentNationality?` · naz. ${esc(readableText(m.opponentNationality))}`:'',ranking=m.opponentRanking?` · classifica ${esc(readableText(m.opponentRanking))}`:'';return`vs <span class="opponentName">${esc(readablePerson(x.op))}</span>${ranking}<span class="opponentClub">${club}${nat}</span>`}
 function agendaKey(m){return `${m.playerId||''}|${m.matchId||m.id||''}`}function mergeAgenda(agenda,matches){const hasEurope=matches.some(m=>circuit(m)==='tennis-europe'),byKey=new Map(matches.map(m=>[agendaKey(m),m]));for(const a of agenda||[]){if(hasEurope&&circuit(a)==='tennis-europe')continue;const key=agendaKey(a),base=byKey.get(key)||{};byKey.set(key,{...base,...a})}return[...byKey.values()]}
@@ -99,8 +100,7 @@ async function load(){
       route();
       restoreUiScroll();
     }else{
-      $('syncStatus').classList.add('stale');
-      $('syncStatus').textContent='Dati temporaneamente non disponibili';
+      unavailableLabel();
       $('dailyAgenda').innerHTML='<div class="empty">Il collegamento ai dati non è disponibile e su questo dispositivo non esiste ancora una copia valida.</div>';
     }
     console.error(e);
