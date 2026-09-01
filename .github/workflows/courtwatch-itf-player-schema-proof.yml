@@ -1,0 +1,26 @@
+name: Court Watch ITF player schema proof
+on:
+  push:
+    branches: ['test/itf-player-schema']
+    paths:
+      - 'src/v3/diagnose-itf-player-schema.mjs'
+      - '.github/workflows/courtwatch-itf-player-schema-proof.yml'
+permissions: {contents: read}
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read three affected draws without writes
+        env:
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUEST_DELAY_MS: 1800
+        run: node src/v3/diagnose-itf-player-schema.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-player-schema-proof
+          path: dist/v3/itf_player_schema_diagnostic.json
+          if-no-files-found: error
+          retention-days: 14
