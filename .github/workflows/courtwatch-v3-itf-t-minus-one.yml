@@ -1,6 +1,11 @@
 name: Court Watch v3 ITF T-1 complete draws
 on:
   workflow_dispatch:
+    inputs:
+      competition_id:
+        description: Optional pending competition ID for a targeted test/run
+        required: false
+        type: string
   schedule:
     - cron: '*/5 * * * *'
   push:
@@ -26,6 +31,7 @@ jobs:
         name: Enumerate all declared sections for one due tournament
         env:
           ITF_REQUEST_DELAY_MS: 1800
+          ITF_T1_COMPETITION_ID: ${{ inputs.competition_id || '' }}
         run: node src/v3/build-itf-t1-section-matrix.mjs
       - uses: actions/upload-artifact@v4
         if: steps.inventory.outputs.competition_id != ''
@@ -52,6 +58,7 @@ jobs:
         env:
           ITF_DRAW_TASK_B64: ${{ matrix.task }}
           ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUIRE_POPULATED_DRAW: 1
         run: |
           export ITF_DRAW_TASK_JSON="$(printf '%s' "$ITF_DRAW_TASK_B64" | base64 --decode)"
           node src/v3/acquire-itf-history-draw-task.mjs
@@ -64,7 +71,7 @@ jobs:
           retention-days: 7
   review:
     needs: [inventory, acquire]
-    if: needs.inventory.outputs.competition_id != ''
+    if: always() && needs.inventory.outputs.competition_id != ''
     concurrency: {group: courtwatch-v3-itf-publish,cancel-in-progress: false}
     runs-on: ubuntu-latest
     timeout-minutes: 13
