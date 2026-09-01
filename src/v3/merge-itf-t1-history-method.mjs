@@ -18,7 +18,8 @@ const watched=((await readJson('players.json',{players:[]})).players||[]).filter
 const targets={...(targetDoc.targets||{})},tournaments={...(targetDoc.tournaments||{})},entries=new Map((source.entries||[]).map(e=>[e.playerId+'|'+e.competitionId,e]));
 const previous=tournaments[id]||{},eventCache={...(previous.eventCache||{})},tournamentDocs=docs.filter(d=>d.competitionId===id),sections=inventory.sections||[];
 const sectionKey=section=>section.sectionId||section.event;
-const cacheFor=section=>eventCache[sectionKey(section)]||(legacyEventIsUnambiguous(sections,section.event)?eventCache[section.sectionId]:null);
+for(const section of sections){const key=sectionKey(section);if(!eventCache[key]&&legacyEventIsUnambiguous(sections,section.event)&&eventCache[section.event])eventCache[key]=eventCache[section.event]}
+
 const bySection=new Map(tournamentDocs.map(doc=>[doc.sectionId||doc.event,doc]));
 const docFor=section=>bySection.get(sectionKey(section))||(legacyEventIsUnambiguous(sections,section.event)?bySection.get(section.event):null);
 let newSectionsCached=0;
