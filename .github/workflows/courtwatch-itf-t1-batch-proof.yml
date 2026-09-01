@@ -117,7 +117,7 @@ jobs:
             cp dist/v3/source_itf_draw_audit.json "dist/v3/audits/itf-t1-batch/$id.json"
           done
           jq -s '{version:3,tournaments:length,complete:([.[].summary.completeTournaments]|add),pending:([.[].summary.pendingTournaments]|add),declared:([.[].summary.declaredSections]|add),acquired:([.[].summary.acquiredSections]|add),unusedAlternatives:([.[].summary.unusedAlternativeSections]|add),declaredButUnused:([.[].summary.declaredButUnusedSections]|add),resolved:([.[].summary.resolvedSections]|add),missing:([.[].summary.missingSections]|add),technicalErrors:([.[].summary.technicalErrorSections]|add),notPublishedOrIncomplete:([.[].summary.notPublishedOrIncompleteSections]|add),audits:map(.audit[0])}' dist/v3/audits/itf-t1-batch/*.json > dist/v3/audits/itf-t1-batch-proof.json
-          test "$(jq -r .tournaments dist/v3/audits/itf-t1-batch-proof.json)" -eq 8
+          test "$(jq -r .tournaments dist/v3/audits/itf-t1-batch-proof.json)" -eq "${{ needs.queue.outputs.tournaments }}"
           test "$(jq -r .technicalErrors dist/v3/audits/itf-t1-batch-proof.json)" -eq 0
           test "$(jq -r .declaredButUnused dist/v3/audits/itf-t1-batch-proof.json)" -eq 2
           test "$(jq -r .complete dist/v3/audits/itf-t1-batch-proof.json)" -ge 2
