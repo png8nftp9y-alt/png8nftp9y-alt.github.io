@@ -1,5 +1,5 @@
 import {writeFile,mkdir} from 'node:fs/promises';
-import {drawsheet} from './itf-common.mjs';
+import {drawsheet,tournamentEvents} from './itf-common.mjs';
 
 const tasks=[
   {competitionId:'J-J30-MDV-2026-004',event:'G-S-Q-KO',tournamentId:1100204009,tourType:'N',weekNumber:0,playerTypeCode:'G',matchTypeCode:'S',eventClassificationCode:'Q',drawsheetStructureCode:'KO',sourceUrl:'https://www.itftennis.com/en/tournament/j30-male/mdv/2026/j-j30-mdv-2026-004/'},
@@ -17,10 +17,18 @@ function paths(value,path='',out=[]){
 const diagnostics=[];
 for(const task of tasks){
  try{
-  const json=await drawsheet(task),drawMatches=matches(json),rawPlayers=drawMatches.flatMap(match=>match.teams||[]).flatMap(team=>team.players||[]);
-  diagnostics.push({competitionId:task.competitionId,event:task.event,status:'read',matches:drawMatches.length,playerReferences:rawPlayers.length,samples:rawPlayers.slice(0,4),samplePaths:paths(rawPlayers[0]||{}),teamSample:drawMatches[0]?.teams?.[0]||null,teamPaths:paths(drawMatches[0]?.teams?.[0]||{}),matchSample:drawMatches[0]||null,matchPaths:paths(drawMatches[0]||{})});
+  const inventory=await tournamentEvents(task),declared=inventory.filter(c=>c.playerTypeCode==='G'&&c.matchTypeCode==='S'&&c.eventClassificationCode==='Q'&&c.drawsheetStructureCode==='KO');
+  const base=declared[0]||task,probes=[];
+  for(const weekNumber of [...new Set([base.weekNumber??0,0,1,2,3])]){
+   try{
+    const json=await drawsheet({...base,weekNumber}),drawMatches=matches(json),rawPlayers=drawMatches.flatMap(match=>match.teams||[]).flatMap(team=>team.players||[]).filter(Boolean);
+    probes.push({weekNumber,status:'read',matches:drawMatches.length,playerReferences:rawPlayers.length,namedPlayerReferences:rawPlayers.filter(player=>player.givenName||player.familyName||player.playerName||player.name).length,firstPlayer:rawPlayers[0]||null,eventId:json?.eventId||null});
+   }catch(error){probes.push({weekNumber,status:'technical_error',error:error.message})}
+  }
+  const json=await drawsheet(base),drawMatches=matches(json),rawPlayers=drawMatches.flatMap(match=>match.teams||[]).flatMap(team=>team.players||[]);
+  diagnostics.push({competitionId:task.competitionId,event:task.event,status:'read',declaredInventory:declared.map(c=>({tournamentId:c.tournamentId,tourType:c.tourType,weekNumber:c.weekNumber,playerTypeCode:c.playerTypeCode,matchTypeCode:c.matchTypeCode,eventClassificationCode:c.eventClassificationCode,drawsheetStructureCode:c.drawsheetStructureCode})),probes,matches:drawMatches.length,playerReferences:rawPlayers.length,samples:rawPlayers.slice(0,4),samplePaths:paths(rawPlayers[0]||{}),teamSample:drawMatches[0]?.teams?.[0]||null,teamPaths:paths(drawMatches[0]?.teams?.[0]||{}),matchSample:drawMatches[0]||null,matchPaths:paths(drawMatches[0]||{})});
  }catch(error){diagnostics.push({competitionId:task.competitionId,event:task.event,status:'technical_error',error:error.message,matches:0,playerReferences:0,samples:[],samplePaths:[]})}
 }
 await mkdir('dist/v3',{recursive:true});
 await writeFile('dist/v3/itf_player_schema_diagnostic.json',JSON.stringify({version:1,generatedAt:new Date().toISOString(),diagnostics},null,2)+'\n');
-console.log(JSON.stringify(diagnostics.map(({competitionId,status,matches,playerReferences,error})=>({competitionId,status,matches,playerReferences,error})),null,2));
+console.log(JSON.stringify(diagnostics.map(({competitionId,status,declaredInventory,probes,matches,playerReferences,error})=>({competitionId,status,declaredInventory,probes,matches,playerReferences,error})),null,2));
