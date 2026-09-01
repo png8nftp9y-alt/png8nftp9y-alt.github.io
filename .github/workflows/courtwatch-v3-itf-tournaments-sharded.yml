@@ -3,9 +3,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '37 */6 * * *'
-  push:
-    branches: [main]
-    paths: ['src/v3/itf-common.mjs','src/v3/discover-itf-tournaments-shard.mjs','src/v3/merge-itf-tournament-shards.mjs','.github/workflows/courtwatch-v3-itf-tournaments-sharded.yml']
+
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-map,cancel-in-progress: false}
 jobs:
