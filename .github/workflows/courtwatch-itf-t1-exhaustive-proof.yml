@@ -1,0 +1,113 @@
+name: Court Watch ITF T-1 exhaustive sections proof
+on:
+  workflow_dispatch:
+  push:
+    branches: ['test/itf-t1-exhaustive-sections']
+    paths:
+      - 'src/v3/proof-itf-t1-inventory.mjs'
+      - 'src/v3/proof-itf-t1-section.mjs'
+      - '.github/workflows/courtwatch-itf-t1-exhaustive-proof.yml'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-itf-t1-exhaustive-proof
+  cancel-in-progress: false
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      matrix: ${{ steps.inventory.outputs.matrix }}
+      expected: ${{ steps.inventory.outputs.expected }}
+      competition_id: ${{ steps.inventory.outputs.competition_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci --ignore-scripts
+      - id: inventory
+        name: Enumerate every ITF draw section
+        env:
+          ITF_REQUEST_DELAY_MS: 1800
+        run: node src/v3/proof-itf-t1-inventory.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-t1-exhaustive-inventory
+          path: ops/itf-t1-exhaustive/inventory.json
+          if-no-files-found: error
+          retention-days: 7
+  acquire:
+    needs: inventory
+    strategy:
+      fail-fast: false
+      max-parallel: 16
+      matrix: ${{ fromJSON(needs.inventory.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci --ignore-scripts
+      - name: Request exactly one ITF draw section
+        env:
+          ITF_REQUEST_DELAY_MS: 1800
+          ITF_T1_SECTION_INDEX: ${{ matrix.index }}
+          ITF_T1_SECTION_EVENT: ${{ matrix.event }}
+          ITF_T1_COMBO_B64: ${{ matrix.combo }}
+          ITF_T1_TOURNAMENT_B64: ${{ matrix.tournament }}
+        run: node src/v3/proof-itf-t1-section.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-t1-section-${{ matrix.index }}
+          path: ops/itf-t1-exhaustive/results/*.json
+          if-no-files-found: error
+          retention-days: 7
+  review:
+    needs: [inventory, acquire]
+    if: always() && needs.inventory.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: itf-t1-exhaustive-inventory
+          path: proof/inventory
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: itf-t1-section-*
+          path: proof/results
+          merge-multiple: true
+      - name: Prove no declared section was skipped or duplicated
+        env:
+          EXPECTED: ${{ needs.inventory.outputs.expected }}
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const inventory=JSON.parse(fs.readFileSync('proof/inventory/inventory.json','utf8'));
+          const files=fs.readdirSync('proof/results').filter(x=>x.endsWith('.json')).sort();
+          const rows=files.map(x=>JSON.parse(fs.readFileSync('proof/results/'+x,'utf8')));
+          const expected=Number(process.env.EXPECTED);
+          const indexes=new Set(rows.map(x=>x.index));
+          const events=new Set(rows.map(x=>x.event));
+          const declared=new Set(inventory.sections.map(x=>x.event));
+          if(expected!==inventory.expectedSections)throw new Error('Inventory output count mismatch');
+          if(rows.length!==expected||indexes.size!==expected||events.size!==expected)throw new Error('A draw section was skipped or duplicated');
+          for(const event of declared)if(!events.has(event))throw new Error('Missing declared section '+event);
+          const counts=rows.reduce((a,x)=>(a[x.status]=(a[x.status]||0)+1,a),{});
+          const acquiredBeforeFailure=new Map(rows.filter(x=>x.status==='acquired').map(x=>[x.event,x]));
+          for(const row of rows.filter(x=>x.status!=='acquired'))void row;
+          if(acquiredBeforeFailure.size!==rows.filter(x=>x.status==='acquired').length)throw new Error('An acquired section was overwritten');
+          const result={status:'green',competitionId:inventory.competitionId,declaredSections:expected,requestedSections:rows.length,uniqueSections:events.size,counts,acquiredSectionsPreserved:acquiredBeforeFailure.size};
+          fs.mkdirSync('proof/out',{recursive:true});
+          fs.writeFileSync('proof/out/result.json',JSON.stringify(result,null,2)+'\n');
+          console.log(JSON.stringify(result,null,2));
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-t1-exhaustive-proof
+          path: proof/out/result.json
+          if-no-files-found: error
+          retention-days: 14
