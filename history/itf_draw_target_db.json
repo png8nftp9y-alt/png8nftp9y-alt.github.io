@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-09-01T19:28:46.757Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-09-01T19:29:28.382Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
   "targets": {
@@ -29971,7 +29971,7 @@
     "J-J30-ARG-2026-003": {
       "competitionId": "J-J30-ARG-2026-003",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:24:49.451Z",
+      "checkedAt": "2026-09-01T19:29:28.073Z",
       "playersFound": 0,
       "families": [
         {
@@ -29981,15 +29981,15 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -30027,15 +30027,15 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -30047,8 +30047,8 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -30067,7 +30067,7 @@
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "B-S-M-RR:draw_artifact_missing | G-S-M-RR:draw_artifact_missing | G-S-Q-KO:draw_artifact_missing",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -30521,11 +30521,29 @@
             }
           ],
           "storedAt": "2026-09-01T01:10:47.838Z"
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:29:28.073Z",
+          "storedAt": "2026-09-01T19:29:28.073Z",
+          "resolution": "round_robin_knockout_ignored"
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:29:28.073Z",
+          "storedAt": "2026-09-01T19:29:28.073Z",
+          "resolution": "round_robin_knockout_ignored"
         }
       },
       "declaredSections": 8,
       "acquiredSections": 3,
-      "missingSections": 5,
+      "missingSections": 3,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -30656,8 +30674,8 @@
           }
         }
       ],
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 3
+      "unusedAlternativeSections": 2,
+      "resolvedSections": 5
     },
     "J-J30-DEN-2026-004": {
       "competitionId": "J-J30-DEN-2026-004",
@@ -38756,7 +38774,7 @@
     "J-J30-USA-2026-006": {
       "competitionId": "J-J30-USA-2026-006",
       "decision": "pending",
-      "checkedAt": "2026-09-01T18:22:32.428Z",
+      "checkedAt": "2026-09-01T19:29:28.194Z",
       "playersFound": 0,
       "families": [
         {
@@ -38766,15 +38784,15 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -38799,8 +38817,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -38812,15 +38830,15 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -38845,17 +38863,17 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "B-S-M-RR:draw_artifact_missing | B-D-M-KO:draw_artifact_missing | G-S-M-RR:draw_artifact_missing | G-D-M-KO:draw_artifact_missing",
       "declaredSections": 8,
       "acquiredSections": 2,
-      "missingSections": 6,
+      "missingSections": 4,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -39302,15 +39320,33 @@
             }
           ],
           "storedAt": "2026-09-01T11:52:13.865Z"
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:29:28.194Z",
+          "storedAt": "2026-09-01T19:29:28.194Z",
+          "resolution": "round_robin_knockout_ignored"
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:29:28.194Z",
+          "storedAt": "2026-09-01T19:29:28.194Z",
+          "resolution": "round_robin_knockout_ignored"
         }
       },
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 2
+      "unusedAlternativeSections": 2,
+      "resolvedSections": 4
     },
     "J-J60-BUL-2026-002": {
       "competitionId": "J-J60-BUL-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-09-01T18:22:32.536Z",
+      "checkedAt": "2026-09-01T19:29:28.293Z",
       "playersFound": 0,
       "families": [
         {
@@ -39320,15 +39356,15 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -39353,8 +39389,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -39366,15 +39402,15 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -39399,17 +39435,17 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "B-S-M-RR:draw_artifact_missing | B-D-M-KO:draw_artifact_missing | G-S-M-RR:draw_artifact_missing | G-D-M-KO:draw_artifact_missing",
       "declaredSections": 8,
       "acquiredSections": 2,
-      "missingSections": 6,
+      "missingSections": 4,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -39936,10 +39972,28 @@
             }
           ],
           "storedAt": "2026-09-01T11:52:13.971Z"
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:29:28.293Z",
+          "storedAt": "2026-09-01T19:29:28.293Z",
+          "resolution": "round_robin_knockout_ignored"
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:29:28.293Z",
+          "storedAt": "2026-09-01T19:29:28.293Z",
+          "resolution": "round_robin_knockout_ignored"
         }
       },
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 2
+      "unusedAlternativeSections": 2,
+      "resolvedSections": 4
     },
     "J-J60-CHI-2026-001": {
       "competitionId": "J-J60-CHI-2026-001",
@@ -41116,7 +41170,7 @@
     "J-J60-COL-2026-001": {
       "competitionId": "J-J60-COL-2026-001",
       "decision": "pending",
-      "checkedAt": "2026-09-01T18:22:32.753Z",
+      "checkedAt": "2026-09-01T19:29:28.382Z",
       "playersFound": 0,
       "families": [
         {
@@ -41126,15 +41180,15 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -41172,15 +41226,15 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -41212,7 +41266,7 @@
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "B-S-M-RR:draw_artifact_missing | G-S-M-RR:draw_artifact_missing",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -42145,13 +42199,31 @@
             }
           ],
           "storedAt": "2026-09-01T18:22:32.753Z"
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:29:28.382Z",
+          "storedAt": "2026-09-01T19:29:28.382Z",
+          "resolution": "round_robin_knockout_ignored"
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:29:28.382Z",
+          "storedAt": "2026-09-01T19:29:28.382Z",
+          "resolution": "round_robin_knockout_ignored"
         }
       },
       "declaredSections": 8,
       "acquiredSections": 4,
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 4,
-      "missingSections": 4,
+      "unusedAlternativeSections": 2,
+      "resolvedSections": 6,
+      "missingSections": 2,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
