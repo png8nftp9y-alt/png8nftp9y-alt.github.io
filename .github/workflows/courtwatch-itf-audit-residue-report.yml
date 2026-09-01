@@ -1,0 +1,47 @@
+name: Court Watch ITF audit residue report
+on:
+  push:
+    branches: ['test/itf-engine-order']
+    paths: ['.github/workflows/courtwatch-itf-audit-residue-report.yml']
+permissions:
+  contents: read
+  actions: read
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download completed read-only audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 33538044060 -n itf-full-readonly-audit -D audit-artifact
+      - name: Print exact pending draws
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const state=JSON.parse(fs.readFileSync('audit-artifact/history/itf_draw_target_db.json','utf8'));
+          const rows=[];
+          for(const tournament of Object.values(state.tournaments||{})){
+            if(tournament?.decision!=='pending')continue;
+            const familyEvents=(tournament.families||[]).flatMap(f=>(f.events||[]).map(e=>({...e,family:f.family})));
+            for(const e of familyEvents){
+              if(e.resolved)continue;
+              rows.push({
+                competitionId:tournament.competitionId,
+                event:e.event,
+                sectionId:e.sectionId||null,
+                category:e.failureType==='technical_error'?'technical':'publication',
+                reason:e.error||e.failureType||'pending'
+              });
+            }
+            if(!familyEvents.length)rows.push({competitionId:tournament.competitionId,event:null,sectionId:null,category:tournament.eventFailure?'technical':'publication',reason:tournament.eventFailure||'pending_without_section_detail'});
+          }
+          rows.sort((a,b)=>a.category.localeCompare(b.category)||a.competitionId.localeCompare(b.competitionId)||String(a.event).localeCompare(String(b.event)));
+          const summary={technical:rows.filter(r=>r.category==='technical').length,publication:rows.filter(r=>r.category==='publication').length,rows};
+          console.log('ITF_RESIDUE_REPORT='+JSON.stringify(summary));
+          fs.writeFileSync('itf-residue-report.json',JSON.stringify(summary,null,2)+'\n');
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-residue-report
+          path: itf-residue-report.json
