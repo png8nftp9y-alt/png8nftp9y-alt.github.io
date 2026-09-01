@@ -1,6 +1,6 @@
 {
   "version": 15,
-  "generatedAt": "2026-09-01T18:56:37.065Z",
+  "generatedAt": "2026-09-01T19:24:51.150Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,27 +8,31 @@
     "completeTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 8,
-    "requestedSections": 4,
-    "acquiredSections": 4,
+    "requestedSections": 6,
+    "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 4,
-    "missingSections": 4,
+    "resolvedSections": 2,
+    "missingSections": 6,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "retrySections": 4,
-    "technicalErrorSections": 0,
+    "retrySections": 6,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 4,
+    "notPublishedOrIncompleteSections": 5,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 44,
     "globalPendingTotal": 22,
-    "globalPendingTechnical": 2,
-    "globalPendingPublication": 20,
+    "globalPendingTechnical": 6,
+    "globalPendingPublication": 16,
     "technicalPendingCompetitionIds": [
       "J-J30-DEN-2026-004",
+      "J-J30-ROU-2026-004",
+      "J-J30-SLO-2026-003",
+      "J-J30-TJK-2026-006",
+      "J-J30-TPE-2026-002",
       "J-J30-SVK-2026-004"
     ],
     "publicationPendingCompetitionIds": [
@@ -39,10 +43,6 @@
       "J-J30-GER-2026-005",
       "J-J30-GHA-2026-005",
       "J-J30-MEX-2026-009",
-      "J-J30-ROU-2026-004",
-      "J-J30-SLO-2026-003",
-      "J-J30-TJK-2026-006",
-      "J-J30-TPE-2026-002",
       "J-J30-USA-2026-005",
       "J-J30-USA-2026-006",
       "J-J60-BUL-2026-002",
@@ -56,16 +56,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-LAT-2026-004",
-      "tournamentName": "J60 Liepaja",
+      "competitionId": "J-J30-TPE-2026-002",
+      "tournamentName": "J30 Taoyuan",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 8,
-      "acquiredSections": 4,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 4,
-      "missingSections": 4,
+      "resolvedSections": 2,
+      "missingSections": 6,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -91,9 +91,9 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "G-S-M-KO",
@@ -119,9 +119,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         }
       ],
       "families": [
@@ -151,7 +151,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 19,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -160,14 +160,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 30,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -197,7 +197,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 15,
+              "players": 23,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -206,19 +206,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 24,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge"
     }
   ]
 }
