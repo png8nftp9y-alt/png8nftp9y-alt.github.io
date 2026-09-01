@@ -16,8 +16,10 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - id: select
-        env: {ITF_T1_TOURNAMENT_BATCH: 100}
-        run: node src/v3/build-itf-t1-tournament-matrix.mjs
+        run: |
+          export ITF_T1_TOURNAMENT_BATCH=100
+          export ITF_T1_COMPETITION_IDS="$(node --input-type=module -e "import fs from 'node:fs';const s=JSON.parse(fs.readFileSync('history/itf_draw_target_db.json'));process.stdout.write(Object.values(s.tournaments||{}).filter(x=>x?.decision==='pending').map(x=>x.competitionId).join(','))")"
+          node src/v3/build-itf-t1-tournament-matrix.mjs
   inventory:
     needs: select
     strategy:
@@ -139,11 +141,11 @@ jobs:
           const state=JSON.parse(fs.readFileSync('history/itf_draw_target_db.json','utf8'));
           const gapLabels=['J30 Male','J30 Nuevo Leon','J30 Skopje','J30 Panama','J30 Cluj Napoca','J30 Dushanbe','J300 College Park','J60 Sao Paulo','J60 Vina del Mar','J60 Shenzhen','J60 Hyderabad','J60 Macau','J60 Singapore','J60 Kreuzlingen','J100 Barcelona','J60 Megrine','J60 Tacarigua'];
           const norm=v=>String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
-          const source=JSON.parse(fs.readFileSync('dist/v3/source_itf_tournaments.json','utf8')),sourceRows=[];
-          (function walk(v){if(Array.isArray(v))return v.forEach(walk);if(!v||typeof v!=='object')return;if(v.competitionId)sourceRows.push(v);for(const x of Object.values(v))if(x&&typeof x==='object')walk(x)})(source);
-          const known={'J30 MALE':'J-J30-MDV-2026-004','J30 PANAMA':'J-J30-PAN-2026-002','J30 DUSHANBE':'J-J30-TJK-2026-005','J60 TACARIGUA':'J-J60-TTO-2026-002'};
-          const allRows=[...Object.values(state.tournaments||{}),...sourceRows],gapIds=[],unresolvedGapLabels=[];
-          for(const label of gapLabels){const n=norm(label),tokens=n.split(' '),ids=new Set(allRows.filter(row=>tokens.every(token=>norm(JSON.stringify(row)).includes(token))).map(row=>String(row.competitionId||'')).filter(Boolean));if(known[n]){gapIds.push(known[n]);continue}if(ids.size===1)gapIds.push([...ids][0]);else unresolvedGapLabels.push({label,candidates:[...ids]})}
+          const sourceRows=[];function walk(v){if(Array.isArray(v))return v.forEach(walk);if(!v||typeof v!=='object')return;if(v.competitionId)sourceRows.push(v);for(const x of Object.values(v))if(x&&typeof x==='object')walk(x)}
+          for(const file of ['dist/v3/source_itf_tournaments.json','dist/v3/source_itf_entries.json','history/itf_player_tournament_db.json'])if(fs.existsSync(file))walk(JSON.parse(fs.readFileSync(file,'utf8')));
+          const known={'J30 Male':'J-J30-MDV-2026-004','J30 Panama':'J-J30-PAN-2026-002','J30 Dushanbe':'J-J30-TJK-2026-005','J60 Tacarigua':'J-J60-TTO-2026-002'};
+          const stateRows=Object.values(state.tournaments||{}),allRows=[...stateRows,...sourceRows],gapIds=[],unresolvedGapLabels=[];
+          for(const label of gapLabels){if(known[label]){gapIds.push(known[label]);continue}const tokens=norm(label).split(' '),ids=new Set(allRows.filter(row=>tokens.every(token=>norm(JSON.stringify(row)).includes(token))).map(row=>String(row.competitionId||'')).filter(Boolean)),stateIds=[...ids].filter(id=>state.tournaments?.[id]);if(stateIds.length===1)gapIds.push(stateIds[0]);else if(ids.size===1)gapIds.push([...ids][0]);else unresolvedGapLabels.push({label,candidates:[...ids]})}
           const tournaments=Object.values(state.tournaments||{}),rows=[];
           for(const t of tournaments)if(t?.decision==='pending'){
             const events=(t.families||[]).flatMap(f=>(f.events||[]).map(e=>({...e,family:f.family})));
