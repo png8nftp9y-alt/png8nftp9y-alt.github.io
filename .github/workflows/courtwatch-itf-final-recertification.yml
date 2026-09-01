@@ -4,6 +4,7 @@ on:
     branches: ['audit/itf-final-recertification']
     paths: ['.github/workflows/courtwatch-itf-final-recertification.yml']
 permissions: {contents: read}
+concurrency: {group: courtwatch-itf-final-recertification,cancel-in-progress: true}
 jobs:
   select:
     runs-on: ubuntu-latest
@@ -124,7 +125,13 @@ jobs:
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const state=JSON.parse(fs.readFileSync('history/itf_draw_target_db.json','utf8'));
-          const gapIds=['J-J30-MDV-2026-004','J-J30-MEX-2026-005','J-J30-MKD-2026-003','J-J30-PAN-2026-002','J-J30-ROU-2026-003','J-J30-TJK-2026-005','J-J300-USA-2026-007','J-J60-BRA-2026-006','J-J60-CHI-2026-004','J-J60-CHN-2026-006','J-J60-IND-2026-007','J-J60-MAC-2026-002','J-J60-SIN-2026-003','J-J60-SUI-2026-004','J-J100-ESP-2026-008','J-J60-TUN-2026-005','J-J60-TTO-2026-002'];
+          const gapLabels=['J30 Male','J30 Nuevo Leon','J30 Skopje','J30 Panama','J30 Cluj Napoca','J30 Dushanbe','J300 College Park','J60 Sao Paulo','J60 Vina del Mar','J60 Shenzhen','J60 Hyderabad','J60 Macau','J60 Singapore','J60 Kreuzlingen','J100 Barcelona','J60 Megrine','J60 Tacarigua'];
+          const norm=v=>String(v||'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
+          const source=JSON.parse(fs.readFileSync('dist/v3/source_itf_tournaments.json','utf8')),sourceRows=[];
+          (function walk(v){if(Array.isArray(v))return v.forEach(walk);if(!v||typeof v!=='object')return;if(v.competitionId)sourceRows.push(v);for(const x of Object.values(v))if(x&&typeof x==='object')walk(x)})(source);
+          const known={'J30 MALE':'J-J30-MDV-2026-004','J30 PANAMA':'J-J30-PAN-2026-002','J30 DUSHANBE':'J-J30-TJK-2026-005','J60 TACARIGUA':'J-J60-TTO-2026-002'};
+          const allRows=[...Object.values(state.tournaments||{}),...sourceRows],gapIds=[],unresolvedGapLabels=[];
+          for(const label of gapLabels){const n=norm(label),tokens=n.split(' '),ids=new Set(allRows.filter(row=>tokens.every(token=>norm(JSON.stringify(row)).includes(token))).map(row=>String(row.competitionId||'')).filter(Boolean));if(known[n]){gapIds.push(known[n]);continue}if(ids.size===1)gapIds.push([...ids][0]);else unresolvedGapLabels.push({label,candidates:[...ids]})}
           const tournaments=Object.values(state.tournaments||{}),rows=[];
           for(const t of tournaments)if(t?.decision==='pending'){
             const events=(t.families||[]).flatMap(f=>(f.events||[]).map(e=>({...e,family:f.family})));
@@ -133,11 +140,11 @@ jobs:
           }
           const gap=gapIds.map(competitionId=>({competitionId,decision:state.tournaments?.[competitionId]?.decision||'missing',missingSections:state.tournaments?.[competitionId]?.missingSections??null}));
           const finland=state.tournaments?.['J-J30-FIN-2026-004'];
-          const report={generatedAt:new Date().toISOString(),history:{tournaments:tournaments.length,complete:tournaments.filter(x=>x?.decision==='complete').length,pending:tournaments.filter(x=>x?.decision==='pending').length,technicalPending:rows.filter(x=>x.category==='technical').length},gap,finland:finland?{decision:finland.decision,missingSections:finland.missingSections}:null,currentResidues:rows};
+          const report={generatedAt:new Date().toISOString(),unresolvedGapLabels,history:{tournaments:tournaments.length,complete:tournaments.filter(x=>x?.decision==='complete').length,pending:tournaments.filter(x=>x?.decision==='pending').length,technicalPending:rows.filter(x=>x.category==='technical').length},gap,finland:finland?{decision:finland.decision,missingSections:finland.missingSections}:null,currentResidues:rows};
           fs.writeFileSync('itf-final-recertification.json',JSON.stringify(report,null,2)+'\n');
           console.log('ITF_FINAL_RECERTIFICATION='+JSON.stringify(report));
           const gapBad=gap.filter(x=>x.decision!=='complete'),technical=rows.filter(x=>x.category==='technical');
-          if(gapBad.length||technical.length)throw Error('recertification failed: gap='+gapBad.map(x=>x.competitionId).join(',')+' technical='+technical.map(x=>x.competitionId+':'+x.event).join(','));
+          if(unresolvedGapLabels.length||gapBad.length||technical.length)throw Error('recertification failed: unresolvedGapLabels='+unresolvedGapLabels.map(x=>x.label).join(',')+' gap='+gapBad.map(x=>x.competitionId).join(',')+' technical='+technical.map(x=>x.competitionId+':'+x.event).join(','));
           NODE
       - uses: actions/upload-artifact@v4
         if: always()
