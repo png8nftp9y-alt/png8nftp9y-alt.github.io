@@ -1,26 +1,26 @@
 {
   "version": 11,
-  "generatedAt": "2026-09-01T03:41:44.133Z",
+  "generatedAt": "2026-09-01T04:31:37.455Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 1,
-    "pendingTournaments": 0,
-    "declaredSections": 6,
-    "requestedSections": 6,
-    "acquiredSections": 6,
-    "missingSections": 0,
-    "newSectionsCached": 6,
-    "retrySections": 0,
+    "completeTournaments": 0,
+    "pendingTournaments": 1,
+    "declaredSections": 7,
+    "requestedSections": 7,
+    "acquiredSections": 5,
+    "missingSections": 2,
+    "newSectionsCached": 5,
+    "retrySections": 2,
     "technicalErrorSections": 0,
-    "notPublishedOrIncompleteSections": 0,
+    "notPublishedOrIncompleteSections": 2,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 23,
-    "globalPendingTotal": 39,
+    "globalPendingTotal": 40,
     "globalPendingTechnical": 18,
-    "globalPendingPublication": 21,
+    "globalPendingPublication": 22,
     "technicalPendingCompetitionIds": [
       "J-J30-MEX-2026-011",
       "J-J30-MKD-2026-003",
@@ -62,23 +62,29 @@
       "J-J60-LAT-2026-004",
       "J-J30-AUS-2026-004",
       "J-J30-POL-2026-004",
-      "J-J30-EGY-2026-001"
+      "J-J30-EGY-2026-001",
+      "J-J60-CRC-2026-002"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J300-IND-2026-001",
-      "tournamentName": "J300 New Delhi",
-      "decision": "complete",
+      "competitionId": "J-J60-CRC-2026-002",
+      "tournamentName": "J60 San Jose",
+      "decision": "pending",
       "playersFound": [],
-      "declaredSections": 6,
-      "acquiredSections": 6,
-      "missingSections": 0,
+      "declaredSections": 7,
+      "acquiredSections": 5,
+      "missingSections": 2,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
           "acquired": true
+        },
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "acquired": false
         },
         {
           "event": "B-S-Q-KO",
@@ -96,9 +102,9 @@
           "acquired": true
         },
         {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "acquired": true
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "acquired": false
         },
         {
           "event": "G-D-M-KO",
@@ -113,9 +119,15 @@
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 32,
+              "players": 8,
               "error": null,
               "failureType": null
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete"
             }
           ]
         },
@@ -125,7 +137,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 30,
+              "players": 19,
               "error": null,
               "failureType": null
             }
@@ -137,7 +149,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 32,
+              "players": 30,
               "error": null,
               "failureType": null
             }
@@ -149,21 +161,15 @@
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 32,
+              "players": 8,
               "error": null,
               "failureType": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": true,
-          "events": [
+            },
             {
-              "event": "G-S-Q-KO",
-              "players": 26,
-              "error": null,
-              "failureType": null
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete"
             }
           ]
         },
@@ -173,7 +179,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 32,
+              "players": 26,
               "error": null,
               "failureType": null
             }
