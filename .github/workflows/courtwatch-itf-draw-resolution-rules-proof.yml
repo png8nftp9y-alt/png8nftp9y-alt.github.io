@@ -1,0 +1,28 @@
+name: Court Watch ITF draw resolution rules proof
+on:
+  push:
+    branches: ['test/itf-draw-resolution-rules']
+    paths: ['.github/workflows/courtwatch-itf-draw-resolution-rules-proof.yml']
+permissions: {contents: read}
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: |
+          node --check src/v3/itf-draw-resolution-rules.mjs
+          node --check src/v3/build-itf-t1-draw-batch.mjs
+          node --check src/v3/merge-itf-t1-history-method.mjs
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import {derivedDrawResolution as r} from './src/v3/itf-draw-resolution-rules.mjs';
+          assert.equal(r('G-S-Q-KO',{declaredEvents:['G-S-Q-KO','G-S-M-KO'],populatedEvents:['G-S-M-KO']}),'qualifying_not_held_main_or_groups_published');
+          assert.equal(r('B-S-Q-KO',{declaredEvents:['B-S-Q-KO','B-S-M-RR'],populatedEvents:['B-S-M-RR']}),'qualifying_not_held_main_or_groups_published');
+          assert.equal(r('G-S-Q-KO',{declaredEvents:['G-S-Q-KO','G-S-M-KO'],populatedEvents:[]}),null);
+          assert.equal(r('G-S-M-KO',{declaredEvents:['G-S-M-KO','G-S-M-RR'],populatedEvents:[] }),'round_robin_knockout_ignored');
+          assert.equal(r('G-S-M-RR',{declaredEvents:['G-S-M-KO','G-S-M-RR'],populatedEvents:['G-S-M-KO']}),null);
+          assert.equal(r('G-S-Q-KO',{declaredEvents:['G-S-Q-KO','B-S-M-KO'],populatedEvents:['B-S-M-KO']}),null);
+          console.log('directional ITF draw rules: 6/6 passed');
+          NODE
