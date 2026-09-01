@@ -1,0 +1,151 @@
+name: Court Watch ITF final recertification
+on:
+  push:
+    branches: ['audit/itf-final-recertification']
+    paths: ['.github/workflows/courtwatch-itf-final-recertification.yml']
+permissions: {contents: read}
+jobs:
+  select:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+      selected: ${{ steps.select.outputs.selected }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - id: select
+        env: {ITF_T1_TOURNAMENT_BATCH: 100}
+        run: node src/v3/build-itf-t1-tournament-matrix.mjs
+  inventory:
+    needs: select
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.select.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - if: matrix.skip != true
+        continue-on-error: true
+        env:
+          ITF_COMPETITION_ID: ${{ matrix.competitionId }}
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUEST_DELAY_MS: 1800
+        run: node src/v3/inventory-itf-history-tournament.mjs
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.skip != true
+        with:
+          name: recert-inventory-${{ matrix.index }}
+          path: dist/v3/shards/itf/inventory/*.json
+          if-no-files-found: error
+  queue:
+    needs: [select, inventory]
+    if: always() && needs.select.outputs.selected != '0'
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.queue.outputs.matrix }}
+      tasks: ${{ steps.queue.outputs.tasks }}
+      tournaments: ${{ steps.queue.outputs.tournaments }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'recert-inventory-*', path: dist/v3/shards/itf/inventory, merge-multiple: true}
+      - id: queue
+        run: node src/v3/build-itf-t1-draw-batch.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recert-queue
+          path: |
+            dist/v3/itf_t1_draw_batch.json
+            dist/v3/shards/itf/t1-inventory/*.json
+          if-no-files-found: error
+  acquire:
+    needs: queue
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.queue.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - if: matrix.skip != true
+        continue-on-error: true
+        env:
+          ITF_DRAW_TASK_B64: ${{ matrix.task }}
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUEST_DELAY_MS: 1800
+          ITF_REQUIRE_POPULATED_DRAW: 1
+        run: |
+          export ITF_TOURNAMENT_TASKS_JSON="$(printf '%s' "$ITF_DRAW_TASK_B64" | base64 --decode)"
+          node src/v3/acquire-itf-history-tournament-tasks.mjs
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.skip != true
+        with:
+          name: recert-draw-${{ matrix.index }}
+          path: dist/v3/shards/itf/draw-tasks/*.json.gz
+          if-no-files-found: error
+  certify:
+    needs: [queue, acquire]
+    if: always() && needs.queue.outputs.tournaments != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {name: recert-queue, path: dist/v3}
+      - uses: actions/download-artifact@v4
+        if: needs.queue.outputs.tasks != '0'
+        with: {pattern: 'recert-draw-*', path: draw-tasks, merge-multiple: true}
+      - name: Merge only inside disposable runner
+        run: |
+          set -euo pipefail
+          mkdir -p dist/v3/audits/itf-final-recertification
+          for inventory in dist/v3/shards/itf/t1-inventory/*.json; do
+            cp "$inventory" dist/v3/itf_t1_section_inventory.json
+            node src/v3/merge-itf-t1-history-method.mjs
+            id="$(jq -r .competitionId "$inventory")"
+            cp dist/v3/source_itf_draw_audit.json "dist/v3/audits/itf-final-recertification/$id.json"
+          done
+          node src/v3/maintain-itf-database.mjs
+          node src/v3/validate-itf-system.mjs
+      - name: Certify history gap and current residues
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const state=JSON.parse(fs.readFileSync('history/itf_draw_target_db.json','utf8'));
+          const gapIds=['J-J30-MDV-2026-004','J-J30-MEX-2026-005','J-J30-MKD-2026-003','J-J30-PAN-2026-002','J-J30-ROU-2026-003','J-J30-TJK-2026-005','J-J300-USA-2026-007','J-J60-BRA-2026-006','J-J60-CHI-2026-004','J-J60-CHN-2026-006','J-J60-IND-2026-007','J-J60-MAC-2026-002','J-J60-SIN-2026-003','J-J60-SUI-2026-004','J-J100-ESP-2026-008','J-J60-TUN-2026-005','J-J60-TTO-2026-002'];
+          const tournaments=Object.values(state.tournaments||{}),rows=[];
+          for(const t of tournaments)if(t?.decision==='pending'){
+            const events=(t.families||[]).flatMap(f=>(f.events||[]).map(e=>({...e,family:f.family})));
+            for(const e of events)if(!e.resolved)rows.push({competitionId:t.competitionId,event:e.event||null,family:e.family,category:e.failureType==='technical_error'?'technical':'publication',reason:e.error||e.failureType||'pending'});
+            if(!events.length)rows.push({competitionId:t.competitionId,event:null,family:null,category:t.eventFailure?'technical':'publication',reason:t.eventFailure||'pending_without_detail'});
+          }
+          const gap=gapIds.map(competitionId=>({competitionId,decision:state.tournaments?.[competitionId]?.decision||'missing',missingSections:state.tournaments?.[competitionId]?.missingSections??null}));
+          const finland=state.tournaments?.['J-J30-FIN-2026-004'];
+          const report={generatedAt:new Date().toISOString(),history:{tournaments:tournaments.length,complete:tournaments.filter(x=>x?.decision==='complete').length,pending:tournaments.filter(x=>x?.decision==='pending').length,technicalPending:rows.filter(x=>x.category==='technical').length},gap,finland:finland?{decision:finland.decision,missingSections:finland.missingSections}:null,currentResidues:rows};
+          fs.writeFileSync('itf-final-recertification.json',JSON.stringify(report,null,2)+'\n');
+          console.log('ITF_FINAL_RECERTIFICATION='+JSON.stringify(report));
+          const gapBad=gap.filter(x=>x.decision!=='complete'),technical=rows.filter(x=>x.category==='technical');
+          if(gapBad.length||technical.length)throw Error('recertification failed: gap='+gapBad.map(x=>x.competitionId).join(',')+' technical='+technical.map(x=>x.competitionId+':'+x.event).join(','));
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-final-recertification
+          path: |
+            itf-final-recertification.json
+            history/itf_database_audit.json
+            history/itf_draw_target_db.json
+            dist/v3/audits/itf-final-recertification/*.json
+          retention-days: 14
