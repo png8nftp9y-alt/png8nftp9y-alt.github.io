@@ -3,9 +3,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '4,18,32,46 * * * *'
-  push:
-    branches: [main]
-    paths: ['players.json','dist/v3/source_itf_tournaments.json','history/itf_historical_player_tournaments.json','src/v3/itf-common.mjs','src/v3/discover-itf-acceptance-shard.mjs','src/v3/retry-itf-acceptance-shard.mjs','src/v3/merge-itf-acceptance-shards.mjs','src/v3/maintain-itf-database.mjs','src/v3/validate-itf-system.mjs','src/v3/entries-engine.mjs','src/v3/itf-r2-cache.sh','.github/workflows/courtwatch-v3-itf-known-fast.yml']
+
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-known-fast,cancel-in-progress: true}
 jobs:
