@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-09-01T00:37:09.953Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-09-01T01:11:38.059Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
   "targets": {
@@ -1510,7 +1510,7 @@
     "J-J30-ARG-2026-003": {
       "competitionId": "J-J30-ARG-2026-003",
       "decision": "pending",
-      "checkedAt": "2026-08-31T19:44:10.704Z",
+      "checkedAt": "2026-09-01T01:10:47.838Z",
       "playersFound": 0,
       "families": [
         {
@@ -1520,12 +1520,12 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -1558,12 +1558,12 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": null
+              "error": "deferred_isolated_section"
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -1574,23 +1574,23 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "error": "deferred_isolated_section"
             }
           ]
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge"
+              "players": 32,
+              "error": null
             }
           ]
         }
       ],
-      "eventFailure": "browser_fallback:browser_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1909,8 +1909,260 @@
             }
           ],
           "storedAt": "2026-08-31T19:44:10.704Z"
+        },
+        "G-D-M-KO": {
+          "family": "G-D-M",
+          "populated": true,
+          "players": [
+            {
+              "id": "800747737",
+              "name": "Justina Lassaga"
+            },
+            {
+              "id": "800791377",
+              "name": "Florencia Mardones"
+            },
+            {
+              "id": "800829050",
+              "name": "Olivia Galarza De Vito"
+            },
+            {
+              "id": "800759089",
+              "name": "Ana Vallejos Porta"
+            },
+            {
+              "id": "800740230",
+              "name": "Maria Eugenia Galan"
+            },
+            {
+              "id": "800859186",
+              "name": "Lucila Stoppani"
+            },
+            {
+              "id": "800788004",
+              "name": "Angela Morena Medinaceli Lobos"
+            },
+            {
+              "id": "800713287",
+              "name": "Mercedes Zunino Arques"
+            },
+            {
+              "id": "800798586",
+              "name": "Maria Luz Apas"
+            },
+            {
+              "id": "800751196",
+              "name": "Martina Piccolo Nievas"
+            },
+            {
+              "id": "800819499",
+              "name": "Ana Larah Benjamim Camargo"
+            },
+            {
+              "id": "800814361",
+              "name": "Lucila Marrella"
+            },
+            {
+              "id": "800799130",
+              "name": "Nayla Paulochenka"
+            },
+            {
+              "id": "800780062",
+              "name": "Sofia Zunino Arques"
+            },
+            {
+              "id": "800780003",
+              "name": "Manon Angelina Felicia"
+            },
+            {
+              "id": "800785527",
+              "name": "Iara Pawelek Piscopo"
+            },
+            {
+              "id": "800822447",
+              "name": "Josela Cremasco"
+            },
+            {
+              "id": "800713118",
+              "name": "Maria Valentina Lloret"
+            },
+            {
+              "id": "800751963",
+              "name": "Guadalupe Muro"
+            },
+            {
+              "id": "800812508",
+              "name": "Delfina Tiseyra"
+            },
+            {
+              "id": "800677654",
+              "name": "MORA BASEL"
+            },
+            {
+              "id": "800716730",
+              "name": "Malena Molina Iriarte"
+            },
+            {
+              "id": "800818607",
+              "name": "Jazmin Zurbriggen"
+            },
+            {
+              "id": "800818608",
+              "name": "Luz Zurbriggen"
+            },
+            {
+              "id": "800721205",
+              "name": "Maria Florencia Goldsztein"
+            },
+            {
+              "id": "800787183",
+              "name": "Serena Minetti Delgado"
+            },
+            {
+              "id": "800786681",
+              "name": "Sofia Gabilanes"
+            },
+            {
+              "id": "800779953",
+              "name": "Zaira Abigail Martinez"
+            },
+            {
+              "id": "800747737",
+              "name": "Justina Lassaga"
+            },
+            {
+              "id": "800791377",
+              "name": "Florencia Mardones"
+            },
+            {
+              "id": "800786681",
+              "name": "Sofia Gabilanes"
+            },
+            {
+              "id": "800779953",
+              "name": "Zaira Abigail Martinez"
+            }
+          ],
+          "storedAt": "2026-09-01T01:10:47.838Z"
         }
-      }
+      },
+      "declaredSections": 8,
+      "acquiredSections": 3,
+      "missingSections": 5,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "tournamentId": 1100205125,
+            "tourType": "N",
+            "circuitCode": "JT",
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-san-miguel-de-tucuman/arg/2026/j-j30-arg-2026-003/"
+          }
+        }
+      ]
     },
     "J-J30-DEN-2026-004": {
       "competitionId": "J-J30-DEN-2026-004",
