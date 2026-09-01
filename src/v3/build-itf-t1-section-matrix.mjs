@@ -6,7 +6,12 @@ const state=await readJson('history/itf_draw_target_db.json',{tournaments:{}});
 const tomorrow=new Date(Date.parse(TODAY+'T00:00:00Z')+864e5).toISOString().slice(0,10);
 const due=(map.tournaments||[]).filter(t=>t.startDate<=tomorrow&&t.endDate>=TODAY&&state.tournaments?.[t.competitionId]?.decision!=='complete').sort((a,b)=>String(state.tournaments?.[a.competitionId]?.checkedAt||'').localeCompare(String(state.tournaments?.[b.competitionId]?.checkedAt||''))||String(a.startDate).localeCompare(String(b.startDate))||String(a.competitionId).localeCompare(String(b.competitionId)));
 const tournament=due[0];
-if(!tournament)throw new Error('No pending ITF T-1 tournament.');
+if(!tournament){
+ const matrix={include:[{skip:true,index:0,event:'none',competitionId:'none',inventory:''}]};
+ if(process.env.GITHUB_OUTPUT)await fs.appendFile(process.env.GITHUB_OUTPUT,'matrix='+JSON.stringify(matrix)+'\ncompetition_id=\ndeclared=0\nrequested=0\n');
+ console.log(JSON.stringify({status:'no_pending_itf_t1_tournaments'}));
+ process.exit(0);
+}
 const combos=await tournamentEvents(tournament);
 if(!combos.length)throw new Error('ITF returned no draw combinations for '+tournament.competitionId);
 const eventKey=c=>[c.playerTypeCode,c.matchTypeCode,c.eventClassificationCode,c.drawsheetStructureCode].join('-');
