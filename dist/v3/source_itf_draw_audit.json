@@ -1,6 +1,6 @@
 {
   "version": 15,
-  "generatedAt": "2026-09-01T18:22:32.753Z",
+  "generatedAt": "2026-09-01T18:47:22.412Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,36 +8,38 @@
     "completeTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 8,
-    "requestedSections": 6,
+    "requestedSections": 0,
     "acquiredSections": 4,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
     "resolvedSections": 4,
     "missingSections": 4,
-    "newSectionsCached": 2,
+    "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "retrySections": 4,
-    "technicalErrorSections": 0,
-    "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 4,
+    "retrySections": 0,
+    "technicalErrorSections": 4,
+    "missingArtifactSections": 4,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 44,
     "globalPendingTotal": 22,
-    "globalPendingTechnical": 2,
-    "globalPendingPublication": 20,
+    "globalPendingTechnical": 10,
+    "globalPendingPublication": 12,
     "technicalPendingCompetitionIds": [
-      "J-J30-DEN-2026-004",
-      "J-J30-SVK-2026-004"
-    ],
-    "publicationPendingCompetitionIds": [
       "J-J30-MDV-2026-004",
       "J-J30-PAN-2026-002",
       "J-J30-ARG-2026-003",
+      "J-J30-DEN-2026-004",
       "J-J30-ECU-2026-005",
       "J-J30-GER-2026-005",
       "J-J30-GHA-2026-005",
+      "J-J60-FRA-2026-006",
+      "J-J60-LAT-2026-004",
+      "J-J30-SVK-2026-004"
+    ],
+    "publicationPendingCompetitionIds": [
       "J-J30-MEX-2026-009",
       "J-J30-ROU-2026-004",
       "J-J30-SLO-2026-003",
@@ -48,16 +50,14 @@
       "J-J60-BUL-2026-002",
       "J-J60-CHI-2026-001",
       "J-J60-COL-2026-001",
-      "J-J60-FRA-2026-006",
-      "J-J60-LAT-2026-004",
       "J-J30-AUS-2026-004",
       "J-J30-POL-2026-004"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J60-COL-2026-001",
-      "tournamentName": "J60 Cartagena",
+      "competitionId": "J-J60-LAT-2026-004",
+      "tournamentName": "J60 Liepaja",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 8,
@@ -132,15 +132,15 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             },
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -151,7 +151,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 19,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -164,7 +164,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 32,
+              "players": 30,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -178,15 +178,15 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -197,7 +197,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 12,
+              "players": 15,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -210,7 +210,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 30,
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -218,7 +218,7 @@
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "B-S-M-KO:draw_artifact_missing | B-S-M-RR:draw_artifact_missing | G-S-M-KO:draw_artifact_missing | G-S-M-RR:draw_artifact_missing"
     }
   ]
 }
