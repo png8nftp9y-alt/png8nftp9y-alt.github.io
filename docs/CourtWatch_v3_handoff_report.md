@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-01.55**
+Revisione documento: **2026-09-01.56**
+
+- 1 settembre 2026 — Correzione dei tabelloni vuoti certificata sul torneo in corso J30 San Miguel de Tucumán, run `33458855019` verde: 8 sezioni dichiarate, 3 già acquisite preservate, soltanto 5 richieste; tutte e 5 le risposte senza giocatori sono rimaste `not_published_or_incomplete`, 0 errori tecnici, 0 rimozioni e decisione correttamente `pending` 3/8. Il motore operativo richiede ora contenuto popolato prima di salvare una sezione come acquisita e distingue esplicitamente `technical_error` da `not_published_or_incomplete`. Correzione pubblicata con commit `4c9a97fa`.
 
 - 1 settembre 2026 — Primo ciclo operativo del nuovo T−1 storico, run `33457808699`, certificato verde. J60 Arlon: 6 tabelloni dichiarati, 6 richiesti, 6 acquisiti e salvati, 0 mancanti e 0 retry; torneo passato a `complete`. Lo stato globale è salito a 19 tornei completi e conserva 38 pending (37 tecnici e 1 di pubblicazione), che restano nella coda persistente e saranno elaborati uno per ciclo senza ritentare i tabelloni già acquisiti.
 
