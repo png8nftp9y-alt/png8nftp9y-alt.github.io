@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-09-01T19:29:28.382Z",
+  "generatedAt": "2026-09-01T19:31:56.753Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
@@ -791,8 +791,8 @@
     },
     "J-J30-MDV-2026-004": {
       "competitionId": "J-J30-MDV-2026-004",
-      "decision": "pending",
-      "checkedAt": "2026-09-01T19:24:49.954Z",
+      "decision": "complete",
+      "checkedAt": "2026-09-01T19:31:56.146Z",
       "playersFound": 0,
       "families": [
         {
@@ -868,9 +868,9 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             }
           ]
         },
@@ -891,9 +891,9 @@
       "eventFailure": null,
       "declaredSections": 8,
       "acquiredSections": 5,
-      "unusedAlternativeSections": 2,
-      "resolvedSections": 7,
-      "missingSections": 1,
+      "unusedAlternativeSections": 3,
+      "resolvedSections": 8,
+      "missingSections": 0,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -1922,6 +1922,15 @@
           "observedAt": "2026-09-01T06:54:00.239Z",
           "storedAt": "2026-09-01T06:54:00.239Z",
           "resolution": "unused_alternative_structure"
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:31:56.146Z",
+          "storedAt": "2026-09-01T19:31:56.146Z",
+          "resolution": "qualifying_not_held_main_or_groups_published"
         }
       }
     },
@@ -4655,8 +4664,8 @@
     },
     "J-J30-PAN-2026-002": {
       "competitionId": "J-J30-PAN-2026-002",
-      "decision": "pending",
-      "checkedAt": "2026-09-01T19:24:50.447Z",
+      "decision": "complete",
+      "checkedAt": "2026-09-01T19:31:56.248Z",
       "playersFound": 0,
       "families": [
         {
@@ -4732,9 +4741,9 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             }
           ]
         },
@@ -4755,9 +4764,9 @@
       "eventFailure": null,
       "declaredSections": 8,
       "acquiredSections": 5,
-      "unusedAlternativeSections": 2,
-      "resolvedSections": 7,
-      "missingSections": 1,
+      "unusedAlternativeSections": 3,
+      "resolvedSections": 8,
+      "missingSections": 0,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -5806,6 +5815,15 @@
           "observedAt": "2026-09-01T06:54:01.158Z",
           "storedAt": "2026-09-01T06:54:01.158Z",
           "resolution": "unused_alternative_structure"
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:31:56.248Z",
+          "storedAt": "2026-09-01T19:31:56.248Z",
+          "resolution": "qualifying_not_held_main_or_groups_published"
         }
       }
     },
@@ -29971,7 +29989,7 @@
     "J-J30-ARG-2026-003": {
       "competitionId": "J-J30-ARG-2026-003",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:29:28.073Z",
+      "checkedAt": "2026-09-01T19:31:56.022Z",
       "playersFound": 0,
       "families": [
         {
@@ -29988,8 +30006,8 @@
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -30034,8 +30052,8 @@
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -30047,8 +30065,8 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -30067,7 +30085,7 @@
           ]
         }
       ],
-      "eventFailure": "B-S-M-RR:draw_artifact_missing | G-S-M-RR:draw_artifact_missing | G-S-Q-KO:draw_artifact_missing",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -30527,8 +30545,8 @@
           "populated": false,
           "terminalAlternative": true,
           "players": [],
-          "observedAt": "2026-09-01T19:29:28.073Z",
-          "storedAt": "2026-09-01T19:29:28.073Z",
+          "observedAt": "2026-09-01T19:31:56.022Z",
+          "storedAt": "2026-09-01T19:31:56.022Z",
           "resolution": "round_robin_knockout_ignored"
         },
         "G-S-M-KO": {
@@ -30536,8 +30554,8 @@
           "populated": false,
           "terminalAlternative": true,
           "players": [],
-          "observedAt": "2026-09-01T19:29:28.073Z",
-          "storedAt": "2026-09-01T19:29:28.073Z",
+          "observedAt": "2026-09-01T19:31:56.022Z",
+          "storedAt": "2026-09-01T19:31:56.022Z",
           "resolution": "round_robin_knockout_ignored"
         }
       },
@@ -38457,7 +38475,7 @@
     "J-J30-USA-2026-005": {
       "competitionId": "J-J30-USA-2026-005",
       "decision": "pending",
-      "checkedAt": "2026-09-01T18:22:32.309Z",
+      "checkedAt": "2026-09-01T19:31:56.354Z",
       "playersFound": 0,
       "families": [
         {
@@ -38467,9 +38485,9 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "B-S-M-RR",
@@ -38513,9 +38531,9 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "G-S-M-RR",
@@ -38649,13 +38667,31 @@
             }
           ],
           "storedAt": "2026-09-01T11:02:24.858Z"
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:31:56.354Z",
+          "storedAt": "2026-09-01T19:31:56.354Z",
+          "resolution": "round_robin_knockout_ignored"
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:31:56.354Z",
+          "storedAt": "2026-09-01T19:31:56.354Z",
+          "resolution": "round_robin_knockout_ignored"
         }
       },
       "declaredSections": 7,
       "acquiredSections": 1,
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 1,
-      "missingSections": 6,
+      "unusedAlternativeSections": 2,
+      "resolvedSections": 3,
+      "missingSections": 4,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -38774,7 +38810,7 @@
     "J-J30-USA-2026-006": {
       "competitionId": "J-J30-USA-2026-006",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:29:28.194Z",
+      "checkedAt": "2026-09-01T19:31:56.453Z",
       "playersFound": 0,
       "families": [
         {
@@ -38791,8 +38827,8 @@
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -38817,8 +38853,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -38837,8 +38873,8 @@
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -38863,14 +38899,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "B-S-M-RR:draw_artifact_missing | B-D-M-KO:draw_artifact_missing | G-S-M-RR:draw_artifact_missing | G-D-M-KO:draw_artifact_missing",
+      "eventFailure": null,
       "declaredSections": 8,
       "acquiredSections": 2,
       "missingSections": 4,
@@ -39326,8 +39362,8 @@
           "populated": false,
           "terminalAlternative": true,
           "players": [],
-          "observedAt": "2026-09-01T19:29:28.194Z",
-          "storedAt": "2026-09-01T19:29:28.194Z",
+          "observedAt": "2026-09-01T19:31:56.453Z",
+          "storedAt": "2026-09-01T19:31:56.453Z",
           "resolution": "round_robin_knockout_ignored"
         },
         "G-S-M-KO": {
@@ -39335,8 +39371,8 @@
           "populated": false,
           "terminalAlternative": true,
           "players": [],
-          "observedAt": "2026-09-01T19:29:28.194Z",
-          "storedAt": "2026-09-01T19:29:28.194Z",
+          "observedAt": "2026-09-01T19:31:56.453Z",
+          "storedAt": "2026-09-01T19:31:56.453Z",
           "resolution": "round_robin_knockout_ignored"
         }
       },
@@ -39346,7 +39382,7 @@
     "J-J60-BUL-2026-002": {
       "competitionId": "J-J60-BUL-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:29:28.293Z",
+      "checkedAt": "2026-09-01T19:31:56.551Z",
       "playersFound": 0,
       "families": [
         {
@@ -39363,8 +39399,8 @@
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -39389,8 +39425,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -39409,8 +39445,8 @@
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -39435,14 +39471,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "B-S-M-RR:draw_artifact_missing | B-D-M-KO:draw_artifact_missing | G-S-M-RR:draw_artifact_missing | G-D-M-KO:draw_artifact_missing",
+      "eventFailure": null,
       "declaredSections": 8,
       "acquiredSections": 2,
       "missingSections": 4,
@@ -39978,8 +40014,8 @@
           "populated": false,
           "terminalAlternative": true,
           "players": [],
-          "observedAt": "2026-09-01T19:29:28.293Z",
-          "storedAt": "2026-09-01T19:29:28.293Z",
+          "observedAt": "2026-09-01T19:31:56.551Z",
+          "storedAt": "2026-09-01T19:31:56.551Z",
           "resolution": "round_robin_knockout_ignored"
         },
         "G-S-M-KO": {
@@ -39987,8 +40023,8 @@
           "populated": false,
           "terminalAlternative": true,
           "players": [],
-          "observedAt": "2026-09-01T19:29:28.293Z",
-          "storedAt": "2026-09-01T19:29:28.293Z",
+          "observedAt": "2026-09-01T19:31:56.551Z",
+          "storedAt": "2026-09-01T19:31:56.551Z",
           "resolution": "round_robin_knockout_ignored"
         }
       },
@@ -39998,7 +40034,7 @@
     "J-J60-CHI-2026-001": {
       "competitionId": "J-J60-CHI-2026-001",
       "decision": "pending",
-      "checkedAt": "2026-09-01T18:22:32.645Z",
+      "checkedAt": "2026-09-01T19:31:56.652Z",
       "playersFound": 0,
       "families": [
         {
@@ -40008,9 +40044,9 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "B-S-M-RR",
@@ -40054,9 +40090,9 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             },
             {
               "event": "G-S-M-RR",
@@ -40082,14 +40118,14 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
@@ -41029,13 +41065,359 @@
             }
           ],
           "storedAt": "2026-09-01T18:22:32.645Z"
+        },
+        "G-D-M-KO": {
+          "family": "G-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800759753",
+              "name": "stephanie pumar",
+              "givenName": "stephanie",
+              "familyName": "pumar",
+              "nationalityCode": "VEN",
+              "profileLink": "/en/players/stephanie-pumar/800759753/ven/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800682346",
+              "name": "Flavia Cherobim Souza",
+              "givenName": "Flavia Cherobim",
+              "familyName": "Souza",
+              "nationalityCode": "BRA",
+              "profileLink": "/en/players/flavia-cherobim-souza/800682346/bra/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800859977",
+              "name": "Maite Gonzalez Otarola",
+              "givenName": "Maite",
+              "familyName": "Gonzalez Otarola",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/maite-gonzalez-otarola/800859977/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800860141",
+              "name": "Elena Rojas",
+              "givenName": "Elena",
+              "familyName": "Rojas",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/elena-rojas/800860141/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800695373",
+              "name": "Gabriana Muela",
+              "givenName": "Gabriana",
+              "familyName": "Muela",
+              "nationalityCode": "URU",
+              "profileLink": "/en/players/gabriana-muela/800695373/uru/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800713294",
+              "name": "Celeste Salas",
+              "givenName": "Celeste",
+              "familyName": "Salas",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/celeste-salas/800713294/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800752159",
+              "name": "Pia Fabres",
+              "givenName": "Pia",
+              "familyName": "Fabres",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/pia-fabres/800752159/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800822114",
+              "name": "Emilia Ainhoa Saez Hoffens",
+              "givenName": "Emilia Ainhoa",
+              "familyName": "Saez Hoffens",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/emilia-ainhoa-saez-hoffens/800822114/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800739106",
+              "name": "Sofia Cuoco",
+              "givenName": "Sofia",
+              "familyName": "Cuoco",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/sofia-cuoco/800739106/arg/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791546",
+              "name": "Catalina Porre",
+              "givenName": "Catalina",
+              "familyName": "Porre",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/catalina-porre/800791546/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751615",
+              "name": "Valentina Natalia Munoz Diaz",
+              "givenName": "Valentina Natalia",
+              "familyName": "Munoz Diaz",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/valentina-natalia-munoz-diaz/800751615/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800784417",
+              "name": "Fernanda Eugenia Peirano Ardiles",
+              "givenName": "Fernanda Eugenia",
+              "familyName": "Peirano Ardiles",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/fernanda-eugenia-peirano-ardiles/800784417/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800645610",
+              "name": "Samantha Alvarez",
+              "givenName": "Samantha",
+              "familyName": "Alvarez",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/samantha-alvarez/800645610/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800711905",
+              "name": "Luiza Ninno",
+              "givenName": "Luiza",
+              "familyName": "Ninno",
+              "nationalityCode": "BRA",
+              "profileLink": "/en/players/luiza-ninno/800711905/bra/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800739751",
+              "name": "Emilia Cecilia Antelo Cordova",
+              "givenName": "Emilia Cecilia",
+              "familyName": "Antelo Cordova",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/emilia-cecilia-antelo-cordova/800739751/bol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781276",
+              "name": "Emilia Bustillos",
+              "givenName": "Emilia",
+              "familyName": "Bustillos",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/emilia-bustillos/800781276/bol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800716734",
+              "name": "Amelie Boulier Santelices",
+              "givenName": "Amelie",
+              "familyName": "Boulier Santelices",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/amelie-boulier-santelices/800716734/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800719280",
+              "name": "Fernanda Seguel Benavides",
+              "givenName": "Fernanda",
+              "familyName": "Seguel Benavides",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/fernanda-seguel-benavides/800719280/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800678910",
+              "name": "Carmenluz Calderon",
+              "givenName": "Carmenluz",
+              "familyName": "Calderon",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/carmenluz-calderon/800678910/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800718983",
+              "name": "Ambra Marsiletti",
+              "givenName": "Ambra",
+              "familyName": "Marsiletti",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/ambra-marsiletti/800718983/arg/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800758641",
+              "name": "LARA CRISTINA HASS",
+              "givenName": "LARA CRISTINA",
+              "familyName": "HASS",
+              "nationalityCode": "BRA",
+              "profileLink": "/en/players/lara-cristina-hass/800758641/bra/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743056",
+              "name": "Delfina Ruete",
+              "givenName": "Delfina",
+              "familyName": "Ruete",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/delfina-ruete/800743056/arg/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781503",
+              "name": "Rebeca Pinell Espinosa",
+              "givenName": "Rebeca",
+              "familyName": "Pinell Espinosa",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/rebeca-pinell-espinosa/800781503/bol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800643051",
+              "name": "Martina Salaberry",
+              "givenName": "Martina",
+              "familyName": "Salaberry",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/martina-salaberry/800643051/bol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800723153",
+              "name": "Matilda Casarini",
+              "givenName": "Matilda",
+              "familyName": "Casarini",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/matilda-casarini/800723153/arg/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800678506",
+              "name": "Josefa Isidora Meneses Parada",
+              "givenName": "Josefa Isidora",
+              "familyName": "Meneses Parada",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/josefa-isidora-meneses-parada/800678506/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800806991",
+              "name": "Gabriela Rezende de Carvalho",
+              "givenName": "Gabriela Rezende",
+              "familyName": "de Carvalho",
+              "nationalityCode": "BRA",
+              "profileLink": "/en/players/gabriela-rezende-de-carvalho/800806991/bra/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800718296",
+              "name": "Sofia isidora Peralta calderon",
+              "givenName": "Sofia isidora",
+              "familyName": "Peralta calderon",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/sofia-isidora-peralta-calderon/800718296/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800652517",
+              "name": "Zoe Castro Calderon",
+              "givenName": "Zoe",
+              "familyName": "Castro Calderon",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/zoe-castro-calderon/800652517/bol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800784472",
+              "name": "Blanca Figueroa Carrasco",
+              "givenName": "Blanca",
+              "familyName": "Figueroa Carrasco",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/blanca-figueroa-carrasco/800784472/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800718202",
+              "name": "Isidora Lisboa",
+              "givenName": "Isidora",
+              "familyName": "Lisboa",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/isidora-lisboa/800718202/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800716005",
+              "name": "Sofia Paredes",
+              "givenName": "Sofia",
+              "familyName": "Paredes",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/sofia-paredes/800716005/chi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-09-01T19:31:56.652Z"
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:31:56.652Z",
+          "storedAt": "2026-09-01T19:31:56.652Z",
+          "resolution": "round_robin_knockout_ignored"
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": false,
+          "terminalAlternative": true,
+          "players": [],
+          "observedAt": "2026-09-01T19:31:56.652Z",
+          "storedAt": "2026-09-01T19:31:56.652Z",
+          "resolution": "round_robin_knockout_ignored"
         }
       },
       "declaredSections": 8,
-      "acquiredSections": 3,
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 3,
-      "missingSections": 5,
+      "acquiredSections": 4,
+      "unusedAlternativeSections": 2,
+      "resolvedSections": 6,
+      "missingSections": 2,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -41170,7 +41552,7 @@
     "J-J60-COL-2026-001": {
       "competitionId": "J-J60-COL-2026-001",
       "decision": "pending",
-      "checkedAt": "2026-09-01T19:29:28.382Z",
+      "checkedAt": "2026-09-01T19:31:56.753Z",
       "playersFound": 0,
       "families": [
         {
@@ -41187,8 +41569,8 @@
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -41233,8 +41615,8 @@
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -41266,7 +41648,7 @@
           ]
         }
       ],
-      "eventFailure": "B-S-M-RR:draw_artifact_missing | G-S-M-RR:draw_artifact_missing",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -42205,8 +42587,8 @@
           "populated": false,
           "terminalAlternative": true,
           "players": [],
-          "observedAt": "2026-09-01T19:29:28.382Z",
-          "storedAt": "2026-09-01T19:29:28.382Z",
+          "observedAt": "2026-09-01T19:31:56.753Z",
+          "storedAt": "2026-09-01T19:31:56.753Z",
           "resolution": "round_robin_knockout_ignored"
         },
         "G-S-M-KO": {
@@ -42214,8 +42596,8 @@
           "populated": false,
           "terminalAlternative": true,
           "players": [],
-          "observedAt": "2026-09-01T19:29:28.382Z",
-          "storedAt": "2026-09-01T19:29:28.382Z",
+          "observedAt": "2026-09-01T19:31:56.753Z",
+          "storedAt": "2026-09-01T19:31:56.753Z",
           "resolution": "round_robin_knockout_ignored"
         }
       },
