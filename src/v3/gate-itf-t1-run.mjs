@@ -1,0 +1,20 @@
+import process from 'node:process';
+import {readJson,writeJson,NOW} from './itf-common.mjs';
+
+const diagnosticsFile=process.env.ITF_SYSTEM_DIAGNOSTICS_FILE||'dist/v3/itf_system_diagnostics.json';
+const auditFile=process.env.ITF_DRAW_AUDIT_FILE||'dist/v3/source_itf_draw_audit.json';
+const outputFile=process.env.ITF_T1_GATE_OUTPUT||'dist/v3/itf_t1_run_gate.json';
+const diagnostics=await readJson(diagnosticsFile,{}),audit=await readJson(auditFile,{}),summary=audit.summary||diagnostics.checks?.tMinus1||{};
+const technicalIds=[...new Set(summary.technicalPendingCompetitionIds||[])].sort();
+const publicationIds=[...new Set(summary.publicationPendingCompetitionIds||[])].sort();
+const technicalCount=Number(summary.globalPendingTechnical??technicalIds.length),publicationCount=Number(summary.globalPendingPublication??publicationIds.length);
+const errors=[];
+if(!String(summary.mode||'').startsWith('live_t_minus_1'))errors.push('t_minus_one_summary_missing');
+if(technicalCount!==technicalIds.length)errors.push('technical_pending_count_mismatch');
+if(publicationCount!==publicationIds.length)errors.push('publication_pending_count_mismatch');
+if(technicalCount>0)errors.push('technical_pending_present');
+const status=errors.length?'blocked':'green';
+const out={version:1,generatedAt:NOW,status,technicalPending:{count:technicalCount,competitionIds:technicalIds},publicationPending:{count:publicationCount,competitionIds:publicationIds},errors};
+await writeJson(outputFile,out);
+console.log(JSON.stringify(out,null,2));
+if(errors.length)process.exitCode=2;
