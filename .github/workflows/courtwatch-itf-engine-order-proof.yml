@@ -26,7 +26,8 @@ jobs:
       - name: Verify homonymous draws remain distinct
         run: node -e "import('./src/v3/itf-draw-identity.mjs').then(({indexSections})=>{const base={playerTypeCode:'G',matchTypeCode:'S',eventClassificationCode:'Q',drawsheetStructureCode:'KO',tournamentId:123};const rows=indexSections([{...base,weekNumber:0},{...base,weekNumber:1}]);if(rows.length!==2||rows[0].sectionId===rows[1].sectionId)throw Error('homonymous ITF draws collapsed')})"
       - name: Verify merge and cache use section identity
-        run: node -e "const s=require('fs').readFileSync('src/v3/merge-itf-t1-history-method.mjs','utf8');if(s.includes('byEvent.get(section.event)')||s.includes('eventCache[section.event]={'))throw Error('merge still collapses homonymous draws');for(const token of ['sectionId:section.sectionId','eventCache[section.sectionId]','doc.sectionId||doc.event'])if(!s.includes(token))throw Error('missing section identity in merge: '+token)"
+        run: |
+          node -e "const s=require('fs').readFileSync('src/v3/merge-itf-t1-history-method.mjs','utf8');if(s.includes('byEvent.get(section.event)')||s.includes('eventCache[section.event]={'))throw Error('merge still collapses homonymous draws');for(const token of ['sectionId:section.sectionId','eventCache[section.sectionId]','doc.sectionId||doc.event'])if(!s.includes(token))throw Error('missing section identity: '+token)"
       - name: Verify green and technical gates
         run: |
           mkdir -p dist/v3
