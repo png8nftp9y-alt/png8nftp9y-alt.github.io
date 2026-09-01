@@ -76,10 +76,10 @@ jobs:
         with: {node-version: '22'}
       - name: Acquire one isolated bridge draw exactly as history
         env:
-          ITF_DRAW_TASK_JSON: ${{ toJSON(fromJSON(format('"{0}"', matrix.task))) }}
+          ITF_DRAW_TASK_B64: ${{ matrix.task }}
           ITF_REQUEST_TIMEOUT_MS: '30000'
         run: |
-          export ITF_DRAW_TASK_JSON="$(printf '%s' "$ITF_DRAW_TASK_JSON" | base64 --decode)"
+          export ITF_DRAW_TASK_JSON="$(printf '%s' "$ITF_DRAW_TASK_B64" | base64 --decode)"
           node src/v3/acquire-itf-history-draw-task.mjs
       - uses: actions/upload-artifact@v4
         if: always()
