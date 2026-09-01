@@ -1,30 +1,32 @@
 {
-  "version": 14,
-  "generatedAt": "2026-09-01T16:22:11.187Z",
+  "version": 15,
+  "generatedAt": "2026-09-01T16:44:02.291Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
-    "pendingTournaments": 1,
+    "completeTournaments": 1,
+    "pendingTournaments": 0,
     "declaredSections": 7,
-    "requestedSections": 1,
+    "requestedSections": 0,
     "acquiredSections": 5,
     "unusedAlternativeSections": 1,
-    "resolvedSections": 6,
-    "missingSections": 1,
+    "declaredButUnusedSections": 1,
+    "resolvedSections": 7,
+    "missingSections": 0,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
-    "retrySections": 1,
+    "newDeclaredButUnused": 1,
+    "retrySections": 0,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 1,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 42,
-    "globalPendingTotal": 24,
+    "globalCompleteTournaments": 44,
+    "globalPendingTotal": 22,
     "globalPendingTechnical": 2,
-    "globalPendingPublication": 22,
+    "globalPendingPublication": 20,
     "technicalPendingCompetitionIds": [
       "J-J30-DEN-2026-004",
       "J-J30-SVK-2026-004"
@@ -32,8 +34,6 @@
     "publicationPendingCompetitionIds": [
       "J-J30-MDV-2026-004",
       "J-J30-PAN-2026-002",
-      "J-J30-TJK-2026-005",
-      "J-J60-TTO-2026-002",
       "J-J30-ARG-2026-003",
       "J-J30-ECU-2026-005",
       "J-J30-GER-2026-005",
@@ -58,13 +58,14 @@
     {
       "competitionId": "J-J60-TTO-2026-002",
       "tournamentName": "J60 Tacarigua",
-      "decision": "pending",
+      "decision": "complete",
       "playersFound": [],
       "declaredSections": 7,
       "acquiredSections": 5,
       "unusedAlternativeSections": 1,
-      "resolvedSections": 6,
-      "missingSections": 1,
+      "declaredButUnusedSections": 1,
+      "resolvedSections": 7,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -105,8 +106,8 @@
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "resolved": true,
+          "status": "declared_but_unused"
         },
         {
           "event": "G-D-M-KO",
@@ -183,9 +184,9 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "declared_but_unused",
+              "failureType": "declared_but_unused",
+              "resolved": true
             }
           ]
         },
