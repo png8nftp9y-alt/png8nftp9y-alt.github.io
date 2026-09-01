@@ -1,22 +1,24 @@
 {
-  "version": 9,
-  "generatedAt": "2026-09-01T01:11:38.059Z",
+  "version": 10,
+  "generatedAt": "2026-09-01T01:13:44.771Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
-    "mode": "live_t_minus_1_cumulative_all_sections_merge",
-    "isolatedArtifacts": 6,
-    "tournamentsChecked": 6,
-    "completeTournaments": 0,
-    "pendingTournaments": 6,
-    "cachedSectionsUsed": 12,
-    "newSectionsCached": 1,
-    "drawRequests": 6,
-    "browserFallbacks": 0,
-    "browserRecoveries": 0,
-    "globalCompleteTournaments": 18,
+    "mode": "live_t_minus_1_historical_acquisition",
+    "tournamentsChecked": 1,
+    "completeTournaments": 1,
+    "pendingTournaments": 0,
+    "declaredSections": 6,
+    "requestedSections": 6,
+    "acquiredSections": 6,
+    "missingSections": 0,
+    "newSectionsCached": 6,
+    "retrySections": 0,
+    "confirmedInDraw": 0,
+    "removedByReliableDrawAbsence": 0,
+    "globalCompleteTournaments": 19,
     "globalPendingTotal": 38,
-    "globalPendingTechnical": 19,
-    "globalPendingPublication": 19,
+    "globalPendingTechnical": 37,
+    "globalPendingPublication": 1,
     "technicalPendingCompetitionIds": [
       "J-J30-MDV-2026-004",
       "J-J30-MEX-2026-011",
@@ -34,13 +36,9 @@
       "J-J60-SUI-2026-001",
       "J-J100-ESP-2026-006",
       "J-J60-TUN-2026-005",
+      "J-J30-ARG-2026-003",
       "J-J30-DEN-2026-004",
       "J-J30-ECU-2026-005",
-      "J-J30-SVK-2026-004"
-    ],
-    "publicationPendingCompetitionIds": [
-      "J-J60-TTO-2026-002",
-      "J-J30-ARG-2026-003",
       "J-J30-GER-2026-005",
       "J-J30-GHA-2026-005",
       "J-J30-HON-2026-005",
@@ -57,28 +55,27 @@
       "J-J60-FRA-2026-006",
       "J-J60-LAT-2026-004",
       "J-J30-AUS-2026-004",
+      "J-J30-SVK-2026-004",
       "J-J30-POL-2026-004"
+    ],
+    "publicationPendingCompetitionIds": [
+      "J-J60-TTO-2026-002"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J30-ARG-2026-003",
-      "tournamentName": "J30 San Miguel de Tucumán",
-      "decision": "pending",
+      "competitionId": "J-J60-BEL-2026-001",
+      "tournamentName": "J60 Arlon",
+      "decision": "complete",
       "playersFound": [],
-      "declaredSections": 8,
-      "acquiredSections": 2,
-      "missingSections": 6,
+      "declaredSections": 6,
+      "acquiredSections": 6,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-M-RR",
-          "family": "B-S-M",
-          "acquired": false
+          "acquired": true
         },
         {
           "event": "B-S-Q-KO",
@@ -93,38 +90,28 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": false
+          "acquired": true
         },
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": false
+          "acquired": true
         },
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false
+          "acquired": true
         }
       ],
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
+              "players": 32,
               "error": null
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -134,7 +121,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 44,
+              "players": 32,
               "error": null
             }
           ]
@@ -152,678 +139,23 @@
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-D-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
-    },
-    {
-      "competitionId": "J-J30-ARG-2026-003",
-      "tournamentName": "J30 San Miguel de Tucumán",
-      "decision": "pending",
-      "playersFound": [],
-      "declaredSections": 8,
-      "acquiredSections": 2,
-      "missingSections": 6,
-      "sections": [
-        {
-          "event": "B-S-M-KO",
-          "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-M-RR",
-          "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-Q-KO",
-          "family": "B-S-Q",
-          "acquired": true
-        },
-        {
-          "event": "B-D-M-KO",
-          "family": "B-D-M",
-          "acquired": true
-        },
-        {
-          "event": "G-S-M-KO",
-          "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "acquired": false
-        },
-        {
-          "event": "G-D-M-KO",
-          "family": "G-D-M",
-          "acquired": false
-        }
-      ],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 44,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-D-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-D-M-KO",
               "players": 32,
               "error": null
             }
           ]
         },
         {
-          "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-D-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
-    },
-    {
-      "competitionId": "J-J30-ARG-2026-003",
-      "tournamentName": "J30 San Miguel de Tucumán",
-      "decision": "pending",
-      "playersFound": [],
-      "declaredSections": 8,
-      "acquiredSections": 2,
-      "missingSections": 6,
-      "sections": [
-        {
-          "event": "B-S-M-KO",
-          "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-M-RR",
-          "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-Q-KO",
-          "family": "B-S-Q",
-          "acquired": true
-        },
-        {
-          "event": "B-D-M-KO",
-          "family": "B-D-M",
-          "acquired": true
-        },
-        {
-          "event": "G-S-M-KO",
-          "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "acquired": false
-        },
-        {
-          "event": "G-D-M-KO",
-          "family": "G-D-M",
-          "acquired": false
-        }
-      ],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 44,
+              "players": 21,
               "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-D-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-D-M-KO",
-              "players": 32,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": null
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-D-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
-    },
-    {
-      "competitionId": "J-J30-ARG-2026-003",
-      "tournamentName": "J30 San Miguel de Tucumán",
-      "decision": "pending",
-      "playersFound": [],
-      "declaredSections": 8,
-      "acquiredSections": 2,
-      "missingSections": 6,
-      "sections": [
-        {
-          "event": "B-S-M-KO",
-          "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-M-RR",
-          "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-Q-KO",
-          "family": "B-S-Q",
-          "acquired": true
-        },
-        {
-          "event": "B-D-M-KO",
-          "family": "B-D-M",
-          "acquired": true
-        },
-        {
-          "event": "G-S-M-KO",
-          "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "acquired": false
-        },
-        {
-          "event": "G-D-M-KO",
-          "family": "G-D-M",
-          "acquired": false
-        }
-      ],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 44,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-D-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-D-M-KO",
-              "players": 32,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-D-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
-    },
-    {
-      "competitionId": "J-J30-ARG-2026-003",
-      "tournamentName": "J30 San Miguel de Tucumán",
-      "decision": "pending",
-      "playersFound": [],
-      "declaredSections": 8,
-      "acquiredSections": 2,
-      "missingSections": 6,
-      "sections": [
-        {
-          "event": "B-S-M-KO",
-          "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-M-RR",
-          "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-Q-KO",
-          "family": "B-S-Q",
-          "acquired": true
-        },
-        {
-          "event": "B-D-M-KO",
-          "family": "B-D-M",
-          "acquired": true
-        },
-        {
-          "event": "G-S-M-KO",
-          "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "acquired": false
-        },
-        {
-          "event": "G-D-M-KO",
-          "family": "G-D-M",
-          "acquired": false
-        }
-      ],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 44,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-D-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-D-M-KO",
-              "players": 32,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 0,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-D-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-D-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        }
-      ],
-      "eventFailure": null
-    },
-    {
-      "competitionId": "J-J30-ARG-2026-003",
-      "tournamentName": "J30 San Miguel de Tucumán",
-      "decision": "pending",
-      "playersFound": [],
-      "declaredSections": 8,
-      "acquiredSections": 3,
-      "missingSections": 5,
-      "sections": [
-        {
-          "event": "B-S-M-KO",
-          "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-M-RR",
-          "family": "B-S-M",
-          "acquired": false
-        },
-        {
-          "event": "B-S-Q-KO",
-          "family": "B-S-Q",
-          "acquired": true
-        },
-        {
-          "event": "B-D-M-KO",
-          "family": "B-D-M",
-          "acquired": true
-        },
-        {
-          "event": "G-S-M-KO",
-          "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": false
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "acquired": false
-        },
-        {
-          "event": "G-D-M-KO",
-          "family": "G-D-M",
-          "acquired": true
-        }
-      ],
-      "families": [
-        {
-          "family": "B-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-S-Q-KO",
-              "players": 44,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "B-D-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-D-M-KO",
-              "players": 32,
-              "error": null
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "deferred_isolated_section"
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
             }
           ]
         },
@@ -833,7 +165,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 32,
+              "players": 28,
               "error": null
             }
           ]
