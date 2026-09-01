@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-09-01T12:12:48.622Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-09-01T12:15:01.056Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 5,
   "targets": {
@@ -792,7 +792,7 @@
     "J-J30-MDV-2026-004": {
       "competitionId": "J-J30-MDV-2026-004",
       "decision": "pending",
-      "checkedAt": "2026-09-01T11:52:13.542Z",
+      "checkedAt": "2026-09-01T12:15:00.459Z",
       "playersFound": 0,
       "families": [
         {
@@ -4656,7 +4656,7 @@
     "J-J30-PAN-2026-002": {
       "competitionId": "J-J30-PAN-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-09-01T11:52:13.650Z",
+      "checkedAt": "2026-09-01T12:15:00.560Z",
       "playersFound": 0,
       "families": [
         {
@@ -7499,7 +7499,7 @@
     "J-J30-TJK-2026-005": {
       "competitionId": "J-J30-TJK-2026-005",
       "decision": "pending",
-      "checkedAt": "2026-09-01T11:52:13.756Z",
+      "checkedAt": "2026-09-01T12:15:00.656Z",
       "playersFound": 0,
       "families": [
         {
@@ -25084,7 +25084,7 @@
     "J-J60-TTO-2026-002": {
       "competitionId": "J-J60-TTO-2026-002",
       "decision": "pending",
-      "checkedAt": "2026-09-01T11:52:14.190Z",
+      "checkedAt": "2026-09-01T12:15:01.056Z",
       "playersFound": 0,
       "families": [
         {
@@ -29953,7 +29953,7 @@
     "J-J30-ARG-2026-003": {
       "competitionId": "J-J30-ARG-2026-003",
       "decision": "pending",
-      "checkedAt": "2026-09-01T11:52:13.021Z",
+      "checkedAt": "2026-09-01T12:15:00.326Z",
       "playersFound": 0,
       "families": [
         {
@@ -39410,7 +39410,7 @@
     "J-J60-CHI-2026-001": {
       "competitionId": "J-J60-CHI-2026-001",
       "decision": "pending",
-      "checkedAt": "2026-08-31T23:39:05.180Z",
+      "checkedAt": "2026-09-01T12:15:00.754Z",
       "playersFound": 0,
       "families": [
         {
@@ -39420,23 +39420,29 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             },
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
         {
           "family": "B-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -39447,7 +39453,9 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -39458,23 +39466,29 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
+              "players": 27,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -39485,13 +39499,757 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         }
       ],
       "eventFailure": null,
-      "eventCache": {}
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800741172",
+              "name": "Mirko Uribe Vilches",
+              "givenName": "Mirko",
+              "familyName": "Uribe Vilches",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/mirko-uribe-vilches/800741172/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800719250",
+              "name": "Enrique Camilo Espinoza Alvarez",
+              "givenName": "Enrique Camilo",
+              "familyName": "Espinoza Alvarez",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/enrique-camilo-espinoza-alvarez/800719250/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800714364",
+              "name": "DIEGO INIGUEZ  CALDERON",
+              "givenName": "DIEGO",
+              "familyName": "INIGUEZ  CALDERON",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/diego-iniguez-calderon/800714364/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800741263",
+              "name": "Tomas Alonso Valladares",
+              "givenName": "Tomas",
+              "familyName": "Alonso Valladares",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/tomas-alonso-valladares/800741263/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800719188",
+              "name": "Mauro Mancinelli",
+              "givenName": "Mauro",
+              "familyName": "Mancinelli",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/mauro-mancinelli/800719188/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800741176",
+              "name": "Agustin Acevedo Tapia",
+              "givenName": "Agustin",
+              "familyName": "Acevedo Tapia",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/agustin-acevedo-tapia/800741176/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800716644",
+              "name": "Fernando Alonso Alvarez Bustos",
+              "givenName": "Fernando Alonso",
+              "familyName": "Alvarez Bustos",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/fernando-alonso-alvarez-bustos/800716644/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800636241",
+              "name": "Luis Santiago Miranda Jove",
+              "givenName": "Luis Santiago",
+              "familyName": "Miranda Jove",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/luis-santiago-miranda-jove/800636241/bol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800710108",
+              "name": "Juan Pablo Irigoin",
+              "givenName": "Juan Pablo",
+              "familyName": "Irigoin",
+              "nationalityCode": "URU",
+              "profileLink": "/en/players/juan-pablo-irigoin/800710108/uru/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800758232",
+              "name": "Eduardo Pena Ibanez",
+              "givenName": "Eduardo",
+              "familyName": "Pena Ibanez",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/eduardo-pena-ibanez/800758232/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800678654",
+              "name": "Vicente Morgan",
+              "givenName": "Vicente",
+              "familyName": "Morgan",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/vicente-morgan/800678654/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800690646",
+              "name": "MATEO DE AVILA TOMINOVIC",
+              "givenName": "MATEO",
+              "familyName": "DE AVILA TOMINOVIC",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/mateo-de-avila-tominovic/800690646/bol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800702195",
+              "name": "Franco Del Vecchio",
+              "givenName": "Franco",
+              "familyName": "Del Vecchio",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/franco-del-vecchio/800702195/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800646739",
+              "name": "Baltazar Montalva",
+              "givenName": "Baltazar",
+              "familyName": "Montalva",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/baltazar-montalva/800646739/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800746050",
+              "name": "Alejandro gomez",
+              "givenName": "Alejandro",
+              "familyName": "gomez",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/alejandro-gomez/800746050/bol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800757823",
+              "name": "Tristan Javier Easton Rabi",
+              "givenName": "Tristan Javier",
+              "familyName": "Easton Rabi",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/tristan-javier-easton-rabi/800757823/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800719198",
+              "name": "IGNACIO MOYA",
+              "givenName": "IGNACIO",
+              "familyName": "MOYA",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/ignacio-moya/800719198/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800719064",
+              "name": "Benjamin Oyarzo",
+              "givenName": "Benjamin",
+              "familyName": "Oyarzo",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/benjamin-oyarzo/800719064/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800679618",
+              "name": "Nicolas Pincheira",
+              "givenName": "Nicolas",
+              "familyName": "Pincheira",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/nicolas-pincheira/800679618/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800804136",
+              "name": "Fedor Curiel Mendoza",
+              "givenName": "Fedor",
+              "familyName": "Curiel Mendoza",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/fedor-curiel-mendoza/800804136/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800813969",
+              "name": "ANDRE TORO",
+              "givenName": "ANDRE",
+              "familyName": "TORO",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/andre-toro/800813969/bol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800741537",
+              "name": "Juan Antona",
+              "givenName": "Juan",
+              "familyName": "Antona",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/juan-antona/800741537/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800742342",
+              "name": "Samuel Castillo Suarez",
+              "givenName": "Samuel",
+              "familyName": "Castillo Suarez",
+              "nationalityCode": "COL",
+              "profileLink": "/en/players/samuel-castillo-suarez/800742342/col/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800716956",
+              "name": "Simon Doren",
+              "givenName": "Simon",
+              "familyName": "Doren",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/simon-doren/800716956/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800711147",
+              "name": "Facundo Barboza",
+              "givenName": "Facundo",
+              "familyName": "Barboza",
+              "nationalityCode": "URU",
+              "profileLink": "/en/players/facundo-barboza/800711147/uru/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800818617",
+              "name": "Maximiliano Quezada",
+              "givenName": "Maximiliano",
+              "familyName": "Quezada",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/maximiliano-quezada/800818617/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800768340",
+              "name": "Gabriel Daroca",
+              "givenName": "Gabriel",
+              "familyName": "Daroca",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/gabriel-daroca/800768340/bol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800742885",
+              "name": "Cristobal Andres Vargas Pizarro",
+              "givenName": "Cristobal Andres",
+              "familyName": "Vargas Pizarro",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/cristobal-andres-vargas-pizarro/800742885/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800678514",
+              "name": "Pedro Santana",
+              "givenName": "Pedro",
+              "familyName": "Santana",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/pedro-santana/800678514/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800821485",
+              "name": "Emmanuel Paz Ortiz",
+              "givenName": "Emmanuel",
+              "familyName": "Paz Ortiz",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/emmanuel-paz-ortiz/800821485/bol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800737885",
+              "name": "Facundo Henriquez Contreras",
+              "givenName": "Facundo",
+              "familyName": "Henriquez Contreras",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/facundo-henriquez-contreras/800737885/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800712557",
+              "name": "Tomas Zurmendi",
+              "givenName": "Tomas",
+              "familyName": "Zurmendi",
+              "nationalityCode": "URU",
+              "profileLink": "/en/players/tomas-zurmendi/800712557/uru/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-09-01T12:15:00.754Z"
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800723153",
+              "name": "Matilda Casarini",
+              "givenName": "Matilda",
+              "familyName": "Casarini",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/matilda-casarini/800723153/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800822114",
+              "name": "Emilia Ainhoa Saez Hoffens",
+              "givenName": "Emilia Ainhoa",
+              "familyName": "Saez Hoffens",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/emilia-ainhoa-saez-hoffens/800822114/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800758271",
+              "name": "Zoey Fu Yen",
+              "givenName": "Zoey",
+              "familyName": "Fu Yen",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/zoey-fu-yen/800758271/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800718296",
+              "name": "Sofia isidora Peralta calderon",
+              "givenName": "Sofia isidora",
+              "familyName": "Peralta calderon",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/sofia-isidora-peralta-calderon/800718296/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800823787",
+              "name": "Josefa Carolina Kuhlmann Rueda",
+              "givenName": "Josefa Carolina",
+              "familyName": "Kuhlmann Rueda",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/josefa-carolina-kuhlmann-rueda/800823787/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800778937",
+              "name": "Ana Clara Bonavita",
+              "givenName": "Ana Clara",
+              "familyName": "Bonavita",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/ana-clara-bonavita/800778937/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800652630",
+              "name": "Sofia Daroca",
+              "givenName": "Sofia",
+              "familyName": "Daroca",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/sofia-daroca/800652630/bol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800784417",
+              "name": "Fernanda Eugenia Peirano Ardiles",
+              "givenName": "Fernanda Eugenia",
+              "familyName": "Peirano Ardiles",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/fernanda-eugenia-peirano-ardiles/800784417/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800837956",
+              "name": "Emilia Goich",
+              "givenName": "Emilia",
+              "familyName": "Goich",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/emilia-goich/800837956/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800652517",
+              "name": "Zoe Castro Calderon",
+              "givenName": "Zoe",
+              "familyName": "Castro Calderon",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/zoe-castro-calderon/800652517/bol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800851671",
+              "name": "Camila Bassi",
+              "givenName": "Camila",
+              "familyName": "Bassi",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/camila-bassi/800851671/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800797940",
+              "name": "Maria Belen Perez Munoz",
+              "givenName": "Maria Belen",
+              "familyName": "Perez Munoz",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/maria-belen-perez-munoz/800797940/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800752120",
+              "name": "Mariana Herdener",
+              "givenName": "Mariana",
+              "familyName": "Herdener",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/mariana-herdener/800752120/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800838412",
+              "name": "Antonia Gonzalez",
+              "givenName": "Antonia",
+              "familyName": "Gonzalez",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/antonia-gonzalez/800838412/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800769594",
+              "name": "Michella Noriega",
+              "givenName": "Michella",
+              "familyName": "Noriega",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/michella-noriega/800769594/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800747312",
+              "name": "Millaray Rayen Roa Quintrel",
+              "givenName": "Millaray Rayen",
+              "familyName": "Roa Quintrel",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/millaray-rayen-roa-quintrel/800747312/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800705311",
+              "name": "Colomba Herrera Gonzalez",
+              "givenName": "Colomba",
+              "familyName": "Herrera Gonzalez",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/colomba-herrera-gonzalez/800705311/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800776201",
+              "name": "Victoria Andrea Veas Olave",
+              "givenName": "Victoria Andrea",
+              "familyName": "Veas Olave",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/victoria-andrea-veas-olave/800776201/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800778364",
+              "name": "GIA ANTONELLA PINEDA CARBALLO",
+              "givenName": "GIA ANTONELLA",
+              "familyName": "PINEDA CARBALLO",
+              "nationalityCode": "COL",
+              "profileLink": "/en/players/gia-antonella-pineda-carballo/800778364/col/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800859977",
+              "name": "Maite Gonzalez Otarola",
+              "givenName": "Maite",
+              "familyName": "Gonzalez Otarola",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/maite-gonzalez-otarola/800859977/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800864305",
+              "name": "Piera Constanzo Rodriguez",
+              "givenName": "Piera",
+              "familyName": "Constanzo Rodriguez",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/piera-constanzo-rodriguez/800864305/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800784472",
+              "name": "Blanca Figueroa Carrasco",
+              "givenName": "Blanca",
+              "familyName": "Figueroa Carrasco",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/blanca-figueroa-carrasco/800784472/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800742237",
+              "name": "Maria Agustina Ficarra Munoz",
+              "givenName": "Maria Agustina",
+              "familyName": "Ficarra Munoz",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/maria-agustina-ficarra-munoz/800742237/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800799469",
+              "name": "Celestina Mikkelson",
+              "givenName": "Celestina",
+              "familyName": "Mikkelson",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/celestina-mikkelson/800799469/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800756913",
+              "name": "Trinidad Gutierrez Monroy",
+              "givenName": "Trinidad",
+              "familyName": "Gutierrez Monroy",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/trinidad-gutierrez-monroy/800756913/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800740277",
+              "name": "Sabrina Urriolagoitia",
+              "givenName": "Sabrina",
+              "familyName": "Urriolagoitia",
+              "nationalityCode": "BOL",
+              "profileLink": "/en/players/sabrina-urriolagoitia/800740277/bol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800860141",
+              "name": "Elena Rojas",
+              "givenName": "Elena",
+              "familyName": "Rojas",
+              "nationalityCode": "CHI",
+              "profileLink": "/en/players/elena-rojas/800860141/chi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-09-01T12:15:00.754Z"
+        }
+      },
+      "declaredSections": 8,
+      "acquiredSections": 2,
+      "unusedAlternativeSections": 0,
+      "resolvedSections": 2,
+      "missingSections": 6,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "competitionId": "J-J60-CHI-2026-001",
+            "event": "B-S-M-KO",
+            "tournamentId": 1100204554,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-santiago/chi/2026/j-j60-chi-2026-001/"
+          }
+        },
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "combo": {
+            "competitionId": "J-J60-CHI-2026-001",
+            "event": "B-S-M-RR",
+            "tournamentId": 1100204554,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-santiago/chi/2026/j-j60-chi-2026-001/"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "competitionId": "J-J60-CHI-2026-001",
+            "event": "B-S-Q-KO",
+            "tournamentId": 1100204554,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-santiago/chi/2026/j-j60-chi-2026-001/"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "competitionId": "J-J60-CHI-2026-001",
+            "event": "B-D-M-KO",
+            "tournamentId": 1100204554,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-santiago/chi/2026/j-j60-chi-2026-001/"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "competitionId": "J-J60-CHI-2026-001",
+            "event": "G-S-M-KO",
+            "tournamentId": 1100204554,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-santiago/chi/2026/j-j60-chi-2026-001/"
+          }
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "combo": {
+            "competitionId": "J-J60-CHI-2026-001",
+            "event": "G-S-M-RR",
+            "tournamentId": 1100204554,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-santiago/chi/2026/j-j60-chi-2026-001/"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "competitionId": "J-J60-CHI-2026-001",
+            "event": "G-S-Q-KO",
+            "tournamentId": 1100204554,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-santiago/chi/2026/j-j60-chi-2026-001/"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "competitionId": "J-J60-CHI-2026-001",
+            "event": "G-D-M-KO",
+            "tournamentId": 1100204554,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-santiago/chi/2026/j-j60-chi-2026-001/"
+          }
+        }
+      ]
     },
     "J-J60-COL-2026-001": {
       "competitionId": "J-J60-COL-2026-001",
@@ -40030,7 +40788,7 @@
     "J-J60-FRA-2026-006": {
       "competitionId": "J-J60-FRA-2026-006",
       "decision": "pending",
-      "checkedAt": "2026-09-01T00:20:33.024Z",
+      "checkedAt": "2026-09-01T12:15:00.860Z",
       "playersFound": 0,
       "families": [
         {
@@ -40040,23 +40798,29 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             },
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
         {
           "family": "B-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
+              "players": 19,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -40067,7 +40831,9 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -40078,23 +40844,29 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
+              "players": 14,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -40105,18 +40877,502 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         }
       ],
       "eventFailure": null,
-      "eventCache": {}
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800863864",
+              "name": "Axel Girard",
+              "givenName": "Axel",
+              "familyName": "Girard",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/axel-girard/800863864/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800650314",
+              "name": "David-Nathan Meumeu Bory",
+              "givenName": "David-Nathan",
+              "familyName": "Meumeu Bory",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/david-nathan-meumeu-bory/800650314/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800713104",
+              "name": "Bruno KARL ANGHEL",
+              "givenName": "Bruno KARL",
+              "familyName": "ANGHEL",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/bruno-karl-anghel/800713104/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800636045",
+              "name": "jungho KIM",
+              "givenName": "jungho",
+              "familyName": "KIM",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/jungho-kim/800636045/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751222",
+              "name": "TIMEO GERSCHHEIMER",
+              "givenName": "TIMEO",
+              "familyName": "GERSCHHEIMER",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/timeo-gerschheimer/800751222/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800714630",
+              "name": "Lenny Nitschke",
+              "givenName": "Lenny",
+              "familyName": "Nitschke",
+              "nationalityCode": "LUX",
+              "profileLink": "/en/players/lenny-nitschke/800714630/lux/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800810153",
+              "name": "Robin CAMPASOL",
+              "givenName": "Robin",
+              "familyName": "CAMPASOL",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/robin-campasol/800810153/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800767227",
+              "name": "Rafael Pena",
+              "givenName": "Rafael",
+              "familyName": "Pena",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/rafael-pena/800767227/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800798551",
+              "name": "Mateo Font Tant",
+              "givenName": "Mateo",
+              "familyName": "Font Tant",
+              "nationalityCode": "ESP",
+              "profileLink": "/en/players/mateo-font-tant/800798551/esp/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800667736",
+              "name": "Clement Ramos",
+              "givenName": "Clement",
+              "familyName": "Ramos",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/clement-ramos/800667736/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766745",
+              "name": "Nicolas GRY",
+              "givenName": "Nicolas",
+              "familyName": "GRY",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/nicolas-gry/800766745/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800676280",
+              "name": "Elias Joachim",
+              "givenName": "Elias",
+              "familyName": "Joachim",
+              "nationalityCode": "LUX",
+              "profileLink": "/en/players/elias-joachim/800676280/lux/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800668875",
+              "name": "Aurelien Ladouas",
+              "givenName": "Aurelien",
+              "familyName": "Ladouas",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/aurelien-ladouas/800668875/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800724627",
+              "name": "JULIEN BINGLER",
+              "givenName": "JULIEN",
+              "familyName": "BINGLER",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/julien-bingler/800724627/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800805186",
+              "name": "Marti Franco Regue",
+              "givenName": "Marti",
+              "familyName": "Franco Regue",
+              "nationalityCode": "ESP",
+              "profileLink": "/en/players/marti-franco-regue/800805186/esp/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800747782",
+              "name": "Florian van Buren",
+              "givenName": "Florian",
+              "familyName": "van Buren",
+              "nationalityCode": "GER",
+              "profileLink": "/en/players/florian-van-buren/800747782/ger/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800656963",
+              "name": "Riccardo Pepe",
+              "givenName": "Riccardo",
+              "familyName": "Pepe",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/riccardo-pepe/800656963/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800738296",
+              "name": "Alexander Silivestru",
+              "givenName": "Alexander",
+              "familyName": "Silivestru",
+              "nationalityCode": "ROU",
+              "profileLink": "/en/players/alexander-silivestru/800738296/rou/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751824",
+              "name": "Paul Verronneau",
+              "givenName": "Paul",
+              "familyName": "Verronneau",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/paul-verronneau/800751824/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-09-01T12:15:00.860Z"
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800664128",
+              "name": "Jessica Morrison",
+              "givenName": "Jessica",
+              "familyName": "Morrison",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/jessica-morrison/800664128/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800764177",
+              "name": "Mayssa Boca",
+              "givenName": "Mayssa",
+              "familyName": "Boca",
+              "nationalityCode": "ROU",
+              "profileLink": "/en/players/mayssa-boca/800764177/rou/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800698590",
+              "name": "MELISSA VALENCIA",
+              "givenName": "MELISSA",
+              "familyName": "VALENCIA",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/melissa-valencia/800698590/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800731976",
+              "name": "Lina Richaud",
+              "givenName": "Lina",
+              "familyName": "Richaud",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/lina-richaud/800731976/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800739674",
+              "name": "Lina Amirouch",
+              "givenName": "Lina",
+              "familyName": "Amirouch",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/lina-amirouch/800739674/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800729887",
+              "name": "Eva Delmar",
+              "givenName": "Eva",
+              "familyName": "Delmar",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/eva-delmar/800729887/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800731196",
+              "name": "Leora Lopes Ferreira",
+              "givenName": "Leora",
+              "familyName": "Lopes Ferreira",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/leora-lopes-ferreira/800731196/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800773778",
+              "name": "Elona GRATALOUP",
+              "givenName": "Elona",
+              "familyName": "GRATALOUP",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/elona-grataloup/800773778/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800681284",
+              "name": "Margo Kusmierek",
+              "givenName": "Margo",
+              "familyName": "Kusmierek",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/margo-kusmierek/800681284/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800724770",
+              "name": "Martina Silva Escot",
+              "givenName": "Martina",
+              "familyName": "Silva Escot",
+              "nationalityCode": "ESP",
+              "profileLink": "/en/players/martina-silva-escot/800724770/esp/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766841",
+              "name": "ANAIS MARCHAL",
+              "givenName": "ANAIS",
+              "familyName": "MARCHAL",
+              "nationalityCode": "BEL",
+              "profileLink": "/en/players/anais-marchal/800766841/bel/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800858208",
+              "name": "Manelle Khaldi",
+              "givenName": "Manelle",
+              "familyName": "Khaldi",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/manelle-khaldi/800858208/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800754476",
+              "name": "Uma malika Ngo Bogso",
+              "givenName": "Uma malika",
+              "familyName": "Ngo Bogso",
+              "nationalityCode": "CMR",
+              "profileLink": "/en/players/uma-malika-ngo-bogso/800754476/cmr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800816492",
+              "name": "Lea Mathieu",
+              "givenName": "Lea",
+              "familyName": "Mathieu",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/lea-mathieu/800816492/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-09-01T12:15:00.860Z"
+        }
+      },
+      "declaredSections": 8,
+      "acquiredSections": 2,
+      "unusedAlternativeSections": 0,
+      "resolvedSections": 2,
+      "missingSections": 6,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "competitionId": "J-J60-FRA-2026-006",
+            "event": "B-S-M-KO",
+            "tournamentId": 1100203490,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-dijon/fra/2026/j-j60-fra-2026-006/"
+          }
+        },
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "combo": {
+            "competitionId": "J-J60-FRA-2026-006",
+            "event": "B-S-M-RR",
+            "tournamentId": 1100203490,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-dijon/fra/2026/j-j60-fra-2026-006/"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "competitionId": "J-J60-FRA-2026-006",
+            "event": "B-S-Q-KO",
+            "tournamentId": 1100203490,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-dijon/fra/2026/j-j60-fra-2026-006/"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "competitionId": "J-J60-FRA-2026-006",
+            "event": "B-D-M-KO",
+            "tournamentId": 1100203490,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-dijon/fra/2026/j-j60-fra-2026-006/"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "competitionId": "J-J60-FRA-2026-006",
+            "event": "G-S-M-KO",
+            "tournamentId": 1100203490,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-dijon/fra/2026/j-j60-fra-2026-006/"
+          }
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "combo": {
+            "competitionId": "J-J60-FRA-2026-006",
+            "event": "G-S-M-RR",
+            "tournamentId": 1100203490,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-dijon/fra/2026/j-j60-fra-2026-006/"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "competitionId": "J-J60-FRA-2026-006",
+            "event": "G-S-Q-KO",
+            "tournamentId": 1100203490,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-dijon/fra/2026/j-j60-fra-2026-006/"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "competitionId": "J-J60-FRA-2026-006",
+            "event": "G-D-M-KO",
+            "tournamentId": 1100203490,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-dijon/fra/2026/j-j60-fra-2026-006/"
+          }
+        }
+      ]
     },
     "J-J60-LAT-2026-004": {
       "competitionId": "J-J60-LAT-2026-004",
       "decision": "pending",
-      "checkedAt": "2026-09-01T00:20:35.639Z",
+      "checkedAt": "2026-09-01T12:15:00.960Z",
       "playersFound": 0,
       "families": [
         {
@@ -40126,23 +41382,29 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             },
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": null
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
         {
           "family": "B-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
+              "players": 19,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -40153,7 +41415,9 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -40164,23 +41428,29 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             },
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "deferred_isolated_section"
+              "players": 15,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -40191,13 +41461,507 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "deferred_isolated_section"
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         }
       ],
       "eventFailure": null,
-      "eventCache": {}
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800717713",
+              "name": "Adas Turan Efe",
+              "givenName": "Adas Turan",
+              "familyName": "Efe",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/adas-turan-efe/800717713/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800832428",
+              "name": "Matvejs Gurskis",
+              "givenName": "Matvejs",
+              "familyName": "Gurskis",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/matvejs-gurskis/800832428/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800591607",
+              "name": "Ugnius Remeikis",
+              "givenName": "Ugnius",
+              "familyName": "Remeikis",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/ugnius-remeikis/800591607/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800856671",
+              "name": "Tumas Kolganovas",
+              "givenName": "Tumas",
+              "familyName": "Kolganovas",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/tumas-kolganovas/800856671/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800639490",
+              "name": "Dorian Arja",
+              "givenName": "Dorian",
+              "familyName": "Arja",
+              "nationalityCode": "SWE",
+              "profileLink": "/en/players/dorian-arja/800639490/swe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800671601",
+              "name": "Nojus Poska",
+              "givenName": "Nojus",
+              "familyName": "Poska",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/nojus-poska/800671601/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800697396",
+              "name": "Dovydas Gostautas",
+              "givenName": "Dovydas",
+              "familyName": "Gostautas",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/dovydas-gostautas/800697396/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800667388",
+              "name": "Ernests Ritovs",
+              "givenName": "Ernests",
+              "familyName": "Ritovs",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/ernests-ritovs/800667388/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800684550",
+              "name": "Erikas Balkunas",
+              "givenName": "Erikas",
+              "familyName": "Balkunas",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/erikas-balkunas/800684550/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800664031",
+              "name": "Romans Kravcovs",
+              "givenName": "Romans",
+              "familyName": "Kravcovs",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/romans-kravcovs/800664031/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800667889",
+              "name": "Vilius Vaskys",
+              "givenName": "Vilius",
+              "familyName": "Vaskys",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/vilius-vaskys/800667889/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800597950",
+              "name": "Marats Iljasovs",
+              "givenName": "Marats",
+              "familyName": "Iljasovs",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/marats-iljasovs/800597950/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800632736",
+              "name": "Arnas Viktoravicius",
+              "givenName": "Arnas",
+              "familyName": "Viktoravicius",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/arnas-viktoravicius/800632736/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800793431",
+              "name": "Jan-Elmar Sarapik",
+              "givenName": "Jan-Elmar",
+              "familyName": "Sarapik",
+              "nationalityCode": "EST",
+              "profileLink": "/en/players/jan-elmar-sarapik/800793431/est/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800600620",
+              "name": "Kristofers Krumins",
+              "givenName": "Kristofers",
+              "familyName": "Krumins",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/kristofers-krumins/800600620/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800684956",
+              "name": "William Durman",
+              "givenName": "William",
+              "familyName": "Durman",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/william-durman/800684956/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800677525",
+              "name": "Matas Luksevicius",
+              "givenName": "Matas",
+              "familyName": "Luksevicius",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/matas-luksevicius/800677525/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800748743",
+              "name": "Mikolaj Karpinski",
+              "givenName": "Mikolaj",
+              "familyName": "Karpinski",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/mikolaj-karpinski/800748743/pol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800665357",
+              "name": "Henrijs Miks Gulans",
+              "givenName": "Henrijs Miks",
+              "familyName": "Gulans",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/henrijs-miks-gulans/800665357/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-09-01T12:15:00.960Z"
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800676993",
+              "name": "Emma Ketler",
+              "givenName": "Emma",
+              "familyName": "Ketler",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/emma-ketler/800676993/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800645010",
+              "name": "Roneta Kacinskaite",
+              "givenName": "Roneta",
+              "familyName": "Kacinskaite",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/roneta-kacinskaite/800645010/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800717421",
+              "name": "Emilija Lekse",
+              "givenName": "Emilija",
+              "familyName": "Lekse",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/emilija-lekse/800717421/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800696688",
+              "name": "Ksenia Semjonova",
+              "givenName": "Ksenia",
+              "familyName": "Semjonova",
+              "nationalityCode": "EST",
+              "profileLink": "/en/players/ksenia-semjonova/800696688/est/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800728295",
+              "name": "Kerola Gulbe",
+              "givenName": "Kerola",
+              "familyName": "Gulbe",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/kerola-gulbe/800728295/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800628905",
+              "name": "Ugne Opulskyte",
+              "givenName": "Ugne",
+              "familyName": "Opulskyte",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/ugne-opulskyte/800628905/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800878090",
+              "name": "Patricija Magonite",
+              "givenName": "Patricija",
+              "familyName": "Magonite",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/patricija-magonite/800878090/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800727295",
+              "name": "Karolina Rocena",
+              "givenName": "Karolina",
+              "familyName": "Rocena",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/karolina-rocena/800727295/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800695783",
+              "name": "Anna Zudane",
+              "givenName": "Anna",
+              "familyName": "Zudane",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/anna-zudane/800695783/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800748495",
+              "name": "Paula Krumina",
+              "givenName": "Paula",
+              "familyName": "Krumina",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/paula-krumina/800748495/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800804666",
+              "name": "Kalatozishvili Nia",
+              "givenName": "Kalatozishvili",
+              "familyName": "Nia",
+              "nationalityCode": "GEO",
+              "profileLink": "/en/players/kalatozishvili-nia/800804666/geo/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800711060",
+              "name": "Eliza Mangule",
+              "givenName": "Eliza",
+              "familyName": "Mangule",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/eliza-mangule/800711060/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800724630",
+              "name": "BARBORA ANDRIJAUSKAITE",
+              "givenName": "BARBORA",
+              "familyName": "ANDRIJAUSKAITE",
+              "nationalityCode": "LTU",
+              "profileLink": "/en/players/barbora-andrijauskaite/800724630/ltu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800748490",
+              "name": "Eliza Karsuma",
+              "givenName": "Eliza",
+              "familyName": "Karsuma",
+              "nationalityCode": "LAT",
+              "profileLink": "/en/players/eliza-karsuma/800748490/lat/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800805917",
+              "name": "Henriette Jarv",
+              "givenName": "Henriette",
+              "familyName": "Jarv",
+              "nationalityCode": "EST",
+              "profileLink": "/en/players/henriette-jarv/800805917/est/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-09-01T12:15:00.960Z"
+        }
+      },
+      "declaredSections": 8,
+      "acquiredSections": 2,
+      "unusedAlternativeSections": 0,
+      "resolvedSections": 2,
+      "missingSections": 6,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "competitionId": "J-J60-LAT-2026-004",
+            "event": "B-S-M-KO",
+            "tournamentId": 1100202461,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-liepaja/lat/2026/j-j60-lat-2026-004/"
+          }
+        },
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "combo": {
+            "competitionId": "J-J60-LAT-2026-004",
+            "event": "B-S-M-RR",
+            "tournamentId": 1100202461,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-liepaja/lat/2026/j-j60-lat-2026-004/"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "competitionId": "J-J60-LAT-2026-004",
+            "event": "B-S-Q-KO",
+            "tournamentId": 1100202461,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-liepaja/lat/2026/j-j60-lat-2026-004/"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "competitionId": "J-J60-LAT-2026-004",
+            "event": "B-D-M-KO",
+            "tournamentId": 1100202461,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-liepaja/lat/2026/j-j60-lat-2026-004/"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "competitionId": "J-J60-LAT-2026-004",
+            "event": "G-S-M-KO",
+            "tournamentId": 1100202461,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-liepaja/lat/2026/j-j60-lat-2026-004/"
+          }
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "combo": {
+            "competitionId": "J-J60-LAT-2026-004",
+            "event": "G-S-M-RR",
+            "tournamentId": 1100202461,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "RR",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-liepaja/lat/2026/j-j60-lat-2026-004/"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "competitionId": "J-J60-LAT-2026-004",
+            "event": "G-S-Q-KO",
+            "tournamentId": 1100202461,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-liepaja/lat/2026/j-j60-lat-2026-004/"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "competitionId": "J-J60-LAT-2026-004",
+            "event": "G-D-M-KO",
+            "tournamentId": 1100202461,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-liepaja/lat/2026/j-j60-lat-2026-004/"
+          }
+        }
+      ]
     },
     "J-J60-SUI-2026-002": {
       "competitionId": "J-J60-SUI-2026-002",
