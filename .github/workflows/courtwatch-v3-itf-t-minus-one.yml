@@ -110,10 +110,20 @@ jobs:
         run: |
           export ITF_DRAW_TASK_JSON="$(printf '%s' "$ITF_DRAW_TASK_B64" | base64 --decode)"
           node src/v3/acquire-itf-history-draw-task.mjs
-      - uses: actions/upload-artifact@v4
+      - id: upload_draw
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
         if: always() && matrix.skip != true
         with:
           name: itf-t1-draw-${{ matrix.index }}
+          path: dist/v3/shards/itf/draw-tasks/*.json.gz
+          if-no-files-found: error
+          retention-days: 7
+      - name: Retry transient artifact upload
+        uses: actions/upload-artifact@v4
+        if: always() && matrix.skip != true && steps.upload_draw.outcome == 'failure'
+        with:
+          name: itf-t1-draw-retry-${{ matrix.index }}
           path: dist/v3/shards/itf/draw-tasks/*.json.gz
           if-no-files-found: error
           retention-days: 7
