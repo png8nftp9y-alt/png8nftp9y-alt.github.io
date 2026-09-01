@@ -9,7 +9,11 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-01.65**
+Revisione documento: **2026-09-01.66**
+
+- 1 settembre 2026 — Su indicazione verificata dell'utente, J-J30-TJK-2026-005__G-S-Q-KO (Dushanbe) e J-J60-TTO-2026-002__G-S-Q-KO (Tacarigua) non corrispondono a qualificazioni realmente disputate. Preparata la classificazione terminale esplicita `declared_but_unused`: le due sezioni restano contabilizzate rispetto all'inventario ITF, ma vengono tolte dalla coda e non sono più richieste; nessun torneo o tabellone valido viene cancellato. Collaudo read-only avviato sul run 33492650181, con gate esatto di due sezioni terminali e zero errori tecnici; promozione produttiva subordinata al verde comunicato dall'utente.
+
+- 1 settembre 2026 — Male (J-J30-MDV-2026-004) e Panama (J-J30-PAN-2026-002) si sono disputati entrambi dal 24 al 29 agosto 2026. L'analisi degli artifact del run produttivo 33487375087 dimostra che i rispettivi G-S-Q-KO non sono vuoti: ciascuno contiene 8 match e 32 slot giocatore, ma tutti i dati nominativi normalizzati sono vuoti. Se il sito mostra i nomi, la causa è nell'estrazione/schema del parser oppure nella risposta scheletro dell'endpoint usato, non nella mancata pubblicazione del tabellone. Queste due sezioni non devono essere rese terminali o cancellate: occorre acquisire la risposta grezza e correggere la normalizzazione prima di certificarle.
 
 - 1 settembre 2026 — Chiarita la natura dei quattro residui del buco e dell'anomalia Finlandia. Per Male, Panama, Dushanbe e Tacarigua l'endpoint ITF dichiara `G-S-Q-KO`, ma il Drawsheet restituisce zero giocatori; `not_published_or_incomplete` è quindi una classificazione conservativa della risposta, non la prova che un torneo concluso possieda realmente un tabellone incompleto. È possibile che la qualificazione dichiarata nei filtri non sia stata disputata/usata; il motore attuale non può ancora renderla terminale perché, a differenza delle alternative KO/RR, la famiglia `G-S-Q` non ha una struttura sorella popolata che lo dimostri. Caso distinto `J-J30-FIN-2026-004__G-S-Q-KO`: l'artifact storico non è vuoto e contiene 24 match e 96 riferimenti giocatore, ma zero nomi estratti; è un difetto di normalizzazione del vecchio parser, non un tabellone mancante. Lo storico resta completo come archivio tecnico, ma la rosa nominativa di quella singola sezione non è ancora affidabile finché il parser non viene corretto e l'artifact rielaborato senza sovrascrivere l'originale.
 
