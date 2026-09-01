@@ -11,7 +11,8 @@ for(const doc of docs.filter(Boolean)){const id=doc.competitionId,previous=state
  if(doc.status==='complete')for(const event of events)if(!resolved(event.event)){const task={...event,index:tasks.length,taskId:id+'__'+event.event};tasks.push(task)}
 }
 if(tasks.length>240)throw new Error('ITF T-1 draw batch exceeds safe matrix size: '+tasks.length);
-const matrix={include:tasks.length?tasks.map(task=>({index:task.index,competitionId:task.competitionId,event:task.event,task:Buffer.from(JSON.stringify(task)).toString('base64')})):[{skip:true,index:0,competitionId:'none',event:'none',task:''}]};
+const grouped=[...Map.groupBy(tasks,task=>task.competitionId)].map(([competitionId,tournamentTasks],index)=>({index,competitionId,event:tournamentTasks.map(x=>x.event).join(','),task:Buffer.from(JSON.stringify(tournamentTasks)).toString('base64')}));
+const matrix={include:grouped.length?grouped:[{skip:true,index:0,competitionId:'none',event:'none',task:''}]};
 await writeJson('dist/v3/itf_t1_draw_batch.json',{version:1,generatedAt:new Date().toISOString(),tournaments:inventories.length,tasks:tasks.length,inventoryErrors:inventories.filter(item=>item.inventoryError).length});
 if(process.env.GITHUB_OUTPUT)await fs.appendFile(process.env.GITHUB_OUTPUT,'matrix='+JSON.stringify(matrix)+'\ntasks='+tasks.length+'\ntournaments='+inventories.length+'\n');
 console.log(JSON.stringify({tournaments:inventories.length,tasks:tasks.length,inventoryErrors:inventories.filter(item=>item.inventoryError).length},null,2));
