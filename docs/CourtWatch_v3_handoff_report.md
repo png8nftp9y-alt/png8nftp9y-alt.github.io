@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-08-31.53**
+Revisione documento: **2026-09-01.54**
+
+- 1 settembre 2026 — Certificato in prova il riuso integrale del metodo storico per i tabelloni T−1: run `33457103374` verde sui 17 tornei conclusi rimasti nel buco, 125 tabelloni dichiarati, 125 artifact unici e completi, 0 retry, 0 mancanti e 0 illeggibili. Preparata l'integrazione operativa: inventario ITF completo, un runner isolato per tabellone con `acquire-itf-history-draw-task.mjs`, conservazione cumulativa dei successi e retry esclusivo dei falliti. I pending non escono più dalla coda alla data finale. Nessun endpoint OOP o risultati viene interrogato dal flusso.
 
 - 31 agosto 2026 — Rafforzata la pianificazione locale contro Mac spento/logout: il LaunchAgent usa ora `run-backup-if-due.sh`, viene valutato la domenica alle 04:30 e anche al successivo login (`RunAtLoad`). Se `latest.txt` indica un backup riuscito con meno di sei giorni, termina senza scaricare; se la copia manca o è scaduta, esegue immediatamente il backup completo. Un appuntamento perso viene quindi recuperato al primo accesso dell'utente, senza duplicare copie recenti.
 
