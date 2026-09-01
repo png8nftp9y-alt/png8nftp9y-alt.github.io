@@ -1374,3 +1374,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Primo collaudo operativo: run `33454644777` verde su `J-J30-AUS-2026-004`. ITF ha dichiarato 7 tabelloni e il workflow ha avviato esattamente 7 job distinti; tutti gli artifact sono stati raccolti e validati. Il merge ha riutilizzato 7 sezioni già disponibili nei singoli snapshot, salvato 1 nuova sezione e pubblicato lo stato validato nel commit automatico `52bb6b80`.
 - Dopo il ciclo, i tornei completi restano 18 e i pending complessivi 38; i pending tecnici sono scesi da 26 a 20, mentre 18 risultano ora correttamente classificati come pubblicazione ufficiale incompleta. Nessuna assenza è stata dedotta da sezioni mancanti o illeggibili e le 4 entry ITF visibili sono rimaste invariate.
 - I cicli successivi continuano ogni cinque minuti: sezioni acquisite escluse dalle richieste successive; sezioni non pubblicate, incomplete, in errore o Incapsula ritentate su nuovi runner finché diventano leggibili. Storico ITF e acceptance list non sono stati modificati.
+
+
+## Aggiornamento 1 settembre 2026 — audit dei pending ITF già conclusi
+
+- L’audit incrociato tra `history/itf_draw_target_db.json` e il catalogo globale ha rilevato 17 tornei pending con data finale già trascorsa: 16 in stato tecnico e 1 con tabelloni mancanti/incompleti. Tutti hanno zero sezioni salvate nello stato T−1 corrente.
+- I 16 pending tecnici conclusi sono: J30 Male, J30 Nuevo Leon, J30 Skopje, J30 Panama, J30 Cluj Napoca, J30 Dushanbe, J300 College Park, J60 São Paulo, J60 Vina del Mar, J60 Shenzhen, J60 Hyderabad, J60 Macau, J60 Singapore, J60 Kreuzlingen, J100 Barcelona e J60 Megrine.
+- J60 Tacarigua è concluso ed è classificato come pubblicazione mancante/incompleta, senza errore tecnico esplicito e senza tabelloni salvati.
+- Causa strutturale verificata: la selezione automatica corrente richiede `endDate >= TODAY`; un torneo ancora pending esce quindi dalla coda dopo la data finale. Il retry automatico non garantisce ancora la convergenza a zero e questi 17 tornei non vengono recuperati dal ciclo live ordinario.
+- Correzione necessaria e non ancora applicata: distinguere permanentemente `technical_error`, `officially_missing_or_incomplete`, `acquired` e `complete`; mantenere in una coda di recupero anche i tornei conclusi finché ogni tabellone è acquisito oppure esiste una classificazione terminale ufficiale documentata. Nessun pending concluso deve essere eliminato soltanto per decorrenza della data.
