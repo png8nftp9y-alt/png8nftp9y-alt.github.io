@@ -9,7 +9,9 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-01.67**
+Revisione documento: **2026-09-01.68**
+
+- 1 settembre 2026 — Chiusura produttiva del buco per le sezioni inesistenti certificata dal run 33533384990 e persistita nel commit automatico 3704ef78: Dushanbe e Tacarigua sono completi con una `declared_but_unused` ciascuno, zero richieste residue e zero errori tecnici nel lotto. Stato globale emesso dal run: 44 tornei completi, 22 pending, dei quali 2 tecnici (J-J30-DEN-2026-004 e J-J30-SVK-2026-004) e 20 classificati come pubblicazione. Nel buco restano soltanto Male e Panama, i cui G-S-Q-KO contengono match ma non nomi normalizzati. Avviata una diagnosi read-only dello schema grezzo su Male, Panama e sull'anomalia storica Finlandia; obiettivo successivo: correggere il parser, rielaborare le tre sezioni e produrre l'elenco completo dei pending residui con motivo verificabile dall'utente.
 
 - 1 settembre 2026 — Il primo collaudo read-only delle sezioni inesistenti, run 33492650181, è risultato rosso esclusivamente per un gate di cardinalità obsoleto: il workflow pretendeva 8 tornei, mentre il selettore ne aveva correttamente inclusi 6 perché due ID richiesti erano già completi. La funzione verificata ha avuto esito corretto: Dushanbe e Tacarigua hanno richiesto zero sezioni, registrato una `declared_but_unused` ciascuno, raggiunto missing=0 e decisione complete; zero errori tecnici. Il gate confronta ora il totale aggregato con il numero effettivamente selezionato. Nuovo collaudo read-only: run 33493010050.
 
