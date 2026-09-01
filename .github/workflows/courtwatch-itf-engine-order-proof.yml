@@ -9,6 +9,7 @@ on:
       - 'src/v3/inventory-itf-history-tournament.mjs'
       - 'src/v3/acquire-itf-history-draw-task.mjs'
       - 'src/v3/build-itf-t1-draw-batch.mjs'
+      - 'src/v3/merge-itf-t1-history-method.mjs'
       - '.github/workflows/courtwatch-v3-itf-t-minus-one.yml'
       - '.github/workflows/courtwatch-itf-engine-order-proof.yml'
 permissions: {contents: read}
@@ -24,6 +25,8 @@ jobs:
         run: node -e "import('./src/v3/itf-known-unused-draws.mjs').then(({isKnownUnusedDraw:f})=>{for(const [id,event] of [['J-J30-FIN-2026-004','G-S-Q-KO'],['J-J30-TJK-2026-005','G-S-Q-KO'],['J-J60-TTO-2026-002','G-S-Q-KO']])if(!f(id,event))throw Error('missing terminal '+id);for(const id of ['J-J30-MDV-2026-004','J-J30-PAN-2026-002'])if(f(id,'G-S-Q-KO'))throw Error('real draw marked unused '+id)})"
       - name: Verify homonymous draws remain distinct
         run: node -e "import('./src/v3/itf-draw-identity.mjs').then(({indexSections})=>{const base={playerTypeCode:'G',matchTypeCode:'S',eventClassificationCode:'Q',drawsheetStructureCode:'KO',tournamentId:123};const rows=indexSections([{...base,weekNumber:0},{...base,weekNumber:1}]);if(rows.length!==2||rows[0].sectionId===rows[1].sectionId)throw Error('homonymous ITF draws collapsed')})"
+      - name: Verify merge and cache use section identity
+        run: node -e "const s=require('fs').readFileSync('src/v3/merge-itf-t1-history-method.mjs','utf8');if(s.includes('byEvent.get(section.event)')||s.includes('eventCache[section.event]={'))throw Error('merge still collapses homonymous draws');for(const token of ['sectionId:section.sectionId','eventCache[section.sectionId]','doc.sectionId||doc.event'])if(!s.includes(token))throw Error('missing section identity in merge: '+token)"
       - name: Verify green and technical gates
         run: |
           mkdir -p dist/v3
