@@ -2,7 +2,7 @@ name: Court Watch ITF T-1 eight-tournament batch proof
 # Read-only certification of batch selection, isolated acquisition and cumulative merge.
 on:
   push:
-    branches: ['test/itf-t1-unused-draws']
+    branches: ['test/itf-empty-skeletons']
     paths:
       - 'src/v3/build-itf-t1-tournament-matrix.mjs'
       - 'src/v3/build-itf-t1-draw-batch.mjs'
@@ -119,7 +119,7 @@ jobs:
           jq -s '{version:3,tournaments:length,complete:([.[].summary.completeTournaments]|add),pending:([.[].summary.pendingTournaments]|add),declared:([.[].summary.declaredSections]|add),acquired:([.[].summary.acquiredSections]|add),unusedAlternatives:([.[].summary.unusedAlternativeSections]|add),declaredButUnused:([.[].summary.declaredButUnusedSections]|add),resolved:([.[].summary.resolvedSections]|add),missing:([.[].summary.missingSections]|add),technicalErrors:([.[].summary.technicalErrorSections]|add),notPublishedOrIncomplete:([.[].summary.notPublishedOrIncompleteSections]|add),audits:map(.audit[0])}' dist/v3/audits/itf-t1-batch/*.json > dist/v3/audits/itf-t1-batch-proof.json
           test "$(jq -r .tournaments dist/v3/audits/itf-t1-batch-proof.json)" -eq "${{ needs.queue.outputs.tournaments }}"
           test "$(jq -r .technicalErrors dist/v3/audits/itf-t1-batch-proof.json)" -eq 0
-          test "$(jq -r .declaredButUnused dist/v3/audits/itf-t1-batch-proof.json)" -eq 2
+          test "$(jq -r .declaredButUnused dist/v3/audits/itf-t1-batch-proof.json)" -eq 4
           test "$(jq -r .complete dist/v3/audits/itf-t1-batch-proof.json)" -ge 2
           test "$(jq -r '.declared == (.resolved + .missing)' dist/v3/audits/itf-t1-batch-proof.json)" = true
       - uses: actions/upload-artifact@v4
