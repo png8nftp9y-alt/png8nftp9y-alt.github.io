@@ -1,0 +1,16 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {readJson,writeJson} from './itf-common.mjs';
+
+const root=process.env.ITF_T1_INVENTORY_ROOT||'dist/v3/shards/itf/inventory',state=await readJson('history/itf_draw_target_db.json',{tournaments:{}}),docs=[];
+async function walk(dir){let items=[];try{items=await fs.readdir(dir,{withFileTypes:true})}catch{return}for(const item of items){const full=path.join(dir,item.name);if(item.isDirectory())await walk(full);else if(item.name.endsWith('.json'))docs.push(await readJson(full,null))}}
+await walk(root);const tasks=[],inventories=[];
+for(const doc of docs.filter(Boolean)){const id=doc.competitionId,previous=state.tournaments?.[id]||{},cache=previous.eventCache||{},events=doc.status==='complete'?(doc.events||[]):[],sections=events.map((event,index)=>({index,event:event.event,acquired:Boolean(cache[event.event]?.populated),combo:event})),fallbackSections=!sections.length?(previous.eventInventory||[]).map((item,index)=>({index,event:item.event,acquired:Boolean(cache[item.event]?.populated),combo:item.combo||{}})):sections;
+ const inventory={version:3,generatedAt:new Date().toISOString(),mode:'live_t_minus_one_historical_batch',competitionId:id,tournamentName:doc.tournament?.tournamentName||'',tournament:doc.tournament||{},declaredSections:fallbackSections.length,alreadyAcquiredSections:fallbackSections.filter(item=>item.acquired).length,requestedSections:sections.filter(item=>!item.acquired).length,inventoryError:doc.status==='complete'?null:(doc.error||'event_inventory_retry_required'),sections:fallbackSections};inventories.push(inventory);await writeJson(`dist/v3/shards/itf/t1-inventory/${id}.json`,inventory);
+ if(doc.status==='complete')for(const event of events)if(!cache[event.event]?.populated){const task={...event,index:tasks.length,taskId:id+'__'+event.event};tasks.push(task)}
+}
+if(tasks.length>240)throw new Error('ITF T-1 draw batch exceeds safe matrix size: '+tasks.length);
+const matrix={include:tasks.length?tasks.map(task=>({index:task.index,competitionId:task.competitionId,event:task.event,task:Buffer.from(JSON.stringify(task)).toString('base64')})):[{skip:true,index:0,competitionId:'none',event:'none',task:''}]};
+await writeJson('dist/v3/itf_t1_draw_batch.json',{version:1,generatedAt:new Date().toISOString(),tournaments:inventories.length,tasks:tasks.length,inventoryErrors:inventories.filter(item=>item.inventoryError).length});
+if(process.env.GITHUB_OUTPUT)await fs.appendFile(process.env.GITHUB_OUTPUT,'matrix='+JSON.stringify(matrix)+'\ntasks='+tasks.length+'\ntournaments='+inventories.length+'\n');
+console.log(JSON.stringify({tournaments:inventories.length,tasks:tasks.length,inventoryErrors:inventories.filter(item=>item.inventoryError).length},null,2));
