@@ -9,7 +9,7 @@ Total output lines: 1478
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-01.70**
+Revisione documento: **2026-09-01.71**\n\n- 1 settembre 2026 — Il run read-only 33535411670 è verde a livello GitHub ma non certifica le tre verifiche: Male ha confermato che soltanto `weekNumber=0` possiede l'evento (8 match scheletro, zero riferimenti giocatore reali; settimane 1–3 vuote), mentre Panama e Finlandia hanno fallito `GetEventFilters` per `incapsula_challenge`. Il verde è quindi un falso positivo del workflow diagnostico, che cattura gli errori per produrre l'artifact ma non applica un gate finale. Direzione unica: (1) rendere rosso ogni test con un errore tecnico richiesto; (2) recuperare la copia popolata delle qualificazioni Male/Panama senza terminalizzarle; (3) rieseguire l'audit complessivo e pubblicare una sola tabella `risolto / dati non disponibili / errore tecnico`. Nessuna modifica produttiva deriva da questo run.
 
 - 1 settembre 2026 — Correzione della revisione .69 dopo verifica diretta dell'utente: Male e Panama possiedono match reali nei rispettivi tabelloni di qualificazione. Le risposte `GetDrawsheet` con 8 match e 32 riferimenti tutti nulli dimostrano che il motore raggiunge una copia scheletro, non che il tabellone sia inesistente. Male e Panama restano `pending` e non devono essere `declared_but_unused`; il test che li classificava terminali è ritirato e non va promosso. Dushanbe e Tacarigua restano gli unici terminali produttivi confermati. Avviato il run read-only 33535411670 per confrontare inventario ufficiale e varianti `weekNumber` 0–3 senza scrivere su database o R2.
 
