@@ -7,9 +7,11 @@ const tomorrow=new Date(Date.parse(TODAY+'T00:00:00Z')+864e5).toISOString().slic
 // A pending tournament never ages out of the queue.  T-1 starts the search,
 // but only a certified complete inventory removes it from subsequent cycles.
 const due=(map.tournaments||[]).filter(t=>t.startDate<=tomorrow&&state.tournaments?.[t.competitionId]?.decision!=='complete').sort((a,b)=>String(state.tournaments?.[a.competitionId]?.checkedAt||'').localeCompare(String(state.tournaments?.[b.competitionId]?.checkedAt||''))||String(a.startDate).localeCompare(String(b.startDate))||String(a.competitionId).localeCompare(String(b.competitionId)));
-const tournament=due[0];
+const requestedId=String(process.env.ITF_T1_COMPETITION_ID||'').trim().toUpperCase();
+const tournament=requestedId?due.find(t=>String(t.competitionId).toUpperCase()===requestedId):due[0];
+if(requestedId&&!tournament)throw new Error('Requested ITF T-1 tournament is not pending/due: '+requestedId);
 if(!tournament){
- const matrix={include:[{skip:true,index:0,event:'none',competitionId:'none',inventory:''}]};
+ const matrix={include:[{skip:true,index:0,event:'none',competitionId:'none',task:''}]};
  if(process.env.GITHUB_OUTPUT)await fs.appendFile(process.env.GITHUB_OUTPUT,'matrix='+JSON.stringify(matrix)+'\ncompetition_id=\ndeclared=0\nrequested=0\n');
  console.log(JSON.stringify({status:'no_pending_itf_t1_tournaments'}));
  process.exit(0);
