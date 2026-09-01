@@ -1,0 +1,27 @@
+name: Court Watch ITF engine order proof
+on:
+  push:
+    branches: ['test/itf-engine-order']
+    paths:
+      - 'src/v3/itf-known-unused-draws.mjs'
+      - 'src/v3/gate-itf-t1-run.mjs'
+      - '.github/workflows/courtwatch-v3-itf-t-minus-one.yml'
+      - '.github/workflows/courtwatch-itf-engine-order-proof.yml'
+permissions: {contents: read}
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify terminal draw registry
+        run: node -e "import('./src/v3/itf-known-unused-draws.mjs').then(({isKnownUnusedDraw:f})=>{for(const [id,event] of [['J-J30-FIN-2026-004','G-S-Q-KO'],['J-J30-TJK-2026-005','G-S-Q-KO'],['J-J60-TTO-2026-002','G-S-Q-KO']])if(!f(id,event))throw Error('missing terminal '+id);for(const id of ['J-J30-MDV-2026-004','J-J30-PAN-2026-002'])if(f(id,'G-S-Q-KO'))throw Error('real draw marked unused '+id)})"
+      - name: Verify green and technical gates
+        run: |
+          mkdir -p dist/v3
+          node -e "require('fs').writeFileSync('dist/v3/source_itf_draw_audit.json',JSON.stringify({summary:{mode:'live_t_minus_1_historical_batch',globalPendingTechnical:0,globalPendingPublication:1,technicalPendingCompetitionIds:[],publicationPendingCompetitionIds:['PENDING-DRAW']}}))"
+          node src/v3/gate-itf-t1-run.mjs
+          node -e "require('fs').writeFileSync('dist/v3/source_itf_draw_audit.json',JSON.stringify({summary:{mode:'live_t_minus_1_historical_batch',globalPendingTechnical:1,globalPendingPublication:1,technicalPendingCompetitionIds:['TECHNICAL'],publicationPendingCompetitionIds:['PENDING-DRAW']}}))"
+          if node src/v3/gate-itf-t1-run.mjs; then echo 'technical gate incorrectly green'; exit 1; fi
