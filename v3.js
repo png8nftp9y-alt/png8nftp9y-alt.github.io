@@ -85,7 +85,7 @@ async function load(){
       opponents,
       tournamentEntries:tournamentEntries.filter(x=>visibleIds.has(x.playerId)),
       diagnostics,
-      generatedAt:projection?.generatedAt||docs.status?.generatedAt||docs.players.generatedAt||docs.tournaments.generatedAt||previous.generatedAt||new Date().toISOString(),
+      generatedAt:(universalProjectionFresh&&projection?.generatedAt)||docs.status?.generatedAt||docs.players.generatedAt||docs.tournaments.generatedAt||previous.generatedAt||new Date().toISOString(),
     };
     saveCachedData(state.data);
     if(!uiSelectionRestored){state.data.players.forEach(p=>state.selected.add(p.id));uiSelectionRestored=true}else state.selected=new Set([...state.selected].filter(id=>state.data.players.some(p=>p.id===id)));
