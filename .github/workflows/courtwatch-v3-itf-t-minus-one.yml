@@ -10,7 +10,7 @@ on:
     - cron: '0,15,30,45 * * * *'
   push:
     branches: [main]
-    paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/build-itf-t1-tournament-matrix.mjs','src/v3/build-itf-t1-draw-batch.mjs','src/v3/inventory-itf-history-tournament.mjs','src/v3/acquire-itf-history-draw-task.mjs','src/v3/merge-itf-t1-history-method.mjs','.github/workflows/courtwatch-v3-itf-known-fast.yml','.github/workflows/courtwatch-v3-itf-live.yml','.github/workflows/courtwatch-v3-itf-safety-120d.yml','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
+    paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/itf-known-unused-draws.mjs','src/v3/gate-itf-t1-run.mjs','src/v3/build-itf-t1-tournament-matrix.mjs','src/v3/build-itf-t1-draw-batch.mjs','src/v3/inventory-itf-history-tournament.mjs','src/v3/acquire-itf-history-draw-task.mjs','src/v3/merge-itf-t1-history-method.mjs','.github/workflows/courtwatch-v3-itf-known-fast.yml','.github/workflows/courtwatch-v3-itf-live.yml','.github/workflows/courtwatch-v3-itf-safety-120d.yml','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: false}
 jobs:
@@ -193,12 +193,16 @@ jobs:
             git push origin HEAD:main && exit 0
           done
           exit 1
+      - name: Gate the complete run after preserving successful draws
+        run: node src/v3/gate-itf-t1-run.mjs
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: itf-t-minus-one-validated
           path: |
             dist/v3/source_itf_draw_audit.json
             dist/v3/audits/itf-t1-batch/*.json
             dist/v3/itf_system_diagnostics.json
+            dist/v3/itf_t1_run_gate.json
             history/itf_database_audit.json
           retention-days: 14
