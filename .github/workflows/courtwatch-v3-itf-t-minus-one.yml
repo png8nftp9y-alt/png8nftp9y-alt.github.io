@@ -91,7 +91,7 @@ jobs:
     needs: queue
     strategy:
       fail-fast: false
-      max-parallel: 16
+      max-parallel: 2
       matrix: ${{ fromJSON(needs.queue.outputs.matrix) }}
     runs-on: ubuntu-latest
     timeout-minutes: 11
