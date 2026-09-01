@@ -1,0 +1,99 @@
+name: Court Watch ITF Incapsula focused proof
+on:
+  push:
+    branches: ['test/itf-engine-order']
+    paths: ['.github/workflows/courtwatch-itf-incapsula-focused-proof.yml']
+permissions: {contents: read}
+jobs:
+  inventory:
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - {index: 0, competitionId: J-J30-DEN-2026-004}
+          - {index: 1, competitionId: J-J30-SVK-2026-004}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - env:
+          ITF_COMPETITION_ID: ${{ matrix.competitionId }}
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUEST_DELAY_MS: 2500
+        run: node src/v3/inventory-itf-history-tournament.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: incapsula-inventory-${{ matrix.index }}
+          path: dist/v3/shards/itf/inventory/*.json
+  queue:
+    needs: inventory
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.focus.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'incapsula-inventory-*', path: dist/v3/shards/itf/inventory, merge-multiple: true}
+      - id: build
+        run: node src/v3/build-itf-t1-draw-batch.mjs
+      - id: focus
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const wanted=new Set(['G-D-M-KO','G-S-M-KO','G-S-Q-KO']);
+          const docs=fs.readdirSync('dist/v3/shards/itf/t1-inventory').map(f=>JSON.parse(fs.readFileSync('dist/v3/shards/itf/t1-inventory/'+f)));
+          const tasks=[];
+          for(const doc of docs)for(const section of doc.sections||[])if(wanted.has(section.event)&&!section.resolved){
+            const task={...section.combo,event:section.event,sectionId:section.sectionId,competitionId:doc.competitionId,sourceUrl:doc.tournament?.sourceUrl||section.combo?.sourceUrl||'',taskId:doc.competitionId+'__'+section.sectionId};
+            tasks.push({index:tasks.length,competitionId:doc.competitionId,event:section.event,sectionId:section.sectionId,task:Buffer.from(JSON.stringify(task)).toString('base64')});
+          }
+          if(tasks.length!==6)throw Error('expected six focused tasks, got '+tasks.length);
+          fs.appendFileSync(process.env.GITHUB_OUTPUT,'matrix='+JSON.stringify({include:tasks})+'\n');
+          NODE
+  acquire:
+    needs: queue
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix: ${{ fromJSON(needs.queue.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci --ignore-scripts
+      - continue-on-error: true
+        env:
+          ITF_DRAW_TASK_B64: ${{ matrix.task }}
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUEST_DELAY_MS: 2500
+          ITF_REQUIRE_POPULATED_DRAW: 1
+        run: |
+          export ITF_DRAW_TASK_JSON="$(printf '%s' "$ITF_DRAW_TASK_B64" | base64 --decode)"
+          node src/v3/acquire-itf-history-draw-task.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: incapsula-result-${{ matrix.index }}
+          path: dist/v3/shards/itf/draw-tasks/*.json.gz
+          if-no-files-found: error
+  gate:
+    needs: acquire
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {pattern: 'incapsula-result-*', path: results, merge-multiple: true}
+      - name: Require zero Incapsula responses
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';import zlib from 'node:zlib';
+          const rows=fs.readdirSync('results').map(f=>JSON.parse(zlib.gunzipSync(fs.readFileSync('results/'+f))));
+          const blocked=rows.filter(x=>String(x.error||'').includes('incapsula'));
+          console.log(JSON.stringify(rows.map(x=>({competitionId:x.competitionId,event:x.event,status:x.status,failureType:x.failureType,error:x.error,players:x.players?.length||0,matches:x.matches?.length||0})),null,2));
+          if(rows.length!==6||blocked.length)throw Error('Incapsula remains on '+blocked.map(x=>x.taskId).join(','));
+          NODE
