@@ -12,7 +12,7 @@ on:
     branches: [main]
     paths: ['players.json','former-players.json','dist/v3/source_itf_tournaments.json','src/v3/itf-common.mjs','src/v3/build-itf-t1-tournament-matrix.mjs','src/v3/build-itf-t1-draw-batch.mjs','src/v3/inventory-itf-history-tournament.mjs','src/v3/acquire-itf-history-draw-task.mjs','src/v3/acquire-itf-history-tournament-tasks.mjs','src/v3/merge-itf-t1-history-method.mjs','.github/workflows/courtwatch-v3-itf-known-fast.yml','.github/workflows/courtwatch-v3-itf-live.yml','.github/workflows/courtwatch-v3-itf-safety-120d.yml','.github/workflows/courtwatch-v3-itf-t-minus-one.yml']
 permissions: {contents: write}
-concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: false}
+concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: true}
 jobs:
   select:
     runs-on: ubuntu-latest
