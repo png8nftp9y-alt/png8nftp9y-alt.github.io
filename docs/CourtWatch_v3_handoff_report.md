@@ -1,12 +1,3 @@
-Warning: truncated output (original token count: 50352)
-Total output lines: 1361
-
-Warning: truncated output (original token count: 50254)
-Total output lines: 1366
-
-Warning: truncated output (original token count: 54598)
-Total output lines: 1478
-
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
 Revisione documento: **2026-09-01.74**
