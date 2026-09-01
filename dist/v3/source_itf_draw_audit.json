@@ -1,23 +1,23 @@
 {
   "version": 11,
-  "generatedAt": "2026-09-01T04:31:37.455Z",
+  "generatedAt": "2026-09-01T05:01:44.176Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
-    "pendingTournaments": 1,
-    "declaredSections": 7,
-    "requestedSections": 7,
-    "acquiredSections": 5,
-    "missingSections": 2,
-    "newSectionsCached": 5,
-    "retrySections": 2,
+    "completeTournaments": 1,
+    "pendingTournaments": 0,
+    "declaredSections": 6,
+    "requestedSections": 6,
+    "acquiredSections": 6,
+    "missingSections": 0,
+    "newSectionsCached": 6,
+    "retrySections": 0,
     "technicalErrorSections": 0,
-    "notPublishedOrIncompleteSections": 2,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 23,
+    "globalCompleteTournaments": 24,
     "globalPendingTotal": 40,
     "globalPendingTechnical": 18,
     "globalPendingPublication": 22,
@@ -68,23 +68,18 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-CRC-2026-002",
-      "tournamentName": "J60 San Jose",
-      "decision": "pending",
+      "competitionId": "J-J60-SWE-2026-001",
+      "tournamentName": "J60 Malmo",
+      "decision": "complete",
       "playersFound": [],
-      "declaredSections": 7,
-      "acquiredSections": 5,
-      "missingSections": 2,
+      "declaredSections": 6,
+      "acquiredSections": 6,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
           "acquired": true
-        },
-        {
-          "event": "B-S-M-RR",
-          "family": "B-S-M",
-          "acquired": false
         },
         {
           "event": "B-S-Q-KO",
@@ -102,9 +97,9 @@
           "acquired": true
         },
         {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": false
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "acquired": true
         },
         {
           "event": "G-D-M-KO",
@@ -119,15 +114,9 @@
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 8,
+              "players": 48,
               "error": null,
               "failureType": null
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete"
             }
           ]
         },
@@ -137,7 +126,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 19,
+              "players": 48,
               "error": null,
               "failureType": null
             }
@@ -149,7 +138,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 30,
+              "players": 48,
               "error": null,
               "failureType": null
             }
@@ -161,15 +150,21 @@
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 8,
+              "players": 48,
               "error": null,
               "failureType": null
-            },
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
             {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete"
+              "event": "G-S-Q-KO",
+              "players": 44,
+              "error": null,
+              "failureType": null
             }
           ]
         },
@@ -179,7 +174,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 26,
+              "players": 48,
               "error": null,
               "failureType": null
             }
