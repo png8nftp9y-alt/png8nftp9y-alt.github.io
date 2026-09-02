@@ -10,13 +10,14 @@ Ogni esecuzione salva:
 - database SQLite locale apribile con DB Browser for SQLite, DBeaver o `sqlite3`;
 - prefisso R2 `fitp/cache`;
 - prefisso R2 `itf/database`;
+- generazione corrente ITF completa di cache partecipanti, database giocatori/risultati, stato T−1 dei tabelloni, relazioni giocatore–torneo e audit;
 - prefisso R2 `itf/history-draws`, inclusi i 17 blocchi certificati dei 4.291 tabelloni;
 - prefisso R2 `tennis-europe/cache`;
 - prefissi R2 `tennis-europe/oop-history` e `tennis-europe/oop-live`;
 - manifest con checksum SHA-256;
 - verifica SQLite `PRAGMA integrity_check`.
 
-Il backup termina con errore se uno dei sei prefissi R2 è vuoto o se lo storico ITF contiene meno di 17 blocchi.
+Il backup termina con errore se uno dei sei prefissi R2 è vuoto, se lo storico ITF contiene meno di 17 blocchi oppure se la generazione ITF corrente non contiene tutti i sei file necessari. La copia D1 registra inoltre i conteggi separati di tornei, presenze e profili osservati ITF.
 
 Le copie vengono salvate per impostazione predefinita in `.courtwatch-backups/`, che non deve essere pubblicata nel repository.
 
