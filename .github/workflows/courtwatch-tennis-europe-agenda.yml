@@ -3,7 +3,7 @@ name: Court Watch Tennis Europe agenda D1
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ['Court Watch Tennis Europe OOP and results live']
+    workflows: ['Court Watch Tennis Europe OOP and results live', 'Court Watch Cloudflare D1 and app API']
     types: [completed]
   push:
     branches: [main]
