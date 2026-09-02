@@ -28,6 +28,8 @@ await fs.rm(out,{recursive:true,force:true});await fs.mkdir(out,{recursive:true}
 // Keep remote D1 imports comfortably below the storage-operation timeout.
 // The files remain ordered and idempotent, so a transient failure retries only
 // the current 500-statement block instead of rebuilding the whole generation.
-const statements=sql.filter(x=>x!=='PRAGMA foreign_keys=ON;'),chunkSize=500;\nconst control=statements.filter(x=>x.startsWith('DELETE FROM ')),data=statements.filter(x=>!x.startsWith('DELETE FROM '));\nawait fs.writeFile(`${out}/000-control.sql`,['PRAGMA foreign_keys=ON;',...control].join('\\n')+'\\n');
-for(let start=0,index=1;start<data.length;start+=chunkSize,index++){const chunk=['PRAGMA foreign_keys=ON;',...data.slice(start,start+chunkSize)];await fs.writeFile(`${out}/${String(index).padStart(3,'0')}-data.sql`,chunk.join('\\n')+'\\n')}
+const statements=sql.filter(x=>x!=='PRAGMA foreign_keys=ON;'),chunkSize=500;
+const control=statements.filter(x=>x.startsWith('DELETE FROM ')),data=statements.filter(x=>!x.startsWith('DELETE FROM '));
+await fs.writeFile(`${out}/000-control.sql`,['PRAGMA foreign_keys=ON;',...control].join('\n')+'\n');
+for(let start=0,index=1;start<data.length;start+=chunkSize,index++){const chunk=['PRAGMA foreign_keys=ON;',...data.slice(start,start+chunkSize)];await fs.writeFile(`${out}/${String(index).padStart(3,'0')}-data.sql`,chunk.join('\n')+'\n')}
 console.log(JSON.stringify({output:out,files:1+Math.ceil(data.length/chunkSize),controlStatements:control.length,dataStatements:data.length,counts}));
