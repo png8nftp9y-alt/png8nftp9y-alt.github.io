@@ -1,7 +1,7 @@
 const V3='/dist/v3/';
 const APP_API='https://courtwatch-app-api.ckrk9ggvrb.workers.dev/v1/app-snapshot';
 const ADMIN_MODE=document.body.dataset.adminMode==='true';
-const adminStyle=document.createElement('link');adminStyle.rel='stylesheet';adminStyle.href='v3-admin.css?v=202609020100';document.head.append(adminStyle);
+const adminStyle=document.createElement('link');adminStyle.rel='stylesheet';adminStyle.href='v3-admin.css?v=202609020700';document.head.append(adminStyle);
 const LAST_GOOD_CACHE='courtwatch-v3-last-good-v1';
 const UI_STATE_CACHE='courtwatch-v3-ui-state-v1';
 const FORMER_PLAYERS=new Set(['martina-busa','manuel-natale','pietro-sala','niccolo-zanaga']);
@@ -57,7 +57,6 @@ function moveBothToMonth(year,month){const day=Math.min(state.agenda.getDate(),n
 function renderSynchronizedDates(){saveUiState();renderAgenda();renderCalendar()}
 function wire(){$('prevAgenda').onclick=()=>{state.agenda=add(state.agenda,-1);syncMonthFromAgenda();renderSynchronizedDates()};$('nextAgenda').onclick=()=>{state.agenda=add(state.agenda,1);syncMonthFromAgenda();renderSynchronizedDates()};$('agendaToday').onclick=()=>openPicker($('agendaPicker'));$('agendaPicker').onchange=e=>{if(e.target.value){state.agenda=new Date(e.target.value+'T12:00:00');syncMonthFromAgenda();renderSynchronizedDates()}closePicker(e.target)};$('agendaPicker').onblur=e=>{if(state.openPicker===e.target)state.openPicker=null};$('prevMonth').onclick=()=>{moveBothToMonth(state.month.getFullYear(),state.month.getMonth()-1);renderSynchronizedDates()};$('nextMonth').onclick=()=>{moveBothToMonth(state.month.getFullYear(),state.month.getMonth()+1);renderSynchronizedDates()};$('todayBtn').onclick=()=>openPicker($('monthPicker'));$('monthPicker').onchange=e=>{if(e.target.value){const [y,m]=e.target.value.split('-').map(Number);moveBothToMonth(y,m-1);renderSynchronizedDates()}closePicker(e.target)};$('monthPicker').onblur=e=>{if(state.openPicker===e.target)state.openPicker=null};$('toggleAll').onclick=()=>{state.selected.size?state.selected.clear():state.data.players.forEach(p=>state.selected.add(p.id));saveUiState();renderHome()};$('backHome').onclick=()=>location.hash='';$('resetHome').onclick=()=>{state.agenda=new Date();state.month=new Date();state.openPicker=null;history.replaceState(null,'',location.pathname+location.search);saveUiState();route();scrollTo({top:0,behavior:'smooth'})};addEventListener('hashchange',()=>{saveUiState();route()});addEventListener('pagehide',saveUiState)}
 function wireAdmin(){if(!ADMIN_MODE)return;$('switchCollection').onclick=()=>{state.activeCollection=state.activeCollection==='tcl'?'altri':'tcl';applyAdminCollection();renderHome()};$('addPlayer').onclick=()=>{$('playerSearch').value='';$('playerSearchResults').innerHTML='<div class="empty">Cerca per nome o ID ufficiale.</div>';$('addPlayerDialog').showModal();$('playerSearch').focus()};let searchTimer;$('playerSearch').oninput=()=>{clearTimeout(searchTimer);const q=$('playerSearch').value.trim();if(q.length<2){$('playerSearchResults').innerHTML='<div class="empty">Inserisci almeno due caratteri.</div>';return}searchTimer=setTimeout(async()=>{try{const response=await fetch(APP_API.replace('/v1/app-snapshot','/v1/player-search')+'?q='+encodeURIComponent(q),{cache:'no-store'}),data=await response.json();renderPlayerSearch(data.players||[])}catch{$('playerSearchResults').innerHTML='<div class="empty">Ricerca temporaneamente non disponibile.</div>'}},250)}}
-function placeAdminActions(){if(!ADMIN_MODE)return;const actions=document.querySelector('.playerActions');if(actions)$('playerTotal').before(actions)}
 async function load(){
   if(loadRunning)return;
   loadRunning=true;
@@ -116,4 +115,4 @@ async function load(){
     console.error(e);
   }finally{loadRunning=false}
 }
-wire();placeAdminActions();wireAdmin();load();setInterval(load,30000);
+wire();wireAdmin();load();setInterval(load,30000);
