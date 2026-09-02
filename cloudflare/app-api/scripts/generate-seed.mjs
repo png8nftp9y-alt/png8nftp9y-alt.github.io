@@ -25,6 +25,9 @@ appMatches.forEach((r,i)=>sql.push(`INSERT INTO app_matches(seq,player_id,compet
 const counts={...manifest.counts,observedPlayers:(observed.players||[]).length,observedByCircuit:observed.counts||{},observedSources:observed.sources||{},appPlayers:appPlayers.length,appTournaments:appTournaments.length,appMatches:appMatches.length};
 sql.push(`INSERT OR REPLACE INTO generations(id,generated_at,schema_version,status,counts_json) VALUES('current',${esc(manifest.generatedAt)},${esc(manifest.version)},'green',${esc(JSON.stringify(counts))});`);
 await fs.rm(out,{recursive:true,force:true});await fs.mkdir(out,{recursive:true});
-const statements=sql.filter(x=>x!=='PRAGMA foreign_keys=ON;'),chunkSize=2000;
+// D1 resets a storage object when a large payload keeps a single import busy
+// for too long. Keep each remote transaction deliberately small; the import
+// loop is idempotent and retries individual files without rebuilding prior ones.
+const statements=sql.filter(x=>x!=='PRAGMA foreign_keys=ON;'),chunkSize=500;
 for(let start=0,index=0;start<statements.length;start+=chunkSize,index++){const chunk=['PRAGMA foreign_keys=ON;',...statements.slice(start,start+chunkSize)];await fs.writeFile(`${out}/${String(index).padStart(3,'0')}.sql`,chunk.join('\n')+'\n')}
 console.log(JSON.stringify({output:out,files:Math.ceil(statements.length/chunkSize),counts}));
