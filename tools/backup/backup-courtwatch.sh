@@ -66,6 +66,11 @@ else
   test "$(wc -l < "$row_counts_file" | tr -d ' ')" = "$table_count"
   sqlite3 "$sqlite_file" '.schema' > "$snapshot_dir/d1/schema.sql"
 
+  d1_itf_tournaments="$(sqlite3 "$sqlite_file" "SELECT COUNT(*) FROM tournaments WHERE circuit='itf';")"
+  d1_itf_entries="$(sqlite3 "$sqlite_file" "SELECT COUNT(*) FROM entries WHERE circuit='itf';")"
+  d1_itf_observed_players="$(sqlite3 "$sqlite_file" "SELECT COUNT(*) FROM observed_players WHERE circuit='itf';")"
+  test "$d1_itf_observed_players" -gt 0
+
   gzip -n "$sql_file"
   gzip -n "$sqlite_file"
 fi
@@ -91,6 +96,16 @@ for prefix in "${prefixes[@]}"; do
   test -n "$(find "$snapshot_dir/r2/$prefix" -type f -print -quit)" || { echo "Empty R2 backup prefix: $prefix" >&2; exit 2; }
 done
 
+itf_pointer="$snapshot_dir/r2/itf/database/pointers/current.json"
+itf_generation="$(jq -er .generation "$itf_pointer")"
+itf_generation_dir="$snapshot_dir/r2/itf/database/generations/$itf_generation"
+itf_state_files=(itf_participant_cache.json.gz itf_players_database.json.gz itf_results_database.json.gz itf_draw_target_db.json itf_player_tournament_db.json itf_database_audit.json)
+for file in "${itf_state_files[@]}"; do
+  test -s "$itf_generation_dir/$file" || { echo "Incomplete current ITF R2 generation: missing $file" >&2; exit 2; }
+done
+for file in itf_draw_target_db.json itf_player_tournament_db.json itf_database_audit.json; do jq -e 'type=="object"' "$itf_generation_dir/$file" >/dev/null; done
+for file in itf_participant_cache.json.gz itf_players_database.json.gz itf_results_database.json.gz; do gzip -t "$itf_generation_dir/$file"; done
+
 manifest="$snapshot_dir/manifest.txt"
 {
   echo "created_at_utc=$timestamp"
@@ -99,10 +114,15 @@ manifest="$snapshot_dir/manifest.txt"
   if test "${COURTWATCH_R2_ONLY:-0}" != "1"; then
     echo "d1_row_counts=d1/row-counts.tsv"
     echo "d1_schema=d1/schema.sql"
+    echo "d1_itf_tournaments=$d1_itf_tournaments"
+    echo "d1_itf_entries=$d1_itf_entries"
+    echo "d1_itf_observed_players=$d1_itf_observed_players"
   fi
   echo "r2_bucket=$R2_BUCKET"
   echo "r2_prefixes=${prefixes[*]}"
   echo "itf_history_blocks=$itf_history_blocks"
+  echo "itf_database_generation=$itf_generation"
+  echo "itf_database_state_files=${itf_state_files[*]}"
   find "$snapshot_dir" -type f ! -name manifest.txt -print0 | sort -z |
     while IFS= read -r -d '' file; do
       printf '%s  %s\n' "$(sha256_file "$file")" "${file#$snapshot_dir/}"
