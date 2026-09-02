@@ -60,6 +60,8 @@ jobs:
       - name: Create or reuse Court Watch D1
         id: d1
         run: npm run configure
+      - name: Deploy read-compatible Worker before database maintenance
+        run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
       - name: Apply D1 migrations
         run: npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
       - name: Restore current observed-player indexes from R2
