@@ -1,7 +1,7 @@
 const V3='/dist/v3/';
 const APP_API='https://courtwatch-app-api.ckrk9ggvrb.workers.dev/v1/app-snapshot';
 const ADMIN_MODE=document.body.dataset.adminMode==='true';
-const adminStyle=document.createElement('link');adminStyle.rel='stylesheet';adminStyle.href='v3-admin.css?v=202609020700';document.head.append(adminStyle);
+const adminStyle=document.createElement('link');adminStyle.rel='stylesheet';adminStyle.href='v3-admin.css?v=202609020701';document.head.append(adminStyle);
 const LAST_GOOD_CACHE='courtwatch-v3-last-good-v1';
 const UI_STATE_CACHE='courtwatch-v3-ui-state-v1';
 const FORMER_PLAYERS=new Set(['martina-busa','manuel-natale','pietro-sala','niccolo-zanaga']);
