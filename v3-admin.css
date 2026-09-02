@@ -2,8 +2,8 @@
 .top .brand { justify-self: start; }
 .top .homeToday { justify-self: center; }
 .top .status { justify-self: end; }
-.adminOnly { display: none; }
-body[data-admin-mode="true"] .adminOnly { display: flex; }
+.adminOnly { display: none !important; }
+body[data-admin-mode="true"] .adminOnly { display: flex !important; }
 .playerHeading, .playerActions { display: flex; align-items: center; gap: 8px; }
 .playerActions .btn { padding-block: 4px; }
 .playerDialog { width: min(620px, calc(100vw - 28px)); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
