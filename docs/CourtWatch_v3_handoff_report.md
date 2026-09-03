@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-02.77**
+Revisione documento: **2026-09-03.78**
+
+- 3 settembre 2026 — Interfaccia torneo: navigazione dal calendario alla pagina del torneo, match raggruppati per giocatore, date `gg-mm-aaaa`, luogo e data con icone, collegamento alla fonte ufficiale, nazionalità limitata ad avversari e compagni internazionali. Il report è aggiornato per revisioni operative e non costituisce un indicatore live dello stato dei motori.
 
 - 2 settembre 2026 — Uniformata la presentazione degli incontri Tennis Europe nell'agenda: nei doppi il compagno compare sulla stessa riga del giocatore (`giocatore / compagno`), compagno e avversari conservano le rispettive nazionalità nel formato `(SWE) 🇸🇪`, e i set conclusi vengono orientati sempre con la squadra vincitrice a sinistra. Il colore continua a rappresentare l'esito del giocatore monitorato: verde se vincente, rosso se sconfitto. La modifica riguarda proiezione Europe e interfaccia, non acquisizione, archivio o motori.
 
