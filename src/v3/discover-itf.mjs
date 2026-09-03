@@ -237,11 +237,14 @@ function tournamentMeta(html, fallback = {}) {
   const dr = parseDateRange(text);
   const hostNation = clean((text.match(/Host nation:\s*([^|]{2,60}?)(?=\s+Hospitality:|\s+Surface:|\s+Prize money:|\s+Date:|$)/i) || [])[1] || fallback.hostNation || '');
   const venue = clean((text.match(/Venue Name:\s*([^|]{2,80}?)(?=\s+Venue Address:|$)/i) || [])[1] || '');
+  const address = clean((text.match(/Venue Address:\s*([^|]{2,180}?)(?=\s+(?:Telephone|Tel|Email|Website|Hospitality|Surface|Date):|$)/i) || [])[1] || '');
   return {
     tournamentName: clean(h1) || fallback.tournamentName || '',
     startDate: dr.startDate || fallback.startDate || '',
     endDate: dr.endDate || fallback.endDate || '',
     location: fallback.location || venue || hostNation,
+    venueName: venue || fallback.venueName || '',
+    address: address || fallback.address || '',
     hostNation,
     category: fallback.category || (clean(h1).match(/\bJ(?:30|60|100|200|300|500|GS)\b/i) || [])[0] || ''
   };
@@ -367,6 +370,8 @@ async function worker() {
           competitionId: candidate.competitionId,
           tournamentName: meta.tournamentName || candidate.tournamentName || 'Torneo ITF',
           location: meta.location || candidate.location || '',
+          venueName: meta.venueName || candidate.venueName || '',
+          address: meta.address || candidate.address || '',
           startDate: meta.startDate || candidate.startDate || '',
           endDate: meta.endDate || candidate.endDate || '',
           category: meta.category || candidate.category || '',

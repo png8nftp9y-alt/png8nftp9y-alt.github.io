@@ -74,11 +74,18 @@ jobs:
         run: bash src/v3/fitp-r2-cache.sh publish
       - name: Publish validated player entries atomically
         run: |
+          set -euo pipefail
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
+          snapshot=/tmp/courtwatch-fitp-publish
+          rm -rf "$snapshot"; mkdir -p "$snapshot"
+          files=(players.json dist/v3/fitp_player_clubs_recovered.json history/fitp_tournament_archive.json dist/v3/source_fitp_entries.json dist/v3/source_fitp_entries_audit.json history/player_tournaments.json history/audit.json)
+          for file in "${files[@]}"; do test -f "$file" || continue; mkdir -p "$snapshot/$(dirname "$file")"; cp "$file" "$snapshot/$file"; done
           for attempt in 1 2 3 4 5; do
             git fetch origin main
-            git reset --mixed origin/main
+            git reset --hard origin/main
+            cp -R "$snapshot"/* ./
+            node src/v3/entries-engine.mjs
             git add \
               players.json \
               dist/v3/fitp_player_clubs_recovered.json \

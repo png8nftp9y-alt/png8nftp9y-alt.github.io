@@ -133,6 +133,7 @@ jobs:
             git reset --hard origin/main
             cp /tmp/te-live/dist/v3/* dist/v3/
             cp /tmp/te-live/history/* history/
+            node src/v3/entries-engine.mjs
             git add dist/v3 history/tennis_europe_tournament_catalog.json history/tennis_europe_player_tournament_db.json history/tennis_europe_database_audit.json
             git add history/tennis_europe_participant_database_audit.json src/v3/tennis-europe-r2-cache.sh src/v3/merge-tennis-europe-participant-cache.mjs
             git rm -f --ignore-unmatch history/tennis_europe_participant_cache.json.gz history/tennis_europe_participant_index.json.gz
