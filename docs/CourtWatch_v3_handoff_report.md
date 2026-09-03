@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.104**
+Revisione documento: **2026-09-03.105**
+
+- 3 settembre 2026 — Le bandiere delle nazionalità sono nuovamente rettangolari e piatte: rimossa la resa emoji ondulata e adottato un elemento `<img>` esplicito verso gli SVG locali, evitando il precedente problema dello sfondo CSS invisibile.
 
 - La configurazione pubblica `players.json` è inoltre la fonte canonica dei profili nel client anche quando la proiezione D1 è più recente; D1 non può quindi più far oscillare temporaneamente classifica, circolo o tessera del giocatore.
 
