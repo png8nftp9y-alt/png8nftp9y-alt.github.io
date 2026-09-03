@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.90**
+Revisione documento: **2026-09-03.91**
+
+- 3 settembre 2026 — Rimosso integralmente il `guarded isolated merge`: eliminati il workflow semiorario `.github/workflows/courtwatch-v3-merge-isolated.yml` e lo script `src/v3/merge-isolated-engines.mjs`. Il processo era un ricostruttore aggiuntivo della proiezione aggregata, non un motore di acquisizione, e scriveva gli stessi file prodotti dai workflow FITP, Tennis Europe e ITF, introducendo concorrenza e possibilità di ripubblicare snapshot meno recenti. Restano operativi i motori dei tre circuiti e `entries-engine.mjs`, richiamato dai rispettivi workflow. La precedente attribuzione dell'avviso di ritardo alla soglia di 25 giocatori non era dimostrata per l'episodio osservato dall'utente: la soglia spiegava il fallimento del singolo run `33782092308`, non necessariamente l'avviso precedente. Al momento della richiesta di rimozione l'indicatore di ritardo non era presente. Verificati riferimenti residui, workflow alternativi di pubblicazione e diff limitato alle due eliminazioni e al report.
 
 - 3 settembre 2026 — Individuata e rimossa la causa concreta dell'avviso di aggiornamento in ritardo osservato dopo il commit venue: il merge isolato conservava un gate obsoleto di almeno 25 giocatori e terminava con exit code 2, mentre il roster attivo e corretto è di 23. Il limite di sicurezza è stato riallineato a 20 per continuare a intercettare riduzioni anomale senza bloccare il roster corrente. Il fallimento riguardava la pubblicazione della generazione aggregata, non l'acquisizione ITF; run interessato `33782092308`. La correzione viene verificata con un nuovo run del merge prima della certificazione finale.
 
