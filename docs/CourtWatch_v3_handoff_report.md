@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.96**
+Revisione documento: **2026-09-03.97**
+
+- 3 settembre 2026 — Sostituito su richiesta lo scorrimento interno dell'agenda con una pagina a scorrimento naturale. L'agenda torna ad avere altezza determinata dal suo contenuto; la barra del calendario con titolo, mese e frecce usa ora `position: sticky` e resta in alto durante lo scorrimento, con sfondo e livello dedicati per non sovrapporsi in modo illeggibile al calendario.
 
 - 3 settembre 2026 — Corretto immediatamente il riferimento JavaScript inesistente `dateFmt` introdotto nell'etichetta accessibile dei nuovi pulsanti-giorno. L'eccezione interrompeva `renderCalendar()` e impediva la successiva esecuzione di `renderPlayers()`, facendo sparire insieme calendario e colonna giocatori. L'etichetta ora usa il formatter esistente `fmt`; aggiornato il cache-buster del client.
 
