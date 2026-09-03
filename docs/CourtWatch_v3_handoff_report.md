@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.93**
+Revisione documento: **2026-09-03.94**
+
+- 3 settembre 2026 — Uniformata ulteriormente l'intestazione delle pagine torneo FITP: anche gli indirizzi ricevuti interamente in maiuscolo vengono presentati in forma leggibile e la località mantiene sempre la sigla della provincia in maiuscolo dopo la città (`Nome circolo, Indirizzo, Città PROVINCIA`). La modifica resta limitata alla pagina torneo e non aggiunge il circolo al calendario. Aggiornato il cache-buster del client. Elencate e ricontrollate le 12 competizioni uniche le cui 40 relazioni giocatore-torneo non hanno indirizzo perché il dettaglio ufficiale P.U.C. pubblica i relativi campi vuoti.
 
 - 3 settembre 2026 — Verifica post-workflow del commit venue: i run verdi avevano pubblicato correttamente la mappa Tennis Europe con `TC Pully`, `TC Bachten De Kupe` e `Teniski Klub Doboj`, ma `entries-engine.mjs` continuava a costruire le 46 schede dalle sole entry di accettazione e non univa la mappa ufficiale; conseguenza misurata: 43/46 venue nella proiezione. Corretto il merge ordinario per collegare anche Tennis Europe a `source_tennis_europe_tournaments_sharded.json` tramite `competitionId`, come già avviene per ITF e FITP. La stessa verifica certifica ITF 4/4 con circolo e FITP 370/370 con circolo. Per FITP restano 40 relazioni giocatore-torneo senza indirizzo, corrispondenti a 12 competizioni uniche: non è un ritardo del workflow; per tali competizioni la risposta ufficiale P.U.C. restituisce letteralmente `Address`, `Municipality`, `Province` e `impianti` vuoti (verificato direttamente, per esempio, sul Lemon Bowl). Nessun indirizzo viene inventato o dedotto dai tabelloni; occorre acquisirlo da un'ulteriore fonte ufficiale del circolo.
 
