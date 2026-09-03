@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.87**
+Revisione documento: **2026-09-03.88**
+
+- 3 settembre 2026 — Rafforzata la correzione Crema dopo il primo ciclo automatico della mappa Tennis Europe: il markup ufficiale può collocare il referente personale nella sezione della sede, quindi la sola presenza dell’etichetta Venue non è sufficiente. Il parser applica ora un controllo generale che scarta nomi propri di persona privi di termini riconducibili a una struttura sportiva e assegna priorità alle sedi ufficialmente verificate; per l’ID di Crema resta `Tennis Club Crema`. Ripristinata anche la mappa sorgente dopo che il workflow aveva ripubblicato temporaneamente `Jessica Festari`; la proiezione pubblica era rimasta corretta.
 
 - 3 settembre 2026 — Corretta la sede del `Torneo Internazionale Under 16 - Città di Crema` (ID `6A379359-E8F3-42F4-9063-16EFB100DB7B`): `Jessica Festari` è la direttrice/contatto del torneo e non la venue; la sede verificata è `Tennis Club Crema`, Crema, Italy. Corretto anche il parser generale Tennis Europe: il testo sommario accanto alla bandiera non è più accettato come venue, perché può contenere il nome di una persona; vengono accettati soltanto campi espliciti Venue/Club/Site, con fonte ufficiale verificata quando la homepage non pubblica un’etichetta strutturata. Aggiornate la mappa sorgente e la proiezione pubblica senza modificare iscrizioni, risultati o motori decisionali.
 
