@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.99**
+Revisione documento: **2026-09-03.100**
+
+- 3 settembre 2026 — Eliminato il falso lampeggio intermittente dell'indicatore di ritardo. La soglia client era esattamente 30 minuti, uguale alla cadenza nominale del workflow aggregato FITP (`17,47 * * * *`), quindi il normale ritardo di accodamento ed esecuzione di GitHub Actions faceva apparire brevemente l'avviso prima della generazione successiva. La soglia è ora 45 minuti: nessuna frequenza o acquisizione è stata modificata e non è stato aggiunto polling; un aggiornamento realmente mancato continua a produrre l'avviso.
 
 - 3 settembre 2026 — Corretto il selettore progressivo che si richiudeva dopo la scelta dell'anno: la ricostruzione del pannello rimuoveva il pulsante originario prima che il clic raggiungesse il gestore globale, facendolo classificare erroneamente come clic esterno. I clic interni al selettore ora non propagano al documento, consentendo correttamente il percorso anni → mesi → giorni.
 
