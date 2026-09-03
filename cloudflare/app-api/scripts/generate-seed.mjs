@@ -16,7 +16,7 @@ for(const r of (schedules.schedules||[]).filter(r=>r.circuit!=='tennis-europe'))
 for(const r of (matches.matches||[]).filter(r=>r.circuit!=='tennis-europe'))sql.push(`INSERT INTO matches(id,tournament_id,circuit,played_date,payload) VALUES(${esc(r.id)},${esc(r.tournamentId)},${esc(r.circuit)},${esc(r.playedDate)},${payload(r)});`);
 for(const r of (results.results||[]).filter(r=>r.circuit!=='tennis-europe'))sql.push(`INSERT INTO results(id,tournament_id,match_id,circuit,played_date,payload) VALUES(${esc(r.id)},${esc(r.tournamentId)},${esc(r.matchId)},${esc(r.circuit)},${esc(r.playedDate)},${payload(r)});`);
 const configPlayers=[...new Map((playerConfig.players||[]).map(p=>[p.id,p])).values()],allowed=new Set(configPlayers.map(p=>p.id)),legacyById=new Map((legacy.players||[]).map(p=>[p.id,p]));
-const appPlayers=configPlayers.map(p=>({...p,...(legacyById.get(p.id)||{})}));
+const appPlayers=configPlayers.map(p=>({...(legacyById.get(p.id)||{}),...p}));
 const appTournaments=(mapDoc.tournaments||[]).filter(row=>allowed.has(row.playerId));
 const appMatches=[];
 appPlayers.forEach((r,i)=>sql.push(`INSERT INTO app_players(seq,id,payload) VALUES(${i+1},${esc(r.id)},${payload(r)});`));

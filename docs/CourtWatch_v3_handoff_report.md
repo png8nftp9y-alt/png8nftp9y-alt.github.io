@@ -1,6 +1,10 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.103**
+Revisione documento: **2026-09-03.104**
+
+- La configurazione pubblica `players.json` è inoltre la fonte canonica dei profili nel client anche quando la proiezione D1 è più recente; D1 non può quindi più far oscillare temporaneamente classifica, circolo o tessera del giocatore.
+
+- 3 settembre 2026 — Consolidata navigazione e consistenza dell'agenda. Le bandiere usano ora emoji Unicode derivate dal codice IOC/ISO e non dipendono dal caricamento di un asset SVG; il caso `MEX → MX` mostra quindi sempre la bandiera messicana. Corretto il generatore D1 dei giocatori: `players.json` corrente ha precedenza su `data.json` legacy, che aveva temporaneamente sovrascritto classifiche aggiornate (per esempio Anna Gambarini 3.4 e Daniele Gelli 3.5) con valori vecchi. In agenda il clic sulla scheda match apre il torneo, mentre il nome del giocatore apre la sua pagina. Nella pagina torneo il nome del giocatore apre la relativa pagina. La pagina giocatore è ora una singola colonna di tornei, con le rispettive partite raggruppate sotto ciascun torneo. Il fallback Europe introdotto nella revisione precedente resta permanente nel client e conserva l'ultima raccolta valida contro risposte D1 vuote o transitorie.
 
 - 3 settembre 2026 — Eliminata l'intermittenza dell'agenda Tennis Europe: una risposta D1 temporaneamente vuota o fallita non sostituisce più la raccolta Europe valida già caricata e conservata nella cache; D1 resta primario e una nuova raccolta Europe non vuota sostituisce normalmente la precedente. Completata l'eccezione Kufstein nello stesso schema dei match automatici con ora `11:00`, campo `CC Sparkasse`, avversario Lucca Becerra e nazionalità `MEX`, visualizzata con bandiera messicana dal renderer generale. Le future modifiche generali al rendering dell'agenda si applicano quindi anche a questo record manuale.
 
