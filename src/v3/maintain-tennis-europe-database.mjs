@@ -80,7 +80,7 @@ for (const t of map) {
     ...previous,
     circuit: 'tennis-europe', competitionId: id,
     tournamentName: t.tournamentName || previous.tournamentName || '',
-    location: t.location || previous.location || '',
+    location: t.location || previous.location || '', venueName: t.venueName || previous.venueName || '',
     startDate: t.startDate || previous.startDate || '', endDate: t.endDate || previous.endDate || '',
     sourceUrl: t.sourceUrl || previous.sourceUrl || '', eventsUrl: t.eventsUrl || previous.eventsUrl || '',
     acceptanceListUrl: t.acceptanceListUrl || previous.acceptanceListUrl || '',

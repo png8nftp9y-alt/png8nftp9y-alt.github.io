@@ -1,9 +1,10 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.80**
+Revisione documento: **2026-09-03.81**
 
 - 3 settembre 2026 — Interfaccia torneo: navigazione dal calendario alla pagina del torneo, match raggruppati per giocatore, date `gg-mm-aaaa`, luogo e data con icone, collegamento alla fonte ufficiale, nazionalità limitata ad avversari e compagni internazionali. Il report è aggiornato per revisioni operative e non costituisce un indicatore live dello stato dei motori.
 - 3 settembre 2026 — Corretto il criterio della sede nella pagina torneo: il campo OOP non viene più utilizzato per dedurre il circolo. La sede proviene esclusivamente dai metadati ufficiali del torneo; per `Bad Waltersdorf 2026 - Indoor` è stata verificata e impostata `Sportaktivpark Bad Waltersdorf`, con località `Bad Waltersdorf, Austria`. Verificata inoltre la conservazione dei risultati terminali `W/O` come partite concluse.
+- 3 settembre 2026 — Generalizzata la correzione della sede a tutti i tornei: ogni shard Tennis Europe acquisisce `venueName` dalla homepage ufficiale del torneo, lo conserva nel database permanente e lo propaga nelle entry; ITF continua a usare la sede fornita dall'API ufficiale del torneo. Rimossa l'eccezione applicativa specifica per Bad Waltersdorf. OOP non è una fonte ammessa per sede o circolo.
 - 3 settembre 2026 — Rifinitura pagina torneo: icona calendario mantenuta solo nell'intestazione e bandiere rese come sfondi SVG locali per eliminare i riquadri vuoti di Safari.
 
 - 2 settembre 2026 — Uniformata la presentazione degli incontri Tennis Europe nell'agenda: nei doppi il compagno compare sulla stessa riga del giocatore (`giocatore / compagno`), compagno e avversari conservano le rispettive nazionalità nel formato `(SWE) 🇸🇪`, e i set conclusi vengono orientati sempre con la squadra vincitrice a sinistra. Il colore continua a rappresentare l'esito del giocatore monitorato: verde se vincente, rosso se sconfitto. La modifica riguarda proiezione Europe e interfaccia, non acquisizione, archivio o motori.
