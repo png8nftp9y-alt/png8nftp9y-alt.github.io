@@ -1,7 +1,7 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-09-03T22:34:02.886Z",
-  "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
+  "generatedAt": "2026-09-03T23:17:21.823Z",
+  "status": "orders_of_play_engine_ex_novo_waiting_official_daily_oop",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 23,
@@ -15,7 +15,11 @@
     "warnings": 0,
     "tennisEuropeVisible": 90,
     "tennisEuropeAcceptanceConfirmed": 2,
-    "diagnostics": "yellow"
+    "diagnostics": "yellow",
+    "entries": 421,
+    "matches": 0,
+    "agenda": 421,
+    "timedAgenda": 0
   },
   "engines": {
     "discoverFitp": {
@@ -29,15 +33,15 @@
       "status": "itf_acceptance_complete"
     },
     "entries": {
-      "status": "built",
-      "file": "src/v3/entries-engine.mjs",
-      "method": "merge FITP + validated dated TE acceptance list/profile entries + ITF; no v1/v2/data.json"
+      "status": "built"
     },
     "ordersOfPlay": {
-      "status": "active"
+      "status": "built",
+      "file": "src/v3/orders-of-play-engine.mjs",
+      "method": "starts only from v3 tournament_entries; no data.json and no v2"
     },
     "results": {
-      "status": "active"
+      "status": "pending"
     }
   },
   "warnings": []
