@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.107**
+Revisione documento: **2026-09-03.108**
+
+- 3 settembre 2026 — Ripristinata su richiesta la dimensione originaria delle bandiere (`18×12 px`), mantenendo il nuovo SVG messicano piatto e correttamente decodificabile.
 
 - 3 settembre 2026 — Individuata con verifica sul sito pubblicato la causa della bandiera messicana invisibile: `flags/mx.svg` terminava con errore di codifica e l'immagine risultava completa ma con dimensioni naturali zero. Introdotto `mx-flat.svg`, SVG pulito e rettangolare, collegato esplicitamente a `MEX`; dimensione visiva portata da 18×12 a 24×16 pixel. Confermata inoltre sul sito la classifica corrente di Anna Gambarini `3.4`, proveniente dalla fonte canonica `players.json`.
 
