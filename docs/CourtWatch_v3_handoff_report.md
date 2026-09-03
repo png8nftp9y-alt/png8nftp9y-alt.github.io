@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.95**
+Revisione documento: **2026-09-03.96**
+
+- 3 settembre 2026 — Corretto immediatamente il riferimento JavaScript inesistente `dateFmt` introdotto nell'etichetta accessibile dei nuovi pulsanti-giorno. L'eccezione interrompeva `renderCalendar()` e impediva la successiva esecuzione di `renderPlayers()`, facendo sparire insieme calendario e colonna giocatori. L'etichetta ora usa il formatter esistente `fmt`; aggiornato il cache-buster del client.
 
 - 3 settembre 2026 — Sincronizzata l'agenda con il calendario: ogni numero del giorno è ora un pulsante accessibile e il clic imposta immediatamente l'agenda su quella data, aggiornando coerentemente anche il mese quando viene selezionato un giorno esterno. Stabilizzata inoltre la posizione dei comandi del mese assegnando all'agenda un'altezza costante con scorrimento interno delle partite, così la barra del calendario non sale o scende al variare del numero di incontri. Verificati gli indirizzi FITP pubblicati: 330 relazioni hanno un indirizzo, ma soltanto due indirizzi unici contengono un civico effettivo (`Via della Repubblica 116` e `Via S. Maria Nuova 15`); `Via 2 Giugno` è una denominazione stradale. I civici forniti dal P.U.C. vengono conservati e mostrati.
 
