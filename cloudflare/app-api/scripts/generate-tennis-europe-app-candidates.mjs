@@ -6,6 +6,7 @@ const [historical,live,registry]=await Promise.all([read('../../dist/v3/tennis_e
 const normalize=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
 const isoDate=value=>{const v=String(value||'');return /^\d{8}$/.test(v)?`${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`:v};
 const esc=value=>`'${String(value??'').replaceAll("'","''")}'`,payload=value=>esc(JSON.stringify(value));
+const winnerFirstScore=(score,winnerTeamIndex)=>{const value=String(score||'').trim();if(winnerTeamIndex!==1||!value||/^(?:W\/O|WO)$/i.test(value))return value;return value.split(/\s+/).map(set=>{const m=set.match(/^(\d+)(?:\((\d+)\))?-(\d+)(?:\((\d+)\))?$/);return m?`${m[3]}${m[4]?`(${m[4]})`:''}-${m[1]}${m[2]?`(${m[2]})`:''}`:set}).join(' ')};
 const monitored=(registry.players||[]).filter(p=>(p.circuits||[]).some(c=>normalize(c)==='tennis europe'));
 const ownersByName=new Map();for(const p of monitored){const key=normalize(p.name);if(!ownersByName.has(key))ownersByName.set(key,[]);ownersByName.get(key).push(p)}
 const tournamentMap=new Map((historical.tournaments||[]).map(t=>[t.competitionId,t]));for(const t of live.tournaments||[])tournamentMap.set(t.competitionId,t);
@@ -17,11 +18,13 @@ for(const match of matchMap.values())for(const player of match.players||[]){cons
  const teamIndex=(match.teams||[]).findIndex(team=>(team||[]).map(String).includes(playerId));
  if(teamIndex<0)throw new Error('Player team missing for '+owner.id+' in '+match.id);
  const teamIds=new Set((match.teams[teamIndex]||[]).map(String));
- const partner=(match.players||[]).filter(x=>teamIds.has(String(x.id))&&String(x.id)!==playerId).map(x=>x.name).join(' / ');
- const opponents=(match.players||[]).filter(x=>!teamIds.has(String(x.id))).map(x=>x.name);
+ const partners=(match.players||[]).filter(x=>teamIds.has(String(x.id))&&String(x.id)!==playerId);
+ const opponentPlayers=(match.players||[]).filter(x=>!teamIds.has(String(x.id)));
+ const partner=partners.map(x=>x.name).join(' / '),opponents=opponentPlayers.map(x=>x.name);
  if(!opponents.length)throw new Error('Opponent missing for '+owner.id+' in '+match.id);
  const completed=match.status==='completed',winnerTeam=Number.isInteger(match.winnerTeamIndex)?match.winnerTeamIndex:null;
- const row={id:'te-app:'+owner.id+'|'+match.id,playerId:owner.id,playerName:owner.name,sourcePlayerName:player.name,sourceNationality:player.nationality||'',matchId:match.id,competitionId:match.competitionId,tournamentName:tournament.tournamentName||tournament.name||'',location:tournament.location||'',date:isoDate(match.date),time:match.time||'',court:match.court||'',event:match.event||'',draw:match.event||'',round:match.round||'',status:match.status,score:match.score||'',result:completed?(match.score||''):'' ,winnerPlayerIds:match.winnerPlayerIds||[],winnerTeamIndex:winnerTeam,advances:completed&&winnerTeam!==null?winnerTeam===teamIndex:null,teamIndex,matchType:(match.teams||[]).some(team=>(team||[]).length>1)?'doubles':'singles',partner,opponent:opponents.join(' / '),opponentOptions:opponents,sourceUrl:match.sourceUrl,circuit:'tennis-europe',linkMethod:'exact_normalized_full_name'};
+ const displayScore=winnerFirstScore(match.score,winnerTeam);
+ const row={id:'te-app:'+owner.id+'|'+match.id,playerId:owner.id,playerName:owner.name,sourcePlayerName:player.name,sourceNationality:player.nationality||'',matchId:match.id,competitionId:match.competitionId,tournamentName:tournament.tournamentName||tournament.name||'',location:tournament.location||'',date:isoDate(match.date),time:match.time||'',court:match.court||'',event:match.event||'',draw:match.event||'',round:match.round||'',status:match.status,score:displayScore,result:completed?displayScore:'',winnerPlayerIds:match.winnerPlayerIds||[],winnerTeamIndex:winnerTeam,advances:completed&&winnerTeam!==null?winnerTeam===teamIndex:null,teamIndex,matchType:(match.teams||[]).some(team=>(team||[]).length>1)?'doubles':'singles',partner,partnerNationalities:partners.map(x=>x.nationality||''),opponent:opponents.join(' / '),opponentOptions:opponents,opponentNationalities:opponentPlayers.map(x=>x.nationality||''),sourceUrl:match.sourceUrl,circuit:'tennis-europe',linkMethod:'exact_normalized_full_name'};
  candidates.set(owner.id+'|'+match.id,row)
 }}
 if(ambiguous.length)throw new Error('Ambiguous Court Watch Europe candidates: '+JSON.stringify(ambiguous));
