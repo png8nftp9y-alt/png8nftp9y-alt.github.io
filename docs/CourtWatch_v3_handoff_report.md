@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.97**
+Revisione documento: **2026-09-03.98**
+
+- 3 settembre 2026 — Sostituite le due barre temporali separate con una sola barra nell'intestazione dell'agenda: `≪`/`≫` cambiano mese, `‹`/`›` cambiano giorno e il pulsante centrale mostra la data. Rimossa la barra mesi sopra il calendario. Il pulsante data apre ora un selettore personalizzato progressivo anni → mesi → giorni, con ritorno tra i livelli; la selezione finale aggiorna insieme agenda e calendario. L'agenda mantiene lo scorrimento naturale della pagina, senza area di scroll interna.
 
 - 3 settembre 2026 — Sostituito su richiesta lo scorrimento interno dell'agenda con una pagina a scorrimento naturale. L'agenda torna ad avere altezza determinata dal suo contenuto; la barra del calendario con titolo, mese e frecce usa ora `position: sticky` e resta in alto durante lo scorrimento, con sfondo e livello dedicati per non sovrapporsi in modo illeggibile al calendario.
 
