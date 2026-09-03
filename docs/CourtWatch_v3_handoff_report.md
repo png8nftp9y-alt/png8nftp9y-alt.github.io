@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.105**
+Revisione documento: **2026-09-03.106**
+
+- 3 settembre 2026 — Nella pagina giocatore le partite restano raggruppate per torneo, ma ciascuna partita occupa ora una singola riga a tutta larghezza, coerentemente con la pagina torneo.
 
 - 3 settembre 2026 — Le bandiere delle nazionalità sono nuovamente rettangolari e piatte: rimossa la resa emoji ondulata e adottato un elemento `<img>` esplicito verso gli SVG locali, evitando il precedente problema dello sfondo CSS invisibile.
 
