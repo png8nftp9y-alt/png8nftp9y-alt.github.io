@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.102**
+Revisione documento: **2026-09-03.103**
+
+- 3 settembre 2026 — Eliminata l'intermittenza dell'agenda Tennis Europe: una risposta D1 temporaneamente vuota o fallita non sostituisce più la raccolta Europe valida già caricata e conservata nella cache; D1 resta primario e una nuova raccolta Europe non vuota sostituisce normalmente la precedente. Completata l'eccezione Kufstein nello stesso schema dei match automatici con ora `11:00`, campo `CC Sparkasse`, avversario Lucca Becerra e nazionalità `MEX`, visualizzata con bandiera messicana dal renderer generale. Le future modifiche generali al rendering dell'agenda si applicano quindi anche a questo record manuale.
 
 - 3 settembre 2026 — Inserita come eccezione persistente la finale del Bonus Draw U12 maschile di Kufstein del 25 luglio: Edoardo Grimoldi vincitore per W/O su Lucca Becerra, verificata nel tabellone ufficiale Tennis Europe. Il record manuale è un input versionato sia per il client sia per l'import D1 e non viene perso dai successivi aggiornamenti automatici. Corretto inoltre il timestamp della spia di ritardo: il client usa il più recente tra la proiezione effettivamente selezionata e i JSON essenziali, invece di fermarsi al primo timestamp disponibile. Testo di agenda, giocatori, calendario e schede reso selezionabile; una selezione attiva non attiva la navigazione interna.
 
