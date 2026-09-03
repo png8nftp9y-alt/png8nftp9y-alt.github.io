@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.98**
+Revisione documento: **2026-09-03.99**
+
+- 3 settembre 2026 — Corretto il selettore progressivo che si richiudeva dopo la scelta dell'anno: la ricostruzione del pannello rimuoveva il pulsante originario prima che il clic raggiungesse il gestore globale, facendolo classificare erroneamente come clic esterno. I clic interni al selettore ora non propagano al documento, consentendo correttamente il percorso anni → mesi → giorni.
 
 - 3 settembre 2026 — Sostituite le due barre temporali separate con una sola barra nell'intestazione dell'agenda: `≪`/`≫` cambiano mese, `‹`/`›` cambiano giorno e il pulsante centrale mostra la data. Rimossa la barra mesi sopra il calendario. Il pulsante data apre ora un selettore personalizzato progressivo anni → mesi → giorni, con ritorno tra i livelli; la selezione finale aggiorna insieme agenda e calendario. L'agenda mantiene lo scorrimento naturale della pagina, senza area di scroll interna.
 
