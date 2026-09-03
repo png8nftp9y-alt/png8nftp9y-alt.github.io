@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.85**
+Revisione documento: **2026-09-03.86**
+
+- 3 settembre 2026 — Rettificato il perimetro di visualizzazione della sede: nelle bande del calendario tornano a comparire soltanto città e Paese tramite `cityCountry()`. Il nome del circolo/venue resta disponibile nelle pagine del giocatore e del torneo e non viene più mostrato nel calendario. Mantenute la conservazione integrale di `location` durante il raggruppamento e la deduplicazione della sede nella pagina torneo. Aggiornato il cache-buster di `v3.js`.
 
 - 3 settembre 2026 — Corretto il mancato aggiornamento percepito della mappa dopo la revisione venue: `v3.html` manteneva invariato il parametro di versione di `v3.js`, consentendo al browser di riutilizzare il client precedente. Aggiornato il cache-buster del client e irrobustita `tournamentPlace()` contro duplicazioni già presenti all’interno della singola stringa `location`; `Sportaktivpark Bad Waltersdorf` viene ora mostrato una sola volta. Report aggiornato nello stesso commit come richiesto.
 
