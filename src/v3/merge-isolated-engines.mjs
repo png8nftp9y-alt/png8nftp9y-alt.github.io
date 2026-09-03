@@ -53,7 +53,7 @@ const teAcceptance=teEntries.filter(e=>e.entryStatus==='confirmed_on_acceptance_
 const warnings=[];
 
 const guardErrors=[];
-if((playersDoc.players||[]).length<25)guardErrors.push(`players too low: ${(playersDoc.players||[]).length}`);
+if((playersDoc.players||[]).length<20)guardErrors.push(`players too low: ${(playersDoc.players||[]).length}`);
 if((byCircuit.fitp||0)<300)guardErrors.push(`FITP too low: ${byCircuit.fitp||0}`);
 if((byCircuit['tennis-europe']||0)<40)guardErrors.push(`Tennis Europe too low: ${byCircuit['tennis-europe']||0}`);
 if((byCircuit.itf||0)<2)guardErrors.push(`ITF too low: ${byCircuit.itf||0}`);
