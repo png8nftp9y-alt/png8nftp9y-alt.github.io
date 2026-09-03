@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.100**
+Revisione documento: **2026-09-03.101**
+
+- 3 settembre 2026 — Introdotta la politica persistente per gli indirizzi FITP mancanti: il P.U.C. resta primario; quando non pubblica `Address`, il merge consulta il registro versionato delle sedi verificate sul web; i tornei contenenti `Centro Estivo FITP` sono esplicitamente esenti. Ogni nuovo caso non esente e non risolto produce un warning bloccante per la completezza con URL di ricerca Google, senza dedurre automaticamente sedi ambigue. Verificati e registrati gli indirizzi dei nove tornei correnti interessati (otto sedi, con Ronchi Mare ricorrente); il Master Kinder conserva entrambe le sedi. Rebuild: 161/164 competizioni FITP uniche con indirizzo, tre sole esenzioni Centro Estivo e zero casi obbligatori irrisolti. Completata inoltre la normalizzazione visiva: circolo, indirizzo e città non restano interamente maiuscoli, mentre la sigla provinciale resta maiuscola.
 
 - 3 settembre 2026 — Eliminato il falso lampeggio intermittente dell'indicatore di ritardo. La soglia client era esattamente 30 minuti, uguale alla cadenza nominale del workflow aggregato FITP (`17,47 * * * *`), quindi il normale ritardo di accodamento ed esecuzione di GitHub Actions faceva apparire brevemente l'avviso prima della generazione successiva. La soglia è ora 45 minuti: nessuna frequenza o acquisizione è stata modificata e non è stato aggiunto polling; un aggiornamento realmente mancato continua a produrre l'avviso.
 
