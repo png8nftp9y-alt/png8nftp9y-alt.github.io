@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
 const incremental=process.env.TE_INCREMENTAL==='1';
-const [historical,live,registry]=await Promise.all([read('../../dist/v3/tennis_europe_oop_historical.json'),read('../../dist/v3/tennis_europe_oop_live.json'),read('../../players.json')]);
+const [historical,live,registry,manual]=await Promise.all([read('../../dist/v3/tennis_europe_oop_historical.json'),read('../../dist/v3/tennis_europe_oop_live.json'),read('../../players.json'),read('../../dist/v3/manual_matches.json')]);
 const normalize=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
 const isoDate=value=>{const v=String(value||'');return /^\d{8}$/.test(v)?`${v.slice(0,4)}-${v.slice(4,6)}-${v.slice(6,8)}`:v};
 const esc=value=>`'${String(value??'').replaceAll("'","''")}'`,payload=value=>esc(JSON.stringify(value));
@@ -27,6 +27,7 @@ for(const match of matchMap.values())for(const player of match.players||[]){cons
  const row={id:'te-app:'+owner.id+'|'+match.id,playerId:owner.id,playerName:owner.name,sourcePlayerName:player.name,sourceNationality:player.nationality||'',matchId:match.id,competitionId:match.competitionId,tournamentName:tournament.tournamentName||tournament.name||'',location:tournament.location||'',date:isoDate(match.date),time:match.time||'',court:match.court||'',event:match.event||'',draw:match.event||'',round:match.round||'',status:match.status,score:displayScore,result:completed?displayScore:'',winnerPlayerIds:match.winnerPlayerIds||[],winnerTeamIndex:winnerTeam,advances:completed&&winnerTeam!==null?winnerTeam===teamIndex:null,teamIndex,matchType:(match.teams||[]).some(team=>(team||[]).length>1)?'doubles':'singles',partner,partnerNationalities:partners.map(x=>x.nationality||''),opponent:opponents.join(' / '),opponentOptions:opponents,opponentNationalities:opponentPlayers.map(x=>x.nationality||''),sourceUrl:match.sourceUrl,circuit:'tennis-europe',linkMethod:'exact_normalized_full_name'};
  candidates.set(owner.id+'|'+match.id,row)
 }}
+for(const row of manual.matches||[])if(row.circuit==='tennis-europe')candidates.set(row.playerId+'|'+row.matchId,row);
 if(ambiguous.length)throw new Error('Ambiguous Court Watch Europe candidates: '+JSON.stringify(ambiguous));
 const rows=[...candidates.values()].sort((a,b)=>a.date.localeCompare(b.date)||a.playerId.localeCompare(b.playerId)||a.matchId.localeCompare(b.matchId));
 const sql=incremental?['PRAGMA foreign_keys=ON;']:['PRAGMA foreign_keys=ON;','DELETE FROM app_match_candidates;'];for(const r of rows)sql.push(`INSERT OR REPLACE INTO app_match_candidates(courtwatch_id,match_id,competition_id,match_date,status,payload) VALUES(${esc(r.playerId)},${esc(r.matchId)},${esc(r.competitionId)},${esc(r.date)},${esc(r.status)},${payload(r)});`);

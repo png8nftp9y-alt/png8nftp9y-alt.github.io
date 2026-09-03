@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.101**
+Revisione documento: **2026-09-03.102**
+
+- 3 settembre 2026 — Inserita come eccezione persistente la finale del Bonus Draw U12 maschile di Kufstein del 25 luglio: Edoardo Grimoldi vincitore per W/O su Lucca Becerra, verificata nel tabellone ufficiale Tennis Europe. Il record manuale è un input versionato sia per il client sia per l'import D1 e non viene perso dai successivi aggiornamenti automatici. Corretto inoltre il timestamp della spia di ritardo: il client usa il più recente tra la proiezione effettivamente selezionata e i JSON essenziali, invece di fermarsi al primo timestamp disponibile. Testo di agenda, giocatori, calendario e schede reso selezionabile; una selezione attiva non attiva la navigazione interna.
 
 - 3 settembre 2026 — Introdotta la politica persistente per gli indirizzi FITP mancanti: il P.U.C. resta primario; quando non pubblica `Address`, il merge consulta il registro versionato delle sedi verificate sul web; i tornei contenenti `Centro Estivo FITP` sono esplicitamente esenti. Ogni nuovo caso non esente e non risolto produce un warning bloccante per la completezza con URL di ricerca Google, senza dedurre automaticamente sedi ambigue. Verificati e registrati gli indirizzi dei nove tornei correnti interessati (otto sedi, con Ronchi Mare ricorrente); il Master Kinder conserva entrambe le sedi. Rebuild: 161/164 competizioni FITP uniche con indirizzo, tre sole esenzioni Centro Estivo e zero casi obbligatori irrisolti. Completata inoltre la normalizzazione visiva: circolo, indirizzo e città non restano interamente maiuscoli, mentre la sigla provinciale resta maiuscola.
 
