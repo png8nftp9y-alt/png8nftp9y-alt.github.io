@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.83**
+Revisione documento: **2026-09-03.84**
+
+- 3 settembre 2026 — Corretta la visualizzazione della sede nella mappa/calendario: il client non riduce più `location` a sola città e Paese durante il raggruppamento e usa `tournamentPlace()` anche nelle bande del calendario. La funzione elimina le duplicazioni quando `location` contiene già `venueName`; per Bad Waltersdorf viene quindi mostrato una sola volta `Sportaktivpark Bad Waltersdorf, Bad Waltersdorf, Austria`. I dati sorgente e i motori non sono stati modificati. Regola operativa permanente: ogni modifica applicativa deve aggiornare questo report nello stesso commit.
 
 - 3 settembre 2026 — Interfaccia torneo: navigazione dal calendario alla pagina del torneo, match raggruppati per giocatore, date `gg-mm-aaaa`, luogo e data con icone, collegamento alla fonte ufficiale, nazionalità limitata ad avversari e compagni internazionali. Il report è aggiornato per revisioni operative e non costituisce un indicatore live dello stato dei motori.
 - 3 settembre 2026 — Corretto il criterio della sede nella pagina torneo: il campo OOP non viene più utilizzato per dedurre il circolo. La sede proviene esclusivamente dai metadati ufficiali del torneo; per `Bad Waltersdorf 2026 - Indoor` è stata verificata e impostata `Sportaktivpark Bad Waltersdorf`, con località `Bad Waltersdorf, Austria`. Verificata inoltre la conservazione dei risultati terminali `W/O` come partite concluse.
