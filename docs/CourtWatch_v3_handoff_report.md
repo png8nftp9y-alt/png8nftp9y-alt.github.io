@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.94**
+Revisione documento: **2026-09-03.95**
+
+- 3 settembre 2026 — Sincronizzata l'agenda con il calendario: ogni numero del giorno è ora un pulsante accessibile e il clic imposta immediatamente l'agenda su quella data, aggiornando coerentemente anche il mese quando viene selezionato un giorno esterno. Stabilizzata inoltre la posizione dei comandi del mese assegnando all'agenda un'altezza costante con scorrimento interno delle partite, così la barra del calendario non sale o scende al variare del numero di incontri. Verificati gli indirizzi FITP pubblicati: 330 relazioni hanno un indirizzo, ma soltanto due indirizzi unici contengono un civico effettivo (`Via della Repubblica 116` e `Via S. Maria Nuova 15`); `Via 2 Giugno` è una denominazione stradale. I civici forniti dal P.U.C. vengono conservati e mostrati.
 
 - 3 settembre 2026 — Uniformata ulteriormente l'intestazione delle pagine torneo FITP: anche gli indirizzi ricevuti interamente in maiuscolo vengono presentati in forma leggibile e la località mantiene sempre la sigla della provincia in maiuscolo dopo la città (`Nome circolo, Indirizzo, Città PROVINCIA`). La modifica resta limitata alla pagina torneo e non aggiunge il circolo al calendario. Aggiornato il cache-buster del client. Elencate e ricontrollate le 12 competizioni uniche le cui 40 relazioni giocatore-torneo non hanno indirizzo perché il dettaglio ufficiale P.U.C. pubblica i relativi campi vuoti.
 
