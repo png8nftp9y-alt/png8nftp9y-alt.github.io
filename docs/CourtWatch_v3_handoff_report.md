@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.117**
+Revisione documento: **2026-09-04.118**
+
+- 4 settembre 2026 — Agenda Tennis Europe ulteriormente riallineata: località sopra, nome torneo sotto, seguito a destra dalle etichette del codice evento (`BS12`, `GS14`, `BD16`, ecc.), turno normalizzato (`SQ1`, `SQ2`, `R64`, `R32`, `R16`, `QF`, `SF`, `F`; per il bonus draw `BONUS` più turno) e infine etichetta `Tennis Europe`. Anche `vs` usa peso normale; giocatore e compagno di doppio restano evidenziati. Il collaudo ufficiale del parser include ora Bad Waltersdorf del 21 febbraio 2026 e diventa rosso se non trova esattamente `FÜRSTENFELD1`; richiede inoltre almeno un vero `notBefore`, impedendo che una prova sintatticamente riuscita nasconda ancora campo o qualificatore errati.
 
 - 4 settembre 2026 — Corretta integralmente la presentazione e l'associazione dei dati nell'agenda Tennis Europe. L'etichetta del circuito precede il nome del torneo; sotto compare città/Paese usando la stessa funzione del calendario e soltanto dopo il nome del giocatore. Campo spostato sopra l'orario. La causa comune di campi errati e qualificatori `Not before` mancanti era il parser, che cercava ora e campo in una finestra generica precedente al match: ora ogni partita eredita esclusivamente la propria intestazione ufficiale di programmazione e ne ricava insieme campo, ora e `notBefore`. Test sintetico certificato: `FÜRSTENFELD1`, `11:00`, `notBefore=true`. Aggiornati parser live, backfill e prova. Il backfill storico ora attiva automaticamente il merge certificato con il proprio run ID; il merge storico riuscito attiva una ricostruzione completa D1, mentre i cicli live restano incrementali. In questo modo la correzione raggiunge anche le partite storiche e non soltanto quelle future.
 
