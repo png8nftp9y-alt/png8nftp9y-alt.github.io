@@ -3,7 +3,7 @@ name: Court Watch Tennis Europe agenda D1
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ['Court Watch Tennis Europe OOP and results live', 'Court Watch Cloudflare D1 and app API']
+    workflows: ['Court Watch Tennis Europe OOP and results live', 'Court Watch Tennis Europe OOP historical merge', 'Court Watch Cloudflare D1 and app API']
     types: [completed]
   push:
     branches: [main]
@@ -36,7 +36,7 @@ jobs:
         working-directory: cloudflare/app-api
     env:
       # Import only live deltas; the certified historical archive remains untouched.
-      TE_INCREMENTAL: '1'
+      TE_INCREMENTAL: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Court Watch Tennis Europe OOP historical merge' && '0' || '1' }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}

@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.116**
+Revisione documento: **2026-09-04.117**
+
+- 4 settembre 2026 — Corretta integralmente la presentazione e l'associazione dei dati nell'agenda Tennis Europe. L'etichetta del circuito precede il nome del torneo; sotto compare città/Paese usando la stessa funzione del calendario e soltanto dopo il nome del giocatore. Campo spostato sopra l'orario. La causa comune di campi errati e qualificatori `Not before` mancanti era il parser, che cercava ora e campo in una finestra generica precedente al match: ora ogni partita eredita esclusivamente la propria intestazione ufficiale di programmazione e ne ricava insieme campo, ora e `notBefore`. Test sintetico certificato: `FÜRSTENFELD1`, `11:00`, `notBefore=true`. Aggiornati parser live, backfill e prova. Il backfill storico ora attiva automaticamente il merge certificato con il proprio run ID; il merge storico riuscito attiva una ricostruzione completa D1, mentre i cicli live restano incrementali. In questo modo la correzione raggiunge anche le partite storiche e non soltanto quelle future.
 
 - 4 settembre 2026 — Agenda: nelle schede Tennis Europe l'etichetta del circuito è stata spostata accanto al nome del torneo. Il nome dell'avversario usa ora peso normale, mentre il nome dell'eventuale compagno di doppio resta in grassetto insieme al giocatore monitorato. Aggiornati gli identificatori di cache JS/CSS. L'utente ha confermato verde il run Europe precedente.
 

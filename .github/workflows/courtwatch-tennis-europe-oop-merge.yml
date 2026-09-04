@@ -4,8 +4,11 @@ on:
     inputs:
       source_run_id:
         description: Successful backfill workflow run ID
-        required: false
-        default: '33324600811'
+      required: false
+      default: '33324600811'
+  workflow_run:
+    workflows: ['Court Watch Tennis Europe OOP historical backfill']
+    types: [completed]
   push:
     branches: [main]
     paths:
@@ -20,11 +23,12 @@ concurrency:
   cancel-in-progress: true
 jobs:
   merge:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       GH_TOKEN: ${{ github.token }}
-      SOURCE_RUN_ID: ${{ github.event.inputs.source_run_id || '33324600811' }}
+      SOURCE_RUN_ID: ${{ github.event.workflow_run.id || github.event.inputs.source_run_id || '33324600811' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
