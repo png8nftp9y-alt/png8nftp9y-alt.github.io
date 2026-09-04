@@ -1509,3 +1509,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - J60 Tacarigua è concluso ed è classificato come pubblicazione mancante/incompleta, senza errore tecnico esplicito e senza tabelloni salvati.
 - Causa strutturale verificata: la selezione automatica corrente richiede `endDate >= TODAY`; un torneo ancora pending esce quindi dalla coda dopo la data finale. Il retry automatico non garantisce ancora la convergenza a zero e questi 17 tornei non vengono recuperati dal ciclo live ordinario.
 - Correzione necessaria e non ancora applicata: distinguere permanentemente `technical_error`, `officially_missing_or_incomplete`, `acquired` e `complete`; mantenere in una coda di recupero anche i tornei conclusi finché ogni tabellone è acquisito oppure esiste una classificazione terminale ufficiale documentata. Nessun pending concluso deve essere eliminato soltanto per decorrenza della data.
+
+## Revisione 2026-09-04.132 — pagina giocatore: stato tornei e apertura compressa
+
+- Il run Tennis Europe successivo alla separazione della verifica API per circuito è stato confermato verde dall'utente; il percorso Europe ha quindi completato acquisizione, import D1 e verifica senza essere bloccato da differenze FITP estranee.
+- Le partite della pagina giocatore sono ora realmente chiuse all'apertura: la regola CSS esplicita per `[hidden]` impedisce alla precedente dichiarazione `display:block` di riaprire i contenitori.
+- Aggiunta la tendina tornei con le opzioni `Tutti i tornei`, `In corso`, `Programmati` e `Conclusi`.
+- Il filtro per stato opera insieme ai filtri circuito, singolo/doppio e vinte/perse; aggiorna contestualmente il numero di tornei visibili e le statistiche generali delle partite.
+- Aumentata la separazione tra il titolo `Tornei e partite` e il relativo conteggio; i conteggi giocata/vinta/persa di ciascun torneo sono stati portati a 15 px.
+- Cache client aggiornata a `v3.js?v=2026090411`. Verifiche locali: sintassi JavaScript valida e nessun errore di whitespace nel diff.
