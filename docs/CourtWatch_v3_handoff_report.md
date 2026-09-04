@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.112**
+Revisione documento: **2026-09-04.113**
+
+- 4 settembre 2026 — Corretto il falso rosso finale di Tennis Europe emerso nel run `33825816667`: tutte le 16 shard avevano concluso con zero errori, ma la diagnostica rendeva fatale anche lo stato previsto di due tabelloni non ancora pubblicati per tornei con inizio il 5 settembre (Anna Gambarini a Bari e Virginia Cereghini a Palermo). Il gate distingue ora i tabelloni ufficiali ancora in attesa dagli errori tecnici: timeout, eccezioni e HTTP 5xx restano bloccanti; un tabellone non pubblicato conserva l'iscrizione senza produrre un falso errore di sistema. Nessun polling e nessuna frequenza aumentata.
 
 - 4 settembre 2026 — Risolto il residuo rosso del run `33825624625`: la sessione e le liste Tennis Europe erano operative, ma una singola GET della Piestany Cup U14 aveva superato il timeout di 12 secondi. Le sole GET scadute vengono ora ripetute una volta dopo 250 ms; le richieste riuscite non vengono duplicate e un secondo fallimento resta bloccante. Nessun polling o aumento della frequenza dei workflow.
 
