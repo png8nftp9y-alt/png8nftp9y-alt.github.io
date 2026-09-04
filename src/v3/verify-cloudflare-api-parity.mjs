@@ -15,7 +15,7 @@ const tournamentKey=row=>[row.playerId,String(row.competitionId||row.itfTourname
 const legacyTournaments=(mapDoc.tournaments||[]).filter(x=>allowed.has(x.playerId)).map(tournamentKey),apiTournaments=(snapshot.tournaments||[]).map(tournamentKey);
 function compare(label,left,right){const a=new Set(left),b=new Set(right),missing=[...a].filter(x=>!b.has(x)),extra=[...b].filter(x=>!a.has(x));return{label,legacyRows:left.length,apiRows:right.length,legacyUnique:a.size,apiUnique:b.size,missing:missing.slice(0,20),extra:extra.slice(0,20),ok:left.length===right.length&&missing.length===0&&extra.length===0}}
 const checks=[compare('players',legacyPlayers,apiPlayers),compare('tournaments',legacyTournaments,apiTournaments)];
-const europeOnly=process.env.TE_INCREMENTAL==='1';
+const europeOnly=process.env.VERIFY_SCOPE==='tennis-europe';
 const expected=JSON.parse(manifest.counts_json||'{}'),appMatches=snapshot.matches||[],appUniqueMatches=new Set(appMatches.map(x=>x.matchId)).size;
 const invalidAppMatches=appMatches.filter(x=>x.circuit!=='tennis-europe'||!x.playerId||!x.matchId||!x.date||!x.tournamentName||!x.opponent||!x.round||x.status==='completed'&&!x.result);
 const agendaKey=m=>`${m.playerId||''}|${m.matchId||m.id||''}`,mergedAgenda=new Map(appMatches.map(m=>[agendaKey(m),m]));

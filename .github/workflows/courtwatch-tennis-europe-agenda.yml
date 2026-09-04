@@ -100,5 +100,6 @@ jobs:
       - name: Verify Europe API and daily agenda
         env:
           API_BASE: ${{ steps.deploy.outputs.api_url }}
+          VERIFY_SCOPE: tennis-europe
         working-directory: .
         run: node src/v3/verify-cloudflare-api-parity.mjs
