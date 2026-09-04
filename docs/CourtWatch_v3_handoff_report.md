@@ -1518,3 +1518,15 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Il filtro per stato opera insieme ai filtri circuito, singolo/doppio e vinte/perse; aggiorna contestualmente il numero di tornei visibili e le statistiche generali delle partite.
 - Aumentata la separazione tra il titolo `Tornei e partite` e il relativo conteggio; i conteggi giocata/vinta/persa di ciascun torneo sono stati portati a 15 px.
 - Cache client aggiornata a `v3.js?v=2026090411`. Verifiche locali: sintassi JavaScript valida e nessun errore di whitespace nel diff.
+
+
+## Revisione 2026-09-04.133 — link torneo, analisi match, N.B. e stato D1
+
+- Nell'agenda la pagina torneo si apre esclusivamente cliccando sul nome del torneo. Passando il puntatore sulla riga del nome, soltanto il nome viene sottolineato; il resto del blocco non è un collegamento.
+- Nella pagina giocatore la riga torneo apre e chiude le partite, mentre il collegamento alla pagina torneo è limitato alle sole lettere del nome; il pallino circuito resta informativo.
+- Ogni partita nelle pagine giocatore e torneo espone un pulsante grafico per l'analisi: stato neutro quando assente, stato blu con pallino verde quando presente.
+- Le analisi sono persistite nella tabella D1 `match_analyses`. Lettura, inserimento, modifica e cancellazione del testo richiedono autenticazione amministrativa; l'endpoint pubblico espone soltanto le chiavi che possiedono un'analisi, necessarie allo stato visivo dell'icona.
+- La password richiesta dall'interfaccia protegge le operazioni di lettura e scrittura delle analisi e viene conservata esclusivamente nella sessione del browser.
+- La dicitura `N.B.` è calcolata per ogni match dal campo `notBefore` oppure da un orario sorgente che inizi con `Not Before`; la regola si applica quindi anche ai match futuri importati con questi dati.
+- I run generali D1 `33914779041` e `33914780691` hanno applicato correttamente la migrazione `0011_match_analyses.sql`, ma si sono fermati nel ripristino degli indici osservati: nessuna delle copie ITF soddisfaceva la soglia configurata di 10.000 partecipanti (current 0, backup-1 498, backup-2 0). Nessuna modifica alla politica ITF è stata pubblicata.
+- La pagina amministrativa può pertanto mostrare D1 `operativo` con un'età elevata: il Worker e l'ultima generazione valida rispondono, ma la generazione universale non è stata aggiornata dal run fallito.
