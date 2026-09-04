@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.114**
+Revisione documento: **2026-09-04.115**
+
+- 4 settembre 2026 — Agenda: rimossa anche l'etichetta `Doppio`; le schede non mostrano più alcuna etichetta della specialità. Confermato dall'utente verde il run Tennis Europe `33826131310`. Aggiornato il cache-buster senza ulteriori controlli o polling.
 
 - 4 settembre 2026 — Agenda: il nome del torneo precede ora il nome del giocatore in ogni scheda match. Rimossa l'etichetta `Singolare` (l'etichetta `Doppio` resta informativa) e rimossa l'etichetta `Terminata` dalle partite con risultato; dati, navigazione e stato del match restano invariati. Aggiornato il cache-buster del client.
 
