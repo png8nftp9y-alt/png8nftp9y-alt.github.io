@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.115**
+Revisione documento: **2026-09-04.116**
+
+- 4 settembre 2026 — Agenda: nelle schede Tennis Europe l'etichetta del circuito è stata spostata accanto al nome del torneo. Il nome dell'avversario usa ora peso normale, mentre il nome dell'eventuale compagno di doppio resta in grassetto insieme al giocatore monitorato. Aggiornati gli identificatori di cache JS/CSS. L'utente ha confermato verde il run Europe precedente.
 
 - 4 settembre 2026 — Agenda: rimossa anche l'etichetta `Doppio`; le schede non mostrano più alcuna etichetta della specialità. Confermato dall'utente verde il run Tennis Europe `33826131310`. Aggiornato il cache-buster senza ulteriori controlli o polling.
 
