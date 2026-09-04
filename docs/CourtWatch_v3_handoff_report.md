@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.119**
+Revisione documento: **2026-09-04.120**
+
+- 4 settembre 2026 — Su conferma dell'utente, tutti i run della seconda correzione campo/`notBefore` sono verdi. Rifinita l'agenda: l'ordine a destra del nome torneo è ora `Tennis Europe`, categoria e turno. I turni di qualificazione non usano più la dimensione residua (`SQ32`, `SQ16`): per ciascun torneo/evento le dimensioni ufficiali vengono ordinate dalla maggiore alla minore e trasformate nella sequenza `SQ1`, `SQ2`, ecc. Nella pagina giocatore la testata di ogni torneo riporta ora anche il nome del circolo prima di città e date.
 
 - 4 settembre 2026 — Il collaudo reale `33828342128` ha correttamente respinto la prima correzione di campo/ora: 65 match Bad Waltersdorf letti, ma `badWaltersdorfCourtVerified=false` e `notBeforeParsed=0`. L'artefatto ha individuato tre cause esatte: l'intera intestazione veniva usata come campo (`F&#220;RSTENFELD1 Sportaktivpark…`), le entità numeriche HTML non erano decodificate e l'ora vuota diventava `00000` per effetto di `padStart`; inoltre `Not before` risiede nel blocco temporale precedente, non nel sottoblocco del campo. I tre parser ora decodificano le entità, estraggono esclusivamente `nav-link__value` come campo, leggono l'ora con datetime completo dal contesto temporale, non trasformano il vuoto e cercano lì il qualificatore `Not before`. Il gate semantico su `FÜRSTENFELD1` e su almeno un `notBefore` resta bloccante.
 
