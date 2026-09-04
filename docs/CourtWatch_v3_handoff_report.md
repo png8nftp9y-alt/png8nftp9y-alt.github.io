@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.111**
+Revisione documento: **2026-09-04.112**
+
+- 4 settembre 2026 — Risolto il residuo rosso del run `33825624625`: la sessione e le liste Tennis Europe erano operative, ma una singola GET della Piestany Cup U14 aveva superato il timeout di 12 secondi. Le sole GET scadute vengono ora ripetute una volta dopo 250 ms; le richieste riuscite non vengono duplicate e un secondo fallimento resta bloccante. Nessun polling o aumento della frequenza dei workflow.
 
 - 4 settembre 2026 — Rettificato il primo gate successivo alla correzione cookie Tennis Europe: il run `33825290937` ha dimostrato che la nuova sessione legge correttamente le liste su tutte le shard, ma alcuni tornei a squadre privi di una pagina Acceptance list rispondono legittimamente con HTTP 302. Il controllo non tratta più ogni 302 come errore tecnico; restano bloccanti la ricomparsa effettiva della cookie wall, i timeout e gli errori di acquisizione. La distinzione impedisce sia falsi verdi sia falsi rossi.
 
