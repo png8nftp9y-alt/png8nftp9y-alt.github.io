@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-03.108**
+Revisione documento: **2026-09-04.109**
+
+- 4 settembre 2026 — Agenda Tennis Europe: mantenuto nel corpo soltanto il nome del torneo, senza ripetere il luogo già disponibile nella scheda torneo; numero/nome del campo spostato sotto l'orario nella prima colonna. Il parser Europe live e storico conserva ora esplicitamente il qualificatore ufficiale `Not before` nel campo booleano `notBefore`; il renderer lo presenta come `N.B. HH:MM` e riconosce anche record compatibili nei quali la frase sia incorporata nell'orario. Gli orari realmente mancanti restano `—`.
 
 - 3 settembre 2026 — Ripristinata su richiesta la dimensione originaria delle bandiere (`18×12 px`), mantenendo il nuovo SVG messicano piatto e correttamente decodificabile.
 
