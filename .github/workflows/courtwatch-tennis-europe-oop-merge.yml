@@ -9,6 +9,10 @@ on:
   workflow_run:
     workflows: ['Court Watch Tennis Europe OOP historical backfill']
     types: [completed]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-tennis-europe-oop-merge.yml'
 permissions:
   actions: read
   contents: read
@@ -17,17 +21,34 @@ concurrency:
   cancel-in-progress: true
 jobs:
   merge:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
       GH_TOKEN: ${{ github.token }}
-      SOURCE_RUN_ID: ${{ github.event.workflow_run.id || github.event.inputs.source_run_id || '33324600811' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Resolve successful backfill run
+        id: source
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          UPSTREAM_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          UPSTREAM_RUN_ID: ${{ github.event.workflow_run.id }}
+          REQUESTED_RUN_ID: ${{ inputs.source_run_id }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_run" ] && [ "$UPSTREAM_CONCLUSION" != "success" ]; then
+            echo "Upstream backfill did not succeed: $UPSTREAM_CONCLUSION" >&2
+            exit 1
+          fi
+          source_run_id="$UPSTREAM_RUN_ID"
+          if [ -z "$source_run_id" ]; then source_run_id="$REQUESTED_RUN_ID"; fi
+          if [ -z "$source_run_id" ]; then
+            source_run_id="$(gh run list --repo "${{ github.repository }}" --workflow courtwatch-tennis-europe-oop-backfill.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
+          fi
+          test -n "$source_run_id"
+          echo "source_run_id=$source_run_id" >> "$GITHUB_OUTPUT"
       - name: Configure private R2 historical archive
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -45,10 +66,10 @@ jobs:
       - name: Download every validated backfill shard
         run: |
           mkdir -p dist/v3/downloaded-tennis-europe-oop
-          gh run download "$SOURCE_RUN_ID" --repo "${{ github.repository }}" --dir dist/v3/downloaded-tennis-europe-oop --pattern 'tennis-europe-oop-backfill-*'
+          gh run download "${{ steps.source.outputs.source_run_id }}" --repo "${{ github.repository }}" --dir dist/v3/downloaded-tennis-europe-oop --pattern 'tennis-europe-oop-backfill-*'
       - name: Merge and certify the complete historical archive
         env:
-          TE_OOP_SOURCE_RUN_ID: ${{ env.SOURCE_RUN_ID }}
+          TE_OOP_SOURCE_RUN_ID: ${{ steps.source.outputs.source_run_id }}
         run: node src/v3/merge-tennis-europe-oop-backfill.mjs
       - name: Publish verified historical generation to R2
         run: bash src/v3/tennis-europe-oop-history-r2.sh publish
