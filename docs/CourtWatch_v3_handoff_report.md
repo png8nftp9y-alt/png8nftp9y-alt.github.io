@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.109**
+Revisione documento: **2026-09-04.110**
+
+- 4 settembre 2026 — Risolto il blocco ripetuto del workflow Tennis Europe live. Gli artefatti del run `33824046036` dimostravano che tutte le 16 shard terminavano formalmente, ma 15 ricevevano HTTP 302 verso la cookie wall e acquisivano zero liste; il solo shard con sessione valida leggeva 5.048 partecipanti. La sessione di consenso ora segue i redirect, conserva tutti i cookie `Set-Cookie`, legge e invia il solo consenso tecnico disponibile e verifica con uno smoke test che la cookie wall non ricompaia. Inoltre una shard con errori termina esplicitamente con exit code 2: un accesso incompleto non può più essere dichiarato riuscito né arrivare al merge. L'ultima copia valida resta protetta fino a una pubblicazione integralmente verificata.
 
 - 4 settembre 2026 — Agenda Tennis Europe: mantenuto nel corpo soltanto il nome del torneo, senza ripetere il luogo già disponibile nella scheda torneo; numero/nome del campo spostato sotto l'orario nella prima colonna. Il parser Europe live e storico conserva ora esplicitamente il qualificatore ufficiale `Not before` nel campo booleano `notBefore`; il renderer lo presenta come `N.B. HH:MM` e riconosce anche record compatibili nei quali la frase sia incorporata nell'orario. Gli orari realmente mancanti restano `—`.
 
