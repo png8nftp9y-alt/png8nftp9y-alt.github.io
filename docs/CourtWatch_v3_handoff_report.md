@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.118**
+Revisione documento: **2026-09-04.119**
+
+- 4 settembre 2026 — Il collaudo reale `33828342128` ha correttamente respinto la prima correzione di campo/ora: 65 match Bad Waltersdorf letti, ma `badWaltersdorfCourtVerified=false` e `notBeforeParsed=0`. L'artefatto ha individuato tre cause esatte: l'intera intestazione veniva usata come campo (`F&#220;RSTENFELD1 Sportaktivpark…`), le entità numeriche HTML non erano decodificate e l'ora vuota diventava `00000` per effetto di `padStart`; inoltre `Not before` risiede nel blocco temporale precedente, non nel sottoblocco del campo. I tre parser ora decodificano le entità, estraggono esclusivamente `nav-link__value` come campo, leggono l'ora con datetime completo dal contesto temporale, non trasformano il vuoto e cercano lì il qualificatore `Not before`. Il gate semantico su `FÜRSTENFELD1` e su almeno un `notBefore` resta bloccante.
 
 - 4 settembre 2026 — Agenda Tennis Europe ulteriormente riallineata: località sopra, nome torneo sotto, seguito a destra dalle etichette del codice evento (`BS12`, `GS14`, `BD16`, ecc.), turno normalizzato (`SQ1`, `SQ2`, `R64`, `R32`, `R16`, `QF`, `SF`, `F`; per il bonus draw `BONUS` più turno) e infine etichetta `Tennis Europe`. Anche `vs` usa peso normale; giocatore e compagno di doppio restano evidenziati. Il collaudo ufficiale del parser include ora Bad Waltersdorf del 21 febbraio 2026 e diventa rosso se non trova esattamente `FÜRSTENFELD1`; richiede inoltre almeno un vero `notBefore`, impedendo che una prova sintatticamente riuscita nasconda ancora campo o qualificatore errati.
 
