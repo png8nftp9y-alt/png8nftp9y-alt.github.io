@@ -1530,3 +1530,10 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - La dicitura `N.B.` è calcolata per ogni match dal campo `notBefore` oppure da un orario sorgente che inizi con `Not Before`; la regola si applica quindi anche ai match futuri importati con questi dati.
 - I run generali D1 `33914779041` e `33914780691` hanno applicato correttamente la migrazione `0011_match_analyses.sql`, ma si sono fermati nel ripristino degli indici osservati: nessuna delle copie ITF soddisfaceva la soglia configurata di 10.000 partecipanti (current 0, backup-1 498, backup-2 0). Nessuna modifica alla politica ITF è stata pubblicata.
 - La pagina amministrativa può pertanto mostrare D1 `operativo` con un'età elevata: il Worker e l'ultima generazione valida rispondono, ma la generazione universale non è stata aggiornata dal run fallito.
+
+## Revisione 2026-09-04.134 — bootstrap autenticazione Cloudflare Access
+
+- Avviata la fase di autenticazione del primo account, destinato a `federico181099@gmail.com`, senza modificare ancora D1, R2 o i dati applicativi.
+- Aggiunto il workflow isolato `Court Watch Cloudflare Access bootstrap`. Usa il secret GitHub dedicato `CLOUDFLARE_ACCESS_API_TOKEN` e verifica in sola lettura il token, il sottodominio Workers, le applicazioni Access già configurate e le zone appartenenti all'account.
+- Il workflow pubblica esclusivamente un artifact sanificato di durata giornaliera: non stampa il token, non crea applicazioni o policy e non modifica configurazioni Cloudflare.
+- La configurazione del login proseguirà soltanto dopo il successo di questo audit, così da applicare la protezione all'hostname corretto e non produrre una schermata di login priva di enforcement server-side.

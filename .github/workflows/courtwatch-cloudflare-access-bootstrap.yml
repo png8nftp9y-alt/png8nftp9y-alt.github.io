@@ -1,0 +1,55 @@
+name: Court Watch Cloudflare Access bootstrap
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-cloudflare-access-bootstrap.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_ACCESS_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - name: Validate required secrets
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+      - name: Audit Cloudflare Access prerequisites
+        shell: bash
+        run: |
+          set -euo pipefail
+          api='https://api.cloudflare.com/client/v4'
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          request() {
+            local endpoint="$1" output="$2"
+            code=$(curl --silent --show-error --output "$output" --write-out '%{http_code}' "${auth[@]}" "$api$endpoint")
+            if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+              jq '{success,errors}' "$output"
+              echo "Cloudflare API request failed: $endpoint (HTTP $code)" >&2
+              exit 1
+            fi
+          }
+          request '/user/tokens/verify' /tmp/token.json
+          request "/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/subdomain" /tmp/subdomain.json
+          request "/accounts/$CLOUDFLARE_ACCOUNT_ID/access/apps?per_page=100" /tmp/apps.json
+          request "/zones?account.id=$CLOUDFLARE_ACCOUNT_ID&per_page=100" /tmp/zones.json
+          jq -n \
+            --arg token_status "$(jq -r '.result.status // "unknown"' /tmp/token.json)" \
+            --arg workers_subdomain "$(jq -r '.result.subdomain // ""' /tmp/subdomain.json)" \
+            --argjson access_apps "$(jq '[.result[] | {id,name,domain,type}]' /tmp/apps.json)" \
+            --argjson zones "$(jq '[.result[] | {id,name,status}]' /tmp/zones.json)" \
+            '{tokenStatus:$token_status,workersSubdomain:$workers_subdomain,accessApps:$access_apps,zones:$zones}' | tee cloudflare-access-audit.json
+      - name: Upload sanitized audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-access-audit
+          path: cloudflare-access-audit.json
+          retention-days: 1
