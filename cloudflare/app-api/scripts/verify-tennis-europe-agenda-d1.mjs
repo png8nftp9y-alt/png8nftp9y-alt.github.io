@@ -8,7 +8,7 @@ const [oop,candidates]=await Promise.all([
 if(oop.status!=='green'||candidates.status!=='green'||candidates.publishedToAgenda!==true)throw new Error('Tennis Europe manifests are not publishable');
 const expected={
   teOopTournaments:Number(oop.counts.tournaments),
-  teMatches:Number(oop.counts.matches),
+  teMatches:Number(oop.counts.matches)+Number(candidates.counts.manualParentMatches||0),
   teSchedules:Number(oop.counts.matches),
   teResults:Number(oop.counts.completed),
   tePlayers:Number(oop.counts.players),

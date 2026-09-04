@@ -35,9 +35,9 @@ await fs.writeFile(path.join('seed-tennis-europe-oop','04-app-match-candidates.s
 const appSql=incremental?['PRAGMA foreign_keys=ON;']:['PRAGMA foreign_keys=ON;',`DELETE FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe';`];
 for(const r of rows){if(incremental)appSql.push(`DELETE FROM app_matches WHERE player_id=${esc(r.playerId)} AND json_extract(payload,'$.matchId')=${esc(r.matchId)};`);appSql.push(`INSERT INTO app_matches(player_id,competition_id,match_date,payload) VALUES(${esc(r.playerId)},${esc(r.competitionId)},${esc(r.date)},${payload(r)});`);}
 await fs.writeFile(path.join('seed-tennis-europe-oop','05-app-matches.sql'),appSql.join('\n')+'\n');
-const uniqueMatches=new Set(rows.map(x=>x.matchId)).size,completed=rows.filter(x=>x.status==='completed').length,scheduled=rows.filter(x=>x.status==='scheduled').length;
+const uniqueMatches=new Set(rows.map(x=>x.matchId)).size,manualParentMatches=new Set(rows.filter(x=>x.manual&&!matchMap.has(x.matchId)).map(x=>x.matchId)).size,completed=rows.filter(x=>x.status==='completed').length,scheduled=rows.filter(x=>x.status==='scheduled').length;
 const missingAgendaFields=rows.filter(x=>!x.id||!x.playerId||!x.matchId||!x.date||!x.tournamentName||!x.opponent||!x.round||x.status==='completed'&&!x.result);
-const result={status:missingAgendaFields.length?'red':'green',incremental,counts:{monitoredEuropePlayers:monitored.length,uniqueMatches,playerMatchOccurrences:rows.length,completed,scheduled,ambiguous:0,missingAgendaFields:missingAgendaFields.length},publishedToAgenda:true};
+const result={status:missingAgendaFields.length?'red':'green',incremental,counts:{monitoredEuropePlayers:monitored.length,uniqueMatches,manualParentMatches,playerMatchOccurrences:rows.length,completed,scheduled,ambiguous:0,missingAgendaFields:missingAgendaFields.length},publishedToAgenda:true};
 await fs.writeFile('seed-tennis-europe-oop/app-match-candidates-manifest.json',JSON.stringify(result,null,2)+'\n');
 if(uniqueMatches<147||rows.length<149||missingAgendaFields.length)throw new Error(`App match parity failed: uniqueMatches=${uniqueMatches}, occurrences=${rows.length}, missingAgendaFields=${missingAgendaFields.length}`);
 console.log(JSON.stringify(result));
