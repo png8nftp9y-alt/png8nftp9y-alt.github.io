@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.110**
+Revisione documento: **2026-09-04.111**
+
+- 4 settembre 2026 — Rettificato il primo gate successivo alla correzione cookie Tennis Europe: il run `33825290937` ha dimostrato che la nuova sessione legge correttamente le liste su tutte le shard, ma alcuni tornei a squadre privi di una pagina Acceptance list rispondono legittimamente con HTTP 302. Il controllo non tratta più ogni 302 come errore tecnico; restano bloccanti la ricomparsa effettiva della cookie wall, i timeout e gli errori di acquisizione. La distinzione impedisce sia falsi verdi sia falsi rossi.
 
 - 4 settembre 2026 — Risolto il blocco ripetuto del workflow Tennis Europe live. Gli artefatti del run `33824046036` dimostravano che tutte le 16 shard terminavano formalmente, ma 15 ricevevano HTTP 302 verso la cookie wall e acquisivano zero liste; il solo shard con sessione valida leggeva 5.048 partecipanti. La sessione di consenso ora segue i redirect, conserva tutti i cookie `Set-Cookie`, legge e invia il solo consenso tecnico disponibile e verifica con uno smoke test che la cookie wall non ricompaia. Inoltre una shard con errori termina esplicitamente con exit code 2: un accesso incompleto non può più essere dichiarato riuscito né arrivare al merge. L'ultima copia valida resta protetta fino a una pubblicazione integralmente verificata.
 
