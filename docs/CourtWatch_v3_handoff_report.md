@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.113**
+Revisione documento: **2026-09-04.114**
+
+- 4 settembre 2026 — Agenda: il nome del torneo precede ora il nome del giocatore in ogni scheda match. Rimossa l'etichetta `Singolare` (l'etichetta `Doppio` resta informativa) e rimossa l'etichetta `Terminata` dalle partite con risultato; dati, navigazione e stato del match restano invariati. Aggiornato il cache-buster del client.
 
 - 4 settembre 2026 — Corretto il falso rosso finale di Tennis Europe emerso nel run `33825816667`: tutte le 16 shard avevano concluso con zero errori, ma la diagnostica rendeva fatale anche lo stato previsto di due tabelloni non ancora pubblicati per tornei con inizio il 5 settembre (Anna Gambarini a Bari e Virginia Cereghini a Palermo). Il gate distingue ora i tabelloni ufficiali ancora in attesa dagli errori tecnici: timeout, eccezioni e HTTP 5xx restano bloccanti; un tabellone non pubblicato conserva l'iscrizione senza produrre un falso errore di sistema. Nessun polling e nessuna frequenza aumentata.
 
