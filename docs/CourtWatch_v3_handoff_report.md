@@ -1871,9 +1871,9 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Aggiornato il cache-buster a `v3.js?v=2026090528`.
 
 
-## Revisione 2026-09-05.172 — gerarchia visiva Agenda
+## Revisione 2026-09-05.173 — ripristino agenda stabile
 
-- Nell'Agenda il nome giocatore viene mostrato per primo, sopra nome torneo e luogo.
-- Il nome torneo precede sempre il luogo del torneo.
-- Campo, numero match e orario nella colonna sinistra sono tutti evidenziati in blu uniforme.
-- Cache aggiornata a `v3.js?v=2026090528`.
+- Ripristinata la funzione `renderAgenda` stabile precedente all’errore di sintassi.
+- Applicata via CSS la gerarchia richiesta: giocatore, torneo, luogo.
+- Campo, numero match e orario sono evidenziati in blu uniforme.
+- Aggiornati i cache-buster di JavaScript e CSS a `2026090529`.

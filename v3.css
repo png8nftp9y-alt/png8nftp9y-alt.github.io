@@ -81,4 +81,11 @@
 /* Official order-of-play match number in agenda */
 .agendaCourtMatch{font-weight:750;color:var(--ink)!important;white-space:nowrap}
 
-.agendaWhen small{color:#3155c6!important;font-weight:800;font-size:12px}.agendaWhen time{color:#3155c6!important;font-weight:850}
+
+/* Agenda hierarchy: player, tournament, location */
+.agendaItem>div:nth-child(2){display:flex;flex-direction:column}
+.agendaItem>div:nth-child(2)>.agendaTitle{order:0}
+.agendaItem>div:nth-child(2)>.agendaTournament{order:1}
+.agendaItem>div:nth-child(2)>.agendaLocation{order:2}
+.agendaWhen small{color:#3155c6!important;font-weight:800;font-size:12px}
+.agendaWhen time{color:#3155c6!important;font-weight:850}
