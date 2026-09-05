@@ -12,7 +12,7 @@ const adminHeaders={'Content-Type':'text/html; charset=utf-8','Cache-Control':'n
 const PUBLIC_DATA='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io/main/dist/v3';
 const ACTIONS_API='https://api.github.com/repos/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs?branch=main&per_page=50';
 const WATCHDOG_RUNS_API='https://api.github.com/repos/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/workflows/courtwatch-cloudflare-watchdog-deploy.yml/runs?branch=main&per_page=5';
-const PUBLIC_APP='https://png8nftp9y-alt.github.io/v3.html?protected=2026090514';
+const PUBLIC_APP='https://png8nftp9y-alt.github.io/v3.html?protected=2026090515';
 const WORKFLOWS=[
   ['FITP','courtwatch-v3-fitp-entries.yml'],
   ['Tennis Europe','courtwatch-v3-tennis-europe-live.yml'],
@@ -26,7 +26,7 @@ async function accessUser(request,env){const email=String(request.headers.get('C
 async function protectedApp(request,env,path,url){
   const user=await accessUser(request,env);if(!user)return privateJson({error:'access_authentication_required'},401);
   if(path==='/app'){const response=await fetch(PUBLIC_APP,{headers:{'User-Agent':'courtwatch-protected-app'}});if(!response.ok)return new Response('Applicazione temporaneamente non disponibile',{status:503});let html=await response.text();html=html.replace('<head>','<head><base href="https://png8nftp9y-alt.github.io/">');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Frame-Options':'DENY','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin'}})}
-  const apiPath=path.replace(/^\/app-api/,'');
+  const apiPath=path.replace(/^\/app(?:-api|\/api)/,'');
   if(apiPath==='/session'&&request.method==='GET')return privateJson({user:{id:user.id,email:user.email,displayName:user.display_name,role:user.role}});
   if(apiPath==='/app-snapshot'&&request.method==='GET'){const[players,tournaments,matches,manifest,overrides]=await Promise.all([all(env,'app_players','WHERE id IN (SELECT courtwatch_id FROM user_app_players WHERE user_id=?) ORDER BY seq',[user.id]),all(env,'app_tournaments','WHERE player_id IN (SELECT courtwatch_id FROM user_app_players WHERE user_id=?) ORDER BY seq',[user.id]),all(env,'app_matches','WHERE player_id IN (SELECT courtwatch_id FROM user_app_players WHERE user_id=?) ORDER BY seq',[user.id]),env.DB.prepare("SELECT * FROM generations WHERE id='current'").first(),optionalRows(env.DB.prepare("SELECT entity_type,entity_id,action,payload FROM manual_overrides WHERE active=1 ORDER BY updated_at"))]);return privateJson({generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players:applyOverrides(players,overrides,'player'),tournaments:applyOverrides(tournaments,overrides,'tournament'),matches})}
   if(apiPath==='/match-analysis-status'&&request.method==='GET'){const rows=await optionalRows(env.DB.prepare('SELECT match_key,updated_at FROM user_match_analyses WHERE user_id=? ORDER BY updated_at DESC').bind(user.id));return privateJson({matches:rows.map(row=>({matchKey:row.match_key,updatedAt:row.updated_at}))})}
@@ -133,7 +133,7 @@ export default{
     try{
       if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
       const url=new URL(request.url),path=url.pathname.replace(/\/$/,'');
-      if(path==='/app'||path.startsWith('/app-api/'))return protectedApp(request,env,path,url);
+      if(path==='/app'||path.startsWith('/app-api/')||path.startsWith('/app/api/'))return protectedApp(request,env,path,url);
       if(path==='/admin'||path.startsWith('/admin/')||path==='/admin/query-export'||path==='/admin/override'||path==='/admin/override/undo'||path==='/admin/r2'||path==='/admin/r2/object'){if(!env.ADMIN_TOKEN)return new Response('Admin non configurata',{status:503,headers:adminHeaders});if(!adminAuthorized(request,env))return new Response('Autenticazione richiesta',{status:401,headers:{...adminHeaders,'WWW-Authenticate':'Basic realm="Court Watch Admin", charset="UTF-8"'}});if(path==='/admin'&&request.method==='GET')return Response.redirect(new URL('/admin/diagnostica',request.url),302);if(['/admin/diagnostica','/admin/profili','/admin/utenti','/admin/database','/admin/backup','/admin/fallimenti'].includes(path)&&request.method==='GET')return new Response(await adminPage(request,env),{headers:adminHeaders});if(path==='/admin/query-export'&&request.method==='GET')return adminQueryExport(request,env);if(path==='/admin/r2'&&request.method==='GET')return adminR2Page(request,env);if(path==='/admin/r2/object'&&request.method==='GET')return adminR2Object(request,env);if(path==='/admin/override'&&request.method==='POST')return writeOverride(request,env,false);if(path==='/admin/override/undo'&&request.method==='POST')return writeOverride(request,env,true);return new Response('Metodo non consentito',{status:405,headers:adminHeaders})}
       if(path==='/v1/match-analysis-status'&&request.method==='GET'){const rows=await optionalRows(env.DB.prepare('SELECT match_key,updated_at FROM match_analyses ORDER BY updated_at DESC'));return json({matches:rows.map(row=>({matchKey:row.match_key,updatedAt:row.updated_at}))})}
       if(path==='/v1/match-analysis'){
