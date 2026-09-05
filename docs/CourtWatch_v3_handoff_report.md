@@ -1608,3 +1608,11 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Corretto un errore nel rilascio della revisione precedente: `v3.js` era stato modificato senza cambiare il parametro di versione, quindi i browser già aperti potevano continuare a eseguire la copia difettosa.
 - Aggiornato il riferimento client a `v3.js?v=2026090502` e rinnovata anche la shell HTML servita dal Worker; la correzione dell'origine API non può più essere mascherata dalla cache precedente.
 - Unico collaudo post-deploy: la pagina protetta serve effettivamente `2026090502`, carica 23 giocatori, mostra agenda Tennis Europe e FITP completa e non produce nuovi warning o errori applicativi.
+
+
+## Revisione 2026-09-05.143 — ripristino agenda universale pre-login e ITF
+
+- Individuata la regressione residua: il client pre-login usava `/v1/app-snapshot`, mentre l'integrazione account lo aveva sostituito con `/app-api/app-snapshot`; quest'ultima proiezione risultava a tratti incompleta e provocava fallback e perdita degli eventi di circuito.
+- Ripristinata esattamente la proiezione universale pre-login per giocatori, tornei, match e agenda. Login/sessione continuano a proteggere l'accesso all'app; le analisi restano private e associate all'utente.
+- Invalidata nuovamente la cache con `v3.js?v=2026090503` e rinnovata la shell del Worker.
+- Unico collaudo post-deploy: 23 giocatori, zero nuovi errori applicativi, eventi ITF presenti nel calendario di agosto (J30 Cuneo, Martina Danesi), insieme ai circuiti FITP e Tennis Europe.
