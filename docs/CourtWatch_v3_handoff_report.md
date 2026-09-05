@@ -1634,3 +1634,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - La revisione statica della causa `<base>` ha individuato e corretto anche il redirect relativo usato dall'analisi quando la sessione scade: ora usa `location.origin + '/app'`, come già fatto per `history.replaceState`.
 - Cache client portata a `v3.js?v=2026090505` e shell protetta rinnovata.
 - L'apertura del prompt nativo di analisi ha bloccato il browser automatico prima che potesse registrarne il testo e annullarlo; non viene quindi ancora dichiarato completato il collaudo CRUD dell'analisi. Il codice client non contiene più alcun prompt password e il Worker usa `request.json()` per il PUT, ma la prova UI completa resta da ripetere in una sessione browser recuperata.
+
+
+## Revisione 2026-09-05.146 — luogo agenda completo e non troncato
+
+- La riga luogo dell'agenda non usa più la sola località: viene composta dai campi strutturati del torneo nel formato `circolo · località` per FITP, Tennis Europe e ITF, con normalizzazione specifica FITP e rimozione dei duplicati.
+- Se il circolo non è pubblicato dalla sorgente, resta visibile la località disponibile; se mancano entrambi viene mostrato `Luogo da pubblicare` senza inventare dati.
+- Corretto il layout della colonna centrale e rimossi dalla riga luogo ellissi, overflow nascosto e vincoli di riga: il testo completo va a capo anche su mobile.
+- Cache separate invalidate: `v3.js?v=2026090506` e `v3.css?v=2026090501`; shell protetta rinnovata.
+- Run avviati: Pages `33969780952`; D1/Worker `33969780509`. Nessun polling automatico.
