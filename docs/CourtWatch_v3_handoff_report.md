@@ -1905,3 +1905,11 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 ## Revisione 2026-09-05.178 — cache CSS pubblicabile
 
 - Incrementato il cache-buster di `v3.css` in `v3.html` per superare il release guard e pubblicare la correzione Agenda.
+
+
+## Revisione 2026-09-05.179 — colori e ordine finali Agenda
+
+- Campo, numero match e orario mantengono il blu già utilizzato.
+- L’avversaria è nera.
+- Il risultato è posizionato sotto l’avversaria (con eventuale condizione tra i due elementi).
+- Cache CSS incrementata a `2026090531`.
