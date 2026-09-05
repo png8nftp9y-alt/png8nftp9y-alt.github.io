@@ -1616,3 +1616,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Ripristinata esattamente la proiezione universale pre-login per giocatori, tornei, match e agenda. Login/sessione continuano a proteggere l'accesso all'app; le analisi restano private e associate all'utente.
 - Invalidata nuovamente la cache con `v3.js?v=2026090503` e rinnovata la shell del Worker.
 - Unico collaudo post-deploy: 23 giocatori, zero nuovi errori applicativi, eventi ITF presenti nel calendario di agosto (J30 Cuneo, Martina Danesi), insieme ai circuiti FITP e Tennis Europe.
+
+
+## Revisione 2026-09-05.144 — correzione definitiva Home · Oggi
+
+- Riprodotto il guasto partendo dall'agenda ITF dell'8 agosto: il pulsante rimuoveva l'hash ma lasciava agenda e calendario sulla data precedente.
+- Causa radice: il `<base>` della shell protetta faceva risolvere l'URL relativo passato a `history.replaceState` sul dominio GitHub Pages; il browser sollevava una `SecurityError` cross-origin e interrompeva il gestore prima del render.
+- `history.replaceState` usa ora un URL assoluto costruito con `location.origin`, quindi resta sempre sull'origine protetta indipendentemente dal base degli asset.
+- Cache invalidata con `v3.js?v=2026090504` e shell Worker rinnovata.
+- Collaudo reale: partenza da sabato 8 agosto con agenda `J30 Cuneo — Martina Danesi — ITF`; clic su `Home · Oggi`; ritorno al 5 settembre, agenda e calendario sincronizzati, URL protetto conservato e nessun nuovo errore o warning.
