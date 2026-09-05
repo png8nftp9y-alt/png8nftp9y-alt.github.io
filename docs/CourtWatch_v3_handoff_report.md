@@ -1807,3 +1807,13 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Il parser assegna il progressivo prima di ridurre i dati ai soli giocatori CourtWatch; il numero resta quindi quello dell'ordine di gioco completo e non cambia con i filtri dell'app.
 - Il campo viene propagato senza perdita attraverso acquisizione OOP, proiezione verificabile, seed D1 e candidati `app_matches`.
 - Cache aggiornate a `v3.js?v=2026090526` e `v3.css?v=2026090515`.
+
+
+## Revisione 2026-09-05.165 — filtro anni pagina giocatore e diagnosi CRUD
+
+- Aggiunto alla pagina giocatore il filtro `Anno`, con `Tutti gli anni` e gli anni disponibili ordinati dal più recente. A ogni nuova apertura della pagina viene selezionato automaticamente l'anno corrente.
+- Il filtro usa la sovrapposizione dell'intervallo del torneo con l'anno: un torneo iniziato in X e terminato in X+1 compare sia in X sia in X+1. La stessa regola aggiorna elenco tornei, numero visibile e statistiche partite.
+- Il filtro anno si combina con circuito, tipo partita, stato torneo ed esito senza sostituirli.
+- Il run CRUD `33990372988` è fallito prima del collaudo: Cloudflare ha restituito HTTP 403 alla creazione del token temporaneo. Nessuna operazione CRUD e nessuna modifica dati sono avvenute.
+- Il workflow ora espone un errore esplicito che richiede il permesso `Access: Service Tokens Write` sul secret `CLOUDFLARE_ACCESS_API_TOKEN`; la revoca del token è stata resa sicura anche se la creazione della policy fallisce.
+- Cache aggiornata a `v3.js?v=2026090527`.

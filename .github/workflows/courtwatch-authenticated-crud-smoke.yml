@@ -33,23 +33,32 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID"
           api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID"
           auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json")
-          token_response=$(curl --fail --silent --show-error "${auth[@]}" -X POST --data '{"name":"CourtWatch CI ephemeral ${{ github.run_id }}","duration":"1h"}' "$api/access/service_tokens")
+          token_file=$(mktemp)
+          token_status=$(curl --silent --show-error --output "$token_file" --write-out '%{http_code}' "${auth[@]}" -X POST --data '{"name":"CourtWatch CI ephemeral ${{ github.run_id }}","duration":"1h"}' "$api/access/service_tokens")
+          token_response=$(<"$token_file")
+          if [[ "$token_status" != 2* ]]; then
+            message=$(jq -r '[.errors[]?.message] | join("; ")' <<<"$token_response")
+            echo "::error::Cloudflare non autorizza la creazione del token tecnico (HTTP $token_status). Aggiungere Access: Service Tokens Write a CLOUDFLARE_ACCESS_API_TOKEN. $message"
+            exit 1
+          fi
           token_id=$(jq -er '.result.id' <<<"$token_response")
           client_id=$(jq -er '.result.client_id' <<<"$token_response")
           client_secret=$(jq -er '.result.client_secret' <<<"$token_response")
           echo "::add-mask::$client_id"
           echo "::add-mask::$client_secret"
+          {
+            echo "CF_SERVICE_TOKEN_ID=$token_id"
+            echo "CF_ACCESS_CLIENT_ID=$client_id"
+            echo "CF_ACCESS_CLIENT_SECRET=$client_secret"
+          } >> "$GITHUB_ENV"
           apps=$(curl --fail --silent --show-error "${auth[@]}" "$api/access/apps?per_page=100")
           app_id=$(jq -er '.result[] | select(.domain=="courtwatch-app-api.ckrk9ggvrb.workers.dev/app") | .id' <<<"$apps")
           policy_payload=$(jq -n --arg token_id "$token_id" --arg name "CourtWatch CI ephemeral ${{ github.run_id }}" '{name:$name,precedence:2,decision:"non_identity",include:[{service_token:{token_id:$token_id}}]}')
           policy_response=$(curl --fail --silent --show-error "${auth[@]}" -X POST --data "$policy_payload" "$api/access/apps/$app_id/policies")
           policy_id=$(jq -er '.result.id' <<<"$policy_response")
           {
-            echo "CF_SERVICE_TOKEN_ID=$token_id"
             echo "CF_ACCESS_APP_ID=$app_id"
             echo "CF_ACCESS_POLICY_ID=$policy_id"
-            echo "CF_ACCESS_CLIENT_ID=$client_id"
-            echo "CF_ACCESS_CLIENT_SECRET=$client_secret"
           } >> "$GITHUB_ENV"
       - name: Verify authenticated session and analysis CRUD
         env:
