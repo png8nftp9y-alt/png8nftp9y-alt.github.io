@@ -1,0 +1,47 @@
+name: Court Watch configure private login
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-cloudflare-access-configure.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_ACCESS_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      OWNER_EMAIL: federico181099@gmail.com
+    steps:
+      - name: Configure Federico-only Access applications
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID"
+          api='https://api.cloudflare.com/client/v4'
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          apps=$(curl --fail --silent --show-error "${auth[@]}" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/apps?per_page=100")
+          configure_path() {
+            local name="$1" domain="$2" app_id policy_count
+            app_id=$(jq -r --arg domain "$domain" '.result[] | select(.domain==$domain) | .id' <<<"$apps" | head -1)
+            if [ -z "$app_id" ]; then
+              payload=$(jq -n --arg name "$name" --arg domain "$domain" '{name:$name,domain:$domain,type:"self_hosted",session_duration:"24h",auto_redirect_to_identity:false}')
+              created=$(curl --fail --silent --show-error "${auth[@]}" -X POST --data "$payload" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/apps")
+              app_id=$(jq -er '.result.id' <<<"$created")
+            fi
+            policies=$(curl --fail --silent --show-error "${auth[@]}" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/apps/$app_id/policies")
+            policy_count=$(jq '[.result[] | select(.name=="Federico only")] | length' <<<"$policies")
+            if [ "$policy_count" -eq 0 ]; then
+              payload=$(jq -n --arg email "$OWNER_EMAIL" '{name:"Federico only",precedence:1,decision:"allow",include:[{email:{email:$email}}]}')
+              curl --fail --silent --show-error "${auth[@]}" -X POST --data "$payload" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/apps/$app_id/policies" >/dev/null
+            fi
+            echo "Configured $domain"
+          }
+          configure_path 'Court Watch private app' 'courtwatch-app-api.ckrk9ggvrb.workers.dev/app'
+          configure_path 'Court Watch private API' 'courtwatch-app-api.ckrk9ggvrb.workers.dev/app-api'
