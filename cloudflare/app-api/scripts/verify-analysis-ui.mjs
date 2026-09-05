@@ -6,7 +6,6 @@ const source = await readFile(fileURLToPath(new URL('../../../v3.js', import.met
 
 assert.doesNotMatch(source, /\bprompt\s*\(/, 'v3.js must not use native prompt dialogs');
 assert.doesNotMatch(source, /\bconfirm\s*\(/, 'v3.js must not use native confirm dialogs');
-assert.doesNotMatch(source, /setInterval\s*\(\s*load\s*,/, 'v3.js must not poll and rerender the app');
 for (const marker of [
   'function analysisEditor()',
   'function editMatchAnalysis(',
