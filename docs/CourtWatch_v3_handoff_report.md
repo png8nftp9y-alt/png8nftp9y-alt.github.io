@@ -1719,3 +1719,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Il comando mostra `Deseleziona tutti` quando sono selezionati almeno due giocatori. Con zero o un giocatore mostra `Seleziona tutti`; il clic segue la stessa soglia.
 - I badge maschili `BS`/`BD` usano ora un blu indaco scuro con bordo dedicato, visivamente distinto dal blu FITP. I badge femminili rosa/viola conservano un bordo coordinato.
 - Cache aggiornate a `v3.js?v=2026090521` e `v3.css?v=2026090509`.
+
+
+## Revisione 2026-09-05.155 — rifinitura definitiva controlli agenda
+
+- Rimossi i bordi dai badge evento Tennis Europe. I femminili hanno ora sfondo pieno rosa/viola e testo bianco; i maschili sfondo pieno blu cobalto/indaco e testo bianco, chiaramente distinto dal fondo azzurro FITP. Questa regola sostituisce quella della revisione .154, nella quale il contrasto era stato affidato anche al bordo.
+- Il comando globale mostra `Seleziona tutti` ogni volta che almeno un giocatore non è selezionato, compresi i casi con due o tre giocatori non selezionati. `Deseleziona tutti` compare esclusivamente quando l'intero elenco è selezionato; il clic segue la stessa condizione.
+- L'account FQ resta ancorato in alto a destra e il menu Logout si apre in sovrapposizione sotto l'icona, senza ombra e senza modificare posizione o altezza di agenda e contenuti.
+- In agenda non viene più aggiunto dal client il prefisso `Campo`: il valore del campo/court è mostrato esattamente come restituito dall'ordine di gioco, evitando diciture duplicate come `Court Court` o `Campo Campo`.
+- Cache aggiornate a `v3.js?v=2026090522` e `v3.css?v=2026090510`.
