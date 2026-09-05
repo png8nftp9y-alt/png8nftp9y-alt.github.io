@@ -1763,3 +1763,10 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Ogni esecuzione produce l'artefatto `courtwatch-release-guard.json`, conservato per 30 giorni, con il risultato dettagliato di ogni controllo.
 - Il controllo è generale e viene applicato a ogni push su `main`, inclusi aggiornamenti automatici dei dati. Non modifica il funzionamento dell'app né la frequenza degli aggiornamenti agenda.
 - Limite residuo: il CRUD autenticato completo richiede in una fase successiva un'identità tecnica di collaudo; senza tale credenziale il workflow può verificare il contratto del client e dei dati, ma non creare/modificare/eliminare analisi dentro una sessione reale.
+
+
+## Revisione 2026-09-05.160 — correzione dimensione contatore partite
+
+- Nel contatore `1 partita` / `N partite` della pagina torneo è stata aumentata esclusivamente la dimensione del carattere a 15 px.
+- Peso, colore, spaziatura, tendine e dati restano invariati.
+- Cache CSS aggiornata a `v3.css?v=2026090514`.
