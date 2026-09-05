@@ -2,6 +2,10 @@ name: Court Watch authenticated CRUD smoke
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-authenticated-crud-smoke.yml'
   workflow_run:
     workflows: ['Court Watch Cloudflare D1 and app API']
     types: [completed]
@@ -15,7 +19,7 @@ concurrency:
 
 jobs:
   crud:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:

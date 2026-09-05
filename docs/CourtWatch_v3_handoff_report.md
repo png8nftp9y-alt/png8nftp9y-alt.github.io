@@ -1835,3 +1835,11 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Il run `33991378950` è fallito esclusivamente nel validatore perché Cloudflare D1 ha rifiutato il pattern SQL `GLOB` con `LIKE or GLOB pattern too complex`; import e generazione dei numeri erano già riusciti.
 - Il riconoscimento delle URL ufficiali dell'ordine di gioco usa ora `LIKE '%/matches/%'`, equivalente per questo controllo e compatibile con D1.
 - Il vincolo resta invariato: una partita Tennis Europe ufficiale con campo e senza numero positivo rende rosso il run prima del deploy Worker.
+
+
+## Revisione 2026-09-05.168 — avvio verificabile dello Scudo CRUD
+
+- Il workflow CRUD autenticato può ora partire anche quando viene modificato il proprio file, oltre che manualmente e dopo il deploy D1/Worker.
+- Questo consente di collaudare immediatamente la versione diagnostica corrente senza riutilizzare un vecchio tentativo GitHub legato a una revisione precedente del workflow.
+- I tentativi 2 e 3 del run `33990372988` hanno confermato un HTTP 403 Cloudflare, ma la vecchia revisione non distingueva fra creazione service token, lettura applicazione e creazione policy.
+- La revisione corrente espone lo status e il corpo della specifica chiamata fallita, preservando sempre la revoca delle risorse temporanee già create.
