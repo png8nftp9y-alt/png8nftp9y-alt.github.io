@@ -1877,3 +1877,9 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Applicata via CSS la gerarchia richiesta: giocatore, torneo, luogo.
 - Campo, numero match e orario sono evidenziati in blu uniforme.
 - Aggiornati i cache-buster di JavaScript e CSS a `2026090529`.
+
+
+## Revisione 2026-09-05.174 — ordine avversaria e blu Agenda
+
+- L’avversaria resta in fondo alla scheda, dopo luogo.
+- Campo, numero match e orario usano il blu standard precedente (`var(--blue)`).
