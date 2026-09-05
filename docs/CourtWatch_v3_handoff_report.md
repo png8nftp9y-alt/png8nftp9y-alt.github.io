@@ -1770,3 +1770,10 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Nel contatore `1 partita` / `N partite` della pagina torneo è stata aumentata esclusivamente la dimensione del carattere a 15 px.
 - Peso, colore, spaziatura, tendine e dati restano invariati.
 - Cache CSS aggiornata a `v3.css?v=2026090514`.
+
+
+## Revisione 2026-09-05.161 — partner del doppio nella pagina giocatore
+
+- Nella pagina giocatore le partite di doppio mostrano ora `Doppio con [nome partner]`, con la stessa formattazione e le eventuali nazionalità già utilizzate nella pagina torneo.
+- Le partite di singolare, il badge turno, le tendine e i dati non sono stati modificati.
+- Cache JavaScript aggiornata a `v3.js?v=2026090525`.
