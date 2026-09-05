@@ -1,9 +1,6 @@
-Warning: truncated output (original token count: 66519)
-Total output lines: 1547
-
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-04.131**
+Revisione documento: **2026-09-05.136**
 
 - 4 settembre 2026 — Corretto il rosso residuo del run Europe D1 `33896843868`. Tutti i passaggi Europe erano riusciti, inclusi import, parità D1, deploy Worker e validazione dell'agenda; l'ultimo script diventava rosso per quattro tornei FITP presenti nel JSON ma non ancora replicati dal workflow FITP. La modalità di verifica non dipende più erroneamente da `TE_INCREMENTAL`: il workflow Europe passa ora `VERIFY_SCOPE=tennis-europe` sia nei rebuild completi sia nei live incrementali e controlla soltanto API/OOP/agenda Europe. Il confronto universale di giocatori e tornei resta attivo nel workflow universale, senza nascondere discrepanze FITP o ITF.\n\n- 4 settembre 2026 — Estesa la pagina giocatore con filtri combinabili e riepiloghi per torneo. Restano disponibili i circuiti `Tutti/FITP/Tennis Europe/ITF`; una seconda tendina seleziona `Singolo e doppio/Singolo/Doppio`; i riquadri generali `Tutte/Vinte/Perse` sono pulsanti di filtro con stato attivo evidente. Conteggi e numero di tornei visibili si riallineano alla selezione. Ogni torneo mostra inoltre statistiche informative non cliccabili `giocate/vinte/perse`; le righe delle partite sono inizialmente compresse e si aprono o richiudono tramite una freccia accessibile. Layout mobile e cache-buster aggiornati.\n\n- 4 settembre 2026 — Corretto il rosso finale del rebuild D1 Europe `33895506157`. Import e vincoli referenziali erano riusciti; la parità attendeva 49.173 match ma D1 ne conteneva correttamente 49.174, perché il manifest OOP non include nel proprio conteggio il match padre manuale di Grimoldi. Il generatore espone ora `manualParentMatches` come conteggio esplicito e il verificatore somma esclusivamente tali genitori manuali al totale OOP atteso. Nessun confronto è stato allentato: la parità resta esatta per rebuild completi.\n\n- 4 settembre 2026 — Corretto il fallimento D1 Europe `33869145153` nello step `04-app-match-candidates.sql`. Il record manuale della finale Bonus Draw di Edoardo Grimoldi era presente tra i candidati dell'app ma mancava nella tabella padre `matches`, quindi la chiave esterna lo respingeva; i retry non potevano risolvere un errore deterministico. Il generatore inserisce ora con `INSERT OR IGNORE` il match padre manuale prima della relazione, soltanto dopo aver verificato che il torneo ufficiale Kufstein esista nell'archivio. La chiave esterna resta attiva e continua a bloccare riferimenti realmente orfani. Il push del generatore avvia un rebuild D1 completo.\n\n- 4 settembre 2026 — Aggiunto nella pagina giocatore il filtro a tendina `Tutte le partite`, `FITP`, `Tennis Europe`, `ITF`. La selezione nasconde immediatamente i tornei degli altri circuiti, aggiorna il numero di tornei visibili e ricalcola le statistiche giocate/vinte/perse sul solo circuito scelto; aprendo un altro giocatore il filtro riparte da `Tutte le partite`. Layout adattato anche agli schermi mobili e cache-buster aggiornato.\n\n- 4 settembre 2026 — Corretto il rosso del rebuild Europe D1 `33868356003`. Il run aveva ripristinato correttamente da R2 le generazioni storica e live, ma `restore-tennis-europe-oop.sh` conservava una terza duplicazione dei confronti esatti `453 tornei` e `47.048 partite`; sostituiti con le stesse baseline minime monotone e configurabili già applicate a merge e pubblicazione R2. Una ricerca completa non trova ulteriori confronti rigidi residui. I push di manutenzione e i merge storici eseguono ora una ricostruzione completa (`TE_INCREMENTAL=0`), mentre i normali workflow live restano incrementali: i campi storici `notBefore` e `court` raggiungono quindi D1 senza aumentare il lavoro dei cicli ordinari.\n\n- 4 settembre 2026 — Aggiunta nella pagina giocatore una sezione statistica automatica con partite giocate, vinte e perse. Il conteggio comprende soltanto match con esito certo (`advances=true/false`), quindi singolari, doppi e W/O conclusi; incontri programmati o in corso non vengono classificati prematuramente come sconfitte. Le statistiche derivano dalla raccolta generale delle partite e si aggiornano automaticamente quando i motori pubblicano nuovi risultati. Aggiornato il cache-buster del client.\n\n- 4 settembre 2026 — Individuata la mancata propagazione di campo e `N.B.` nell'app. L'artefatto reale del collaudo `33828515398` mostra `notBeforeParsed=511` e, per Virginia Cereghini a Bad Waltersdorf, `time=10:30`, `notBefore=true`, ma campo ancora concatenato come `FÜRSTENFELD1 Sportaktivpark Bad Waltersdorf/Fürstenfeld`. L'estrazione ora conserva esclusivamente il primo valore strutturato `nav-link__value`, ottenendo esattamente `FÜRSTENFELD1`. Riparato inoltre il workflow di merge storico: `required` e `default` erano fuori dal livello YAML di `source_run_id`, facendo fallire la validazione prima della creazione dei job; rimosso anche il trigger push inutile. La catena definitiva resta backfill verde → merge storico con ID del run appena concluso → rebuild D1 completo.
 
@@ -283,7 +280,781 @@ App pubblica: `https://png8nftp9y-alt.github.io/v3.html`
 - La mappa dei tornei e la ricerca delle iscrizioni dei giocatori sono due fasi distinte.
 - Le nuove iscrizioni e le cancellazioni devono essere rilevate aggiornando le liste dei partecipanti.
 - Il calendario non deve essere pubblicato con dati parziali o corrotti.
-- Prima di ogni pubblicazione deve essere conservata l’ultima versione corretta; se una nuova gener…16519 tokens truncated…E=1` mantiene esplicitamente la scansione di tutti i 23. Avviato il controllo live run `32871533186`.
+- Prima di ogni pubblicazione deve essere conservata l’ultima versione corretta; se una nuova generazione fallisce, deve restare visibile quella precedente.
+- In diagnostica l’utente vuole vedere soltanto spie colorate, senza icone o pannelli di monitoraggio invasivi.
+- L’assistente deve comunicare lo stato e l’esito dei controlli; non deve essere l’interfaccia dell’app a mostrare un’icona di monitoraggio.
+- Il sistema deve essere continuo nel tempo: la finestra di ricerca avanza quotidianamente e lo storico impedisce la perdita degli eventi già validati.
+- I file pesanti e le cache non devono far crescere indefinitamente Git.
+
+## 3. Motore FITP
+
+### 3.1 Motore principale
+
+È stato scelto il motore provinciale come motore FITP principale. Il motore nazionale resta un controllo di confronto/fallback, non deve sostituire automaticamente il catalogo provinciale con dati nazionali o parziali.
+
+Il test nazionale di riferimento aveva restituito 5.593 tornei. Il confronto provinciale/nazionale è stato usato per individuare:
+
+- codici provincia errati o alternativi;
+- città metropolitane;
+- problemi di paginazione;
+- province senza risultati o con risultati anomali;
+- tornei presenti solo nel nazionale;
+- tornei di durata superiore a 21 giorni.
+
+Il problema di Roma è stato ricondotto al codice provincia 258 e corretto/testato. I tornei romani che l’utente trovava manualmente sotto il filtro Roma erano il riferimento da recuperare.
+
+### 3.2 Finestre temporali
+
+Il motore provinciale usa finestre sovrapposte di 21 giorni. L’overlap è obbligatorio anche quando una finestra viene suddivisa per saturazione o errore.
+
+Motivo: un torneo a cavallo tra due intervalli non deve sfuggire. Esempio discusso: torneo dal 16 al 28 gennaio; finestre contigue senza sovrapposizione possono escluderlo a seconda dei filtri FITP su data di inizio e fine.
+
+Assunzione concordata: non risultano tornei FITP ordinari più lunghi di 21 giorni. I casi oltre 21 giorni vanno comunque diagnosticati e gestiti, non ignorati.
+
+La finestra deve avanzare nel tempo: ogni giorno si elimina un giorno ormai vecchio e se ne aggiunge uno futuro. Il catalogo/storico conserva ciò che è già stato acquisito.
+
+### 3.3 Paginazione e fallback
+
+- La paginazione deve essere completa per ogni provincia.
+- Se una richiesta principale satura o fallisce, si suddivide la finestra.
+- Le sottofinestre devono mantenere overlap, per evitare buchi.
+- Ogni provincia deve rilasciare risultati plausibili o una diagnostica esplicita.
+- Il sistema deve controllare tutte le 107 province.
+- Un risultato basso o nullo non va accettato automaticamente come corretto.
+
+### 3.4 Ricerca giocatori e iscrizioni
+
+La ricerca del giocatore deve avvenire nella mappa tornei, consultando le liste partecipanti aggiornate. Deve rilevare:
+
+- nuova iscrizione: il giocatore compare oggi e non compariva prima;
+- cancellazione/ritiro: il giocatore compariva e successivamente non compare più;
+- conferma: continua a comparire.
+
+Sono stati aggiunti Andrea Losa con tessera FITP `2613625755` e Darko Sartori con tessera FITP `9058584226`.
+
+Per Darko Sartori la rigenerazione completa del 24 agosto 2026 ha trovato 15 tornei FITP dal 18 dicembre 2025, tutti associati tramite tessera e senza errori. La classifica corrente rilevata è `3.3` e il club verificato è `Tennis Club Lecco`. Il controllo incrociato non ha trovato un profilo o un'iscrizione ufficiale Tennis Europe/ITF univocamente riconducibile al giocatore. Su successiva richiesta esplicita dell'utente, Darko è stato comunque abilitato per Tennis Europe: deve comparire nella mappa giocatori e partecipare alle future scansioni TE, ma nessun torneo TE deve essergli attribuito senza una corrispondenza ufficiale. ITF resta disabilitato fino a nuove evidenze.
+
+Quando l’utente chiede di inserire un giocatore, l’operazione desiderata comprende automaticamente:
+
+1. aggiunta al file giocatori;
+2. recupero/verifica della tessera;
+3. aggiornamento delle iscrizioni ai tornei;
+4. aggiornamento del calendario e dello storico;
+5. in futuro, aggiornamento anche di ordini di gioco e risultati.
+
+Per le ricostruzioni storiche, il requisito è partire dal 18 dicembre 2025. Non si può dipendere soltanto dalla finestra corrente, perché dopo mesi i tornei vecchi non sarebbero più restituiti dalla ricerca FITP. Serve quindi un archivio persistente di tornei e partecipanti.
+
+I tornei ITF eventualmente presenti nel PUC FITP non devono rientrare nel conteggio FITP.
+
+Anomalia verificata in produzione il 17 agosto 2026: `ITF J30 CUNEO` di Martina Danesi è presente in `dist/v3/tournaments.json` sia come record FITP blu (`competitionId` FITP `13267468-DCCF-44C3-BA20-ED3606039646`) sia come record ITF verde (`J-J30-ITA-2026-002`). Il motore FITP può legittimamente intercettare e conservare nella propria mappa grezza i tornei internazionali restituiti dal PUC. Il filtro deve però escluderli dalla fase di costruzione delle iscrizioni e del calendario FITP, come già stabilito per i tornei Tennis Europe presenti nel PUC. Il record blu non deve quindi essere pubblicato; il torneo visibile deve provenire esclusivamente dal motore ITF.
+
+Correzione completata il 17 agosto 2026 nei file `src/v3/entries-engine.mjs` e `src/v3/merge-isolated-engines.mjs`. Il filtro agisce soltanto nel merge del calendario e non modifica `source_fitp_entries.json`. Verifica dopo il workflow `31987024886`: mappa sorgente FITP 393 record, calendario 431 record totali, FITP visibili 392, ITF visibili 1, record internazionali pubblicati come FITP 0. `J30 Cuneo` rimane una sola volta come ITF verde per Martina Danesi.
+
+### 3.5 Storico FITP
+
+Lo storico non è un semplice accumulo immutabile di ogni iscrizione osservata. Deve conservare i tornei che rimangono effettivamente nel calendario.
+
+Regola concordata:
+
+- se il giocatore compare in lista, il torneo può entrare nel calendario/storico;
+- se prima dell’inizio scompare dalla lista, significa normalmente cancellazione e il torneo deve essere rimosso dal calendario attivo;
+- il catalogo storico dei tornei può restare per ricostruzioni e audit, ma l’associazione giocatore-torneo non deve restare attiva se il giocatore si è cancellato;
+- dopo una conferma definitiva mediante tabellone o dopo lo svolgimento dell’evento, i dati devono essere conservati stabilmente.
+
+## 4. Protezione delle pubblicazioni
+
+Regola globale, valida per tutti i motori e per sempre:
+
+1. generare una nuova versione in staging;
+2. verificare completezza, conteggi, integrità e assenza di regressioni;
+3. pubblicare solo se i controlli passano;
+4. in caso di errore lasciare visibile l’ultima versione corretta;
+5. non sostituire mai catalogo, calendario o storico con una generazione parziale.
+
+Questa regola deve essere applicata anche a Tennis Europe, ITF, gare a squadre, ordini di gioco e risultati.
+
+### 4.1 Protezione del caricamento nel browser
+
+Dal 23 agosto 2026 la protezione non riguarda soltanto i workflow. L'app conserva nel browser l'ultima generazione completa caricata con successo.
+
+- `players.json` e `tournaments.json` sono i dati essenziali;
+- agenda, risultati, avversari, diagnostica e file analoghi sono accessori e il loro errore non blocca più tutta l'app;
+- un file accessorio temporaneamente indisponibile viene sostituito dall'ultima copia valida disponibile;
+- se un file essenziale non è raggiungibile, viene caricata la copia completa salvata in `localStorage`;
+- la testata mostra `Ultimi dati salvati` con stato giallo quando è attivo il fallback;
+- se il dispositivo non ha mai completato almeno un caricamento valido, non può esistere una cache locale: in quel solo caso viene mostrato un messaggio di indisponibilità invece di inventare dati.
+
+Test locali superati: caricamento completo, errore di un file accessorio e indisponibilità di un file essenziale con recupero della cache. Asset attivati tramite versionamento `v3.js?v=202608231900` e `v3.css?v=202608231900`.
+
+## 5. Storage R2 e GitHub
+
+È stato scelto Cloudflare R2 per spostare fuori da Git i file pesanti e destinati a crescere, mantenendo in Git codice, configurazioni e dati leggeri necessari al sito.
+
+Obiettivi:
+
+- evitare crescita indefinita della cronologia Git;
+- conservare più generazioni recuperabili;
+- rendere possibili cache grandi per partecipanti, indici, tabelloni, ordini di gioco e risultati;
+- mantenere il funzionamento strutturale dell’app invariato: cambia il livello di persistenza/recupero dati, non la grafica.
+
+Strategia generazionale concordata per R2:
+
+- `current`;
+- `backup-1`;
+- `backup-2`.
+
+I workflow FITP devono:
+
+1. ripristinare la cache da R2;
+2. elaborare una nuova generazione;
+3. pubblicarla e verificarla;
+4. ruotare current/backup soltanto dopo verifica riuscita;
+5. mantenere calendario e storico integri;
+6. lasciare fuori da `main` i file pesanti `history/fitp_participant_cache.json.gz` e `history/fitp_membership_index.json.gz`.
+
+È stata rinviata la pulizia della cronologia Git finché non fossero state verificate almeno due generazioni R2 successive e fossero pronti `current`, `backup-1` e `backup-2`.
+
+## 6. Motore Tennis Europe
+
+### 6.1 Architettura scelta
+
+È stato scelto il motore sharded come motore Tennis Europe principale, dopo il confronto con il motore vecchio. La ricerca è stata impostata con frequenza desiderata di 15 minuti, se sostenibile.
+
+Anche Tennis Europe richiede:
+
+- catalogo completo dei tornei;
+- database/storico persistente;
+- ricerca aggiornata dei giocatori nelle acceptance list;
+- controllo T−1 dei tabelloni;
+- protezione contro dati parziali;
+- avanzamento continuo della finestra temporale nel futuro.
+
+Il database Tennis Europe deve contenere almeno:
+
+- identificativo torneo;
+- nome torneo;
+- date di inizio e fine;
+- località/paese;
+- categoria, età e sesso;
+- URL ufficiali;
+- snapshot delle acceptance list;
+- associazioni giocatore-torneo e loro stato;
+- snapshot/metadati dei tabelloni di singolare;
+- stato di conferma nel tabellone;
+- timestamp dell’ultima verifica.
+
+### 6.2 Etichette acceptance list
+
+Prima dell’inizio del torneo, il calendario deve mostrare la posizione del giocatore nella acceptance list:
+
+- verde: `MD-n`;
+- giallo: `Q-n`;
+- arancione scuro: `A-n`;
+- `WC` quando il giocatore è presente in acceptance list ma senza numero/posizione.
+
+Caso di riferimento WC: Virginia Cereghini al Torneo Avvenire di Milano.
+
+Le etichette possono cambiare nel tempo sia come categoria sia come numero e devono essere aggiornate frequentemente.
+
+Ordine nel calendario:
+
+1. prima tutti gli `MD`, ordinati dal numero più basso al più alto;
+2. poi tutti i `Q`, ordinati dal numero più basso al più alto;
+3. poi tutti gli `A`, ordinati dal numero più basso al più alto;
+4. i `WC` vanno gestiti esplicitamente e non scartati per assenza del numero.
+
+La categoria ha sempre precedenza sul numero.
+
+### 6.3 Regola T−1
+
+T−1 significa un giorno prima dell’inizio del torneo, calcolato nel fuso `Europe/Rome`.
+
+Il controllo deve essere eseguito soltanto sui tornei nei quali almeno uno dei giocatori seguiti risulta già presente nella acceptance list, non sull’intero catalogo Tennis Europe.
+
+Al T−1:
+
+1. controllare solo i tabelloni di singolare;
+2. cercare sia qualificazioni sia main draw, indipendentemente dall’etichetta precedente;
+3. se il giocatore compare in almeno uno dei due, conservarlo nel calendario e rimuovere l’etichetta acceptance (`MD-n`, `Q-n`, `A-n`, `WC`), mostrando il solo nome;
+4. se non compare in nessuno dei due, rimuoverlo soltanto quando entrambi i tabelloni pertinenti sono pubblicati, popolati e affidabili;
+5. se uno o entrambi i tabelloni sono mancanti, non pubblicati, vuoti, composti solo da `Bye` o non verificabili, il controllo è inconcludente e il giocatore deve restare con l’ultimo stato valido.
+
+Il doppio non partecipa alla decisione T−1. Sarà usato successivamente per ordine di gioco e risultati.
+
+### 6.4 Tabelloni vuoti
+
+URL ufficiale fornito dall’utente come caso di test:
+
+`https://te.tournamentsoftware.com/tournament/5173C79B-B05D-4157-AD04-CD4D4F68C4E7/draw/1`
+
+È il tabellone `BS14 - Boys Singles 14 Main Draw`, size 64, con tutte le 64 posizioni indicate come `Bye`. Deve essere classificato come:
+
+- pubblicato;
+- vuoto/non compilato;
+- inconcludente;
+- mai sufficiente per rimuovere un giocatore.
+
+Il relativo tabellone qualificazioni usa il percorso `/Draw/7`.
+
+### 6.5 Stato operativo corrente del T−1
+
+La logica decisionale è stata predisposta in `src/v3/verify-tennis-europe-draws.mjs`:
+
+- scandisce i percorsi numerati dei tabelloni del torneo;
+- separa singolare e doppio;
+- distingue main draw e qualificazioni;
+- filtra sesso e categoria d'età;
+- riconosce tabelloni mancanti, vuoti/solo Bye e popolati;
+- elimina un giocatore soltanto con assenza certa da entrambi i tabelloni di singolare pertinenti;
+- conserva l'ultimo stato valido nei casi inconcludenti;
+- esegue uno smoke test sul tabellone vuoto noto prima di consentire la pubblicazione.
+
+Stato verificato: **non ancora operativo in produzione**. L'ostacolo attuale non è la regola T−1, ma la sessione HTTP richiesta da `te.tournamentsoftware.com`. Il sito presenta una cookie wall; il browser normale la supera, mentre il client del workflow non sta ancora recuperando correttamente i campi `CookiePurposes` necessari al POST di consenso.
+
+Workflow di prova falliti in sicurezza:
+
+- `31988159989` — URL iniziale errato/404;
+- `31988340607` — redirect alla cookie wall;
+- `31988451028` e `31988550963` — campi di consenso non rilevati;
+- `31988653159` — ultimo test noto, stesso blocco sui consent purposes.
+
+In tutti questi casi la pubblicazione atomica è stata saltata: le 45 iscrizioni Tennis Europe validate non sono state sostituite da risultati parziali.
+
+Prossimo intervento tecnico:
+
+1. seguire esplicitamente il redirect della cookie wall conservando i cookie intermedi;
+2. analizzare gli elementi `input` indipendentemente dall'ordine degli attributi HTML;
+3. inviare il consenso minimo equivalente al pulsante browser “Accept” (`CookiePurposes=1`);
+4. ripetere lo smoke test sul tabellone vuoto noto;
+5. eseguire il T−1 sui soli tornei con nostri giocatori;
+6. pubblicare soltanto dopo verifica dei conteggi, delle conferme, delle rimozioni motivate e dei casi inconcludenti.
+
+### 6.6 Ultimi conteggi Tennis Europe validati
+
+| Dato | Valore |
+| --- | ---: |
+| Tornei nella mappa sharded | 598 |
+| Shard del catalogo | 4 |
+| Copertura temporale | 19 dicembre 2025 – 15 agosto 2028 |
+| Iscrizioni dei giocatori | 45 |
+| Tornei distinti con almeno un giocatore | 20 |
+| Etichette acceptance presenti | 45 |
+| Rimozioni T−1 pubblicate | 0, perché il controllo non ha ancora superato lo smoke test |
+
+### 6.7 Implementazione T−1 già introdotta
+
+Nel file `src/v3/verify-tennis-europe-draws.mjs` sono state introdotte queste logiche:
+
+- data T−1 nel fuso di Roma;
+- probing delle route numerate `/tournament/{competitionId}/draw/1..24`;
+- distinzione tra pagina mancante, tabellone vuoto e tabellone popolato;
+- filtri per singolare/doppio, sesso, età e tipo main/qualifying;
+- rimozione permessa soltanto con entrambi i tabelloni di singolare affidabili;
+- modalità backfill storico e modalità audit-only;
+- file audit `dist/v3/source_tennis_europe_draw_backfill_audit.json`.
+
+Per Veurne/Gregorio Puccio, dopo la correzione del fuso:
+
+- data controllo: 16 agosto 2026;
+- inizio torneo: 17 agosto 2026;
+- differenza: −1 giorno;
+- 24 route numerate controllate;
+- nessun tabellone pertinente pubblicato;
+- Gregorio è stato correttamente conservato con etichetta `MD-15`.
+
+È stato inoltre corretto un falso positivo nel quale il testo tecnico `direct draw n` faceva sembrare una route inesistente un tabellone valido.
+
+## 7. Audit straordinario dei tornei Tennis Europe passati
+
+L’utente ha chiesto, una sola volta, di applicare il criterio T−1 anche alle altre iscrizioni storiche per verificare il funzionamento. L’audit è stato configurato in sola lettura (`TE_DRAW_BACKFILL=1`, `TE_DRAW_AUDIT_ONLY=1`), quindi non può modificare calendario o iscrizioni.
+
+Workflow temporaneo:
+
+`.github/workflows/courtwatch-v3-tennis-europe-draw-backfill-once.yml`
+
+Esecuzioni note:
+
+- `31912407123`: successo tecnico, ma tutte le pagine tabellone erano state intercettate dalla cookie wall;
+- `31912693910`: successo tecnico, ma 2.160 richieste risultavano ancora reindirizzate alla cookie wall;
+- `31913073102`: successo tecnico il 16 agosto 2026; audit su 40 iscrizioni concluse e 19 tornei, 2.000 probe, ma tutti i 2.000 ancora reindirizzati alla cookie wall.
+
+L’ultimo audit non ha modificato nulla:
+
+- 40 iscrizioni conservate;
+- 0 confermate dal tabellone;
+- 0 rimosse;
+- 40 inconcludenti.
+
+Il numero è sceso rispetto alle 44 storiche richieste perché la sorgente sharded corrente, al momento dell’ultimo audit, conteneva soltanto 40 iscrizioni concluse. Prima di considerare completato il test, bisogna recuperare la fotografia corretta delle 44 iscrizioni oppure spiegare puntualmente quali quattro associazioni siano scomparse e perché.
+
+### 7.1 Problema cookie wall ancora aperto
+
+Il modulo inizialmente inviava valori di consenso errati (`1,2,3,4`). Il form corrente usa identificativi a bit:
+
+`1,2,4,16`
+
+È stato individuato anche un secondo problema: il programma effettuava direttamente il POST di consenso senza visitare prima la pagina cookie wall. La visita GET iniziale è probabilmente necessaria per ricevere il cookie di sessione usato dal successivo POST.
+
+Una sostituzione precedente aveva inserito accidentalmente sequenze letterali `\n` dentro una riga di commento del blocco `acceptedCookie()`, commentando di fatto il ciclo che aggiungeva i valori `CookiePurposes`. Il blocco è stato successivamente riscritto, ma il client automatico continua a non ricevere il form di consenso completo. La prossima correzione deve:
+
+1. sostituire integralmente `acceptedCookie()`;
+2. aprire direttamente una pagina tabellone nota e seguire in modo controllato tutti i redirect;
+3. leggere la location della cookie wall;
+4. fare GET della cookie wall e raccogliere i `Set-Cookie`;
+5. estrarre `ReturnUrl` dal form;
+6. inviare POST a `/cookiewall/Save` con il consenso minimo equivalente ad “Accept” (`CookiePurposes=1`), cookie di sessione, `Origin` e `Referer`;
+7. raccogliere i cookie restituiti dal POST;
+8. verificare con una singola pagina nota che `finalUrl` non contenga più `/cookiewall/`;
+9. solo dopo rilanciare il controllo T−1 e l'audit storico.
+
+Il blocco corrente è riproducibile nel workflow e riguarda il recupero della pagina di consenso/redirect, non un limite d'uso degli strumenti. La protezione di pubblicazione sta lavorando come previsto.
+
+## 8. File e componenti principali
+
+Percorsi rilevanti nel repository:
+
+- `v3.html` — interfaccia principale;
+- `v3.js` — logica client/calendario;
+- `src/v3/entries-engine.mjs` — costruzione delle iscrizioni;
+- `src/v3/discover-tennis-europe-tournaments-shard.mjs` — scoperta tornei Tennis Europe per shard;
+- `src/v3/merge-tennis-europe-tournament-shards.mjs` — merge catalogo tornei;
+- `src/v3/discover-tennis-europe-acceptance-shard.mjs` — ricerca acceptance list per shard;
+- `src/v3/merge-tennis-europe-acceptance-shards.mjs` — merge iscrizioni;
+- `src/v3/verify-tennis-europe-draws.mjs` — controllo T−1/tabelloni;
+- `src/v3/maintain-tennis-europe-database.mjs` — manutenzione database Tennis Europe (presente nella working copy locale; verificare se pubblicato su main);
+- `.github/workflows/courtwatch-v3-tennis-europe-live.yml` — workflow live Tennis Europe;
+- `.github/workflows/courtwatch-v3-tennis-europe-draw-backfill-once.yml` — workflow temporaneo di audit storico;
+- `dist/v3/source_tennis_europe_entries.json` — iscrizioni Tennis Europe correnti;
+- `dist/v3/source_tennis_europe_entries_sharded.json` — risultato del motore sharded;
+- `dist/v3/source_tennis_europe_draw_audit.json` — audit T−1 ordinario;
+- `dist/v3/source_tennis_europe_draw_backfill_audit.json` — audit storico straordinario.
+
+## 9. Stato dei lavori
+
+### Completato o sostanzialmente operativo
+
+- scelta del motore FITP provinciale come principale;
+- finestre FITP sovrapposte di 21 giorni;
+- correzione dei codici provincia, incluso Roma 258;
+- controlli di paginazione e confronto con nazionale;
+- esclusione dei tornei ITF dal conteggio FITP;
+- aggiunta di Andrea Losa/tessera FITP;
+- aggiunta di Darko Sartori/tessera FITP e ricostruzione di 15 tornei storici/correnti;
+- impostazione storage R2 con generazioni current/backup;
+- scelta del motore Tennis Europe sharded;
+- acceptance label MD/Q/A e ordinamento per priorità;
+- gestione concettuale WC senza numero;
+- regola T−1 sicura e conservativa;
+- riconoscimento concettuale di tabelloni vuoti/solo Bye;
+- audit storico in modalità non distruttiva.
+
+### Da verificare o completare
+
+1. Correggere definitivamente la sessione cookie wall in `acceptedCookie()`.
+2. Ripristinare/proteggere la sorgente Tennis Europe validata: il commit `aa88fa9` del 17 agosto 2026 ha sostituito le 43 entry rimaste dopo le due scadenze con 38 record di struttura diversa. La protezione deve impedire a un workflow ex-novo o parziale di sovrascrivere acceptance list validate e storico.
+3. Verificare una singola pagina tabellone via Node/GitHub Actions prima del backfill completo.
+4. Ricostruire l’insieme esatto delle 44 iscrizioni storiche richieste; la sorgente corrente ne ha fornite 40.
+5. Rilanciare una sola volta l’audit storico e produrre elenco giocatore per giocatore.
+6. Rimuovere/disabilitare il workflow temporaneo di backfill al termine del test.
+7. Verificare che il database Tennis Europe sia effettivamente pubblicato e aggiornato dal workflow live.
+8. Verificare in produzione la visualizzazione WC per ogni torneo, non solo il parsing.
+9. Validare l’avanzamento continuo della finestra Tennis Europe nel futuro.
+10. Completare il motore ITF.
+11. Completare il motore gare a squadre.
+12. Solo dopo, progettare ordini di gioco e risultati separatamente per circuito.
+13. Concludere la verifica R2 e, se tutte le generazioni sono sane, pianificare la pulizia della cronologia Git.
+
+## 10. Procedura consigliata per riprendere in una nuova chat
+
+### Fase A — mettere in sicurezza lo stato
+
+1. Collegare il repository GitHub.
+2. Leggere `main` e controllare gli ultimi workflow.
+3. Non sovrascrivere modifiche locali o dati dell’utente.
+4. Verificare che calendario e storico correnti siano integri.
+5. Conservare l’ultima versione corretta prima di qualsiasi pubblicazione.
+
+### Fase B — chiudere il problema cookie Tennis Europe
+
+1. Ispezionare il blocco `acceptedCookie()` su `main`.
+2. Eliminare le sequenze letterali `\n` introdotte nella riga commentata.
+3. Implementare GET cookie wall + POST consenso con valori `1,2,4,16`.
+4. Creare un test rapido su un solo URL noto.
+5. Accettare il test solo se:
+   - risposta HTTP 200;
+   - `finalUrl` è il tabellone, non la cookie wall;
+   - il titolo/heading identifica il tabellone;
+   - il caso di esempio viene riconosciuto come empty/bye-only.
+
+### Fase C — audit delle 44 iscrizioni
+
+1. Recuperare la fotografia contenente le 44 iscrizioni storiche originarie.
+2. Confrontarla con le 40 correnti e spiegare le quattro differenze.
+3. Eseguire il backfill in `AUDIT_ONLY`.
+4. Restituire per ogni giocatore e torneo:
+   - torneo;
+   - evento;
+   - vecchia etichetta;
+   - tabellone qualificazioni: mancante/vuoto/popolato/presente/assente;
+   - main draw: mancante/vuoto/popolato/presente/assente;
+   - decisione simulata.
+5. Non applicare le rimozioni storiche al calendario senza una nuova istruzione esplicita dell’utente.
+6. Eliminare il workflow temporaneo dopo il test.
+
+### Fase D — proseguire Tennis Europe live
+
+1. Lasciare il T−1 live limitato ai soli tornei con giocatori in acceptance list.
+2. Aggiornare le etichette ogni 15 minuti, se il carico è sostenibile.
+3. Salvare snapshot nel database/storico.
+4. Applicare la regola conservativa sui tabelloni vuoti.
+5. Pubblicare soltanto generazioni complete e validate.
+
+### Fase E — sistemare le pagine personali dei giocatori
+
+Attività sospesa da affrontare dopo il completamento del motore Tennis Europe T−1:
+
+1. rendere esplicito l'ordinamento cronologico dei tornei nella pagina personale, senza dipendere dall'ordine ricevuto da `tournaments.json`;
+2. ordinare per data di inizio, poi data di fine e infine nome del torneo;
+3. definire chiaramente la separazione fra tornei futuri, in corso e conclusi;
+4. verificare che storico, iscrizioni cancellate e conferme da tabellone siano rappresentati correttamente;
+5. mantenere coerenti colori ed etichette dei quattro circuiti;
+6. ordinare cronologicamente anche agenda, ordini di gioco e risultati quando saranno completi;
+7. non modificare la pagina personale durante la correzione corrente del T−1, salvo interventi necessari a evitare regressioni.
+
+## 11. Prompt pronto da usare in un’altra chat
+
+> Sto continuando il progetto Court Watch v3 nel repository `png8nftp9y-alt/png8nftp9y-alt.github.io`. Leggi il report allegato prima di fare modifiche. Mantieni la grafica v3 invariata e applica sempre la regola “ultima versione corretta”: nessun dato parziale deve sostituire catalogo, calendario o storico. Il motore FITP principale è provinciale con 107 province, Roma codice 258, finestre sovrapposte di 21 giorni e nazionale solo come controllo. Tennis Europe usa il motore sharded, acceptance label MD/Q/A/WC, aggiornamento desiderato ogni 15 minuti e controllo T−1 soltanto sui tornei con nostri giocatori in lista. Al T−1 controlla entrambi i tabelloni di singolare; conferma il giocatore se compare in almeno uno, rimuovilo soltanto se entrambi sono pubblicati, popolati e affidabili e lui è assente. Tabelloni mancanti, vuoti o solo Bye sono inconcludenti e non devono rimuovere nessuno. Prima attività: correggi definitivamente `acceptedCookie()` in `src/v3/verify-tennis-europe-draws.mjs`, perché l’audit storico è ancora reindirizzato alla cookie wall. Verifica su una singola pagina nota, poi ripeti in sola lettura il test straordinario sulle 44 iscrizioni storiche, spiegando anche perché la sorgente corrente ne contiene 40. Non modificare il calendario durante questo audit e rimuovi il workflow temporaneo al termine.
+
+Attività successiva già concordata: sistemare le pagine personali dei giocatori, garantendo direttamente nel rendering l'ordinamento cronologico dei tornei e, in seguito, di agenda e risultati.
+
+## 12. Criteri di accettazione immediati
+
+La prossima fase è conclusa soltanto quando:
+
+- nessuna richiesta di tabellone finisce sulla cookie wall;
+- il tabellone di esempio con 64 Bye è riconosciuto come pubblicato ma vuoto;
+- i tabelloni popolati vengono distinti da quelli vuoti;
+- sesso, fascia d’età, singolare/doppio e main/qualifying sono filtrati correttamente;
+- l’audit copre esattamente le 44 iscrizioni richieste oppure documenta in modo verificabile ogni differenza;
+- calendario e storico non cambiano durante il test;
+- il workflow temporaneo viene rimosso dopo l’uso;
+- il workflow live continua a proteggere l’ultima versione corretta.
+
+## 13. Aggiornamento 24 agosto 2026 — nuovo motore ITF globale
+
+Su richiesta dell’utente è iniziata la sostituzione del motore ITF iniziale con un’architettura equivalente al motore Tennis Europe.
+
+### Pubblicazione iniziale
+
+- commit atomico su `main`: `522d17f14f234e4b788d1b5048ddfce20935f5a4` — `Add sharded ITF global database engine`;
+- copertura minima invariabile: dal `2025-12-18`;
+- orizzonte iniziale: 730 giorni nel futuro;
+- scansione geografica: `europe`, `americas`, `asia_pacific`, `africa_middle_east`, `other`;
+- scansione live: 16 shard per acceptance list, partecipanti e risultati;
+- frequenza catalogo: ogni 6 ore;
+- frequenza live desiderata: ogni 15 minuti ai minuti `07`, `22`, `37`, `52`.
+
+### Nuovi componenti
+
+- `src/v3/itf-common.mjs` — normalizzazione, regioni, richieste ufficiali e utilità condivise;
+- `src/v3/discover-itf-tournaments-shard.mjs` — catalogo mondiale per area geografica;
+- `src/v3/merge-itf-tournament-shards.mjs` — merge, soglia minima e continuità/last-known-good;
+- `src/v3/discover-itf-acceptance-shard.mjs` — acceptance list ufficiali, database partecipanti e matching dei nostri giocatori;
+- `src/v3/merge-itf-acceptance-shards.mjs` — merge completo dei 16 shard;
+- `src/v3/verify-itf-draws.mjs` — etichette MD/Q/A e controllo T−1 conservativo;
+- `src/v3/discover-itf-results-shard.mjs` — acquisizione giocatori e risultati ufficiali;
+- `src/v3/maintain-itf-database.mjs` — catalogo storico tornei, relazioni giocatore-torneo e database completi giocatori/risultati;
+- `src/v3/validate-itf-system.mjs` — blocco della pubblicazione se catalogo, acceptance, T−1 o database sono incompleti;
+- `src/v3/itf-r2-cache.sh` — generazioni R2 con `current`, `backup-1`, `backup-2`;
+- `.github/workflows/courtwatch-v3-itf-tournaments-sharded.yml` — pipeline catalogo geografico;
+- `.github/workflows/courtwatch-v3-itf-live.yml` — pipeline live, database, R2 e merge app.
+
+### Regole di sicurezza introdotte
+
+- una risposta ITF anti-bot con HTTP 200 ma contenuto non JSON non è mai considerata una lista vuota;
+- un ciclo incompleto deve fallire prima della pubblicazione;
+- una rimozione T−1 è ammessa solo quando un tabellone ufficiale di singolare contiene almeno quattro partecipanti leggibili ed il giocatore è assente;
+- pagine mancanti, illeggibili o tabelloni non sufficientemente popolati restano inconcludenti e mantengono l’iscrizione;
+- i file pesanti con tutti i partecipanti, giocatori e risultati restano su R2; su GitHub vengono pubblicati cataloghi, relazioni e audit leggeri.
+
+### Stato al momento di questo aggiornamento
+
+- sintassi Node di tutti i nuovi moduli: verificata;
+- sintassi shell R2: verificata;
+- `git diff --check`: superato;
+- primo ciclo reale GitHub Actions: avviato automaticamente dal commit; validazione dei conteggi e compatibilità precisa con gli endpoint dinamici ITF ancora in corso;
+- il vecchio dato ITF resta la versione pubblica valida finché il nuovo sistema non supera tutte le soglie.
+
+## 14. Aggiornamento 25 agosto 2026 — catalogo ITF completo e motore live ufficiale
+
+Il primo catalogo geografico validato è stato pubblicato dal commit `df58e2dade2bf422b1c6faab4036aa0b79e3c984`.
+
+- copertura: dal `2025-12-18` al `2028-08-24`;
+- tornei distinti: **1.058**;
+- Europa: 428;
+- Americhe: 236;
+- Asia-Pacifico: 223;
+- Africa/Medio Oriente: 160;
+- altre aree: 19;
+- errori del merge geografico: 0.
+
+Sono stati identificati e adottati gli endpoint JSON ufficiali ITF:
+
+- `GetCalendar` per il catalogo;
+- `GetAcceptanceList` per MD/Q/A e tutti i partecipanti;
+- `GetEventFilters` per ricavare gli eventi effettivamente disponibili;
+- `GetDrawsheet` per tabelloni KO/RR, giocatori, incontri e risultati.
+
+Il commit `34787997efd6f7a461877b90057d3b79378d801c` (`Complete official ITF live database engine`) ha:
+
+- eliminato il filtro errato che limitava il matching ai soli profili già marcati `ITF`; ora tutta la rosa Court Watch viene confrontata con le liste ITF;
+- implementato lo schema reale `givenName` + `familyName` e la conversione `M → MD`, `Q → Q`, `A → A`;
+- implementato tabelloni ufficiali singolare/doppio, KO/RR, main/qualifying;
+- applicato il T−1 conservativo ai tabelloni di singolare;
+- reso permanenti e incrementali in R2 i database compressi di partecipanti, giocatori e risultati, mantenendo le generazioni `current`, `backup-1`, `backup-2`;
+- cambiato il cron live da 15 a **14 minuti** con `*/14 * * * *`.
+
+Nota operativa: GitHub cron interpreta `*/14` all'interno di ogni ora (`00, 14, 28, 42, 56`); il passaggio `56 → 00` è quindi di 4 minuti. La concorrenza impedisce sovrapposizioni. È la configurazione richiesta, ma non rappresenta un intervallo matematicamente costante di 840 secondi attraverso il cambio d'ora.
+
+La scansione locale completa delle 1.058 acceptance list ha incontrato risposte anti-bot HTTP 200 non JSON dopo molte richieste concorrenti. Tali risposte sono state correttamente registrate come errore e non come lista vuota; non è stato pubblicato un conteggio falso dei tornei con nostri giocatori. Il conteggio ufficiale va letto soltanto dalla prima generazione GitHub/R2 che supera tutti i 16 shard e la validazione `itf_system_complete`.
+
+Dopo la verifica degli endpoint, il materiale diagnostico temporaneo (`temp-itf-site-diagnostic.yml`, `diagnose-itf-site.mjs`, `itf_site_diagnostic.json`) è stato rimosso da `main` con il commit `961cafca31a4dec636b129366d656f01373815ed`. Il catalogo geografico è stato rigenerato dal bot nel commit `adc0a8adcaff3efe461153ab83c1afb6f255161e`, discendente dal nuovo motore.
+
+### Perimetro definitivo della rosa ITF
+
+L'utente ha precisato che il motore deve cercare soltanto i **23 giocatori titolari**. Il commit `e9bb954820ad4224320bf22442d495feb6eff1a9` esclude automaticamente dal matching ITF i quattro profili presenti in `former-players.json`: Martina Busa, Manuel Natale, Pietro Sala e Niccolò Zanaga. Il database generale può conservarne lo storico, ma nuovi conteggi, MD/Q/A e controlli T−1 riguardano esclusivamente i 23 titolari.
+
+### Separazione backfill/live per superare l'anti-bot
+
+Il commit `17e36f0f7d6a837c0682f10b06e309debc7868ef` separa definitivamente:
+
+- backfill completo e rallentato dal 18/12/2025, eseguito con un solo shard alla volta e pause/retry sulle risposte non JSON;
+- live ogni 14 minuti, limitato alla finestra utile delle acceptance list (−21/+120 giorni) e a risultati/tabelloni attivi o recenti (−35/+7 giorni), con massimo due shard concorrenti;
+- retry progressivi anche sulle risposte anti-bot HTTP 200 non JSON;
+- cancellazione del live precedente quando arriva un ciclo più recente, evitando code e sovrapposizioni.
+
+Il workflow straordinario `.github/workflows/courtwatch-v3-itf-backfill.yml` è stato avviato automaticamente dal commit `4a7a40ee503e81c7a392a5330bcce37b80221731`. Se tutti i 16 shard superano la validazione, pubblica la prima generazione completa su R2 e il commit `Publish complete ITF backfill database`; in caso contrario non sostituisce l'ultima versione valida.
+
+Il primo tentativo risultava ancora sul primo shard perché ogni shard eseguiva consecutivamente sia acceptance sia tutti i tabelloni/risultati. Il commit `3de21be5931142a445d2c510ae81f77ffd575ae6` ha corretto la pipeline: due shard acceptance alla volta; pubblicazione immediata del conteggio verificato tramite commit `Publish verified ITF player tournament count`; solo dopo, fase separata dei risultati con due shard concorrenti. Il nuovo run cancella automaticamente il precedente. Questa separazione riduce il tempo necessario per ottenere il conteggio senza compromettere il database completo successivo.
+
+Poiché anche due shard acceptance richiedevano oltre sei minuti per il primo blocco, il commit `b1ebe6f99bb97807c25373f4e33c5b3550be9d63` ha introdotto il percorso rapido ufficiale `PlayerApi/GetPlayerSearch` + `PlayerApi/GetPlayerActivity`: prima risolve gli ID ITF dei 23 titolari e ricostruisce direttamente la loro attività dal 18/12/2025; solo dopo continua il controllo globale delle acceptance list. Il conteggio rapido usa decine di richieste invece di oltre mille. Il run GitHub Actions associato è `32786909582`; il precedente `32786046775` è destinato alla cancellazione tramite il gruppo di concorrenza.
+
+Il run rapido `32786909582` è terminato con errore controllato alle 22:56:46. `GetPlayerSearch` ha risolto un solo profilo esatto tra i 23 titolari: Martina Danesi, World Tennis ID `800792690`. Per Mattia Garibaldi, Nicholas Scappa e Nikola Nikolaev Kerkenyakov la ricerca è diventata illeggibile dopo l'attivazione dell'anti-bot; per gli altri 19 non è emerso un profilo ITF esatto. Le tre richieste annuali `GetPlayerActivity` di Martina sono risultate illeggibili, quindi lo zero prodotto dal job non è valido e non è stato pubblicato. Controlli web indipendenti confermano almeno tre presenze di Martina dal periodo richiesto: J30 Compiegne, J30 Cuneo e J30 Szentes; questo è un minimo verificato, non ancora il conteggio definitivo.
+
+Il fallimento del job rapido bloccava per dipendenza tutti gli shard acceptance. Il commit `c1e9a7a058a84b0b0074f152746f19f99cab72c7` lo rende diagnostico e non bloccante: se parziale non pubblica un conteggio, ma termina correttamente e lascia proseguire il backfill. Gli shard acceptance sono ora quattro in parallelo con 2,5 secondi di pausa per singolo runner, mantenendo il ritmo aggregato controllato. Il nuovo run attivo è `32787985907`; il run precedente lento `32786046775` risulta cancellato e quello rapido fallito `32786909582` è archiviato.
+
+### Regola ITF anticipo di 2 giorni per mappa e T−1
+
+Il commit `e0f18abc785ad379485856f5c764582675cc3b28` aveva inizialmente interpretato in modo errato la regola come `+2 giorni`. Il commit correttivo `ece3c50cb5109e70b0c8613fd7804e1728ebc204` (`Correct ITF start offset to two days earlier`) stabilisce la regola definitiva richiesta dall'utente:
+
+- nella mappa finale, soltanto la data iniziale ITF è visualizzata come `data ufficiale di inizio − 2 giorni`;
+- la data finale resta identica alla data ufficiale ITF;
+- `officialStartDate` conserva nel record della mappa la data iniziale originale;
+- il database sorgente e le relazioni storiche mantengono entrambe le date ufficiali senza alterazioni;
+- il controllo T−1 ITF usa come riferimento la nuova data iniziale anticipata di 2 giorni, quindi scatta il giorno precedente a quella data;
+- FITP e Tennis Europe non sono interessati dalla regola.
+
+Verifiche eseguite: `node --check` su `entries-engine.mjs` e `verify-itf-draws.mjs`, più `git diff --check`, tutte superate.
+
+## 15. Aggiornamento 25 agosto 2026 — finestra mobile uniforme FITP, Tennis Europe e ITF
+
+Il commit `2485c83c29f753e8a19a664f07a9c83f8edc19fb` (`Align FITP and ITF rolling windows with permanent history`) uniforma i tre circuiti al modello già attivo su Tennis Europe.
+
+- finestra live: da `oggi − 240 giorni` a `oggi + 730 giorni`;
+- a ogni cambio di giornata il limite passato avanza di un giorno e quello futuro aggiunge un giorno;
+- uscire dalla finestra live significa soltanto non essere più interrogato: nessun torneo viene cancellato;
+- storico permanente minimo invariato dal `18/12/2025`;
+- FITP conserva catalogo/partecipanti nel proprio archivio permanente e nelle generazioni R2;
+- ITF conserva catalogo, relazioni giocatore-torneo, giocatori e risultati nel database storico/R2; i record fuori finestra vengono marcati non correnti, non eliminati;
+- entrambi i merge bloccano la pubblicazione se gli shard non hanno la stessa finestra, se la finestra non corrisponde al giorno corrente o se la continuità col catalogo valido precedente scende sotto la soglia;
+- Tennis Europe era già configurato con la stessa finestra e non è stato modificato.
+
+La fase acceptance del backfill ITF è terminata nel commit automatico `879ef955455079fe4646536444e5ab952920b1c0`: 1.058 tornei controllati, stato `itf_acceptance_complete`, 1 entry dei 23 titolari, 0 errori. La fase results shard completa è ancora in corso ed è necessariamente più lunga perché acquisisce tabelloni, giocatori, incontri e risultati storici di tutti i tornei; i successivi cicli live restano limitati alla finestra attiva/recente.
+
+Verifiche della modifica: sintassi Node dei sei moduli, `git diff --check` e controllo matematico `240/730` superati. La pubblicazione ha modificato soltanto i sei file dei motori/cataloghi e non ha riavviato il backfill results già in corso.
+
+### Accelerazione del backfill risultati ITF
+
+Il run `32787985907` aveva completato tutti i 16 acceptance shard e pubblicato il conteggio, ma la fase risultati eseguiva soltanto due shard contemporaneamente: al controllo risultavano attivi `result-shard (0)` e `(1)`, mentre gli altri erano in coda. Il commit `72291961416a00375fdd580dbc001b5ae5dcbc1e` (`Accelerate resumable ITF results backfill`) sostituisce questa coda con un workflow dedicato:
+
+- non ripete l'acceptance: riutilizza gli artifact già validi del run `32787985907`;
+- divide i 1.058 tornei in 32 result shard più piccoli;
+- esegue fino a 8 shard in parallelo;
+- mantiene un ritardo di 2,4 secondi per runner, retry anti-bot e timeout per singolo shard;
+- usa lo stesso gruppo di concorrenza del vecchio backfill, quindi la nuova esecuzione sostituisce automaticamente quella lenta;
+- `maintain-itf-database.mjs` non assume più esattamente 16 file risultati, ma acquisisce dinamicamente tutti gli shard validi presenti;
+- la pubblicazione finale resta atomica e avviene soltanto dopo merge acceptance, T−1, database, validazione e salvataggio R2.
+
+Verifiche: sintassi Node, parsing YAML e `git diff --check` superati. Il workflow rapido è attivato dal commit stesso.
+
+#### Correzione dei falsi fallimenti results shard
+
+Il primo run del workflow rapido, `32790482361`, ha mostrato che la velocità non era la causa del fallimento. Esempi verificati dai log:
+
+- shard 0: 36 tornei, 784 giocatori, 1.149 incontri, 21 errori di singolo evento;
+- shard 3: 22 tornei, 371 giocatori, 584 incontri, 25 errori di singolo evento;
+- shard 4: 24 tornei, 407 giocatori, 467 incontri, 22 errori di singolo evento.
+
+Lo script confrontava erroneamente il numero di errori dei singoli tabelloni/eventi con il numero dei tornei dello shard e terminava con exit code 2, pur avendo acquisito centinaia di giocatori e incontri. Il commit `71b0ed3d53a0575a9b7d1951ea06738572c66371` (`Fix ITF results shard failure classification`) corregge il criterio:
+
+- soltanto l'impossibilità di leggere `GetEventFilters` per troppi tornei è bloccante;
+- un singolo tabellone non disponibile viene registrato in una `retryQueue`, senza scartare lo shard valido;
+- output e audit passano allo schema versione 3 con `drawsRead`, `blockingTournamentFailures`, limite bloccante e coda di retry;
+- il workflow rapido si riattiva anche quando cambia `discover-itf-results-shard.mjs`, sostituendo automaticamente il run basato sulla soglia errata.
+
+La protezione ultima-versione-corretta resta attiva: la pubblicazione finale richiede ancora che la soglia degli errori realmente bloccanti sia rispettata e che database/R2 superino la validazione.
+
+### Regola ITF dopo la scomparsa dell'acceptance list
+
+È stato chiarito che, diversamente da Tennis Europe, a T−1 l'acceptance list ITF può scomparire e non essere più consultabile. La scomparsa della lista non dimostra né la presenza né l'assenza del giocatore nel torneo.
+
+L'anomalia Cuneo/Palermo è stata ricostruita con precisione:
+
+- la versione precedente conteneva Martina Danesi a `J30 Cuneo` (`J-J30-ITA-2026-002`) come seed ufficiale;
+- il commit `879ef955455079fe4646536444e5ab952920b1c0` ha rigenerato `source_itf_entries.json` dalle sole acceptance list correnti;
+- Cuneo, già oltre la fase acceptance, non era più restituito e quindi è scomparso;
+- `J100 Palermo`, ancora futuro e con acceptance list disponibile, è stato invece trovato come `A`;
+- Cuneo è rimasto nella sorgente FITP grezza, ma è correttamente escluso dal calendario FITP perché è un torneo ITF.
+
+Su istruzione esplicita dell'utente, Cuneo non deve essere ripristinato da seed o vecchie entry: deve essere trovato nel tabellone ufficiale, altrimenti non deve comparire.
+
+Il commit `3f468503edc34002454d6408ffd91a8ff4f86023` (`Discover ITF entries from official draws after T-1`) introduce `src/v3/discover-itf-draw-entries.mjs`:
+
+- legge soltanto i tabelloni/risultati ufficiali già acquisiti nei result shard;
+- confronta tutti i nomi dei tabelloni con i 23 titolari e i rispettivi alias esatti;
+- crea una entry `draw_confirmed` soltanto quando il giocatore è realmente presente;
+- non ripristina automaticamente acceptance scomparse o entry storiche;
+- se il giocatore non è trovato nel tabellone, non crea alcuna entry;
+- viene eseguito sia nel backfill risultati sia nel motore live, prima della verifica T−1 e della costruzione del database/calendario;
+- produce `source_itf_draw_entry_discovery_audit.json` con shard letti, incontri, nomi e giocatori trovati.
+
+Nuovi run attivati dal commit: fast results backfill `32791934553` e live ITF `32791934739`.
+
+### Regola definitiva ITF: stesso comportamento Tennis Europe
+
+Il commit `67186bd65335353f9914bda78b762e729d43a5c5` (`Apply historical and live ITF draw scan rules`) separa i due percorsi:
+
+- backfill storico una tantum: analizza tutti i tabelloni ITF ufficiali dei tornei dal `18/12/2025` fino al giorno corrente, perché le acceptance list dei tornei conclusi non sono più disponibili;
+- motore live ogni 14 minuti: interroga i tabelloni soltanto dei tornei nei quali uno dei 23 titolari era stato precedentemente trovato in una acceptance list ufficiale;
+- i bersagli live vengono salvati automaticamente in `history/itf_draw_target_db.json`; non esistono seed o ripristini manuali per Cuneo o altri tornei;
+- il backfill continua a creare una relazione soltanto quando il giocatore viene realmente trovato in un tabellone ufficiale.
+
+Il chiarimento successivo stabilisce che la macchina decisionale ITF deve essere identica a Tennis Europe. La sola differenza è tecnica: ITF rimuove dal sito l'acceptance list quando comincia la pubblicazione dei tabelloni, quindi CourtWatch ne conserva localmente l'ultima copia ufficiale valida. Il commit correttivo `3b38527f8023d3247a649f7c54327f36a994f593` (`Match ITF T-1 decisions to Tennis Europe`) applica la regola definitiva:
+
+- appena il giocatore compare nell'acceptance, il torneo compare in mappa con etichetta `MD-n`, `Q-n` oppure `A-n`;
+- da T−1, se il giocatore compare in almeno un tabellone singolare o gruppo/girone ufficiale compilato, resta permanentemente in mappa e l'etichetta acceptance viene rimossa;
+- l'assenza dalla sola qualificazione non consente la rimozione;
+- se una fase è compilata ma un'altra fase rilevante è ancora vuota, mancante o illeggibile, il torneo resta in mappa con l'ultima etichetta acceptance e la decisione rimane in attesa;
+- la rimozione è consentita soltanto dopo una fase finale singolare compilata, assenza del giocatore da tutte le fasi compilate e assenza di sezioni rilevanti ancora vuote o illeggibili;
+- lo stato (`pending`, `confirmed`, `removed`) e l'ultima acceptance ufficiale vengono conservati nel database bersagli e pubblicati con ogni ciclo live.
+
+Verifiche eseguite: sintassi Node dei moduli merge/verifica, parsing YAML dei workflow live/backfill e `git diff --check`, tutte superate. Il commit correttivo sostituisce automaticamente il precedente run live tramite il gruppo di concorrenza.
+
+### Revisione obbligatoria prima della pubblicazione ITF
+
+Il controllo del run live `32792464234` ha dimostrato che gli shard acquisivano dati reali: lo shard 0 ha letto 32 tornei, 4 acceptance list e 658 partecipanti. Cinque richieste hanno restituito pagine anti-bot non JSON. Lo shard le classificava correttamente come retryable e terminava con successo, ma il merge bloccava erroneamente qualsiasi stato `partial`, anche sotto la soglia ammessa.
+
+Il commit `75904f58ee154141ae2ba36b8ec67211886e5560` (`Align ITF acceptance merge retry thresholds`) uniforma il merge alla stessa soglia degli shard: gli errori entro `max(5, 15% dei tornei)` vengono registrati come warning/retry e non bloccano il database; soltanto il superamento della soglia è fatale.
+
+Su richiesta dell'utente, nessun nuovo dato ITF deve essere pubblicato prima di aver comunicato l'elenco dei tornei trovati. Il commit `9c73e39c0a6260b7a079f1e301048fc454d3079f` (`Require ITF tournament review before data publication`) trasforma quindi entrambe le pipeline in modalità revisione:
+
+- live e backfill continuano acquisizione, merge, verifica T−1, costruzione e validazione del database candidato;
+- sono disabilitati il caricamento R2 e il commit automatico dei dati nell'app;
+- ogni pipeline carica un artifact di revisione contenente entry, audit dei tabelloni, relazioni giocatore-torneo e diagnostica;
+- l'elenco dei tornei candidati deve essere estratto dall'artifact e comunicato all'utente prima della successiva pubblicazione;
+- i nuovi run di revisione sono `32792867960` (live) e `32792867944` (backfill storico); i gruppi di concorrenza sostituiscono i run precedenti.
+
+Verifiche: parsing YAML, assenza di comandi `R2 publish`/`git push` nei due workflow e `git diff --check`, tutte superate.
+
+### Eliminazione del falso fallimento acceptance shard
+
+Nel run di revisione live `32792867960`, lo shard 1 ha acquisito 36 tornei, 7 liste pubblicate, 1.299 partecipanti e 1 entry dei titolari. Sei richieste hanno restituito una pagina anti-bot non JSON; il vecchio limite era `max(5, 15%) = 5,4`, quindi la sesta risposta ha causato exit code 2 nonostante l'acquisizione sostanziale fosse valida.
+
+Il commit `61af12884ef5682783e3d2c9fbdf2a4d607f67d5` (`Retry ITF acceptance misses without false shard failures`) introduce lo schema acceptance shard versione 3:
+
+- le singole risposte anti-bot/API irrisolte dopo i retry interni entrano in `retryQueue`;
+- uno shard con partecipanti reali non fallisce per poche richieste irrisolte;
+- il blocco resta possibile soltanto in caso di collasso quasi totale: almeno il 90% dei tornei fallito e zero partecipanti acquisiti;
+- il merge tratta la retry queue come warning e blocca soltanto shard esplicitamente `blocked` o artifact mancanti;
+- nessuna decisione T−1 viene presa usando un tabellone mancante, e la modalità revisione continua a impedire qualsiasi pubblicazione automatica.
+
+Il nuovo run live sostitutivo è `32793172919`. Il backfill storico resta separato e non presentava shard falliti al momento della correzione.
+
+### Completamento result shard e correzione della review
+
+Il backfill di revisione `32792867944` ha mostrato un secondo falso fallimento. Lo shard risultati 0 aveva acquisito 19 tornei, 30 tabelloni, 723 giocatori e 1.043 incontri; 13 chiamate `GetEventFilters` erano finite nella retry queue. La precedente soglia lo marcava comunque `blocked`, causando il fallimento del job pur in presenza di un artifact consistente.
+
+La review live `32793172919` aveva invece completato con successo tutti i 16 shard. Il merge aveva elaborato 444 tornei, 15.651 partecipanti e 1 entry dei titolari, ma `maintain-itf-database.mjs` accettava soltanto la stringa esatta `itf_acceptance_complete` e rifiutava il nuovo stato valido `itf_acceptance_complete_with_retryable_errors`.
+
+Il commit `b5cd79ae6b074e3c31fd2324ea05e9a5e3a58c70` (`Complete ITF result shards and review validation`) corregge entrambi i punti:
+
+- un result shard con incontri reali viene completato e conserva le richieste irrisolte nella retry queue;
+- il blocco resta soltanto per collasso quasi totale: zero incontri e almeno il 90% dei tornei senza `EventFilters`;
+- `maintain-itf-database.mjs` accetta tutti gli stati che iniziano con `itf_acceptance_complete`, ma continua a rifiutare gli stati realmente incompleti o bloccati;
+- i nuovi run puliti sono `32794205080` (live) e `32794205074` (backfill storico);
+- la modalità review resta attiva: nessuna scrittura su R2, database pubblicato o mappa prima dell'elenco comunicato all'utente.
+
+Verifiche: sintassi Node e `git diff --check` superati.
+
+### Decisione architetturale: backfill storico separato dal motore periodico
+
+Il 25/08/2026 è stato confermato il punto 6 della strategia ITF: il recupero storico dal 18/12/2025 diventa un processo separato, finito, persistente e riprendibile. Non deve più essere eseguito nel ciclo ITF ogni 14 minuti.
+
+Il motore periodico resta dedicato ai tornei correnti e futuri e, in fase T−1, controlla i tabelloni soltanto dei tornei nei quali uno dei 23 titolari era stato trovato nell'acceptance list. Il backfill storico conserva un checkpoint per ogni torneo/sezione, non ripete dati già acquisiti e termina soltanto quando ogni sezione è classificata come popolata oppure definitivamente verificata; challenge, HTML anomalo e risposte illeggibili restano pendenti e non vengono trasformati in assenze.
+
+Al momento della decisione, nel lotto precedente di 16 tornei risultano 10 tornei completamente risolti e 6 tornei con una sola sezione ancora illeggibile: J-J100-EGY-2026-001, J-J100-EGY-2026-003, J-J100-ESP-2026-005, J-J100-FIN-2026-001, J-J100-GBR-2026-002 e J-J100-GBR-2026-004. La coda automatica completa `32805787865` è in esecuzione con due worker.
+
+### Rimozione immediata dei withdrawn ITF
+
+Il 25/08/2026 è stata applicata la regola richiesta: quando la fonte ufficiale ITF indica esplicitamente un titolare come `Withdrawn`, la coppia giocatore-torneo viene esclusa dalle entry visibili e quindi rimossa dalla mappa. L'assenza momentanea dalla acceptance list non equivale a withdrawn e continua a essere gestita dalla macchina a stati T−1.
+
+La discovery acceptance ora conserva separatamente i withdrawn espliciti, inclusi i codici W/WD/WDR e gli stati testuali di ritiro. Il merge assegna `drawDecision: removed` e `removalReason: withdrawn`, impedendo che una vecchia acceptance o una precedente conferma in tabellone ripubblichi il torneo. Lo storico partecipanti conserva il ritiro come dato di audit. Commit remoti: `3a9e7445cc28639b41c5e0d8ae2ead8c24fedb4f` e `e67d6272786be8a6be5a4a1e2405a9fc9fbc3f5a`.
+
+### Prova integrazione acquisitore persistente
+
+È stata verificata la base già presente nel repository: CourtWatch dispone già di cache persistente ITF su R2 per partecipanti, giocatori e risultati tramite `src/v3/itf-r2-cache.sh`, e il workflow live possiede già la configurazione dei secret R2. Manca invece un servizio browser persistente che acquisisca e depositi in R2 le risposte `GetEventFilters` e `GetDrawsheet`; attualmente `itf-common.mjs` le richiede ancora direttamente da GitHub Actions.
+
+Il tentativo isolato di verificare l'endpoint ITF con il browser cloud disponibile nella sessione è stato bloccato dalla policy URL del browser prima della navigazione; non è stato effettuato alcun tentativo di aggiramento e nessun dato o file della mappa è stato modificato. Per completare la prova serve quindi un endpoint del browser persistente/VPS, oppure l'accesso alla relativa infrastruttura, da collegare come fonte opzionale cache-first.
+
+### Ripristino del percorso di acquisizione ITF esistente
+
+Il 25/08/2026 i run live `32835228694` e `32841246368` sono falliti prima della scansione per un errore di sintassi introdotto nell'adattatore opzionale del browser persistente: una regex non valida in `itf-common.mjs`. Il guasto non era causato da ITF o Imperva; impediva a Node di caricare il modulo e faceva fallire tutti i 16 acceptance shard.
+
+Su richiesta di mantenere l'architettura esistente, l'adattatore opzionale è stato rimosso dal percorso operativo e `request()` è stato ripristinato alla lettura diretta precedente. Sono state rimosse anche le variabili opzionali dal workflow live. Commit: `d96ea58ea01b98f5332ef690fd7658bb15735166` e `2ddb451908b7bfbba30d4bc75ab430d4fc25f715`. Il run sostitutivo è stato avviato automaticamente; resta distinto il limite strutturale delle challenge Imperva sui singoli endpoint.
+
+### Sessione cookie ITF modellata sulla soluzione Tennis Europe
+
+È stato confrontato il motore Tennis Europe con ITF. Tennis Europe esegue bootstrap della sessione, mantiene un cookie jar, segue i redirect e riutilizza i cookie nei tabelloni; ITF effettuava invece richieste API indipendenti senza una sessione preventiva.
+
+È stato aggiunto un diagnostico isolato, senza pubblicazione. Il primo run `32856881915` su Palermo ha acquisito i cookie `ARRAffinity`, `ARRAffinitySameSite`, `nlbi_178373`, `visid_incap_178373` e `incap_ses_*`; `GetEventFilters` ha restituito JSON valido ma zero combinazioni, correttamente, perché Palermo è ancora futuro e i tabelloni non sono pubblicati.
+
+Il secondo run `32857036648` su J100 Punta Cana concluso è riuscito completamente: pagina torneo e redirect letti nella stessa sessione, 5 cookie conservati, `GetEventFilters` JSON da 2.226 byte con 6 combinazioni e `GetDrawsheet` JSON da 31.756 byte. Questo dimostra che il modello di sessione già usato per Tennis Europe è applicabile agli endpoint ITF.
+
+Il commit `a032731306c877126174fa82c008486d6c3b0da5` integra nel motore ITF il bootstrap della pagina torneo, cookie jar condiviso nel processo, redirect manuali, cookie Imperva/Azure, Referer e intestazioni XHR coerenti prima di `GetEventFilters` e `GetDrawsheet`. La logica T−1, le decisioni di mappa e il database non cam…352 tokens truncated…e il matcher con `ITF_HISTORICAL_T_MINUS_ONE=1`, poi aggiorna tramite `maintain-itf-database.mjs` gli stessi database `itf_player_tournament_db`, giocatori e risultati usati dal motore T−1. Nessuna pubblicazione automatica. Run sostitutivo: `32862536274`.
+- Esito run `32862536274`: tutti i 32 shard hanno completato con successo, ma la review ha correttamente fallito perché ha contato 720 retry. Diagnosi su shard 0: 19 tornei assegnati, 1 letto e 18 `GetEventFilters_incapsula_challenge`; il cookie jar globale veniva riutilizzato tra tornei diversi.
+- Commit `a3488f2cb516c20f8ff6f6511524649f6a0de439`: sessione Imperva isolata per torneo (`ITF_COOKIE_JAR.clear()` all'inizio del bootstrap), fino a tre bootstrap completi per `GetEventFilters`, propagazione della `sourceUrl` nelle combinazioni e nuovo bootstrap automatico anche durante `GetDrawsheet` se ricompare la challenge.
+- Commit `eba74b37cd1e272754f891cee445953f2c12ee6a`: aggiunto `src/v3/itf-common.mjs` ai trigger del backfill pulito e avviata la nuova ricostruzione completa. Run: `32863254569`.
+- Nel run `32863254569`, 31 shard su 32 hanno completato; lo shard 4 è rimasto attivo anormalmente a lungo. Lo shard 4 contiene 16 tornei nella finestra, di cui 14 già conclusi e 2 iniziati il 24 agosto ancora in corso.
+- Per evitare di ripetere i 31 shard completati, commit `d74c719c5acf4cc53e47af696d1288403dabd839`: nuovo workflow di recupero `courtwatch-v3-itf-shard4-rescue.yml`, che divide la partizione 4 in 16 sottopartizioni indipendenti (`TOTAL=512`) con timeout individuale di 20 minuti, usa soltanto tornei già conclusi fino al 23 agosto, riutilizza gli artifact degli altri shard e richiede zero retry nella review complessiva. Run: `32864756948`.
+- Riscrittura strutturale richiesta: aggiunti `scan-itf-history-tournament.mjs`, `run-itf-history-worker.mjs` e `merge-itf-history-tournaments.mjs`. Ogni torneo concluso dal 18 dicembre 2025 è ora un'unità persistente indipendente con file, stato, sezioni, match, retry e timeout propri; il worker continua anche se una singola unità fallisce o scade. Il merge confronta gli artifact con l'intero catalogo atteso e rifiuta la generazione per qualunque torneo mancante o incompleto.
+- Nuovo workflow permanente `.github/workflows/courtwatch-v3-itf-history-engine.yml`: 32 worker, massimo 16 concorrenti, subprocess separato per torneo, timeout individuale 240 secondi, review comune con matcher dei 23 titolari e aggiornamento dello stesso database ITF T−1. Commit finali `7a147c8`, `d788b70`, `7722460`, `1a40dd8`, avvio `805a295c3bf196ea9e9b85324ace0bab8d55aebe`; run `32865143864`.
+- Il run `32865143864` ha dimostrato che un subprocess per torneo non isola l'IP: il primo torneo del runner passa e i successivi vengono bloccati. Test causale su tre runner distinti (`32865738560`): Messico e Sudafrica completi; Portogallo legge 5 tabelloni su 6 e viene bloccato sull'ultimo `G-D-M-KO`. Ripetizione con pacing 5 secondi (`32865920202`) fallita sullo stesso sesto tabellone: la soglia è per sessione/IP, non per velocità.
+- Aggiunto `scan-itf-history-event.mjs` e isolato soltanto il tabellone residuo portoghese `G-D-M-KO` su un nuovo runner. Run `32866118162` completato con successo. Causa e soluzione dimostrate: prima unità per torneo su runner isolato; ogni tabellone residuo viene ritentato singolarmente su un nuovo runner, senza ripetere quelli già acquisiti.
+- Percorso definitivo chiarito: l'obiettivo corrente è contare i tornei ITF nei quali compaiono i 23 titolari; gli ordini di gioco sono esplicitamente rinviati. La pipeline viene separata in inventario tornei/tabelloni, acquisizione indipendente di ogni tabellone, salvataggio completo di giocatori/incontri/risultati, matcher e conteggio.
+- Implementata la base della pipeline a due fasi: `inventory-itf-history-tournament.mjs` produce l'inventario ufficiale degli eventi per torneo; `build-itf-history-draw-queue.mjs` confronta l'inventario con tutti i tornei conclusi dal 18 dicembre 2025 e costruisce task identificati `competitionId__event`; `acquire-itf-history-draw-task.mjs` acquisisce un singolo tabellone e salva giocatori, incontri, punteggi e risultati normalizzati. Commit `cdb2194`, `3a7fbd2`, `8a8f1e3`.
+- Avviata la fase inventario completa: `inventory-itf-history-tournament.mjs` supporta indici deterministici sull'elenco ordinato dei tornei conclusi (commit `3c143a4`). Il workflow `courtwatch-v3-itf-history-inventory.yml` distribuisce fino a 800 tornei in quattro onde da 200 job, un torneo per runner, massimo 32 concorrenti per onda; la review unisce gli inventari e genera `itf_history_draw_queue.json`. Commit di avvio `afdda23e4dca0b0257b2a399a334030b8b4909c1`, run `32868353005`.
+- Chiarimento sul consumo: l'utente intende minimizzare i crediti della chat, non i costi dei runner GitHub. L'architettura del motore deve quindi restare quella tecnicamente più affidabile (inventario, acquisizioni isolate per tabellone, merge completo), senza compromessi funzionali per ridurre GitHub Actions. Durante le attese l'assistente deve fermarsi, evitare polling ripetuti e indicare all'utente quale run/job e quali valori verificare. `acquire-itf-history-draw-task.mjs` supporta indici di coda (commit `0b324b8`).
+- Verifica del run inventario `32868353005`: tutti gli 800 job di inventario risultano completati con successo, ma il job finale di review/merge non è stato creato dal workflow matrice ed il run padre è rimasto bloccato. Non è necessario ripetere gli 800 inventari.
+- Creato un workflow indipendente di sola unione, `.github/workflows/courtwatch-v3-itf-inventory-merge.yml`, che scarica gli 800 artifact dal run `32868353005`, esegue `build-itf-history-draw-queue.mjs` e salva `itf-history-draw-queue`. Commit iniziale `3d4effa551d714b80797412e8ffc7a632b7990cf`; commit di attivazione `66b6775f7654477909588b38d67eedaaa3f62e85`.
+- Al primo controllo dopo il commit di attivazione GitHub aveva registrato soltanto il deploy Pages e non ancora il workflow di merge. Per limitare il consumo di crediti ChatGPT non viene eseguito polling: verificare nella scheda Actions la comparsa di `Court Watch v3 ITF inventory merge`; al termine annotare i cinque valori `expected`, `inventoried`, `missing`, `retry`, `tasks`.
+- Poiché il push del file workflow non ha creato alcuna esecuzione, il trigger è stato sostituito con `workflow_run` sulla conclusione di `pages build and deployment` (commit `95331b50d2e7caba3ec91c7d468379eb96e94f8b`). Gli 800 inventari prodotti dal run `32868353005` restano validi e non vengono ripetuti; manca ancora il merge necessario a costruire la coda dei tabelloni, quindi non è ancora disponibile il conteggio dei tornei con i 23 titolari.
+- Correzione dello stato: il primo merge indipendente era in realtà partito e completato con successo nel run `32869802974`, job `merge`, step `Run node src/v3/build-itf-history-draw-queue.mjs`. Valori: `expected=682`, `inventoried=599`, `missing=83`, `retry=0`, `tasks=3808`. L'inventario non è quindi ancora completo: gli 83 tornei mancanti devono essere acquisiti prima di avviare la lettura dei 3.808 tabelloni.
+- Causa degli 83 mancanti: i job a indice hanno usato la fotografia del catalogo disponibile nel commit dell'inventario, contenente 599 tornei eleggibili; il merge successivo ha usato il catalogo aggiornato, contenente 682 tornei. La differenza è esattamente 83. Il difetto è quindi l'uso di indici su un catalogo mobile, non un errore di lettura dei 599 inventari prodotti.
+- Correzione: salvato l'elenco esatto dei 83 `competitionId` in `src/v3/itf-history-missing-inventory.json` (commit `056a6ce568391723668465d210fedd2e51261e94`) e creato il workflow `courtwatch-v3-itf-missing-inventory.yml` (commit `f847e19fd528b3d9aeea35c07019423d2b51fb67`). Ogni ID viene inventariato su un runner indipendente; la review fonde i 599 artifact esistenti con gli 83 nuovi e fallisce salvo `missing=0` e `retry=0`. Run avviato: `32870688827`.
+- Linea guida permanente richiesta dall'utente: davanti a errori, dati mancanti o workflow bloccati non limitarsi a rilanciare o aggirare il singolo caso. Occorre identificare e documentare la causa verificata, correggere il meccanismo generale che l'ha prodotta, quindi rieseguire e accettare l'esito soltanto dopo una verifica completa. Retry e recuperi sono strumenti di acquisizione, non sostituti della diagnosi.
+- Review del recupero certificata nel run `32870688827`, job `review` `97877244559`: `expected=682`, `inventoried=682`, `missing=0`, `retry=0`, `tasks=4291`. L'inventario di tutti i tornei conclusi nella finestra è completo. La fase successiva deve acquisire e verificare tutti i 4.291 tabelloni dichiarati prima del matcher dei 23 titolari.
+- Regola T−1 live corretta su indicazione dell'utente: per un torneo futuro non si cercano tutti i 23 titolari nei tabelloni. Si cercano esclusivamente i nostri giocatori precedentemente salvati nell'acceptance list di quello specifico torneo. La ricerca sui 23 resta valida soltanto per lo storico concluso, dove le acceptance non sono più disponibili.
+- Commit `85200cd432a454326fec0ac3a8ab7dd17054edb9`: `discover-itf-draw-entries.mjs` carica `history/itf_draw_target_db.json`, costruisce l'insieme delle relazioni acceptance attive e, in modalità live, scarta ogni match giocatore/torneo privo di tale relazione. Target rimossi o withdrawn non sono idonei; `ITF_HISTORICAL_T_MINUS_ONE=1` mantiene esplicitamente la scansione di tutti i 23. Avviato il controllo live run `32871533186`.
 - Distinzione architetturale definitiva: lo storico ITF è un backfill una tantum, usato esclusivamente per ricostruire tornei, tabelloni, giocatori e risultati dal 18 dicembre 2025 e inizializzare il database in assenza delle vecchie acceptance list. Non è il motore operativo permanente. Il motore vero è quello live rivolto ai tornei futuri: scoperta con finestra mobile, acceptance list dei nostri giocatori, inventario dei tabelloni al T−1, acquisizione indipendente dei singoli tabelloni e decisione per ciascun giocatore precedentemente presente in acceptance.
 - Sequenza definitiva motore ITF live/futuro: finestra mobile; catalogo tornei; acceptance dei soli nostri giocatori con etichetta MD/Q/A; al T−1 inventario di tutti i tabelloni/gruppi dichiarati; acquisizione indipendente di ogni tabellone; ricerca limitata ai giocatori salvati in acceptance per quel torneo; conferma senza etichetta se presenti; stato pendente finché esistono sezioni vuote/non pubblicate; rimozione solo per withdrawn o assenza dopo pubblicazione completa. Frequenza prevista: 14 minuti.
 - Avviata la fase storica successiva all'inventario. Commit `7ac34fc06d134d01a952004ede0a96522a1394ee`: ogni acquisizione di tabellone salva sempre un artifact con stato `complete` oppure `retry`, così la causa di una mancata lettura resta identificabile e può essere recuperata in modo mirato senza ripetere i tabelloni riusciti.
@@ -769,8 +1540,17 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 
 ## Revisione 2026-09-04.135 — primo account e accesso privato
 
-- Predisposto l'accesso Cloudflare One-Time PIN limitato a `federico181099@gmail.com` per i percorsi Worker `/app` e `/app-api`; gli endpoint tecnici usati dai motori restano separati e non vengono interrotti.
+- Predisposto l'accesso Cloudflare Access limitato a `federico181099@gmail.com` per i percorsi Worker `/app` e `/app-api`; gli endpoint tecnici usati dai motori restano separati e non vengono interrotti.
 - Aggiunta la migrazione conservativa `0012_single_account_ownership.sql`: crea l'utente Federico, collega i giocatori applicativi correnti al suo `user_id` e copia le analisi preesistenti nella nuova tabella per-utente senza cancellare le tabelle originali.
 - Il Worker serve la pagina protetta su `/app`, ricava l'identità esclusivamente dall'header certificato da Cloudflare Access e filtra snapshot, stato analisi e CRUD analisi in base all'utente attivo.
 - L'interfaccia usa gli endpoint protetti per dati e analisi; la password separata delle analisi è rimossa. La pagina GitHub Pages reindirizza al percorso autenticato del Worker.
-- La configurazione Access è idempotente e crea due applicazioni self-hosted con policy `Federico only`, sessione di 24 ore e verifica via codice monouso email.
+- La configurazione Access è idempotente e crea due applicazioni self-hosted con policy `Federico only` e sessione di 24 ore.
+
+## Revisione 2026-09-05.136 — collaudo sicurezza, proprietà dati e consumo
+
+- Verifica esterna senza sessione completata: una richiesta a `/app` viene intercettata da Cloudflare Access e non riceve HTML o dati applicativi.
+- Il workflow D1 contiene ora gate bloccanti che richiedono esattamente l'account Federico attivo, parità completa tra `app_players` e collegamenti `user_app_players`, e parità completa tra analisi legacy e `user_match_analyses`.
+- Tutte le risposte di sessione, snapshot personale e analisi protette usano `Cache-Control: no-store`; i dati per utente non sono più candidati alla cache pubblica condivisa.
+- Eliminato il polling client ogni 30 secondi. L'app carica i dati all'apertura e ricarica soltanto al ripristino reale di una pagina dalla back-forward cache; non esegue richieste periodiche in background.
+- Nessun provider AI o chiamata LLM è presente nel client o nel Worker dell'app. I workflow dati restano schedulati indipendentemente dalla navigazione dell'utente.
+- La verifica autenticata nel browser cloud è impedita dalla challenge anti-bot del login Cloudflare; la completezza dei dati è quindi certificata dai gate D1 e dal filtro per `user_id`, mentre il collaudo visuale autenticato resta da confermare fuori dal browser cloud.
