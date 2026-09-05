@@ -37,7 +37,7 @@ jobs:
           configure_path() {
             local name="$1" domain="$2" app_id policy_count payload updated
             app_id=$(jq -r --arg domain "$domain" '.result[] | select(.domain==$domain) | .id' <<<"$apps" | head -1)
-            payload=$(jq -n --arg name "$name" --arg domain "$domain" --arg otp "$otp_id" '{name:$name,domain:$domain,type:"self_hosted",session_duration:"4w",auto_redirect_to_identity:true,allowed_idps:[$otp]}')
+            payload=$(jq -n --arg name "$name" --arg domain "$domain" --arg otp "$otp_id" '{name:$name,domain:$domain,type:"self_hosted",session_duration:"720h",auto_redirect_to_identity:true,allowed_idps:[$otp]}')
             if [ -z "$app_id" ]; then
               created=$(curl --fail --silent --show-error "${auth[@]}" -X POST --data "$payload" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/apps")
               app_id=$(jq -er '.result.id' <<<"$created")
