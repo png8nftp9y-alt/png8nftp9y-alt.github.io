@@ -1736,3 +1736,11 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - I colori FITP restano invariati. Il badge maschile Tennis Europe torna alla prima versione azzurra (`#dbeeff` con testo `#1769aa`), senza bordo; il badge femminile usa un rosa leggero (`#fce7f3` con testo `#9d174d`), senza bordo.
 - Sotto la testata è ora riservato permanentemente uno spazio vuoto per il menu account. L'agenda rimane quindi nella stessa posizione sia con menu chiuso sia con menu aperto; il Logout appare in quello spazio, senza sovrapporsi ai contenuti e senza farli scivolare.
 - Cache aggiornate a `v3.js?v=2026090523` e `v3.css?v=2026090511`.
+
+
+## Revisione 2026-09-05.157 — scambio colori FITP e maschile Tennis Europe
+
+- Corretto il fraintendimento della revisione .156: la logica dei circuiti non cambia.
+- Sono state invertite esclusivamente le palette dei badge: FITP usa ora l'azzurro precedentemente assegnato al badge maschile Tennis Europe (`#dbeeff` / `#1769aa`); il badge maschile Tennis Europe usa la precedente palette FITP (`--blueSoft` / `--blue`).
+- Il badge femminile Tennis Europe resta rosa leggero e senza bordo.
+- Cache CSS aggiornata a `v3.css?v=2026090512`.
