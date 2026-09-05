@@ -1,0 +1,70 @@
+name: Court Watch authenticated CRUD smoke
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Court Watch Cloudflare D1 and app API']
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: courtwatch-authenticated-crud-smoke
+  cancel-in-progress: false
+
+jobs:
+  crud:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_ACCESS_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Create isolated ephemeral Access identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID"
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID"
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json")
+          token_response=$(curl --fail --silent --show-error "${auth[@]}" -X POST --data '{"name":"CourtWatch CI ephemeral ${{ github.run_id }}","duration":"1h"}' "$api/access/service_tokens")
+          token_id=$(jq -er '.result.id' <<<"$token_response")
+          client_id=$(jq -er '.result.client_id' <<<"$token_response")
+          client_secret=$(jq -er '.result.client_secret' <<<"$token_response")
+          echo "::add-mask::$client_id"
+          echo "::add-mask::$client_secret"
+          apps=$(curl --fail --silent --show-error "${auth[@]}" "$api/access/apps?per_page=100")
+          app_id=$(jq -er '.result[] | select(.domain=="courtwatch-app-api.ckrk9ggvrb.workers.dev/app") | .id' <<<"$apps")
+          policy_payload=$(jq -n --arg token_id "$token_id" --arg name "CourtWatch CI ephemeral ${{ github.run_id }}" '{name:$name,precedence:2,decision:"non_identity",include:[{service_token:{token_id:$token_id}}]}')
+          policy_response=$(curl --fail --silent --show-error "${auth[@]}" -X POST --data "$policy_payload" "$api/access/apps/$app_id/policies")
+          policy_id=$(jq -er '.result.id' <<<"$policy_response")
+          {
+            echo "CF_SERVICE_TOKEN_ID=$token_id"
+            echo "CF_ACCESS_APP_ID=$app_id"
+            echo "CF_ACCESS_POLICY_ID=$policy_id"
+            echo "CF_ACCESS_CLIENT_ID=$client_id"
+            echo "CF_ACCESS_CLIENT_SECRET=$client_secret"
+          } >> "$GITHUB_ENV"
+      - name: Verify authenticated session and analysis CRUD
+        env:
+          APP_BASE: https://courtwatch-app-api.ckrk9ggvrb.workers.dev/app/api
+        run: node tools/courtwatch-authenticated-crud-smoke.mjs
+      - name: Revoke ephemeral Access identity
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID"
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+          if [ -n "${CF_ACCESS_POLICY_ID:-}" ] && [ -n "${CF_ACCESS_APP_ID:-}" ]; then
+            curl --silent --show-error "${auth[@]}" -X DELETE "$api/access/apps/$CF_ACCESS_APP_ID/policies/$CF_ACCESS_POLICY_ID" >/dev/null
+          fi
+          if [ -n "${CF_SERVICE_TOKEN_ID:-}" ]; then
+            curl --silent --show-error "${auth[@]}" -X DELETE "$api/access/service_tokens/$CF_SERVICE_TOKEN_ID" >/dev/null
+          fi

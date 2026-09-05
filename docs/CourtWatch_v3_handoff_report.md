@@ -1787,3 +1787,13 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Aggiunto uno smoke test post-deploy: verifica che GitHub Pages esponga esattamente le versioni asset previste dal commit e che una richiesta anonima a `/app` sia respinta o reindirizzata al login.
 - Il checkout dei deploy conserva due commit, necessari per confrontare report e versioni cache con la revisione precedente.
 - Limite residuo invariato: il flusso CRUD autenticato richiede un'identità tecnica dedicata; non viene simulata né aggirata la sessione dell'utente.
+
+
+## Revisione 2026-09-05.163 — collaudo CRUD autenticato isolato
+
+- Aggiunta l'identità applicativa tecnica `user-courtwatch-ci`, priva di giocatori collegati e separata dall'account Federico. La migrazione elimina esplicitamente eventuali associazioni accidentali a giocatori reali.
+- Il Worker riconosce le richieste di servizio già autenticate da Cloudflare Access attraverso il JWT inoltrato da Access e le associa esclusivamente all'utente CI. Il flusso email/OTP dell'utente reale resta prioritario e invariato.
+- Aggiunto il workflow `Court Watch authenticated CRUD smoke`: dopo un deploy D1/Worker riuscito crea un token Access temporaneo di un'ora e una policy Service Auth dedicata, esegue il collaudo e revoca sempre policy e token al termine.
+- Il collaudo verifica sessione autenticata, isolamento dell'account, snapshot senza giocatori reali, creazione/aggiornamento/lettura/elenco/eliminazione di un'analisi sintetica. La chiave è univoca per run e viene eliminata anche in caso di errore.
+- Client ID e secret temporanei vengono mascherati nei log e non sono salvati come credenziali permanenti.
+- Il workflow richiede che il secret GitHub esistente `CLOUDFLARE_ACCESS_API_TOKEN` disponga anche del permesso Cloudflare `Access: Service Tokens Write`; il primo run costituisce la verifica effettiva di tale autorizzazione.
