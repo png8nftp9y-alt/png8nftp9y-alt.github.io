@@ -1625,3 +1625,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - `history.replaceState` usa ora un URL assoluto costruito con `location.origin`, quindi resta sempre sull'origine protetta indipendentemente dal base degli asset.
 - Cache invalidata con `v3.js?v=2026090504` e shell Worker rinnovata.
 - Collaudo reale: partenza da sabato 8 agosto con agenda `J30 Cuneo — Martina Danesi — ITF`; clic su `Home · Oggi`; ritorno al 5 settembre, agenda e calendario sincronizzati, URL protetto conservato e nessun nuovo errore o warning.
+
+
+## Revisione 2026-09-05.145 — collaudo funzionale esteso e chiusura URL cross-origin
+
+- Eseguito collaudo funzionale esteso, non limitato al caricamento: 23 giocatori; giorno precedente/successivo; mese precedente; agenda ITF J30 Cuneo dell'8 agosto; ritorno a oggi; selezione e deselezione globale; filtro singolo giocatore; apertura profilo; filtri circuito FITP/Tennis Europe; filtro stato tornei; apertura dettaglio torneo; ritorno al calendario. Tutti questi percorsi sono positivi.
+- Confermata nel giorno corrente la presenza congiunta di agenda FITP e Tennis Europe; ITF è verificato sulla data reale dell'evento storico. Non esistono presenze ITF attive a settembre perché J100 Palermo risulta ritirato già nei dati pre-login.
+- La revisione statica della causa `<base>` ha individuato e corretto anche il redirect relativo usato dall'analisi quando la sessione scade: ora usa `location.origin + '/app'`, come già fatto per `history.replaceState`.
+- Cache client portata a `v3.js?v=2026090505` e shell protetta rinnovata.
+- L'apertura del prompt nativo di analisi ha bloccato il browser automatico prima che potesse registrarne il testo e annullarlo; non viene quindi ancora dichiarato completato il collaudo CRUD dell'analisi. Il codice client non contiene più alcun prompt password e il Worker usa `request.json()` per il PUT, ma la prova UI completa resta da ripetere in una sessione browser recuperata.
