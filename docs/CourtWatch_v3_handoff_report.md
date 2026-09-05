@@ -1894,3 +1894,9 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 
 - Ripristinata la versione operativa precedente alle ultime modifiche Agenda.
 - Questo commit forza una nuova pubblicazione GitHub Pages della versione completa.
+
+
+## Revisione 2026-09-05.177 — avversaria in fondo
+
+- L’avversaria è posizionata in fondo ai dettagli della partita, dopo il luogo.
+- Il testo dell’avversaria usa il blu standard precedente (`var(--blue)`).
