@@ -1797,3 +1797,13 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Il collaudo verifica sessione autenticata, isolamento dell'account, snapshot senza giocatori reali, creazione/aggiornamento/lettura/elenco/eliminazione di un'analisi sintetica. La chiave è univoca per run e viene eliminata anche in caso di errore.
 - Client ID e secret temporanei vengono mascherati nei log e non sono salvati come credenziali permanenti.
 - Il workflow richiede che il secret GitHub esistente `CLOUDFLARE_ACCESS_API_TOKEN` disponga anche del permesso Cloudflare `Access: Service Tokens Write`; il primo run costituisce la verifica effettiva di tale autorizzazione.
+
+
+## Revisione 2026-09-05.164 — numero ufficiale ordine di gioco e nomi calendario non interattivi
+
+- Rimossi dai nomi dei giocatori dentro le fasce torneo del calendario la pressione prolungata, il titolo e ogni comportamento individuale. La pressione prolungata per isolare un giocatore resta esclusivamente sui pulsanti dei giocatori selezionati sopra il calendario.
+- In agenda campo, numero ufficiale della partita e orario sono riuniti nella colonna sinistra; il campo non viene più ripetuto nella riga del torneo.
+- Non viene effettuata alcuna stima lato interfaccia: viene mostrato soltanto `courtMatchNumber`, ricavato dall'ordine completo dei match ufficiali dello stesso campo nella pagina OOP Tennis Europe.
+- Il parser assegna il progressivo prima di ridurre i dati ai soli giocatori CourtWatch; il numero resta quindi quello dell'ordine di gioco completo e non cambia con i filtri dell'app.
+- Il campo viene propagato senza perdita attraverso acquisizione OOP, proiezione verificabile, seed D1 e candidati `app_matches`.
+- Cache aggiornate a `v3.js?v=2026090526` e `v3.css?v=2026090515`.
