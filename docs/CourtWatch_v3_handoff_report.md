@@ -1843,3 +1843,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Questo consente di collaudare immediatamente la versione diagnostica corrente senza riutilizzare un vecchio tentativo GitHub legato a una revisione precedente del workflow.
 - I tentativi 2 e 3 del run `33990372988` hanno confermato un HTTP 403 Cloudflare, ma la vecchia revisione non distingueva fra creazione service token, lettura applicazione e creazione policy.
 - La revisione corrente espone lo status e il corpo della specifica chiamata fallita, preservando sempre la revoca delle risorse temporanee già create.
+
+
+## Revisione 2026-09-05.169 — disponibilità dell'app durante manutenzione D1
+
+- Rimossa la dipendenza da D1 nell'apertura della shell protetta `/app`: Cloudflare Access autorizza la richiesta prima del Worker, quindi l'HTML può essere servito senza interrogare `app_users`.
+- La verifica dell'account applicativo resta obbligatoria per sessione, snapshot dati e CRUD; un'identità non associata a un account attivo non può leggere o modificare dati.
+- Durante import e migrazioni D1, un rallentamento o rifiuto temporaneo del database non può più trasformare l'apertura della pagina in errore Cloudflare 1101.
+- Il workflow D1 pubblica questa versione read-compatible prima di iniziare la manutenzione del database.
+- Il controllo anonimo post-deploy dello Scudo continua a verificare che Cloudflare Access blocchi o reindirizzi `/app` senza login.
