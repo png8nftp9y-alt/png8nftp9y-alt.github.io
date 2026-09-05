@@ -19,6 +19,20 @@ jobs:
     steps:
       - name: Load CourtWatch site
         uses: actions/checkout@v4
+      - name: Configure Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: CourtWatch release guard
+        run: node tools/courtwatch-release-guard.mjs
+      - name: Save guard report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: courtwatch-release-guard
+          path: artifacts/courtwatch-release-guard.json
+          if-no-files-found: error
+          retention-days: 30
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:

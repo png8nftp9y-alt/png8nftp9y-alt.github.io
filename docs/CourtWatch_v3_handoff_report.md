@@ -1753,3 +1753,13 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Quando un torneo contiene più di un giocatore monitorato, ciascuna sezione giocatore nella pagina torneo dispone di una tendina per mostrare o nascondere le sue partite. Entrando nella pagina le sezioni sono chiuse; lo stato aperto resta durante gli aggiornamenti dati e dopo il reload della stessa pagina, e viene cancellato uscendo dalla pagina o passando a un altro torneo.
 - Nei tornei con un solo giocatore le partite restano direttamente visibili e non compare alcuna tendina.
 - Cache aggiornate a `v3.js?v=2026090524` e `v3.css?v=2026090513`.
+
+
+## Revisione 2026-09-05.159 — baseline stabile e blocco preventivo del deploy
+
+- Creata la baseline di recupero `courtwatch-stable` sul commit `0ecf7e419d74000f9cf5faa09585c909fb3c7496`, corrispondente alla versione funzionante corrente prima dell'introduzione dei guardiani.
+- Aggiunto `tools/courtwatch-release-guard.mjs`, eseguito obbligatoriamente prima del caricamento GitHub Pages. Un controllo fallito interrompe il job prima del deploy.
+- Il guardiano valida: sintassi di `v3.js`; assenza di `<base>`; presenza degli elementi DOM essenziali e dei cache-buster; endpoint autenticato `/app/api`; assenza di prompt password nel client; refresh applicativo a 30 secondi; almeno 23 giocatori; ID giocatore unici; assenza di riferimenti orfani; dataset tornei e agenda non vuoti; presenza di copertura FITP, ITF e Tennis Europe.
+- Ogni esecuzione produce l'artefatto `courtwatch-release-guard.json`, conservato per 30 giorni, con il risultato dettagliato di ogni controllo.
+- Il controllo è generale e viene applicato a ogni push su `main`, inclusi aggiornamenti automatici dei dati. Non modifica il funzionamento dell'app né la frequenza degli aggiornamenti agenda.
+- Limite residuo: il CRUD autenticato completo richiede in una fase successiva un'identità tecnica di collaudo; senza tale credenziale il workflow può verificare il contratto del client e dei dati, ma non creare/modificare/eliminare analisi dentro una sessione reale.
