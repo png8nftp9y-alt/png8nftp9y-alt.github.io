@@ -22,3 +22,7 @@
 .agendaTournament:hover .agendaTournamentName{text-decoration:underline;text-decoration-color:currentColor;text-underline-offset:2px}
 
 .agendaTournament:hover button.agendaTournamentName,.agendaTournament:focus-within button.agendaTournamentName{text-decoration:underline!important;text-decoration-color:currentColor!important;text-underline-offset:3px;box-shadow:inset 0 -1px currentColor}
+
+/* Agenda: show the complete venue and locality on every viewport. */
+.agendaItem>div:nth-child(2){min-width:0}
+.agendaLocation{display:block;max-width:none;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;word-break:normal;line-height:1.35}
