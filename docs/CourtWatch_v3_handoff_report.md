@@ -1913,3 +1913,10 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - L’avversaria è nera.
 - Il risultato è posizionato sotto l’avversaria (con eventuale condizione tra i due elementi).
 - Cache CSS incrementata a `2026090531`.
+
+
+## Revisione 2026-09-05.180 — blu standard sui dati campo
+
+- Campo, numero match e orario usano il blu standard precedente (`var(--blue)`, `#2477b3`).
+- L’avversaria resta nera.
+- Cache CSS incrementata a `2026090532`.
