@@ -1601,3 +1601,10 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Forzato il rinnovo della shell HTML protetta per eliminare la copia precedente ancora servita dall'edge; corretto inoltre il parsing JSON della scrittura analisi (`request.json()`).
 - Collaudo autenticato eseguito una sola volta dopo il deploy: lo snapshot account è caricato, compaiono tutti i 23 giocatori, l'agenda include i match completi Tennis Europe/FITP, il profilo giocatore si apre correttamente con tornei, risultati e filtri, e i comandi analisi sono presenti senza richiesta della vecchia password.
 - La sessione Access resta a 30 giorni: OTP al primo accesso del browser e soltanto dopo scadenza o perdita dei cookie. Nessun polling dei workflow è stato eseguito.
+
+
+## Revisione 2026-09-05.142 — invalidazione cache client effettiva
+
+- Corretto un errore nel rilascio della revisione precedente: `v3.js` era stato modificato senza cambiare il parametro di versione, quindi i browser già aperti potevano continuare a eseguire la copia difettosa.
+- Aggiornato il riferimento client a `v3.js?v=2026090502` e rinnovata anche la shell HTML servita dal Worker; la correzione dell'origine API non può più essere mascherata dalla cache precedente.
+- Unico collaudo post-deploy: la pagina protetta serve effettivamente `2026090502`, carica 23 giocatori, mostra agenda Tennis Europe e FITP completa e non produce nuovi warning o errori applicativi.
