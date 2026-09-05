@@ -1,6 +1,6 @@
 const V3='https://png8nftp9y-alt.github.io/dist/v3/';
 const PRIVATE_API=location.origin+'/app-api';
-const APP_API=PRIVATE_API+'/app-snapshot';
+const APP_API='https://courtwatch-app-api.ckrk9ggvrb.workers.dev/v1/app-snapshot';
 const LAST_GOOD_CACHE='courtwatch-v3-last-good-v1';
 const UI_STATE_CACHE='courtwatch-v3-ui-state-v1';
 const FORMER_PLAYERS=new Set(['martina-busa','manuel-natale','pietro-sala','niccolo-zanaga']);
