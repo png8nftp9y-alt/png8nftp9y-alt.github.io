@@ -1,5 +1,6 @@
 const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,PUT,DELETE,OPTIONS','Access-Control-Allow-Headers':'Content-Type,Authorization'};
 const json=(value,status=200)=>Response.json(value,{status,headers:{...cors,'Cache-Control':'public, max-age=30'}});
+// Protected account/session payloads must never enter shared caches.
 const privateJson=(value,status=200)=>Response.json(value,{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin'}});
 const parseRows=result=>(result?.results||[]).map(row=>JSON.parse(row.payload));
 async function all(env,table,where='',binds=[]){return parseRows(await env.DB.prepare(`SELECT payload FROM ${table} ${where}`).bind(...binds).all())}
