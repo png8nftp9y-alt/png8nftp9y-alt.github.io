@@ -26,14 +26,24 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID"
           api='https://api.cloudflare.com/client/v4'
           auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          idps=$(curl --fail --silent --show-error "${auth[@]}" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/identity_providers")
+          otp_id=$(jq -r '.result[] | select(.type=="onetimepin") | .id' <<<"$idps" | head -1)
+          if [ -z "$otp_id" ]; then
+            otp_payload=$(jq -n '{name:"One-time PIN",type:"onetimepin",config:{}}')
+            otp_created=$(curl --fail --silent --show-error "${auth[@]}" -X POST --data "$otp_payload" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/identity_providers")
+            otp_id=$(jq -er '.result.id' <<<"$otp_created")
+          fi
           apps=$(curl --fail --silent --show-error "${auth[@]}" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/apps?per_page=100")
           configure_path() {
-            local name="$1" domain="$2" app_id policy_count
+            local name="$1" domain="$2" app_id policy_count payload updated
             app_id=$(jq -r --arg domain "$domain" '.result[] | select(.domain==$domain) | .id' <<<"$apps" | head -1)
+            payload=$(jq -n --arg name "$name" --arg domain "$domain" --arg otp "$otp_id" '{name:$name,domain:$domain,type:"self_hosted",session_duration:"24h",auto_redirect_to_identity:true,allowed_idps:[$otp]}')
             if [ -z "$app_id" ]; then
-              payload=$(jq -n --arg name "$name" --arg domain "$domain" '{name:$name,domain:$domain,type:"self_hosted",session_duration:"24h",auto_redirect_to_identity:false}')
               created=$(curl --fail --silent --show-error "${auth[@]}" -X POST --data "$payload" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/apps")
               app_id=$(jq -er '.result.id' <<<"$created")
+            else
+              updated=$(curl --fail --silent --show-error "${auth[@]}" -X PUT --data "$payload" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/apps/$app_id")
+              jq -e '.success == true' <<<"$updated" >/dev/null
             fi
             policies=$(curl --fail --silent --show-error "${auth[@]}" "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/access/apps/$app_id/policies")
             policy_count=$(jq '[.result[] | select(.name=="Federico only")] | length' <<<"$policies")
