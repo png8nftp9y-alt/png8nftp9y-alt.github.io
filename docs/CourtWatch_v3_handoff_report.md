@@ -1827,3 +1827,11 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - La verifica D1 controlla direttamente tutti gli `app_matches` Tennis Europe ufficiali e blocca deploy e run se almeno uno perde `courtMatchNumber`.
 - Anche lo smoke dell'API pubblicata verifica lo stesso vincolo; un run verde non può più dichiarare completa l'Agenda Europe se manca il numero partita.
 - FITP e ITF non sono inclusi in questo vincolo finché i rispettivi motori non dispongono di un ordine di gioco completo e verificabile.
+
+
+## Revisione 2026-09-05.167 — compatibilità controllo numero match con Cloudflare D1
+
+- Il primo rebuild completo del backfill Europe ha prodotto correttamente 151 occorrenze Agenda e zero record ufficiali senza `courtMatchNumber`.
+- Il run `33991378950` è fallito esclusivamente nel validatore perché Cloudflare D1 ha rifiutato il pattern SQL `GLOB` con `LIKE or GLOB pattern too complex`; import e generazione dei numeri erano già riusciti.
+- Il riconoscimento delle URL ufficiali dell'ordine di gioco usa ora `LIKE '%/matches/%'`, equivalente per questo controllo e compatibile con D1.
+- Il vincolo resta invariato: una partita Tennis Europe ufficiale con campo e senza numero positivo rende rosso il run prima del deploy Worker.

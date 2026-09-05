@@ -39,7 +39,7 @@ const query=`SELECT
 )) appInvalid,
 (SELECT COUNT(*) FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe'
  AND COALESCE(json_extract(payload,'$.court'),'')<>''
- AND json_extract(payload,'$.sourceUrl') GLOB '*/matches/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]*'
+ AND json_extract(payload,'$.sourceUrl') LIKE '%/matches/%'
  AND COALESCE(CAST(json_extract(payload,'$.courtMatchNumber') AS INTEGER),0)<=0
 ) appMissingCourtMatchNumbers`;
 const run=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',query,'--json'],{encoding:'utf8'});
