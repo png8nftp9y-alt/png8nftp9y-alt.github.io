@@ -12,14 +12,6 @@ const ownersByName=new Map();for(const p of monitored){const key=normalize(p.nam
 const tournamentMap=new Map((historical.tournaments||[]).map(t=>[t.competitionId,t]));for(const t of live.tournaments||[])tournamentMap.set(t.competitionId,t);
 const matchMap=new Map((historical.matches||[]).map(m=>[m.id,m]));for(const m of live.matches||[])matchMap.set(m.id,m);
 const positiveMatchNumber=value=>{const number=Number(value);return Number.isInteger(number)&&number>0?number:0};
-const courtSequenceKey=match=>[match.competitionId,isoDate(match.date),normalize(match.court)].join('|');
-const courtPositions=new Map();
-for(const match of matchMap.values()){
- if(!match.court)continue;
- const key=courtSequenceKey(match),existing=positiveMatchNumber(match.courtMatchNumber),next=(courtPositions.get(key)||0)+1;
- match.courtMatchNumber=existing||next;
- courtPositions.set(key,Math.max(next,positiveMatchNumber(match.courtMatchNumber)));
-}
 const sourceIdentities=new Map();for(const match of matchMap.values())for(const player of match.players||[]){const key=normalize(player.name),identity=(player.nationality||'')+'|'+key;if(!sourceIdentities.has(key))sourceIdentities.set(key,new Set());sourceIdentities.get(key).add(identity)}
 const ambiguous=[],candidates=new Map();for(const [key,owners] of ownersByName)if(owners.length>1)ambiguous.push({type:'courtwatch_name_collision',key});
 for(const match of matchMap.values())for(const player of match.players||[]){const key=normalize(player.name),owners=ownersByName.get(key)||[];if(!owners.length)continue;if((sourceIdentities.get(key)?.size||0)>1){ambiguous.push({type:'source_identity_collision',key});continue}for(const owner of owners){

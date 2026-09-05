@@ -1852,3 +1852,13 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Durante import e migrazioni D1, un rallentamento o rifiuto temporaneo del database non può più trasformare l'apertura della pagina in errore Cloudflare 1101.
 - Il workflow D1 pubblica questa versione read-compatible prima di iniziare la manutenzione del database.
 - Il controllo anonimo post-deploy dello Scudo continua a verificare che Cloudflare Access blocchi o reindirizzi `/app` senza login.
+
+
+## Revisione 2026-09-05.170 — numero match Tennis Europe esclusivamente ufficiale
+
+- Ritirata la ricostruzione introdotta nella revisione .166: l'ordine dei record nello snapshot non è una fonte valida del numero di match per campo e ha prodotto valori formalmente presenti ma errati.
+- I parser Tennis Europe live e storico leggono ora `courtMatchNumber` esclusivamente dal markup ufficiale dell'ordine di gioco: attributi espliciti, dicitura Match/Partita/Incontro oppure valore numerico dedicato nell'header.
+- Eliminato dal generatore D1 ogni calcolo progressivo basato sulla posizione dei record.
+- Se una pagina ufficiale Tennis Europe contiene un campo ma il parser non trova il relativo numero dichiarato, acquisizione e pubblicazione diventano rosse; non viene più pubblicato un numero stimato.
+- La modifica al parser storico avvia il backfill completo a shard; il merge successivo sostituirà nell'Agenda i numeri precedentemente ricostruiti.
+- FITP e ITF restano esclusi finché i rispettivi motori non espongono un ordine di gioco ufficiale verificabile.
