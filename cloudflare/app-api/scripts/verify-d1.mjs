@@ -31,7 +31,12 @@ const query=`SELECT
 (SELECT COUNT(*) FROM observed_players) observedPlayers,
 (SELECT COUNT(*) FROM observed_players WHERE circuit='fitp') observedFitp,
 (SELECT COUNT(*) FROM observed_players WHERE circuit='tennis-europe') observedTe,
-(SELECT COUNT(*) FROM observed_players WHERE circuit='itf') observedItf`;
+(SELECT COUNT(*) FROM observed_players WHERE circuit='itf') observedItf,
+(SELECT COUNT(*) FROM app_users WHERE id='user-federico-181099' AND lower(email)='federico181099@gmail.com' AND status='active') ownerUsers,
+(SELECT COUNT(*) FROM user_app_players WHERE user_id='user-federico-181099') ownerPlayerLinks,
+(SELECT COUNT(*) FROM app_players) appPlayerRows,
+(SELECT COUNT(*) FROM user_match_analyses WHERE user_id='user-federico-181099') ownerAnalyses,
+(SELECT COUNT(*) FROM match_analyses) legacyAnalyses`;
 const run=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',query,'--json'],{encoding:'utf8'});if(run.status!==0)throw new Error(run.stderr||run.stdout);
 const parsed=JSON.parse(run.stdout),row=parsed.flatMap(x=>x.results||[])[0]||{},errors=[];
 // Tennis Europe relational rows are owned and certified by the dedicated
@@ -41,4 +46,7 @@ const tennisEuropeOwned=new Set(['tournaments','schedules','matches','results','
 for(const [key,value] of Object.entries(expected))if(!tennisEuropeOwned.has(key)&&Number(row[key])!==Number(value))errors.push(`${key}: D1=${row[key]} expected=${value}`);
 const observed={total:Number(row.observedPlayers),fitp:Number(row.observedFitp),tennisEurope:Number(row.observedTe),itf:Number(row.observedItf)};
 if(observed.total<=Number(manifest.counts.players)||observed.fitp<50000||observed.tennisEurope<5000||observed.itf<5000)errors.push('observed player index incomplete: '+JSON.stringify(observed));
+if(Number(row.ownerUsers)!==1)errors.push('Federico account missing or inactive');
+if(Number(row.ownerPlayerLinks)!==Number(row.appPlayerRows))errors.push(`Federico player ownership incomplete: links=${row.ownerPlayerLinks} app_players=${row.appPlayerRows}`);
+if(Number(row.ownerAnalyses)!==Number(row.legacyAnalyses))errors.push(`Federico analysis migration incomplete: owned=${row.ownerAnalyses} legacy=${row.legacyAnalyses}`);
 if(errors.length)throw new Error('D1 parity failed: '+errors.join('; '));console.log(JSON.stringify({status:'green',schema:manifest.version,counts:expected,observedPlayers:observed}));
