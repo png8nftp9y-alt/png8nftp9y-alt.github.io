@@ -17,7 +17,8 @@ const expected={
   candidateUniqueMatches:Number(candidates.counts.uniqueMatches),
   appMatches:Number(candidates.counts.playerMatchOccurrences),
   appUniqueMatches:Number(candidates.counts.uniqueMatches),
-  appInvalid:0
+  appInvalid:0,
+  appMissingCourtMatchNumbers:0
 };
 const query=`SELECT
 (SELECT COUNT(*) FROM tournaments WHERE id LIKE 'te-oop:%') teOopTournaments,
@@ -35,11 +36,16 @@ const query=`SELECT
  COALESCE(json_extract(payload,'$.date'),'')='' OR COALESCE(json_extract(payload,'$.tournamentName'),'')='' OR
  COALESCE(json_extract(payload,'$.opponent'),'')='' OR COALESCE(json_extract(payload,'$.round'),'')='' OR
  (json_extract(payload,'$.status')='completed' AND COALESCE(json_extract(payload,'$.result'),'')='')
-)) appInvalid`;
+)) appInvalid,
+(SELECT COUNT(*) FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe'
+ AND COALESCE(json_extract(payload,'$.court'),'')<>''
+ AND json_extract(payload,'$.sourceUrl') GLOB '*/matches/[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]*'
+ AND COALESCE(CAST(json_extract(payload,'$.courtMatchNumber') AS INTEGER),0)<=0
+) appMissingCourtMatchNumbers`;
 const run=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',query,'--json'],{encoding:'utf8'});
 if(run.status!==0)throw new Error(run.stderr||run.stdout);
 const parsed=JSON.parse(run.stdout),row=parsed.flatMap(x=>x.results||[])[0]||{},errors=[];
 const incremental=oop.incremental===true||candidates.incremental===true;
-for(const [key,value] of Object.entries(expected)){const actual=Number(row[key]);if(key==='appInvalid'){if(actual!==value)errors.push(`${key}: D1=${actual} expected=${value}`)}else if(incremental?actual<value:actual!==value)errors.push(`${key}: D1=${actual} expected${incremental?'>=':'='}${value}`)}
+for(const [key,value] of Object.entries(expected)){const actual=Number(row[key]);if(key==='appInvalid'||key==='appMissingCourtMatchNumbers'){if(actual!==value)errors.push(`${key}: D1=${actual} expected=${value}`)}else if(incremental?actual<value:actual!==value)errors.push(`${key}: D1=${actual} expected${incremental?'>=':'='}${value}`)}
 if(errors.length)throw new Error('Tennis Europe D1 parity failed: '+errors.join('; '));
 console.log(JSON.stringify({status:'green',circuit:'tennis-europe',incremental,counts:expected}));

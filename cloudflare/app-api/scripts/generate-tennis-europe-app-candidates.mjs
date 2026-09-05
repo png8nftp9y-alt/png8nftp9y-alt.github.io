@@ -11,6 +11,15 @@ const monitored=(registry.players||[]).filter(p=>(p.circuits||[]).some(c=>normal
 const ownersByName=new Map();for(const p of monitored){const key=normalize(p.name);if(!ownersByName.has(key))ownersByName.set(key,[]);ownersByName.get(key).push(p)}
 const tournamentMap=new Map((historical.tournaments||[]).map(t=>[t.competitionId,t]));for(const t of live.tournaments||[])tournamentMap.set(t.competitionId,t);
 const matchMap=new Map((historical.matches||[]).map(m=>[m.id,m]));for(const m of live.matches||[])matchMap.set(m.id,m);
+const positiveMatchNumber=value=>{const number=Number(value);return Number.isInteger(number)&&number>0?number:0};
+const courtSequenceKey=match=>[match.competitionId,isoDate(match.date),normalize(match.court)].join('|');
+const courtPositions=new Map();
+for(const match of matchMap.values()){
+ if(!match.court)continue;
+ const key=courtSequenceKey(match),existing=positiveMatchNumber(match.courtMatchNumber),next=(courtPositions.get(key)||0)+1;
+ match.courtMatchNumber=existing||next;
+ courtPositions.set(key,Math.max(next,positiveMatchNumber(match.courtMatchNumber)));
+}
 const sourceIdentities=new Map();for(const match of matchMap.values())for(const player of match.players||[]){const key=normalize(player.name),identity=(player.nationality||'')+'|'+key;if(!sourceIdentities.has(key))sourceIdentities.set(key,new Set());sourceIdentities.get(key).add(identity)}
 const ambiguous=[],candidates=new Map();for(const [key,owners] of ownersByName)if(owners.length>1)ambiguous.push({type:'courtwatch_name_collision',key});
 for(const match of matchMap.values())for(const player of match.players||[]){const key=normalize(player.name),owners=ownersByName.get(key)||[];if(!owners.length)continue;if((sourceIdentities.get(key)?.size||0)>1){ambiguous.push({type:'source_identity_collision',key});continue}for(const owner of owners){
@@ -36,8 +45,9 @@ const appSql=incremental?['PRAGMA foreign_keys=ON;']:['PRAGMA foreign_keys=ON;',
 for(const r of rows){if(incremental)appSql.push(`DELETE FROM app_matches WHERE player_id=${esc(r.playerId)} AND json_extract(payload,'$.matchId')=${esc(r.matchId)};`);appSql.push(`INSERT INTO app_matches(player_id,competition_id,match_date,payload) VALUES(${esc(r.playerId)},${esc(r.competitionId)},${esc(r.date)},${payload(r)});`);}
 await fs.writeFile(path.join('seed-tennis-europe-oop','05-app-matches.sql'),appSql.join('\n')+'\n');
 const uniqueMatches=new Set(rows.map(x=>x.matchId)).size,manualParentMatches=new Set(rows.filter(x=>x.manual&&!matchMap.has(x.matchId)).map(x=>x.matchId)).size,completed=rows.filter(x=>x.status==='completed').length,scheduled=rows.filter(x=>x.status==='scheduled').length;
+const missingCourtMatchNumbers=rows.filter(x=>/\/matches\/\d{8}(?:$|[?#])/i.test(String(x.sourceUrl||''))&&x.court&&!positiveMatchNumber(x.courtMatchNumber));
 const missingAgendaFields=rows.filter(x=>!x.id||!x.playerId||!x.matchId||!x.date||!x.tournamentName||!x.opponent||!x.round||x.status==='completed'&&!x.result);
-const result={status:missingAgendaFields.length?'red':'green',incremental,counts:{monitoredEuropePlayers:monitored.length,uniqueMatches,manualParentMatches,playerMatchOccurrences:rows.length,completed,scheduled,ambiguous:0,missingAgendaFields:missingAgendaFields.length},publishedToAgenda:true};
+const result={status:missingAgendaFields.length||missingCourtMatchNumbers.length?'red':'green',incremental,counts:{monitoredEuropePlayers:monitored.length,uniqueMatches,manualParentMatches,playerMatchOccurrences:rows.length,completed,scheduled,ambiguous:0,missingAgendaFields:missingAgendaFields.length,missingCourtMatchNumbers:missingCourtMatchNumbers.length},publishedToAgenda:true};
 await fs.writeFile('seed-tennis-europe-oop/app-match-candidates-manifest.json',JSON.stringify(result,null,2)+'\n');
-if(uniqueMatches<147||rows.length<149||missingAgendaFields.length)throw new Error(`App match parity failed: uniqueMatches=${uniqueMatches}, occurrences=${rows.length}, missingAgendaFields=${missingAgendaFields.length}`);
+if(uniqueMatches<147||rows.length<149||missingAgendaFields.length||missingCourtMatchNumbers.length)throw new Error(`App match parity failed: uniqueMatches=${uniqueMatches}, occurrences=${rows.length}, missingAgendaFields=${missingAgendaFields.length}, missingCourtMatchNumbers=${missingCourtMatchNumbers.length}`);
 console.log(JSON.stringify(result));

@@ -1817,3 +1817,13 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Il run CRUD `33990372988` è fallito prima del collaudo: Cloudflare ha restituito HTTP 403 alla creazione del token temporaneo. Nessuna operazione CRUD e nessuna modifica dati sono avvenute.
 - Il workflow ora espone un errore esplicito che richiede il permesso `Access: Service Tokens Write` sul secret `CLOUDFLARE_ACCESS_API_TOKEN`; la revoca del token è stata resa sicura anche se la creazione della policy fallisce.
 - Cache aggiornata a `v3.js?v=2026090527`.
+
+
+## Revisione 2026-09-05.166 — numero partita obbligatorio per l'Agenda Tennis Europe
+
+- Corretto il backfill degli snapshot OOP Tennis Europe storici: quando un record ufficiale precedente non contiene ancora `courtMatchNumber`, il generatore ricostruisce il progressivo nell'ordine completo della stessa combinazione torneo, data e campo prima di ridurre i dati ai giocatori CourtWatch.
+- Il numero già fornito dai nuovi parser resta prioritario e non viene ricalcolato.
+- Il manifest dei candidati Agenda ora diventa rosso se una partita proveniente dalla pagina ufficiale `/matches/YYYYMMDD`, dotata di campo, arriva senza un numero positivo.
+- La verifica D1 controlla direttamente tutti gli `app_matches` Tennis Europe ufficiali e blocca deploy e run se almeno uno perde `courtMatchNumber`.
+- Anche lo smoke dell'API pubblicata verifica lo stesso vincolo; un run verde non può più dichiarare completa l'Agenda Europe se manca il numero partita.
+- FITP e ITF non sono inclusi in questo vincolo finché i rispettivi motori non dispongono di un ordine di gioco completo e verificabile.
