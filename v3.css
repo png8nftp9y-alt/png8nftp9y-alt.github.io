@@ -62,3 +62,13 @@
 /* Swap FITP and Tennis Europe boys badge palettes */
 .type.fitp{background:#dbeeff;color:#1769aa}
 .type.drawCode.boys{background:var(--blueSoft);color:var(--blue);border:0}
+
+
+/* FITP dark badge, match round badges, multi-player tournament accordions */
+.type.fitp{background:#3155c6;color:#fff}
+.matchRoundCode{margin:0 0 6px 0}
+.tournamentPlayerMatches[hidden]{display:none!important}
+.expandableTournamentPlayer{cursor:pointer}
+.expandableTournamentPlayer>span{margin-left:auto;margin-right:8px}
+.tournamentPlayerToggle{flex:0 0 auto;width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;font-size:16px}
+.tournamentPlayerToggle[aria-expanded="true"]{transform:rotate(180deg)}
