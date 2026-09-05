@@ -16,7 +16,7 @@ for (const marker of [
   '>Elimina<',
   "method:'PUT'",
   "method:'DELETE'",
-  "location.origin+'/app-api'"
+  "location.origin+'/app/api'"
 ]) {
   assert.ok(source.includes(marker), `missing analysis UI marker: ${marker}`);
 }
