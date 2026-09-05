@@ -1728,3 +1728,11 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - L'account FQ resta ancorato in alto a destra e il menu Logout si apre in sovrapposizione sotto l'icona, senza ombra e senza modificare posizione o altezza di agenda e contenuti.
 - In agenda non viene più aggiunto dal client il prefisso `Campo`: il valore del campo/court è mostrato esattamente come restituito dall'ordine di gioco, evitando diciture duplicate come `Court Court` o `Campo Campo`.
 - Cache aggiornate a `v3.js?v=2026090522` e `v3.css?v=2026090510`.
+
+
+## Revisione 2026-09-05.156 — maggioranza selezione e spazio stabile logout
+
+- Il comando globale usa ora la maggioranza stretta: se i giocatori selezionati sono più dei non selezionati mostra ed esegue `Deseleziona tutti`; in parità o quando prevalgono i non selezionati mostra ed esegue `Seleziona tutti`.
+- I colori FITP restano invariati. Il badge maschile Tennis Europe torna alla prima versione azzurra (`#dbeeff` con testo `#1769aa`), senza bordo; il badge femminile usa un rosa leggero (`#fce7f3` con testo `#9d174d`), senza bordo.
+- Sotto la testata è ora riservato permanentemente uno spazio vuoto per il menu account. L'agenda rimane quindi nella stessa posizione sia con menu chiuso sia con menu aperto; il Logout appare in quello spazio, senza sovrapporsi ai contenuti e senza farli scivolare.
+- Cache aggiornate a `v3.js?v=2026090523` e `v3.css?v=2026090511`.
