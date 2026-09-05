@@ -1900,3 +1900,8 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 
 - L’avversaria è posizionata in fondo ai dettagli della partita, dopo il luogo.
 - Il testo dell’avversaria usa il blu standard precedente (`var(--blue)`).
+
+
+## Revisione 2026-09-05.178 — cache CSS pubblicabile
+
+- Incrementato il cache-buster di `v3.css` in `v3.html` per superare il release guard e pubblicare la correzione Agenda.
