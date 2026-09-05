@@ -50,6 +50,7 @@ if(Number(row.ownerUsers)!==1)errors.push('Federico account missing or inactive'
 if(Number(row.ownerPlayerLinks)!==Number(row.appPlayerRows))errors.push(`Federico player ownership incomplete: links=${row.ownerPlayerLinks} app_players=${row.appPlayerRows}`);
 if(Number(row.ownerAnalyses)!==Number(row.legacyAnalyses))errors.push(`Federico analysis migration incomplete: owned=${row.ownerAnalyses} legacy=${row.legacyAnalyses}`);
 if(errors.length)throw new Error('D1 parity failed: '+errors.join('; '));
+// Reserved probe row: every run removes it before and after the CRUD assertions.
 const probeKey='__courtwatch_analysis_crud_probe__',probeUser='user-federico-181099';
 const probeSql=`DELETE FROM user_match_analyses WHERE user_id='${probeUser}' AND match_key='${probeKey}';
 INSERT INTO user_match_analyses(user_id,match_key,analysis,updated_at) VALUES('${probeUser}','${probeKey}','crud-created',datetime('now'));
