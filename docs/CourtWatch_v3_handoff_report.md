@@ -1592,3 +1592,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Nessun CSS o layout è stato modificato rispetto alla versione pre-login.
 - La sessione Cloudflare Access è stata estesa da 24 ore a `720h` (30 giorni), valore accettato dall'API; workflow `33967681249` verde. Il codice viene richiesto al primo accesso del browser e nuovamente soltanto dopo scadenza della sessione o perdita dei cookie.
 - Nessun polling dell'assistente: eseguito un solo controllo finale dopo il deploy.
+
+
+## Revisione 2026-09-05.141 — correzione instradamento API protetta
+
+- Individuata nel browser la regressione reale: il tag `base` necessario a caricare CSS, JavaScript, bandiere e JSON dalla grafica GitHub faceva risolvere anche `/app-api/*` sul dominio GitHub Pages. Lo snapshot privato rispondeva quindi 404 e il client degradava sui JSON di emergenza.
+- Separata l'origine privata dall'origine degli asset: tutte le chiamate snapshot e analisi usano ora esplicitamente `location.origin + '/app-api'`, mantenendo invariati layout, CSS e comportamento della versione pre-login.
+- Forzato il rinnovo della shell HTML protetta per eliminare la copia precedente ancora servita dall'edge; corretto inoltre il parsing JSON della scrittura analisi (`request.json()`).
+- Collaudo autenticato eseguito una sola volta dopo il deploy: lo snapshot account è caricato, compaiono tutti i 23 giocatori, l'agenda include i match completi Tennis Europe/FITP, il profilo giocatore si apre correttamente con tornei, risultati e filtri, e i comandi analisi sono presenti senza richiesta della vecchia password.
+- La sessione Access resta a 30 giorni: OTP al primo accesso del browser e soltanto dopo scadenza o perdita dei cookie. Nessun polling dei workflow è stato eseguito.
