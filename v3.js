@@ -15,7 +15,7 @@ function restoreUiScroll(){if(uiScrollRestored)return;uiScrollRestored=true;requ
 const fmt=d=>new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(d);
 const agendaBtnFmt=d=>new Intl.DateTimeFormat('it-IT',{weekday:'long',day:'numeric',month:'short'}).format(d).replace(',', '').replace('.', '');
 const monthFmt=d=>new Intl.DateTimeFormat('it-IT',{month:'long',year:'numeric'}).format(d);
-const initials=n=>String(n||'').split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase();
+const initials=n=>{const parts=String(n||'').trim().split(/\s+/).filter(Boolean);return (parts.length>1?[parts[0],parts[parts.length-1]]:parts).map(x=>x[0]).join('').toUpperCase();}
 const decodeEntities=value=>{const el=document.createElement('textarea');el.innerHTML=String(value||'');return el.value};
 const readableText=value=>decodeEntities(value).replace(/\s+/g,' ').trim();
 const readablePerson=value=>{const words=readableText(value).split(' ').filter(Boolean);if(words.length>1&&words.at(-1).localeCompare(words.at(-2),undefined,{sensitivity:'base'})===0)words.pop();return words.join(' ')};

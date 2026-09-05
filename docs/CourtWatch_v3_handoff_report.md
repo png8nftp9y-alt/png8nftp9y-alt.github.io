@@ -1862,3 +1862,10 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Se una pagina ufficiale Tennis Europe contiene un campo ma il parser non trova il relativo numero dichiarato, acquisizione e pubblicazione diventano rosse; non viene più pubblicato un numero stimato.
 - La modifica al parser storico avvia il backfill completo a shard; il merge successivo sostituirà nell'Agenda i numeri precedentemente ricostruiti.
 - FITP e ITF restano esclusi finché i rispettivi motori non espongono un ordine di gioco ufficiale verificabile.
+
+
+## Revisione 2026-09-05.171 — iniziali nome e cognome
+
+- Corretta la funzione comune delle avatar: usa la prima lettera del primo elemento e la prima lettera dell'ultimo elemento del nome completo.
+- `Nikola Nikolaev Kerkenyakov` viene quindi visualizzato come `NK`, sia nella colonna Giocatori sia nella pagina giocatore.
+- Aggiornato il cache-buster a `v3.js?v=2026090528`.
