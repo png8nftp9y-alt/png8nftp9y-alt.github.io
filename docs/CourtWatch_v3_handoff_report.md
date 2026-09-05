@@ -1869,3 +1869,11 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Corretta la funzione comune delle avatar: usa la prima lettera del primo elemento e la prima lettera dell'ultimo elemento del nome completo.
 - `Nikola Nikolaev Kerkenyakov` viene quindi visualizzato come `NK`, sia nella colonna Giocatori sia nella pagina giocatore.
 - Aggiornato il cache-buster a `v3.js?v=2026090528`.
+
+
+## Revisione 2026-09-05.172 — gerarchia visiva Agenda
+
+- Nell'Agenda il nome giocatore viene mostrato per primo, sopra nome torneo e luogo.
+- Il nome torneo precede sempre il luogo del torneo.
+- Campo, numero match e orario nella colonna sinistra sono tutti evidenziati in blu uniforme.
+- Cache aggiornata a `v3.js?v=2026090528`.
