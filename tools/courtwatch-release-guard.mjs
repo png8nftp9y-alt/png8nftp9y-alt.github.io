@@ -33,6 +33,13 @@ orphanTournaments.length===0?pass('tournament-players','nessun playerId orfano')
 orphanAgenda.length===0?pass('agenda-players','nessun playerId orfano'):fail('agenda-players',orphanAgenda.length+' riferimenti orfani');
 for(const [name,min] of Object.entries(baseline.minimums.byCircuit)){const tn=tournaments.filter(x=>circuit(x)===name).length,an=agenda.filter(x=>circuit(x)===name).length;tn>=min?pass('tournaments-'+name,String(tn)):fail('tournaments-'+name,'copertura assente');an>=min?pass('agenda-'+name,String(an)):fail('agenda-'+name,'copertura assente')}
 
+const changed=execFileSync('git',['diff','--name-only','HEAD^','HEAD'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
+const functional=changed.filter(path=>/^(?:v3\.(?:js|css|html)|cloudflare\/|infra\/|src\/|tools\/|\.courtwatch\/|\.github\/workflows\/|[^/]+\.(?:mjs|js|css|html)|package(?:-lock)?\.json$)/.test(path));
+if(functional.length&&!changed.includes('docs/CourtWatch_v3_handoff_report.md'))fail('report-same-commit','modifiche funzionali senza aggiornamento report: '+functional.join(', '));else pass('report-same-commit',functional.length?'report incluso':'nessuna modifica funzionale');
+const previousHtml=execFileSync('git',['show','HEAD^:v3.html'],{encoding:'utf8'});
+const assetVersion=(source,name)=>Number((source.match(new RegExp(name.replace('.','\\.')+'\\?v=(\\d+)'))||[])[1]||0);
+for(const asset of ['v3.js','v3.css'])if(changed.includes(asset)){const before=assetVersion(previousHtml,asset),after=assetVersion(html,asset);if(changed.includes('v3.html')&&after>before)pass('cache-'+asset,before+' → '+after);else fail('cache-'+asset,'asset modificato senza incremento cache in v3.html')}
+
 const report={generatedAt:new Date().toISOString(),baseline:baseline.stableCommit,results,passed:failures.length===0};
 fs.mkdirSync('artifacts',{recursive:true});
 fs.writeFileSync('artifacts/courtwatch-release-guard.json',JSON.stringify(report,null,2)+'\n');

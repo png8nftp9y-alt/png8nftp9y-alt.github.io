@@ -1777,3 +1777,13 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Nella pagina giocatore le partite di doppio mostrano ora `Doppio con [nome partner]`, con la stessa formattazione e le eventuali nazionalità già utilizzate nella pagina torneo.
 - Le partite di singolare, il badge turno, le tendine e i dati non sono stati modificati.
 - Cache JavaScript aggiornata a `v3.js?v=2026090525`.
+
+
+## Revisione 2026-09-05.162 — Scudo CourtWatch, secondo livello
+
+- Il guardiano controlla ora il diff del commit: ogni modifica funzionale a interfaccia, Worker, infrastruttura, workflow o strumenti deve includere nello stesso commit l'aggiornamento di questo report; in caso contrario il deploy viene bloccato.
+- Se cambia `v3.js` o `v3.css`, il guardiano richiede anche la modifica di `v3.html` e un incremento numerico del relativo cache-buster. Questo impedisce che il browser continui a eseguire asset precedenti.
+- Aggiunto il workflow separato `CourtWatch Shield` per pull request e avvio manuale. Esegue gli stessi controlli prima che una proposta possa essere considerata pubblicabile e conserva il rapporto dettagliato per 30 giorni.
+- Aggiunto uno smoke test post-deploy: verifica che GitHub Pages esponga esattamente le versioni asset previste dal commit e che una richiesta anonima a `/app` sia respinta o reindirizzata al login.
+- Il checkout dei deploy conserva due commit, necessari per confrontare report e versioni cache con la revisione precedente.
+- Limite residuo invariato: il flusso CRUD autenticato richiede un'identità tecnica dedicata; non viene simulata né aggirata la sessione dell'utente.

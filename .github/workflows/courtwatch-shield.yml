@@ -1,0 +1,45 @@
+name: CourtWatch Shield
+on:
+  pull_request:
+    paths:
+      - 'v3.js'
+      - 'v3.css'
+      - 'v3.html'
+      - 'cloudflare/**'
+      - 'infra/**'
+      - 'src/**'
+      - 'tools/**'
+      - '.courtwatch/**'
+      - '.github/workflows/**'
+      - '*.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'dist/v3/players.json'
+      - 'dist/v3/tournaments.json'
+      - 'dist/v3/agenda.json'
+      - 'docs/CourtWatch_v3_handoff_report.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  release-guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Load proposed CourtWatch version
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Configure Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run CourtWatch release guard
+        run: node tools/courtwatch-release-guard.mjs
+      - name: Save detailed guard report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: courtwatch-shield-report
+          path: artifacts/courtwatch-release-guard.json
+          if-no-files-found: error
+          retention-days: 30

@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Load CourtWatch site
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - name: Configure Node
         uses: actions/setup-node@v4
         with:
@@ -44,3 +46,8 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify published app and access gate
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          APP_URL: https://courtwatch-app-api.ckrk9ggvrb.workers.dev/app
+        run: node tools/courtwatch-post-deploy-smoke.mjs
