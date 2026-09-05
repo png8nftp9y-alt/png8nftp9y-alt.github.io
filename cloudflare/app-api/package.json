@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node --check src/index.js && node --check scripts/configure-d1.mjs && node --check scripts/generate-seed.mjs && node --check scripts/generate-tennis-europe-oop-seed.mjs && node --check scripts/generate-tennis-europe-app-candidates.mjs && node --check scripts/verify-d1.mjs && node --check scripts/build-observed-player-index.mjs",
+    "check": "node --check src/index.js && node --check scripts/configure-d1.mjs && node --check scripts/generate-seed.mjs && node --check scripts/generate-tennis-europe-oop-seed.mjs && node --check scripts/generate-tennis-europe-app-candidates.mjs && node --check scripts/verify-d1.mjs && node --check scripts/build-observed-player-index.mjs && node scripts/verify-analysis-ui.mjs",
     "configure": "node scripts/configure-d1.mjs",
     "seed": "node scripts/generate-seed.mjs",
     "seed:te-oop": "node scripts/generate-tennis-europe-oop-seed.mjs",
