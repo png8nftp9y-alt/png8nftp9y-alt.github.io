@@ -1883,3 +1883,8 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 
 - L’avversaria resta in fondo alla scheda, dopo luogo.
 - Campo, numero match e orario usano il blu standard precedente (`var(--blue)`).
+
+
+## Revisione 2026-09-05.175 — risultato sotto avversaria
+
+- Il risultato viene mostrato sotto l’avversaria nell’Agenda.
