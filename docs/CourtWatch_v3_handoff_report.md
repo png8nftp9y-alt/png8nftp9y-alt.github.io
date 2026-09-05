@@ -1744,3 +1744,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Sono state invertite esclusivamente le palette dei badge: FITP usa ora l'azzurro precedentemente assegnato al badge maschile Tennis Europe (`#dbeeff` / `#1769aa`); il badge maschile Tennis Europe usa la precedente palette FITP (`--blueSoft` / `--blue`).
 - Il badge femminile Tennis Europe resta rosa leggero e senza bordo.
 - Cache CSS aggiornata a `v3.css?v=2026090512`.
+
+
+## Revisione 2026-09-05.158 — FITP scuro, badge turno e tendine pagina torneo
+
+- Il badge FITP usa ora sfondo blu scuro (`#3155c6`) e testo bianco. Il badge maschile Tennis Europe conserva la palette attuale; quello femminile resta rosa leggero.
+- Il badge del turno calcolato dalla stessa funzione usata in agenda (qualificazioni, R64/R32/R16/R8, QF, SF, F e Bonus Draw) compare ora anche su ogni partita nella pagina giocatore e nella pagina torneo.
+- Quando un torneo contiene più di un giocatore monitorato, ciascuna sezione giocatore nella pagina torneo dispone di una tendina per mostrare o nascondere le sue partite. Entrando nella pagina le sezioni sono chiuse; lo stato aperto resta durante gli aggiornamenti dati e dopo il reload della stessa pagina, e viene cancellato uscendo dalla pagina o passando a un altro torneo.
+- Nei tornei con un solo giocatore le partite restano direttamente visibili e non compare alcuna tendina.
+- Cache aggiornate a `v3.js?v=2026090524` e `v3.css?v=2026090513`.
