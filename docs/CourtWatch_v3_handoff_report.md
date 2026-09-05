@@ -1643,3 +1643,11 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Corretto il layout della colonna centrale e rimossi dalla riga luogo ellissi, overflow nascosto e vincoli di riga: il testo completo va a capo anche su mobile.
 - Cache separate invalidate: `v3.js?v=2026090506` e `v3.css?v=2026090501`; shell protetta rinnovata.
 - Run avviati: Pages `33969780952`; D1/Worker `33969780509`. Nessun polling automatico.
+
+
+## Revisione 2026-09-05.147 — gate CRUD analisi verde
+
+- Il run dedicato `33969389104` è terminato con successo.
+- Il log del gate D1 riporta esplicitamente `"analysisCrud":"green"`: creazione, lettura, modifica, rilettura, eliminazione e verifica di assenza residui della chiave temporanea sono tutte riuscite.
+- Lo stesso run ha certificato account Federico attivo, 23 giocatori, parità completa delle associazioni utente, migrazione analisi legacy, schema D1, Worker e parità API live.
+- Il deploy interfaccia luogo agenda `33969780952` è verde; il relativo run D1/Worker `33969780509` era ancora in esecuzione all'unico controllo effettuato.
