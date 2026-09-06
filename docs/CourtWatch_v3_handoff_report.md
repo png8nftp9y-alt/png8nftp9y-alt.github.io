@@ -2085,3 +2085,11 @@ Run CRUD `34059135483`: codice admin e protezione endpoint verdi; il test D1 era
 - Restano obbligatori i controlli precedenti su report, cache-buster, asset pubblicati, Access anonimo, dataset e copertura dei circuiti. Un fallimento blocca il deploy e conserva JSON e screenshot diagnostici per 30 giorni.
 
 Primo run dello Scudo completo `34059700455`: deploy bloccato correttamente prima della pubblicazione perché il collaudo puntava a un comando analisi presente nel DOM ma nascosto nella tendina chiusa. Il test apre ora la tendina e richiede un comando visibile; nessuna versione non certificata è stata pubblicata dal run fallito.
+
+
+## Revisione 2026-09-06.202 — agenda raggruppata per torneo
+
+- L'agenda giornaliera è ora divisa in blocchi distinti per torneo. Ogni intestazione mostra nome del torneo, sola città e circuito (EUROPE, FITP o ITF) con il colore già associato alla fonte.
+- Le righe partita non ripetono torneo o luogo. La colonna sinistra, ampliata e protetta dalle sovrapposizioni, mostra nell'ordine turno, orario, campo e numero match ufficiale.
+- La colonna destra mostra giocatore con etichetta Maschile/Femminile, avversario, risultato e condizioni. Restano attivi i collegamenti a giocatore e dettaglio torneo.
+- Aggiornati entrambi i cache-buster. Lo Scudo funzionale completo verifica la nuova impaginazione prima del deploy.

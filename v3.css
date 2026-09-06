@@ -110,3 +110,25 @@
 .type.tennis-europe{background:#d97706;color:#fff}
 .type.drawCode.boys{background:#2477b3;color:#fff;border:0}
 .type.drawCode.girls{background:#db2777;color:#fff;border:0}
+
+/* Agenda grouped by tournament */
+.agendaList{display:flex;flex-direction:column;gap:14px;padding:14px;background:#f8f8f6}
+.agendaTournamentBlock{background:#fff;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.agendaTournamentHead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 15px;border-bottom:1px solid var(--line)}
+.agendaTournamentBlock.fitp .agendaTournamentHead{border-left:5px solid var(--blue);background:var(--blueSoft)}
+.agendaTournamentBlock.tennis-europe .agendaTournamentHead{border-left:5px solid var(--orange);background:var(--orangeSoft)}
+.agendaTournamentBlock.itf .agendaTournamentHead{border-left:5px solid var(--green);background:var(--greenSoft)}
+.agendaTournamentHead h3{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin:0;font-size:15px}
+.agendaTournamentHead h3 button{border:0;padding:0;background:transparent;font:inherit;font-weight:800;cursor:pointer;text-align:left}
+.agendaTournamentHead h3 button:hover,.agendaTournamentHead h3 button:focus-visible{text-decoration:underline;outline:0}
+.agendaTournamentHead h3 small{font-size:12px;font-weight:600;color:var(--muted)}
+.agendaTournamentMatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr))}
+.agendaTournamentMatches .agendaItem{grid-template-columns:minmax(105px,130px) minmax(0,1fr);gap:16px;min-width:0;padding:14px 15px;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+.agendaMatchBody{min-width:0;overflow-wrap:anywhere}
+.agendaWhen{min-width:0;gap:4px;padding-right:4px}
+.agendaWhen .roundCode{margin-bottom:3px;align-self:flex-start;white-space:nowrap}
+.agendaWhen time,.agendaWhen small{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.agendaTitle{font-size:14px;font-weight:800}
+.genderLabel.boys{background:#e1e7ff;color:#263d99}.genderLabel.girls{background:#f7e1f0;color:#912f73}
+.agendaMatchBody .versus{margin-top:7px!important}
+@media(max-width:650px){.agendaList{padding:10px;gap:10px}.agendaTournamentMatches{grid-template-columns:1fr}.agendaTournamentMatches .agendaItem{grid-template-columns:96px minmax(0,1fr);gap:12px}.agendaTournamentHead{align-items:flex-start}.agendaTournamentHead h3{display:block}.agendaTournamentHead h3 small{display:block;margin-top:2px}}
