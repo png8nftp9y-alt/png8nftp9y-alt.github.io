@@ -2117,3 +2117,9 @@ Il primo deploy dell'agenda raggruppata (`34060691347`) è stato correttamente b
 ### Avvio deploy revisione 204
 
 Il deploy della revisione agenda è stato riattivato tramite Contents API per generare l'evento push richiesto da GitHub Actions.
+
+
+## Revisione 2026-09-06.205 — Scudo profilo resiliente al riordino dati
+
+- Corretto il falso rosso «profilo e partite»: lo Scudo percorre le tendine del profilo fino a trovare una partita visibile, senza presumere che sia contenuta nel primo torneo.
+- La verifica resta bloccante e continua a richiedere profilo, partita e CRUD completo. Il rosso 34063556956 non riguardava R2 né l'integrità dei dati.
