@@ -3,7 +3,7 @@ const base='../../dist/v3/universal',out='seed-universal';
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
 const [manifest,players,tournaments,entries,schedules,matches,results,legacy,mapDoc,playerConfig,observed]=await Promise.all([
   ...['manifest','players','tournaments','entries','schedules','matches','results'].map(name=>read(`${base}/${name}.json`)),
-  read('../../data.json'),read('../../dist/v3/tournaments.json'),read('../../players.json'),read('observed-players.json'),
+  read('../../data.json'),read('../../dist/v3/tournaments.json'),read('../../players.json'),process.env.D1_SKIP_OBSERVED==='1'?Promise.resolve({players:[]}):read('observed-players.json'),
 ]);
 const esc=value=>`'${String(value??'').replaceAll("'","''")}'`,payload=row=>esc(JSON.stringify(row));
 const circuit=row=>{const s=String(row.circuit||row.sourceId||row.sourceName||'').toLowerCase();return s.includes('tennis-europe')||s.includes('tennis europe')?'tennis-europe':s.includes('itf')?'itf':'fitp'};
@@ -23,7 +23,8 @@ appPlayers.forEach((r,i)=>sql.push(`INSERT INTO app_players(seq,id,payload) VALU
 appTournaments.forEach((r,i)=>sql.push(`INSERT INTO app_tournaments(seq,player_id,competition_id,circuit,payload) VALUES(${i+1},${esc(r.playerId)},${esc(r.competitionId)},${esc(circuit(r))},${payload(r)});`));
 appMatches.forEach((r,i)=>sql.push(`INSERT INTO app_matches(seq,player_id,competition_id,match_date,payload) VALUES(${i+1},${esc(r.playerId)},${esc(r.competitionId)},${esc(r.date)},${payload(r)});`));
 const counts={...manifest.counts,observedPlayers:(observed.players||[]).length,observedByCircuit:observed.counts||{},observedSources:observed.sources||{},appPlayers:appPlayers.length,appTournaments:appTournaments.length,appMatches:appMatches.length};
-sql.push(`INSERT OR REPLACE INTO generations(id,generated_at,schema_version,status,counts_json) VALUES('current',${esc(manifest.generatedAt)},${esc(manifest.version)},'green',${esc(JSON.stringify(counts))});`);
+if(process.env.D1_SKIP_OBSERVED==='1'){delete counts.observedPlayers;delete counts.observedByCircuit;delete counts.observedSources;}
+sql.push(`INSERT OR REPLACE INTO generations(id,generated_at,schema_version,status,counts_json) VALUES('current',${esc(manifest.generatedAt)},${esc(manifest.version)},'green',json_patch(COALESCE((SELECT counts_json FROM generations WHERE id='current'),'{}'),${esc(JSON.stringify(counts))}));`);
 await fs.rm(out,{recursive:true,force:true});await fs.mkdir(out,{recursive:true});
 // Keep remote D1 imports comfortably below the storage-operation timeout.
 // The files remain ordered and idempotent, so a transient failure retries only

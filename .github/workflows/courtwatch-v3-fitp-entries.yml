@@ -3,8 +3,11 @@ name: Court Watch v3 FITP player entries
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: [Court Watch v3 FITP provincial primary]
+    types: [completed]
+    branches: [main]
   schedule:
-    - cron: '17,47 * * * *'
     - cron: '11 2 * * 0'
   push:
     branches: [main]
@@ -28,6 +31,7 @@ concurrency:
 
 jobs:
   entries:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:

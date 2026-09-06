@@ -2,6 +2,20 @@ name: Court Watch Cloudflare D1 and app API
 
 on:
   workflow_dispatch:
+    inputs:
+      full_refresh:
+        description: Rebuild the complete observed-player index
+        type: boolean
+        default: false
+  workflow_run:
+    workflows:
+      - Court Watch v3 FITP player entries
+      - Court Watch v3 Tennis Europe live entries
+      - Court Watch v3 ITF acceptance discovery 42d
+      - Court Watch v3 ITF known labels fast
+      - Court Watch v3 ITF T-1 complete draws
+    types: [completed]
+    branches: [main]
   push:
     branches: [main]
     paths:
@@ -30,18 +44,21 @@ concurrency:
 
 jobs:
   migrate-import-verify-deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     defaults:
       run:
         working-directory: cloudflare/app-api
     env:
+      D1_SKIP_OBSERVED: ${{ (github.event_name == 'workflow_run' || (github.event_name == 'workflow_dispatch' && !inputs.full_refresh)) && '1' || '0' }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
+        with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Configure private R2 reads
@@ -65,10 +82,12 @@ jobs:
       - name: Apply D1 migrations
         run: npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
       - name: Restore current observed-player indexes from R2
+        if: env.D1_SKIP_OBSERVED != '1'
         run: bash scripts/restore-observed-indexes.sh
       - name: Restore verified Europe OOP history and live snapshot
         run: bash scripts/restore-tennis-europe-oop.sh
       - name: Build universal observed-player index
+        if: env.D1_SKIP_OBSERVED != '1'
         run: node scripts/build-observed-player-index.mjs
       - name: Rebuild current universal projection
         working-directory: .

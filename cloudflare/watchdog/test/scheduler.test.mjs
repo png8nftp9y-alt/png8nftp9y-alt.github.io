@@ -6,6 +6,9 @@ const workflows = [
   "courtwatch-v3-itf-known-fast.yml",
   "courtwatch-v3-itf-live.yml",
   "courtwatch-v3-itf-t-minus-one.yml",
+  "courtwatch-tennis-europe-oop-live.yml",
+  "courtwatch-v3-fitp-entries.yml",
+  "courtwatch-v3-tennis-europe-live.yml",
 ];
 const slot = Math.floor(Date.now() / 900000) * 900000;
 async function tick(cron, runs = [], failWorkflow = null) {
@@ -30,14 +33,14 @@ async function tick(cron, runs = [], failWorkflow = null) {
     return requests;
   } finally {globalThis.fetch = originalFetch;}
 }
-test("ITF cron dispatches all three live flows even with a fresh completed run in the previous slot", async () => {
+test("ITF cron dispatches all six live flows even with a fresh completed run in the previous slot", async () => {
   const requests = await tick("*/15 * * * *", [{
     id: 1, status: "completed", conclusion: "success",
     created_at: new Date(slot - 900000).toISOString(),
     updated_at: new Date(slot - 1000).toISOString(),
   }]);
   const posts = requests.filter(r => r.method === "POST");
-  assert.equal(posts.length, 3);
+  assert.equal(posts.length, 6);
   for (const workflow of workflows) assert(posts.some(r => r.url.includes(workflow)));
   assert(!requests.some(r => r.url.includes("raw.githubusercontent.com")));
 });
@@ -55,18 +58,17 @@ test("queued, waiting and running workflows are not cancelled or duplicated", as
     assert.equal(requests.filter(r => r.method === "POST").length, 0);
   }
 });
-test("10-minute watchdog retains FITP, Europe and daily ITF safety only", async () => {
+test("10-minute watchdog retains D1 recovery and daily ITF safety", async () => {
   const requests = await tick("*/10 * * * *", [{
     id: 4, status: "completed", conclusion: "success",
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   }]);
   for (const workflow of workflows) assert(!requests.some(r => r.url.includes(workflow)));
-  assert(requests.some(r => r.url.includes("courtwatch-v3-fitp-entries.yml")));
-  assert(requests.some(r => r.url.includes("courtwatch-v3-tennis-europe-live.yml")));
+  assert(requests.some(r => r.url.includes("courtwatch-cloudflare-app-api.yml")));
   assert(requests.some(r => r.url.includes("courtwatch-v3-itf-safety-120d.yml")));
   assert.equal(requests.filter(r => r.method === "POST").length, 0);
 });
 test("one GitHub API error does not prevent the other ITF dispatches", async () => {
   const requests = await tick("*/15 * * * *", [], workflows[0]);
-  assert.equal(requests.filter(r => r.method === "POST").length, 2);
+  assert.equal(requests.filter(r => r.method === "POST").length, 5);
 });

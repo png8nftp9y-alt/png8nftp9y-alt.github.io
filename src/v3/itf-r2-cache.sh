@@ -7,6 +7,26 @@ readonly FILES=("${CORE_FILES[@]}" "${STATE_FILES[@]}")
 aws_r2(){ aws --endpoint-url "$ENDPOINT" "$@"; }
 empty_file(){ case "$1" in itf_participant_cache.json.gz) printf '%s' '{"version":4,"generatedAt":null,"participants":[]}'|gzip -n > "$DIR/$1";; itf_players_database.json.gz) printf '%s' '{"version":1,"generatedAt":null,"status":"complete","players":[]}'|gzip -n > "$DIR/$1";; itf_results_database.json.gz) printf '%s' '{"version":1,"generatedAt":null,"status":"complete","matches":[]}'|gzip -n > "$DIR/$1";; esac; }
 validate(){ local f;for f in "${CORE_FILES[@]}";do gzip -t "$DIR/$f";done;for f in "${STATE_FILES[@]}";do jq -e 'type=="object"' "$DIR/$f" >/dev/null;done; }
-restore(){ local w g f;mkdir -p "$DIR";w="$(mktemp -d)";trap 'rm -rf "${w:-}"' EXIT;if ! aws_r2 s3 cp "s3://${R2_BUCKET}/${PREFIX}/pointers/current.json" "$w/p.json" --only-show-errors 2>/dev/null;then for f in "${CORE_FILES[@]}";do test -f "$DIR/$f"||empty_file "$f";done;validate;echo 'R2 has no complete ITF database yet; initialized local generation.';return;fi;g="$(jq -er .generation "$w/p.json")";for f in "${CORE_FILES[@]}";do if ! aws_r2 s3 cp "s3://${R2_BUCKET}/${PREFIX}/generations/$g/$f" "$DIR/$f" --only-show-errors 2>/dev/null;then empty_file "$f";fi;done;for f in "${STATE_FILES[@]}";do aws_r2 s3 cp "s3://${R2_BUCKET}/${PREFIX}/generations/$g/$f" "$DIR/$f" --only-show-errors 2>/dev/null||echo "ITF state $f is not present in legacy R2 generation $g; preserving Git state.";done;validate;echo "Restored ITF database $g from R2."; }
+restore(){
+  local w g f
+  mkdir -p "$DIR"
+  w="$(mktemp -d)"
+  trap 'rm -rf "${w:-}"' EXIT
+  # Authentication and missing objects are errors, never an empty database.
+  aws_r2 s3 cp "s3://${R2_BUCKET}/${PREFIX}/pointers/current.json" "$w/p.json" --only-show-errors
+  g="$(jq -er '.generation | select(type=="string" and length>0)' "$w/p.json")"
+  for f in "${CORE_FILES[@]}"; do
+    aws_r2 s3 cp "s3://${R2_BUCKET}/${PREFIX}/generations/$g/$f" "$w/$f" --only-show-errors
+    gzip -t "$w/$f"
+    gzip -cd "$w/$f" | jq -e 'type=="object"' >/dev/null
+  done
+  for f in "${STATE_FILES[@]}"; do
+    aws_r2 s3 cp "s3://${R2_BUCKET}/${PREFIX}/generations/$g/$f" "$w/$f" --only-show-errors
+    jq -e 'type=="object"' "$w/$f" >/dev/null
+  done
+  for f in "${FILES[@]}"; do cp "$w/$f" "$DIR/$f"; done
+  validate
+  echo "Restored ITF database $g from R2."
+}
 publish(){ local w g current;w="$(mktemp -d)";trap 'rm -rf "${w:-}"' EXIT;validate;g="$(sha256sum "${FILES[@]/#/$DIR/}"|sha256sum|cut -d' ' -f1)";if aws_r2 s3 cp "s3://${R2_BUCKET}/${PREFIX}/pointers/current.json" "$w/current.json" --only-show-errors 2>/dev/null&&test "$(jq -r .generation "$w/current.json")" = "$g";then echo "ITF database unchanged ($g); R2 publish skipped.";return;fi;jq -n --arg generation "$g" --arg at "$(date -u +%FT%TZ)" --argjson files "$(printf '%s\n' "${FILES[@]}"|jq -R .|jq -s .)" '{schemaVersion:2,generation:$generation,createdAt:$at,files:$files}' > "$w/new.json";for f in "${FILES[@]}";do aws_r2 s3 cp "$DIR/$f" "s3://${R2_BUCKET}/${PREFIX}/generations/$g/$f" --only-show-errors;done;aws_r2 s3 cp "s3://${R2_BUCKET}/${PREFIX}/pointers/backup-1.json" "$w/b1.json" --only-show-errors 2>/dev/null||true;test ! -s "$w/b1.json"||aws_r2 s3 cp "$w/b1.json" "s3://${R2_BUCKET}/${PREFIX}/pointers/backup-2.json" --only-show-errors;test ! -s "$w/current.json"||aws_r2 s3 cp "$w/current.json" "s3://${R2_BUCKET}/${PREFIX}/pointers/backup-1.json" --only-show-errors;aws_r2 s3 cp "$w/new.json" "s3://${R2_BUCKET}/${PREFIX}/pointers/current.json" --only-show-errors;echo "Published ITF database $g to R2."; }
 case "${1:-}" in restore)restore;;publish)publish;;*)exit 2;;esac

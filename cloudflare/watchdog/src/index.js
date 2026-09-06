@@ -2,10 +2,12 @@ const REPOSITORY = "png8nftp9y-alt/png8nftp9y-alt.github.io";
 const RAW_BASE = `https://raw.githubusercontent.com/${REPOSITORY}/main`;
 const API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
 
-const ITF_CRON = "*/15 * * * *";
-const ITF_LIVE_IDS = new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one"]);
+const LIVE_CRON = "*/15 * * * *";
+const LIVE_IDS = new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one", "tennis-europe-oop", "fitp", "tennis-europe"]);
 
 const TARGETS = [
+  { id: "tennis-europe-oop", workflow: "courtwatch-tennis-europe-oop-live.yml" },
+  { id: "d1", workflow: "courtwatch-cloudflare-app-api.yml", successfulRunMaxAgeMinutes: 40, cooldownMinutes: 25 },
   {
     id: "fitp",
     workflow: "courtwatch-v3-fitp-entries.yml",
@@ -112,7 +114,7 @@ async function checkTarget(target, env, now) {
   return { id: target.id, action: "dispatched", source };
 }
 
-async function checkItfSchedule(target, env, scheduledTime) {
+async function checkLiveSchedule(target, env, scheduledTime) {
   const runs = await latestRuns(target, env);
   const slotStart = Math.floor(scheduledTime / 900000) * 900000;
   const active = runs.find((run) => run.status !== "completed");
@@ -126,10 +128,10 @@ async function checkItfSchedule(target, env, scheduledTime) {
 async function runWatchdog(env, controller) {
   if (!env.COURTWATCH_GITHUB_TOKEN) throw new Error("Missing COURTWATCH_GITHUB_TOKEN");
   const now = Date.now();
-  const itfTick = controller.cron === ITF_CRON;
-  const targets = TARGETS.filter((target) => ITF_LIVE_IDS.has(target.id) === itfTick);
+  const liveTick = controller.cron === LIVE_CRON;
+  const targets = TARGETS.filter((target) => LIVE_IDS.has(target.id) === liveTick);
   const settled = await Promise.allSettled(targets.map((target) =>
-    itfTick ? checkItfSchedule(target, env, controller.scheduledTime) : checkTarget(target, env, now),
+    liveTick ? checkLiveSchedule(target, env, controller.scheduledTime) : checkTarget(target, env, now),
   ));
   const results = settled.map((result, index) =>
     result.status === "fulfilled"

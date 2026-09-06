@@ -63,21 +63,25 @@ jobs:
         run: node src/v3/merge-fitp-tournament-shards.mjs
       - name: Update FITP calendar history
         run: node src/v3/maintain-fitp-calendar-history.mjs
-      - name: Commit validated catalog and calendar history
+      - name: Publish validated catalog without rebasing derived files
         run: |
+          set -euo pipefail
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          # Shards are temporary inputs. Restore tracked snapshots and remove
-          # downloaded untracked shards before creating the atomic publish commit.
-          git restore --worktree --source=HEAD -- dist/v3/shards
-          git clean -fd -- dist/v3/shards
-          git add \
-            dist/v3/source_fitp_tournaments.json \
-            dist/v3/source_fitp_tournaments_audit.json \
-            dist/v3/tournaments.json \
-            history/player_tournaments.json \
-            history/audit.json
-          git diff --cached --quiet && exit 0
-          git commit -m "Update authoritative FITP provincial catalog"
-          git pull --rebase origin main
-          git push origin HEAD:main
+          snapshot=$(mktemp -d)
+          cp dist/v3/source_fitp_tournaments.json "$snapshot/catalog.json"
+          cp dist/v3/source_fitp_tournaments_audit.json "$snapshot/audit.json"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp "$snapshot/catalog.json" dist/v3/source_fitp_tournaments.json
+            cp "$snapshot/audit.json" dist/v3/source_fitp_tournaments_audit.json
+            node src/v3/entries-engine.mjs
+            node src/v3/maintain-fitp-calendar-history.mjs
+            git add dist/v3/source_fitp_tournaments.json dist/v3/source_fitp_tournaments_audit.json dist/v3/players.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/entries_fitp.json dist/v3/entries_tennis_europe.json dist/v3/entries_itf.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json history/player_tournaments.json history/audit.json
+            git diff --cached --quiet && exit 0
+            git commit -m "Publish validated FITP catalog on latest entry state"
+            git push origin HEAD:main && exit 0
+            sleep "$attempt"
+          done
+          exit 1

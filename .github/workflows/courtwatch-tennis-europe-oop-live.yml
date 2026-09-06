@@ -1,8 +1,7 @@
 name: Court Watch Tennis Europe OOP and results live
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '3,18,33,48 * * * *'
+  # Live updates dispatched by Cloudflare every 15 minutes.
   push:
     branches: [main]
     paths:
@@ -17,7 +16,7 @@ permissions:
   contents: read
 concurrency:
   group: courtwatch-tennis-europe-oop-live
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   acquire-live:
     runs-on: ubuntu-latest
