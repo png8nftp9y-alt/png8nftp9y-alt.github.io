@@ -2,6 +2,9 @@ const REPOSITORY = "png8nftp9y-alt/png8nftp9y-alt.github.io";
 const RAW_BASE = `https://raw.githubusercontent.com/${REPOSITORY}/main`;
 const API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
 
+const ITF_CRON = "*/15 * * * *";
+const ITF_LIVE_IDS = new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one"]);
+
 const TARGETS = [
   {
     id: "fitp",
@@ -20,21 +23,14 @@ const TARGETS = [
   {
     id: "itf-known-labels",
     workflow: "courtwatch-v3-itf-known-fast.yml",
-    freshnessUrl: `${RAW_BASE}/dist/v3/source_itf_entries.json`,
-    maxAgeMinutes: 40,
-    cooldownMinutes: 25,
   },
   {
     id: "itf-acceptance-42d",
     workflow: "courtwatch-v3-itf-live.yml",
-    successfulRunMaxAgeMinutes: 40,
-    cooldownMinutes: 25,
   },
   {
     id: "itf-t-minus-one",
     workflow: "courtwatch-v3-itf-t-minus-one.yml",
-    successfulRunMaxAgeMinutes: 40,
-    cooldownMinutes: 25,
   },
   {
     id: "itf-safety-120d",
@@ -86,7 +82,7 @@ async function sourceIsStale(target, now) {
 }
 
 function runState(target, runs, now) {
-  const active = runs.find((run) => run.status === "queued" || run.status === "in_progress");
+  const active = runs.find((run) => run.status !== "completed");
   const recent = runs.find((run) => ageMinutes(run.created_at, now) < target.cooldownMinutes);
   const success = runs.find((run) => run.conclusion === "success");
   return { active, recent, success };
@@ -116,22 +112,37 @@ async function checkTarget(target, env, now) {
   return { id: target.id, action: "dispatched", source };
 }
 
-async function runWatchdog(env) {
+async function checkItfSchedule(target, env, scheduledTime) {
+  const runs = await latestRuns(target, env);
+  const slotStart = Math.floor(scheduledTime / 900000) * 900000;
+  const active = runs.find((run) => run.status !== "completed");
+  if (active) return { id: target.id, action: "active", runId: active.id };
+  const inSlot = runs.find((run) => Date.parse(run.created_at) >= slotStart);
+  if (inSlot) return { id: target.id, action: "already_started", runId: inSlot.id };
+  await dispatch(target, env);
+  return { id: target.id, action: "dispatched", slotStart: new Date(slotStart).toISOString() };
+}
+
+async function runWatchdog(env, controller) {
   if (!env.COURTWATCH_GITHUB_TOKEN) throw new Error("Missing COURTWATCH_GITHUB_TOKEN");
   const now = Date.now();
-  const settled = await Promise.allSettled(TARGETS.map((target) => checkTarget(target, env, now)));
+  const itfTick = controller.cron === ITF_CRON;
+  const targets = TARGETS.filter((target) => ITF_LIVE_IDS.has(target.id) === itfTick);
+  const settled = await Promise.allSettled(targets.map((target) =>
+    itfTick ? checkItfSchedule(target, env, controller.scheduledTime) : checkTarget(target, env, now),
+  ));
   const results = settled.map((result, index) =>
     result.status === "fulfilled"
       ? result.value
-      : { id: TARGETS[index].id, action: "error", error: String(result.reason) },
+      : { id: targets[index].id, action: "error", error: String(result.reason) },
   );
-  console.log(JSON.stringify({ event: "courtwatch_watchdog", at: new Date(now).toISOString(), results }));
+  console.log(JSON.stringify({ event: "courtwatch_watchdog", cron: controller.cron, at: new Date(now).toISOString(), results }));
   return results;
 }
 
 export default {
-  async scheduled(_controller, env, ctx) {
-    ctx.waitUntil(runWatchdog(env));
+  async scheduled(controller, env, ctx) {
+    ctx.waitUntil(runWatchdog(env, controller));
   },
 
   async fetch() {

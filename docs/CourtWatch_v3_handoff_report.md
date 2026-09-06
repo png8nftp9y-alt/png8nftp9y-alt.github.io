@@ -2034,3 +2034,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - L’etichetta usa lo stesso stile del tipo partita già definito; l’ordine resta data → tipo partita → icona turno.
 - L’Agenda e il filtro singolo/doppio restano invariati.
 - Cache-buster JS aggiornato a `2026090607`.
+
+## Revisione 2026-09-06.195 — schedulazione ITF live ogni 15 minuti
+
+- Il run T−1 `34031824215` era stato avviato con `workflow_dispatch`; il watchdog precedente aspettava oltre 40 minuti dall'ultimo successo e verificava ogni 10 minuti, spiegando il recupero tardivo osservato quando il cron GitHub non partiva puntualmente.
+- Cloudflare è ora lo schedulatore primario dei tre flussi ITF live: known labels, acceptance discovery 42d e tabelloni T−1. Un cron dedicato `*/15 * * * *` richiede l'avvio ai minuti 00, 15, 30 e 45 UTC, senza attendere la soglia di freschezza di 40 minuti.
+- Rimossi i cron GitHub duplicati dei soli tre flussi live. Il watchdog ogni 10 minuti continua a gestire FITP, Tennis Europe e il recupero della safety ITF giornaliera; la safety 120d non diventa trimestroraria.
+- Prima del dispatch si controllano i run del singolo workflow: nessun duplicato se un run è già stato creato nello stesso intervallo di 15 minuti o è ancora attivo/in coda/in attesa. Le concurrency ITF non cancellano più una lavorazione avviata.
+- Cinque test locali superati: avvio dei tre flussi con dati freschi, deduplicazione nello stesso intervallo, protezione dei run attivi, separazione dal watchdog ordinario, indipendenza in caso di errore API di un flusso. Gli stessi test sono un gate nel workflow di deploy Cloudflare prima del dry-run Wrangler.
+- Limiti: Cloudflare può impiegare fino a 15 minuti a propagare il nuovo cron; i tempi di coda/esecuzione GitHub restano esterni allo schedulatore. Se un ciclo precedente è ancora attivo viene preservato e il nuovo avvio viene saltato. La periodicità configurata non certifica un aggiornamento completato ogni 15 minuti. Verifica del deploy da effettuare sul run generato da questo commit.

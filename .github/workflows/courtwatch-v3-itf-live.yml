@@ -1,11 +1,10 @@
 name: Court Watch v3 ITF acceptance discovery 42d
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0,14,28,42,56 * * * *'
+  # Dispatched every 15 minutes by the Cloudflare watchdog ITF cron.
 
 permissions: {contents: write}
-concurrency: {group: courtwatch-v3-itf-live,cancel-in-progress: true}
+concurrency: {group: courtwatch-v3-itf-live,cancel-in-progress: false}
 jobs:
   acceptance:
     runs-on: ubuntu-latest

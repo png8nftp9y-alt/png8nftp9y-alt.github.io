@@ -7,11 +7,10 @@ on:
         description: Optional comma-separated pending competition IDs
         required: false
         type: string
-  schedule:
-    - cron: '0,15,30,45 * * * *'
+  # Dispatched every 15 minutes by the Cloudflare watchdog ITF cron.
 
 permissions: {contents: write}
-concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: true}
+concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: false}
 jobs:
   select:
     runs-on: ubuntu-latest

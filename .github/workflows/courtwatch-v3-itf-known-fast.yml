@@ -1,11 +1,10 @@
 name: Court Watch v3 ITF known labels fast
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '4,18,32,46 * * * *'
+  # Dispatched every 15 minutes by the Cloudflare watchdog ITF cron.
 
 permissions: {contents: write}
-concurrency: {group: courtwatch-v3-itf-known-fast,cancel-in-progress: true}
+concurrency: {group: courtwatch-v3-itf-known-fast,cancel-in-progress: false}
 jobs:
   acceptance:
     runs-on: ubuntu-latest
