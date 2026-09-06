@@ -2113,3 +2113,7 @@ Il primo deploy dell'agenda raggruppata (`34060691347`) è stato correttamente b
 - Colonna sinistra e destra hanno la stessa altezza; campo, numero match e orario condividono dimensione e peso. Il contenuto partita è giustificato e le righe FITP non aggiungono più il circolo al giocatore CourtWatch.
 - Corretto il filtro Doppio nella pagina giocatore: ora legge l'etichetta tipo partita effettiva, quindi tornei e incontri di doppio non vengono più esclusi erroneamente.
 - Cache-buster aggiornati a v3.css?v=2026090609 e v3.js?v=2026090610.
+
+### Avvio deploy revisione 204
+
+Il deploy della revisione agenda è stato riattivato tramite Contents API per generare l'evento push richiesto da GitHub Actions.
