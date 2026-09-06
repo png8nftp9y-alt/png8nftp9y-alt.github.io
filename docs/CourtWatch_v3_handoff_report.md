@@ -1927,3 +1927,9 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - OOP Europe: ripristinata la base dell'ultimo parser con run verde, eliminando l'errore globale introdotto dalla validazione rigida del numero match.
 - Numero match Europe: il parser legge il numero ufficiale mostrato immediatamente prima dell'orario; quando Tennis Europe non espone quel valore mantiene il fallback per ordine sul campo, senza bloccare l'intero torneo.
 - Modifiche pubblicate atomicamente con questo aggiornamento del report.
+
+## Revisione 2026-09-06.182 — annullamento regola ITF T−1
+
+- Rimossa integralmente la regola simmetrica KO/Round Robin introdotta nella revisione precedente; ripristinato senza variazioni il comportamento ITF T−1 preesistente.
+- Il caso J30 McKinney è chiuso come non-errore tecnico: il run era verde e le sezioni Round Robin risultavano soltanto non ancora pubblicate/completate dalla fonte ufficiale. Nessuna regola speciale viene mantenuta per forzarne la risoluzione.
+- OOP Europe e la lettura del numero match restano invariati.
