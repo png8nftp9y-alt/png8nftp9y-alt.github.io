@@ -1961,3 +1961,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Restano vietati fallback progressivi e valori dedotti: il numero deve essere presente nel sotto-header ufficiale.
 - Aggiunti quattro tentativi limitati soltanto per errori HTTP temporanei/rete e ridotta la concorrenza del backfill da 8 a 2 shard per non saturare Tennis Europe né interferire con il live.
 - I motivi completi dei tornei scartati vengono ora stampati nel log del run; la pubblicazione resta atomica e richiede zero scarti e zero numeri mancanti.
+
+
+## Revisione 2026-09-06.186 — intestazione Calendario e variante OOP TBA
+
+- Ripristinata l'intestazione visibile `Calendario` nella relativa scheda, con la stessa gerarchia usata per `Agenda`.
+- Il run OOP live precedente è risultato verde; il rosso riguardava il backfill storico.
+- Il log dello shard 0 ha isolato il caso Alfa TI Cup del 19 maggio 2026: `6. Court and time TBA`.
+- Il parser live e storico riconosce ora anche `Court and time TBA` e `Court & time TBA` come varianti ufficiali del sotto-header, estraendo esclusivamente il numero iniziale dichiarato.
+- Restano obbligatori numero ufficiale e validazione a zero mancanti; nessun fallback è stato introdotto.

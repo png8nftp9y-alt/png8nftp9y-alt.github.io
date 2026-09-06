@@ -16,7 +16,7 @@ function officialSchedule(context){
   const subheaders=[...String(context||'').matchAll(/<div\b[^>]*class=["'][^"']*\bmatch-group__subheader\b[^"']*["'][^>]*>([\s\S]*?)<\/div>/gi)];
   const fragments=subheaders.length?subheaders.map(entry=>entry[1]).reverse():[String(context||'')];
   for(const fragment of fragments){
-    const label=clean(fragment),numberMatch=label.match(/^\s*(\d+)\s*(?:[.:\-–—)]\s*)?(?=(?:starting|not\s*before|followed|after\s*rest|time\s*tba|\d{1,2}:\d{2})\b)/i);
+    const label=clean(fragment),numberMatch=label.match(/^\s*(\d+)\s*(?:[.:\-–—)]\s*)?(?=(?:starting|not\s*before|followed|after\s*rest|court(?:\s+(?:and|&))?\s*time\s*tba|time\s*tba|\d{1,2}:\d{2})\b)/i);
     if(!numberMatch||!positiveMatchNumber(numberMatch[1]))continue;
     const times=[...fragment.matchAll(/<time\b([^>]*)>([\s\S]*?)<\/time>/gi)],entry=times.at(-1),datetime=entry?attr(entry[1],'datetime'):'',clock=(datetime.match(/\b(\d{1,2}:\d{2})\b/)||label.match(/\b(\d{1,2}:\d{2})\b/)||[])[1]||'';
     return{courtMatchNumber:Number(numberMatch[1]),courtMatchNumberSource:'official_schedule_subheader',time:clock?clock.padStart(5,'0'):'',notBefore:/\bnot\s*before\b|\bN\.?B\.?\b/i.test(label)};
