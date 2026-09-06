@@ -1933,3 +1933,10 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Rimossa integralmente la regola simmetrica KO/Round Robin introdotta nella revisione precedente; ripristinato senza variazioni il comportamento ITF T−1 preesistente.
 - Il caso J30 McKinney è chiuso come non-errore tecnico: il run era verde e le sezioni Round Robin risultavano soltanto non ancora pubblicate/completate dalla fonte ufficiale. Nessuna regola speciale viene mantenuta per forzarne la risoluzione.
 - OOP Europe e la lettura del numero match restano invariati.
+
+## Revisione 2026-09-06.183 — numero match manuale e badge saturi
+
+- Aggiunto `courtMatchNumber: 1` con fonte `manual_confirmed` alla partita manuale di Edoardo Grimoldi del 25 luglio 2026, Austrian Youth Open Kufstein.
+- Mantenuto invariato il badge FITP (`#3155c6`); resi più accesi, conservando le tonalità, i badge Tennis Europe (`#d97706`), maschile (`#2477b3`) e femminile (`#db2777`), tutti con testo bianco.
+- Cache CSS incrementata a `2026090601`.
+- Situazione OOP: ultimo run verde, 22/22 tornei elaborati, 482 match, 0 errori; il parser cerca il numero ufficiale immediatamente prima dell'orario e usa il fallback progressivo soltanto quando la fonte non lo espone.
