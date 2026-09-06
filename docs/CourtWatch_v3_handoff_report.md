@@ -2010,3 +2010,11 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Il risultato è leggermente più grande, con stile limitato alle sole liste di queste pagine.
 - L'Agenda non è stata modificata.
 - Cache-buster aggiornati a `2026090604`.
+## Revisione 2026-09-06.191 — ordine dettagli match
+
+- Nelle sole pagine giocatore e torneo l’ordine è ora: data, Doppio con … (se presente), icona turno, avversaria, risultato.
+- Doppio con … usa testo nero, dimensione maggiore e peso normale.
+- Il risultato usa dimensione maggiore e peso normale.
+- Il filtro singolo/doppio continua a riconoscere il doppio dalla nuova etichetta.
+- L’Agenda è rimasta invariata.
+- Cache-buster aggiornati a `2026090605`.
