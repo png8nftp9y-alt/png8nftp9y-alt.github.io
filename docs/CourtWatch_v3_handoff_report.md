@@ -2123,3 +2123,17 @@ Il deploy della revisione agenda è stato riattivato tramite Contents API per ge
 
 - Corretto il falso rosso «profilo e partite»: lo Scudo percorre le tendine del profilo fino a trovare una partita visibile, senza presumere che sia contenuta nel primo torneo.
 - La verifica resta bloccante e continua a richiedere profilo, partita e CRUD completo. Il rosso 34063556956 non riguardava R2 né l'integrità dei dati.
+
+
+## Revisione 2026-09-06.206 — uniformità agenda e bandiere
+
+- Uniformata ogni partita con turno centrato, campo, numero match ridotto e orario in posizioni fisse; eliminata la giustificazione e normalizzati spazi e margini.
+- Rimossa «(Cancelled)» da J30 Compiegne. Riparata la bandiera Serbia e aggiunto un bordo leggerissimo alle bandiere con bianco ai bordi.
+
+
+## Revisione 2026-09-06.207 — pubblicazione effettiva dell'interfaccia
+
+- Etichetta circuito aggiornata a «TENNIS EUROPE».
+- Causa della versione invariata online: il Worker /app richiedeva sempre lo stesso URL versionato di v3.html rimasto nella cache CDN.
+- Il Worker richiede ora la versione certificata pubblicata da Pages con cache disabilitata e parametro univoco, evitando che futuri deploy grafici restino invisibili.
+- Cache-buster frontend aggiornati a v3.css?v=2026090610 e v3.js?v=2026090612.
