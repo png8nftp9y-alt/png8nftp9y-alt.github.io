@@ -2028,3 +2028,9 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Il risultato torna più piccolo (12px) e in grassetto come lo stile iniziale.
 - L’Agenda e il filtro singolo/doppio restano invariati.
 - Cache-buster CSS aggiornato a `2026090606`.
+## Revisione 2026-09-06.194 — etichetta singolare
+
+- Reinserita la scritta “Singolare” nelle liste match delle pagine giocatore e torneo.
+- L’etichetta usa lo stesso stile del tipo partita già definito; l’ordine resta data → tipo partita → icona turno.
+- L’Agenda e il filtro singolo/doppio restano invariati.
+- Cache-buster JS aggiornato a `2026090607`.
