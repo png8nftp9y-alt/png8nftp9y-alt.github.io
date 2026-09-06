@@ -13,7 +13,7 @@ const PUBLIC_DATA='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-a
 const ACTIONS_API='https://api.github.com/repos/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs?branch=main&per_page=50';
 const WATCHDOG_RUNS_API='https://api.github.com/repos/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/workflows/courtwatch-cloudflare-watchdog-deploy.yml/runs?branch=main&per_page=5';
 // UI revision 207 is documented in the canonical handoff report.
-const PUBLIC_APP='https://png8nftp9y-alt.github.io/v3.html';
+const PUBLIC_APP='https://png8nftp9y-alt.github.io/v3.html?protected=2026090612';
 const WORKFLOWS=[
   ['FITP','courtwatch-v3-fitp-entries.yml'],
   ['Tennis Europe','courtwatch-v3-tennis-europe-live.yml'],
@@ -28,7 +28,7 @@ async function accessUser(request,env){const email=String(request.headers.get('C
 async function protectedApp(request,env,path,url){
   // Cloudflare Access authorizes /app before the request reaches this Worker.
   // Keep the application shell independent from D1 so maintenance imports cannot make page loading fail.
-  if(path==='/app'){const appUrl=new URL(PUBLIC_APP);appUrl.searchParams.set('fresh',String(Date.now()));const response=await fetch(appUrl,{headers:{'User-Agent':'courtwatch-protected-app'},cache:'no-store',cf:{cacheTtl:0,cacheEverything:false}});if(!response.ok)return new Response('Applicazione temporaneamente non disponibile',{status:503});let html=await response.text();html=html.replace('<head>','<head><base href="https://png8nftp9y-alt.github.io/">');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Frame-Options':'DENY','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin'}})}
+  if(path==='/app'){const response=await fetch(PUBLIC_APP,{headers:{'User-Agent':'courtwatch-protected-app'}});if(!response.ok)return new Response('Applicazione temporaneamente non disponibile',{status:503});let html=await response.text();html=html.replace('<head>','<head><base href="https://png8nftp9y-alt.github.io/">');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Frame-Options':'DENY','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin'}})}
   const user=await accessUser(request,env);if(!user)return privateJson({error:'access_authentication_required'},401);
   const apiPath=path.replace(/^\/app(?:-api|\/api)/,'');
   if(apiPath==='/session'&&request.method==='GET')return privateJson({user:{id:user.id,email:user.email,displayName:user.display_name,role:user.role}});
