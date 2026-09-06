@@ -2073,3 +2073,5 @@ Il run `34058778061` non ha creato job per una validazione GitHub del workflow. 
 
 ### 200. Admin e CRUD: rimosso falso errore Access
 I run CRUD fallivano prima del test con HTTP 403 perché `CLOUDFLARE_ACCESS_API_TOKEN` non possiede il permesso Access Service Tokens Write; il backend CRUD non era coinvolto. Il collaudo non crea più identità Access effimere. Verifica invece il codice admin/analisi, la protezione dell'endpoint admin pubblicato e CREATE/UPDATE/READ/DELETE isolato sulla tabella remota `user_match_analyses`, cancellando sempre la riga sintetica. Il confine Cloudflare Access resta gestito dalla policy esistente; una sessione browser reale richiede l'identità dell'utente.
+
+Run CRUD `34059135483`: codice admin e protezione endpoint verdi; il test D1 era rosso perché mancava `wrangler.generated.jsonc`. Aggiunta la configurazione D1 prima del CRUD remoto.

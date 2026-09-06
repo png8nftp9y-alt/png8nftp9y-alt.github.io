@@ -35,6 +35,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: npm install
+      - name: Configure remote D1
+        run: node scripts/configure-d1.mjs
       - name: Verify admin and analysis implementation
         run: |
           npm run check
