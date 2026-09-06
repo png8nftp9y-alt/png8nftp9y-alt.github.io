@@ -1980,3 +1980,14 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Se il Calendario è corto, la lista giocatori non lo supera e abilita lo scorrimento interno; se il Calendario è alto, la lista si mostra per intero finché rientra nell'altezza disponibile.
 - La colonna Giocatori non può mai risultare più lunga del Calendario.
 - Aggiornati i cache-buster CSS e JavaScript a `2026090602`.
+
+
+## Revisione 2026-09-06.188 — riduzione dinamica colonna e righe OOP ufficiali
+
+- Aggiunto `align-items: start` alla griglia Calendario/Giocatori: la scheda Calendario conserva sempre la propria altezza naturale quando diminuiscono i giocatori selezionati.
+- Il `ResizeObserver` può quindi rilevare immediatamente anche la riduzione del Calendario e abbassare il limite della colonna Giocatori senza ricaricare la pagina.
+- Cache CSS incrementata a `2026090603`.
+- Run Europe: live verde; backfill storico con 14 shard verdi e due rossi.
+- Lo shard 8 ha isolato righe di dettaglio di competizioni a squadre prive di `match-group__subheader`: sono singoli incontri interni alla sfida, non righe dell'ordine di gioco numerato.
+- I parser live e storico associano ora ogni match esclusivamente al sotto-header ufficiale contenuto nello stesso `match-group__item`; le righe non appartenenti all'OOP vengono escluse e non ricevono valori inventati o ereditati dalla riga precedente.
+- Ogni partita pubblicata nell'Agenda continua ad avere un numero ufficiale positivo obbligatorio.
