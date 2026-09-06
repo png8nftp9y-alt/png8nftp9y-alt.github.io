@@ -12,8 +12,8 @@ const adminHeaders={'Content-Type':'text/html; charset=utf-8','Cache-Control':'n
 const PUBLIC_DATA='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io/main/dist/v3';
 const ACTIONS_API='https://api.github.com/repos/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs?branch=main&per_page=50';
 const WATCHDOG_RUNS_API='https://api.github.com/repos/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/workflows/courtwatch-cloudflare-watchdog-deploy.yml/runs?branch=main&per_page=5';
-// UI revision 213 is documented in the canonical handoff report.
-const PUBLIC_APP='https://png8nftp9y-alt.github.io/v3.html?protected=2026090615';
+// UI revision 214 is documented in the canonical handoff report.
+const PUBLIC_APP='https://png8nftp9y-alt.github.io/v3.html?protected=2026090616';
 const WORKFLOWS=[
   ['FITP','courtwatch-v3-fitp-entries.yml'],
   ['Tennis Europe','courtwatch-v3-tennis-europe-live.yml'],
