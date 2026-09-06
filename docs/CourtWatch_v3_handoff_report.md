@@ -2093,3 +2093,5 @@ Primo run dello Scudo completo `34059700455`: deploy bloccato correttamente prim
 - Le righe partita non ripetono torneo o luogo. La colonna sinistra, ampliata e protetta dalle sovrapposizioni, mostra nell'ordine turno, orario, campo e numero match ufficiale.
 - La colonna destra mostra giocatore con etichetta Maschile/Femminile, avversario, risultato e condizioni. Restano attivi i collegamenti a giocatore e dettaglio torneo.
 - Aggiornati entrambi i cache-buster. Lo Scudo funzionale completo verifica la nuova impaginazione prima del deploy.
+
+Il primo deploy dell'agenda raggruppata (`34060691347`) è stato correttamente bloccato dallo Scudo: i cache-buster non erano aumentati a causa di un'espressione di sostituzione errata. Portati esplicitamente a `v3.css?v=2026090607` e `v3.js?v=2026090608`; la versionee non certificata non è stata pubblicata.
