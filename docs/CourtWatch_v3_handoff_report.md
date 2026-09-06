@@ -1991,3 +1991,12 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Lo shard 8 ha isolato righe di dettaglio di competizioni a squadre prive di `match-group__subheader`: sono singoli incontri interni alla sfida, non righe dell'ordine di gioco numerato.
 - I parser live e storico associano ora ogni match esclusivamente al sotto-header ufficiale contenuto nello stesso `match-group__item`; le righe non appartenenti all'OOP vengono escluse e non ricevono valori inventati o ereditati dalla riga precedente.
 - Ogni partita pubblicata nell'Agenda continua ad avere un numero ufficiale positivo obbligatorio.
+
+
+## Revisione 2026-09-06.189 — correzione classificazione tornei Europe
+
+- Corretta la classificazione precedente: Team Montage International Championship e Krakow Cup 2026 sono tornei ordinari, non gare a squadre.
+- La pagina ufficiale Team Montage del 22 maggio mostra regolarmente le partite programmate con numero per campo.
+- Nella stessa pagina esiste una sezione ufficiale separata `Not scheduled` contenente tre partite senza numero di ordine di gioco.
+- I parser escludono esclusivamente le righe appartenenti alla sezione `Not scheduled`; non escludono tornei o tipologie di gara.
+- Se una riga esterna a `Not scheduled` non espone un numero ufficiale positivo, l'acquisizione fallisce esplicitamente. Nessun valore viene inventato o ereditato.
