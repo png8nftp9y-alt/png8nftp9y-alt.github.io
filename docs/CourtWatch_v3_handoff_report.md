@@ -2069,3 +2069,7 @@ Aggiunto un ripristino una tantum serializzato con i publisher ITF. Legge i 17 b
 Primo run di ricostruzione `34058700342`: fermato dal gate locale prima di qualsiasi scrittura R2 per un escape errato nel conteggio dei nomi `.json.gz`. Corretto il controllo; dati R2 invariati dal tentativo fallito.
 
 Il run `34058778061` non ha creato job per una validazione GitHub del workflow. Sostituito il conteggio basato su espressione regolare con `awk`, mantenendo invariati gate e operazioni R2.
+
+
+### 200. Admin e CRUD: rimosso falso errore Access
+I run CRUD fallivano prima del test con HTTP 403 perché `CLOUDFLARE_ACCESS_API_TOKEN` non possiede il permesso Access Service Tokens Write; il backend CRUD non era coinvolto. Il collaudo non crea più identità Access effimere. Verifica invece il codice admin/analisi, la protezione dell'endpoint admin pubblicato e CREATE/UPDATE/READ/DELETE isolato sulla tabella remota `user_match_analyses`, cancellando sempre la riga sintetica. Il confine Cloudflare Access resta gestito dalla policy esistente; una sessione browser reale richiede l'identità dell'utente.
