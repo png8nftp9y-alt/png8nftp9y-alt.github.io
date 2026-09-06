@@ -2155,3 +2155,8 @@ Worker e documentazione sono inclusi nello stesso commit, come richiesto dal con
 - Causa del 1101: la richiesta del guscio /app usava opzioni cache non accettate dal runtime Worker durante il deploy preliminare.
 - Ripristinata la chiamata fetch compatibile e sicura; il parametro statico del guscio è stato aggiornato a protected=2026090612 per recuperare la versione frontend corrente senza riutilizzare la precedente cache.
 - Worker e report sono inclusi nello stesso commit di rilascio.
+
+
+### Percorso rapido di ripristino Worker
+
+Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando cambia il relativo sorgente o il workflow di hotfix. Non importa dati e non scrive su D1/R2; evita che un ripristino urgente dell'app resti bloccato dalla lunga coda del rebuild completo.
