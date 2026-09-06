@@ -2137,3 +2137,8 @@ Il deploy della revisione agenda è stato riattivato tramite Contents API per ge
 - Causa della versione invariata online: il Worker /app richiedeva sempre lo stesso URL versionato di v3.html rimasto nella cache CDN.
 - Il Worker richiede ora la versione certificata pubblicata da Pages con cache disabilitata e parametro univoco, evitando che futuri deploy grafici restino invisibili.
 - Cache-buster frontend aggiornati a v3.css?v=2026090610 e v3.js?v=2026090612.
+
+
+### Conformità Scudo revisione 207
+
+Worker e documentazione sono inclusi nello stesso commit, come richiesto dal controllo report-same-commit.
