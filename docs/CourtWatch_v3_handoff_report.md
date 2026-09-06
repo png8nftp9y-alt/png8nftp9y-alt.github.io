@@ -2055,3 +2055,6 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Cinque test schedulatore superati localmente, inclusi sei flussi indipendenti, nessun duplicato e conservazione dei run attivi. Collaudo remoto e riparazione R2 in corso.
 
 ITF R2 root cause identified in all four publishing workflows: AWS credentials were written to GITHUB_ENV and restore executed in the same step, before those variables take effect. Export credentials in the current shell as well. Restore now fails visibly on unreadable pointers or objects and validates all staged objects before replacing local files; it no longer silently initializes empty databases. Remote pointer inspection remains required to quantify prior resets.
+
+### 197. ITF R2 acceptance recovery
+Remote read-only inspection 34047739383 succeeded: current had 0 participants, backup-1 498, backup-2 30,795; all three player/result datasets were empty. Recover missing tournament snapshots from retained immutable generation cb8dcf33c760fb7864fce61f0038dfd6cf4c598298ad1aaa63cec66285c35edf while keeping newer current snapshots. Serialize recovery with ITF publishers. List retained permanent archive sizes for further recovery; no historical object is deleted.

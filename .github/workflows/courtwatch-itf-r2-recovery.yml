@@ -48,3 +48,26 @@ jobs:
               fi
             done
           done
+      - name: Recover retained acceptance cache without replacing newer tournament snapshots
+        run: |
+          set -euo pipefail
+          bash src/v3/itf-r2-cache.sh restore
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/generations/cb8dcf33c760fb7864fce61f0038dfd6cf4c598298ad1aaa63cec66285c35edf/itf_participant_cache.json.gz" /tmp/itf-cache-retained.gz --only-show-errors
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import {gunzipSync,gzipSync} from 'node:zlib';
+          const read=p=>JSON.parse(gunzipSync(fs.readFileSync(p)));
+          const current=read('history/itf_participant_cache.json.gz');
+          const retained=read('/tmp/itf-cache-retained.gz');
+          if(retained.participants.length<30000)throw new Error('Retained acceptance generation unexpectedly incomplete');
+          const existing=new Set(current.participants.map(p=>p.competitionId));
+          const added=retained.participants.filter(p=>!existing.has(p.competitionId));
+          fs.writeFileSync('history/itf_participant_cache.json.gz',gzipSync(JSON.stringify({...current,generatedAt:new Date().toISOString(),participants:[...current.participants,...added]})));
+          console.log(JSON.stringify({current:current.participants.length,recovered:added.length,total:current.participants.length+added.length}));
+          JS
+          bash src/v3/itf-r2-cache.sh publish
+      - name: Identify retained permanent archives
+        run: |
+          aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3api list-objects-v2 --bucket "$R2_BUCKET" --prefix itf/database/generations/ --output json > /tmp/itf-generations.json
+          jq '[.Contents[] | select(.Key | endswith("itf_players_database.json.gz") or endswith("itf_results_database.json.gz"))] | sort_by(.Size) | reverse | .[:12] | map({Key,Size,LastModified})' /tmp/itf-generations.json
