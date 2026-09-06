@@ -2191,3 +2191,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Per i match Europe senza ora numerica, queste diciture hanno priorità sul testo generico `Orario da pubblicare`. Il renderer gestisce anche archivi compatibili che conservano il testo nel campo ora o in una delle etichette schedule.
 - Allineato anche il parser storico al parser live: la dicitura viene estratta dallo stesso sotto-header ufficiale che fornisce il numero match e attraversa il successivo merge D1/Agenda.
 - Cache JavaScript aggiornata a `2026090614` e guscio protetto a `protected=2026090615`.
+
+
+## Revisione 2026-09-06.214 — collegamenti pagina torneo
+
+- Rimossa la dicitura generica `Pagina ufficiale`: il collegamento alla pagina ufficiale del torneo è ora applicato direttamente al nome del torneo nell’intestazione.
+- Il luogo nell’intestazione è collegato a una ricerca Google Maps costruita sul luogo completo mostrato dall’app.
+- Per Tennis Europe, nella precedente posizione del pulsante compare il comando con icona `Acceptance List`, collegato a `acceptanceListUrl`; in assenza del campo esplicito viene usato l’endpoint ufficiale costruito dal `competitionId`.
+- Il nome dei tornei Tennis Europe punta alla pagina ufficiale `/tournament/{competitionId}`, distinta dalla Acceptance List.
+- Agenda, motori e database non sono modificati. Cache CSS/JavaScript aggiornate a `2026090612`/`2026090615`; guscio protetto a `protected=2026090616`.
