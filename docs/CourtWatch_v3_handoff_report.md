@@ -2065,3 +2065,5 @@ Add workflow completion diagnostics for live engines, FITP catalog publication, 
 
 ### 199. Ricostruzione database permanenti ITF in R2
 Aggiunto un ripristino una tantum serializzato con i publisher ITF. Legge i 17 blocchi storici certificati direttamente da R2, verifica manifest, checksum e 4.291 task, ricostruisce i database permanenti di giocatori e risultati, richiede conteggi non nulli e pubblica una nuova generazione soltanto dopo la validazione. La verifica finale rilegge da R2 entrambi i file compressi. Nessun archivio storico viene modificato o eliminato.
+
+Primo run di ricostruzione `34058700342`: fermato dal gate locale prima di qualsiasi scrittura R2 per un escape errato nel conteggio dei nomi `.json.gz`. Corretto il controllo; dati R2 invariati dal tentativo fallito.
