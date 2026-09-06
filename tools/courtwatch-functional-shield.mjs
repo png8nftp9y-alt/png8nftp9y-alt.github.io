@@ -48,7 +48,7 @@ try{
   for(let i=0;i<Math.min(23,await rows.count());i++){
     await rows.nth(i).click();await page.waitForTimeout(100);
     if(await page.locator('#profileView.active').count()){
-      const toggles=page.locator('.tournamentToggle');
+      const toggles=page.locator('.profileTournament:visible .tournamentToggle:visible');
       for(let j=0;j<await toggles.count();j++){
         if(await page.locator('[data-match-analysis]:visible').count()){analysisButton=page.locator('[data-match-analysis]:visible').first();break}
         await toggles.nth(j).click();await page.waitForTimeout(30);

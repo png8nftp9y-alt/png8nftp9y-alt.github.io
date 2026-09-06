@@ -2142,3 +2142,9 @@ Il deploy della revisione agenda è stato riattivato tramite Contents API per ge
 ### Conformità Scudo revisione 207
 
 Worker e documentazione sono inclusi nello stesso commit, come richiesto dal controllo report-same-commit.
+
+
+## Revisione 2026-09-06.208 — Scudo: sole tendine profilo visibili
+
+- Corretto il timeout del run 34064864827: durante la ricerca di una partita analizzabile lo Scudo interagisce soltanto con le tendine dei tornei visibili, evitando controlli nascosti o rimossi dal DOM.
+- Restano invariati tutti i requisiti bloccanti del collaudo.
