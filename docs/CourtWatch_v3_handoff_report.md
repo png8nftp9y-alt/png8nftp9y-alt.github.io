@@ -2148,3 +2148,10 @@ Worker e documentazione sono inclusi nello stesso commit, come richiesto dal con
 
 - Corretto il timeout del run 34064864827: durante la ricerca di una partita analizzabile lo Scudo interagisce soltanto con le tendine dei tornei visibili, evitando controlli nascosti o rimossi dal DOM.
 - Restano invariati tutti i requisiti bloccanti del collaudo.
+
+
+## Revisione 2026-09-06.209 — hotfix Cloudflare 1101
+
+- Causa del 1101: la richiesta del guscio /app usava opzioni cache non accettate dal runtime Worker durante il deploy preliminare.
+- Ripristinata la chiamata fetch compatibile e sicura; il parametro statico del guscio è stato aggiornato a protected=2026090612 per recuperare la versione frontend corrente senza riutilizzare la precedente cache.
+- Worker e report sono inclusi nello stesso commit di rilascio.
