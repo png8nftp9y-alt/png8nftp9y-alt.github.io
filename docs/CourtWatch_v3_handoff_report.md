@@ -2061,3 +2061,7 @@ Remote read-only inspection 34047739383 succeeded: current had 0 participants, b
 
 ### 198. Diagnostics based on current evidence
 Add workflow completion diagnostics for live engines, FITP catalog publication, OOP and both D1 projections; failures remain visible while retries run. Entry/source freshness is checked, FITP catalog warns after 26 hours, legacy agenda presence no longer implies OOP health, empty ITF permanent player/results archives are explicitly partial. Diagnostics regenerate after engine successes and failures using latest main and conflict-safe publication. CRUD changes remain deferred.
+
+
+### 199. Ricostruzione database permanenti ITF in R2
+Aggiunto un ripristino una tantum serializzato con i publisher ITF. Legge i 17 blocchi storici certificati direttamente da R2, verifica manifest, checksum e 4.291 task, ricostruisce i database permanenti di giocatori e risultati, richiede conteggi non nulli e pubblica una nuova generazione soltanto dopo la validazione. La verifica finale rilegge da R2 entrambi i file compressi. Nessun archivio storico viene modificato o eliminato.
