@@ -1940,3 +1940,14 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Mantenuto invariato il badge FITP (`#3155c6`); resi più accesi, conservando le tonalità, i badge Tennis Europe (`#d97706`), maschile (`#2477b3`) e femminile (`#db2777`), tutti con testo bianco.
 - Cache CSS incrementata a `2026090601`.
 - Situazione OOP: ultimo run verde, 22/22 tornei elaborati, 482 match, 0 errori; il parser cerca il numero ufficiale immediatamente prima dell'orario e usa il fallback progressivo soltanto quando la fonte non lo espone.
+
+
+## Revisione 2026-09-06.184 — numero match Tennis Europe obbligatorio e ufficiale
+
+- Verificato direttamente il markup ufficiale dell'ordine di gioco Tennis Europe: il numero è la cifra iniziale del testo dell'elemento `time` (esempi reali: `1. Starting at 09:30`, `2. Not before 10:30`).
+- I parser OOP live e storico leggono `courtMatchNumber` esclusivamente da quel dato ufficiale e lo marcano come `official_time_label`.
+- Eliminato integralmente il fallback progressivo per campo: nessun numero viene più inventato o dedotto dalla posizione dei record.
+- Il numero è obbligatorio per ogni partita acquisita, anche se campo o orario non sono presenti; valori vuoti, zero o incompleti rendono rossa la nuova acquisizione.
+- La validazione è applicata anche al backfill storico dal 18 dicembre 2025; il merge storico viene pubblicato soltanto con zero numeri mancanti.
+- La protezione è atomica: un'acquisizione incompleta non sostituisce le generazioni R2 già validate, quindi la parte funzionante dell'Agenda Europe continua a essere servita.
+- Il generatore e il collaudo D1 conservano il vincolo `missingCourtMatchNumbers = 0`.
