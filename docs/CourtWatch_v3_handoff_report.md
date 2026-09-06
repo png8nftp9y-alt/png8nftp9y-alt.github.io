@@ -1951,3 +1951,13 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - La validazione è applicata anche al backfill storico dal 18 dicembre 2025; il merge storico viene pubblicato soltanto con zero numeri mancanti.
 - La protezione è atomica: un'acquisizione incompleta non sostituisce le generazioni R2 già validate, quindi la parte funzionante dell'Agenda Europe continua a essere servita.
 - Il generatore e il collaudo D1 conservano il vincolo `missingCourtMatchNumbers = 0`.
+
+
+## Revisione 2026-09-06.185 — compatibilità OOP storico e protezione sorgente
+
+- Il controllo dei run rossi ha confermato `missingCourtMatchNumbers: 0` sui match realmente acquisiti: nessun numero vuoto è stato accettato.
+- Individuata la perdita di copertura: il live aveva 6 tornei scartati; nello shard storico 11 erano stati elaborati 5 tornei su 29, con 24 scarti.
+- La lettura ufficiale del numero ora usa l'intero `match-group__subheader`, coprendo sia il markup attuale con numero dentro `time` sia il markup storico con numero nello stesso sotto-header ma fuori da `time`.
+- Restano vietati fallback progressivi e valori dedotti: il numero deve essere presente nel sotto-header ufficiale.
+- Aggiunti quattro tentativi limitati soltanto per errori HTTP temporanei/rete e ridotta la concorrenza del backfill da 8 a 2 shard per non saturare Tennis Europe né interferire con il live.
+- I motivi completi dei tornei scartati vengono ora stampati nel log del run; la pubblicazione resta atomica e richiede zero scarti e zero numeri mancanti.
