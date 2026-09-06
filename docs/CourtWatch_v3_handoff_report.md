@@ -2167,3 +2167,10 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Individuata la causa strutturale: il router restituiva la Promise di protectedApp senza await; un rifiuto asincrono del fetch del guscio sfuggiva quindi al try/catch globale e Cloudflare mostrava 1101.
 - Il router ora attende esplicitamente protectedApp. Inoltre il caricamento del guscio ha un proprio try/catch: errori di rete, HTTP o parsing vengono registrati e producono una risposta 503 controllata, mai un'eccezione Worker non gestita.
 - Il workflow rapido continua a verificare dopo ogni deploy che /app risponda senza 1101. Worker e report sono nello stesso commit.
+
+
+## Revisione 2026-09-06.211 — allineamento verticale agenda
+
+- La colonna destra della partita è abbassata di 30 px: il nome del giocatore CourtWatch è ora allineato verticalmente con la riga del campo nella colonna sinistra.
+- Aggiornato il cache-buster CSS a v3.css?v=2026090611 e la chiave del guscio protetto a protected=2026090613.
+- Nessuna modifica a motori, schema/database, dati R2 o schedulazioni.
