@@ -12,8 +12,8 @@ const adminHeaders={'Content-Type':'text/html; charset=utf-8','Cache-Control':'n
 const PUBLIC_DATA='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io/main/dist/v3';
 const ACTIONS_API='https://api.github.com/repos/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs?branch=main&per_page=50';
 const WATCHDOG_RUNS_API='https://api.github.com/repos/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/workflows/courtwatch-cloudflare-watchdog-deploy.yml/runs?branch=main&per_page=5';
-// UI revision 207 is documented in the canonical handoff report.
-const PUBLIC_APP='https://png8nftp9y-alt.github.io/v3.html?protected=2026090613';
+// UI revision 212 is documented in the canonical handoff report.
+const PUBLIC_APP='https://png8nftp9y-alt.github.io/v3.html?protected=2026090614';
 const WORKFLOWS=[
   ['FITP','courtwatch-v3-fitp-entries.yml'],
   ['Tennis Europe','courtwatch-v3-tennis-europe-live.yml'],
@@ -24,7 +24,8 @@ const WORKFLOWS=[
 ];
 function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function accessClaims(request){try{const token=String(request.headers.get('Cf-Access-Jwt-Assertion')||''),part=token.split('.')[1]||'',base64=part.replace(/-/g,'+').replace(/_/g,'/').padEnd(Math.ceil(part.length/4)*4,'=');return JSON.parse(atob(base64))}catch{return{}}}
-async function accessUser(request,env){const email=String(request.headers.get('Cf-Access-Authenticated-User-Email')||'').trim().toLowerCase();if(email)return env.DB.prepare("SELECT id,email,display_name,role FROM app_users WHERE lower(email)=? AND status='active'").bind(email).first();const claims=accessClaims(request);if(claims.type==='app'&&String(claims.common_name||'').endsWith('.access'))return env.DB.prepare("SELECT id,email,display_name,role FROM app_users WHERE id='user-courtwatch-ci' AND status='active'").first();return null}
+const ACCESS_OWNER={id:'user-federico-181099',email:'federico181099@gmail.com',display_name:'Federico Quadri',role:'admin'};
+async function accessUser(request,env){const email=String(request.headers.get('Cf-Access-Authenticated-User-Email')||'').trim().toLowerCase();if(email){if(email===ACCESS_OWNER.email){try{const row=await env.DB.prepare("SELECT id,email,display_name,role,status FROM app_users WHERE lower(email)=?").bind(email).first();return row?row.status==='active'?row:null:ACCESS_OWNER}catch(error){console.error('access_owner_d1_lookup_failed',error);return ACCESS_OWNER}}return env.DB.prepare("SELECT id,email,display_name,role FROM app_users WHERE lower(email)=? AND status='active'").bind(email).first();}const claims=accessClaims(request);if(claims.type==='app'&&String(claims.common_name||'').endsWith('.access'))return env.DB.prepare("SELECT id,email,display_name,role FROM app_users WHERE id='user-courtwatch-ci' AND status='active'").first();return null}
 async function protectedApp(request,env,path,url){
   // Cloudflare Access authorizes /app before the request reaches this Worker.
   // Keep the application shell independent from D1 so maintenance imports cannot make page loading fail.

@@ -2174,3 +2174,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - La colonna destra della partita è abbassata di 30 px: il nome del giocatore CourtWatch è ora allineato verticalmente con la riga del campo nella colonna sinistra.
 - Aggiornato il cache-buster CSS a v3.css?v=2026090611 e la chiave del guscio protetto a protected=2026090613.
 - Nessuna modifica a motori, schema/database, dati R2 o schedulazioni.
+
+
+## Revisione 2026-09-06.212 — continuità login e diciture OOP Europe
+
+- La configurazione Cloudflare Access resta `720h` (30 giorni) e non viene modificata dai deploy ordinari. Il PIN email è monouso: il messaggio “codice già usato” è coerente con un codice consumato nel primo redirect, non con una riduzione della durata della sessione.
+- Il successivo “nessun account” proveniva dal livello applicativo: dopo l’autenticazione Access, `/session` cercava l’account Federico in D1 durante la ricostruzione/importazione odierna. Il terzo tentativo è riuscito quando D1 era nuovamente stabile.
+- L’identità esatta già autorizzata dalla policy Access (`federico181099@gmail.com`) mantiene ora l’associazione canonica `user-federico-181099` anche durante una lettura D1 temporaneamente indisponibile. Non vengono ammessi altri indirizzi e la protezione Cloudflare Access resta obbligatoria.
+- Il parser OOP Tennis Europe conserva ora la dicitura ufficiale associata al numero di match: `After rest`, `Not before`, `Followed by`, `Starting at`, `Court and time TBA` e `Time TBA`. Il valore attraversa archivio live, seed relazionale, candidati agenda e interfaccia senza essere ricostruito artificialmente.
+- L’Agenda mostra la dicitura nella riga dell’orario; `Not before` conserva la resa compatta `N.B.`. Cache JavaScript aggiornata a `2026090613` e guscio protetto a `protected=2026090614`.
