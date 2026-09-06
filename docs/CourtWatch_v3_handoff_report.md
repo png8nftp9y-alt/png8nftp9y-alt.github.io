@@ -1920,3 +1920,10 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Campo, numero match e orario usano il blu standard precedente (`var(--blue)`, `#2477b3`).
 - L’avversaria resta nera.
 - Cache CSS incrementata a `2026090532`.
+
+## Revisione 2026-09-06.181 — regole ITF T−1 e ripristino OOP Europe
+
+- ITF T−1: una struttura Main Draw alternativa non pubblicata viene chiusa come non utilizzata soltanto quando l'altra struttura ufficiale della stessa famiglia è realmente popolata. La regola è simmetrica KO/Round Robin e segue lo stesso principio già applicato alle qualificazioni quando Main Draw o gironi sono pubblicati.
+- OOP Europe: ripristinata la base dell'ultimo parser con run verde, eliminando l'errore globale introdotto dalla validazione rigida del numero match.
+- Numero match Europe: il parser legge il numero ufficiale mostrato immediatamente prima dell'orario; quando Tennis Europe non espone quel valore mantiene il fallback per ordine sul campo, senza bloccare l'intero torneo.
+- Modifiche pubblicate atomicamente con questo aggiornamento del report.
