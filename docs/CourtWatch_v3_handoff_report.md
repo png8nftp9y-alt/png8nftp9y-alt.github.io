@@ -2095,3 +2095,11 @@ Primo run dello Scudo completo `34059700455`: deploy bloccato correttamente prim
 - Aggiornati entrambi i cache-buster. Lo Scudo funzionale completo verifica la nuova impaginazione prima del deploy.
 
 Il primo deploy dell'agenda raggruppata (`34060691347`) è stato correttamente bloccato dallo Scudo: i cache-buster non erano aumentati a causa di un'espressione di sostituzione errata. Portati esplicitamente a `v3.css?v=2026090607` e `v3.js?v=2026090608`; la versionee non certificata non è stata pubblicata.
+
+
+## Revisione 2026-09-06.203 — rifinitura agenda per torneo
+
+- Conservata la divisione per torneo ma ripristinata l'impostazione continua precedente: niente schede arrotondate o sfondi a blocco; le intestazioni funzionano come divisori nell'elenco e il nome usa il colore del circuito.
+- Ripristinati testo e colori originali delle etichette evento BS, GS, BD e GD con età accanto al giocatore. Il nome CourtWatch è più grande dell'avversario.
+- La colonna sinistra segue ora l'ordine esatto: turno, campo, numero match, orario, con larghezza separata dalla colonna contenuti.
+- Cache-buster aggiornati a v3.css?v=2026090608 e v3.js?v=2026090609.

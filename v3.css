@@ -132,3 +132,19 @@
 .genderLabel.boys{background:#e1e7ff;color:#263d99}.genderLabel.girls{background:#f7e1f0;color:#912f73}
 .agendaMatchBody .versus{margin-top:7px!important}
 @media(max-width:650px){.agendaList{padding:10px;gap:10px}.agendaTournamentMatches{grid-template-columns:1fr}.agendaTournamentMatches .agendaItem{grid-template-columns:96px minmax(0,1fr);gap:12px}.agendaTournamentHead{align-items:flex-start}.agendaTournamentHead h3{display:block}.agendaTournamentHead h3 small{display:block;margin-top:2px}}
+
+/* Agenda refinement: continuous layout with tournament dividers */
+.agendaList{display:block;padding:0;background:#fff}
+.agendaTournamentBlock{border:0;border-radius:0;overflow:visible;background:#fff}
+.agendaTournamentBlock+.agendaTournamentBlock{border-top:10px solid var(--bg)}
+.agendaTournamentHead,.agendaTournamentBlock.fitp .agendaTournamentHead,.agendaTournamentBlock.tennis-europe .agendaTournamentHead,.agendaTournamentBlock.itf .agendaTournamentHead{background:#fff;border-left:0;border-bottom:1px solid var(--line);padding:13px 15px}
+.agendaTournamentBlock.fitp .agendaTournamentHead h3 button,.agendaTournamentBlock.fitp .agendaTournamentHead h3 span{color:var(--blue)}
+.agendaTournamentBlock.tennis-europe .agendaTournamentHead h3 button,.agendaTournamentBlock.tennis-europe .agendaTournamentHead h3 span{color:var(--orange)}
+.agendaTournamentBlock.itf .agendaTournamentHead h3 button,.agendaTournamentBlock.itf .agendaTournamentHead h3 span{color:var(--green)}
+.agendaTournamentMatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.agendaTournamentMatches .agendaItem{grid-template-columns:100px minmax(0,1fr);gap:14px;padding:13px 15px}
+.agendaWhen{gap:3px}
+.agendaWhen .roundCode{order:0}.agendaWhen small:not(.agendaCourtMatch){order:1}.agendaWhen .agendaCourtMatch{order:2}.agendaWhen time{order:3;margin-top:3px}
+.agendaMatchBody .agendaTitle{font-size:17px;line-height:1.25;font-weight:850}
+.agendaMatchBody .versus{font-size:12px;font-weight:400!important}
+@media(max-width:650px){.agendaTournamentBlock+.agendaTournamentBlock{border-top-width:8px}.agendaTournamentMatches .agendaItem{grid-template-columns:92px minmax(0,1fr)}}
