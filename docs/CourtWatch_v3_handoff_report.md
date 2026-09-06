@@ -2015,6 +2015,10 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Nelle sole pagine giocatore e torneo l’ordine è ora: data, Doppio con … (se presente), icona turno, avversaria, risultato.
 - Doppio con … usa testo nero, dimensione maggiore e peso normale.
 - Il risultato usa dimensione maggiore e peso normale.
-- Il filtro singolo/doppio continua a riconoscere il doppio dalla nuova etichetta.
 - L’Agenda è rimasta invariata.
 - Cache-buster aggiornati a `2026090605`.
+## Revisione 2026-09-06.192 — ripristino ambito richiesto
+
+- Rimossa la modifica aggiuntiva al filtro singolo/doppio: il filtro non è stato cambiato.
+- Restano esclusivamente l’ordine data → Doppio con … → icona turno e la tipografia richiesta nelle pagine giocatore e torneo.
+- L’Agenda resta invariata.
