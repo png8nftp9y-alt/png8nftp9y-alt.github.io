@@ -2183,3 +2183,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - L’identità esatta già autorizzata dalla policy Access (`federico181099@gmail.com`) mantiene ora l’associazione canonica `user-federico-181099` anche durante una lettura D1 temporaneamente indisponibile. Non vengono ammessi altri indirizzi e la protezione Cloudflare Access resta obbligatoria.
 - Il parser OOP Tennis Europe conserva ora la dicitura ufficiale associata al numero di match: `After rest`, `Not before`, `Followed by`, `Starting at`, `Court and time TBA` e `Time TBA`. Il valore attraversa archivio live, seed relazionale, candidati agenda e interfaccia senza essere ricostruito artificialmente.
 - L’Agenda mostra la dicitura nella riga dell’orario; `Not before` conserva la resa compatta `N.B.`. Cache JavaScript aggiornata a `2026090613` e guscio protetto a `protected=2026090614`.
+
+
+## Revisione 2026-09-06.213 — resa Agenda dei tempi relativi Europe
+
+- La dicitura ufficiale Tennis Europe `Followed by` viene mostrata nell’app come `A seguire`; `After rest` resta mostrata come `After rest`.
+- Per i match Europe senza ora numerica, queste diciture hanno priorità sul testo generico `Orario da pubblicare`. Il renderer gestisce anche archivi compatibili che conservano il testo nel campo ora o in una delle etichette schedule.
+- Allineato anche il parser storico al parser live: la dicitura viene estratta dallo stesso sotto-header ufficiale che fornisce il numero match e attraversa il successivo merge D1/Agenda.
+- Cache JavaScript aggiornata a `2026090614` e guscio protetto a `protected=2026090615`.
