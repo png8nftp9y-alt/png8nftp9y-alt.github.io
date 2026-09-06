@@ -1970,3 +1970,13 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Il log dello shard 0 ha isolato il caso Alfa TI Cup del 19 maggio 2026: `6. Court and time TBA`.
 - Il parser live e storico riconosce ora anche `Court and time TBA` e `Court & time TBA` come varianti ufficiali del sotto-header, estraendo esclusivamente il numero iniziale dichiarato.
 - Restano obbligatori numero ufficiale e validazione a zero mancanti; nessun fallback è stato introdotto.
+
+
+## Revisione 2026-09-06.187 — comando Calendario e altezza colonna giocatori
+
+- Rimossa la dicitura `Giocatori` dall'area filtri del Calendario.
+- Il pulsante dinamico `Seleziona tutti`/`Deseleziona tutti` è stato spostato sulla stessa riga dell'intestazione `Calendario`.
+- La scheda laterale Giocatori misura continuamente l'altezza reale della scheda Calendario tramite `ResizeObserver`.
+- Se il Calendario è corto, la lista giocatori non lo supera e abilita lo scorrimento interno; se il Calendario è alto, la lista si mostra per intero finché rientra nell'altezza disponibile.
+- La colonna Giocatori non può mai risultare più lunga del Calendario.
+- Aggiornati i cache-buster CSS e JavaScript a `2026090602`.
