@@ -2022,3 +2022,9 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Rimossa la modifica aggiuntiva al filtro singolo/doppio: il filtro non è stato cambiato.
 - Restano esclusivamente l’ordine data → Doppio con … → icona turno e la tipografia richiesta nelle pagine giocatore e torneo.
 - L’Agenda resta invariata.
+## Revisione 2026-09-06.193 — tipografia doppio e risultato
+
+- Nelle sole pagine giocatore e torneo “Doppio con …” resta nero e più grande, ora in grassetto.
+- Il risultato torna più piccolo (12px) e in grassetto come lo stile iniziale.
+- L’Agenda e il filtro singolo/doppio restano invariati.
+- Cache-buster CSS aggiornato a `2026090606`.
