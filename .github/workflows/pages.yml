@@ -27,12 +27,16 @@ jobs:
           node-version: 20
       - name: CourtWatch release guard
         run: node tools/courtwatch-release-guard.mjs
+      - name: Install browser for functional shield
+        run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
+      - name: Verify complete app behavior before deploy
+        run: node tools/courtwatch-functional-shield.mjs
       - name: Save guard report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: courtwatch-release-guard
-          path: artifacts/courtwatch-release-guard.json
+          path: artifacts/
           if-no-files-found: error
           retention-days: 30
       - name: Configure Pages

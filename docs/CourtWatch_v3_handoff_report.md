@@ -2075,3 +2075,11 @@ Il run `34058778061` non ha creato job per una validazione GitHub del workflow. 
 I run CRUD fallivano prima del test con HTTP 403 perché `CLOUDFLARE_ACCESS_API_TOKEN` non possiede il permesso Access Service Tokens Write; il backend CRUD non era coinvolto. Il collaudo non crea più identità Access effimere. Verifica invece il codice admin/analisi, la protezione dell'endpoint admin pubblicato e CREATE/UPDATE/READ/DELETE isolato sulla tabella remota `user_match_analyses`, cancellando sempre la riga sintetica. Il confine Cloudflare Access resta gestito dalla policy esistente; una sessione browser reale richiede l'identità dell'utente.
 
 Run CRUD `34059135483`: codice admin e protezione endpoint verdi; il test D1 era rosso perché mancava `wrangler.generated.jsonc`. Aggiunta la configurazione D1 prima del CRUD remoto.
+
+
+## Revisione 2026-09-06.201 — Scudo CourtWatch funzionale completo
+
+- Esteso lo Scudo dalla sola verifica strutturale a un collaudo browser end-to-end eseguito prima di ogni deploy e sulle pull request.
+- Il gate richiede 23 giocatori, calendario e filtri popolati, profilo con partite, filtri circuito/stato, dettaglio torneo, Home/Oggi, navigazione agenda, menu account, layout mobile e zero errori browser.
+- Il CRUD viene provato attraverso l'interfaccia completa con sessione isolata, CREATE/READ/UPDATE/DELETE e conferma di assenza di residui. Nessun dato operativo viene modificato durante il collaudo browser.
+- Restano obbligatori i controlli precedenti su report, cache-buster, asset pubblicati, Access anonimo, dataset e copertura dei circuiti. Un fallimento blocca il deploy e conserva JSON e screenshot diagnostici per 30 giorni.
