@@ -2160,3 +2160,10 @@ Worker e documentazione sono inclusi nello stesso commit, come richiesto dal con
 ### Percorso rapido di ripristino Worker
 
 Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando cambia il relativo sorgente o il workflow di hotfix. Non importa dati e non scrive su D1/R2; evita che un ripristino urgente dell'app resti bloccato dalla lunga coda del rebuild completo.
+
+
+## Revisione 2026-09-06.210 — barriera permanente contro Cloudflare 1101
+
+- Individuata la causa strutturale: il router restituiva la Promise di protectedApp senza await; un rifiuto asincrono del fetch del guscio sfuggiva quindi al try/catch globale e Cloudflare mostrava 1101.
+- Il router ora attende esplicitamente protectedApp. Inoltre il caricamento del guscio ha un proprio try/catch: errori di rete, HTTP o parsing vengono registrati e producono una risposta 503 controllata, mai un'eccezione Worker non gestita.
+- Il workflow rapido continua a verificare dopo ogni deploy che /app risponda senza 1101. Worker e report sono nello stesso commit.
