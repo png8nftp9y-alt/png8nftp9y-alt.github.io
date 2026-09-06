@@ -1,7 +1,7 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-09-06T17:12:16.535Z",
-  "overall": "yellow",
+  "generatedAt": "2026-09-06T17:13:24.449Z",
+  "overall": "red",
   "legend": {
     "green": "ok",
     "yellow": "attenzione/parziale",
@@ -9,7 +9,7 @@
   },
   "items": [
     {
-      "status": "green",
+      "status": "yellow",
       "label": "FITP tornei",
       "detail": "5885 tornei · 34h fa",
       "critical": true
@@ -39,13 +39,13 @@
       "critical": true
     },
     {
-      "status": "green",
-      "label": "Agenda/OOP",
-      "detail": "421 voci · motore attivo",
+      "status": "yellow",
+      "label": "Agenda legacy",
+      "detail": "421 voci legacy · vedere verifica Agenda/OOP Europe e D1",
       "critical": false
     },
     {
-      "status": "green",
+      "status": "yellow",
       "label": "Risultati",
       "detail": "54 risultati · motore attivo",
       "critical": false
@@ -59,8 +59,104 @@
     {
       "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 06/09/2026, 19:12:16",
+      "detail": "file v3 generati · ultimo merge 06/09/2026, 19:13:24",
       "critical": true
+    },
+    {
+      "status": "yellow",
+      "label": "ITF archivio permanente",
+      "detail": "0 giocatori · 0 risultati · archivio separato dalle acceptance",
+      "critical": false
+    },
+    {
+      "label": "FITP pubblicazione catalogo",
+      "status": "red",
+      "critical": true,
+      "workflow": "courtwatch-v3-fitp-tournaments-sharded.yml",
+      "runId": 34018339342,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/34018339342",
+      "checkedAt": "2026-09-06T17:13:24.419Z",
+      "detail": "failure · 600 min fa · nuova esecuzione in corso"
+    },
+    {
+      "label": "FITP motore live",
+      "status": "green",
+      "critical": true,
+      "workflow": "courtwatch-v3-fitp-entries.yml",
+      "runId": 34047739380,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/34047739380",
+      "checkedAt": "2026-09-06T17:13:24.199Z",
+      "detail": "success · 2 min fa · nuova esecuzione in corso"
+    },
+    {
+      "label": "Europe motore live",
+      "status": "green",
+      "critical": true,
+      "workflow": "courtwatch-v3-tennis-europe-live.yml",
+      "runId": 34046781365,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/34046781365",
+      "checkedAt": "2026-09-06T17:13:24.181Z",
+      "detail": "success · 19 min fa · nuova esecuzione in corso"
+    },
+    {
+      "label": "ITF discovery e R2",
+      "status": "green",
+      "critical": true,
+      "workflow": "courtwatch-v3-itf-live.yml",
+      "runId": 34047248760,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/34047248760",
+      "checkedAt": "2026-09-06T17:13:24.197Z",
+      "detail": "success · 1 min fa"
+    },
+    {
+      "label": "ITF labels e R2",
+      "status": "green",
+      "critical": true,
+      "workflow": "courtwatch-v3-itf-known-fast.yml",
+      "runId": 34047248702,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/34047248702",
+      "checkedAt": "2026-09-06T17:13:24.105Z",
+      "detail": "success · 11 min fa"
+    },
+    {
+      "label": "ITF T−1 e R2",
+      "status": "green",
+      "critical": true,
+      "workflow": "courtwatch-v3-itf-t-minus-one.yml",
+      "runId": 34047248764,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/34047248764",
+      "checkedAt": "2026-09-06T17:13:24.188Z",
+      "detail": "success · 10 min fa"
+    },
+    {
+      "label": "Agenda/OOP Europe",
+      "status": "green",
+      "critical": true,
+      "workflow": "courtwatch-tennis-europe-oop-live.yml",
+      "runId": 34047739410,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/34047739410",
+      "checkedAt": "2026-09-06T17:13:24.253Z",
+      "detail": "success · 2 min fa"
+    },
+    {
+      "label": "D1 generale",
+      "status": "yellow",
+      "critical": true,
+      "workflow": "courtwatch-cloudflare-app-api.yml",
+      "runId": 33992368107,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/33992368107",
+      "checkedAt": "2026-09-06T17:13:24.174Z",
+      "detail": "success · 1191 min fa · nuova esecuzione in corso"
+    },
+    {
+      "label": "D1 agenda Europe",
+      "status": "green",
+      "critical": true,
+      "workflow": "courtwatch-tennis-europe-agenda.yml",
+      "runId": 34045481753,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/34045481753",
+      "checkedAt": "2026-09-06T17:13:24.289Z",
+      "detail": "success · 44 min fa"
     }
   ],
   "raw": {
