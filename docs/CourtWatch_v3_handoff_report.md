@@ -2000,3 +2000,13 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Nella stessa pagina esiste una sezione ufficiale separata `Not scheduled` contenente tre partite senza numero di ordine di gioco.
 - I parser escludono esclusivamente le righe appartenenti alla sezione `Not scheduled`; non escludono tornei o tipologie di gara.
 - Se una riga esterna a `Not scheduled` non espone un numero ufficiale positivo, l'acquisizione fallisce esplicitamente. Nessun valore viene inventato o ereditato.
+
+## Revisione 2026-09-06.190 — dettaglio partite in pagina giocatore e torneo
+
+- Modificate esclusivamente le liste match di pagina giocatore e pagina torneo.
+- Il badge del turno resta in alto; la data compare subito sotto.
+- Rimossi orario, dicitura `Singolare` e campo da queste due pagine.
+- Per i doppi resta la dicitura `Doppio con …` quando il partner è disponibile.
+- Il risultato è leggermente più grande, con stile limitato alle sole liste di queste pagine.
+- L'Agenda non è stata modificata.
+- Cache-buster aggiornati a `2026090604`.
