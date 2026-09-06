@@ -1,0 +1,53 @@
+name: Court Watch operational diagnostics
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['src/v3/update-operational-diagnostics.mjs', 'src/v3/entries-engine.mjs', '.github/workflows/courtwatch-operational-diagnostics.yml']
+  workflow_run:
+    workflows:
+      - Court Watch v3 FITP provincial primary
+      - Court Watch v3 FITP player entries
+      - Court Watch v3 Tennis Europe live entries
+      - Court Watch v3 ITF acceptance discovery 42d
+      - Court Watch v3 ITF known labels fast
+      - Court Watch v3 ITF T-1 complete draws
+      - Court Watch Tennis Europe OOP and results live
+      - Court Watch Tennis Europe agenda D1
+      - Court Watch Cloudflare D1 and app API
+      - Court Watch ITF R2 recovery
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: courtwatch-operational-diagnostics
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Publish current operational evidence
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            node src/v3/update-operational-diagnostics.mjs
+            node src/v3/entries-engine.mjs
+            git add dist/v3/operational_status.json dist/v3/diagnostics.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m "Update workflow and database diagnostic evidence"
+            git push origin HEAD:main && exit 0
+          done
+          exit 1

@@ -29,6 +29,8 @@ function fitpTournamentLight(fitpTournaments){
  const errors=fitpTournaments.errors||[];
  const failed=fitpTournaments.quality?.failedQueries ?? errors.length;
  if(found<5300)return 'red';
+ const age=ageHours(fitpTournaments.generatedAt);
+ if(age==null||age>26)return 'yellow';
  if(failed>25)return 'yellow';
  return 'green';
 }
@@ -78,17 +80,23 @@ const fitpCardOnly=(fitp.byMatchMethod&&Object.keys(fitp.byMatchMethod).length==
 const mapAge=ageHours(fitpTournaments.generatedAt);
 const teAcceptance=(te.entries||[]).filter(e=>e.entryStatus==='confirmed_on_acceptance_list').length;
 const fitpTournamentStatus=fitpTournamentLight(fitpTournaments);
+const operational=await readJson('dist/v3/operational_status.json',{items:[]});
+const itfDatabase=await readJson('history/itf_database_audit.json',{});
+const fresh=(doc,max=.75)=>{const age=ageHours(doc.generatedAt);return age!=null&&age<=max};
 const diagnosticsItems=[
  light(fitpTournamentStatus,'FITP tornei',fitpTournamentDetail(fitpTournaments,mapAge),true),
- light((fitp.entriesFound||0)>=282&&fitpCardOnly&&!(fitp.errors||[]).length?'green':'yellow','FITP iscrizioni',`${fitp.entriesFound||0} entry · tessera ${fitp.byMatchMethod?.membership_card||0}/${fitp.entriesFound||0} · rescue ${fitp.verifiedCompetitionEntryRescues||0}`,true),
- light(teSystem.status==='green'?'green':teSystem.status==='red'?'red':'yellow','Tennis Europe',`${(te.entries||[]).filter(e=>e.circuit==='tennis-europe').length} presenze · T−1 ${teSystem.checks?.confirmed||0}/${teSystem.checks?.rejected||0} · mappa ${teSystem.checks?.mapTournaments||0} · DB ${teSystem.checks?.participantSnapshots||0} liste/${teSystem.checks?.participantIds||0} ID · continuità ${teSystem.checks?.continuityCycles||0}`,true),
- light(String(itf.status||'').startsWith('itf_acceptance_complete')?'green':'yellow','ITF',`${itfMapEntries.length} presenze in mappa · acceptance correnti ${itfCurrentAcceptance} · storico ${itfHistoricalEntries} · withdrawn ${itfWithdrawals} · stato ${itf.status||'n/d'}`,false),
+ light(fresh(fitp)&&(fitp.entriesFound||0)>=282&&fitpCardOnly&&!(fitp.errors||[]).length?'green':'yellow','FITP iscrizioni',`${fitp.entriesFound||0} entry · tessera ${fitp.byMatchMethod?.membership_card||0}/${fitp.entriesFound||0} · rescue ${fitp.verifiedCompetitionEntryRescues||0}`,true),
+ light(teSystem.status==='green'&&fresh(teSystem)?'green':teSystem.status==='red'?'red':'yellow','Tennis Europe',`${(te.entries||[]).filter(e=>e.circuit==='tennis-europe').length} presenze · T−1 ${teSystem.checks?.confirmed||0}/${teSystem.checks?.rejected||0} · mappa ${teSystem.checks?.mapTournaments||0} · DB ${teSystem.checks?.participantSnapshots||0} liste/${teSystem.checks?.participantIds||0} ID · continuità ${teSystem.checks?.continuityCycles||0}`,true),
+ light(fresh(itf)&&String(itf.status||'').startsWith('itf_acceptance_complete')?'green':'yellow','ITF',`${itfMapEntries.length} presenze in mappa · acceptance correnti ${itfCurrentAcceptance} · storico ${itfHistoricalEntries} · withdrawn ${itfWithdrawals} · stato ${itf.status||'n/d'}`,false),
  light(warnings.length?'yellow':'green','Calendario',`${tournamentEntries.length} tornei visibili · FITP ${byCircuit.fitp||0} · TE ${byCircuit['tennis-europe']||0} · ITF ${byCircuit.itf||0}`,true),
- light((agendaDoc.agenda||[]).length>0?'green':'red','Agenda/OOP',`${(agendaDoc.agenda||[]).length} voci · motore ${((agendaDoc.agenda||[]).length?'attivo':'pending')}`,false),
- light((resultsDoc.results||[]).length>0?'green':'red','Risultati',`${(resultsDoc.results||[]).length} risultati · motore ${((resultsDoc.results||[]).length?'attivo':'pending')}`,false),
+ light('yellow','Agenda legacy',`${(agendaDoc.agenda||[]).length} voci legacy · vedere verifica Agenda/OOP Europe e D1`,false),
+ light(fresh(resultsDoc)&&(resultsDoc.results||[]).length>0?'green':'yellow','Risultati',`${(resultsDoc.results||[]).length} risultati · motore ${((resultsDoc.results||[]).length?'attivo':'pending')}`,false),
  light((opponentsDoc.opponents||[]).length&&!(opponentsDoc.opponents||[]).filter(o=>o.dataStatus!=='ok').length?'green':'yellow','Avversari',`${(opponentsDoc.opponents||[]).length} record · da completare ${(opponentsDoc.opponents||[]).filter(o=>o.dataStatus!=='ok').length}`,false),
  light('green','App/UI',`file v3 generati · ultimo merge ${new Date(NOW).toLocaleString('it-IT',{timeZone:'Europe/Rome'})}`,true)
 ];
+diagnosticsItems.push(light(itfDatabase.allPlayers>0&&itfDatabase.allResults>0?'green':'yellow','ITF archivio permanente',`${itfDatabase.allPlayers||0} giocatori · ${itfDatabase.allResults||0} risultati · archivio separato dalle acceptance`,false));
+for(const item of operational.items||[])diagnosticsItems.push({...item,status:fresh(operational)?item.status:'yellow',detail:item.detail+(fresh(operational)?'':' · verifica operativa scaduta')});
+if(!(operational.items||[]).length)diagnosticsItems.push(light('yellow','Verifica operativa','Stato workflow, OOP e D1 non ancora acquisito',true));
 const diagnostics={version:VERSION,generatedAt:NOW,overall:worst(diagnosticsItems),legend:{green:'ok',yellow:'attenzione/parziale',red:'errore o motore incompleto'},items:diagnosticsItems,raw:{fitp:{entriesFound:fitp.entriesFound,externalCircuitEntriesExcludedFromCalendar:fitpExternalExcluded,byPlayer:fitp.byPlayer,byMatchMethod:fitp.byMatchMethod,homonymRejected:fitp.homonymRejected,verifiedCompetitionEntryRescues:fitp.verifiedCompetitionEntryRescues,playerDrivenCandidateTournaments:fitp.playerDrivenCandidateTournaments,playerDrivenCandidateRescues:fitp.playerDrivenCandidateRescues,playerDrivenCandidatesConfirmed:fitp.playerDrivenCandidatesConfirmed},calendar:{tournamentEntries:tournamentEntries.length,byCircuit,warnings:warnings.length},te:{status:te.status,profileSeeds:te.profileSeeds,entriesVisible:teEntries.length,acceptanceConfirmed:teAcceptance,byPlayer:te.byPlayer,byAcceptance:te.byAcceptance,system:teSystem},itf:{status:itf.status,mapEntries:itfMapEntries.length,currentAcceptanceEntries:itfCurrentAcceptance,historicalEntries:itfHistoricalEntries,withdrawals:itfWithdrawals,sourceEntries:(itf.entries||[]).length,archiveEntries:(itfHistory.entries||[]).length}}};
 const syncStatus={version:VERSION,generatedAt:NOW,status:'entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists',coverageFrom:COVERAGE_FROM,checks:{players:activePlayers.length,tournamentEntries:tournamentEntries.length,tournaments:tournaments.length,byCircuit,warnings:warnings.length,tennisEuropeVisible:teEntries.length,tennisEuropeAcceptanceConfirmed:teAcceptance,diagnostics:diagnostics.overall},engines:{discoverFitp:{status:fitp.status||'missing'},discoverTennisEurope:{status:te.status||'missing',calendarMerge:'enabled_for_dated_official_acceptance_list_entries'},discoverItf:{status:itf.status||'missing'},entries:{status:'built',file:'src/v3/entries-engine.mjs',method:'merge FITP + validated dated TE acceptance list/profile entries + ITF; no v1/v2/data.json'},ordersOfPlay:{status:(agendaDoc.agenda||[]).length?'active':'pending'},results:{status:(resultsDoc.results||[]).length?'active':'pending'}},warnings:warnings.slice(0,200)};
 await writeJson('dist/v3/players.json',{version:VERSION,generatedAt:NOW,players:activePlayers});

@@ -2058,3 +2058,6 @@ ITF R2 root cause identified in all four publishing workflows: AWS credentials w
 
 ### 197. ITF R2 acceptance recovery
 Remote read-only inspection 34047739383 succeeded: current had 0 participants, backup-1 498, backup-2 30,795; all three player/result datasets were empty. Recover missing tournament snapshots from retained immutable generation cb8dcf33c760fb7864fce61f0038dfd6cf4c598298ad1aaa63cec66285c35edf while keeping newer current snapshots. Serialize recovery with ITF publishers. List retained permanent archive sizes for further recovery; no historical object is deleted.
+
+### 198. Diagnostics based on current evidence
+Add workflow completion diagnostics for live engines, FITP catalog publication, OOP and both D1 projections; failures remain visible while retries run. Entry/source freshness is checked, FITP catalog warns after 26 hours, legacy agenda presence no longer implies OOP health, empty ITF permanent player/results archives are explicitly partial. Diagnostics regenerate after engine successes and failures using latest main and conflict-safe publication. CRUD changes remain deferred.
