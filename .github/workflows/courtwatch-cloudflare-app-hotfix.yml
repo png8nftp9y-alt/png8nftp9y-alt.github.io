@@ -1,0 +1,43 @@
+name: Court Watch Cloudflare app Worker hotfix
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare/app-api/src/index.js'
+      - '.github/workflows/courtwatch-cloudflare-app-hotfix.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: courtwatch-app-worker-hotfix
+  cancel-in-progress: true
+
+jobs:
+  deploy-worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install
+      - run: npm run check
+      - run: npm run configure
+      - name: Deploy Worker only
+        run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
+      - name: Verify protected app no Worker exception
+        working-directory: .
+        run: |
+          status=$(curl -sS -o /tmp/courtwatch-app.html -w '%{http_code}' https://courtwatch-app-api.ckrk9ggvrb.workers.dev/app)
+          test "$status" = "200" || test "$status" = "302"
+          ! grep -q 'error code: 1101' /tmp/courtwatch-app.html
