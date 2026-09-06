@@ -165,3 +165,18 @@
 .agendaMatchBody{text-align:justify}
 @media(max-width:900px){.agendaMatchRow,.agendaMatchRow.matches-2,.agendaMatchRow.matches-3{grid-template-columns:1fr}}
 @media(max-width:650px){.agendaTournamentBlock+.agendaTournamentBlock{border-top:0}.agendaMatchRow .agendaItem{grid-template-columns:104px minmax(0,1fr)}}
+
+
+/* Agenda uniform rows and bordered light flags */
+.agendaMatchRow .agendaItem{grid-template-columns:132px minmax(0,1fr);gap:24px;min-height:138px;align-items:stretch}
+.agendaWhen{height:100%;display:grid;grid-template-rows:24px 20px 16px 20px;gap:6px;align-content:start;padding-right:0}
+.agendaWhen .roundCode{width:100%;max-width:112px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;text-align:center;margin:0;padding-left:8px;padding-right:8px}
+.agendaWhen .agendaCourtField,.agendaWhen time{font-size:16px!important;line-height:20px;font-weight:850;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
+.agendaWhen .agendaCourtMatch{font-size:12px!important;line-height:16px;font-weight:750;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis}
+.agendaWhen .agendaFieldEmpty{visibility:hidden}
+.agendaMatchBody{text-align:left;display:flex;flex-direction:column;gap:0;min-width:0;padding-left:2px}
+.agendaMatchBody .agendaTitle{margin:0;line-height:1.3}
+.agendaMatchBody .versus{margin:8px 0 0!important;line-height:1.4}
+.agendaMatchBody .result,.agendaMatchBody .condition{margin:7px 0 0;line-height:1.4}
+.countryFlag{box-sizing:border-box;border:1px solid rgba(35,35,35,.18);background:#fff}
+@media(max-width:650px){.agendaMatchRow .agendaItem{grid-template-columns:118px minmax(0,1fr);gap:18px}.agendaWhen .roundCode{max-width:104px}}
