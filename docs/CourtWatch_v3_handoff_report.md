@@ -2083,3 +2083,5 @@ Run CRUD `34059135483`: codice admin e protezione endpoint verdi; il test D1 era
 - Il gate richiede 23 giocatori, calendario e filtri popolati, profilo con partite, filtri circuito/stato, dettaglio torneo, Home/Oggi, navigazione agenda, menu account, layout mobile e zero errori browser.
 - Il CRUD viene provato attraverso l'interfaccia completa con sessione isolata, CREATE/READ/UPDATE/DELETE e conferma di assenza di residui. Nessun dato operativo viene modificato durante il collaudo browser.
 - Restano obbligatori i controlli precedenti su report, cache-buster, asset pubblicati, Access anonimo, dataset e copertura dei circuiti. Un fallimento blocca il deploy e conserva JSON e screenshot diagnostici per 30 giorni.
+
+Primo run dello Scudo completo `34059700455`: deploy bloccato correttamente prima della pubblicazione perché il collaudo puntava a un comando analisi presente nel DOM ma nascosto nella tendina chiusa. Il test apre ora la tendina e richiede un comando visibile; nessuna versione non certificata è stata pubblicata dal run fallito.

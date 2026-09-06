@@ -47,7 +47,8 @@ try{
   const rows=page.locator('#playersList [data-profile]');let analysisButton=null;
   for(let i=0;i<Math.min(23,await rows.count());i++){
     await rows.nth(i).click();await page.waitForTimeout(100);
-    if(await page.locator('#profileView.active').count()&&await page.locator('[data-match-analysis]').count()){analysisButton=page.locator('[data-match-analysis]').first();break}
+    if(await page.locator('#profileView.active').count()&&await page.locator('.tournamentToggle').count())await page.locator('.tournamentToggle').first().click();
+    if(await page.locator('#profileView.active').count()&&await page.locator('[data-match-analysis]:visible').count()){analysisButton=page.locator('[data-match-analysis]:visible').first();break}
     await page.locator('#backHome').click();await page.waitForTimeout(50);
   }
   requireCheck(Boolean(analysisButton),'profilo e partite');
