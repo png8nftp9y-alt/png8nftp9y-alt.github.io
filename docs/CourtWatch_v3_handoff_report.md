@@ -2103,3 +2103,13 @@ Il primo deploy dell'agenda raggruppata (`34060691347`) è stato correttamente b
 - Ripristinati testo e colori originali delle etichette evento BS, GS, BD e GD con età accanto al giocatore. Il nome CourtWatch è più grande dell'avversario.
 - La colonna sinistra segue ora l'ordine esatto: turno, campo, numero match, orario, con larghezza separata dalla colonna contenuti.
 - Cache-buster aggiornati a v3.css?v=2026090608 e v3.js?v=2026090609.
+
+
+## Revisione 2026-09-06.204 — agenda compatta e filtro doppio
+
+- Agenda ordinata stabilmente per circuito: ITF, Tennis Europe, FITP. L'etichetta Europe torna a «Tennis Europe»; ITF usa sfondo verde acceso e testo bianco.
+- Nome torneo grigio e in grassetto come il luogo. Per ITF e Tennis Europe l'intestazione espone città e nazione rimuovendo il circolo iniziale (incluso Bad Waltersdorf); FITP mostra la sola città.
+- Eliminato ogni intervallo tra tornei. Le partite sono al massimo tre per riga: oltre tre elementi, restano affiancate solo coppie con identico orario; gruppi di almeno tre allo stesso orario vengono disposti uno per riga.
+- Colonna sinistra e destra hanno la stessa altezza; campo, numero match e orario condividono dimensione e peso. Il contenuto partita è giustificato e le righe FITP non aggiungono più il circolo al giocatore CourtWatch.
+- Corretto il filtro Doppio nella pagina giocatore: ora legge l'etichetta tipo partita effettiva, quindi tornei e incontri di doppio non vengono più esclusi erroneamente.
+- Cache-buster aggiornati a v3.css?v=2026090609 e v3.js?v=2026090610.

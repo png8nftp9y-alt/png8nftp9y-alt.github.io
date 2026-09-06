@@ -148,3 +148,20 @@
 .agendaMatchBody .agendaTitle{font-size:17px;line-height:1.25;font-weight:850}
 .agendaMatchBody .versus{font-size:12px;font-weight:400!important}
 @media(max-width:650px){.agendaTournamentBlock+.agendaTournamentBlock{border-top-width:8px}.agendaTournamentMatches .agendaItem{grid-template-columns:92px minmax(0,1fr)}}
+
+
+/* Agenda compact tournament flow, circuit order and balanced match columns */
+.agendaTournamentBlock+.agendaTournamentBlock{border-top:0}
+.agendaTournamentHead h3 button,.agendaTournamentHead h3 span,.agendaTournamentBlock.fitp .agendaTournamentHead h3 button,.agendaTournamentBlock.fitp .agendaTournamentHead h3 span,.agendaTournamentBlock.tennis-europe .agendaTournamentHead h3 button,.agendaTournamentBlock.tennis-europe .agendaTournamentHead h3 span,.agendaTournamentBlock.itf .agendaTournamentHead h3 button,.agendaTournamentBlock.itf .agendaTournamentHead h3 span{color:var(--muted);font-weight:850}
+.agendaTournamentHead>.type.itf{background:#18a957;color:#fff}
+.agendaTournamentMatches{display:block}
+.agendaMatchRow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.agendaMatchRow.matches-1{grid-template-columns:minmax(0,1fr)}
+.agendaMatchRow.matches-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.agendaMatchRow .agendaItem{height:100%;align-items:stretch;grid-template-columns:112px minmax(0,1fr)}
+.agendaWhen{height:100%;align-self:stretch;display:grid;grid-template-rows:auto repeat(3,minmax(19px,auto));align-content:space-between}
+.agendaWhen small,.agendaWhen time,.agendaWhen .agendaCourtMatch{font-size:16px!important;line-height:1.2;font-weight:850}
+.agendaWhen time{margin-top:0}
+.agendaMatchBody{text-align:justify}
+@media(max-width:900px){.agendaMatchRow,.agendaMatchRow.matches-2,.agendaMatchRow.matches-3{grid-template-columns:1fr}}
+@media(max-width:650px){.agendaTournamentBlock+.agendaTournamentBlock{border-top:0}.agendaMatchRow .agendaItem{grid-template-columns:104px minmax(0,1fr)}}
