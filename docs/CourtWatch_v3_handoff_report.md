@@ -2211,3 +2211,9 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Il calcolo usa l’intero OOP ufficiale prima di ridurlo ai soli giocatori CourtWatch, quindi conta correttamente anche gli incontri intermedi non presenti nell’Agenda personale.
 - La colonna sinistra è stata ampliata e il nome del campo non usa più ellissi; la colonna destra parte più a destra.
 - Cache CSS/JavaScript aggiornate a `2026090713`/`2026090716`; guscio protetto a `protected=2026090717`.
+
+## Revisione 2026-09-07.216 — ripristino OOP Europe e isolamento parità D1
+
+- Corretto il rosso OOP Europe: durante l’integrazione dei tempi relativi mancava la chiusura del ciclo per campo in `annotateRelativeSchedule`; il successivo `await consent()` veniva quindi interpretato dentro una funzione non asincrona e Node terminava con `SyntaxError: Unexpected reserved word` prima di qualsiasi acquisizione o scrittura R2.
+- La verifica D1 generale non confronta più le quattro proiezioni Agenda Europe (`app_match_candidates` e `app_matches`) con un manifest di sola lettura creato nello stesso run. Queste tabelle sono possedute e certificate dal workflow D1 Europe dedicato, che può avanzare indipendentemente; tutti gli altri controlli di parità, account, proprietà dati e CRUD restano bloccanti.
+- Componenti FITP, ITF, R2, schedulazioni e interfaccia non sono stati modificati. Validazione remota richiesta sui run OOP Europe, D1 Europe e D1 generale avviati dal commit.
