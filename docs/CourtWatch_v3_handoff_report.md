@@ -2224,3 +2224,10 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Europe Agenda D1 parte ora soltanto quando esiste realmente un nuovo dato Europe: completamento verde OOP live, merge storico, modifica esplicita dei suoi script oppure avvio manuale.
 - La serializzazione resta invariata: una sola scrittura D1 alla volta, senza sovrapposizioni. Il job Europe in attesa non viene più rimpiazzato dai completamenti del D1 generale e raggiunge l’import appena si libera il lock.
 - Frequenza OOP, motori FITP/ITF/Europe, archivi R2, schema D1 e interfaccia non sono stati modificati. Il push del workflow avvia un rebuild Europe completo di verifica.
+
+## Revisione 2026-09-07.218 — precedenza effettiva Agenda Europe sul D1 generale
+
+- La catena ordinaria delle scritture è ora esplicita: OOP Europe verde → Europe Agenda D1 → D1 generale. Il rebuild generale non viene più richiesto separatamente al completamento di ciascuno dei cinque motori live, condizione che poteva collocarlo davanti all’importazione dell’agenda appena acquisita.
+- Europe Agenda D1 pubblica quindi per primo campo, orario, numero match, tempi relativi e risultati Europe; soltanto dopo il suo verde D1 generale consolida gli ultimi snapshot disponibili di FITP, Tennis Europe e ITF.
+- Resta vietata l’interruzione di una scrittura generale già iniziata: in quel solo caso Europe attende il tempo residuo, evitando una generazione D1 parziale. Nei cicli ordinari successivi Europe acquisisce il lock prima del generale.
+- La frequenza dei sei motori e dell’OOP resta ogni 15 minuti. Le richieste D1 generali duplicate vengono eliminate, riducendo coda e consumo GitHub Actions; watchdog, avvio manuale e trigger push di manutenzione restano disponibili.
