@@ -2231,3 +2231,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Europe Agenda D1 pubblica quindi per primo campo, orario, numero match, tempi relativi e risultati Europe; soltanto dopo il suo verde D1 generale consolida gli ultimi snapshot disponibili di FITP, Tennis Europe e ITF.
 - Resta vietata l’interruzione di una scrittura generale già iniziata: in quel solo caso Europe attende il tempo residuo, evitando una generazione D1 parziale. Nei cicli ordinari successivi Europe acquisisce il lock prima del generale.
 - La frequenza dei sei motori e dell’OOP resta ogni 15 minuti. Le richieste D1 generali duplicate vengono eliminate, riducendo coda e consumo GitHub Actions; watchdog, avvio manuale e trigger push di manutenzione restano disponibili.
+
+## Revisione 2026-09-07.219 — completamento tempi relativi e larghezza condizionale Agenda Europe
+
+- `Dopo riposo` compare immediatamente sotto il nome del campo. Quando è solo nasconde il numero match; quando il sotto-header contiene anche `Not before`, prevalgono esclusivamente `N.B.` e orario e il numero match resta visibile.
+- La proiezione D1 ricostruisce `relativeMatchNumber` e `relativeFromTime` sull’intero OOP dello stesso torneo, giorno e campo prima di filtrare i giocatori CourtWatch. Anche i record storici già acquisiti con `Followed by` ricevono quindi la forma `A seguire` e il dettaglio, per esempio `(3° match dalle 9:00)`.
+- Corretto anche il ciclo per campo del parser storico, che terminava dopo il primo campo e lasciava incompleti i tempi relativi degli altri campi.
+- I nomi campo privi di prefisso ufficiale `Campo`, `Court`, `C` o `CC` vengono presentati con `Court` anteposto; il dato sorgente conservato in R2 e D1 non viene alterato.
+- Ripristinata la larghezza precedente della colonna sinistra per i campi normali. L’allargamento e lo spostamento della colonna destra si applicano soltanto ai nomi campo lunghi.
+- Cache CSS/JavaScript aggiornate a `2026090714`/`2026090717`. Schedulazioni, schema D1, R2 e motori FITP/ITF non sono modificati.

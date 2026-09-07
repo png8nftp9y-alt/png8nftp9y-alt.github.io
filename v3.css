@@ -195,10 +195,13 @@
 
 
 /* Europe relative OOP labels and full court names */
-.agendaMatchRow .agendaItem{grid-template-columns:178px minmax(0,1fr);gap:24px;min-height:150px}
-.agendaWhen{grid-template-rows:24px 20px minmax(16px,auto) 20px}
+.agendaMatchRow .agendaItem{grid-template-columns:132px minmax(0,1fr);gap:24px;min-height:150px}
+.agendaMatchRow .agendaItem.agendaLongCourt{grid-template-columns:178px minmax(0,1fr)}
+.agendaWhen{grid-template-rows:none;grid-auto-rows:minmax(16px,auto)}
+.agendaWhen .roundCode{order:0}.agendaWhen .agendaCourtField{order:1}.agendaWhen .agendaRestLabel{order:2}.agendaWhen .agendaCourtMatch{order:3}.agendaWhen time{order:4}
 .agendaWhen .agendaCourtField{max-width:none;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
+.agendaWhen .agendaRestLabel{font-size:12px!important;line-height:16px;font-weight:800;color:var(--blue)!important;white-space:nowrap}
 .agendaWhen .agendaCourtMatch{display:flex;flex-direction:column;align-items:flex-start;max-width:none;overflow:visible!important;text-overflow:clip!important}
 .agendaWhen .agendaCourtMatch span{white-space:nowrap}
 .agendaWhen .agendaCourtMatch em{margin-top:2px;font-size:10px;font-style:normal;font-weight:700;line-height:1.2;white-space:nowrap}
-@media(max-width:650px){.agendaMatchRow .agendaItem{grid-template-columns:150px minmax(0,1fr);gap:18px}.agendaWhen .agendaCourtField{font-size:14px!important}}
+@media(max-width:650px){.agendaMatchRow .agendaItem{grid-template-columns:118px minmax(0,1fr);gap:18px}.agendaMatchRow .agendaItem.agendaLongCourt{grid-template-columns:150px minmax(0,1fr)}.agendaWhen .agendaCourtField{font-size:14px!important}}
