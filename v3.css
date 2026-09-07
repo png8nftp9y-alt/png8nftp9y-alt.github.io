@@ -192,3 +192,13 @@
 .tournamentAcceptanceLink{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
 .tournamentAcceptanceLink svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 @media(max-width:650px){.tournamentHero{flex-direction:column}.tournamentAcceptanceLink{align-self:flex-start}}
+
+
+/* Europe relative OOP labels and full court names */
+.agendaMatchRow .agendaItem{grid-template-columns:178px minmax(0,1fr);gap:24px;min-height:150px}
+.agendaWhen{grid-template-rows:24px 20px minmax(16px,auto) 20px}
+.agendaWhen .agendaCourtField{max-width:none;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
+.agendaWhen .agendaCourtMatch{display:flex;flex-direction:column;align-items:flex-start;max-width:none;overflow:visible!important;text-overflow:clip!important}
+.agendaWhen .agendaCourtMatch span{white-space:nowrap}
+.agendaWhen .agendaCourtMatch em{margin-top:2px;font-size:10px;font-style:normal;font-weight:700;line-height:1.2;white-space:nowrap}
+@media(max-width:650px){.agendaMatchRow .agendaItem{grid-template-columns:150px minmax(0,1fr);gap:18px}.agendaWhen .agendaCourtField{font-size:14px!important}}

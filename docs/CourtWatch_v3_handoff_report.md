@@ -2200,3 +2200,14 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Per Tennis Europe, nella precedente posizione del pulsante compare il comando con icona `Acceptance List`, collegato a `acceptanceListUrl`; in assenza del campo esplicito viene usato l’endpoint ufficiale costruito dal `competitionId`.
 - Il nome dei tornei Tennis Europe punta alla pagina ufficiale `/tournament/{competitionId}`, distinta dalla Acceptance List.
 - Agenda, motori e database non sono modificati. Cache CSS/JavaScript aggiornate a `2026090612`/`2026090615`; guscio protetto a `protected=2026090616`.
+
+
+## Revisione 2026-09-07.215 — regole Agenda per tempi relativi Europe
+
+- L’Agenda non mostra più le diciture sorgente `Starting at`, `Court and time TBA` o `Time TBA`: `Starting at` espone soltanto l’orario, mentre i TBA restano senza dicitura.
+- `After rest` viene tradotto in `Dopo riposo`. Se lo stesso sotto-header contiene anche `Not before`, prevale esclusivamente `N.B.`; se `After rest` è solo, il numero match non viene mostrato.
+- `Followed by` viene mostrato come `A seguire` nella posizione del numero match; anche in questo caso il numero ufficiale resta nei dati ma non viene visualizzato.
+- Il parser live e quello storico calcolano sullo stesso campo il precedente match più vicino con ora definita. D1 conserva `relativeMatchNumber` e `relativeFromTime`; sotto `A seguire` l’Agenda mostra, per esempio, `(3° match dalle 9:00)` o `(2° match dalle 12:00)`.
+- Il calcolo usa l’intero OOP ufficiale prima di ridurlo ai soli giocatori CourtWatch, quindi conta correttamente anche gli incontri intermedi non presenti nell’Agenda personale.
+- La colonna sinistra è stata ampliata e il nome del campo non usa più ellissi; la colonna destra parte più a destra.
+- Cache CSS/JavaScript aggiornate a `2026090713`/`2026090716`; guscio protetto a `protected=2026090717`.
