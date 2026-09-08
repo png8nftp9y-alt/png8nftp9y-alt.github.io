@@ -2341,3 +2341,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - `Dopo riposo` e `A seguire` hanno ora la stessa dimensione tipografica del nome del campo: 16 px desktop e 14 px mobile. I dettagli subordinati del conteggio restano più piccoli.
 - Le bandiere usano un bordo nero hairline da 0,5 px. La modifica è solo CSS e può essere ripristinata senza intervenire sui dati.
 - Aggiornato il cache-buster CSS. Nessuna modifica a OOP, D1, R2, motori o schedulazioni.
+
+
+## Revisione 233 — 2026-09-08 — ripristino bordo attenuato bandiere
+
+- Rimosso il bordo nero hairline da 0,5 px introdotto nella revisione 232, perché non approvato nella verifica visiva.
+- Ripristinato il bordo precedente da 1 px con opacità 0,08: resta appena percepibile sulle bandiere con margini bianchi senza creare un contorno nero evidente.
+- Conservate senza modifiche la dimensione di `Dopo riposo` e `A seguire`, l'a capo dei dettagli e tutte le altre regole Agenda.
+- Aggiornato il cache-buster CSS a `2026090820`. Nessuna modifica a OOP, D1, R2, motori o schedulazioni.
