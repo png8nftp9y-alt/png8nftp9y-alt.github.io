@@ -2263,3 +2263,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Il costruttore universale D1 ora, per ITF, usa nell'ordine `qualificationStartDate`, `officialStartDate`, `startDate`; questo impedisce la reintroduzione di date D−2 legacy.
 - Corretto lo Scudo E2E: la proiezione D1 esterna viene isolata con una risposta controllata durante il test; un errore temporaneo del Worker non produce più un falso rosso del deploy, mentre restano attivi tutti i controlli funzionali su UI, Agenda, profili e CRUD.
 - Caricamento app: JSON e proiezione D1 restano richiesti in parallelo. In apertura l'app usa i dati correnti; se una sorgente fallisce usa l'ultima copia locale disponibile. La dicitura di aggiornamento resta nascosta quando i dati sono freschi e appare soltanto in fallback o oltre la soglia di ritardo.
+
+
+## Revisione 223 — 2026-09-08 — eliminazione D−2 nel generatore effettivo
+
+- Individuata la causa residua: `src/v3/entries-engine.mjs`, nella funzione `toTournament`, applicava ancora esplicitamente `addDaysIso(officialStartDate,-2)` a ogni torneo ITF. Questa era la regola realmente usata per rigenerare `dist/v3/tournaments.json` dopo ogni workflow.
+- Eliminata la sottrazione: per ITF la data pubblicata è ora la data ufficiale disponibile, senza D−2.
+- `maintain-itf-database.mjs` normalizza inoltre ogni relazione ITF letta dallo storico/R2, elimina `startDateRule` e `tMinusOneApplied` legacy e impedisce che una copia remota vecchia li reintroduca.
+- Corretti immediatamente 4 record nel calendario pubblicato, 4 nel D1 universale e 4 relazioni nel database ITF.
