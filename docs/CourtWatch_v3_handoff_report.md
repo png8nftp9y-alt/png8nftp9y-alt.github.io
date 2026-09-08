@@ -2349,3 +2349,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Ripristinato il bordo precedente da 1 px con opacità 0,08: resta appena percepibile sulle bandiere con margini bianchi senza creare un contorno nero evidente.
 - Conservate senza modifiche la dimensione di `Dopo riposo` e `A seguire`, l'a capo dei dettagli e tutte le altre regole Agenda.
 - Aggiornato il cache-buster CSS a `2026090820`. Nessuna modifica a OOP, D1, R2, motori o schedulazioni.
+
+
+## Revisione 234 — 2026-09-08 — aggiornamento senza sfarfallio
+
+- Individuata la causa dello sfarfallio periodico: il controllo dati ogni 30 secondi richiamava sempre il renderer completo e sostituiva con `innerHTML` Agenda, calendario e bandiere anche quando il contenuto visibile non era cambiato.
+- Introdotta una firma del contenuto visualizzato. I soli timestamp tecnici di acquisizione vengono ignorati: se giocatori, tornei, match, agenda, risultati, avversari e iscrizioni sono invariati, il DOM principale viene preservato e viene aggiornata soltanto la diagnostica.
+- Quando esiste una modifica reale, il rendering completo continua a essere eseguito, conservando la pubblicazione tempestiva dei nuovi dati.
+- Le piccole bandiere SVG usano ora caricamento immediato anziché `loading="lazy"`, riducendo il lampo residuo nei rendering realmente necessari.
+- Aggiornato il cache-buster JavaScript a `2026090807`. Nessuna modifica alla frequenza di controllo, ai motori, a D1, R2 o alle schedulazioni.
