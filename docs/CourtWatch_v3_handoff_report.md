@@ -2318,3 +2318,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - `A seguire`: conserva il conteggio relativo già mostrato. Se la posizione complessiva differisce, aggiunge nella stessa parentesi `, x° match complessivo dalle HH:MM`; il caso Gelli del 20 luglio diventa quindi `(2° match dalle 10:30, 4° match complessivo dalle 8:30)`.
 - Pagina giocatore: l'intera sezione di un torneo con stato `ongoing` è evidenziata con giallo tenue anche nella vista `Tutti i tornei`.
 - Aggiornati cache-buster CSS/JS. Nessuna modifica a risultati, identità o frequenze di schedulazione.
+
+
+## Revisione 230 — 2026-09-08 — rifiniture Agenda, tornei in corso e bandiere
+
+- Colonna sinistra Agenda: campo, Dopo riposo, numero/dettaglio match e orario usano ora uniformemente il blu già adottato; l'etichetta turno conserva il proprio stile circuito.
+- I dettagli lunghi (`x° match dalle...` e conteggio complessivo) possono andare a capo entro la larghezza della colonna sinistra e non invadono la colonna dei giocatori.
+- Evidenziazione torneo in corso confermata dinamica e inclusiva: è gialla quando `startDate <= oggi <= endDate`; dopo `endDate` torna bianca al successivo rendering/aggiornamento. Tra due tornei in corso consecutivi il separatore è bianco.
+- Bordo bandiere attenuato da opacità 0,18 a 0,08, mantenendo la separazione necessaria per le bandiere con margini bianchi.
+- Aggiornato il cache-buster CSS. Nessuna modifica a dati, motori, D1, R2 o schedulazioni.
