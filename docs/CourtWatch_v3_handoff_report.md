@@ -2247,3 +2247,10 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Le letture JSON e D1 partono ora contemporaneamente. L’unione e tutti i controlli di freschezza restano invariati; cambia soltanto l’ordine asincrono delle richieste.
 - Se esiste una copia locale valida, viene renderizzata immediatamente durante l’aggiornamento e sostituita dalla nuova generazione appena verificata. Al primo accesso senza cache resta il caricamento di rete parallelo.
 - Cache JavaScript aggiornata a `2026090801`. Motori, dati, R2, D1, schedulazioni e regole Agenda non sono modificati.
+
+## Revisione 2026-09-08.221 — caricamento parallelo senza rendering instabile
+
+- Il primo tentativo di mostrare la cache prima del completamento del refresh rendeva l’interfaccia interattiva mentre il DOM veniva subito ricostruito. Lo Scudo ha bloccato il deploy con un timeout su un comando torneo; l’utente ha inoltre osservato Agenda vuota durante quella finestra.
+- Rimosso esclusivamente il rendering anticipato della cache. La copia locale resta disponibile come fallback in caso di errore, secondo il comportamento stabile precedente.
+- Conservata l’ottimizzazione sicura: JSON e proiezione D1 vengono richiesti contemporaneamente anziché in sequenza. L’Agenda viene renderizzata una sola volta con una generazione coerente.
+- Cache JavaScript aggiornata a `2026090802`. Motori, dati, R2, D1 e schedulazioni restano invariati.

@@ -196,8 +196,7 @@ async function load(){
   }finally{loadRunning=false}
 }
 document.addEventListener('click',event=>{const button=event.target.closest('[data-match-analysis]');if(!button)return;event.preventDefault();event.stopPropagation();openMatchAnalysis(button.dataset.matchAnalysis)});
-function showCachedImmediately(){const cached=cachedData();if(!cached)return;state.data=cached;if(!uiSelectionRestored){state.data.players.forEach(p=>state.selected.add(p.id));uiSelectionRestored=true}else state.selected=new Set([...state.selected].filter(id=>state.data.players.some(p=>p.id===id)));syncLabel(state.data,true);route();restoreUiScroll()}
-wire();wireAccount();showCachedImmediately();load();loadAccount();refreshMatchAnalysisStatus();setInterval(load,30000);
+wire();wireAccount();load();loadAccount();refreshMatchAnalysisStatus();setInterval(load,30000);
 const renderProfileWithoutTournamentStatus=renderProfile;
 let profileTournamentStatusFilter='all',profileYearFilter=String(new Date().getFullYear()),profileStatusPlayerId='';
 renderProfile=function(id){
