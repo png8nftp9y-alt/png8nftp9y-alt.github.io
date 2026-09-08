@@ -2358,3 +2358,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Quando esiste una modifica reale, il rendering completo continua a essere eseguito, conservando la pubblicazione tempestiva dei nuovi dati.
 - Le piccole bandiere SVG usano ora caricamento immediato anziché `loading="lazy"`, riducendo il lampo residuo nei rendering realmente necessari.
 - Aggiornato il cache-buster JavaScript a `2026090807`. Nessuna modifica alla frequenza di controllo, ai motori, a D1, R2 o alle schedulazioni.
+
+
+## Revisione 235 — 2026-09-08 — collegamento Agenda all’ordine di gioco
+
+- Nell’Agenda, l’intera colonna di programmazione della partita è ora un unico collegamento: nome campo, numero match, orario e le eventuali diciture `A seguire`, `Dopo riposo` e relativi dettagli.
+- Il collegamento apre in una nuova scheda l’ordine di gioco ufficiale dello stesso torneo e della stessa giornata. Viene usato il `sourceUrl` certificato del match; per Tennis Europe è disponibile anche la ricostruzione deterministica dell’endpoint `/tournament/{competitionId}/matches/{YYYYMMDD}` quando il campo manca.
+- Se un record non possiede ancora un URL ufficiale giornaliero verificabile, la colonna resta testo e non viene creato un collegamento generico o potenzialmente errato.
+- Aggiunti stato hover discreto e focus da tastiera senza alterare dimensioni, allineamento o colori della colonna sinistra.
+- Aggiornati i cache-buster CSS/JavaScript a `2026090821`/`2026090808`. Nessuna modifica ai motori, a D1, R2 o alle schedulazioni.
