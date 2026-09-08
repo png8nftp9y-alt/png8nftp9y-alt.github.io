@@ -2375,3 +2375,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Il comando usa ora la cronologia di navigazione: dalla pagina torneo o giocatore ritorna alla vista immediatamente precedente, invece di forzare sempre la Home/Calendario. In assenza di una cronologia precedente disponibile resta il fallback alla Home.
 - Nella colonna Giocatori, il passaggio del puntatore evidenzia ora l’intera riga con il blu tenue già usato nell’app, ripristinando il comportamento visivo richiesto.
 - Aggiornati i cache-buster CSS/JavaScript a `2026090822`/`2026090809`. Nessuna modifica a dati, motori, D1, R2 o schedulazioni.
+
+
+## Revisione 237 — 2026-09-08 — puntatore manina sulle righe giocatore
+
+- Nella colonna Giocatori, il cursore `pointer` a forma di manina viene ora imposto sull’intera riga e su tutti i suoi elementi interni, inclusi avatar, nome e descrizione.
+- La dichiarazione usa priorità vincolante per impedire che sui nodi testuali ricompaia il cursore a forma di I dedicato alla selezione del testo.
+- Conservata l’evidenziazione azzurra dell’intera riga al passaggio del puntatore introdotta nella revisione 236.
+- Aggiornato il cache-buster CSS a `2026090824`. Nessuna modifica a JavaScript, dati, motori, D1, R2 o schedulazioni.
