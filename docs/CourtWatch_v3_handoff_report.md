@@ -2287,3 +2287,10 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Cause: il workflow richiedeva ancora lo stato letterale precedente, imponeva `relationCount==4` nonostante la quinta relazione valida di Palermo e, dopo l'upload, cercava campi `audit` nel database relazionale che non li contiene.
 - Ripristinato lo stato canonico dell'archivio storico. Il validatore ora verifica conteggio dinamico coerente con `relations`, almeno quattro relazioni, assenza delle proprietà D−2 legacy e corrispondenza tra `startDate` e `qualificationStartDate` quando quest'ultima è pubblicata.
 - Il controllo dopo il download da R2 verifica lo stesso schema relazionale effettivo; nessuna regola factsheet, dato o motore di acquisizione è stato modificato.
+
+
+## Revisione 226 — 2026-09-08 — eliminazione falso positivo Scudo su torneo nascosto
+
+- Il deploy rosso `34222713383` non indicava un errore applicativo: nove controlli E2E, compreso CRUD, erano già superati; il test si fermava tentando di cliccare il primo `[data-open-tournament]` presente nel DOM, che nella vista corrente era nascosto.
+- Corretto lo Scudo selezionando esclusivamente `[data-open-tournament]:visible`. Restano invariati timeout, verifiche funzionali e capacità di bloccare regressioni reali.
+- Nessuna modifica a motori, factsheet ITF, dati, R2, D1 o schedulazioni.

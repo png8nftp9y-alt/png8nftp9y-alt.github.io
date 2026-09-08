@@ -73,7 +73,7 @@ try{
   await page.waitForFunction(()=>document.querySelector('#matchAnalysisEditor')?.hidden===true);
   requireCheck(analysis.size===0,'CRUD UI completo e pulito');
 
-  const tournament=page.locator('[data-open-tournament]').first();
+  const tournament=page.locator('[data-open-tournament]:visible').first();
   if(await tournament.count()){await tournament.click();await page.waitForTimeout(100);requireCheck(await page.locator('#profileView.active').count()===1,'dettaglio torneo')}
   await page.locator('#resetHome').click();await page.waitForTimeout(100);
   requireCheck(await page.locator('#homeView.active').count()===1,'Home Oggi');
