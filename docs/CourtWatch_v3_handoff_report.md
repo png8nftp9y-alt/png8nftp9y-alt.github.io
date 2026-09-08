@@ -2254,3 +2254,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Rimosso esclusivamente il rendering anticipato della cache. La copia locale resta disponibile come fallback in caso di errore, secondo il comportamento stabile precedente.
 - Conservata l’ottimizzazione sicura: JSON e proiezione D1 vengono richiesti contemporaneamente anziché in sequenza. L’Agenda viene renderizzata una sola volta con una generazione coerente.
 - Cache JavaScript aggiornata a `2026090802`. Motori, dati, R2, D1 e schedulazioni restano invariati.
+
+
+## Revisione 222 — 2026-09-08 — rimozione definitiva ITF D−2 e stabilizzazione Scudo
+
+- Rimossa dai quattro record storici ITF la regola obsoleta `official_start_minus_2_days`: la data iniziale coincide ora con `officialStartDate` e non viene più sottratto alcun giorno.
+- Normalizzato anche `history/itf_player_tournament_db.json` e il dataset pubblicato `dist/v3/tournament_entries.json` (4 relazioni corrette), così la vecchia regola non può riapparire da copie derivate.
+- Il costruttore universale D1 ora, per ITF, usa nell'ordine `qualificationStartDate`, `officialStartDate`, `startDate`; questo impedisce la reintroduzione di date D−2 legacy.
+- Corretto lo Scudo E2E: la proiezione D1 esterna viene isolata con una risposta controllata durante il test; un errore temporaneo del Worker non produce più un falso rosso del deploy, mentre restano attivi tutti i controlli funzionali su UI, Agenda, profili e CRUD.
+- Caricamento app: JSON e proiezione D1 restano richiesti in parallelo. In apertura l'app usa i dati correnti; se una sorgente fallisce usa l'ultima copia locale disponibile. La dicitura di aggiornamento resta nascosta quando i dati sono freschi e appare soltanto in fallback o oltre la soglia di ritardo.

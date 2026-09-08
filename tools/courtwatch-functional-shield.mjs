@@ -20,6 +20,7 @@ const browser=await chromium.launch({headless:true}),page=await browser.newPage(
 const errors=[],analysis=new Map(),checks=[];
 page.on('pageerror',error=>errors.push(String(error)));
 page.on('console',message=>{if(message.type()==='error'&&!/favicon|404/.test(message.text()))errors.push(message.text())});
+page.route('https://courtwatch-app-api.ckrk9ggvrb.workers.dev/v1/app-snapshot**',route=>route.fulfill({json:{generatedAt:new Date(0).toISOString(),players:[{id:'shield-projection'}],tournaments:[],matches:[]}}));
 await page.route('**/app/api/**',async route=>{
   const request=route.request(),url=new URL(request.url()),api=url.pathname.replace(/^\/app\/api/,'');
   if(api==='/session')return route.fulfill({json:{user:{id:'shield-user',email:'shield@courtwatch.test',displayName:'CourtWatch Shield',role:'admin'}}});
