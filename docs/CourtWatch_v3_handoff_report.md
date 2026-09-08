@@ -2271,3 +2271,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Eliminata la sottrazione: per ITF la data pubblicata è ora la data ufficiale disponibile, senza D−2.
 - `maintain-itf-database.mjs` normalizza inoltre ogni relazione ITF letta dallo storico/R2, elimina `startDateRule` e `tMinusOneApplied` legacy e impedisce che una copia remota vecchia li reintroduca.
 - Corretti immediatamente 4 record nel calendario pubblicato, 4 nel D1 universale e 4 relazioni nel database ITF.
+
+
+## Revisione 224 — 2026-09-08 — ripristino vincolante data qualificazioni ITF da factsheet
+
+- Corretto l'errore della revisione 223: la data ITF visibile non deve coincidere forzatamente con il main draw. La priorità vincolante è `qualificationStartDate` letta dalla riga `First day of Singles Qualifying` del factsheet; soltanto quando assente si usa `startDate`/data ufficiale disponibile.
+- `entries-engine.mjs` conserva ora esplicitamente `qualificationStartDate` e `officialStartDate` e pubblica il torneo dalla data qualificazioni. Nessuna sottrazione matematica D−2 viene eseguita.
+- Il mantenitore del database converte i vecchi record etichettati `official_start_minus_2_days` nel campo semantico `qualificationStartDate`, elimina le due proprietà legacy e preserva la data qualificazioni nei successivi merge da R2.
+- Riallineati fonte ITF, storico, database relazionale, entry pubblicate, calendario e D1 universale. Palermo usa il factsheet già verificato: qualificazioni dal 5 settembre 2026, main draw dal 7 settembre 2026.
