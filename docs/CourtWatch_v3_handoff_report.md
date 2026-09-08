@@ -2302,3 +2302,10 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Per una voce `Dopo riposo` priva di N.B., sotto l'etichetta viene mostrato `x° match dalle HH:MM` usando `relativeMatchNumber` e `relativeFromTime`, già calcolati sull'intero OOP dello stesso campo.
 - Eccezione richiesta: il dettaglio non viene mostrato quando la posizione è il 2° match. Restano invariati la soppressione del numero match ordinario e il comportamento N.B.
 - Aggiornata la versione cache di CSS e JavaScript. Motori, database, R2, D1 e schedulazioni invariati.
+
+
+## Revisione 228 — 2026-09-08 — correzione grafica Matilde Mambrini
+
+- Correzione esclusivamente di presentazione: la grafia sorgente `matilde Mambrini` viene mostrata come `Matilde Mambrini`.
+- Il dato originale resta invariato; nessuna modifica a OOP Europe, D1, R2, motori, associazioni, risultati o schedulazioni.
+- Aggiornata la versione cache JavaScript.
