@@ -144,13 +144,14 @@ async function load(){
   try{
     const names=['players','tournaments','matches','agenda','results','opponents','entries','status','diagnostics','manual'];
     const files=['players.json','tournaments.json','matches.json','agenda.json','results.json','opponents.json','tournament_entries.json','sync_status.json','diagnostics.json','manual_matches.json'];
+    const projectionPromise=apiProjection().catch(error=>{console.warn('Fallback JSON Court Watch attivo',error);return null});
     const settled=await Promise.allSettled(files.map(v3json));
     const docs=Object.fromEntries(names.map((name,i)=>[name,settled[i].status==='fulfilled'?settled[i].value:null]));
     if(!Array.isArray(docs.players?.players)||!docs.players.players.length)throw Error('Elenco giocatori essenziale non disponibile');
     if(!Array.isArray(docs.tournaments?.tournaments))throw Error('Calendario tornei essenziale non disponibile');
 
     const previous=state.data||cachedData()||{};
-    let projection=null;try{projection=await apiProjection()}catch(error){console.warn('Fallback JSON Court Watch attivo',error)}
+    const projection=await projectionPromise;
     const jsonGeneration=Math.max(...[docs.players?.generatedAt,docs.tournaments?.generatedAt].map(Date.parse).filter(Number.isFinite),0),apiGeneration=Date.parse(projection?.generatedAt||'');
     const universalProjectionFresh=projection&&(!jsonGeneration||(Number.isFinite(apiGeneration)&&apiGeneration>=jsonGeneration));
     if(projection&&!universalProjectionFresh)console.warn('Indice universale D1 in sincronizzazione: uso temporaneo dei JSON per giocatori e tornei; i match di circuito restano dalla API');
@@ -195,7 +196,8 @@ async function load(){
   }finally{loadRunning=false}
 }
 document.addEventListener('click',event=>{const button=event.target.closest('[data-match-analysis]');if(!button)return;event.preventDefault();event.stopPropagation();openMatchAnalysis(button.dataset.matchAnalysis)});
-wire();wireAccount();load();loadAccount();refreshMatchAnalysisStatus();setInterval(load,30000);
+function showCachedImmediately(){const cached=cachedData();if(!cached)return;state.data=cached;if(!uiSelectionRestored){state.data.players.forEach(p=>state.selected.add(p.id));uiSelectionRestored=true}else state.selected=new Set([...state.selected].filter(id=>state.data.players.some(p=>p.id===id)));syncLabel(state.data,true);route();restoreUiScroll()}
+wire();wireAccount();showCachedImmediately();load();loadAccount();refreshMatchAnalysisStatus();setInterval(load,30000);
 const renderProfileWithoutTournamentStatus=renderProfile;
 let profileTournamentStatusFilter='all',profileYearFilter=String(new Date().getFullYear()),profileStatusPlayerId='';
 renderProfile=function(id){

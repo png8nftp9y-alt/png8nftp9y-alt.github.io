@@ -2240,3 +2240,10 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - I nomi campo privi di prefisso ufficiale `Campo`, `Court`, `C` o `CC` vengono presentati con `Court` anteposto; il dato sorgente conservato in R2 e D1 non viene alterato.
 - Ripristinata la larghezza precedente della colonna sinistra per i campi normali. L’allargamento e lo spostamento della colonna destra si applicano soltanto ai nomi campo lunghi.
 - Cache CSS/JavaScript aggiornate a `2026090714`/`2026090717`. Schedulazioni, schema D1, R2 e motori FITP/ITF non sono modificati.
+
+## Revisione 2026-09-08.220 — caricamento iniziale Agenda accelerato
+
+- Individuata nel client la causa del ritardo percepito: le dieci letture JSON venivano attese integralmente prima di avviare la richiesta alla proiezione D1, sommando i due tempi di rete. La misurazione browser mostrava guscio HTML in circa 0,2 secondi e contenuto Agenda dopo circa 2,7 secondi.
+- Le letture JSON e D1 partono ora contemporaneamente. L’unione e tutti i controlli di freschezza restano invariati; cambia soltanto l’ordine asincrono delle richieste.
+- Se esiste una copia locale valida, viene renderizzata immediatamente durante l’aggiornamento e sostituita dalla nuova generazione appena verificata. Al primo accesso senza cache resta il caricamento di rete parallelo.
+- Cache JavaScript aggiornata a `2026090801`. Motori, dati, R2, D1, schedulazioni e regole Agenda non sono modificati.
