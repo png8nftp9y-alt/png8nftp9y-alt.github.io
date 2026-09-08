@@ -2367,3 +2367,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Se un record non possiede ancora un URL ufficiale giornaliero verificabile, la colonna resta testo e non viene creato un collegamento generico o potenzialmente errato.
 - Aggiunti stato hover discreto e focus da tastiera senza alterare dimensioni, allineamento o colori della colonna sinistra.
 - Aggiornati i cache-buster CSS/JavaScript a `2026090821`/`2026090808`. Nessuna modifica ai motori, a D1, R2 o alle schedulazioni.
+
+
+## Revisione 236 — 2026-09-08 — navigazione Indietro ed evidenziazione giocatori
+
+- Il comando `← Torna al calendario` nelle viste di dettaglio è stato sostituito da `← Indietro`.
+- Il comando usa ora la cronologia di navigazione: dalla pagina torneo o giocatore ritorna alla vista immediatamente precedente, invece di forzare sempre la Home/Calendario. In assenza di una cronologia precedente disponibile resta il fallback alla Home.
+- Nella colonna Giocatori, il passaggio del puntatore evidenzia ora l’intera riga con il blu tenue già usato nell’app, ripristinando il comportamento visivo richiesto.
+- Aggiornati i cache-buster CSS/JavaScript a `2026090822`/`2026090809`. Nessuna modifica a dati, motori, D1, R2 o schedulazioni.
