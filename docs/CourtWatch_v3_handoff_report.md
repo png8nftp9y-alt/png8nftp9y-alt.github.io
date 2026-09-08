@@ -2294,3 +2294,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Il deploy rosso `34222713383` non indicava un errore applicativo: nove controlli E2E, compreso CRUD, erano già superati; il test si fermava tentando di cliccare il primo `[data-open-tournament]` presente nel DOM, che nella vista corrente era nascosto.
 - Corretto lo Scudo selezionando esclusivamente `[data-open-tournament]:visible`. Restano invariati timeout, verifiche funzionali e capacità di bloccare regressioni reali.
 - Nessuna modifica a motori, factsheet ITF, dati, R2, D1 o schedulazioni.
+
+
+## Revisione 227 — 2026-09-08 — doppi condivisi e dettaglio Dopo riposo
+
+- Agenda: quando due giocatori monitorati sono compagni nello stesso doppio, le due proiezioni personali vengono riconosciute dalla stessa coppia, torneo, data e identità OOP e mostrate in un solo riquadro. I singolari e i doppi con squadre diverse restano separati.
+- Per una voce `Dopo riposo` priva di N.B., sotto l'etichetta viene mostrato `x° match dalle HH:MM` usando `relativeMatchNumber` e `relativeFromTime`, già calcolati sull'intero OOP dello stesso campo.
+- Eccezione richiesta: il dettaglio non viene mostrato quando la posizione è il 2° match. Restano invariati la soppressione del numero match ordinario e il comportamento N.B.
+- Aggiornata la versione cache di CSS e JavaScript. Motori, database, R2, D1 e schedulazioni invariati.
