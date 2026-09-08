@@ -2327,3 +2327,10 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Evidenziazione torneo in corso confermata dinamica e inclusiva: è gialla quando `startDate <= oggi <= endDate`; dopo `endDate` torna bianca al successivo rendering/aggiornamento. Tra due tornei in corso consecutivi il separatore è bianco.
 - Bordo bandiere attenuato da opacità 0,18 a 0,08, mantenendo la separazione necessaria per le bandiere con margini bianchi.
 - Aggiornato il cache-buster CSS. Nessuna modifica a dati, motori, D1, R2 o schedulazioni.
+
+
+## Revisione 231 — 2026-09-08 — a capo conteggio complessivo
+
+- Nell'etichetta `A seguire`, quando sono presenti conteggio relativo e complessivo, il conteggio complessivo inizia obbligatoriamente su una nuova riga dopo la virgola.
+- Esempio: prima riga `2° match dalle 11:00,`; seconda riga `4° match complessivo dalle 09:00`.
+- Modifica esclusivamente grafica; calcoli OOP, dati, D1, R2, motori e schedulazioni invariati.
