@@ -2279,3 +2279,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - `entries-engine.mjs` conserva ora esplicitamente `qualificationStartDate` e `officialStartDate` e pubblica il torneo dalla data qualificazioni. Nessuna sottrazione matematica D−2 viene eseguita.
 - Il mantenitore del database converte i vecchi record etichettati `official_start_minus_2_days` nel campo semantico `qualificationStartDate`, elimina le due proprietà legacy e preserva la data qualificazioni nei successivi merge da R2.
 - Riallineati fonte ITF, storico, database relazionale, entry pubblicate, calendario e D1 universale. Palermo usa il factsheet già verificato: qualificazioni dal 5 settembre 2026, main draw dal 7 settembre 2026.
+
+
+## Revisione 225 — 2026-09-08 — riparazione pubblicazione ITF R2
+
+- Il run R2 rosso non era un errore del bucket: si fermava in `Validate certified history` prima della configurazione R2.
+- Cause: il workflow richiedeva ancora lo stato letterale precedente, imponeva `relationCount==4` nonostante la quinta relazione valida di Palermo e, dopo l'upload, cercava campi `audit` nel database relazionale che non li contiene.
+- Ripristinato lo stato canonico dell'archivio storico. Il validatore ora verifica conteggio dinamico coerente con `relations`, almeno quattro relazioni, assenza delle proprietà D−2 legacy e corrispondenza tra `startDate` e `qualificationStartDate` quando quest'ultima è pubblicata.
+- Il controllo dopo il download da R2 verifica lo stesso schema relazionale effettivo; nessuna regola factsheet, dato o motore di acquisizione è stato modificato.

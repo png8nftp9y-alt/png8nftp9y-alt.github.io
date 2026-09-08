@@ -18,8 +18,8 @@ jobs:
       - name: Validate certified history
         run: |
           set -euo pipefail
-          jq -e '.status=="itf_historical_draw_backfill_complete" and .audit.expected==4291 and .audit.complete==4291 and .audit.missing==0 and .audit.retry==0 and .audit.unreadable==0 and (.entries|length)==4' history/itf_historical_player_tournaments.json
-          jq -e '.status=="itf_player_tournament_database_complete" and .relationCount==4' history/itf_player_tournament_db.json
+          jq -e '.status=="itf_historical_draw_backfill_complete" and .audit.expected==4291 and .audit.complete==4291 and .audit.missing==0 and .audit.retry==0 and .audit.unreadable==0 and (.entries|length)==4 and all(.entries[]; (.qualificationStartDate|type)=="string" and .qualificationStartDate!="" and .startDate==.qualificationStartDate and (has("startDateRule")|not) and (has("tMinusOneApplied")|not))' history/itf_historical_player_tournaments.json
+          jq -e '.status=="itf_player_tournament_database_complete" and .relationCount==(.relations|length) and .relationCount>=4 and all(.relations[]; .circuit!="itf" or (.qualificationStartDate==null) or (.startDate==.qualificationStartDate and (has("startDateRule")|not) and (has("tMinusOneApplied")|not)))' history/itf_player_tournament_db.json
       - name: Configure R2
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -51,4 +51,4 @@ jobs:
           aws --endpoint-url "$endpoint" s3 cp history/itf_historical_player_tournaments.json "s3://$R2_BUCKET/itf/database/current/itf_historical_player_tournaments.json" --only-show-errors
           aws --endpoint-url "$endpoint" s3 cp /tmp/current.json "s3://$R2_BUCKET/itf/database/pointers/current.json" --only-show-errors
           aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/current/itf_player_tournament_db.json" /tmp/verify.json --only-show-errors
-          jq -e '.relationCount==4 and .audit.missing==0 and .audit.retry==0 and .audit.unreadable==0' /tmp/verify.json
+          jq -e '.status=="itf_player_tournament_database_complete" and .relationCount==(.relations|length) and .relationCount>=4 and all(.relations[]; .circuit!="itf" or (.qualificationStartDate==null) or .startDate==.qualificationStartDate)' /tmp/verify.json
