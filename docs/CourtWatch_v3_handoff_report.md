@@ -2309,3 +2309,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Correzione esclusivamente di presentazione: la grafia sorgente `matilde Mambrini` viene mostrata come `Matilde Mambrini`.
 - Il dato originale resta invariato; nessuna modifica a OOP Europe, D1, R2, motori, associazioni, risultati o schedulazioni.
 - Aggiornata la versione cache JavaScript.
+
+
+## Revisione 229 — 2026-09-08 — sequenza completa campo e tornei in corso
+
+- OOP Europe: ogni match conserva ora `overallMatchNumber` e `overallFromTime`, calcolati sull'intera sequenza dello stesso torneo, giorno e campo; il conteggio non dipende dai soli giocatori CourtWatch.
+- `Dopo riposo`: usa la posizione complessiva e l'orario del primo match programmato sul campo. Mostra `x° match dalle HH:MM` soltanto oltre il 2° match, come richiesto. Questo copre il doppio Puccio del 20 luglio senza correzioni manuali.
+- `A seguire`: conserva il conteggio relativo già mostrato. Se la posizione complessiva differisce, aggiunge nella stessa parentesi `, x° match complessivo dalle HH:MM`; il caso Gelli del 20 luglio diventa quindi `(2° match dalle 10:30, 4° match complessivo dalle 8:30)`.
+- Pagina giocatore: l'intera sezione di un torneo con stato `ongoing` è evidenziata con giallo tenue anche nella vista `Tutti i tornei`.
+- Aggiornati cache-buster CSS/JS. Nessuna modifica a risultati, identità o frequenze di schedulazione.
