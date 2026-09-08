@@ -218,3 +218,8 @@
 .countryFlag{border-color:rgba(35,35,35,.08)}
 
 .agendaWhen .agendaCourtMatch em{white-space:pre-line!important}
+
+/* Requested agenda label sizing and hairline flag border */
+.agendaWhen .agendaRestLabel>span,.agendaWhen .agendaCourtMatch>span{font-size:16px!important;line-height:20px;font-weight:850}
+.countryFlag{border:.5px solid #000}
+@media(max-width:650px){.agendaWhen .agendaRestLabel>span,.agendaWhen .agendaCourtMatch>span{font-size:14px!important;line-height:18px}}

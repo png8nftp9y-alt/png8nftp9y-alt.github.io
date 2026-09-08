@@ -2334,3 +2334,10 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Nell'etichetta `A seguire`, quando sono presenti conteggio relativo e complessivo, il conteggio complessivo inizia obbligatoriamente su una nuova riga dopo la virgola.
 - Esempio: prima riga `2° match dalle 11:00,`; seconda riga `4° match complessivo dalle 09:00`.
 - Modifica esclusivamente grafica; calcoli OOP, dati, D1, R2, motori e schedulazioni invariati.
+
+
+## Revisione 232 — 2026-09-08 — dimensione etichette Agenda e bordo bandiere
+
+- `Dopo riposo` e `A seguire` hanno ora la stessa dimensione tipografica del nome del campo: 16 px desktop e 14 px mobile. I dettagli subordinati del conteggio restano più piccoli.
+- Le bandiere usano un bordo nero hairline da 0,5 px. La modifica è solo CSS e può essere ripristinata senza intervenire sui dati.
+- Aggiornato il cache-buster CSS. Nessuna modifica a OOP, D1, R2, motori o schedulazioni.
