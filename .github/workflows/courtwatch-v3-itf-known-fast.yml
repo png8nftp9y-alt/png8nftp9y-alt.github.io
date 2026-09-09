@@ -21,6 +21,8 @@ jobs:
         continue-on-error: true
         env:
           ITF_REQUEST_DELAY_MS: 650
+          ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
           ITF_ACCEPTANCE_MAX_ATTEMPTS: 5
           ITF_ACCEPTANCE_KNOWN_ONLY: 1
           ITF_ACCEPTANCE_SHARD: ${{ matrix.shard }}
@@ -46,6 +48,8 @@ jobs:
       - name: Retry only unreadable acceptance lists
         env:
           ITF_REQUEST_DELAY_MS: 900
+          ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
           ITF_ACCEPTANCE_RETRY_ATTEMPTS: 8
           ITF_ACCEPTANCE_SHARD: ${{ matrix.shard }}
           ITF_ACCEPTANCE_TOTAL: 4
