@@ -208,7 +208,6 @@ async function load(){
   }finally{loadRunning=false}
 }
 document.addEventListener('click',event=>{const button=event.target.closest('[data-match-analysis]');if(!button)return;event.preventDefault();event.stopPropagation();openMatchAnalysis(button.dataset.matchAnalysis)});
-wire();wireAccount();load();loadAccount();refreshMatchAnalysisStatus();setInterval(load,30000);
 const renderProfileWithoutTournamentStatus=renderProfile;
 let profileTournamentStatusFilter='all',profileYearFilter=String(new Date().getFullYear()),profileStatusPlayerId='';
 renderProfile=function(id){
@@ -236,3 +235,4 @@ renderProfile=function(id){
   for(const[button,baseClick]of baseOutcomeClicks)button.onclick=()=>{baseClick?.call(button);applyTournamentStatus()};
   applyTournamentStatus()
 };
+wire();wireAccount();load();loadAccount();refreshMatchAnalysisStatus();setInterval(load,30000);
