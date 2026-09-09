@@ -2464,3 +2464,13 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Il fallback viene invocato esclusivamente dalla lettura dei metadati factsheet per ottenere `qualificationStartDate`, `venueName` e `address`. La rotta `/v1/fetch`, le API TournamentApi, il motore dei tabelloni e il workflow ITF T−1 restano invariati.
 - Il merge continua a privilegiare il nuovo metadato non vuoto e a conservare quello verificato già persistito, evitando che una risposta dinamica assente cancelli data qualificazioni o luogo nei cicli successivi.
 - Aggiornata la documentazione dell'acquisitore. Nessuna modifica a frequenze, priorità Agenda, database dei risultati o regole dei tabelloni.
+
+
+## Revisione 245 — 2026-09-09 — tre match simultanei per riga e stato caricamento
+
+- Corretta la cardinalità del raggruppamento Agenda: i match dello stesso torneo con identico orario reale o identica stima temporale vengono ora disposti fino a un massimo di tre sulla stessa riga. La precedente implementazione li suddivideva erroneamente a coppie nonostante la griglia CSS fosse già predisposta per tre colonne.
+- Se allo stesso orario esistono più di tre match, il quarto apre la riga successiva; l'ordinamento e la priorità ITF → Tennis Europe → FITP restano invariati.
+- Aggiornato il cache-buster JavaScript a `2026090913`.
+- Confermato il comportamento di caricamento: una copia locale valida viene resa immediatamente mentre prosegue la verifica di rete; i dataset essenziali hanno timeout e convalida; in assenza sia delle fonti sia di una cache valida viene mostrato un messaggio esplicito invece di lasciare l'Agenda vuota.
+- Lo Scudo post-deploy apre l'app pubblicata e richiede giocatori e calendario popolati. Questo copre la regressione applicativa della pagina bianca, senza poter eliminare la latenza fisica di un primo accesso privo di cache o di una rete indisponibile.
+- Nessuna modifica a motori, database, factsheet ITF, frequenze o schedulazioni.
