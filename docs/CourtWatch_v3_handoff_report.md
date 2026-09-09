@@ -2454,3 +2454,13 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - In pagina torneo la posizione viene presentata come `Acceptance list: <posizione>`; la parola/etichetta `live` non viene mostrata.
 - Il recupero universale di data qualificazioni e luogo dai factsheet dinamici è stato predisposto in un percorso di acquisizione isolato e opzionale. Le variabili di attivazione non sono impostate: quindi il nuovo percorso non interferisce con i motori ITF e ITF T−1 attuali, ma non può ancora essere dichiarato risolutivo per tutti i tornei futuri.
 - Pescara resta protetto nell'archivio persistente dei metadati factsheet verificati. Nessuna modifica a regole di durata/stato dei tornei, frequenze, schedulazioni o database pubblicati.
+
+
+## Revisione 244 — 2026-09-09 — separatore universale e attivazione factsheet ITF isolata
+
+- Riprodotto il caso reale segnalato nella pagina di Martina Danesi: Milano è un torneo in corso, mentre Pescara è programmato. La precedente correzione riguardava soltanto due sezioni entrambe `ongoing` e quindi non poteva intercettare questa coppia.
+- Il separatore di 8 px è ora bianco per ogni coppia consecutiva di tornei nella pagina giocatore, indipendentemente dallo stato in corso, programmato o concluso. Aggiornato il cache-buster CSS a `2026090904`.
+- Attivato nei cicli ITF acceptance live e known-fast il recupero isolato dei metadati factsheet. I workflow passano le credenziali dell'acquisitore persistente già esistente; `itf-common.mjs` deriva in modo deterministico la rotta dedicata `/v1/factsheet` dalla rotta esistente `/v1/fetch` e riusa il token, salvo configurazione factsheet specifica.
+- Il fallback viene invocato esclusivamente dalla lettura dei metadati factsheet per ottenere `qualificationStartDate`, `venueName` e `address`. La rotta `/v1/fetch`, le API TournamentApi, il motore dei tabelloni e il workflow ITF T−1 restano invariati.
+- Il merge continua a privilegiare il nuovo metadato non vuoto e a conservare quello verificato già persistito, evitando che una risposta dinamica assente cancelli data qualificazioni o luogo nei cicli successivi.
+- Aggiornata la documentazione dell'acquisitore. Nessuna modifica a frequenze, priorità Agenda, database dei risultati o regole dei tabelloni.
