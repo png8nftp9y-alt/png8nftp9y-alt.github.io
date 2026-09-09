@@ -15,4 +15,4 @@ Only URLs on `www.itftennis.com/tennis/api/TournamentApi/` are accepted.
 
 `POST /v1/factsheet` accepts only official ITF tournament-page URLs and returns rendered page text after the existing serialized browser queue has run. It is isolated from `POST /v1/fetch`, which remains restricted to `TournamentApi` URLs.
 
-The CourtWatch engines use this route only when both `ITF_FACTSHEET_ACQUISITION_URL` and `ITF_FACTSHEET_ACQUIRER_TOKEN` are explicitly configured. With those variables absent, the existing ITF and ITF T−1 acquisition paths are unchanged.
+CourtWatch uses the dedicated factsheet variables when present; otherwise the acceptance workflows derive `/v1/factsheet` from the existing `ITF_ACQUISITION_URL` and reuse `ITF_ACQUIRER_TOKEN`. The fallback is called only by factsheet metadata reads. The existing `/v1/fetch` API path and the ITF T−1 acquisition workflow remain unchanged.
