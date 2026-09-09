@@ -32,7 +32,11 @@ try{
   }
   if(!populated)throw new Error('App pubblicata non popolata dopo tre aperture: '+JSON.stringify(lastState)+'; browser='+browserErrors.join(' | '));
   if(browserErrors.length)throw new Error('App pubblicata con errori browser: '+browserErrors.join(' | '));
-  if(await page.locator('#syncStatus.fallback').count())throw new Error('App pubblicata ferma sulla copia locale di fallback');
+  browserErrors.length=0;
+  await page.reload({waitUntil:'domcontentloaded',timeout:30000});
+  await page.waitForFunction(()=>document.querySelectorAll('#playersList [data-profile]').length>0&&document.querySelectorAll('#calendar .tourBand').length>0,null,{timeout:10000});
+  if(browserErrors.length)throw new Error('Secondo caricamento con cache locale in errore: '+browserErrors.join(' | '));
+  if(await page.locator('#syncStatus.fallback').count()&&await page.locator('#playersList [data-profile]').count()===0)throw new Error('App pubblicata ferma sulla copia locale di fallback');
   console.log('✓ App pubblicata carica dati reali e contenuto visibile');
 }finally{await browser.close()}
 const access=await fetch(appUrl,{redirect:'manual',cache:'no-store'});
