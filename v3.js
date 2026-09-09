@@ -150,6 +150,8 @@ function toggleDatePopover(){const pop=$('datePopover');if(!pop.hidden){pop.hidd
 function wire(){wirePlayersColumnHeight();$('prevAgendaMonth').onclick=()=>{moveBothToMonth(state.agenda.getFullYear(),state.agenda.getMonth()-1);renderSynchronizedDates()};$('nextAgendaMonth').onclick=()=>{moveBothToMonth(state.agenda.getFullYear(),state.agenda.getMonth()+1);renderSynchronizedDates()};$('prevAgenda').onclick=()=>{state.agenda=add(state.agenda,-1);syncMonthFromAgenda();renderSynchronizedDates()};$('nextAgenda').onclick=()=>{state.agenda=add(state.agenda,1);syncMonthFromAgenda();renderSynchronizedDates()};$('agendaToday').onclick=toggleDatePopover;$('datePopover').onclick=e=>e.stopPropagation();$('toggleAll').onclick=()=>{state.selected.size>state.data.players.length-state.selected.size?state.selected.clear():state.data.players.forEach(p=>state.selected.add(p.id));saveUiState();renderHome()};$('backHome').onclick=()=>{if(history.length>1){history.back();return}location.hash=''};$('resetHome').onclick=()=>{state.agenda=new Date();state.month=new Date();$('datePopover').hidden=true;history.replaceState(null,'',location.origin+location.pathname+location.search);saveUiState();route();scrollTo({top:0,behavior:'smooth'})};document.addEventListener('click',e=>{const pop=$('datePopover');if(!pop.hidden&&!pop.contains(e.target)&&!$('agendaToday').contains(e.target))pop.hidden=true});document.addEventListener('keydown',e=>{if(e.key==='Escape')$('datePopover').hidden=true});addEventListener('hashchange',()=>{saveUiState();route()});addEventListener('pagehide',saveUiState)}
 async function load(){
   if(loadRunning)return;
+  const immediate=!state.data&&cachedData();
+  if(immediate){state.data=immediate;if(!uiSelectionRestored){state.data.players.forEach(p=>state.selected.add(p.id));uiSelectionRestored=true}else state.selected=new Set([...state.selected].filter(id=>state.data.players.some(p=>p.id===id)));syncLabel(state.data,true);renderIfDataChanged();restoreUiScroll()}
   loadRunning=true;
   try{
     const names=['players','tournaments','matches','agenda','results','opponents','entries','status','diagnostics','manual'];
@@ -161,7 +163,7 @@ async function load(){
     if(!Array.isArray(docs.tournaments?.tournaments))throw Error('Calendario tornei essenziale non disponibile');
 
     const previous=state.data||cachedData()||{};
-    const projection=await projectionPromise;
+    const projection=await Promise.race([projectionPromise,new Promise(resolve=>setTimeout(()=>resolve(null),1500))]);
     const jsonGeneration=Math.max(...[docs.players?.generatedAt,docs.tournaments?.generatedAt].map(Date.parse).filter(Number.isFinite),0),apiGeneration=Date.parse(projection?.generatedAt||'');
     const universalProjectionFresh=projection&&(!jsonGeneration||(Number.isFinite(apiGeneration)&&apiGeneration>=jsonGeneration));
     if(projection&&!universalProjectionFresh)console.warn('Indice universale D1 in sincronizzazione: uso temporaneo dei JSON per giocatori e tornei; i match di circuito restano dalla API');
