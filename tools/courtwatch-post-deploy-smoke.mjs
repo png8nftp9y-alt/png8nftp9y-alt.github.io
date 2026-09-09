@@ -21,8 +21,14 @@ for(const [file,key,min] of [['players.json','players',1],['tournaments.json','t
 const browser=await chromium.launch({headless:true}),page=await browser.newPage({viewport:{width:1280,height:900}}),browserErrors=[];
 page.on('pageerror',error=>browserErrors.push(String(error)));
 try{
-  await page.goto(pageUrl+'v3.html?shield='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
-  await page.waitForFunction(()=>document.querySelectorAll('#playersList [data-profile]').length>0&&document.querySelectorAll('#calendar .tourBand').length>0,null,{timeout:45000});
+  let populated=false,lastState={};
+  for(let attempt=1;attempt<=3&&!populated;attempt++){
+    await page.goto(pageUrl+'v3.html?shield='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
+    try{await page.waitForFunction(()=>document.querySelectorAll('#playersList [data-profile]').length>0&&document.querySelectorAll('#calendar .tourBand').length>0,null,{timeout:30000});populated=true}catch{}
+    lastState=await page.evaluate(()=>({players:document.querySelectorAll('#playersList [data-profile]').length,tournaments:document.querySelectorAll('#calendar .tourBand').length,status:document.querySelector('#syncStatus')?.textContent||'',alert:document.querySelector('#dataAlert')?.textContent||''}));
+    if(!populated&&attempt<3)await wait(5000);
+  }
+  if(!populated)throw new Error('App pubblicata non popolata dopo tre aperture: '+JSON.stringify(lastState)+'; browser='+browserErrors.join(' | '));
   if(browserErrors.length)throw new Error('App pubblicata con errori browser: '+browserErrors.join(' | '));
   if(await page.locator('#syncStatus.fallback').count())throw new Error('App pubblicata ferma sulla copia locale di fallback');
   console.log('✓ App pubblicata carica dati reali e contenuto visibile');
