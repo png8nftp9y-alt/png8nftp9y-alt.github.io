@@ -19,6 +19,8 @@ for(const [file,key,min] of [['players.json','players',1],['tournaments.json','t
   if(!Array.isArray(rows)||rows.length<min)throw new Error('Dataset pubblicato vuoto o invalido: '+file);
 }
 const browser=await chromium.launch({headless:true}),page=await browser.newPage({viewport:{width:1280,height:900}}),browserErrors=[];
+const testHtml=published.replace(/<script>if\(location\.hostname===\"png8nftp9y-alt\.github\.io\"\)location\.replace\([\s\S]*?<\/script>/,'');
+await page.route('**/v3.html?shield=*',route=>route.fulfill({status:200,contentType:'text/html; charset=utf-8',body:testHtml}));
 page.on('pageerror',error=>browserErrors.push(String(error)));
 try{
   let populated=false,lastState={};
