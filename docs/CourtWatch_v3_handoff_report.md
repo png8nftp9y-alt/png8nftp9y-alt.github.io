@@ -2445,3 +2445,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Agenda: la priorità dei blocchi è ora vincolante `ITF → Tennis Europe → FITP`; l’orario ordina soltanto all’interno della stessa priorità. Se un torneo ha più di tre match nella giornata, ogni match occupa una riga separata anche quando due orari coincidono; l’affiancamento resta consentito soltanto fino a tre match complessivi.
 - Tra due tornei consecutivi evidenziati in giallo non viene più usato un bordo colorato: il secondo blocco ha margine superiore di 8 px e lo sfondo bianco del contenitore resta visibile.
 - Cache-buster CSS/JavaScript aggiornati a `2026090902`/`2026090906`. Report, sintassi JavaScript, JSON e valori Pescara verificati prima del deploy.
+
+
+## Revisione 243 — 2026-09-09 — separatore bianco e stato metadati factsheet ITF
+
+- Corretta la causa dello spazio giallo tra due tornei consecutivi in corso: la regola precedente rimuoveva il bordo e creava un margine trasparente di 8 px, lasciando affiorare lo sfondo giallo. Ora il distacco è un bordo bianco reale di 8 px, senza margine trasparente.
+- Aggiornato il cache-buster CSS a `2026090903`, così i browser caricano immediatamente la correzione.
+- In pagina torneo la posizione viene presentata come `Acceptance list: <posizione>`; la parola/etichetta `live` non viene mostrata.
+- Il recupero universale di data qualificazioni e luogo dai factsheet dinamici è stato predisposto in un percorso di acquisizione isolato e opzionale. Le variabili di attivazione non sono impostate: quindi il nuovo percorso non interferisce con i motori ITF e ITF T−1 attuali, ma non può ancora essere dichiarato risolutivo per tutti i tornei futuri.
+- Pescara resta protetto nell'archivio persistente dei metadati factsheet verificati. Nessuna modifica a regole di durata/stato dei tornei, frequenze, schedulazioni o database pubblicati.
