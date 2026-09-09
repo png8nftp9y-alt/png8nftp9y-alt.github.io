@@ -2383,3 +2383,14 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - La dichiarazione usa priorità vincolante per impedire che sui nodi testuali ricompaia il cursore a forma di I dedicato alla selezione del testo.
 - Conservata l’evidenziazione azzurra dell’intera riga al passaggio del puntatore introdotta nella revisione 236.
 - Aggiornato il cache-buster CSS a `2026090824`. Nessuna modifica a JavaScript, dati, motori, D1, R2 o schedulazioni.
+
+
+## Revisione 238 — 2026-09-09 — qualificazioni ITF, apertura Agenda e ordine temporale
+
+- Corretto il punto residuo della data iniziale ITF: la risposta HTML ottenuta durante il bootstrap della sessione veniva consumata e scartata; la seconda richiesta poteva essere bloccata e lasciare vuota `qualificationStartDate`. Il bootstrap restituisce ora il contenuto della prima risposta valida e il lettore factsheet estrae da quella la riga ufficiale `First day of Singles Qualifying`.
+- La regola di pubblicazione resta semantica e non matematica: per ITF il calendario usa `qualificationStartDate`; soltanto se il factsheet non pubblica tale campo resta disponibile la data ufficiale del torneo. Il caso pubblico J60 Pescara espone qualificazioni il 26 settembre 2026 e main draw il 28 settembre 2026; il successivo ciclo ITF deve quindi pubblicare il 26 settembre.
+- Cliccando un giorno nel calendario, l’Agenda viene impostata sulla data selezionata e la pagina scorre immediatamente alla parte superiore, rendendo visibile l’Agenda invece di lasciare il punto di vista sul calendario.
+- L’ordinamento Agenda usa ora un valore temporale anche per `A seguire`. Dall’orario del primo match sul campo somma 90 minuti per ciascuno dei primi due incontri, 105 minuti per terzo e quarto e 120 minuti per ogni incontro successivo.
+- Esempio certificato dalla formula: primo match alle 08:00 e giocatore nel quarto match → 08:00 + 90 + 90 + 105 minuti = 12:45. La stima serve esclusivamente all’ordinamento; la dicitura ufficiale `A seguire` resta visualizzata senza inventare un orario ufficiale.
+- L’ordine cronologico precede ora la priorità di circuito sia tra le partite sia tra i blocchi torneo. Aggiornato il cache-buster JavaScript a `2026090901`. Nessuna modifica alle frequenze di schedulazione.
+- La correzione ITF entra nei dati al primo successivo ciclo live ITF; non è stato introdotto polling né un valore manuale specifico per Pescara.
