@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.261**
+Revisione documento: **2026-09-10.267**
+
+- 10 settembre 2026 — Rifinita l'intestazione dell'Agenda in modalità `Cronologico`: quando uno slot orario contiene esclusivamente partite dello stesso torneo viene mostrata una sola intestazione identica a quella della modalità `Per torneo`; l'intestazione compatta dentro ogni scheda resta soltanto quando nella stessa riga sono raggruppate partite di tornei differenti. La decisione usa l'identità circuito/competizione e non il semplice numero di match. Cache-buster aggiornato a `2026091024`; nessun motore dati o workflow modificato.
 
 - 9 settembre 2026 — Rimossa completamente la parola `live` dalla posizione in pagina torneo: la forma è ora soltanto `Acceptance list: <posizione>`, per esempio `Acceptance list: Q-12`. Avviata in modo isolato la soluzione strutturale dei metadati factsheet ITF senza modificare il comportamento operativo dei motori correnti. L’acquisitore persistente conserva invariata `/v1/fetch` e aggiunge `/v1/factsheet`, limitata tramite allowlist agli URL ufficiali `/en/tournament/...` e inserita nella medesima coda Chromium seriale con lo stesso intervallo minimo; attende i campi renderizzati e restituisce testo soltanto se non rileva challenge. `itf-common.mjs` consulta questo fallback esclusivamente quando sono presenti le nuove variabili `ITF_FACTSHEET_ACQUISITION_URL` e `ITF_FACTSHEET_ACQUIRER_TOKEN`; nessun workflow corrente le imposta, quindi ITF live e ITF T−1 continuano a eseguire esattamente le richieste e le frequenze precedenti. La nuova via resta disattivata finché non viene collaudata separatamente e configurata consapevolmente. Documentazione aggiornata, sintassi verificata e cache-buster UI portato a `2026090912`.
 
