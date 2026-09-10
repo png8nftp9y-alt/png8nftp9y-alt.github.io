@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.267**
+Revisione documento: **2026-09-10.268**
+
+- 10 settembre 2026 — Diagnosticato il rosso del run classifiche Tennis Europe `34512383170`: migrazioni D1 e lettura match erano verdi, mentre `Acquire official rankings` falliva in circa un secondo prima dell'importazione. La pagina ufficiale espone i profili come `profile/default.aspx?id=<UUID>`; il parser riconosceva soltanto UUID collocati dopo una barra e scartava quindi tutte le righe, producendo `Classifica vuota B14`. Il parser accetta ora entrambi i formati ufficiali, incluso `player-profile/<UUID>`, con prova locale bloccante per ciascuno. Frequenza settimanale e volume delle richieste restano invariati; Agenda e motori ITF non sono stati modificati.
 
 - 10 settembre 2026 — Rifinita l'intestazione dell'Agenda in modalità `Cronologico`: quando uno slot orario contiene esclusivamente partite dello stesso torneo viene mostrata una sola intestazione identica a quella della modalità `Per torneo`; l'intestazione compatta dentro ogni scheda resta soltanto quando nella stessa riga sono raggruppate partite di tornei differenti. La decisione usa l'identità circuito/competizione e non il semplice numero di match. Cache-buster aggiornato a `2026091024`; nessun motore dati o workflow modificato.
 
