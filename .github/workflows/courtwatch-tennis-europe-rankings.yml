@@ -12,7 +12,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: courtwatch-d1-writes
+  group: courtwatch-tennis-europe-rankings
   cancel-in-progress: false
 jobs:
   sync:
@@ -37,6 +37,10 @@ jobs:
         run: node scripts/sync-tennis-europe-rankings.mjs
       - name: Import history and immutable match rankings
         run: npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file seed-tennis-europe-rankings/rankings.sql
+      - name: Verify rankings really reached D1
+        run: |
+          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT COUNT(*) AS ranking_history_count FROM tennis_europe_ranking_history" --json > te-ranking-verification.json
+          node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('te-ranking-verification.json','utf8'));const rows=data?.[0]?.results||data?.result?.[0]?.results||[];const count=Number(rows[0]?.ranking_history_count||0);console.log(JSON.stringify({rankingHistoryCount:count}));if(!Number.isInteger(count)||count<1)process.exit(1)"
       - name: Deploy ranking-aware API
         run: |
           npm run check
