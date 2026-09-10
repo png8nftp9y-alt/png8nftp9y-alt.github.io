@@ -1,6 +1,6 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.256**
+Revisione documento: **2026-09-10.257**
 
 - 9 settembre 2026 — Rimossa completamente la parola `live` dalla posizione in pagina torneo: la forma è ora soltanto `Acceptance list: <posizione>`, per esempio `Acceptance list: Q-12`. Avviata in modo isolato la soluzione strutturale dei metadati factsheet ITF senza modificare il comportamento operativo dei motori correnti. L’acquisitore persistente conserva invariata `/v1/fetch` e aggiunge `/v1/factsheet`, limitata tramite allowlist agli URL ufficiali `/en/tournament/...` e inserita nella medesima coda Chromium seriale con lo stesso intervallo minimo; attende i campi renderizzati e restituisce testo soltanto se non rileva challenge. `itf-common.mjs` consulta questo fallback esclusivamente quando sono presenti le nuove variabili `ITF_FACTSHEET_ACQUISITION_URL` e `ITF_FACTSHEET_ACQUIRER_TOKEN`; nessun workflow corrente le imposta, quindi ITF live e ITF T−1 continuano a eseguire esattamente le richieste e le frequenze precedenti. La nuova via resta disattivata finché non viene collaudata separatamente e configurata consapevolmente. Documentazione aggiornata, sintassi verificata e cache-buster UI portato a `2026090912`.
 
@@ -2576,3 +2576,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - La verifica diretta nell'app pubblicata ha però confermato che, nella pagina del 4° Memorial Padre Pino Puglisi, entrambe le etichette `GD16` e `GS16` puntano ancora alla homepage del torneo invece che ai rispettivi tabelloni.
 - Il verde certifica dunque il completamento dell'importazione, non la presenza effettiva del campo `drawUrl` nei record applicativi visibili. La correzione non viene dichiarata risolta.
 - Non sono stati avviati altri workflow e non è stato eseguito polling. Il prossimo intervento deve verificare la presenza del `drawUrl` nello snapshot OOP e lungo la proiezione D1 prima di richiedere un nuovo run.
+
+
+## Revisione 257 — 2026-09-10 — link tabelloni in Agenda e priorità singolare
+
+- Su conferma dell'utente, i collegamenti specifici ai tabelloni Tennis Europe in pagina torneo risultano funzionanti.
+- Le etichette evento presenti nelle schede dell'Agenda, per esempio `GS16` e `GD16`, sono ora collegamenti al medesimo tabellone ufficiale utilizzato nella pagina torneo. Il collegamento si apre in una nuova scheda e conserva colore e aspetto dell'etichetta.
+- Nella riga `Tabelloni:` della pagina torneo, tutte le categorie di singolare sono ordinate prima delle categorie di doppio; all'interno della stessa specialità resta l'ordinamento alfabetico del codice.
+- Cache-buster JavaScript aggiornato a `v3.js?v=2026091020`; sintassi verificata. Nessuna modifica a motori, database o schedulazioni.
