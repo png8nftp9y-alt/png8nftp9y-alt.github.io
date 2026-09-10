@@ -9,7 +9,7 @@ on:
         default: false
   workflow_run:
     # Europe agenda is the priority publication gate. The general rebuild
-    # follows it and consolidates the latest snapshots from every engine.
+    # follows it, including exact drawUrl values from the latest verified OOP snapshot.
     workflows:
       - Court Watch Tennis Europe agenda D1
     types: [completed]
