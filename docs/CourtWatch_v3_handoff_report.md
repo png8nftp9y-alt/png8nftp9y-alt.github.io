@@ -2644,3 +2644,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Per ciascun match salva separatamente giocatore, partner e avversari con la classifica della categoria disputata. L’API restituisce la fotografia del match; gli aggiornamenti successivi non sostituiscono il valore storico di una partita passata.
 - La visualizzazione è `n°84 TE` tra nome e nazionalità/bandierina. L’intestazione giocatore riceve entrambe le ultime classifiche disponibili U14 e U16.
 - Nessun polling e nessuna chiamata AI aggiunti. Il motore usa soltanto richieste HTTP settimanali alle pagine ufficiali Tennis Europe e condivide la coda D1 per evitare scritture concorrenti.
+
+
+## Revisione 265 — 2026-09-10 — esclusione U12 e congelamento temporale ranking TE
+
+- Corretto un errore di classificazione: gli eventi Tennis Europe U12 non vengono più fatti ricadere automaticamente nella categoria U16. Tennis Europe non pubblica classifiche U12, quindi per questi match non viene mostrato alcun valore `TE`.
+- Il ciclo elimina anche eventuali fotografie U16 precedentemente associate per errore a un match U12.
+- Per U14 e U16 una pubblicazione viene associata al match soltanto se la sua data è uguale o precedente alla data della partita. Dopo la giornata del match, le pubblicazioni successive non possono più sostituire quella fotografia.
+- Restano le sei posizioni logiche dei partecipanti: giocatore monitorato, eventuale partner e uno o più avversari. Il formato resta `n°84 TE` prima di nazionalità e bandierina.
+- Nessuna modifica alla costruzione delle intestazioni torneo dell’Agenda, ai motori OOP Tennis Europe/TE-1 o alle relative schedulazioni. Nessun polling e nessuna chiamata AI aggiunti.
