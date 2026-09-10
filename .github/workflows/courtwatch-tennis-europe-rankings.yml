@@ -3,19 +3,18 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '17 5 * * 1'
-  workflow_run:
-    workflows:
-      - Court Watch Cloudflare D1 and app API
-    types: [completed]
+  push:
     branches: [main]
+    paths:
+      - 'cloudflare/app-api/scripts/sync-tennis-europe-rankings.mjs'
+      - '.github/workflows/courtwatch-tennis-europe-rankings.yml'
 permissions:
   contents: read
 concurrency:
-  group: courtwatch-d1-writes
+  group: courtwatch-tennis-europe-rankings
   cancel-in-progress: false
 jobs:
   sync:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     defaults:
@@ -30,7 +29,6 @@ jobs:
         with: {node-version: '22'}
       - run: npm install
       - run: node scripts/configure-d1.mjs
-      - run: npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
       - name: Read Tennis Europe matches
         run: npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT payload FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe'" --json > te-ranking-matches.json
       - name: Acquire official rankings
