@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.272**
+Revisione documento: **2026-09-10.273**
+
+- 10 settembre 2026 — Dal log autenticato del rosso `34514741722` è emersa la prova completa: overview ricevuta correttamente (`151925` byte), ma `week` vuota e `publicationId=null`, seguiti da `Pubblicazione Tennis Europe non riconosciuta`. Rete e cookie erano quindi funzionanti. Il parser cercava il titolo nell'HTML grezzo, dove i tag possono separare le parole, e richiedeva l'ordine fisso `category=525&id=...`. Ora estrae settimana/data dal testo HTML ripulito e analizza tutti i link categoria con `URLSearchParams`, accettando qualsiasi ordine dei parametri e `&amp;`. Due prove bloccanti coprono tag intermedi e i due ordini del link.
 
 - 10 settembre 2026 — Letto finalmente il log autenticato completo del rosso `34514340063`. Errore esatto: `TypeError: response.text is not a function` alla riga 6 del sincronizzatore ranking. La nuova funzione `request()` restituiva correttamente `{status, url, text}`, ma `get()` trattava erroneamente la proprietà stringa `text` come il metodo della Fetch Response (`response.text()`). Corretto in `return response.text`. Il fallimento avveniva prima di qualsiasi accesso o parsing delle categorie; non era un blocco Tennis Europe né un problema D1.
 
