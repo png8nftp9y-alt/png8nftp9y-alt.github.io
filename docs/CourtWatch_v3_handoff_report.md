@@ -2495,3 +2495,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Verifica operativa ITF: il ciclo live n. 636 del 10 settembre si è concluso con successo; l'audit successivo dichiara `itf_acceptance_complete`, 2 tornei controllati, 1.105 partecipanti, zero retry e zero errori. Pescara conserva `qualificationStartDate=2026-09-26`, `venueName=CIRCOLO TENNIS PESCARA` e l'indirizzo ufficiale, con sorgente factsheet persistita.
 - La protezione contro pagina vuota è attiva, ma un primo accesso senza cache non può essere garantito sempre istantaneo: dipende dalla rete fino al caricamento dei dataset essenziali. Con cache valida il rendering è immediato; senza fonti e senza cache viene mostrato un errore esplicito, non una pagina vuota.
 - Cache-buster aggiornati a `v3.js?v=2026091015` e `v3.css?v=2026091006`; sintassi JavaScript verificata. Nessuna modifica a motori, frequenze o schedulazioni.
+
+
+## Revisione 248 — 2026-09-10 — verifica diretta selettore Girls/Boys ITF
+
+- Verificato nel browser il caso pubblico J60 Pescara: la pagina ufficiale Acceptance List si apre su `Boys`; scegliendo `Girls` il contenuto cambia, ma URL, query string, hash, localStorage e sessionStorage restano invariati. Il selettore è esclusivamente stato interno del componente React ITF e non espone un collegamento profondo distinto per sesso.
+- Confermato quindi che `entryType=Girls` introdotto nella revisione 247 non è interpretato dal sito ITF. Un normale link esterno non può imporre `Girls` o `Boys` senza supporto del sito sorgente; non vengono introdotti parametri ulteriori non documentati o automazioni fragili sulla pagina ITF.
+- Verifica ufficiale Pescara confermata: primo giorno qualificazioni 26 settembre 2026, main draw 28 settembre, sede `CIRCOLO TENNIS PESCARA` e indirizzo `VIA GUGLIELMO MARCONI 355, Pescara, ITALIA, 65126, Italy`.
+- Il recupero di data qualificazioni, sede e indirizzo è attivo nei cicli ITF live e known-fast e conserva l'ultimo metadato verificato. La regola è generale anche per i tornei futuri acquisiti dai cicli, ma resta dipendente dalla struttura/protezione del sito ITF: nessuna integrazione esterna può essere garantita immutabile contro futuri cambiamenti del sito sorgente.
+- Nessuna modifica ai motori ITF/ITF-1, alle schedulazioni o ai database.
