@@ -2541,3 +2541,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - La correzione vale sia per singolare sia per doppio e non ricostruisce numeri di draw per tentativi. Diventa visibile sui tornei live dopo il successivo ciclo Tennis Europe/OOP e la successiva proiezione D1.
 - Chiarita la regola della modalità Agenda `Cronologico`: due match di tornei diversi con lo stesso orario restano in blocchi e righe separate, perché ciascuno mantiene la propria intestazione torneo. L'affiancamento fino a tre elementi riguarda i match dello stesso torneo e della stessa fascia temporale.
 - Nessuna modifica alle cadenze, alle priorità Agenda o agli altri motori.
+
+
+## Revisione 253 — 2026-09-10 — pari orario tra tornei diversi in Agenda Cronologico
+
+- In modalità Agenda `Cronologico`, il raggruppamento temporale usa ora soltanto l'orario reale o calcolato, senza includere l'identità del torneo nella chiave.
+- Due o tre match con lo stesso orario vengono quindi mostrati sulla stessa riga anche quando appartengono a tornei diversi. Il quarto match con il medesimo orario apre una nuova riga, conservando il limite massimo di tre.
+- Ogni scheda nella vista cronologica mostra al proprio interno nome torneo, luogo e circuito, così l'affiancamento tra tornei non elimina il contesto. Il nome del torneo resta cliccabile verso la relativa pagina Court Watch.
+- La modalità `Per torneo` non cambia: intestazioni, priorità ITF → Tennis Europe → FITP e raggruppamenti restano quelli precedenti.
+- Cache-buster aggiornati a `v3.js?v=2026091019` e `v3.css?v=2026091008`; sintassi JavaScript e riferimenti degli asset verificati. Nessuna modifica ai motori, ai dati o alle schedulazioni..
