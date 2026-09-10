@@ -2531,3 +2531,13 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - In modalità `Cronologico` i blocchi vengono ordinati globalmente per orario reale o stimato; tornei diversi possono quindi intercalarsi. I match dello stesso torneo con identica fascia temporale restano raggruppati fino a tre sulla stessa riga.
 - La scelta Agenda viene conservata nello stato locale dell'interfaccia. Aggiunto comportamento responsive per selettore e riga Tabelloni.
 - Cache-buster aggiornati a `v3.js?v=2026091018` e `v3.css?v=2026091007`; sintassi JavaScript e collegamenti degli asset verificati. Nessuna modifica a motori, schedulazioni o database.
+
+
+## Revisione 252 — 2026-09-10 — collegamenti esatti ai tabelloni Tennis Europe
+
+- Individuata la causa dei link Tennis Europe che aprivano la homepage del torneo: il parser dell'ordine di gioco leggeva l'evento e il collegamento al relativo draw dalla stessa riga ufficiale, ma conservava nel match soltanto l'URL giornaliero `/matches/{data}`.
+- Il motore Tennis Europe live e il parser storico conservano ora anche il `drawUrl` esatto ricavato dal link ufficiale della partita, per esempio `/tournament/{competitionId}/draw/{drawId}`.
+- La proiezione D1 porta `drawUrl` fino ai match dell'app. Le etichette `GS/BS/GD/BD` della pagina torneo privilegiano già questo campo e aprono quindi il tabellone corrispondente invece della homepage.
+- La correzione vale sia per singolare sia per doppio e non ricostruisce numeri di draw per tentativi. Diventa visibile sui tornei live dopo il successivo ciclo Tennis Europe/OOP e la successiva proiezione D1.
+- Chiarita la regola della modalità Agenda `Cronologico`: due match di tornei diversi con lo stesso orario restano in blocchi e righe separate, perché ciascuno mantiene la propria intestazione torneo. L'affiancamento fino a tre elementi riguarda i match dello stesso torneo e della stessa fascia temporale.
+- Nessuna modifica alle cadenze, alle priorità Agenda o agli altri motori.
