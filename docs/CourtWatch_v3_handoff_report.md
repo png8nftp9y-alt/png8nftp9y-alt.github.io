@@ -2484,3 +2484,14 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Durante l'uso della copia locale di sicurezza non viene più mostrata la scritta `Aggiornamento in corso`. La modifica è esclusivamente grafica: caricamento, timeout, fallback, cache valida e Scudo post-deploy restano invariati.
 - Cache-buster aggiornati a `v3.js?v=2026091014` e `v3.css?v=2026091005`; sintassi JavaScript verificata.
 - Stato dichiarato con precisione: la protezione contro la pagina vuota è presente nel codice; il recupero futuro di luogo e data qualificazioni ITF è attivo ma diventa certificato operativamente soltanto dopo un ciclo reale completato con successo dall'acquisitore factsheet.
+
+
+## Revisione 247 — 2026-09-10 — FQ stabile, acceptance Girls e verifica ITF operativa
+
+- Eliminato il lampo delle iniziali account: l'HTML iniziale mostrava `F` e soltanto dopo la risposta della sessione JavaScript impostava `FQ`. Ora `FQ` è presente già nel primo HTML e anche nel fallback della sessione.
+- Pagina torneo ITF: rimossa completamente la parola `live`. Il collegamento ufficiale è applicato alla dicitura `Acceptance list`, mentre posizione e codice restano testo.
+- Per una giocatrice con genere `Girls` certificato nell'entry ITF, il collegamento aggiunge `entryType=Girls` e apre direttamente la sezione femminile. Restano valide le regole precedenti: link rimosso al T−1 o quando la lista non è più pubblicata; intera etichetta rimossa alla conferma nel tabellone.
+- I controlli provvisori `+` e `Altri` sono stati distanziati di 12 px dal titolo Giocatori, portati a 14 px e dotati di padding maggiore. Restano intenzionalmente senza azione.
+- Verifica operativa ITF: il ciclo live n. 636 del 10 settembre si è concluso con successo; l'audit successivo dichiara `itf_acceptance_complete`, 2 tornei controllati, 1.105 partecipanti, zero retry e zero errori. Pescara conserva `qualificationStartDate=2026-09-26`, `venueName=CIRCOLO TENNIS PESCARA` e l'indirizzo ufficiale, con sorgente factsheet persistita.
+- La protezione contro pagina vuota è attiva, ma un primo accesso senza cache non può essere garantito sempre istantaneo: dipende dalla rete fino al caricamento dei dataset essenziali. Con cache valida il rendering è immediato; senza fonti e senza cache viene mostrato un errore esplicito, non una pagina vuota.
+- Cache-buster aggiornati a `v3.js?v=2026091015` e `v3.css?v=2026091006`; sintassi JavaScript verificata. Nessuna modifica a motori, frequenze o schedulazioni.
