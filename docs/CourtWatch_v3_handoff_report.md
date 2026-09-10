@@ -2550,3 +2550,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Ogni scheda nella vista cronologica mostra al proprio interno nome torneo, luogo e circuito, così l'affiancamento tra tornei non elimina il contesto. Il nome del torneo resta cliccabile verso la relativa pagina Court Watch.
 - La modalità `Per torneo` non cambia: intestazioni, priorità ITF → Tennis Europe → FITP e raggruppamenti restano quelli precedenti.
 - Cache-buster aggiornati a `v3.js?v=2026091019` e `v3.css?v=2026091008`; sintassi JavaScript e riferimenti degli asset verificati. Nessuna modifica ai motori, ai dati o alle schedulazioni..
+
+
+## Revisione 254 — 2026-09-10 — riallineamento D1 dei link draw Tennis Europe
+
+- Verificata la persistenza del collegamento alla homepage dopo la revisione 252. Il ciclo OOP Tennis Europe n. 396, contenente l'acquisizione del `drawUrl` esatto, era terminato verde; l'ultima proiezione D1 n. 918 era però iniziata prima di quel ciclo e conteneva ancora i match precedenti senza `drawUrl`.
+- Confermata quindi l'assenza di un nuovo errore nel selettore dell'interfaccia: senza `drawUrl` nella generazione D1 visibile, la pagina applicava correttamente il fallback alla homepage del torneo.
+- Richiesto un riallineamento completo D1 tramite il workflow ufficiale, che ripristina lo snapshot Tennis Europe OOP verificato da R2 e rigenera i candidati applicativi includendo `drawUrl`.
+- La catena futura resta automatica: OOP pubblica lo snapshot su R2, Agenda Europe agisce da gate e il rebuild generale D1 consolida la generazione successiva. Nessun numero di tabellone viene inventato lato interfaccia.
+- Nessuna modifica alla visualizzazione Agenda o agli altri motori.
