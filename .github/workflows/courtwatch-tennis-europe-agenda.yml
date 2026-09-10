@@ -15,6 +15,7 @@ on:
       - 'cloudflare/app-api/scripts/verify-tennis-europe-agenda-d1.mjs'
       - 'cloudflare/app-api/migrations/0006_tennis_europe_oop.sql'
       - 'cloudflare/app-api/migrations/0007_app_match_candidates.sql'
+      - 'cloudflare/app-api/migrations/0018_app_match_candidates_match_index.sql'
       - 'src/v3/verify-cloudflare-api-parity.mjs'
       - '.github/workflows/courtwatch-tennis-europe-agenda.yml'
 
@@ -36,7 +37,7 @@ jobs:
         working-directory: cloudflare/app-api
     env:
       # Live upstream runs import deltas; historical merges and maintenance runs rebuild the full Europe archive.
-      TE_INCREMENTAL: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.name != 'Court Watch Tennis Europe OOP historical merge' && '1' || '0' }}
+      TE_INCREMENTAL: ${{ (github.event_name != 'workflow_run' || github.event.workflow_run.name != 'Court Watch Tennis Europe OOP historical merge') && '1' || '0' }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
