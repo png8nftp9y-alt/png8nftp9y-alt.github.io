@@ -1,6 +1,6 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.257**
+Revisione documento: **2026-09-10.258**
 
 - 9 settembre 2026 — Rimossa completamente la parola `live` dalla posizione in pagina torneo: la forma è ora soltanto `Acceptance list: <posizione>`, per esempio `Acceptance list: Q-12`. Avviata in modo isolato la soluzione strutturale dei metadati factsheet ITF senza modificare il comportamento operativo dei motori correnti. L’acquisitore persistente conserva invariata `/v1/fetch` e aggiunge `/v1/factsheet`, limitata tramite allowlist agli URL ufficiali `/en/tournament/...` e inserita nella medesima coda Chromium seriale con lo stesso intervallo minimo; attende i campi renderizzati e restituisce testo soltanto se non rileva challenge. `itf-common.mjs` consulta questo fallback esclusivamente quando sono presenti le nuove variabili `ITF_FACTSHEET_ACQUISITION_URL` e `ITF_FACTSHEET_ACQUIRER_TOKEN`; nessun workflow corrente le imposta, quindi ITF live e ITF T−1 continuano a eseguire esattamente le richieste e le frequenze precedenti. La nuova via resta disattivata finché non viene collaudata separatamente e configurata consapevolmente. Documentazione aggiornata, sintassi verificata e cache-buster UI portato a `2026090912`.
 
@@ -2584,3 +2584,13 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Le etichette evento presenti nelle schede dell'Agenda, per esempio `GS16` e `GD16`, sono ora collegamenti al medesimo tabellone ufficiale utilizzato nella pagina torneo. Il collegamento si apre in una nuova scheda e conserva colore e aspetto dell'etichetta.
 - Nella riga `Tabelloni:` della pagina torneo, tutte le categorie di singolare sono ordinate prima delle categorie di doppio; all'interno della stessa specialità resta l'ordinamento alfabetico del codice.
 - Cache-buster JavaScript aggiornato a `v3.js?v=2026091020`; sintassi verificata. Nessuna modifica a motori, database o schedulazioni.
+
+
+## Revisione 258 — 2026-09-10 — dispositivi connessi nell’Admin
+
+- Aggiunto il registro D1 `app_user_devices`, inizialmente limitato all'account Federico Quadri. Ogni browser riceve un identificativo casuale persistito soltanto nel proprio localStorage; il server conserva etichetta indicativa dispositivo/browser, prima connessione, ultimo accesso, ultima rotta e stato.
+- Il registro viene aggiornato esclusivamente durante le normali richieste già eseguite dall'app verso sessione e proiezione privata. Non sono stati aggiunti polling, workflow, chiamate AI o nuove schedulazioni.
+- Nella pagina Admin → Utenti compare la sezione `Dispositivi connessi`, con conteggio dei dispositivi attivi negli ultimi 15 minuti, elenco degli accessi e comando di revoca del singolo identificativo browser.
+- Un identificativo revocato riceve risposta 403 dalle API private. La revoca riguarda il browser registrato in CourtWatch e non sostituisce la gestione centrale delle sessioni Cloudflare Access.
+- La migrazione è retrocompatibile: il Worker ignora in sicurezza il registro finché la nuova tabella non è stata applicata, evitando interruzioni durante il deploy preliminare.
+- Cache-buster aggiornato a `v3.js?v=2026091021`; sintassi del client verificata e sorgente Worker preparata per il controllo del workflow. Nessuna modifica ai motori tennis, ai dati sportivi o alle loro frequenze.
