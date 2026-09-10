@@ -3,19 +3,19 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '17 5 * * 1'
-  push:
+  workflow_run:
+    workflows:
+      - Court Watch Cloudflare D1 and app API
+    types: [completed]
     branches: [main]
-    paths:
-      - 'cloudflare/app-api/scripts/sync-tennis-europe-rankings.mjs'
-      - 'cloudflare/app-api/migrations/0017_tennis_europe_ranking_history.sql'
-      - '.github/workflows/courtwatch-tennis-europe-rankings.yml'
 permissions:
   contents: read
 concurrency:
-  group: courtwatch-tennis-europe-rankings
+  group: courtwatch-d1-writes
   cancel-in-progress: false
 jobs:
   sync:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     defaults:
