@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.268**
+Revisione documento: **2026-09-10.269**
+
+- 10 settembre 2026 — Agenda cronologica: l'intestazione grande del torneo non viene più ripetuta negli slot successivi consecutivi appartenenti alla stessa competizione; ricompare soltanto al cambio torneo. Se uno slot contiene match di tornei diversi, ciascuna scheda conserva invece l'intestazione compatta necessaria a distinguerli. Corretto inoltre il secondo rosso del ranking `34513425433`: il parser non era coinvolto, poiché il job falliva già su `wrangler d1 migrations apply` per sovrapposizione introdotta dalla coda dedicata. Il ranking torna nella coda globale `courtwatch-d1-writes` e viene avviato dopo la conclusione verde di `Court Watch Cloudflare D1 and app API` tramite `workflow_run`; il push diretto del ranking è rimosso, evitando che i due writer partano insieme. Aggiunta diagnostica per categoria acquisita. Cache-buster UI `2026091025`.
 
 - 10 settembre 2026 — Diagnosticato il rosso del run classifiche Tennis Europe `34512383170`: migrazioni D1 e lettura match erano verdi, mentre `Acquire official rankings` falliva in circa un secondo prima dell'importazione. La pagina ufficiale espone i profili come `profile/default.aspx?id=<UUID>`; il parser riconosceva soltanto UUID collocati dopo una barra e scartava quindi tutte le righe, producendo `Classifica vuota B14`. Il parser accetta ora entrambi i formati ufficiali, incluso `player-profile/<UUID>`, con prova locale bloccante per ciascuno. Frequenza settimanale e volume delle richieste restano invariati; Agenda e motori ITF non sono stati modificati.
 
