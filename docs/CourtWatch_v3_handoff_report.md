@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.271**
+Revisione documento: **2026-09-10.272**
+
+- 10 settembre 2026 — Letto finalmente il log autenticato completo del rosso `34514340063`. Errore esatto: `TypeError: response.text is not a function` alla riga 6 del sincronizzatore ranking. La nuova funzione `request()` restituiva correttamente `{status, url, text}`, ma `get()` trattava erroneamente la proprietà stringa `text` come il metodo della Fetch Response (`response.text()`). Corretto in `return response.text`. Il fallimento avveniva prima di qualsiasi accesso o parsing delle categorie; non era un blocco Tennis Europe né un problema D1.
 
 - 10 settembre 2026 — Diagnosticato il terzo rosso ranking `34513990108`: configurazione e lettura D1 erano verdi, `Acquire official rankings` falliva in un secondo prima di acquisire qualsiasi categoria. Il confronto con l'acquisitore Tennis Europe già operativo ha individuato la differenza strutturale: il ranking usava una richiesta senza sessione e seguiva automaticamente il redirect, ricevendo dal runner GitHub la cookie wall invece della classifica. Il ranking ora apre e conserva una singola sessione con la stessa gestione del consenso essenziale già collaudata dal motore TE, segue esplicitamente i redirect e riutilizza il cookie per tutte le pagine. Aggiunta diagnostica non sensibile con byte, settimana e publication ID; frequenza e numero delle pagine ranking invariati.
 
