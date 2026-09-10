@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.269**
+Revisione documento: **2026-09-10.270**
+
+- 10 settembre 2026 — Il primo tentativo di serializzare il ranking dopo il writer principale non è affidabile su GitHub Actions: il run Cloudflare `34513856762` è stato cancellato mentre era pending perché un gruppo concurrency conserva al massimo un'esecuzione in corso e una in attesa, sostituendo la pending precedente. Il ranking torna quindi su una coda dedicata, ma non esegue più `d1 migrations apply`: la migrazione `0017` era già stata applicata con successo nel run `34512383170` e il secondo rosso avveniva esclusivamente tentando di riapplicare migrazioni durante un writer concorrente. Il workflow ranking legge `app_matches` e scrive soltanto le proprie tabelle ranking già create, senza intervenire su motori, ricostruzioni o schema D1; il trigger push isolato è ripristinato.
 
 - 10 settembre 2026 — Agenda cronologica: l'intestazione grande del torneo non viene più ripetuta negli slot successivi consecutivi appartenenti alla stessa competizione; ricompare soltanto al cambio torneo. Se uno slot contiene match di tornei diversi, ciascuna scheda conserva invece l'intestazione compatta necessaria a distinguerli. Corretto inoltre il secondo rosso del ranking `34513425433`: il parser non era coinvolto, poiché il job falliva già su `wrangler d1 migrations apply` per sovrapposizione introdotta dalla coda dedicata. Il ranking torna nella coda globale `courtwatch-d1-writes` e viene avviato dopo la conclusione verde di `Court Watch Cloudflare D1 and app API` tramite `workflow_run`; il push diretto del ranking è rimosso, evitando che i due writer partano insieme. Aggiunta diagnostica per categoria acquisita. Cache-buster UI `2026091025`.
 
