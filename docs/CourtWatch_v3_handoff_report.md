@@ -2676,3 +2676,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 # Revisione 266 — 10 settembre 2026
 
 - Diagnosticata la causa della mancata visualizzazione delle classifiche Tennis Europe: entrambi i primi run del nuovo workflow ranking (`34509881081` e `34510799610`) sono stati cancellati prima dell'importazione perché condividevano la coda globale `courtwatch-d1-writes` con gli altri motori. Il codice UI/API era quindi presente, ma D1 non era mai stato popolato. Il workflow ranking usa ora una coda dedicata, senza modificare i motori ITF, ITF-1, FITP o Tennis Europe live, e verifica dopo l'importazione che `tennis_europe_ranking_history` contenga realmente record; in assenza di dati il run diventa rosso e non può distribuire un falso successo. Restano esclusi gli U12, per i quali Tennis Europe non pubblica una classifica ufficiale.
+
+
+### 2026-09-11 — Eliminata l'amplificazione delle letture D1 nell'import Tennis Europe
+
+- Motivo: l'import incrementale usava `INSERT OR REPLACE` sulla tabella padre `matches`. SQLite implementa `REPLACE` come cancellazione e reinserimento; la cancellazione attivava i controlli/cascade verso `app_match_candidates`, che non disponeva di un indice con `match_id` come prima colonna. Ogni aggiornamento di una partita poteva quindi scandire l'intera tabella delle candidate.
+- Componenti: `generate-tennis-europe-oop-seed.mjs` elimina esplicitamente le candidate della sola partita e usa `INSERT ... ON CONFLICT(id) DO UPDATE`; la migrazione `0018_app_match_candidates_match_index.sql` aggiunge l'indice su `app_match_candidates(match_id)`.
+- Compatibilità funzionale: l'eliminazione esplicita preserva la precedente semantica di `REPLACE` (le candidate della partita vengono ricostruite dal generatore successivo), mentre l'UPSERT conserva l'identità della riga padre ed evita le cascade implicite. Payload, calendario, risultati e partecipanti prodotti non cambiano.
+- Validazione: controllo sintattico Node superato; la CI reale esegue ripristino degli archivi, migrazioni, generazione, import, verifica D1 e controllo API.
+- Limitazione residua: le query di verifica con più `COUNT(*)` restano inefficienti, ma dai D1 Insights rappresentano meno di un miliardo di letture complessive e non sono la causa dell'eccedenza da 42,71 miliardi.
