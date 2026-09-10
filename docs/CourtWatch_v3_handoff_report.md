@@ -2559,3 +2559,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Richiesto un riallineamento completo D1 tramite il workflow ufficiale, che ripristina lo snapshot Tennis Europe OOP verificato da R2 e rigenera i candidati applicativi includendo `drawUrl`.
 - La catena futura resta automatica: OOP pubblica lo snapshot su R2, Agenda Europe agisce da gate e il rebuild generale D1 consolida la generazione successiva. Nessun numero di tabellone viene inventato lato interfaccia.
 - Nessuna modifica alla visualizzazione Agenda o agli altri motori.
+
+
+## Revisione 255 — 2026-09-10 — causa reale del mancato aggiornamento link Tennis Europe
+
+- Riprodotta nell'app pubblicata la pagina del 4° Memorial Padre Pino Puglisi: le etichette `GD16` e `GS16` puntavano ancora entrambe alla homepage `/tournament/6131A096-712D-4E53-B191-158EE50E83CE`.
+- Il ciclo OOP Tennis Europe n. 396 aveva acquisito correttamente il nuovo `drawUrl`, ma l'import Agenda D1 n. 1079 era iniziato prima della pubblicazione completa dello snapshot R2 e aveva quindi importato la generazione precedente.
+- L'import successivo n. 1080, avviato dopo OOP 396 e quindi idoneo a importare i link esatti, è stato cancellato dalla nuova richiesta di rebuild generale D1 n. 921. I due workflow condividono la coda `courtwatch-d1-writes`; il trigger manuale aggiunto durante la diagnosi ha sostituito il job in attesa. La precedente indicazione di controllare soltanto D1 921 era quindi errata.
+- Non vengono aggiunti altri trigger per non cancellare nuovamente la scrittura corretta. Agenda D1 n. 1081 è il ciclo che deve importare lo snapshot contenente i `drawUrl` esatti; dopo il suo completamento verde l'app non deve più usare il fallback alla homepage per GD16/GS16.
+- Nessuna modifica al codice o ai motori in questa revisione; viene preservata la coda attiva e documentata la causa operativa reale.
