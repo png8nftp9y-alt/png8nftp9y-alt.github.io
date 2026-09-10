@@ -2504,3 +2504,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Verifica ufficiale Pescara confermata: primo giorno qualificazioni 26 settembre 2026, main draw 28 settembre, sede `CIRCOLO TENNIS PESCARA` e indirizzo `VIA GUGLIELMO MARCONI 355, Pescara, ITALIA, 65126, Italy`.
 - Il recupero di data qualificazioni, sede e indirizzo è attivo nei cicli ITF live e known-fast e conserva l'ultimo metadato verificato. La regola è generale anche per i tornei futuri acquisiti dai cicli, ma resta dipendente dalla struttura/protezione del sito ITF: nessuna integrazione esterna può essere garantita immutabile contro futuri cambiamenti del sito sorgente.
 - Nessuna modifica ai motori ITF/ITF-1, alle schedulazioni o ai database.
+
+
+## Revisione 249 — 2026-09-10 — indirizzo Pescara senza località duplicata
+
+- Corretta la composizione del luogo nella pagina torneo: quando ITF fornisce un indirizzo ufficiale completo, città e nazione non vengono più aggiunte nuovamente dai campi separati `location`, `city` e `country`.
+- J60 Pescara viene quindi mostrato con circolo e indirizzo ufficiale una sola volta, senza ripetere `Pescara, Italia`.
+- La correzione è generale per tutti i tornei dotati di indirizzo completo; se l'indirizzo non è disponibile, restano attivi i campi separati come fallback.
+- Cache-buster JavaScript aggiornato a `v3.js?v=2026091016`; sintassi verificata. Nessuna modifica a motori ITF/ITF-1, acquisizione, schedulazioni o database.
