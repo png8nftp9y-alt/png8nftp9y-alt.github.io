@@ -1,6 +1,10 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.273**
+Revisione documento: **2026-09-10.275**
+
+- 10 settembre 2026 — Scartata prima della pubblicazione la sostituzione della lettura D1 con `dist/v3/agenda.json`: il test locale ha confermato 46 record Tennis Europe, ma tutti sono segnaposto Agenda privi dei dettagli storici completi necessari (`event/draw`, avversari e categoria), quindi avrebbe potuto generare un falso verde senza snapshot match. Conservata la sorgente autorevole `app_matches` in D1. La lettura Wrangler usa ora un file temporaneo, non nasconde più l'errore dentro il JSON finale e applica fino a otto retry progressivi per assorbire contese o limiti Cloudflare transitori; soltanto un export riuscito viene promosso a input del ranking.
+
+- 10 settembre 2026 — Il run `34518021009` è fallito prima del parser nello step `Read Tennis Europe matches`: Wrangler D1 è uscito con codice 1 e il redirect dello stdout nel JSON ha nascosto il dettaglio. Rimossa del tutto questa lettura remota non necessaria. Il ranking usa ora `dist/v3/agenda.json`, già versionato e certificato dal release guard (439 match complessivi, 46 Tennis Europe), filtrando localmente il circuito e mantenendo gli stessi identificativi/date/partecipanti. Il parser accetta sia il vecchio export D1 sia la proiezione Agenda. L'import finale nelle sole tabelle ranking conserva retry limitati per eventuale contesa D1 temporanea.
 
 - 10 settembre 2026 — Dal log autenticato del rosso `34514741722` è emersa la prova completa: overview ricevuta correttamente (`151925` byte), ma `week` vuota e `publicationId=null`, seguiti da `Pubblicazione Tennis Europe non riconosciuta`. Rete e cookie erano quindi funzionanti. Il parser cercava il titolo nell'HTML grezzo, dove i tag possono separare le parole, e richiedeva l'ordine fisso `category=525&id=...`. Ora estrae settimana/data dal testo HTML ripulito e analizza tutti i link categoria con `URLSearchParams`, accettando qualsiasi ordine dei parametri e `&amp;`. Due prove bloccanti coprono tag intermedi e i due ordini del link.
 
