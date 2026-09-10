@@ -1,6 +1,6 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-09.248**
+Revisione documento: **2026-09-10.256**
 
 - 9 settembre 2026 — Rimossa completamente la parola `live` dalla posizione in pagina torneo: la forma è ora soltanto `Acceptance list: <posizione>`, per esempio `Acceptance list: Q-12`. Avviata in modo isolato la soluzione strutturale dei metadati factsheet ITF senza modificare il comportamento operativo dei motori correnti. L’acquisitore persistente conserva invariata `/v1/fetch` e aggiunge `/v1/factsheet`, limitata tramite allowlist agli URL ufficiali `/en/tournament/...` e inserita nella medesima coda Chromium seriale con lo stesso intervallo minimo; attende i campi renderizzati e restituisce testo soltanto se non rileva challenge. `itf-common.mjs` consulta questo fallback esclusivamente quando sono presenti le nuove variabili `ITF_FACTSHEET_ACQUISITION_URL` e `ITF_FACTSHEET_ACQUIRER_TOKEN`; nessun workflow corrente le imposta, quindi ITF live e ITF T−1 continuano a eseguire esattamente le richieste e le frequenze precedenti. La nuova via resta disattivata finché non viene collaudata separatamente e configurata consapevolmente. Documentazione aggiornata, sintassi verificata e cache-buster UI portato a `2026090912`.
 
@@ -2568,3 +2568,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - L'import successivo n. 1080, avviato dopo OOP 396 e quindi idoneo a importare i link esatti, è stato cancellato dalla nuova richiesta di rebuild generale D1 n. 921. I due workflow condividono la coda `courtwatch-d1-writes`; il trigger manuale aggiunto durante la diagnosi ha sostituito il job in attesa. La precedente indicazione di controllare soltanto D1 921 era quindi errata.
 - Non vengono aggiunti altri trigger per non cancellare nuovamente la scrittura corretta. Agenda D1 n. 1081 è il ciclo che deve importare lo snapshot contenente i `drawUrl` esatti; dopo il suo completamento verde l'app non deve più usare il fallback alla homepage per GD16/GS16.
 - Nessuna modifica al codice o ai motori in questa revisione; viene preservata la coda attiva e documentata la causa operativa reale.
+
+
+## Revisione 256 — 2026-09-10 — verifica reale successiva ad Agenda D1 1081
+
+- Il workflow Agenda Tennis Europe D1 n. 1081 si è concluso verde alle 02:21 UTC.
+- La verifica diretta nell'app pubblicata ha però confermato che, nella pagina del 4° Memorial Padre Pino Puglisi, entrambe le etichette `GD16` e `GS16` puntano ancora alla homepage del torneo invece che ai rispettivi tabelloni.
+- Il verde certifica dunque il completamento dell'importazione, non la presenza effettiva del campo `drawUrl` nei record applicativi visibili. La correzione non viene dichiarata risolta.
+- Non sono stati avviati altri workflow e non è stato eseguito polling. Il prossimo intervento deve verificare la presenza del `drawUrl` nello snapshot OOP e lungo la proiezione D1 prima di richiedere un nuovo run.
