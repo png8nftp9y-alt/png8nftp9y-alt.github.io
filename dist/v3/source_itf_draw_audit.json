@@ -1,14 +1,14 @@
 {
   "version": 15,
-  "generatedAt": "2026-09-10T12:51:08.283Z",
-  "status": "itf_t_minus_one_publication_pending",
+  "generatedAt": "2026-09-10T13:04:42.414Z",
+  "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
     "completeTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 8,
-    "requestedSections": 2,
+    "requestedSections": 0,
     "acquiredSections": 4,
     "unusedAlternativeSections": 2,
     "declaredButUnusedSections": 0,
@@ -18,34 +18,35 @@
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 2,
-    "technicalErrorSections": 0,
-    "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 2,
+    "retrySections": 0,
+    "technicalErrorSections": 3,
+    "missingArtifactSections": 2,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 47,
     "globalPendingTotal": 19,
-    "globalPendingTechnical": 0,
-    "globalPendingPublication": 19,
-    "technicalPendingCompetitionIds": [],
-    "publicationPendingCompetitionIds": [
+    "globalPendingTechnical": 4,
+    "globalPendingPublication": 15,
+    "technicalPendingCompetitionIds": [
       "J-J30-ARG-2026-003",
+      "J-J30-GHA-2026-005",
+      "J-J30-USA-2026-006",
+      "J-J60-LAT-2026-004"
+    ],
+    "publicationPendingCompetitionIds": [
       "J-J30-DEN-2026-004",
       "J-J30-ECU-2026-005",
       "J-J30-GER-2026-005",
-      "J-J30-GHA-2026-005",
       "J-J30-ROU-2026-004",
       "J-J30-SLO-2026-003",
       "J-J30-TJK-2026-006",
       "J-J30-TPE-2026-002",
       "J-J30-USA-2026-005",
-      "J-J30-USA-2026-006",
       "J-J60-BUL-2026-002",
       "J-J60-CHI-2026-001",
       "J-J60-COL-2026-001",
       "J-J60-FRA-2026-006",
-      "J-J60-LAT-2026-004",
       "J-J30-AUS-2026-004",
       "J-J30-SVK-2026-004",
       "J-J30-POL-2026-004"
@@ -53,8 +54,8 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-FRA-2026-006",
-      "tournamentName": "J60 Dijon",
+      "competitionId": "J-J60-LAT-2026-004",
+      "tournamentName": "J60 Liepaja",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 8,
@@ -136,8 +137,8 @@
             {
               "event": "B-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -161,7 +162,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 20,
+              "players": 30,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -182,8 +183,8 @@
             {
               "event": "G-S-M-RR",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -194,7 +195,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 14,
+              "players": 15,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -207,7 +208,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 18,
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -215,7 +216,7 @@
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "The operation was aborted due to timeout | B-S-M-RR:draw_artifact_missing | G-S-M-RR:draw_artifact_missing"
     }
   ]
 }
