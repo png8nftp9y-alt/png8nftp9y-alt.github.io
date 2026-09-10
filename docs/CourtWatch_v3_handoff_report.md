@@ -2474,3 +2474,13 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Confermato il comportamento di caricamento: una copia locale valida viene resa immediatamente mentre prosegue la verifica di rete; i dataset essenziali hanno timeout e convalida; in assenza sia delle fonti sia di una cache valida viene mostrato un messaggio esplicito invece di lasciare l'Agenda vuota.
 - Lo Scudo post-deploy apre l'app pubblicata e richiede giocatori e calendario popolati. Questo copre la regressione applicativa della pagina bianca, senza poter eliminare la latenza fisica di un primo accesso privo di cache o di una rete indisponibile.
 - Nessuna modifica a motori, database, factsheet ITF, frequenze o schedulazioni.
+
+
+## Revisione 246 — 2026-09-10 — link live ITF, azioni giocatori e stato di caricamento nascosto
+
+- Pagina torneo ITF programmato: accanto a `Acceptance list: <posizione>` compare ora l'etichetta `live` collegata alla pagina ufficiale ITF della acceptance list.
+- Il link `live` viene rimosso dal T−1 calcolato sulla data di inizio qualificazioni, oppure prima se il dato certifica che la acceptance list non è più pubblicata. La posizione resta testo fino alla conferma del giocatore nel tabellone; quando `calendarState` o `entryStatus` certificano il tabellone ufficiale, l'intera etichetta acceptance viene rimossa come già stabilito.
+- Nella testata della colonna Giocatori sono stati aggiunti, accanto al titolo, i due controlli provvisori `+` e `Altri`. Sono intenzionalmente privi di azione in attesa della specifica successiva.
+- Durante l'uso della copia locale di sicurezza non viene più mostrata la scritta `Aggiornamento in corso`. La modifica è esclusivamente grafica: caricamento, timeout, fallback, cache valida e Scudo post-deploy restano invariati.
+- Cache-buster aggiornati a `v3.js?v=2026091014` e `v3.css?v=2026091005`; sintassi JavaScript verificata.
+- Stato dichiarato con precisione: la protezione contro la pagina vuota è presente nel codice; il recupero futuro di luogo e data qualificazioni ITF è attivo ma diventa certificato operativamente soltanto dopo un ciclo reale completato con successo dall'acquisitore factsheet.
