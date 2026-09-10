@@ -2616,3 +2616,13 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - L'utente ha confermato verde il workflow Cloudflare D1 e App API relativo alla revisione 260.
 - La migrazione di garanzia del registro dispositivi e l'isolamento degli errori della relativa sezione risultano quindi distribuiti dalla pipeline.
 - Nessun polling o ulteriore controllo automatico è stato eseguito.
+
+
+## Revisione 262 — 2026-09-10 — fondazione storica classifiche Tennis Europe
+
+- Aggiunte in D1 tre strutture separate: storico settimanale ufficiale per profilo/categoria/data, associazioni verificate dei profili e fotografie immutabili della classifica dei partecipanti per singolo match.
+- La fotografia distingue giocatore monitorato, partner e avversari, conserva categoria, pubblicazione e data della classifica e impedisce che un aggiornamento futuro modifichi retroattivamente la classifica mostrata per una partita già disputata.
+- L’API privata arricchisce lo snapshot già caricato dall’app: nei match Tennis Europe espone il ranking pertinente alla categoria giocata; nell’intestazione giocatore prepara entrambe le ultime classifiche disponibili U14 e U16.
+- L’interfaccia mostra il formato richiesto `n°84 TE` immediatamente dopo il nome e prima di nazionalità e bandierina. Sono predisposti valori distinti anche per ciascun componente di una coppia di doppio.
+- La migrazione e l’arricchimento API sono retrocompatibili: finché lo storico non contiene una posizione, nome e bandierina continuano a essere visualizzati senza errore. Nessuna modifica ai motori Tennis Europe OOP/TE-1, alle loro frequenze o all’ordine dell’Agenda.
+- Cache-buster JavaScript aggiornato a `v3.js?v=2026091022`; nessun polling e nessuna chiamata AI aggiunti.
