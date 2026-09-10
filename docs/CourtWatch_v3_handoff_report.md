@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.270**
+Revisione documento: **2026-09-10.271**
+
+- 10 settembre 2026 — Diagnosticato il terzo rosso ranking `34513990108`: configurazione e lettura D1 erano verdi, `Acquire official rankings` falliva in un secondo prima di acquisire qualsiasi categoria. Il confronto con l'acquisitore Tennis Europe già operativo ha individuato la differenza strutturale: il ranking usava una richiesta senza sessione e seguiva automaticamente il redirect, ricevendo dal runner GitHub la cookie wall invece della classifica. Il ranking ora apre e conserva una singola sessione con la stessa gestione del consenso essenziale già collaudata dal motore TE, segue esplicitamente i redirect e riutilizza il cookie per tutte le pagine. Aggiunta diagnostica non sensibile con byte, settimana e publication ID; frequenza e numero delle pagine ranking invariati.
 
 - 10 settembre 2026 — Il primo tentativo di serializzare il ranking dopo il writer principale non è affidabile su GitHub Actions: il run Cloudflare `34513856762` è stato cancellato mentre era pending perché un gruppo concurrency conserva al massimo un'esecuzione in corso e una in attesa, sostituendo la pending precedente. Il ranking torna quindi su una coda dedicata, ma non esegue più `d1 migrations apply`: la migrazione `0017` era già stata applicata con successo nel run `34512383170` e il secondo rosso avveniva esclusivamente tentando di riapplicare migrazioni durante un writer concorrente. Il workflow ranking legge `app_matches` e scrive soltanto le proprie tabelle ranking già create, senza intervenire su motori, ricostruzioni o schema D1; il trigger push isolato è ripristinato.
 
