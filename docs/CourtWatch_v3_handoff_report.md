@@ -2512,3 +2512,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - J60 Pescara viene quindi mostrato con circolo e indirizzo ufficiale una sola volta, senza ripetere `Pescara, Italia`.
 - La correzione è generale per tutti i tornei dotati di indirizzo completo; se l'indirizzo non è disponibile, restano attivi i campi separati come fallback.
 - Cache-buster JavaScript aggiornato a `v3.js?v=2026091016`; sintassi verificata. Nessuna modifica a motori ITF/ITF-1, acquisizione, schedulazioni o database.
+
+
+## Revisione 250 — 2026-09-10 — paese duplicato nell'indirizzo ITF Pescara
+
+- Riprodotta nell'app pubblicata la stringa effettiva `CIRCOLO TENNIS PESCARA, VIA GUGLIELMO MARCONI 355, Pescara, ITALIA, 65126, Italy`.
+- Individuata la causa residua: `ITALIA` e `Italy` erano già presenti insieme nello stesso campo indirizzo fornito dal factsheet ITF; la revisione 249 eliminava soltanto i campi città/nazione aggiunti separatamente dall'app.
+- La presentazione dell'indirizzo rimuove ora il suffisso inglese `Italy` quando il medesimo indirizzo contiene già `Italia`. Pescara viene mostrato come `CIRCOLO TENNIS PESCARA, VIA GUGLIELMO MARCONI 355, Pescara, ITALIA, 65126`.
+- Verificata la regolarità operativa: i lavori critici risultano verdi e i cicli live osservati sono partiti alle 01:15 e 01:30 UTC, rispettando la cadenza di 15 minuti. ITF può restare in esecuzione più a lungo senza indicare un salto della schedulazione.
+- Cache-buster JavaScript aggiornato a `v3.js?v=2026091017`; sintassi verificata. Nessuna modifica ai dati sorgente, ai motori ITF/ITF-1 o alle schedulazioni.
