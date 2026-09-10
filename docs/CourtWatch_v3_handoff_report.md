@@ -1,6 +1,6 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-10.259**
+Revisione documento: **2026-09-10.260**
 
 - 9 settembre 2026 — Rimossa completamente la parola `live` dalla posizione in pagina torneo: la forma è ora soltanto `Acceptance list: <posizione>`, per esempio `Acceptance list: Q-12`. Avviata in modo isolato la soluzione strutturale dei metadati factsheet ITF senza modificare il comportamento operativo dei motori correnti. L’acquisitore persistente conserva invariata `/v1/fetch` e aggiunge `/v1/factsheet`, limitata tramite allowlist agli URL ufficiali `/en/tournament/...` e inserita nella medesima coda Chromium seriale con lo stesso intervallo minimo; attende i campi renderizzati e restituisce testo soltanto se non rileva challenge. `itf-common.mjs` consulta questo fallback esclusivamente quando sono presenti le nuove variabili `ITF_FACTSHEET_ACQUISITION_URL` e `ITF_FACTSHEET_ACQUIRER_TOKEN`; nessun workflow corrente le imposta, quindi ITF live e ITF T−1 continuano a eseguire esattamente le richieste e le frequenze precedenti. La nuova via resta disattivata finché non viene collaudata separatamente e configurata consapevolmente. Documentazione aggiornata, sintassi verificata e cache-buster UI portato a `2026090912`.
 
@@ -2601,3 +2601,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - L'utente ha confermato verde il workflow Cloudflare D1 e App API n. 922 relativo al registro dispositivi.
 - Migrazione D1, Worker e interfaccia Admin risultano quindi distribuiti dalla pipeline. Il primo browser viene registrato alla successiva richiesta privata dell'app e diventa visibile in Admin → Utenti.
 - Nessun polling o ulteriore controllo automatico è stato eseguito.
+
+
+## Revisione 260 — 2026-09-10 — ripristino pagina Admin dopo errore registro dispositivi
+
+- Dopo il deploy del registro dispositivi, l'apertura di Admin → Utenti restituiva `internal_error`.
+- La lettura della nuova tabella è ora isolata: qualsiasi errore del registro produce un avviso nella sola scheda Dispositivi connessi e non può più impedire l'apertura dell'intera pagina Admin.
+- Aggiunta la migrazione idempotente `0016_ensure_user_devices.sql`, che garantisce tabella e indice anche se il precedente passaggio `0015` non è stato registrato correttamente da Wrangler. Il run precedente riportava infatti `No migrations to apply!`.
+- Sintassi Worker verificata. Nessuna modifica ai motori, alle schedulazioni o ai dati sportivi.
