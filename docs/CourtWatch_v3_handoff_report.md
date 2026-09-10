@@ -2634,3 +2634,13 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - La causa era una pubblicazione costruita su una base JavaScript precedente agli ultimi aggiornamenti automatici del repository.
 - Le tabelle D1 delle classifiche restano additive e innocue, ma la funzione classifiche non viene dichiarata completata: i dati ufficiali non sono ancora stati acquisiti e quindi non potevano essere visibili.
 - Nessun motore Tennis Europe/TE-1, dato sportivo o schedulazione è stato modificato. Nessun polling eseguito.
+
+
+## Revisione 264 — 2026-09-10 — ripristino deploy e acquisizione reale ranking TE
+
+- Individuata nel log la causa del run rosso 1578: lo Scudo ha bloccato il deploy con `cache-v3.js: asset modificato senza incremento cache in v3.html`. Il cache-buster è ora `v3.js?v=2026091023`.
+- Le intestazioni torneo dell’Agenda restano costruite dalla versione applicativa ripristinata; il nuovo codice classifiche modifica soltanto la composizione dei nomi dei partecipanti.
+- Aggiunto un motore classifiche Tennis Europe autonomo, settimanale e manuale. Legge le quattro liste ufficiali B14, G14, B16 e G16, archivia pubblicazione e data in D1 e non modifica i motori OOP Tennis Europe o TE-1.
+- Per ciascun match salva separatamente giocatore, partner e avversari con la classifica della categoria disputata. L’API restituisce la fotografia del match; gli aggiornamenti successivi non sostituiscono il valore storico di una partita passata.
+- La visualizzazione è `n°84 TE` tra nome e nazionalità/bandierina. L’intestazione giocatore riceve entrambe le ultime classifiche disponibili U14 e U16.
+- Nessun polling e nessuna chiamata AI aggiunti. Il motore usa soltanto richieste HTTP settimanali alle pagine ufficiali Tennis Europe e condivide la coda D1 per evitare scritture concorrenti.
