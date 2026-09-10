@@ -2521,3 +2521,13 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - La presentazione dell'indirizzo rimuove ora il suffisso inglese `Italy` quando il medesimo indirizzo contiene già `Italia`. Pescara viene mostrato come `CIRCOLO TENNIS PESCARA, VIA GUGLIELMO MARCONI 355, Pescara, ITALIA, 65126`.
 - Verificata la regolarità operativa: i lavori critici risultano verdi e i cicli live osservati sono partiti alle 01:15 e 01:30 UTC, rispettando la cadenza di 15 minuti. ITF può restare in esecuzione più a lungo senza indicare un salto della schedulazione.
 - Cache-buster JavaScript aggiornato a `v3.js?v=2026091017`; sintassi verificata. Nessuna modifica ai dati sorgente, ai motori ITF/ITF-1 o alle schedulazioni.
+
+
+## Revisione 251 — 2026-09-10 — collegamenti Tabelloni e modalità Agenda
+
+- Nella testata della pagina torneo è stata aggiunta la riga `Tabelloni:`. Mostra una sola etichetta per ciascuna categoria nella quale è presente almeno un giocatore monitorato, usando i codici già condivisi con l'Agenda, per esempio `GS14`, `GD14`, `BS14` e `BD14`.
+- Le etichette riusano le classi cromatiche femminile/maschile dell'Agenda e sono collegamenti. Viene privilegiato l'URL specifico del tabellone fornito dal record; quando la fonte non espone un deep link viene aperta la sezione ufficiale Draws and Results del torneo.
+- Accanto al titolo Agenda è stato aggiunto un menu con `Per torneo` e `Cronologico`. `Per torneo` è il valore predefinito e conserva struttura, priorità ITF → Tennis Europe → FITP, raggruppamenti e regola dei tre match simultanei dell'Agenda precedente.
+- In modalità `Cronologico` i blocchi vengono ordinati globalmente per orario reale o stimato; tornei diversi possono quindi intercalarsi. I match dello stesso torneo con identica fascia temporale restano raggruppati fino a tre sulla stessa riga.
+- La scelta Agenda viene conservata nello stato locale dell'interfaccia. Aggiunto comportamento responsive per selettore e riga Tabelloni.
+- Cache-buster aggiornati a `v3.js?v=2026091018` e `v3.css?v=2026091007`; sintassi JavaScript e collegamenti degli asset verificati. Nessuna modifica a motori, schedulazioni o database.
