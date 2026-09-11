@@ -2766,3 +2766,5 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Audit storico: il selettore espone gli identificativi di pubblicazione; il terzo passaggio stampa il contesto HTML del selettore per ricostruire il postback ufficiale senza fare ipotesi sui parametri URL.
 
 - Postback storico completato: il selettore ranking ASP.NET richiede `__EVENTTARGET` e i campi hidden del form; l'audit ora riproduce quel flusso ufficiale e raccoglie `Last updated` per le settimane 26–36.
+
+- Corretto l'escaping dei regex nel postback audit; il tentativo precedente si fermava prima dell'invio per sintassi JavaScript, senza effetti esterni.
