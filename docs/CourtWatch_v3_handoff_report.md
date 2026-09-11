@@ -2749,3 +2749,8 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Verifica diretta sull'app pubblicata: JavaScript aggiornato caricato, ma il match Tennis Europe di Virginia Cereghini era ancora privo del badge classifica.
 - Causa accertata: l'export ranking selezionava soltanto i payload con campo `circuit='tennis-europe'`; i match applicativi possono identificare la sorgente tramite `sourceId`, `source` o `sourceName`, perciò non venivano esportati e non nasceva alcuno snapshot classifica per agenda/avversari.
 - Correzione: selezione compatibile con tutti i campi sorgente già supportati dalla UI. Nessuna regola di calendario o visualizzazione modificata; un solo run di riallineamento è necessario.
+
+
+### 2026-09-11 — Audit storico orari Tennis Europe
+
+- Aggiunto un workflow manuale/di modifica controllata in sola lettura per estrarre dal selettore ufficiale Tennis Europe le pubblicazioni storiche e i relativi orari `Last updated`, senza accesso o scrittura su D1.
