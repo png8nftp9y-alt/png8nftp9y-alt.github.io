@@ -2758,3 +2758,5 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Primo tentativo audit fallito per un errore sintattico locale nel wrapper del workflow; nessuna chiamata D1 o modifica applicativa è stata eseguita. Wrapper corretto nel commit successivo.
 
 - Secondo tentativo fallito solo nell'output diagnostico finale (regex di logging); la richiesta HTTP era già partita ma il job è stato corretto nuovamente per produrre esclusivamente le opzioni e non eseguire parsing superfluo.
+
+- Gestione cookie wall aggiunta dopo il redirect 302 osservato; il workflow segue il flusso ufficiale senza scritture.
