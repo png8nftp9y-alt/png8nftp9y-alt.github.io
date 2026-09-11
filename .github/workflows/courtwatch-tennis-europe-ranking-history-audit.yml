@@ -30,14 +30,14 @@ jobs:
           for(const match of text.matchAll(/<option\b([^>]*)>([\s\S]*?)<\/option>/gi)){const attrs=match[1],label=clean(match[2]);if(label)options.push({attrs,label})}
           console.log(JSON.stringify({options},null,2));
           const formMatch=text.match(/<form\b([^>]*)>([\s\S]*?)<\/form>/i);
-          const formAttrs=formMatch?.[1]||'',formBody=formMatch?.[2]||'',action=new URL(formAttrs.match(/\baction=["']([^"']*)/i)?.[1]||'/ranking/ranking.aspx?rid=79',BASE).href;
+          const formAttrs=formMatch?.[1]||'',formBody=formMatch?.[2]||'',action=BASE+'/ranking/ranking.aspx?rid=79';
           const selectName=text.match(/<select\b[^>]*class=["'][^"']*publication[^"']*["'][^>]*name=["']([^"']+)["']/i)?.[1]||text.match(/<select\b[^>]*name=["']([^"']+)["'][^>]*class=["'][^"']*publication/i)?.[1]||'';
           const decode=value=>String(value||'').replace(/&amp;/g,'&').replace(/&#39;|&apos;/g,"'").replace(/&quot;/g,'"').replace(/&nbsp;/g,' ');
           const hidden=new URLSearchParams();
           for(const input of formBody.matchAll(/<input\b([^>]*)>/gi)){const attrs=input[1],type=(attrs.match(/\btype=["']([^"']*)/i)?.[1]||'').toLowerCase(),name=attrs.match(/\bname=["']([^"']*)["']/i)?.[1],value=attrs.match(/\bvalue=["']([^"']*)["']/i)?.[1]||'';if(type==='hidden'&&name)hidden.append(name,decode(value))}
           const wanted=options.filter(x=>/^(2[6-9]|3[0-6])-2026$/.test(x.label)),parsePage=html=>{const normalized=clean(html),week=(normalized.match(/Tennis Europe Ranking\s*\(([^)]+)\)/i)||[])[1]||'',updated=(normalized.match(/Last updated:\s*(\d{1,2}\s+[A-Za-z]+\s+\d{4}(?:\s+\d{1,2}:\d{2})?)/i)||[])[1]||'';return{week,updated}};
           const historical=[];
-          for(const option of wanted.slice(0,1)){const value=option.attrs.match(/value=["']([^"']+)["']/i)?.[1]||'',fields=new URLSearchParams(hidden);fields.set('__EVENTTARGET',selectName);fields.set('__EVENTARGUMENT','');fields.set(selectName,value);const page=await request(action,{method:'POST',body:fields.toString()}),parsed=parsePage(page.text),plain=clean(page.text),marker=plain.indexOf('Last updated');historical.push({requested:option.label,value,returned:parsed.week,updated:parsed.updated,status:page.response.status,url:page.response.url,action,selectName,hiddenCount:[...hidden.keys()].length,marker,preview:plain.slice(Math.max(0,marker-300),marker+500)})}
+          for(const option of wanted){const value=option.attrs.match(/value=["']([^"']+)["']/i)?.[1]||'',fields=new URLSearchParams(hidden);fields.set('__EVENTTARGET',selectName);fields.set('__EVENTARGUMENT','');fields.set(selectName,value);const page=await request(action,{method:'POST',body:fields.toString()}),parsed=parsePage(page.text),plain=clean(page.text),marker=plain.indexOf('Last updated');historical.push({requested:option.label,value,returned:parsed.week,updated:parsed.updated,status:page.response.status,url:page.response.url,action,selectName,hiddenCount:[...hidden.keys()].length,marker,preview:plain.slice(Math.max(0,marker-300),marker+500)})}
           console.log(JSON.stringify({historical},null,2));
           console.log('AUDIT_COMPLETE');
           NODE

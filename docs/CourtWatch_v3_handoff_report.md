@@ -2772,3 +2772,5 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Audit postback: aggiunto URL/anteprima della risposta per diagnosticare il contratto ASP.NET restituito dal server, senza trasmettere dati dell'utente.
 
 - Audit storico limitato a una sola settimana per diagnosi del postback: registra contratto form e marker `Last updated` senza ulteriori richieste non necessarie.
+
+- Rotta del postback corretta da `/ranking.aspx` (404) a `/ranking/ranking.aspx`; audit riattivato per tutte le settimane richieste.
