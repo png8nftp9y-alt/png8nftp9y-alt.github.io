@@ -2754,3 +2754,5 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 ### 2026-09-11 — Audit storico orari Tennis Europe
 
 - Aggiunto un workflow manuale/di modifica controllata in sola lettura per estrarre dal selettore ufficiale Tennis Europe le pubblicazioni storiche e i relativi orari `Last updated`, senza accesso o scrittura su D1.
+
+- Primo tentativo audit fallito per un errore sintattico locale nel wrapper del workflow; nessuna chiamata D1 o modifica applicativa è stata eseguita. Wrapper corretto nel commit successivo.

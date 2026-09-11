@@ -15,7 +15,7 @@ jobs:
       - name: Read official ranking history selector
         shell: bash
         run: |
-          node <<'NODE'
+          node --input-type=module <<'NODE'
           const BASE='https://te.tournamentsoftware.com';
           const cookies=new Map();
           const collect=response=>{for(const value of response.headers.getSetCookie?.()||[response.headers.get('set-cookie')||''])for(const part of String(value).split(/,(?=\s*[^;,]+=)/)){const pair=part.split(';')[0].trim(),i=pair.indexOf('=');if(i>0)cookies.set(pair.slice(0,i),pair.slice(i+1))}};
@@ -25,8 +25,8 @@ jobs:
           console.log(JSON.stringify({status:response.status,url:response.url,bytes:text.length,cookieWall:/CookiePurposes|cookiewall/i.test(text)}));
           const clean=value=>String(value).replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&#39;|&apos;/g,"'").replace(/&quot;/g,'"').replace(/\s+/g,' ').trim();
           const options=[];
-          for(const match of text.matchAll(/<option\b([^>]*)>([\\s\\S]*?)<\\/option>/gi)){const attrs=match[1],label=clean(match[2]);if(label)options.push({attrs,label})}
+          for(const match of text.matchAll(/<option\b([^>]*)>([\s\S]*?)<\/option>/gi)){const attrs=match[1],label=clean(match[2]);if(label)options.push({attrs,label})}
           console.log(JSON.stringify({options},null,2));
           console.log('RANKING_HEADLINE',clean(text.match(/<h3[\\s\\S]*?<\\/h3>/i)?.[0]||''));
-          console.log('RANKING_UPDATED',clean(text.match(/Last updated:[\\s\\S]{0,120}/i)?.[0]||''));
+          console.log('RANKING_UPDATED_PLACEHOLDER
           NODE
