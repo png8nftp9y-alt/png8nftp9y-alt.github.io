@@ -194,7 +194,8 @@ async function load(){
     const jsonGeneration=Math.max(...[docs.players?.generatedAt,docs.tournaments?.generatedAt].map(Date.parse).filter(Number.isFinite),0),apiGeneration=Date.parse(projection?.generatedAt||'');
     const universalProjectionFresh=projection&&(!jsonGeneration||(Number.isFinite(apiGeneration)&&apiGeneration>=jsonGeneration));
     if(projection&&!universalProjectionFresh)console.warn('Indice universale D1 in sincronizzazione: uso temporaneo dei JSON per giocatori e tornei; i match di circuito restano dalla API');
-    const visiblePlayers=docs.players.players.filter(p=>!FORMER_PLAYERS.has(p.id));
+    const projectedPlayers=new Map((projection?.players||[]).map(p=>[p.id,p]));
+    const visiblePlayers=docs.players.players.filter(p=>!FORMER_PLAYERS.has(p.id)).map(player=>{const projected=projectedPlayers.get(player.id);return projected?.tennisEuropeRankings?{...player,ranking:projected.ranking,tennisEuropeRankings:projected.tennisEuropeRankings}:player});
     const visibleIds=new Set(visiblePlayers.map(p=>p.id));
     const projectedMatches=Array.isArray(projection?.matches)?projection.matches:[],jsonMatches=Array.isArray(docs.matches?.matches)?docs.matches.matches:[],previousMatches=Array.isArray(previous.matches)?previous.matches:[],freshMatches=projectedMatches.length?projectedMatches:jsonMatches.length?jsonMatches:previousMatches,baseMatches=freshMatches.some(m=>circuit(m)==='tennis-europe')?freshMatches:[...freshMatches,...previousMatches.filter(m=>circuit(m)==='tennis-europe')],manualMatches=Array.isArray(docs.manual?.matches)?docs.manual.matches:[],matches=[...new Map([...baseMatches,...manualMatches].map(m=>[agendaKey(m),m])).values()];
     const agenda=Array.isArray(docs.agenda?.agenda)?docs.agenda.agenda:(previous.agenda||[]);

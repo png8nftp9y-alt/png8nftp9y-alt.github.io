@@ -2734,3 +2734,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Pubblicazione ufficiale `53665`, settimana `37-2026`, data ranking `2026-09-07`.
 - Acquisite 100 posizioni uniche per ciascuna categoria B14, G14, B16 e G16; 824 istruzioni in un solo blocco controllato.
 - Import D1: 1.600 righe lette e 2.400 scritte; storico verificato a 400 record. Il consumo è compatibile con la quota gratuita e il workflow resta settimanale.
+
+
+### 2026-09-11 — Correzione visibilità classifiche Tennis Europe nell'app
+
+- Causa accertata: `app-snapshot` arricchiva correttamente i giocatori con `ranking` e `tennisEuropeRankings`, ma il caricatore UI sostituiva poi l'array API con quello statico di `players.json`, scartando entrambi i campi prima del rendering.
+- Correzione: l'elenco statico resta la fonte anagrafica e viene arricchito, per `id`, esclusivamente con i campi classifica restituiti dalla API. Nessun dato di calendario, torneo, match, motore o schedulazione cambia.
+- Cache-bust aggiornato per forzare Safari a caricare il JavaScript corretto. Nessun polling, run di acquisizione o chiamata AI aggiuntiva introdotta.
+- Validazione: controllo sintattico JavaScript e test deterministico del merge; la pagina profilo può ora mostrare `classifica n°… TE U14/U16` per i giocatori associati.
