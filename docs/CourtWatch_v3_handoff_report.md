@@ -2709,3 +2709,12 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Certificazione: il run `34545548010` (#1175) è verde in tutte le fasi. Per 1.857 match invariati, gli otto file `03-matches-*` hanno letto complessivamente 1.889 righe e scritto 0 righe, contro circa 190,5 milioni di letture precedenti. Frequenza e comportamento dell'app sono invariati.
 - Run universale cancellato: `34545536901` è stato interrotto durante l'import di una nuova generazione universale, prima delle verifiche e del deploy finale. Il successivo #1175 ha certificato l'integrità di D1, API e agenda.
 - Stato conclusivo: la causa dell'eccedenza D1 Tennis Europe è risolta. Eventuali ulteriori movimenti della fattura corrente possono derivare solo da consumo già maturato e contabilizzato in ritardo o da sorgenti indipendenti, non da questa anomalia.
+
+
+### 2026-09-11 — Certificazione operativa completa dopo correzione D1
+
+- Diagnostici pubblicati alle 00:26 UTC: tutti i nove componenti critici sono verdi — catalogo e live FITP, live Tennis Europe, discovery/labels/T−1 ITF, OOP Europe, D1 generale e D1 agenda Europe.
+- Il D1 generale è verde nel run `34545948514`; il D1 agenda Europe è verde nel run `34545767971`. Il successivo aggiornamento generale chiude anche il rischio operativo lasciato dal rebuild universale interrotto.
+- App/UI generate correttamente; ultimo merge 11 settembre alle 02:26 locali. Tennis Europe riporta zero pending, zero inconclusive, zero warning e zero errori. FITP riporta 391/391 entry con tessera e zero errori di refresh. L'archivio ITF è completo con 1.057 tornei correnti/storici, 15.018 giocatori e 87.499 risultati.
+- La correzione costi ha modificato esclusivamente la strategia SQL dell'import D1: nessuna regola applicativa, dato pubblicato, motore sorgente o schedulazione è stata modificata.
+- Lo stato diagnostico aggregato `yellow` deriva da indicatori informativi non bloccanti di Calendario, Agenda legacy, Risultati e Avversari; nessun componente critico è rosso o giallo.
