@@ -29,10 +29,7 @@ jobs:
           const options=[];
           for(const match of text.matchAll(/<option\b([^>]*)>([\s\S]*?)<\/option>/gi)){const attrs=match[1],label=clean(match[2]);if(label)options.push({attrs,label})}
           console.log(JSON.stringify({options},null,2));
-          const wanted=options.filter(x=>/^(2[6-9]|3[0-6])-2026$/.test(x.label));
-          const parsePage=html=>{const normalized=clean(html),week=(normalized.match(/Tennis Europe Ranking\\s*\\(([^)]+)\\)/i)||[])[1]||'',updated=(normalized.match(/Last updated:\\s*(\\d{1,2}\\s+[A-Za-z]+\\s+\\d{4}(?:\\s+\\d{1,2}:\\d{2})?)/i)||[])[1]||'';return{week,updated}};
-          const found=[];
-          for(const option of wanted){for(const param of ['id','rankid','ranking','rankingId']){const page=await request(BASE+'/ranking/ranking.aspx?rid=79&'+param+'='+encodeURIComponent(option.attrs.match(/value="([^"]+)"/)?.[1]||''));const parsed=parsePage(page.text);if(parsed.week===option.label){found.push({week:parsed.week,updated:parsed.updated,param,value:option.attrs.match(/value="([^"]+)"/)?.[1]||''});break}}}
-          console.log(JSON.stringify({historical:found},null,2));
+          const selected=text.indexOf('value="53550"');
+          console.log('SELECT_CONTEXT',selected>=0?text.slice(Math.max(0,selected-1800),selected+900):'value not found');
           console.log('AUDIT_COMPLETE');
           NODE

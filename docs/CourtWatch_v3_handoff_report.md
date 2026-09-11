@@ -2762,3 +2762,5 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Gestione cookie wall aggiunta dopo il redirect 302 osservato; il workflow segue il flusso ufficiale senza scritture.
 
 - Audit storico esteso: per le settimane 26–36 usa gli identificativi ufficiali esposti dal selettore e verifica i parametri della pagina, registrando solo il campo `Last updated` restituito da Tennis Europe.
+
+- Audit storico: il selettore espone gli identificativi di pubblicazione; il terzo passaggio stampa il contesto HTML del selettore per ricostruire il postback ufficiale senza fare ipotesi sui parametri URL.
