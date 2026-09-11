@@ -3,7 +3,7 @@ name: Court Watch Tennis Europe rankings
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 5 * * 1'
+    - cron: '17 18 * * 1,2'
   push:
     branches: [main]
     paths:
@@ -60,8 +60,8 @@ jobs:
           done
       - name: Verify rankings really reached D1
         run: |
-          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT COUNT(*) AS ranking_history_count FROM tennis_europe_ranking_history" --json > te-ranking-verification.json
-          node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('te-ranking-verification.json','utf8'));const rows=data?.[0]?.results||data?.result?.[0]?.results||[];const count=Number(rows[0]?.ranking_history_count||0);console.log(JSON.stringify({rankingHistoryCount:count}));if(!Number.isInteger(count)||count<1)process.exit(1)"
+          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT category, COUNT(*) AS ranking_count FROM tennis_europe_ranking_history WHERE publication_id=(SELECT publication_id FROM tennis_europe_ranking_history ORDER BY ranking_date DESC, captured_at DESC LIMIT 1) GROUP BY category ORDER BY category; SELECT COUNT(*) AS match_snapshot_count FROM tennis_europe_match_ranking_snapshots" --json > te-ranking-verification.json
+          node -e "const fs=require('fs');const data=JSON.parse(fs.readFileSync('te-ranking-verification.json','utf8'));const blocks=data?.[0]?.results?data:(data?.result||[]),counts=Object.fromEntries((blocks[0]?.results||[]).map(row=>[row.category,Number(row.ranking_count)])),snapshots=Number(blocks[1]?.results?.[0]?.match_snapshot_count||0);console.log(JSON.stringify({rankingCounts:counts,matchSnapshotCount:snapshots}));if(['B14','G14','B16','G16'].some(category=>!Number.isInteger(counts[category])||counts[category]<=100)||!Number.isInteger(snapshots)||snapshots<1)process.exit(1)"
       - name: Deploy ranking-aware API
         run: |
           npm run check
