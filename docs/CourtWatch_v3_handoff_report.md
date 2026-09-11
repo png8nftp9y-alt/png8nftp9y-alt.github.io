@@ -2774,3 +2774,24 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Audit storico limitato a una sola settimana per diagnosi del postback: registra contratto form e marker `Last updated` senza ulteriori richieste non necessarie.
 
 - Rotta del postback corretta da `/ranking.aspx` (404) a `/ranking/ranking.aspx`; audit riattivato per tutte le settimane richieste.
+
+
+### 2026-09-11 — Orari ufficiali pubblicazioni Tennis Europe, settimane 26–36
+
+Verificati tramite il selettore storico ufficiale Tennis Europe e il relativo postback della pubblicazione:
+
+| Settimana | Ultimo aggiornamento ufficiale |
+|---|---|
+| 36-2026 | 01 settembre 2026 15:41 |
+| 35-2026 | 25 agosto 2026 09:24 |
+| 34-2026 | 18 agosto 2026 09:12 |
+| 33-2026 | 10 agosto 2026 16:07 |
+| 32-2026 | 03 agosto 2026 16:14 |
+| 31-2026 | 27 luglio 2026 15:49 |
+| 30-2026 | 21 luglio 2026 11:03 |
+| 29-2026 | 13 luglio 2026 14:45 |
+| 28-2026 | 06 luglio 2026 14:57 |
+| 27-2026 | 29 giugno 2026 14:39 |
+| 26-2026 | 22 giugno 2026 12:51 |
+
+La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre 2026 16:10**.
