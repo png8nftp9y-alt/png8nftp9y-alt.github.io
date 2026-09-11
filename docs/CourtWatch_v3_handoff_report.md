@@ -2764,3 +2764,5 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Audit storico esteso: per le settimane 26–36 usa gli identificativi ufficiali esposti dal selettore e verifica i parametri della pagina, registrando solo il campo `Last updated` restituito da Tennis Europe.
 
 - Audit storico: il selettore espone gli identificativi di pubblicazione; il terzo passaggio stampa il contesto HTML del selettore per ricostruire il postback ufficiale senza fare ipotesi sui parametri URL.
+
+- Postback storico completato: il selettore ranking ASP.NET richiede `__EVENTTARGET` e i campi hidden del form; l'audit ora riproduce quel flusso ufficiale e raccoglie `Last updated` per le settimane 26–36.
