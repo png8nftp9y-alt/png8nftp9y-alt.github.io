@@ -2742,3 +2742,10 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Correzione: l'elenco statico resta la fonte anagrafica e viene arricchito, per `id`, esclusivamente con i campi classifica restituiti dalla API. Nessun dato di calendario, torneo, match, motore o schedulazione cambia.
 - Cache-bust aggiornato per forzare Safari a caricare il JavaScript corretto. Nessun polling, run di acquisizione o chiamata AI aggiuntiva introdotta.
 - Validazione: controllo sintattico JavaScript e test deterministico del merge; la pagina profilo può ora mostrare `classifica n°… TE U14/U16` per i giocatori associati.
+
+
+### 2026-09-11 — Correzione snapshot classifiche TE nell'agenda
+
+- Verifica diretta sull'app pubblicata: JavaScript aggiornato caricato, ma il match Tennis Europe di Virginia Cereghini era ancora privo del badge classifica.
+- Causa accertata: l'export ranking selezionava soltanto i payload con campo `circuit='tennis-europe'`; i match applicativi possono identificare la sorgente tramite `sourceId`, `source` o `sourceName`, perciò non venivano esportati e non nasceva alcuno snapshot classifica per agenda/avversari.
+- Correzione: selezione compatibile con tutti i campi sorgente già supportati dalla UI. Nessuna regola di calendario o visualizzazione modificata; un solo run di riallineamento è necessario.

@@ -34,7 +34,7 @@ jobs:
         run: |
           read_ok=0
           for attempt in 1 2 3 4 5 6 7 8; do
-            if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT payload FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe'" --json > te-ranking-matches.pending.json; then
+            if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT payload FROM app_matches WHERE lower(COALESCE(json_extract(payload,'$.circuit'),json_extract(payload,'$.sourceId'),json_extract(payload,'$.source'),json_extract(payload,'$.sourceName'),'')) LIKE '%tennis%europe%'" --json > te-ranking-matches.pending.json; then
               mv te-ranking-matches.pending.json te-ranking-matches.json
               read_ok=1
               break
