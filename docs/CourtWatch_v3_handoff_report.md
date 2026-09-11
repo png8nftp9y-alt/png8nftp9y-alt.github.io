@@ -2726,3 +2726,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - L'import D1 non usa più un singolo file da circa 160.000 istruzioni: genera blocchi deterministici da 2.000 istruzioni, importati con retry limitati e verificati prima del deploy.
 - Restano invariati categorie, frequenza settimanale, snapshot storici per match, esclusione U12 e formato visuale dell'app. Nessun polling o chiamata AI è stato aggiunto al workflow.
 - Validazione locale: sintassi Worker e sincronizzatore verde; verifica UI analisi verde. La certificazione reale richiede il run avviato dal commit atomico di script, workflow e report.
+
+
+### 2026-09-11 — Classifiche Tennis Europe certificate verdi
+
+- Run `34546734387` verde in tutte le fasi: lettura match D1, acquisizione ufficiale, import a blocchi, verifica D1 e deploy API.
+- Pubblicazione ufficiale `53665`, settimana `37-2026`, data ranking `2026-09-07`.
+- Acquisite 100 posizioni uniche per ciascuna categoria B14, G14, B16 e G16; 824 istruzioni in un solo blocco controllato.
+- Import D1: 1.600 righe lette e 2.400 scritte; storico verificato a 400 record. Il consumo è compatibile con la quota gratuita e il workflow resta settimanale.
