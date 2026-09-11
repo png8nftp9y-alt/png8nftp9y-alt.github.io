@@ -2770,3 +2770,5 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Corretto l'escaping dei regex nel postback audit; il tentativo precedente si fermava prima dell'invio per sintassi JavaScript, senza effetti esterni.
 
 - Audit postback: aggiunto URL/anteprima della risposta per diagnosticare il contratto ASP.NET restituito dal server, senza trasmettere dati dell'utente.
+
+- Audit storico limitato a una sola settimana per diagnosi del postback: registra contratto form e marker `Last updated` senza ulteriori richieste non necessarie.
