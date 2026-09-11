@@ -2718,3 +2718,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - App/UI generate correttamente; ultimo merge 11 settembre alle 02:26 locali. Tennis Europe riporta zero pending, zero inconclusive, zero warning e zero errori. FITP riporta 391/391 entry con tessera e zero errori di refresh. L'archivio ITF è completo con 1.057 tornei correnti/storici, 15.018 giocatori e 87.499 risultati.
 - La correzione costi ha modificato esclusivamente la strategia SQL dell'import D1: nessuna regola applicativa, dato pubblicato, motore sorgente o schedulazione è stata modificata.
 - Lo stato diagnostico aggregato `yellow` deriva da indicatori informativi non bloccanti di Calendario, Agenda legacy, Risultati e Avversari; nessun componente critico è rosso o giallo.
+
+
+### 2026-09-11 — Ripresa classifiche Tennis Europe
+
+- Corretto il ciclo di paginazione delle quattro classifiche ufficiali B14, G14, B16 e G16: i profili vengono deduplicati per UUID ufficiale e l'acquisizione termina alla prima pagina senza nuovi profili, impedendo che una pagina ripetuta venga accumulata fino al limite artificiale di 20.000 righe.
+- L'import D1 non usa più un singolo file da circa 160.000 istruzioni: genera blocchi deterministici da 2.000 istruzioni, importati con retry limitati e verificati prima del deploy.
+- Restano invariati categorie, frequenza settimanale, snapshot storici per match, esclusione U12 e formato visuale dell'app. Nessun polling o chiamata AI è stato aggiunto al workflow.
+- Validazione locale: sintassi Worker e sincronizzatore verde; verifica UI analisi verde. La certificazione reale richiede il run avviato dal commit atomico di script, workflow e report.
