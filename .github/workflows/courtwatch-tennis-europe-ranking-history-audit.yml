@@ -27,6 +27,5 @@ jobs:
           const options=[];
           for(const match of text.matchAll(/<option\b([^>]*)>([\s\S]*?)<\/option>/gi)){const attrs=match[1],label=clean(match[2]);if(label)options.push({attrs,label})}
           console.log(JSON.stringify({options},null,2));
-          console.log('RANKING_HEADLINE',clean(text.match(/<h3[\\s\\S]*?<\\/h3>/i)?.[0]||''));
-          console.log('RANKING_UPDATED_PLACEHOLDER
+          console.log('AUDIT_COMPLETE');
           NODE

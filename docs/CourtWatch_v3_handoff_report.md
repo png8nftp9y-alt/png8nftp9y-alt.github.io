@@ -2756,3 +2756,5 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Aggiunto un workflow manuale/di modifica controllata in sola lettura per estrarre dal selettore ufficiale Tennis Europe le pubblicazioni storiche e i relativi orari `Last updated`, senza accesso o scrittura su D1.
 
 - Primo tentativo audit fallito per un errore sintattico locale nel wrapper del workflow; nessuna chiamata D1 o modifica applicativa è stata eseguita. Wrapper corretto nel commit successivo.
+
+- Secondo tentativo fallito solo nell'output diagnostico finale (regex di logging); la richiesta HTTP era già partita ma il job è stato corretto nuovamente per produrre esclusivamente le opzioni e non eseguire parsing superfluo.
