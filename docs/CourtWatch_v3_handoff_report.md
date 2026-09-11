@@ -2687,3 +2687,11 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - Limitazione residua: le query di verifica con più `COUNT(*)` restano inefficienti, ma dai D1 Insights rappresentano meno di un miliardo di letture complessive e non sono la causa dell'eccedenza da 42,71 miliardi.
 
 - Rafforzamento immediato: gli import attivati da modifiche tecniche sono ora incrementali; ogni shard registra in una tabella temporanea soltanto gli ID il cui record D1 differisce dal payload sorgente. Cancellazioni e reinserimenti di schedule, risultati, partecipanti e candidate avvengono esclusivamente per questi ID. Le partite invariate producono solo lookup su chiave primaria e zero riscritture persistenti. Il run completo corretto 34543803214 ha confermato la rimozione dell'amplificazione: 8.138 righe lette nei file match contro circa 190,5 milioni per il precedente import incrementale; parità D1, Worker API e agenda tutte verdi.
+
+
+### 2026-09-11 — Chiusura definitiva anomalia costi D1 Tennis Europe
+
+- Il run definitivo `34545548010` (#1175) è verde in ogni fase: migrazioni, import, parità D1, validazione e deploy Worker, verifica API e agenda.
+- I file `03-matches-*` hanno letto complessivamente 1.889 righe e scritto 0 righe per le 1.857 partite invariate. Prima della correzione lo stesso import leggeva circa 190,5 milioni di righe.
+- La riduzione deriva dalle cancellazioni aggregate per shard, dagli indici sui riferimenti `match_id` e dall'aggiornamento dei soli match il cui payload è realmente cambiato.
+- La causa dell'eccedenza Cloudflare è chiusa: frequenza, dati pubblicati e funzionamento dell'app restano invariati. Eventuali incrementi tardivi della fattura corrente riguardano esclusivamente consumo precedente già maturato.
