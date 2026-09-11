@@ -2695,3 +2695,17 @@ Aggiunto un workflow isolato che distribuisce esclusivamente il Worker quando ca
 - I file `03-matches-*` hanno letto complessivamente 1.889 righe e scritto 0 righe per le 1.857 partite invariate. Prima della correzione lo stesso import leggeva circa 190,5 milioni di righe.
 - La riduzione deriva dalle cancellazioni aggregate per shard, dagli indici sui riferimenti `match_id` e dall'aggiornamento dei soli match il cui payload è realmente cambiato.
 - La causa dell'eccedenza Cloudflare è chiusa: frequenza, dati pubblicati e funzionamento dell'app restano invariati. Eventuali incrementi tardivi della fattura corrente riguardano esclusivamente consumo precedente già maturato.
+
+
+### 2026-09-11 — Cronologia completa incidente Cloudflare D1
+
+- Segnalazione iniziale: il pannello Cloudflare mostrava $19,71 nel ciclo corrente, composti da $17,71 per 17,71 miliardi di righe D1 lette oltre i 25 miliardi inclusi e $2,00 per 1,03 milioni di righe scritte oltre i 50 milioni inclusi.
+- Audit autenticato read-only: creato il workflow `Court Watch D1 cost audit`; run `34542353363` e `34543444978` verdi. D1 Query Insights ha attribuito meno di 700 milioni di letture alle normali query visibili, escludendole come spiegazione dei 42,71 miliardi totali.
+- Attribuzione operativa: i log del workflow agenda Tennis Europe mostravano circa 190,5 milioni di righe lette per ogni import dei file generati `03-matches-*`. La causa era `INSERT OR REPLACE` sulla tabella padre `matches`, combinato con lookup/cascade non indicizzati sulle tabelle figlie.
+- Prima correzione: migrazione `0018_app_match_candidates_match_index.sql` e UPSERT non distruttivo dei match. Il run `34543803214` (#1169) ha mantenuto verdi D1, Worker API e agenda, eliminando l'amplificazione del `REPLACE` nell'import completo.
+- Primo tentativo change-only: il run `34544669082` (#1172) è fallito con `SQLITE_AUTH` perché D1 vieta tabelle `TEMP` negli import remoti; nessun deploy finale è stato eseguito.
+- Secondo tentativo: sostituita la tabella temporanea con `tennis_europe_changed_matches` tramite migrazione `0019`. Il run `34544961871` (#1174) è risultato verde e ha portato a zero le scritture dei match invariati, ma ha rivelato che le cancellazioni condizionali per singola partita conservavano circa 190 milioni di letture.
+- Correzione finale: cancellazioni aggregate per shard e indici `schedules(match_id)` e `results(match_id)` nella migrazione `0020_match_child_lookup_indexes.sql`.
+- Certificazione: il run `34545548010` (#1175) è verde in tutte le fasi. Per 1.857 match invariati, gli otto file `03-matches-*` hanno letto complessivamente 1.889 righe e scritto 0 righe, contro circa 190,5 milioni di letture precedenti. Frequenza e comportamento dell'app sono invariati.
+- Run universale cancellato: `34545536901` è stato interrotto durante l'import di una nuova generazione universale, prima delle verifiche e del deploy finale. Il successivo #1175 ha certificato l'integrità di D1, API e agenda.
+- Stato conclusivo: la causa dell'eccedenza D1 Tennis Europe è risolta. Eventuali ulteriori movimenti della fattura corrente possono derivare solo da consumo già maturato e contabilizzato in ritardo o da sorgenti indipendenti, non da questa anomalia.
