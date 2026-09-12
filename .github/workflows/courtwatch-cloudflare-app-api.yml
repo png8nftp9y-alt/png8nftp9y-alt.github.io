@@ -95,6 +95,7 @@ jobs:
       - name: Build and import universal generation
         run: |
           npm run seed
+          node scripts/guard-d1-import.mjs seed-universal/*.sql
           for sql_file in seed-universal/*.sql; do
             echo "Importing $sql_file"
             imported=0

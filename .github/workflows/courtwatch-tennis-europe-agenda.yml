@@ -74,6 +74,7 @@ jobs:
           node scripts/generate-tennis-europe-app-candidates.mjs
       - name: Import Tennis Europe rows only
         run: |
+          node scripts/guard-d1-import.mjs seed-tennis-europe-oop/*.sql
           for sql_file in seed-tennis-europe-oop/*.sql; do
             echo "Importing $sql_file"
             imported=0

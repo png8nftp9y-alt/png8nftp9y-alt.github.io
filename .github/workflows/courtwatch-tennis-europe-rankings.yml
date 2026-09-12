@@ -47,6 +47,7 @@ jobs:
         run: node scripts/sync-tennis-europe-rankings.mjs
       - name: Import history and immutable match rankings
         run: |
+          node scripts/guard-d1-import.mjs seed-tennis-europe-rankings/rankings-*.sql
           for sql_file in seed-tennis-europe-rankings/rankings-*.sql; do
             imported=0
             for attempt in 1 2 3 4 5; do
