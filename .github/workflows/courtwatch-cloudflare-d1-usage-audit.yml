@@ -31,4 +31,8 @@ jobs:
           const rows=body.data.viewer.accounts?.[0]?.d1AnalyticsAdaptiveGroups||[],daily={};for(const row of rows){const key=row.dimensions?.date||'unknown',out=daily[key]||={rowsRead:0,rowsWritten:0,readQueries:0,writeQueries:0};for(const field of Object.keys(out))out[field]+=Number(row.sum?.[field]||0)}
           const totals=Object.values(daily).reduce((out,row)=>{for(const field of Object.keys(out))out[field]+=row[field];return out},{rowsRead:0,rowsWritten:0,readQueries:0,writeQueries:0});
           console.log('CLOUDFLARE_D1_USAGE '+JSON.stringify({from,to,totals,daily}));
+          const subscriptionResponse=await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/subscriptions`,{headers:{Authorization:`Bearer ${process.env.CLOUDFLARE_API_TOKEN}`}});
+          const subscriptionBody=await subscriptionResponse.json();
+          const subscriptions=(subscriptionBody.result||[]).map(({status,frequency,current_period_start,current_period_end,price,rate_plan})=>({status,frequency,current_period_start,current_period_end,price,plan:rate_plan?{public_name:rate_plan.public_name,currency:rate_plan.currency,externally_managed:rate_plan.externally_managed}:null}));
+          console.log('CLOUDFLARE_SUBSCRIPTIONS '+JSON.stringify({success:subscriptionBody.success,status:subscriptionResponse.status,subscriptions,errors:subscriptionBody.errors||[]}));
           NODE
