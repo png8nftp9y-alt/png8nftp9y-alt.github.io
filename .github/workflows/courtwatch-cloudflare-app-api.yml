@@ -95,20 +95,29 @@ jobs:
       - name: Build and import universal generation
         run: |
           npm run seed
-          node scripts/guard-d1-import.mjs seed-universal/*.sql
-          for sql_file in seed-universal/*.sql; do
-            echo "Importing $sql_file"
-            imported=0
-            for attempt in 1 2 3 4; do
-              if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"; then
-                imported=1
-                break
-              fi
-              echo "Retry $attempt for $sql_file after transient D1 state"
-              sleep $((attempt * 5))
+          LOCAL_IMPORT_HASH=$(tr -d '\\r\\n' < seed-universal/import-hash.txt)
+          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --json \\
+            --command "SELECT json_extract(counts_json, '$.importHash') AS import_hash FROM generations WHERE id='current'" \\
+            > remote-import-hash.json
+          REMOTE_IMPORT_HASH=$(node -e "const fs=require('fs'),x=JSON.parse(fs.readFileSync('remote-import-hash.json','utf8'));let found='';const walk=v=>{if(!v||found)return;if(Array.isArray(v))return v.forEach(walk);if(typeof v==='object'){if(typeof v.import_hash==='string')found=v.import_hash;else Object.values(v).forEach(walk)}};walk(x);process.stdout.write(found)")
+          if [ -n "$REMOTE_IMPORT_HASH" ] && [ "$LOCAL_IMPORT_HASH" = "$REMOTE_IMPORT_HASH" ]; then
+            echo "D1_IMPORT_SKIPPED unchanged=$LOCAL_IMPORT_HASH rows_written=0"
+          else
+            node scripts/guard-d1-import.mjs seed-universal/*.sql
+            for sql_file in seed-universal/*.sql; do
+              echo "Importing $sql_file"
+              imported=0
+              for attempt in 1 2 3 4; do
+                if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"; then
+                  imported=1
+                  break
+                fi
+                echo "Retry $attempt for $sql_file after transient D1 state"
+                sleep $((attempt * 5))
+              done
+              test "$imported" -eq 1
             done
-            test "$imported" -eq 1
-          done
+          fi
       - name: Build read-only Europe parity manifests
         run: |
           npm run seed:te-oop
