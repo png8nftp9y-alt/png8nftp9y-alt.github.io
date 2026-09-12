@@ -21,8 +21,8 @@ jobs:
           node --input-type=module <<'NODE'
           const now=new Date(),from=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),1)).toISOString().slice(0,10),to=now.toISOString().slice(0,10);
           const variants=[
-            `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){d1AnalyticsAdaptiveGroups(limit:10000,filter:{date_ge:$from,date_le:$to},orderBy:[date_ASC]){dimensions{date databaseId}sum{rowsRead rowsWritten readQueries writeQueries}}}}}`,
-            `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){d1AnalyticsAdaptiveGroups(limit:10000,filter:{date_ge:$from,date_le:$to}){dimensions{date databaseId}sum{rowsRead rowsWritten}}}}}`
+            `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){d1AnalyticsAdaptiveGroups(limit:10000,filter:{date_geq:$from,date_leq:$to},orderBy:[date_ASC]){dimensions{date databaseId}sum{rowsRead rowsWritten readQueries writeQueries}}}}}`,
+            `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){d1AnalyticsAdaptiveGroups(limit:10000,filter:{date_geq:$from,date_leq:$to}){dimensions{date databaseId}sum{rowsRead rowsWritten}}}}}`
           ];
           let body;for(const query of variants){const response=await fetch('https://api.cloudflare.com/client/v4/graphql',{method:'POST',headers:{Authorization:`Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({query,variables:{accountTag:process.env.CLOUDFLARE_ACCOUNT_ID,from,to}})});body=await response.json();if(response.ok&&!body.errors?.length)break}
           if(body?.errors?.length||!body?.data)throw new Error(`Cloudflare Analytics API: ${JSON.stringify(body?.errors||body)}`);
