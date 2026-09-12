@@ -1457,3 +1457,10 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - `docs/courtwatch-continuous-report.md` resta soltanto come copia sincronizzata al momento della migrazione e non deve più essere aggiornato separatamente. Tutte le modifiche future devono essere applicate esclusivamente al report canonico.
 - Non viene mantenuto un terzo report Word: evitato per prevenire divergenze manuali. Un eventuale `.docx` potrà essere generato solo come esportazione temporanea del Markdown canonico, mai come sorgente autonoma.
 - Procedura obbligatoria per ogni intervento futuro: completare la modifica, verificarla, aggiungere al report canonico esito, commit/run, conteggi, impatto e punti aperti, quindi consegnare il risultato all'utente.
+
+## Aggiornamento 12 settembre 2026 — stabilizzazione classifica Tennis Europe nel profilo
+
+- Verificato sull'app reale che il profilo di Virginia Cereghini mostrava la sola classifica FITP `2.7`: il rendering supportava già entrambe le classifiche, ma l'API esponeva quella Tennis Europe soltanto quando era presente l'associazione nella tabella alias.
+- Corretta la causa strutturale: l'API recupera ora l'ultima classifica Tennis Europe anche tramite il nome normalizzato univoco del giocatore, senza sostituire la classifica FITP. Il sincronizzatore settimanale consolida inoltre l'associazione usando l'UUID ufficiale Tennis Europe già registrato nel profilo, oltre al nome.
+- Risultato atteso nel profilo: FITP e Tennis Europe contemporaneamente nella riga grigia originale. Gli aggiornamenti settimanali non possono più far scomparire la classifica TE per la sola perdita o ricostruzione dell'alias. Nessuna modifica a match, calendari, frequenze o motori di acquisizione.
+- Verifica locale: controllo sintattico Worker e sincronizzatore verde; suite `verify-analysis-ui` verde. Resta da certificare il deploy Worker e la visualizzazione sul profilo reale.
