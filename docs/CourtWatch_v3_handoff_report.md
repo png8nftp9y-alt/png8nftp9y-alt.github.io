@@ -7,3 +7,13 @@
 - Causa residua individuata: i push su file applicativi impostavano `D1_SKIP_OBSERVED=0` e ricostruivano l'intera proiezione, con 604.753 scritture misurate nel run `34695209250`. Più push tecnici nella stessa giornata hanno moltiplicato il consumo.
 - Correzione pubblicata nel commit `4a686be3822408a4774d7fbf2dca034b1e79a55b`: tutti i push e i workflow automatici usano il percorso ridotto; il rebuild completo è possibile soltanto tramite `workflow_dispatch` con `full_refresh=true`.
 - Certificazione: run `34709459093` verde, `D1_SKIP_OBSERVED=1`, 156.635 letture e 6.913 scritture. Rispetto al push completo da 604.753 scritture, riduzione per push pari a circa 98,86%. Nessun backfill storico Tennis Europe avviato.
+
+
+## Aggiornamento 12 settembre 2026 — costo aggiornato e previsione post-correzione
+
+- Audit Cloudflare autenticato delle 18:46 UTC, run `34712214295`: 61.525.998.551 righe lette e 69.998.729 righe scritte dal 1° settembre. Applicando le quote Workers Paid correnti (25 miliardi di letture e 50 milioni di scritture incluse), l'eccedenza D1 maturata stimata è $56,52, esclusi canone Workers Paid, IVA, storage e altri prodotti.
+- Distribuzione del costo stimato: $36,53 per letture oltre quota e $20,00 per scritture oltre quota. L'importo nel pannello può differire temporaneamente per ritardi di contabilizzazione e per l'effettiva data di rinnovo dell'abbonamento.
+- Tentata la lettura in sola lettura della data di rinnovo tramite endpoint ufficiale Cloudflare Accounts Subscriptions. Il token operativo consente Analytics ma l'endpoint fatturazione restituisce HTTP 403; la data esatta non è quindi certificabile tramite l'accesso disponibile. Il reset delle quote avviene nel giorno mensile di rinnovo del piano, non necessariamente il primo del mese.
+- Proiezione fino al prossimo reset, senza rebuild manuali: scenario ordinario circa $0,68 di ulteriore eccedenza D1 al giorno; limite cautelativo circa $1,23 al giorno, ricavato dalla prima finestra post-correzione ancora interessata da commit e verifiche.
+- Proiezione al 16 settembre: $59,24 scenario ordinario, $61,45 cautelativo. Proiezione al 30 settembre: circa $68,75 ordinaria, $78,67 cautelativa. Dopo il reset, il consumo corretto proiettato resta sotto entrambe le quote mensili incluse e quindi non genera eccedenza D1, salvo avvio manuale di `full_refresh` o nuove regressioni.
+- Il workflow di audit è schedulato quotidianamente alle 07:00 UTC (09:00 CEST) e registra direttamente Analytics Cloudflare; commit audit rinnovo `81ad72bc4fadfea5c2f416a56e165c7b014f37a9`.
