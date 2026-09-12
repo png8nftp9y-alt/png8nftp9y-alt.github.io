@@ -28,7 +28,9 @@ if(process.env.D1_SKIP_OBSERVED==='1'){delete counts.observedPlayers;delete coun
 // Stable fingerprint of the effective application payload. generatedAt is
 // intentionally excluded so unchanged scheduled runs do not rewrite D1.
 const hashPayload={players:players.players||[],tournaments:tournaments.tournaments||[],entries:entries.entries||[],schedules:(schedules.schedules||[]).filter(r=>r.circuit!=='tennis-europe'),matches:(matches.matches||[]).filter(r=>r.circuit!=='tennis-europe'),results:(results.results||[]).filter(r=>r.circuit!=='tennis-europe'),appPlayers,appTournaments,observed:process.env.D1_SKIP_OBSERVED==='1'?[]:(observed.players||[])};
-counts.importHash=crypto.createHash('sha256').update(JSON.stringify(hashPayload)).digest('hex');
+const volatileHashKeys=new Set(['generatedAt','lastSeen','lastSeenAt','lastDrawCheckedAt','acceptanceLastUpdated']);
+const canonicalHashValue=value=>Array.isArray(value)?value.map(canonicalHashValue):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).filter(([key])=>!volatileHashKeys.has(key)).map(([key,item])=>[key,canonicalHashValue(item)])):value;
+counts.importHash=crypto.createHash('sha256').update(JSON.stringify(canonicalHashValue(hashPayload))).digest('hex');
 sql.push(`INSERT OR REPLACE INTO generations(id,generated_at,schema_version,status,counts_json) VALUES('current',${esc(manifest.generatedAt)},${esc(manifest.version)},'green',json_patch(COALESCE((SELECT counts_json FROM generations WHERE id='current'),'{}'),${esc(JSON.stringify(counts))}));`);
 await fs.rm(out,{recursive:true,force:true});await fs.mkdir(out,{recursive:true});
 await fs.writeFile(`${out}/import-hash.txt`,counts.importHash+'\n');
