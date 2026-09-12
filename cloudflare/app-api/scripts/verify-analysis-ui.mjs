@@ -22,6 +22,10 @@ for (const marker of [
   assert.ok(source.includes(marker), `missing analysis UI marker: ${marker}`);
 }
 assert.ok(source.includes('playerRankingSummary(p)'), 'player profile must render both FITP and Tennis Europe rankings');
+assert.ok(source.includes("profileTitle.append(profileRankings)"), 'player profile must place all rankings beside nationality');
+assert.ok(source.includes("source==='tennis-europe'?tournamentTeRanking:source==='fitp'?playerRecord?.ranking:''"), 'tournament page must use the ranking appropriate to that tournament');
+assert.ok(source.includes('${nationalityHtml(playerNationality)}${playerRanking?'), 'tournament page must place ranking after nationality');
+assert.ok(source.includes('${nationalityHtml(knownNationality(name,nationalities[index]))}${teRankHtml(rankings[index])}'), 'participant rankings must follow nationality');
 assert.ok(source.includes('tennisEuropeRanking:projected.tennisEuropeRanking||projected.ranking'), 'JSON merge must preserve the FITP ranking');
 assert.ok(apiSource.includes('player.tennisEuropeRanking=labels.join'), 'API must expose Tennis Europe ranking separately');
 assert.doesNotMatch(apiSource, /player\.ranking=labels\.join/, 'Tennis Europe ranking must not overwrite FITP ranking');
