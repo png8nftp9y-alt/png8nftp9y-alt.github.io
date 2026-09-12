@@ -2,6 +2,7 @@ import fs from 'node:fs';
 
 const files=process.argv.slice(2);
 if(!files.length)throw new Error('Nessun file SQL passato al guard D1');
+const mode=String(process.env.D1_GUARD_MODE||'warn').toLowerCase();
 const limits={
   bytes:Number(process.env.D1_GUARD_MAX_BYTES||15_000_000),
   statements:Number(process.env.D1_GUARD_MAX_STATEMENTS||5_000),
@@ -19,6 +20,7 @@ for(const file of files){
   if(statements.length>limits.statements)failures.push(`statements=${statements.length}>${limits.statements}`);
   if(deletes.length>limits.deletes)failures.push(`deletes=${deletes.length}>${limits.deletes}`);
   if(deleteSubqueries.length>limits.deleteSubqueries)failures.push(`deleteSubqueries=${deleteSubqueries.length}>${limits.deleteSubqueries}`);
-  console.log(JSON.stringify({guard:'d1-import',file,bytes:stat.size,statements:statements.length,deletes:deletes.length,deleteSubqueries:deleteSubqueries.length,status:failures.length?'blocked':'green'}));
-  if(failures.length)throw new Error(`Import D1 bloccato prima dell'esecuzione: ${file}: ${failures.join(', ')}`);
+  console.log(JSON.stringify({guard:'d1-import',file,bytes:stat.size,statements:statements.length,deletes:deletes.length,deleteSubqueries:deleteSubqueries.length,status:failures.length?(mode==='block'?'blocked':'warning'):'green',mode}));
+  if(failures.length&&mode==='block')throw new Error(`Import D1 bloccato prima dell'esecuzione: ${file}: ${failures.join(', ')}`);
+  if(failures.length&&mode!=='block')console.warn(`::warning title=Budget D1 superato::${file}: ${failures.join(', ')}`);
 }
