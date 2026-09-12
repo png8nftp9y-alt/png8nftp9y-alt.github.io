@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import crypto from 'node:crypto';
 const base='../../dist/v3/universal',out='seed-universal';
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
 const [manifest,players,tournaments,entries,schedules,matches,results,legacy,mapDoc,playerConfig,observed]=await Promise.all([
@@ -24,8 +25,13 @@ appTournaments.forEach((r,i)=>sql.push(`INSERT INTO app_tournaments(seq,player_i
 appMatches.forEach((r,i)=>sql.push(`INSERT INTO app_matches(seq,player_id,competition_id,match_date,payload) VALUES(${i+1},${esc(r.playerId)},${esc(r.competitionId)},${esc(r.date)},${payload(r)});`));
 const counts={...manifest.counts,observedPlayers:(observed.players||[]).length,observedByCircuit:observed.counts||{},observedSources:observed.sources||{},appPlayers:appPlayers.length,appTournaments:appTournaments.length,appMatches:appMatches.length};
 if(process.env.D1_SKIP_OBSERVED==='1'){delete counts.observedPlayers;delete counts.observedByCircuit;delete counts.observedSources;}
+// Stable fingerprint of the effective application payload. generatedAt is
+// intentionally excluded so unchanged scheduled runs do not rewrite D1.
+const hashPayload={players:players.players||[],tournaments:tournaments.tournaments||[],entries:entries.entries||[],schedules:(schedules.schedules||[]).filter(r=>r.circuit!=='tennis-europe'),matches:(matches.matches||[]).filter(r=>r.circuit!=='tennis-europe'),results:(results.results||[]).filter(r=>r.circuit!=='tennis-europe'),appPlayers,appTournaments,observed:process.env.D1_SKIP_OBSERVED==='1'?[]:(observed.players||[])};
+counts.importHash=crypto.createHash('sha256').update(JSON.stringify(hashPayload)).digest('hex');
 sql.push(`INSERT OR REPLACE INTO generations(id,generated_at,schema_version,status,counts_json) VALUES('current',${esc(manifest.generatedAt)},${esc(manifest.version)},'green',json_patch(COALESCE((SELECT counts_json FROM generations WHERE id='current'),'{}'),${esc(JSON.stringify(counts))}));`);
 await fs.rm(out,{recursive:true,force:true});await fs.mkdir(out,{recursive:true});
+await fs.writeFile(`${out}/import-hash.txt`,counts.importHash+'\n');
 // Keep remote D1 imports comfortably below the storage-operation timeout.
 // The files remain ordered and idempotent, so a transient failure retries only
 // the current 500-statement block instead of rebuilding the whole generation.
