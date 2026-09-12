@@ -6,7 +6,9 @@ const [manifest,players,tournaments,entries,schedules,matches,results,legacy,map
   ...['manifest','players','tournaments','entries','schedules','matches','results'].map(name=>read(`${base}/${name}.json`)),
   read('../../data.json'),read('../../dist/v3/tournaments.json'),read('../../players.json'),process.env.D1_SKIP_OBSERVED==='1'?Promise.resolve({players:[]}):read('observed-players.json'),
 ]);
-const esc=value=>`'${String(value??'').replaceAll("'","''")}'`,payload=row=>esc(JSON.stringify(row));
+const volatileHashKeys=new Set(['generatedAt','lastSeen','lastSeenAt','lastDrawCheckedAt','acceptanceLastUpdated']);
+const canonicalHashValue=value=>Array.isArray(value)?value.map(canonicalHashValue):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).filter(([key])=>!volatileHashKeys.has(key)).map(([key,item])=>[key,canonicalHashValue(item)])):value;
+const esc=value=>`'${String(value??'').replaceAll("'","''")}'`,payload=row=>esc(JSON.stringify(canonicalHashValue(row)));
 const circuit=row=>{const s=String(row.circuit||row.sourceId||row.sourceName||'').toLowerCase();return s.includes('tennis-europe')||s.includes('tennis europe')?'tennis-europe':s.includes('itf')?'itf':'fitp'};
 const sql=['PRAGMA foreign_keys=ON;'],cleanup=[],different=columns=>columns.map(column=>`${column} IS NOT excluded.${column}`).join(' OR '),idList=rows=>rows.map(row=>esc(row.id)).join(',');
 const deleteMissing=(table,rows,scope='1=1')=>cleanup.push(rows.length?`DELETE FROM ${table} WHERE ${scope} AND id NOT IN (${idList(rows)});`:`DELETE FROM ${table} WHERE ${scope};`);
@@ -33,8 +35,6 @@ if(process.env.D1_SKIP_OBSERVED==='1'){delete counts.observedPlayers;delete coun
 // Stable fingerprint of the effective application payload. generatedAt is
 // intentionally excluded so unchanged scheduled runs do not rewrite D1.
 const hashPayload={players:players.players||[],tournaments:tournaments.tournaments||[],entries:entries.entries||[],schedules:(schedules.schedules||[]).filter(r=>r.circuit!=='tennis-europe'),matches:(matches.matches||[]).filter(r=>r.circuit!=='tennis-europe'),results:(results.results||[]).filter(r=>r.circuit!=='tennis-europe'),appPlayers,appTournaments,observed:process.env.D1_SKIP_OBSERVED==='1'?[]:(observed.players||[])};
-const volatileHashKeys=new Set(['generatedAt','lastSeen','lastSeenAt','lastDrawCheckedAt','acceptanceLastUpdated']);
-const canonicalHashValue=value=>Array.isArray(value)?value.map(canonicalHashValue):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).filter(([key])=>!volatileHashKeys.has(key)).map(([key,item])=>[key,canonicalHashValue(item)])):value;
 counts.importHash=crypto.createHash('sha256').update(JSON.stringify(canonicalHashValue(hashPayload))).digest('hex');
 sql.push(`INSERT OR REPLACE INTO generations(id,generated_at,schema_version,status,counts_json) VALUES('current',${esc(manifest.generatedAt)},${esc(manifest.version)},'green',json_patch(COALESCE((SELECT counts_json FROM generations WHERE id='current'),'{}'),${esc(JSON.stringify(counts))}));`);
 await fs.rm(out,{recursive:true,force:true});await fs.mkdir(out,{recursive:true});
