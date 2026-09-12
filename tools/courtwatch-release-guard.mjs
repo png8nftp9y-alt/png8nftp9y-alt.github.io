@@ -35,7 +35,7 @@ for(const [name,min] of Object.entries(baseline.minimums.byCircuit)){const tn=to
 
 const changed=execFileSync('git',['diff','--name-only','HEAD^','HEAD'],{encoding:'utf8'}).trim().split(/\r?\n/).filter(Boolean);
 const functional=changed.filter(path=>/^(?:v3\.(?:js|css|html)|cloudflare\/|infra\/|src\/|tools\/|\.courtwatch\/|\.github\/workflows\/|[^/]+\.(?:mjs|js|css|html)|package(?:-lock)?\.json$)/.test(path));
-if(functional.length&&!changed.includes('docs/CourtWatch_v3_handoff_report.md'))fail('report-same-commit','modifiche funzionali senza aggiornamento report: '+functional.join(', '));else pass('report-same-commit',functional.length?'report incluso':'nessuna modifica funzionale');
+if(functional.length&&!changed.some(path=>['docs/CourtWatch_v3_handoff_report.md','docs/courtwatch-continuous-report.md'].includes(path)))fail('report-same-commit','modifiche funzionali senza aggiornamento report: '+functional.join(', '));else pass('report-same-commit',functional.length?'report incluso':'nessuna modifica funzionale');
 const previousHtml=execFileSync('git',['show','HEAD^:v3.html'],{encoding:'utf8'});
 const assetVersion=(source,name)=>Number((source.match(new RegExp(name.replace('.','\\.')+'\\?v=(\\d+)'))||[])[1]||0);
 for(const asset of ['v3.js','v3.css'])if(changed.includes(asset)){const before=assetVersion(previousHtml,asset),after=assetVersion(html,asset);if(changed.includes('v3.html')&&after>before)pass('cache-'+asset,before+' → '+after);else fail('cache-'+asset,'asset modificato senza incremento cache in v3.html')}
