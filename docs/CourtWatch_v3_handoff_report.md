@@ -17,3 +17,12 @@
 - Proiezione fino al prossimo reset, senza rebuild manuali: scenario ordinario circa $0,68 di ulteriore eccedenza D1 al giorno; limite cautelativo circa $1,23 al giorno, ricavato dalla prima finestra post-correzione ancora interessata da commit e verifiche.
 - Proiezione al 16 settembre: $59,24 scenario ordinario, $61,45 cautelativo. Proiezione al 30 settembre: circa $68,75 ordinaria, $78,67 cautelativa. Dopo il reset, il consumo corretto proiettato resta sotto entrambe le quote mensili incluse e quindi non genera eccedenza D1, salvo avvio manuale di `full_refresh` o nuove regressioni.
 - Il workflow di audit è schedulato quotidianamente alle 07:00 UTC (09:00 CEST) e registra direttamente Analytics Cloudflare; commit audit rinnovo `81ad72bc4fadfea5c2f416a56e165c7b014f37a9`.
+
+
+## Aggiornamento 12 settembre 2026 — politica permanente anti-consumo D1
+
+- Introdotta un'impronta SHA-256 del contenuto applicativo effettivo nella generazione D1. I timestamp puramente tecnici (`generatedAt`, `lastSeen`, `lastSeenAt`, `lastDrawCheckedAt`, `acceptanceLastUpdated`) sono esclusi: non devono provocare riscritture.
+- Il workflow confronta l'impronta locale con quella pubblicata in `generations.counts_json.importHash`; quando coincidono salta l'intero import universale e dichiara `rows_written=0`. Frequenza, acquisizione, API e dati visibili restano invariati.
+- Il primo run inizializza necessariamente la nuova impronta. Il run manuale `34713406100` è verde su D1, API e parità, ma ha importato 6.913 righe perché tra le due revisioni erano presenti cambiamenti sorgente; la prova di skip identico resta da certificare su un ciclo senza modifiche applicative.
+- Su istruzione dell'utente, le soglie D1 non interrompono più automaticamente gli aggiornamenti: il guard opera in modalità `warn`, produce annotazioni e report ma lascia proseguire l'app. La modalità bloccante resta disponibile solo se impostata esplicitamente con `D1_GUARD_MODE=block`.
+- Regola per modifiche future: nessun rebuild completo automatico; impronta contenuto obbligatoria; timestamp tecnici non sono cambiamenti; soglie segnalate senza fermare l'app; consumo account controllato dall'audit giornaliero.
