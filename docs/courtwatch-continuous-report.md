@@ -1464,3 +1464,9 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Corretta la causa strutturale: l'API recupera ora l'ultima classifica Tennis Europe anche tramite il nome normalizzato univoco del giocatore, senza sostituire la classifica FITP. Il sincronizzatore settimanale consolida inoltre l'associazione usando l'UUID ufficiale Tennis Europe già registrato nel profilo, oltre al nome.
 - Risultato atteso nel profilo: FITP e Tennis Europe contemporaneamente nella riga grigia originale. Gli aggiornamenti settimanali non possono più far scomparire la classifica TE per la sola perdita o ricostruzione dell'alias. Nessuna modifica a match, calendari, frequenze o motori di acquisizione.
 - Verifica locale: controllo sintattico Worker e sincronizzatore verde; suite `verify-analysis-ui` verde. Resta da certificare il deploy Worker e la visualizzazione sul profilo reale.
+
+## Aggiornamento 12 settembre 2026 — etichette ranking e politica storico
+
+- Nel profilo giocatore la riga grigia usa ora il formato compatto `2.7 FITP · n°… TE U14/U16`: rimossa la parola ripetuta `classifica` e aggiunta l'etichetta `FITP` alla destra del valore federale.
+- Confermata la schedulazione automatica delle classifiche Tennis Europe: lunedì e martedì alle 18:17 UTC. Ogni ciclo acquisisce integralmente B14, G14, B16 e G16 dalla pubblicazione ufficiale corrente e usa scritture idempotenti.
+- Lo storico richiesto comprende tutte le pubblicazioni ufficiali applicabili ai giocatori e ai match Tennis Europe presenti in Court Watch, incluse le classifiche dei partecipanti valide alla data della partita. Va eseguito come backfill separato e a blocchi, senza alterare il ciclo settimanale né reintrodurre scansioni D1 massive.
