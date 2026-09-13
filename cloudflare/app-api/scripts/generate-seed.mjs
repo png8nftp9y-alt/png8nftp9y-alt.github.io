@@ -6,7 +6,10 @@ const [manifest,players,tournaments,entries,schedules,matches,results,legacy,map
   ...['manifest','players','tournaments','entries','schedules','matches','results'].map(name=>read(`${base}/${name}.json`)),
   read('../../data.json'),read('../../dist/v3/tournaments.json'),read('../../players.json'),process.env.D1_SKIP_OBSERVED==='1'?Promise.resolve({players:[]}):read('observed-players.json'),
 ]);
-const volatileHashKeys=new Set(['generatedAt','lastSeen','lastSeenAt','lastDrawCheckedAt','acceptanceLastUpdated']);
+// These fields describe when a source was checked, not a user-visible data
+// change. Excluding them from the fingerprint prevents scheduled no-op runs
+// from rebuilding D1 while the stored payload remains complete.
+const volatileHashKeys=new Set(['generatedAt','lastSeen','lastSeenAt','lastDrawCheckedAt','acceptanceLastUpdated','observedAt','resultVerifiedAt','orderOfPlayCheckedAt','lastChecked','verifiedAt','parsedAt','issuedAt','resultsGeneratedAt','profileSyncUpdatedAt','startedAt','finishedAt','entriesGeneratedAt','agendaGeneratedAt']);
 const canonicalHashValue=value=>Array.isArray(value)?value.map(canonicalHashValue):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).filter(([key])=>!volatileHashKeys.has(key)).map(([key,item])=>[key,canonicalHashValue(item)])):value;
 const esc=value=>`'${String(value??'').replaceAll("'","''")}'`,payload=row=>esc(JSON.stringify(canonicalHashValue(row)));
 const circuit=row=>{const s=String(row.circuit||row.sourceId||row.sourceName||'').toLowerCase();return s.includes('tennis-europe')||s.includes('tennis europe')?'tennis-europe':s.includes('itf')?'itf':'fitp'};

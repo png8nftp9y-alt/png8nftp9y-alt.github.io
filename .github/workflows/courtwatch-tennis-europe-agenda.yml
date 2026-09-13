@@ -10,6 +10,7 @@ on:
     paths:
       - 'cloudflare/app-api/scripts/generate-tennis-europe-oop-seed.mjs'
       - 'cloudflare/app-api/scripts/generate-tennis-europe-app-candidates.mjs'
+      - 'cloudflare/app-api/scripts/generate-tennis-europe-import-hash.mjs'
       - 'dist/v3/manual_matches.json'
       - 'cloudflare/app-api/scripts/restore-tennis-europe-oop.sh'
       - 'cloudflare/app-api/scripts/verify-tennis-europe-agenda-d1.mjs'
@@ -65,6 +66,7 @@ jobs:
       - name: Create or reuse Court Watch D1
         run: node scripts/configure-d1.mjs
       - name: Apply shared schema migrations
+        if: github.event_name != 'workflow_run'
         run: npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
       - name: Restore verified Tennis Europe archives only
         run: bash scripts/restore-tennis-europe-oop.sh
@@ -72,8 +74,20 @@ jobs:
         run: |
           node scripts/generate-tennis-europe-oop-seed.mjs
           node scripts/generate-tennis-europe-app-candidates.mjs
+          node scripts/generate-tennis-europe-import-hash.mjs
       - name: Import Tennis Europe rows only
+        id: import
         run: |
+          LOCAL_IMPORT_HASH=$(tr -d '\r\n' < seed-tennis-europe-oop/import-hash.txt)
+          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --json \
+            --command "SELECT json_extract(counts_json, '$.teImportHash') AS import_hash FROM generations WHERE id='current'" \
+            > remote-te-import-hash.json
+          REMOTE_IMPORT_HASH=$(node -e "const fs=require('fs'),x=JSON.parse(fs.readFileSync('remote-te-import-hash.json','utf8'));let found='';const walk=v=>{if(!v||found)return;if(Array.isArray(v))return v.forEach(walk);if(typeof v==='object'){if(typeof v.import_hash==='string')found=v.import_hash;else Object.values(v).forEach(walk)}};walk(x);process.stdout.write(found)")
+          if [ -n "$REMOTE_IMPORT_HASH" ] && [ "$LOCAL_IMPORT_HASH" = "$REMOTE_IMPORT_HASH" ]; then
+            echo "TE_D1_IMPORT_SKIPPED unchanged=$LOCAL_IMPORT_HASH rows_written=0"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           node scripts/guard-d1-import.mjs seed-tennis-europe-oop/*.sql
           for sql_file in seed-tennis-europe-oop/*.sql; do
             echo "Importing $sql_file"
@@ -88,7 +102,11 @@ jobs:
             done
             test "$imported" -eq 1
           done
+          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc \
+            --command "UPDATE generations SET counts_json=json_set(COALESCE(counts_json,'{}'),'$.teImportHash','$LOCAL_IMPORT_HASH') WHERE id='current'"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
       - name: Verify Tennis Europe D1 parity
+        if: steps.import.outputs.changed == 'true'
         run: node scripts/verify-tennis-europe-agenda-d1.mjs
       - name: Validate Worker API
         run: npx wrangler deploy --dry-run --config wrangler.generated.jsonc
