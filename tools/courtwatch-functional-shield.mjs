@@ -35,6 +35,9 @@ await page.route('**/app/api/**',async route=>{
 });
 const requireCheck=(condition,name,detail='')=>{if(!condition)throw new Error(name+(detail?': '+detail:''));checks.push({name,status:'pass',detail})};
 try{
+  const appSource=await fs.readFile(path.join(root,'v3.js'),'utf8');
+  requireCheck(appSource.includes('${agendaDrawCodeLabelHtml(m)}</div><small class="agendaCourtField'),'sigla evento nella colonna sinistra');
+  requireCheck(!appSource.includes('${agendaDrawCodeHtml(m,itemTournament)}</div><small class="agendaCourtField'),'nessun link annidato nel collegamento OOP');
   await page.goto(base+'/v3.html',{waitUntil:'domcontentloaded',timeout:30000});
   await page.waitForFunction(()=>document.querySelectorAll('#playersList [data-profile]').length>=23&&document.querySelectorAll('#calendar .tourBand').length>0,null,{timeout:45000});
   requireCheck(await page.locator('#playersList [data-profile]').count()===23,'23 giocatori');

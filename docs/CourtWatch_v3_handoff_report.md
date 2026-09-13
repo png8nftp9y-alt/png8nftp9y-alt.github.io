@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-13.139**
+Revisione documento: **2026-09-13.140**
+
+- 13 settembre 2026 — Ripristinato il collegamento OOP nell'agenda dopo la regressione del commit `7caaec2`: la sigla evento (GD14, GS14, ecc.) era stata resa come link al tabellone dentro il link OOP della colonna sinistra, producendo HTML con collegamenti annidati e inducendo il browser a spezzare il link esterno. La disposizione precedente dell'agenda resta invariata; nella colonna sinistra turno e sigla evento sono ora etichette adiacenti non interattive, mentre l'intera colonna mantiene il link OOP. Aggiunte verifiche automatiche contro la ricomparsa di link annidati; cache asset aggiornata a `2026091303`. Validazione: parsing JavaScript e controlli sorgente dello scudo funzionale. Limite residuo: pubblicazione subordinata al workflow Pages, non monitorato automaticamente su richiesta del proprietario.
 
 - 13 settembre 2026 — Riparato il release guard del deploy Pages dopo il run rosso `34759113622`: lo scudo funzionale richiedeva ancora `#profileTournamentStatusFilter`, nonostante la tendina stato fosse stata rimossa intenzionalmente. L'asserzione ora verifica che la tendina sia assente. Evidenza del run: sintassi e dati agenda superati; unico errore `filtro stato tornei`; i passaggi Pages erano stati saltati. Validazione: sostituzione univoca dell'asserzione e coerenza con il requisito UI. Limite residuo: il nuovo workflow deve completare la pubblicazione; non viene monitorato automaticamente su richiesta del proprietario.
 
