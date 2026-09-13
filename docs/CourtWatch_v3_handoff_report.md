@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-13.140**
+Revisione documento: **2026-09-13.141**
+
+- 13 settembre 2026 — Corretto il compromesso errato della precedente riparazione OOP: l'etichetta evento nella colonna sinistra (GD14, GS14, ecc.) torna a essere un link al tabellone. Per evitare collegamenti HTML annidati, la colonna mantiene la stessa disposizione visiva ma usa link fratelli: il turno e i dettagli di programmazione puntano all'OOP, l'etichetta evento punta al tabellone. Aggiornati scudo funzionale e cache asset a `2026091304`. Stato Pages osservato prima della modifica: diversi run cancellati automaticamente da commit successivi e ultimo run `34759528369` pending; nessun monitoraggio successivo. Validazione: parsing JavaScript e asserzioni strutturali sui due collegamenti distinti.
 
 - 13 settembre 2026 — Ripristinato il collegamento OOP nell'agenda dopo la regressione del commit `7caaec2`: la sigla evento (GD14, GS14, ecc.) era stata resa come link al tabellone dentro il link OOP della colonna sinistra, producendo HTML con collegamenti annidati e inducendo il browser a spezzare il link esterno. La disposizione precedente dell'agenda resta invariata; nella colonna sinistra turno e sigla evento sono ora etichette adiacenti non interattive, mentre l'intera colonna mantiene il link OOP. Aggiunte verifiche automatiche contro la ricomparsa di link annidati; cache asset aggiornata a `2026091303`. Validazione: parsing JavaScript e controlli sorgente dello scudo funzionale. Limite residuo: pubblicazione subordinata al workflow Pages, non monitorato automaticamente su richiesta del proprietario.
 
