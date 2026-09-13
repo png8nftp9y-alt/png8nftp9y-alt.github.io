@@ -2949,3 +2949,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - `6f434025` — Record Tennis Europe ranking certification. Registrazione della certificazione delle classifiche Tennis Europe.
 - `ea29e9eb` — Show every ranking in player and tournament views. Pubblicazione di tutte le classifiche disponibili nelle viste giocatore e torneo.
 - `222903a5` — Document Cloudflare D1 rebuild containment. Registrazione del contenimento dei rebuild D1; dettagli quantitativi e correzione sono riportati nella sezione “Perché sono aumentati i costi Cloudflare”.
+
+## Aggiornamento 13 settembre 2026 — applicazione effettiva delle correzioni UI richieste
+
+- Agenda doppio: sostituito il singolo pulsante che racchiudeva giocatore e compagno. Il giocatore Court Watch ha ora un link limitato al proprio nome; il compagno ha un link autonomo quando dispone di un profilo Court Watch, altrimenti il suo nome resta testo separato e non viene incluso nel link del giocatore.
+- Pagina giocatore: per ogni torneo con data iniziale futura, rimossi dalla testata i conteggi `giocate`, `vinte` e `perse`; al loro posto viene mostrata l’etichetta `PROGRAMMATI` con sfondo rosso acceso e testo bianco. Il pulsante per aprire le partite resta disponibile.
+- Rimossa dalla UI la tendina `Tutti i tornei / In corso / Programmati / Conclusi`. Restano i filtri Circuito, Partita e Anno.
+- Aggiornati i cache-buster di `v3.js` e `v3.css`.
+- Verifica statica: JavaScript analizzato senza errori di sintassi; presenza dei link separati, dell’etichetta programmati e assenza del selettore stato certificate prima del commit.
