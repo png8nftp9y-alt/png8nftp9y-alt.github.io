@@ -989,3 +989,13 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Rimossa dalla UI la tendina `Tutti i tornei / In corso / Programmati / Conclusi`. Restano i filtri Circuito, Partita e Anno.
 - Aggiornati i cache-buster di `v3.js` e `v3.css`.
 - Verifica statica: JavaScript analizzato senza errori di sintassi; presenza dei link separati, dell’etichetta programmati e assenza del selettore stato certificate prima del commit.
+
+## Aggiornamento 13 settembre 2026 — filtri Categoria e Sesso nel calendario
+
+- Aggiunte nel Calendario due tendine indipendenti: `Categoria` (`U10`, `U12`, `U14`, `U16`, `U18`, `O18`) e `Sesso` (`M`, `F`), entrambe con opzione iniziale per mostrare tutti.
+- Le categorie sono calcolate per l'anno del mese visualizzato a partire dall'anno di nascita acquisito; cambiando anno nel calendario il gruppo anagrafico si aggiorna automaticamente.
+- I giocatori e le bande dei tornei mostrati nel calendario rispettano entrambi i filtri. `Seleziona tutti` e `Deseleziona tutti` agiscono soltanto sui giocatori del gruppo visibile, senza alterare le selezioni degli altri gruppi.
+- La scelta delle due tendine viene conservata localmente sul dispositivo insieme allo stato dell'interfaccia.
+- Età e sesso sono risolti nel browser dai metadati anagrafici dei 23 giocatori monitorati; l'intervento non introduce chiamate API, letture D1, scritture D1, motori o schedulazioni aggiuntivi.
+- Componenti modificati: `v3.html`, `v3.css`, `v3.js`; aggiornati i cache-buster degli asset.
+- Validazione: sintassi di `v3.js`, presenza di entrambi i selettori e controllo whitespace Git. Limite noto: per un futuro nuovo giocatore i metadati anagrafici dovranno essere inseriti durante il flusso di aggiunta, altrimenti comparirà soltanto con i filtri impostati su tutti.
