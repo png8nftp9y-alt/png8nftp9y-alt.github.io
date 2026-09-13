@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-13.138**
+Revisione documento: **2026-09-13.139**
+
+- 13 settembre 2026 — Riparato il release guard del deploy Pages dopo il run rosso `34759113622`: lo scudo funzionale richiedeva ancora `#profileTournamentStatusFilter`, nonostante la tendina stato fosse stata rimossa intenzionalmente. L'asserzione ora verifica che la tendina sia assente. Evidenza del run: sintassi e dati agenda superati; unico errore `filtro stato tornei`; i passaggi Pages erano stati saltati. Validazione: sostituzione univoca dell'asserzione e coerenza con il requisito UI. Limite residuo: il nuovo workflow deve completare la pubblicazione; non viene monitorato automaticamente su richiesta del proprietario.
 
 - 13 settembre 2026 — Correzione UI agenda/profilo: le etichette evento (GS14, BS14, GD14, ecc.) sono ora nello stesso gruppo visivo e immediatamente accanto all'etichetta del turno; non sono più accodate al nome del giocatore. Nei tornei futuri della pagina giocatore, lo stato `scheduled` calcolato dal filtro definitivo sostituisce sempre le statistiche giocate/vinte/perse con l'etichetta rossa `PROGRAMMATO`. Aggiornato il cache-buster degli asset a `2026091302`. Validazione: sostituzioni univoche, parsing JavaScript e controllo dei riferimenti HTML/CSS. Limite residuo: la visibilità pubblica dipende dal completamento del workflow GitHub Pages avviato dal commit; il workflow non viene monitorato automaticamente su richiesta del proprietario.
 

@@ -61,7 +61,7 @@ try{
   }
   requireCheck(Boolean(analysisButton),'profilo e partite');
   requireCheck(await page.locator('#profileCircuitFilter').count()===1,'filtro circuito profilo');
-  requireCheck(await page.locator('#profileTournamentStatusFilter').count()===1,'filtro stato tornei');
+  requireCheck(await page.locator('#profileTournamentStatusFilter').count()===0,'filtro stato tornei rimosso');
 
   await analysisButton.click();
   const editor=page.locator('#matchAnalysisEditor'),text=editor.locator('.analysisEditorText');
