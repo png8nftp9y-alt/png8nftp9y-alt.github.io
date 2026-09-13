@@ -2939,3 +2939,13 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Ricostruzione eseguita dalla versione integra `f01a4d21` del 5 settembre e dalle aggiunte recuperabili dei successivi commit Git che hanno modificato il report.
 - Le voci sono conservate con commit sorgente; nessun testo corrotto è stato usato come fonte.
 - Il precedente blob danneggiato resta integralmente disponibile nella cronologia Git.
+
+### Commit censiti senza patch testuale disponibile nell’API GitHub
+
+- `1bf5bc37` — Revert latest agenda result ordering change. Modifica transitoria successivamente annullata.
+- `aab3b5d5` — Restore agenda result ordering change. Ripristino della disposizione dell’agenda; lo stato finale è documentato dai commit successivi.
+- `b0a8dd8b` — Restore last known working CourtWatch application. Ripristino applicativo di emergenza; lo stato finale è documentato dalle verifiche e revisioni successive.
+- `8394498a` — Complete Tennis Europe ranking coverage. Completamento della copertura classifiche Tennis Europe.
+- `6f434025` — Record Tennis Europe ranking certification. Registrazione della certificazione delle classifiche Tennis Europe.
+- `ea29e9eb` — Show every ranking in player and tournament views. Pubblicazione di tutte le classifiche disponibili nelle viste giocatore e torneo.
+- `222903a5` — Document Cloudflare D1 rebuild containment. Registrazione del contenimento dei rebuild D1; dettagli quantitativi e correzione sono riportati nella sezione “Perché sono aumentati i costi Cloudflare”.
