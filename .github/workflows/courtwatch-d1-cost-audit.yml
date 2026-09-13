@@ -1,5 +1,6 @@
 name: Court Watch D1 cost audit
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths: ['.github/workflows/courtwatch-d1-cost-audit.yml']

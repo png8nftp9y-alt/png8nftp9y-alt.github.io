@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-13.145**
+Revisione documento: **2026-09-13.146**
+
+- 13 settembre 2026 — Abilitato l'avvio manuale del workflow read-only `Court Watch D1 cost audit`, che usa `wrangler d1 insights` per attribuire le righe lette e scritte alle query SQL aggregate degli ultimi 31 giorni. Il testo SQL viene sanificato prima della stampa. Il push del solo workflow avvia una verifica; nessuna query applicativa, scrittura D1 o modifica dell'app.
 
 - 13 settembre 2026 — Esteso l'audit Cloudflare D1 autenticato, in sola lettura, per conservare la dimensione `databaseId` restituita da GraphQL Analytics, risolverla nel nome tramite l'API D1 e pubblicare totali e serie giornaliere per ciascun database. Il costo teorico ai tassi di eccedenza viene mostrato senza attribuire artificialmente a un database le quote mensili condivise. Nessuna query SQL, scrittura D1, modifica applicativa o variazione di frequenza.
 
