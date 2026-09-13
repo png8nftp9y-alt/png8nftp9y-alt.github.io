@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-13.141**
+Revisione documento: **2026-09-13.142**
+
+- 13 settembre 2026 — Rifinita la pagina giocatore: i tornei programmati mostrano soltanto il badge rosso `PROGRAMMATO`, senza freccia né apertura delle partite. Dalla data di inizio lo stato passa automaticamente a `ongoing`, il badge sparisce, ricompaiono statistiche e controllo di apertura e l'intestazione usa il giallo; il giorno corrente è ora parte della firma di rendering per aggiornare la transizione anche senza variazioni dei dati. Le statistiche di ogni torneo vengono ricalcolate sulle righe visibili dopo circuito, tipo, anno ed esito: `Tutte` mostra giocate/vinte/perse, `Vinte` solo vinte, `Perse` solo perse. Aumentato il contrasto fra intestazione torneo e righe partita con fondi, bordi e separatori più netti. Cache asset aggiornata a `2026091305`. Validazione: parsing JavaScript e nuove asserzioni nello scudo funzionale. Limite residuo: pubblicazione subordinata ai workflow avviati dal commit, non monitorati automaticamente.
 
 - 13 settembre 2026 — Corretto il compromesso errato della precedente riparazione OOP: l'etichetta evento nella colonna sinistra (GD14, GS14, ecc.) torna a essere un link al tabellone. Per evitare collegamenti HTML annidati, la colonna mantiene la stessa disposizione visiva ma usa link fratelli: il turno e i dettagli di programmazione puntano all'OOP, l'etichetta evento punta al tabellone. Aggiornati scudo funzionale e cache asset a `2026091304`. Stato Pages osservato prima della modifica: diversi run cancellati automaticamente da commit successivi e ultimo run `34759528369` pending; nessun monitoraggio successivo. Validazione: parsing JavaScript e asserzioni strutturali sui due collegamenti distinti.
 
