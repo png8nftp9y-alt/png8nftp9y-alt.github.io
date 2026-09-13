@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 50332)
+Total output lines: 997
+
 Warning: truncated output (original token count: 111930)
 Total output lines: 3014
 
@@ -257,16 +260,7 @@ Le informazioni superate non devono essere semplicemente cancellate quando sono 
 | 24 agosto 2026 | Verificata l'applicazione T−1 sui 7 tornei Tennis Europe di Darko: lo script `verify-tennis-europe-draws.mjs` è stato eseguito, ma l'audit ha assegnato a tutti la decisione `kept_pre_tournament_acceptance`. Anche i 6 tornei già conclusi conservano le etichette A/MD/Q e non hanno campi `drawVerification`/`drawState`; Doboj è correttamente ancora a T−8. La regola T−1 non può quindi considerarsi applicata a Darko. Anomalia da correggere: gestione della finestra temporale/audit storico per giocatori aggiunti dopo la conclusione dei tornei. Non rimuovere nessuna entry finché i tabelloni non sono controllati con la regola affidabile concordata. |
 | 24 agosto 2026 | Su richiesta dell'utente è stato installato il plugin Cloudflare per ottenere accesso operativo a R2. L'installazione è riuscita, ma nella sessione corrente non sono ancora esposte azioni R2 e non è quindi ancora verificata la connessione dell'account/bucket: al successivo caricamento deve essere eseguita una lettura innocua prima di qualsiasi modifica. GitHub resta leggibile pubblicamente ma senza autenticazione di scrittura: il push HTTPS fallisce con richiesta credenziali e non è disponibile un'integrazione GitHub installabile nella sessione corrente. Non accettare token o password in chat; usare esclusivamente il collegamento account autorizzato dell'interfaccia. |
 | 24 agosto 2026 | Chiarito l'ambito del controllo database: la scansione e la ricostruzione completate in questa sessione riguardano la copia locale versionata (`history/tennis_europe_player_tournament_db.json` e cache partecipanti), non gli oggetti correnti/backup nel bucket R2. La sessione locale non dispone di `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` o `R2_BUCKET`; l'accesso R2 è previsto tramite secrets del workflow GitHub Actions. Per verificare e pubblicare sul database R2 occorre quindi eseguire il workflow autenticato del repository. |
-| 24 agosto 2026 | Corretto il percorso di controllo Tennis Europe per Darko. Il primo esito negativo derivava dal fatto che `discover-tennis-europe-acceptance-shard.mjs` filtra a monte i giocatori configurati con circuito `Tennis Europe`: Darko era allora presente soltanto come FITP, quindi non poteva produrre entry TE. Inoltre era stata consultata la ricerca web e gli snapshot preesistenti, ma non era ancora stata rilanciata l'inter…61930 tokens truncated…e, ritardando la pubblicazione delle partite odierne.
-- Europe Agenda D1 parte ora soltanto quando esiste realmente un nuovo dato Europe: completamento verde OOP live, merge storico, modifica esplicita dei suoi script oppure avvio manuale.
-- La serializzazione resta invariata: una sola scrittura D1 alla volta, senza sovrapposizioni. Il job Europe in attesa non viene più rimpiazzato dai completamenti del D1 generale e raggiunge l’import appena si libera il lock.
-- Frequenza OOP, motori FITP/ITF/Europe, archivi R2, schema D1 e interfaccia non sono stati modificati. Il push del workflow avvia un rebuild Europe completo di verifica.
-
-### 2026-09-07 — Prioritize Europe agenda before general D1 rebuild (`ade4aacd`)
-
-## Revisione 2026-09-07.218 — precedenza effettiva Agenda Europe sul D1 generale
-- La catena ordinaria delle scritture è ora esplicita: OOP Europe verde → Europe Agenda D1 → D1 generale. Il rebuild generale non viene più richiesto separatamente al completamento di ciascuno dei cinque motori live, condizione che poteva collocarlo davanti all’importazione dell’agenda appena acquisita.
-- Europe Agenda D1 pubblica quindi per primo campo, orario, numero match, tempi relativi e risultati Europe; soltanto dopo il suo verde D1 generale consolida gli ultimi snapshot disponibili di FITP, Tennis Europe e ITF.
+| 24 agosto 2026 | Corretto il percorso di controllo Tennis Europe per Darko. Il primo esito negativo derivava dal fatto che `discover-tennis-europe-acceptance-shard.mjs` filtra a monte i giocatori configurati con circuito `Tennis Europe`: Darko era allora presente soltanto come FITP, quindi non poteva produrre entry TE. Inoltre era stata consultata la …332 tokens truncated…ultati Europe; soltanto dopo il suo verde D1 generale consolida gli ultimi snapshot disponibili di FITP, Tennis Europe e ITF.
 - Resta vietata l’interruzione di una scrittura generale già iniziata: in quel solo caso Europe attende il tempo residuo, evitando una generazione D1 parziale. Nei cicli ordinari successivi Europe acquisisce il lock prima del generale.
 - La frequenza dei sei motori e dell’OOP resta ogni 15 minuti. Le richieste D1 generali duplicate vengono eliminate, riducendo coda e consumo GitHub Actions; watchdog, avvio manuale e trigger push di manutenzione restano disponibili.
 
@@ -930,6 +924,14 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Questa spiegazione riguarda la causa tecnica osservata; una sparizione futura deve essere trattata come regressione e verificata contro snapshot sorgente, alias e stato della relazione, senza dedurre automaticamente un ritiro.
 
 ## Integrità del documento
+
+## Aggiornamento 13 settembre 2026 — barriera permanente contro regressioni di costo D1
+
+- Aggiunto `verify-d1-cost-invariants.mjs`, eseguito da `npm run check` prima che il workflow generale raggiunga configurazione, migrazioni o import D1.
+- Il controllo fallisce se una modifica futura rimuove le impronte/no-op, rende nuovamente integrali le verifiche su dati invariati, riattiva migrazioni periodiche, collega il CRUD smoke a ogni deploy, reintroduce `INSERT OR REPLACE` sulle proiezioni Tennis Europe protette o elimina il limite di scrittura del registro dispositivi.
+- I tre workflow D1/CRUD sono inclusi nei path che attivano il controllo generale: una modifica alla politica di costo viene quindi verificata prima delle operazioni remote.
+- Nessun trigger temporale dei motori è stato modificato. La barriera riguarda esclusivamente regressioni che aumenterebbero letture o scritture senza produrre nuovi dati visibili.
+- Limite esplicito: una barriera nel repository protegge le modifiche ordinarie; un amministratore con facoltà di rimuovere contemporaneamente workflow e controllo può sempre aggirarla. Una garanzia organizzativa assoluta richiede anche branch protection obbligatoria lato GitHub.
 
 ## Aggiornamento 13 settembre 2026 — causa certificata dei picchi D1 del 9–10 settembre e contenimento permanente
 
