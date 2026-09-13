@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-13.143**
+Revisione documento: **2026-09-13.144**
+
+- 13 settembre 2026 — Aggiunta una riga separatrice leggera tra partite consecutive nella pagina giocatore, mantenendo assenti bordi e ombre attorno al torneo e alle singole partite. La separazione usa esclusivamente un bordo superiore grigio chiaro dalla seconda partita in poi, con spaziatura verticale dedicata. Cache asset aggiornata a `2026091307`. Validazione: regola limitata alle sole righe partita adiacenti.
 
 - 13 settembre 2026 — Rifinito il contrasto della pagina giocatore su feedback del proprietario: rimossi bordo scuro e qualsiasi ombra da contenitore torneo e righe partita; la gerarchia resta affidata a fondo grigio dell'intestazione, fondo bianco delle partite e maggiore spaziatura. Cache asset aggiornata a `2026091306`. Audit anagrafico per i futuri filtri Calendario: i 23 record correnti non espongono data/anno di nascita, categoria o sesso, quindi non è stata introdotta alcuna deduzione dai nomi; servono campi espliciti `category` (U10/U12/U14/U16/U18/O18) e `gender` (M/F). Verifica sparizione: Virginia Cereghini è presente nell'anagrafica pubblicata e in 17 relazioni torneo/agenda; Arginelli non compare nell'anagrafica monitorata né nei dati pubblicati, quindi il suo caso non può essere certificato come risolto. Validazione: sostituzione univoca CSS e verifica copertura campi anagrafici.
 
