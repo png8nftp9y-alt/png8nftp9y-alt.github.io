@@ -1,6 +1,8 @@
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
-Revisione documento: **2026-09-13.144**
+Revisione documento: **2026-09-13.145**
+
+- 13 settembre 2026 — Esteso l'audit Cloudflare D1 autenticato, in sola lettura, per conservare la dimensione `databaseId` restituita da GraphQL Analytics, risolverla nel nome tramite l'API D1 e pubblicare totali e serie giornaliere per ciascun database. Il costo teorico ai tassi di eccedenza viene mostrato senza attribuire artificialmente a un database le quote mensili condivise. Nessuna query SQL, scrittura D1, modifica applicativa o variazione di frequenza.
 
 - 13 settembre 2026 — Aggiunta una riga separatrice leggera tra partite consecutive nella pagina giocatore, mantenendo assenti bordi e ombre attorno al torneo e alle singole partite. La separazione usa esclusivamente un bordo superiore grigio chiaro dalla seconda partita in poi, con spaziatura verticale dedicata. Cache asset aggiornata a `2026091307`. Validazione: regola limitata alle sole righe partita adiacenti.
 
