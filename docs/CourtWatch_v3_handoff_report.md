@@ -1008,3 +1008,14 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Nella pagina giocatore l'informazione anagrafica è collocata tra circolo e tessera. Una data ISO completa viene resa, per esempio, come `data di nascita 12 gen 2001`; quando la fonte ufficiale disponibile espone soltanto l'anno, viene mostrato correttamente `anno di nascita 2012`, senza inventare giorno e mese.
 - Stato dati: per i giocatori attuali le fonti ufficiali già raccolte certificano l'anno di nascita, non la data completa. Il formatter è pronto a usare automaticamente `birthDate`/`dateOfBirth` non appena una fonte pubblica attendibile fornisce giorno e mese.
 - Nessuna chiamata API o operazione D1 aggiunta: filtri e formattazione avvengono nel browser. Motori e schedulazioni invariati.
+
+## Aggiornamento 14 settembre 2026 — selezione libera, navigazione e comandi giocatore
+
+- Corretto l'anno di nascita di Martina Danesi da `2010` a `2009`: il valore precedente era un'inferenza errata dalla categoria U16/ITF, non una data ufficiale, e non deve essere considerato fonte attendibile.
+- Categoria e Sesso ora impostano una selezione rapida iniziale. Tutti i nomi restano visibili e ogni giocatore esterno ai gruppi scelti può essere selezionato manualmente; il calendario segue sempre la selezione effettiva dei nomi.
+- La tendina multipla Categoria si chiude cliccando fuori dal menu.
+- Nella testata Giocatori sono presenti i comandi `+` e `−`, con descrizioni native `Aggiungi giocatore` e `Rimuovi giocatore`; `Altri` resta separato.
+- Nella pagina giocatore è stato collocato a destra, alla stessa altezza di `Indietro`, il comando `− Rimuovi giocatore`, sopra il profilo e il contatore delle partite.
+- L'apertura di una pagina giocatore porta all'intestazione; la navigazione indietro riporta all'inizio della home, dove l'Agenda è il primo contenuto.
+- I comandi di rimozione sono predisposti nell'interfaccia ma non cancellano ancora il registro: la cancellazione persistente richiede il CRUD giocatori previsto nel lavoro dedicato, con conferma esplicita per evitare rimozioni accidentali.
+- Nessuna modifica a motori, schedulazioni o accessi D1.
