@@ -1019,3 +1019,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - L'apertura di una pagina giocatore porta all'intestazione; la navigazione indietro riporta all'inizio della home, dove l'Agenda è il primo contenuto.
 - I comandi di rimozione sono predisposti nell'interfaccia ma non cancellano ancora il registro: la cancellazione persistente richiede il CRUD giocatori previsto nel lavoro dedicato, con conferma esplicita per evitare rimozioni accidentali.
 - Nessuna modifica a motori, schedulazioni o accessi D1.
+
+## Aggiornamento 14 settembre 2026 — filtri facilitatori e righe torneo senza partite
+
+- Categoria e Sesso restano scorciatoie per creare una selezione iniziale, non vincoli permanenti. Se viene selezionato manualmente un giocatore escluso dai gruppi attivi, entrambi i controlli anagrafici tornano automaticamente a `Tutte/Tutti` e la selezione manuale viene rispettata.
+- Ripristinate le diciture esatte `Seleziona tutti` e `Deseleziona tutti`; il comando opera nuovamente sull'intero elenco e azzera i filtri anagrafici, secondo il comportamento globale precedente.
+- Nella pagina giocatore `Rimuovi giocatore` è ora nero, con peso normale e senza il segno meno.
+- Nella pagina torneo la freccia di espansione non viene renderizzata accanto a `Iscritto` quando non esistono ancora partite da mostrare; anche l'interazione di espansione viene collegata soltanto alle righe che possiedono partite.
+- Cache-buster aggiornati; nessuna modifica a motori, schedulazioni o consumo D1.
