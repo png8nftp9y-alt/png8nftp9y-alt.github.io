@@ -1034,3 +1034,7 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - L'intestazione usa direttamente `state.month`: resta quindi sincronizzata con Agenda e navigazione mensile senza introdurre uno stato o una richiesta dati separati.
 - Nella pagina giocatore, selezionando `Tutti gli anni`, i tornei visibili vengono raggruppati tramite separatori annuali (`2026`, `2025`, ecc.), seguendo lo schema indicato dall'utente. I separatori rispettano anche i filtri circuito, tipo partita ed esito e vengono rimossi quando si seleziona un singolo anno.
 - Aggiornati markup, stile, logica client e cache-buster. Nessuna lettura/scrittura D1 aggiuntiva e nessuna modifica ai motori o alle schedulazioni.
+
+### Rifinitura separatore anno
+
+- Aumentata la dimensione dell'anno nei separatori della pagina giocatore da 18 a 26 pixel e spostato l'allineamento sul margine destro, mantenendo invariato il raggruppamento dei tornei.
