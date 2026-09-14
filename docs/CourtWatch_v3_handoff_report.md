@@ -999,3 +999,12 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Età e sesso sono risolti nel browser dai metadati anagrafici dei 23 giocatori monitorati; l'intervento non introduce chiamate API, letture D1, scritture D1, motori o schedulazioni aggiuntivi.
 - Componenti modificati: `v3.html`, `v3.css`, `v3.js`; aggiornati i cache-buster degli asset.
 - Validazione: sintassi di `v3.js`, presenza di entrambi i selettori e controllo whitespace Git. Limite noto: per un futuro nuovo giocatore i metadati anagrafici dovranno essere inseriti durante il flusso di aggiunta, altrimenti comparirà soltanto con i filtri impostati su tutti.
+
+## Aggiornamento 14 settembre 2026 — filtri calendario multipli e nascita nel profilo
+
+- Spostati i controlli `Categoria` e `Sesso` nella testata, immediatamente a fianco della scritta `Calendario`.
+- La tendina Categoria consente la selezione simultanea di più gruppi tra `U10`, `U12`, `U14`, `U16`, `U18` e `O18`; nessuna selezione equivale a `Tutte`.
+- I nomi dei 23 giocatori restano sempre visibili. Quelli esclusi dalla combinazione Categoria/Sesso appaiono deselezionati, mentre calendario e comando seleziona/deseleziona operano esclusivamente sui giocatori visibili per il filtro.
+- Nella pagina giocatore l'informazione anagrafica è collocata tra circolo e tessera. Una data ISO completa viene resa, per esempio, come `data di nascita 12 gen 2001`; quando la fonte ufficiale disponibile espone soltanto l'anno, viene mostrato correttamente `anno di nascita 2012`, senza inventare giorno e mese.
+- Stato dati: per i giocatori attuali le fonti ufficiali già raccolte certificano l'anno di nascita, non la data completa. Il formatter è pronto a usare automaticamente `birthDate`/`dateOfBirth` non appena una fonte pubblica attendibile fornisce giorno e mese.
+- Nessuna chiamata API o operazione D1 aggiunta: filtri e formattazione avvengono nel browser. Motori e schedulazioni invariati.
