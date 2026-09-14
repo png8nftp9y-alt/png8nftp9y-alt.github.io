@@ -1027,3 +1027,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Nella pagina giocatore `Rimuovi giocatore` è ora nero, con peso normale e senza il segno meno.
 - Nella pagina torneo la freccia di espansione non viene renderizzata accanto a `Iscritto` quando non esistono ancora partite da mostrare; anche l'interazione di espansione viene collegata soltanto alle righe che possiedono partite.
 - Cache-buster aggiornati; nessuna modifica a motori, schedulazioni o consumo D1.
+
+## Aggiornamento 14 settembre 2026 — mese calendario e separatori annuali
+
+- Inserita tra i nomi dei giocatori e la legenda FITP/Tennis Europe/ITF un'intestazione centrale con mese e anno del calendario, per esempio `Settembre 2026`.
+- L'intestazione usa direttamente `state.month`: resta quindi sincronizzata con Agenda e navigazione mensile senza introdurre uno stato o una richiesta dati separati.
+- Nella pagina giocatore, selezionando `Tutti gli anni`, i tornei visibili vengono raggruppati tramite separatori annuali (`2026`, `2025`, ecc.), seguendo lo schema indicato dall'utente. I separatori rispettano anche i filtri circuito, tipo partita ed esito e vengono rimossi quando si seleziona un singolo anno.
+- Aggiornati markup, stile, logica client e cache-buster. Nessuna lettura/scrittura D1 aggiuntiva e nessuna modifica ai motori o alle schedulazioni.
