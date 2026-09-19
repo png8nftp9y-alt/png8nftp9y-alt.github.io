@@ -251,11 +251,12 @@
 
 
 /* Opponent profile: no initials/avatar; those remain exclusive to CourtWatch players. */
-.opponentProfileHero{padding:24px}
-.opponentProfileIdentity h2{margin:0 0 10px;font-size:30px}
-.opponentProfileIdentity p{margin:6px 0;color:var(--muted)}
-.opponentProfileIdentity .flag{margin-right:7px}
-.opponentProfileRanking{font-weight:700;color:var(--text)!important}
+.opponentProfileHero{padding:24px;overflow-x:auto}
+.opponentProfileIdentity{display:flex;align-items:center;gap:14px;min-width:max-content;white-space:nowrap}
+.opponentProfileIdentity h2{margin:0;font-size:30px}
+.opponentProfileNationality{color:var(--muted)}
+.opponentProfileIdentity .nationality{white-space:nowrap}
+.opponentProfileRanking{font-weight:700;color:var(--ink)!important}
 .opponentHistoryPlaceholder{margin-top:14px}
 .opponentPlayerLink{font-size:inherit;font-weight:400}
 .agendaMatchBody .opponentPlayerLink.courtWatchOpponent{font-size:17px;font-weight:850;line-height:1.25}

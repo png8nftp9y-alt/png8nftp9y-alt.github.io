@@ -1941,12 +1941,26 @@ function renderOpponent(identity, matchId, index) {
       ] || "",
     ranking = (match.opponentTeRankings || [])[index],
     rankingDate = (match.opponentTeRankingDates || [])[index] || "",
+    snapshotCategory = (match.opponentTeRankingCategories || [])[index] || "",
+    eventAge = String(match.event || match.draw || "").match(/(?:^|[^0-9])(14|16)(?:[^0-9]|$)/)?.[1] || "",
+    rankingCategory = /14$/.test(snapshotCategory)
+      ? "U14"
+      : /16$/.test(snapshotCategory)
+        ? "U16"
+        : eventAge
+          ? "U" + eventAge
+          : "",
     flag = nationalityHtml(nationality),
     rankingLabel = ranking
-      ? `n°${esc(ranking)} TE${rankingDate ? ` · ranking del ${esc(displayDate(rankingDate))}` : ""}`
-      : "Ranking non disponibile";
+      ? `n°${esc(ranking)} TE${rankingCategory ? ` ${esc(rankingCategory)}` : ""}${rankingDate ? ` · ranking del ${esc(displayDate(rankingDate))}` : ""}`
+      : "Ranking non disponibile",
+    follow = $("removeProfilePlayer");
+  follow.hidden = false;
+  follow.textContent = "Segui giocatore";
+  follow.title = "Segui giocatore";
+  follow.setAttribute("aria-label", "Segui giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><p>${flag || "Nazionalità non disponibile"}</p><p class="opponentProfileRanking">${rankingLabel}</p></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Stato di forma</h3><span>Ultimi 5 tornei</span></div><div class="empty">Storico in preparazione.</div></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><span class="opponentProfileNationality">${flag || "Nazionalità non disponibile"}</span><span class="opponentProfileRanking">${rankingLabel}</span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Stato di forma</h3><span>Ultimi 5 tornei</span></div><div class="empty">Storico in preparazione.</div></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
 }
@@ -2341,7 +2355,11 @@ let openProfileTournamentKeys = new Set(
     : [],
 );
 renderProfile = function (id) {
-  $("removeProfilePlayer").hidden = false;
+  const remove = $("removeProfilePlayer");
+  remove.hidden = false;
+  remove.textContent = "Rimuovi giocatore";
+  remove.title = "Rimuovi giocatore";
+  remove.setAttribute("aria-label", "Rimuovi giocatore");
   if (profileFilterPlayerId !== id) {
     profileCircuitFilter = "all";
     profileMatchTypeFilter = "all";

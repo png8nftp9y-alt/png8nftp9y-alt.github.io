@@ -1173,3 +1173,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Quando l’avversario è anch’esso CourtWatch, il suo nome riceve la stessa dimensione e lo stesso peso del giocatore CourtWatch mostrato sopra. Entrambi restano collegati alle rispettive pagine complete.
 - Per una sfida conclusa fra due giocatori CourtWatch, la scheda unica e neutrale non mostra più il solo punteggio dalla prospettiva del primo record: indica `Vincitore: Nome Cognome · Risultato: punteggio`, usando il campo autorevole `advances` della proiezione della partita.
 - Per tutti gli altri incontri il formato del risultato resta invariato. La modifica non cambia acquisizione, D1, motori o schedulazioni.
+
+
+### Rifinitura intestazione pagina avversario
+
+- L’intestazione della pagina avversario è ora una sola riga non spezzata: nome, nazionalità e ranking con data della pubblicazione. Sugli schermi stretti resta su un’unica riga ed è scorribile orizzontalmente, senza introdurre avatar o iniziali.
+- Il ranking specifica `TE U14` oppure `TE U16`. La categoria proviene dallo snapshot D1; il codice evento viene usato soltanto come fallback quando lo snapshot storico non espone ancora la categoria.
+- Nella pagina avversario il comando della testata diventa `Segui giocatore`. Aprendo una pagina CourtWatch torna automaticamente a `Rimuovi giocatore`; nella pagina torneo resta nascosto.
+- La API include ora la categoria dello stesso snapshot che fornisce ranking e data. Nessuna nuova scansione, riscrittura massiva o modifica alle schedulazioni.
