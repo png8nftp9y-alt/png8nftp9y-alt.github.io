@@ -1085,3 +1085,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Query Insights in sola lettura conferma che i maggiori costi storici residui provengono dalle verifiche integrali multi-tabella e dalla ricreazione ripetuta degli indici. Negli ultimi 31 giorni le quattro creazioni di indice principali censite spiegano circa 553.964 scritture; le scritture applicative ordinarie su dispositivi e analisi sono invece nell'ordine di poche migliaia.
 - Audit eseguiti: `Court Watch Cloudflare D1 usage audit #16` e `Court Watch D1 cost audit #5`, entrambi verdi. Nessuna query SQL di scrittura, migrazione, import o modifica delle frequenze è stata eseguita dall'audit.
 
+
+
+## Aggiornamento 19 settembre 2026 — caricamento più rapido senza variazioni funzionali
+
+- Le dieci risorse JSON statiche dell'app mantengono gli stessi URL, contenuti, ordine di caricamento, merge e fallback, ma non ricevono più un parametro temporale diverso a ogni richiesta. Il browser usa ora la rivalidazione condizionale `cache: no-cache`: quando il file non è cambiato, può riutilizzare la copia locale dopo la verifica HTTP invece di riscaricarlo integralmente.
+- La proiezione privata `/app/api/app-snapshot` resta deliberatamente `cache: no-store` con parametro temporale, così autenticazione e aggiornamento dei dati applicativi non cambiano.
+- Restano invariati rendering, aggiornamento automatico ogni 30 secondi, motori FITP/Tennis Europe/ITF, database D1, R2 e schedulazioni. Il beneficio riguarda soprattutto aperture successive e refresh; la prima apertura senza cache deve ancora scaricare i dati completi.
+- Cache-buster di `v3.js` aggiornato a `2026091903`. Verifica statica: sintassi JavaScript valida, dieci dataset invariati, API privata ancora no-store e timer di 30 secondi presente.

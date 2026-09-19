@@ -583,8 +583,8 @@ async function v3json(path) {
   const controller = new AbortController(),
     timer = setTimeout(() => controller.abort(), 12000);
   try {
-    const r = await fetch(V3 + path + "?t=" + Date.now(), {
-      cache: "no-store",
+    const r = await fetch(V3 + path, {
+      cache: "no-cache",
       mode: "cors",
       signal: controller.signal,
     });
