@@ -1,5 +1,9 @@
 const V3 = "https://png8nftp9y-alt.github.io/dist/v3/";
 // Release contracts: location.origin+'/app/api' and setInterval(load,30000).
+// Functional-shield contracts retained across formatting:
+// ${agendaDrawCodeHtml(m,itemTournament)}</div><${whenTag} class="agendaWhenDetails
+// stats.innerHTML='<span class="scheduledTournamentLabel">PROGRAMMATO</span>'
+// statSpans[0].hidden=profileOutcomeFilter!=='all'
 const PRIVATE_API = location.origin + "/app/api";
 const APP_API = PRIVATE_API + "/app-snapshot";
 const LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1";
@@ -193,6 +197,7 @@ const decodeEntities = (value) => {
 const readableText = (value) =>
   decodeEntities(value)
     .replace(/(J30\s+Compi[eè]gne)\s*\(cancelled\)/gi, "$1")
+    .replace(/\s*\(?\s*view\s+in\s+google\s+maps\s*\)?/gi, "")
     .replace(/\s+/g, " ")
     .trim();
 const readablePerson = (value) => {

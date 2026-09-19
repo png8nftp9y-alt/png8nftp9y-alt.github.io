@@ -8,6 +8,7 @@ permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-backfill,cancel-in-progress: true}
 jobs:
   fast-player-count:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -28,6 +29,7 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
   acceptance-shard:
+    if: github.event_name == 'workflow_dispatch'
     needs: fast-player-count
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -46,6 +48,7 @@ jobs:
         if: always()
         with: {name: 'itf-acceptance-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*'}
   publish-count:
+    if: github.event_name == 'workflow_dispatch'
     needs: acceptance-shard
     runs-on: ubuntu-latest
     steps:
@@ -65,6 +68,7 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
   result-shard:
+    if: github.event_name == 'workflow_dispatch'
     needs: acceptance-shard
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -83,6 +87,7 @@ jobs:
         if: always()
         with: {name: 'itf-results-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*'}
   publish:
+    if: github.event_name == 'workflow_dispatch'
     needs: [acceptance-shard, result-shard, publish-count]
     runs-on: ubuntu-latest
     timeout-minutes: 45
