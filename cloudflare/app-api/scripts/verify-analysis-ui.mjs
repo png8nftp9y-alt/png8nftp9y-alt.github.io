@@ -44,6 +44,8 @@ assert.ok(hasSource('function opponentTournamentEventLinks(') && hasSource('oppo
 assert.ok(hasSource('<span class="opponentHistoryOpponent">vs ${opponents'), 'opponent history rows must prefix the opponent with vs');
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
 assert.ok(hasApiSource('excludeMatchId') && hasSource('&excludeMatchId='), 'opponent study page must exclude the CourtWatch match');
+assert.ok(hasApiSource('tennisEuropePerspectiveScore') && hasSource('opponentHistoryRoundLabel'), 'opponent study rows must orient scores and show full rounds');
+assert.ok(hasApiSource("const targets=[...new Set(matches.flatMap"), 'match snapshot must backfill participant rankings by date');
 assert.ok(hasSource('https://te.tournamentsoftware.com/tournament/'), 'opponent tournament name must link to its official homepage');
 assert.ok(hasSource('bindParticipantNavigation($("profileContent"))'), 'profile and tournament pages must bind participant links');
 assert.ok(hasSource('function dedupeAgendaMatches(') && hasSource('sameAgendaMatch(existing, match)'), 'agenda must deduplicate shared CourtWatch matches');

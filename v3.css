@@ -299,3 +299,8 @@
 .opponentHistoryRound{display:block;overflow:hidden;text-overflow:ellipsis;padding-right:12px}
 .opponentHistoryTournamentHead h4 a{color:inherit;text-decoration:none}
 .opponentHistoryTournamentHead h4 a:hover,.opponentHistoryTournamentHead h4 a:focus-visible{text-decoration:underline}
+
+
+/* Full round labels: no truncation or overlap. */
+.opponentHistoryMatch{grid-template-columns:minmax(190px,max-content) minmax(520px,1fr) 120px;column-gap:28px}
+.opponentHistoryRound{overflow:visible;text-overflow:clip;padding-right:16px;white-space:nowrap}

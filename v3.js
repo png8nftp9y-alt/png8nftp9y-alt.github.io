@@ -1974,6 +1974,12 @@ function opponentHistoryRanking(person) {
       : "";
   return `n°${person.ranking} TE${category}`;
 }
+function opponentHistoryRoundLabel(value) {
+  const round = readableText(value || "");
+  return /round\s*robin|(?:^|\b)rr(?:\b|$)|group\s*stage/i.test(round)
+    ? "RR"
+    : round || "—";
+}
 function opponentTournamentEventLinks(tournament) {
   const events = new Map();
   for (const match of tournament.matches || []) {
@@ -2017,7 +2023,7 @@ function renderOpponentHistory(data) {
                     match.status === "completed"
                       ? readableText(match.score) || "—"
                       : readableText(match.status || "Programmato");
-                return `<div class="opponentHistoryMatch"><span class="opponentHistoryRound">${esc(readableText(match.round) || "—")}</span><span class="opponentHistoryOpponent">vs ${opponents || "Avversario da definire"}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
+                return `<div class="opponentHistoryMatch"><span class="opponentHistoryRound">${esc(opponentHistoryRoundLabel(match.round))}</span><span class="opponentHistoryOpponent">vs ${opponents || "Avversario da definire"}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
               })
               .join("")}</div></section>`;
           },

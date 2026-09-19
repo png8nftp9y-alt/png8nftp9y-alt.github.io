@@ -1230,3 +1230,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Il ranking resta visibile quando disponibile, senza data. Se manca, lo spazio viene omesso completamente e non appare alcuna dicitura sostitutiva.
 - Il nome del torneo apre la homepage ufficiale Tennis Europe; le etichette evento continuano ad aprire i rispettivi tabelloni.
 - La colonna del turno è stata ampliata a 160 pixel, con separazione di 24 pixel prima dell’avversario ed ellissi di sicurezza, eliminando sovrapposizioni.
+
+
+### Orientamento punteggio, ranking e turni nello studio avversario
+
+- Il punteggio dello storico viene normalizzato dalla prospettiva del giocatore studiato: se occupava la seconda squadra nel dato ufficiale, ciascun set viene invertito. Il suo numero è quindi sempre a sinistra, indipendentemente da vittoria o sconfitta.
+- Il turno non viene più troncato: la colonna usa larghezza minima di 190 pixel espandibile, nessuna ellissi e 28 pixel di separazione dall’avversario. Le diciture round robin, group stage o RR vengono sintetizzate in `RR`.
+- Se lo snapshot specifico della partita non contiene il ranking, l’API cerca nello storico Tennis Europe la pubblicazione più recente non successiva alla data del match, privilegiando la stessa categoria B/G U14/U16. Il ranking torna quindi visibile sia nell’intestazione sia accanto agli avversari incontrati quando esiste una pubblicazione ufficiale applicabile.
+- Per gli incontri futuri, il link alla pagina avversario è disponibile automaticamente appena il match compare in Agenda; la pagina esclude il match futuro e mostra esclusivamente il materiale precedente.
