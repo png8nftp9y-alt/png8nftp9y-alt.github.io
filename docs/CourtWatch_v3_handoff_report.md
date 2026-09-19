@@ -1070,3 +1070,9 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - L'unico rosso era `Court Watch Cloudflare D1 and app API #1882`, fermato nello step locale `Check source` prima di migrazioni, import o deploy. Il verificatore UI cercava numerose espressioni JavaScript soltanto nella forma compatta e con virgolette singole, mentre il formatter usa spazi e virgolette doppie. Le verifiche semantiche ora canonicalizzano esclusivamente spazi e stile delle virgolette, mantenendo tutti i marker richiesti e i divieti su prompt/confirm.
 - J60 Bari riceve un override manuale persistente `location: Bari, Italy` nel registro ufficiale `history/itf_official_metadata.json`. Il generatore ITF dà precedenza esplicita a tale valore manuale rispetto alla mappa e alle acceptance; anche il calendario pubblicato corrente è stato corretto direttamente. La modifica è limitata al torneo `J-J60-ITA-2026-002`.
 
+## Aggiornamento 19 settembre 2026 — eliminazione del doppio deploy Pages
+
+- Identificata la causa dei timeout ripetuti su `purging_cdn`: il repository usa già la pubblicazione automatica GitHub Pages da `main`, mentre `Deploy CourtWatch` avviava una seconda pubblicazione completa a ogni push. I numerosi commit automatici dei motori producevano quindi deployment concorrenti, cancellazioni e nuove purghe CDN prima del completamento della precedente.
+- Il workflow protetto `Deploy CourtWatch` resta disponibile manualmente con release guard, scudo funzionale e smoke test, ma non parte più automaticamente a ogni commit. La pubblicazione automatica ordinaria resta affidata all'unica pipeline nativa `pages build and deployment`, che continua a pubblicare i dati aggiornati da `main`.
+- Verificata nello stesso commit la permanenza dell'override manuale `Bari, Italy`, della precedenza del registro ITF nel generatore, del calendario corrente corretto e della riparazione del verificatore D1.
+

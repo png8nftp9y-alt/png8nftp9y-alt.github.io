@@ -1,7 +1,7 @@
 name: Deploy CourtWatch
 on:
-  push:
-    branches: [main]
+  # GitHub Pages already publishes main automatically. Keep this guarded
+  # deployment manual to avoid a second concurrent CDN purge on every bot commit.
   workflow_dispatch:
 permissions:
   contents: read
