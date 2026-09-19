@@ -301,7 +301,7 @@ const itfEntries = [...(itfHistory.entries || []), ...(itf.entries || [])].map(
       ...r,
       circuit: "itf",
       tournamentName: r.tournamentName || official.tournamentName,
-      location: official.location || r.location,
+      location: metadata.location || official.location || r.location,
       qualificationStartDate:
         metadata.qualificationStartDate || r.qualificationStartDate || "",
       officialStartDate:

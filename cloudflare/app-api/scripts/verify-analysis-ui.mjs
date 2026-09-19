@@ -4,6 +4,9 @@ import { fileURLToPath } from 'node:url';
 
 const source = await readFile(fileURLToPath(new URL('../../../v3.js', import.meta.url)), 'utf8');
 const apiSource = await readFile(fileURLToPath(new URL('../src/index.js', import.meta.url)), 'utf8');
+const canonical = value => String(value).replace(/\s+/g, '').replace(/"/g, "'");
+const hasSource = marker => canonical(source).includes(canonical(marker));
+const hasApiSource = marker => canonical(apiSource).includes(canonical(marker));
 
 assert.doesNotMatch(source, /\bprompt\s*\(/, 'v3.js must not use native prompt dialogs');
 assert.doesNotMatch(source, /\bconfirm\s*\(/, 'v3.js must not use native confirm dialogs');
@@ -19,17 +22,17 @@ for (const marker of [
   "method:'DELETE'",
   "location.origin+'/app/api'"
 ]) {
-  assert.ok(source.includes(marker), `missing analysis UI marker: ${marker}`);
+  assert.ok(hasSource(marker), `missing analysis UI marker: ${marker}`);
 }
-assert.ok(source.includes('playerRankingSummary(p)'), 'player profile must render both FITP and Tennis Europe rankings');
+assert.ok(hasSource('playerRankingSummary(p)'), 'player profile must render both FITP and Tennis Europe rankings');
 assert.doesNotMatch(source, /profileTitle\.append\(profileRankings\)/, 'player rankings must remain in the muted detail row');
-assert.ok(source.includes("source==='tennis-europe'?tournamentTeRanking:source==='fitp'?playerRecord?.ranking:''"), 'tournament page must use the ranking appropriate to that tournament');
-assert.ok(source.includes('${nationalityHtml(playerNationality)}${playerRanking?'), 'tournament page must place ranking after nationality');
-assert.ok(source.includes('${nationalityHtml(knownNationality(name,nationalities[index]))}${teRankHtml(rankings[index])}'), 'participant rankings must follow nationality');
-assert.ok(source.includes('const projection=await projectionPromise'), 'the UI must wait for the authoritative projection instead of flickering to a partial fallback');
-assert.ok(source.includes('retained=projected?.tennisEuropeRankings||projected?.tennisEuropeRanking?projected:previousPlayers.get(player.id)'), 'last known Tennis Europe rankings must survive a temporary projection gap');
-assert.ok(source.includes('retainedCurrentMatches=previousMatches.filter'), 'current matches must survive a temporary projection gap');
-assert.ok(source.includes('tennisEuropeRanking:retained.tennisEuropeRanking||retained.ranking'), 'JSON merge must preserve the FITP ranking');
-assert.ok(apiSource.includes('player.tennisEuropeRanking=labels.join'), 'API must expose Tennis Europe ranking separately');
+assert.ok(hasSource("source==='tennis-europe'?tournamentTeRanking:source==='fitp'?playerRecord?.ranking:''"), 'tournament page must use the ranking appropriate to that tournament');
+assert.ok(hasSource('${nationalityHtml(playerNationality)}${playerRanking?'), 'tournament page must place ranking after nationality');
+assert.ok(hasSource('${nationalityHtml(knownNationality(name,nationalities[index]))}${teRankHtml(rankings[index])}'), 'participant rankings must follow nationality');
+assert.ok(hasSource('const projection=await projectionPromise'), 'the UI must wait for the authoritative projection instead of flickering to a partial fallback');
+assert.ok(hasSource('retained=projected?.tennisEuropeRankings||projected?.tennisEuropeRanking?projected:previousPlayers.get(player.id)'), 'last known Tennis Europe rankings must survive a temporary projection gap');
+assert.ok(hasSource('retainedCurrentMatches=previousMatches.filter'), 'current matches must survive a temporary projection gap');
+assert.ok(hasSource('tennisEuropeRanking:retained.tennisEuropeRanking||retained.ranking'), 'JSON merge must preserve the FITP ranking');
+assert.ok(hasApiSource('player.tennisEuropeRanking=labels.join'), 'API must expose Tennis Europe ranking separately');
 assert.doesNotMatch(apiSource, /player\.ranking=labels\.join/, 'Tennis Europe ranking must not overwrite FITP ranking');
 console.log(JSON.stringify({ analysisUi: 'green', nativePrompt: false, nativeConfirm: false, actions: ['read', 'save', 'update', 'delete'] }));
