@@ -1165,3 +1165,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Per un avversario non seguito, il nome in Agenda è cliccabile e apre la nuova route dedicata. La prima intestazione contiene nome, nazionalità e ranking Tennis Europe fotografato per la partita, accompagnato dalla data della pubblicazione ranking.
 - La API applicativa espone ora insieme al ranking anche `profile_id` e `ranking_date` degli snapshot già presenti in D1. Non vengono introdotte nuove scansioni o riscritture massive.
 - La pagina avversario non usa avatar né iniziali: tali elementi restano esclusivi dei giocatori CourtWatch. È predisposta la sezione «Stato di forma — Ultimi 5 tornei», che verrà popolata dal relativo storico limitato.
+
+
+### Rifinitura Agenda — gerarchia avversari e vincitore esplicito
+
+- Il nome di un avversario non CourtWatch resta cliccabile ma usa peso normale e la dimensione secondaria della riga «vs»; il grassetto non viene più applicato agli avversari esterni.
+- Quando l’avversario è anch’esso CourtWatch, il suo nome riceve la stessa dimensione e lo stesso peso del giocatore CourtWatch mostrato sopra. Entrambi restano collegati alle rispettive pagine complete.
+- Per una sfida conclusa fra due giocatori CourtWatch, la scheda unica e neutrale non mostra più il solo punteggio dalla prospettiva del primo record: indica `Vincitore: Nome Cognome · Risultato: punteggio`, usando il campo autorevole `advances` della proiezione della partita.
+- Per tutti gli altri incontri il formato del risultato resta invariato. La modifica non cambia acquisizione, D1, motori o schedulazioni.

@@ -869,11 +869,28 @@ function opponentHtml(m, x) {
           ),
           monitored = courtWatchPlayerByName(name);
         return monitored
-          ? `<button class="inlinePlayerLink opponentPlayerLink" data-open-player="${esc(monitored.id)}">${content}</button>`
+          ? `<button class="inlinePlayerLink opponentPlayerLink courtWatchOpponent" data-open-player="${esc(monitored.id)}">${content}</button>`
           : `<button class="inlinePlayerLink opponentPlayerLink" data-open-opponent="${esc(profileIds[index] || "")}" data-opponent-name="${esc(readablePerson(name))}" data-opponent-index="${index}" data-opponent-match="${esc(m.matchId || m.id || "")}">${content}</button>`;
       })
       .join('<span class="teamSeparator">/</span>');
   return `vs <span class="opponentName">${people}</span><span class="opponentClub">${club}</span>`;
+}
+function agendaResultHtml(m, x) {
+  if (!m.result) return "";
+  const names = m.opponentOptions?.length
+      ? m.opponentOptions
+      : String(x.op || "").split(/\s*\/\s*|\s+oppure\s+/i),
+    courtWatchOpponent =
+      names.length === 1 ? courtWatchPlayerByName(names[0]) : null,
+    winner =
+      courtWatchOpponent && m.advances === true
+        ? readablePerson(m.playerName)
+        : courtWatchOpponent && m.advances === false
+          ? readablePerson(courtWatchOpponent.name)
+          : "";
+  return winner
+    ? `<p class="result sharedCourtWatchResult">Vincitore: ${esc(winner)} · Risultato: ${esc(readableText(m.result))}</p>`
+    : `<p class="result${m.advances === false ? " loss" : m.advances === true ? " win" : ""}">Risultato: ${esc(readableText(m.result))}</p>`;
 }
 function plainOpponentHtml(m, x) {
   if (!x.op) return pendingOpponentHtml(m);
@@ -1614,7 +1631,7 @@ function renderAgenda() {
                       chronologicalMeta = mixedChronological
                         ? `<div class="agendaChronologicalTournament"><div>${itemTKey ? `<button data-open-tournament="${esc(itemTKey)}">${esc(itemName)}</button>` : `<span>${esc(itemName)}</span>`}<small>${esc(itemPlace)}</small></div><span class="type ${itemSource}">${agendaCircuitLabel(m)}</span></div>`
                         : "";
-                    return `<article class="agendaItem${loss}${win}${agendaLongCourt(m) ? " agendaLongCourt" : ""}"><div class="agendaWhen"><div class="agendaRoundLabels">${round ? (oopUrl ? `<a class="type roundCode agendaRoundOopLink" ${whenAttrs.trim()}>${esc(round)}</a>` : `<span class="type roundCode">${esc(round)}</span>`) : ""}${agendaDrawCodeHtml(m, itemTournament)}</div><${whenTag} class="agendaWhenDetails${oopUrl ? " agendaWhenLink" : ""}"${whenAttrs}><small class="agendaCourtField${m.court ? "" : " agendaFieldEmpty"}">${m.court ? esc(agendaCourtName(m)) : "—"}</small>${schedule.restText ? `<small class="agendaRestLabel"><span>${esc(schedule.restText)}</span>${schedule.restDetail ? `<em>${esc(schedule.restDetail)}</em>` : ""}</small>` : ""}<small class="agendaCourtMatch${numberText ? "" : " agendaFieldEmpty"}">${numberText ? `<span>${esc(numberText)}</span>${schedule.numberDetail ? `<em>${esc(schedule.numberDetail)}</em>` : ""}` : "—"}</small><time class="${schedule.timeText ? "" : "agendaFieldEmpty"}">${schedule.timeText ? esc(schedule.timeText) : "—"}</time></${whenTag}></div><div class="agendaMatchBody">${chronologicalMeta}<div class="agendaTitle">${agendaPlayerTeamLinksHtml(m)}</div><p class="versus">${opponentHtml(m, x)}</p>${m.result ? `<p class="result${loss}${win}">Risultato: ${esc(readableText(m.result))}</p>` : ""}${x.condition ? `<p class="condition">${esc(readableText(x.condition))}</p>` : ""}</div></article>`;
+                    return `<article class="agendaItem${loss}${win}${agendaLongCourt(m) ? " agendaLongCourt" : ""}"><div class="agendaWhen"><div class="agendaRoundLabels">${round ? (oopUrl ? `<a class="type roundCode agendaRoundOopLink" ${whenAttrs.trim()}>${esc(round)}</a>` : `<span class="type roundCode">${esc(round)}</span>`) : ""}${agendaDrawCodeHtml(m, itemTournament)}</div><${whenTag} class="agendaWhenDetails${oopUrl ? " agendaWhenLink" : ""}"${whenAttrs}><small class="agendaCourtField${m.court ? "" : " agendaFieldEmpty"}">${m.court ? esc(agendaCourtName(m)) : "—"}</small>${schedule.restText ? `<small class="agendaRestLabel"><span>${esc(schedule.restText)}</span>${schedule.restDetail ? `<em>${esc(schedule.restDetail)}</em>` : ""}</small>` : ""}<small class="agendaCourtMatch${numberText ? "" : " agendaFieldEmpty"}">${numberText ? `<span>${esc(numberText)}</span>${schedule.numberDetail ? `<em>${esc(schedule.numberDetail)}</em>` : ""}` : "—"}</small><time class="${schedule.timeText ? "" : "agendaFieldEmpty"}">${schedule.timeText ? esc(schedule.timeText) : "—"}</time></${whenTag}></div><div class="agendaMatchBody">${chronologicalMeta}<div class="agendaTitle">${agendaPlayerTeamLinksHtml(m)}</div><p class="versus">${opponentHtml(m, x)}</p>${agendaResultHtml(m, x)}${x.condition ? `<p class="condition">${esc(readableText(x.condition))}</p>` : ""}</div></article>`;
                   })
                   .join("")}</div>`,
             )

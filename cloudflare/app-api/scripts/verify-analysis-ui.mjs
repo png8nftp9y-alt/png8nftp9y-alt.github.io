@@ -36,6 +36,8 @@ assert.ok(hasSource('tennisEuropeRanking:retained.tennisEuropeRanking||retained.
 assert.ok(hasApiSource('player.tennisEuropeRanking=labels.join'), 'API must expose Tennis Europe ranking separately');
 assert.ok(hasSource('function renderOpponent(') && hasSource('opponentTeRankingDates'), 'opponent page must expose ranking date');
 assert.ok(hasSource('function dedupeAgendaMatches(') && hasSource('sameAgendaMatch(existing, match)'), 'agenda must deduplicate shared CourtWatch matches');
+assert.ok(hasSource('function agendaResultHtml(') && hasSource('Vincitore:'), 'shared CourtWatch match must name the winner');
+assert.ok(hasSource('courtWatchOpponent') && hasSource('opponentPlayerLink'), 'opponent styling must distinguish CourtWatch players');
 assert.ok(hasApiSource("profileKey=prefix+'ProfileIds'") && hasApiSource("dateKey=prefix+'RankingDates'"), 'API must expose opponent ranking identity and date');
 assert.doesNotMatch(apiSource, /player\.ranking=labels\.join/, 'Tennis Europe ranking must not overwrite FITP ranking');
 console.log(JSON.stringify({ analysisUi: 'green', nativePrompt: false, nativeConfirm: false, actions: ['read', 'save', 'update', 'delete'] }));
