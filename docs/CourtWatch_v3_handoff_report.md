@@ -1051,3 +1051,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Ripulita la dicitura tecnica `View in Google Maps` dagli indirizzi ITF: viene eliminata sia durante l'acquisizione del fact sheet sia in fase di visualizzazione, così sono corretti anche i dati già memorizzati (incluso Bari) senza un backfill globale.
 - Le città internazionali ricevute interamente in maiuscolo vengono normalizzate nella visualizzazione del calendario (`BARI` → `Bari`); il dato sorgente resta invariato e la regola vale automaticamente per i prossimi tornei.
 - Chiusura regressione J60 Bari: inseriti nel registro persistente i dati del fact sheet ufficiale (qualificazioni 3 ottobre 2026, main draw 5 ottobre, NEW COUNTRY TENNIS ACADEMY A.S.D. c/o COUNTRY CLUB BARI, STRADA SANTA CATERINA 18/G, Bari, Bari, 70124, Italy). Il generatore ora applica dal registro anche `qualificationStartDate` e `officialStartDate`, non soltanto sede e indirizzo; inoltre l'indirizzo ufficiale persistente ha precedenza su copie vuote o obsolete degli shard. I cicli automatici possono aggiornare l'acceptance senza riportare l'inizio al main draw o cancellare l'indirizzo.
+
+## Aggiornamento 19 settembre 2026 — riparazione deploy 1689
+
+- Il run `Deploy CourtWatch #1689` è fallito esclusivamente nello scudo funzionale alla verifica `transizione giornaliera stato torneo`; release guard e preparazione del browser erano verdi, mentre pubblicazione e verifica remota sono state saltate.
+- La logica applicativa era già presente in `renderDataSignature` come `today: iso(new Date())`. Il controllo cercava invece la sola forma non formattata `today:iso(new Date())`, producendo un falso rosso dopo la formattazione automatica del sorgente.
+- L'asserzione usa ora un'espressione regolare limitata che tollera esclusivamente gli spazi sintattici attorno ai due punti, continuando a richiedere `today`, `iso` e `new Date()` nella firma di rendering. Nessuna logica applicativa, dato sportivo, operazione D1, frequenza o schedulazione è stata modificata.
+

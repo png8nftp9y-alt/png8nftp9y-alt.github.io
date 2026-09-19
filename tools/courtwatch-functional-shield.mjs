@@ -67,7 +67,7 @@ try{
   requireCheck(await page.locator('#profileTournamentStatusFilter').count()===0,'filtro stato tornei rimosso');
   requireCheck(appSource.includes("stats.innerHTML='<span class=\"scheduledTournamentLabel\">PROGRAMMATO</span>'"),'programmato senza freccia');
   requireCheck(appSource.includes("statSpans[0].hidden=profileOutcomeFilter!=='all'"),'statistiche torneo sincronizzate con esito');
-  requireCheck(appSource.includes('today:iso(new Date())'),'transizione giornaliera stato torneo');
+  requireCheck(/today\s*:\s*iso\(new Date\(\)\)/.test(appSource),'transizione giornaliera stato torneo');
 
   await analysisButton.click();
   const editor=page.locator('#matchAnalysisEditor'),text=editor.locator('.analysisEditorText');
