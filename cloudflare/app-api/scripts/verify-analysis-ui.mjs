@@ -43,6 +43,8 @@ assert.ok(hasSource('function loadOpponentHistory(') && hasSource('/opponent-pro
 assert.ok(hasSource('function opponentTournamentEventLinks(') && hasSource('opponentTournamentDraw'), 'opponent tournaments must link event badges to draws');
 assert.ok(hasSource('<span class="opponentHistoryOpponent">vs ${opponents'), 'opponent history rows must prefix the opponent with vs');
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
+assert.ok(hasApiSource('excludeMatchId') && hasSource('&excludeMatchId='), 'opponent study page must exclude the CourtWatch match');
+assert.ok(hasSource('https://te.tournamentsoftware.com/tournament/'), 'opponent tournament name must link to its official homepage');
 assert.ok(hasSource('bindParticipantNavigation($("profileContent"))'), 'profile and tournament pages must bind participant links');
 assert.ok(hasSource('function dedupeAgendaMatches(') && hasSource('sameAgendaMatch(existing, match)'), 'agenda must deduplicate shared CourtWatch matches');
 assert.ok(hasSource('function agendaResultHtml(') && hasSource('Vincitore:'), 'shared CourtWatch match must name the winner');

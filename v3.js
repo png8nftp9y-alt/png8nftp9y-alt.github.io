@@ -2001,8 +2001,11 @@ function renderOpponentHistory(data) {
   body.innerHTML = tournaments.length
     ? tournaments
         .map(
-          (tournament) =>
-            `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${esc(readableText(tournament.name))}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span></header><div class="opponentHistoryMatches">${(tournament.matches || [])
+          (tournament) => {
+            const home = tournament.competitionId
+              ? `https://te.tournamentsoftware.com/tournament/${encodeURIComponent(tournament.competitionId)}`
+              : "";
+            return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span></header><div class="opponentHistoryMatches">${(tournament.matches || [])
               .map((match) => {
                 const opponents = (match.opponents || [])
                     .map(
@@ -2012,16 +2015,17 @@ function renderOpponentHistory(data) {
                     .join(" / "),
                   outcome =
                     match.status === "completed"
-                      ? `${match.won ? "V" : "S"} ${readableText(match.score) || "—"}`
+                      ? readableText(match.score) || "—"
                       : readableText(match.status || "Programmato");
                 return `<div class="opponentHistoryMatch"><span class="opponentHistoryRound">${esc(readableText(match.round) || "—")}</span><span class="opponentHistoryOpponent">vs ${opponents || "Avversario da definire"}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
               })
-              .join("")}</div></section>`,
+              .join("")}</div></section>`;
+          },
         )
         .join("")
     : '<div class="empty">Nessuno storico disponibile prima di questa data.</div>';
 }
-async function loadOpponentHistory(name, asOf) {
+async function loadOpponentHistory(name, asOf, excludeMatchId) {
   const body = $("opponentTournamentHistory");
   if (body) body.innerHTML = '<div class="empty">Caricamento storico…</div>';
   try {
@@ -2030,7 +2034,9 @@ async function loadOpponentHistory(name, asOf) {
         "/opponent-profile?name=" +
         encodeURIComponent(name) +
         "&asOf=" +
-        encodeURIComponent(asOf || ""),
+        encodeURIComponent(asOf || "") +
+        "&excludeMatchId=" +
+        encodeURIComponent(excludeMatchId || ""),
       privateApiOptions({ cache: "no-store" }),
     );
     if (!response.ok) throw Error("opponent history");
@@ -2085,17 +2091,17 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
     flag = nationalityHtml(nationality),
     rankingLabel = ranking
       ? `n°${esc(ranking)} TE${rankingCategory ? ` ${esc(rankingCategory)}` : ""}${rankingDate ? ` · (ranking del ${esc(displayDate(rankingDate))})` : ""}`
-      : "Ranking non disponibile",
+      : "",
     follow = $("removeProfilePlayer");
   follow.hidden = false;
   follow.textContent = "Segui giocatore";
   follow.title = "Segui giocatore";
   follow.setAttribute("aria-label", "Segui giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><span class="opponentProfileNationality">${flag || "Nazionalità non disponibile"}</span><span class="opponentProfileRanking">${rankingLabel}</span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><span class="opponentProfileNationality">${flag || "Nazionalità non disponibile"}</span>${rankingLabel ? `<span class="opponentProfileRanking">${rankingLabel}</span>` : ""}</div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
-  loadOpponentHistory(name, match.date);
+  loadOpponentHistory(name, match.date, match.matchId || match.id || "");
 }
 function renderProfile(id) {
   const p = state.data.players.find((x) => x.id === id);

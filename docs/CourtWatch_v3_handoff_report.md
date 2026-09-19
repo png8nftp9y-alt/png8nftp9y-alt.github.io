@@ -1220,3 +1220,13 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Ogni nominativo incontrato è preceduto da `vs`.
 - Accanto al nome del torneo vengono mostrate le etichette evento effettivamente disputate dall’avversario, per esempio `GS14`; quando il match contiene il collegamento ufficiale al draw, l’etichetta apre direttamente quel tabellone in una nuova scheda.
 - La riga unica contiene ora turno, avversario con nazionalità/bandiera/ranking e risultato.
+
+
+### Pagina avversario come studio pre-partita
+
+- La partita CourtWatch dalla quale viene aperta la pagina è ora esclusa esplicitamente tramite `excludeMatchId`. Restano visibili soltanto gli incontri precedenti o, nella stessa data, gli altri incontri già presenti: la scheda serve a studiare l’avversario prima del match considerato.
+- Per una partita futura la pagina viene resa disponibile automaticamente appena il match entra in Agenda, perché il collegamento nasce dalla stessa proiezione Agenda; lo storico viene limitato alla data del match ed esclude il match stesso.
+- Le righe risultato non mostrano più `V` o `S`: riportano soltanto il punteggio. Lo stato di forma aggregato continua a indicare vittorie e sconfitte.
+- Il ranking resta visibile quando disponibile, senza data. Se manca, lo spazio viene omesso completamente e non appare alcuna dicitura sostitutiva.
+- Il nome del torneo apre la homepage ufficiale Tennis Europe; le etichette evento continuano ad aprire i rispettivi tabelloni.
+- La colonna del turno è stata ampliata a 160 pixel, con separazione di 24 pixel prima dell’avversario ed ellissi di sicurezza, eliminando sovrapposizioni.
