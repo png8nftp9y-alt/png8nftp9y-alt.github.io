@@ -1189,3 +1189,15 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - La stessa pagina limitata viene usata anche per un compagno di doppio non CourtWatch. Il link conserva il ruolo (`opponent` o `partner`), l’identità Tennis Europe, la partita e l’indice del partecipante, così intestazione, nazionalità e snapshot ranking vengono letti dai campi corretti.
 - Se avversario o compagno è già CourtWatch, il link continua ad aprire direttamente la pagina CourtWatch completa.
 - La proiezione espone anche l’identificativo sorgente del compagno come fallback; non vengono aggiunte acquisizioni, scansioni complete o riscritture D1.
+
+
+### Rifinitura visiva nazionalità e data ranking avversario
+
+- Nell’intestazione su una sola riga, codice nazionalità e bandiera usano ora la stessa scala tipografica del nome del giocatore; la bandiera è dimensionata proporzionalmente e resta allineata al testo.
+- La data dello snapshot è mostrata nel formato `(ranking del …)` accanto a posizione e categoria U14/U16.
+- Il ranking e la relativa data hanno `font-style: normal` esplicito e non possono ereditare il corsivo.
+- Restano in vigore: avversario esterno a peso normale; avversario CourtWatch con stessa dimensione e grassetto del primo giocatore; vincitore nominato esplicitamente nelle sfide CourtWatch concluse; formato invariato negli altri incontri.
+
+- Precisazione visiva: il compagno di doppio resta in grassetto anche quando non è CourtWatch; il clic apre comunque la pagina avversario limitata.
+
+- Correzione terminologica richiesta: ranking e data usano peso normale, quindi non sono in grassetto; il compagno di doppio resta invece in grassetto.

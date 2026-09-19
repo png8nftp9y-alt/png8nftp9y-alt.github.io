@@ -853,7 +853,7 @@ function participantLinkHtml(m, role, name, index, content, courtWatchClass = ""
         : m.opponentTeProfileIds || m.opponentSourceIds || [];
   return monitored
     ? `<button class="inlinePlayerLink ${courtWatchClass}" data-open-player="${esc(monitored.id)}">${content}</button>`
-    : `<button class="inlinePlayerLink opponentPlayerLink" data-open-opponent="${esc(profileIds[index] || "")}" data-opponent-role="${esc(role)}" data-opponent-name="${esc(readablePerson(name))}" data-opponent-index="${index}" data-opponent-match="${esc(m.matchId || m.id || "")}">${content}</button>`;
+    : `<button class="inlinePlayerLink opponentPlayerLink${role === "partner" ? " doublesPartnerLink" : ""}" data-open-opponent="${esc(profileIds[index] || "")}" data-opponent-role="${esc(role)}" data-opponent-name="${esc(readablePerson(name))}" data-opponent-index="${index}" data-opponent-match="${esc(m.matchId || m.id || "")}">${content}</button>`;
 }
 function partnerHtml(m) {
   const names = String(m.partner || "")
@@ -2008,7 +2008,7 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
           : "",
     flag = nationalityHtml(nationality),
     rankingLabel = ranking
-      ? `n°${esc(ranking)} TE${rankingCategory ? ` ${esc(rankingCategory)}` : ""}${rankingDate ? ` · ranking del ${esc(displayDate(rankingDate))}` : ""}`
+      ? `n°${esc(ranking)} TE${rankingCategory ? ` ${esc(rankingCategory)}` : ""}${rankingDate ? ` · (ranking del ${esc(displayDate(rankingDate))})` : ""}`
       : "Ranking non disponibile",
     follow = $("removeProfilePlayer");
   follow.hidden = false;

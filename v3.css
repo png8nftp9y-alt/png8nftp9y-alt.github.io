@@ -254,10 +254,12 @@
 .opponentProfileHero{padding:24px;overflow-x:auto}
 .opponentProfileIdentity{display:flex;align-items:center;gap:14px;min-width:max-content;white-space:nowrap}
 .opponentProfileIdentity h2{margin:0;font-size:30px}
-.opponentProfileNationality{color:var(--muted)}
-.opponentProfileIdentity .nationality{white-space:nowrap}
-.opponentProfileRanking{font-weight:700;color:var(--ink)!important}
+.opponentProfileNationality,.opponentProfileIdentity .nationality{font-size:30px;font-weight:700;line-height:1;color:var(--ink);white-space:nowrap}
+.opponentProfileNationality .countryFlag{width:36px;height:24px;vertical-align:0}
+.opponentProfileRanking{font-style:normal!important;font-weight:400;color:var(--ink)!important}
+.opponentProfileRanking *{font-style:normal!important}
 .opponentHistoryPlaceholder{margin-top:14px}
 .opponentPlayerLink{font-size:inherit;font-weight:400}
+.doublesPartnerLink{font-weight:800}
 .agendaMatchBody .opponentPlayerLink.courtWatchOpponent{font-size:17px;font-weight:850;line-height:1.25}
 .sharedCourtWatchResult{color:var(--green)!important;font-weight:800}
