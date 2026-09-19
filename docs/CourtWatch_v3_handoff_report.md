@@ -1132,3 +1132,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - La riga del watchdog è stata rinominata `Deploy watchdog Cloudflare`: la data mostrata è correttamente la data dell'ultima pubblicazione del Worker e della sua configurazione cron, non l'ultima esecuzione pianificata.
 - L'operatività sorvegliata continua a essere rappresentata dalle righe dei workflow FITP, Tennis Europe e ITF effettivamente controllati dal watchdog. Un deploy vecchio ma verde non viene più presentato come watchdog fermo.
 - Nessuna modifica alle frequenze, ai motori, ai dati sportivi, a D1 o R2; cambia soltanto l'origine e il significato delle informazioni mostrate nell'Admin.
+
+
+## Aggiornamento 19 settembre 2026 — scaglionamento watchdog per circuito
+
+- Le frequenze live restano identiche, una volta ogni 15 minuti, ma i dispatch non partono più tutti contemporaneamente: ITF ai minuti 00/15/30/45, Tennis Europe ai minuti 05/20/35/50 e FITP ai minuti 10/25/40/55.
+- I controlli di manutenzione D1 e sicurezza ITF 120 giorni restano ogni 10 minuti e sono spostati ai minuti 03/13/23/33/43/53, separandoli dai dispatch principali.
+- La protezione contro duplicati nello stesso quarto d'ora, i controlli sui run già attivi e le frequenze di acquisizione restano invariati. Lo scaglionamento riduce la concorrenza simultanea su GitHub Actions, rete e R2 senza diminuire la copertura.
+- Aggiornati i test del watchdog per certificare l'esatta appartenenza dei workflow ai tre gruppi e la permanenza dei controlli di manutenzione.

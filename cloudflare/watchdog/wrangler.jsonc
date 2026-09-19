@@ -5,7 +5,12 @@
   "compatibility_date": "2026-08-29",
   "compatibility_flags": ["nodejs_compat"],
   "triggers": {
-    "crons": ["*/10 * * * *", "*/15 * * * *"]
+    "crons": [
+      "0,15,30,45 * * * *",
+      "5,20,35,50 * * * *",
+      "10,25,40,55 * * * *",
+      "3,13,23,33,43,53 * * * *"
+    ]
   },
   "observability": {
     "enabled": true,

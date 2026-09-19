@@ -2,8 +2,13 @@ const REPOSITORY = "png8nftp9y-alt/png8nftp9y-alt.github.io";
 const RAW_BASE = `https://raw.githubusercontent.com/${REPOSITORY}/main`;
 const API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
 
-const LIVE_CRON = "*/15 * * * *";
-const LIVE_IDS = new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one", "tennis-europe-oop", "fitp", "tennis-europe"]);
+const MAINTENANCE_CRON = "3,13,23,33,43,53 * * * *";
+const LIVE_GROUPS = new Map([
+  ["0,15,30,45 * * * *", new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one"])],
+  ["5,20,35,50 * * * *", new Set(["tennis-europe-oop", "tennis-europe"])],
+  ["10,25,40,55 * * * *", new Set(["fitp"])],
+]);
+const LIVE_IDS = new Set([...LIVE_GROUPS.values()].flatMap((ids) => [...ids]));
 
 const TARGETS = [
   { id: "tennis-europe-oop", workflow: "courtwatch-tennis-europe-oop-live.yml" },
@@ -128,8 +133,12 @@ async function checkLiveSchedule(target, env, scheduledTime) {
 async function runWatchdog(env, controller) {
   if (!env.COURTWATCH_GITHUB_TOKEN) throw new Error("Missing COURTWATCH_GITHUB_TOKEN");
   const now = Date.now();
-  const liveTick = controller.cron === LIVE_CRON;
-  const targets = TARGETS.filter((target) => LIVE_IDS.has(target.id) === liveTick);
+  const liveIds = LIVE_GROUPS.get(controller.cron);
+  const liveTick = Boolean(liveIds);
+  if (!liveTick && controller.cron !== MAINTENANCE_CRON) return [];
+  const targets = liveTick
+    ? TARGETS.filter((target) => liveIds.has(target.id))
+    : TARGETS.filter((target) => !LIVE_IDS.has(target.id));
   const settled = await Promise.allSettled(targets.map((target) =>
     liveTick ? checkLiveSchedule(target, env, controller.scheduledTime) : checkTarget(target, env, now),
   ));
