@@ -386,7 +386,14 @@ const cityCountry = (s) => {
     .trim();
   if (v.includes("|")) v = v.split("|").pop().trim();
   const m = v.match(/([\p{L}' .-]+,\s*[\p{L}' .-]+)(?:\s|$)/u);
-  return (m ? m[1] : v).trim() || "Città/stato da pubblicare";
+  const label = (m ? m[1] : v).trim();
+  if (!label) return "Città/stato da pubblicare";
+  const parts = label.split(",");
+  if (/^[\p{Lu}' .-]+$/u.test(parts[0]) && /\p{Lu}/u.test(parts[0]))
+    parts[0] = parts[0]
+      .toLocaleLowerCase("it-IT")
+      .replace(/(^|[\s'-])\p{Ll}/gu, (letter) => letter.toLocaleUpperCase("it-IT"));
+  return parts.join(",").trim();
 };
 const displayDate = (value) => {
   const m = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
