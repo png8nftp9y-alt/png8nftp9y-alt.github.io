@@ -1156,3 +1156,12 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - In Agenda e nel dettaglio partita viene mostrato `Avversario da definire`. La dicitura `Possibili: Nome A / Nome B` compare soltanto se la pagina ufficiale associa senza ambiguità una riga con il giocatore noto e una riga con esattamente due candidati; in caso contrario non vengono formulate ipotesi.
 - Ogni riga pendente usa l’identità ufficiale dello slot (torneo, data, campo e numero d’ordine). Nell’import incrementale, un record successivo dello stesso slot elimina quello precedente prima dell’inserimento: quando il vincitore viene pubblicato resta una sola partita con l’avversario effettivo.
 - Adeguati il generatore D1 e i controlli di parità per accettare l’avversario vuoto soltanto quando la sorgente lo marca esplicitamente come pendente. Gli incontri completi continuano a richiedere l’avversario e un’anomalia reale resta rossa.
+
+
+## Aggiornamento 19 settembre 2026 — incontri fra giocatori CourtWatch e intestazione avversario
+
+- L’Agenda deduplica ora tutte le proiezioni Tennis Europe che condividono lo stesso identificativo ufficiale di partita, non soltanto i doppi. Se due giocatori CourtWatch si affrontano, la vista generale mostra una sola scheda; il record ufficiale resta unico e le due prospettive personali restano disponibili nei rispettivi storici.
+- Il nome mostrato come avversario viene confrontato con il registro CourtWatch. Se appartiene a un giocatore seguito, usa lo stesso stile in grassetto e lo stesso collegamento alla pagina CourtWatch completa; non viene aperta la pagina avversario limitata.
+- Per un avversario non seguito, il nome in Agenda è cliccabile e apre la nuova route dedicata. La prima intestazione contiene nome, nazionalità e ranking Tennis Europe fotografato per la partita, accompagnato dalla data della pubblicazione ranking.
+- La API applicativa espone ora insieme al ranking anche `profile_id` e `ranking_date` degli snapshot già presenti in D1. Non vengono introdotte nuove scansioni o riscritture massive.
+- La pagina avversario non usa avatar né iniziali: tali elementi restano esclusivi dei giocatori CourtWatch. È predisposta la sezione «Stato di forma — Ultimi 5 tornei», che verrà popolata dal relativo storico limitato.

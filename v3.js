@@ -836,17 +836,44 @@ function pendingOpponentHtml(m) {
     ? `Avversario da definire · Possibili: ${possible.map(esc).join(" / ")}`
     : "Avversario da definire";
 }
+function courtWatchPlayerByName(name) {
+  const wanted = readablePerson(name);
+  return (state.data?.players || []).find(
+    (player) =>
+      readablePerson(player.name).localeCompare(wanted, "it", {
+        sensitivity: "base",
+      }) === 0,
+  );
+}
 function opponentHtml(m, x) {
   if (!x.op) return pendingOpponentHtml(m);
   const club = m.opponentClub
       ? ` · circolo ${esc(readableText(m.opponentClub))}`
       : "",
+    names = m.opponentOptions?.length
+      ? m.opponentOptions
+      : String(x.op).split(/\s*\/\s*|\s+oppure\s+/i),
     nationalities = m.opponentNationalities?.length
       ? m.opponentNationalities
       : m.opponentNationality
         ? [m.opponentNationality]
-        : [];
-  return `vs <span class="opponentName">${peopleHtml(x.op, nationalities, m.opponentTeRankings || [])}</span><span class="opponentClub">${club}</span>`;
+        : [],
+    rankings = m.opponentTeRankings || [],
+    profileIds = m.opponentTeProfileIds || m.opponentSourceIds || [],
+    people = names
+      .map((name, index) => {
+        const content = playerLabelHtml(
+            name,
+            nationalities[index] || "",
+            rankings[index],
+          ),
+          monitored = courtWatchPlayerByName(name);
+        return monitored
+          ? `<button class="inlinePlayerLink opponentPlayerLink" data-open-player="${esc(monitored.id)}">${content}</button>`
+          : `<button class="inlinePlayerLink opponentPlayerLink" data-open-opponent="${esc(profileIds[index] || "")}" data-opponent-name="${esc(readablePerson(name))}" data-opponent-index="${index}" data-opponent-match="${esc(m.matchId || m.id || "")}">${content}</button>`;
+      })
+      .join('<span class="teamSeparator">/</span>');
+  return `vs <span class="opponentName">${people}</span><span class="opponentClub">${club}</span>`;
 }
 function plainOpponentHtml(m, x) {
   if (!x.op) return pendingOpponentHtml(m);
@@ -1403,34 +1430,31 @@ function agendaTeamNames(m) {
     .map((name) => readablePerson(name).toLocaleUpperCase("it-IT"))
     .sort();
 }
-function sameAgendaDouble(a, b) {
+function sameAgendaMatch(a, b) {
+  if (circuit(a) !== circuit(b) || a.date !== b.date) return false;
+  const aid = String(a.matchId || ""),
+    bid = String(b.matchId || "");
+  if (aid && bid) return aid === bid;
   if (!matchMeta(a).isDouble || !matchMeta(b).isDouble) return false;
   if (
-    circuit(a) !== circuit(b) ||
     String(a.competitionId || a.tournamentName || "") !==
-      String(b.competitionId || b.tournamentName || "") ||
-    a.date !== b.date
+    String(b.competitionId || b.tournamentName || "")
   )
     return false;
   const at = agendaTeamNames(a),
     bt = agendaTeamNames(b);
-  if (
-    at.length < 2 ||
-    at.length !== bt.length ||
-    at.some((name, index) => name !== bt[index])
-  )
-    return false;
-  const aid = String(a.matchId || ""),
-    bid = String(b.matchId || "");
-  return aid && bid
-    ? aid === bid
-    : [a.court, a.time, a.round, agendaCourtMatchNumber(a)].join("|") ===
-        [b.court, b.time, b.round, agendaCourtMatchNumber(b)].join("|");
+  return (
+    at.length >= 2 &&
+    at.length === bt.length &&
+    at.every((name, index) => name === bt[index]) &&
+    [a.court, a.time, a.round, agendaCourtMatchNumber(a)].join("|") ===
+      [b.court, b.time, b.round, agendaCourtMatchNumber(b)].join("|")
+  );
 }
-function dedupeAgendaDoubles(items) {
+function dedupeAgendaMatches(items) {
   const unique = [];
   for (const match of items) {
-    if (!unique.some((existing) => sameAgendaDouble(existing, match)))
+    if (!unique.some((existing) => sameAgendaMatch(existing, match)))
       unique.push(match);
   }
   return unique;
@@ -1453,7 +1477,7 @@ function agendaMatchRows(matches) {
 }
 function renderAgenda() {
   const key = iso(state.agenda),
-    items = dedupeAgendaDoubles(
+    items = dedupeAgendaMatches(
       (state.data.agenda || []).filter(
         (m) => m.date === key && state.selected.has(m.playerId),
       ),
@@ -1609,6 +1633,18 @@ function renderAgenda() {
   document
     .querySelectorAll("#dailyAgenda [data-open-player]")
     .forEach((x) => (x.onclick = () => openProfile(x.dataset.openPlayer)));
+  document
+    .querySelectorAll("#dailyAgenda [data-open-opponent]")
+    .forEach(
+      (x) =>
+        (x.onclick = () =>
+          openOpponent(
+            x.dataset.opponentMatch,
+            x.dataset.opponentIndex,
+            x.dataset.openOpponent,
+            x.dataset.opponentName,
+          )),
+    );
 }
 function tournamentKey(t) {
   const identity =
@@ -1856,6 +1892,46 @@ function renderIfDataChanged() {
 function openProfile(id) {
   location.hash = "player/" + encodeURIComponent(id);
   scrollTo({ top: 0, behavior: "smooth" });
+}
+function openOpponent(matchId, index, profileId, name) {
+  const identity = profileId || readablePerson(name);
+  location.hash =
+    "opponent/" +
+    encodeURIComponent(identity) +
+    "/" +
+    encodeURIComponent(matchId) +
+    "/" +
+    String(Number(index) || 0);
+  scrollTo({ top: 0, behavior: "smooth" });
+}
+function renderOpponent(identity, matchId, index) {
+  const sources = [...(state.data.matches || []), ...(state.data.agenda || [])],
+    match =
+      sources.find(
+        (row) => String(row.matchId || row.id || "") === String(matchId),
+      ) || null;
+  if (!match) {
+    location.hash = "";
+    return;
+  }
+  const names = match.opponentOptions?.length
+      ? match.opponentOptions
+      : String(match.opponent || "").split(/\s*\/\s*/),
+    name = readablePerson(names[index] || names[0] || identity),
+    nationality =
+      (match.opponentNationalities || [match.opponentNationality || ""])[
+        index
+      ] || "",
+    ranking = (match.opponentTeRankings || [])[index],
+    rankingDate = (match.opponentTeRankingDates || [])[index] || "",
+    flag = nationalityHtml(nationality),
+    rankingLabel = ranking
+      ? `n°${esc(ranking)} TE${rankingDate ? ` · ranking del ${esc(displayDate(rankingDate))}` : ""}`
+      : "Ranking non disponibile";
+  $("profileContent").innerHTML =
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><p>${flag || "Nazionalità non disponibile"}</p><p class="opponentProfileRanking">${rankingLabel}</p></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Stato di forma</h3><span>Ultimi 5 tornei</span></div><div class="empty">Storico in preparazione.</div></div>`;
+  $("homeView").classList.remove("active");
+  $("profileView").classList.add("active");
 }
 function renderProfile(id) {
   const p = state.data.players.find((x) => x.id === id);
@@ -2423,6 +2499,7 @@ renderProfile = function (id) {
 };
 function route() {
   const player = location.hash.match(/^#player\/(.+)$/),
+    opponent = location.hash.match(/^#opponent\/([^/]+)\/([^/]+)\/(\d+)$/),
     tournament = location.hash.match(/^#tournament\/(.+)$/);
   if (!player) {
     profileYearFilter = String(new Date().getFullYear());
@@ -2434,6 +2511,12 @@ function route() {
     saveUiState();
   }
   if (player && state.data) renderProfile(decodeURIComponent(player[1]));
+  else if (opponent && state.data)
+    renderOpponent(
+      decodeURIComponent(opponent[1]),
+      decodeURIComponent(opponent[2]),
+      Number(opponent[3]),
+    );
   else {
     if (profileFilterPlayerId) {
       profileFilterPlayerId = "";
