@@ -828,8 +828,16 @@ function agendaCourtName(m) {
 function agendaLongCourt(m) {
   return agendaCourtName(m).length > 17;
 }
+function pendingOpponentHtml(m) {
+  const possible = Array.isArray(m.possibleOpponents)
+    ? m.possibleOpponents.map(readablePerson).filter(Boolean)
+    : [];
+  return possible.length === 2
+    ? `Avversario da definire · Possibili: ${possible.map(esc).join(" / ")}`
+    : "Avversario da definire";
+}
 function opponentHtml(m, x) {
-  if (!x.op) return "Avversario da definire";
+  if (!x.op) return pendingOpponentHtml(m);
   const club = m.opponentClub
       ? ` · circolo ${esc(readableText(m.opponentClub))}`
       : "",
@@ -841,7 +849,7 @@ function opponentHtml(m, x) {
   return `vs <span class="opponentName">${peopleHtml(x.op, nationalities, m.opponentTeRankings || [])}</span><span class="opponentClub">${club}</span>`;
 }
 function plainOpponentHtml(m, x) {
-  if (!x.op) return "Avversario da definire";
+  if (!x.op) return pendingOpponentHtml(m);
   const club = m.opponentClub
       ? ` · circolo ${esc(readableText(m.opponentClub))}`
       : "",

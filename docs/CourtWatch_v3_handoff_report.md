@@ -1148,3 +1148,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - `Risultati` non richiede più che il file legacy cambi entro 45 minuti. Verifica che il documento sia strutturalmente valido e che la pipeline Agenda/OOP + D1 sia operativa; l'assenza di nuovi risultati non viene confusa con un motore fermo.
 - `Avversari` considera valido un array vuoto quando il numero di record da completare è zero. Diventa giallo soltanto se il documento non è valido o contiene record incompleti.
 - I workflow operativi restano controllati separatamente e una loro anomalia rende ancora gialle le righe applicative collegate. Nessun dato, motore, database o schedulazione è stato modificato.
+
+
+## Aggiornamento 19 settembre 2026 — avversario Tennis Europe ancora da definire
+
+- Il parser dell’ordine di gioco Tennis Europe non scarta più una partita programmata quando è pubblicato un solo partecipante: la riga viene acquisita come incontro singolare con avversario pendente.
+- In Agenda e nel dettaglio partita viene mostrato `Avversario da definire`. La dicitura `Possibili: Nome A / Nome B` compare soltanto se la pagina ufficiale associa senza ambiguità una riga con il giocatore noto e una riga con esattamente due candidati; in caso contrario non vengono formulate ipotesi.
+- Ogni riga pendente usa l’identità ufficiale dello slot (torneo, data, campo e numero d’ordine). Nell’import incrementale, un record successivo dello stesso slot elimina quello precedente prima dell’inserimento: quando il vincitore viene pubblicato resta una sola partita con l’avversario effettivo.
+- Adeguati il generatore D1 e i controlli di parità per accettare l’avversario vuoto soltanto quando la sorgente lo marca esplicitamente come pendente. Gli incontri completi continuano a richiedere l’avversario e un’anomalia reale resta rossa.
