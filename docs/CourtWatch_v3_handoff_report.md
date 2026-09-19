@@ -1108,3 +1108,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Ogni risposta remota valida viene conservata nella Cache API del Worker. Per cinque minuti viene servita direttamente; dopo tale intervallo viene rivalidata e, se GitHub è temporaneamente lento, in errore o oltre il timeout di cinque secondi, viene usata automaticamente l'ultima risposta valida fino a 24 ore.
 - Un errore transitorio di GitHub non azzera più i documenti diagnostici e non trasforma le relative spie in gialle. La logica di freschezza interna ai documenti resta invariata: una sorgente realmente non aggiornata continua a essere segnalata in base al proprio `generatedAt`.
 - Nessuna modifica a motori, acquisizione, dati applicativi, D1, R2 o schedulazioni. Le chiamate remote dell'Admin diminuiscono e il caricamento della pagina risulta più stabile.
+
+
+## Aggiornamento 19 settembre 2026 — stato Copertura basato sui problemi operativi
+
+- Lo stato complessivo della sezione Admin “Copertura” considera ora esclusivamente i controlli marcati come critici. Indicatori informativi o legacy non possono più abbassare da soli lo stato generale.
+- La mancanza dell'indirizzo nel JSON statico FITP è trattata come avviso informativo quando iscrizione, identificativo P.U.C., torneo e sorgente ufficiale sono presenti; non rende più giallo il controllo critico Calendario, perché l'app può già mostrare il dato aggiornato proveniente dalla proiezione D1.
+- Restano gialli o rossi i problemi evidenti sui controlli critici: motore non aggiornato, soglie di copertura non rispettate, errori di acquisizione, identificativi ufficiali mancanti o sorgenti essenziali incomplete.
+- Aggiornati anche gli artefatti diagnostici correnti; la regola è permanente nelle generazioni successive. Nessuna modifica a dati sportivi, motori di acquisizione, D1, R2 o schedulazioni.

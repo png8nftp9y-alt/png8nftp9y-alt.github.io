@@ -139,8 +139,7 @@ function light(status, label, detail, critical = false) {
 }
 function worst(items) {
   if (items.some((x) => x.status === "red" && x.critical)) return "red";
-  if (items.some((x) => x.status === "red")) return "yellow";
-  if (items.some((x) => x.status === "yellow")) return "yellow";
+  if (items.some((x) => x.status === "yellow" && x.critical)) return "yellow";
   return "green";
 }
 function fitpTournamentLight(fitpTournaments) {
@@ -449,7 +448,9 @@ const diagnosticsItems = [
     false,
   ),
   light(
-    warnings.length ? "yellow" : "green",
+    warnings.some((warning) => !warning.includes("indirizzo da cercare su Google"))
+      ? "yellow"
+      : "green",
     "Calendario",
     `${tournamentEntries.length} tornei visibili · FITP ${byCircuit.fitp || 0} · TE ${byCircuit["tennis-europe"] || 0} · ITF ${byCircuit.itf || 0}`,
     true,
