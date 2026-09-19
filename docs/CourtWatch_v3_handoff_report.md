@@ -1124,3 +1124,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - La riga ITF passerà automaticamente a `green` soltanto quando il sistema è certificato, il documento è recente, gli errori sono zero e risultano zero pubblicazioni e zero problemi tecnici pendenti nei controlli T−1.
 - Finché ITF dichiara tabelloni ufficiali non ancora pubblicati, l'Admin conserva lo stato descrittivo corrente. Nessun colore viene forzato e un problema reale continua a impedire il verde.
 - Nessuna modifica ai motori, ai dati sportivi, a D1, R2 o alle schedulazioni; cambia esclusivamente la normalizzazione del testo mostrato nell'Admin.
+
+
+## Aggiornamento 19 settembre 2026 — lettura corretta ITF 120 giorni e watchdog
+
+- L'Admin interroga ora l'endpoint GitHub dedicato del workflow `courtwatch-v3-itf-safety-120d.yml`; il run giornaliero non dipende più dalla finestra degli ultimi 50 run globali e non appare “non disponibile” soltanto perché altri workflow lo hanno fatto uscire dall'elenco.
+- La riga del watchdog è stata rinominata `Deploy watchdog Cloudflare`: la data mostrata è correttamente la data dell'ultima pubblicazione del Worker e della sua configurazione cron, non l'ultima esecuzione pianificata.
+- L'operatività sorvegliata continua a essere rappresentata dalle righe dei workflow FITP, Tennis Europe e ITF effettivamente controllati dal watchdog. Un deploy vecchio ma verde non viene più presentato come watchdog fermo.
+- Nessuna modifica alle frequenze, ai motori, ai dati sportivi, a D1 o R2; cambia soltanto l'origine e il significato delle informazioni mostrate nell'Admin.
