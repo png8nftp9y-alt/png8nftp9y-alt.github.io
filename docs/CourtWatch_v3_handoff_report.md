@@ -1058,3 +1058,9 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - La logica applicativa era già presente in `renderDataSignature` come `today: iso(new Date())`. Il controllo cercava invece la sola forma non formattata `today:iso(new Date())`, producendo un falso rosso dopo la formattazione automatica del sorgente.
 - L'asserzione usa ora un'espressione regolare limitata che tollera esclusivamente gli spazi sintattici attorno ai due punti, continuando a richiedere `today`, `iso` e `new Date()` nella firma di rendering. Nessuna logica applicativa, dato sportivo, operazione D1, frequenza o schedulazione è stata modificata.
 
+## Aggiornamento 19 settembre 2026 — riparazione verifica pubblica deploy 1690
+
+- Il run `Deploy CourtWatch #1690` ha superato la pubblicazione degli asset attesi ed è fallito soltanto nello smoke test successivo con `players=0` e `tournaments=0`.
+- Lo smoke apre una copia controllata di `v3.html` dopo aver rimosso il redirect verso il Worker protetto. La formattazione automatica aveva disposto su più righe e aggiunto spazi allo script di redirect; l'espressione precedente riconosceva esclusivamente la forma compatta e lasciava quindi attivo il redirect. Il browser di prova finiva sulla pagina protetta anziché sull'app statica da verificare.
+- Il riconoscimento tollera ora spazi, righe e virgolette della formattazione corrente, ma resta vincolato al dominio GitHub Pages e alla chiamata `location.replace`. L'applicazione, gli asset pubblicati, i dati sportivi, D1, motori e schedulazioni non sono stati modificati.
+
