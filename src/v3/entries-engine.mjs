@@ -302,13 +302,17 @@ const itfEntries = [...(itfHistory.entries || []), ...(itf.entries || [])].map(
       circuit: "itf",
       tournamentName: r.tournamentName || official.tournamentName,
       location: official.location || r.location,
+      qualificationStartDate:
+        metadata.qualificationStartDate || r.qualificationStartDate || "",
+      officialStartDate:
+        metadata.officialStartDate || r.officialStartDate || r.startDate || "",
       venueName:
         r.venueName ||
         metadata.venueName ||
         official.venueName ||
         official.clubName ||
         "",
-      address: r.address || metadata.address || official.address || "",
+      address: metadata.address || r.address || official.address || "",
     });
   },
 );
