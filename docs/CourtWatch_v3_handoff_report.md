@@ -1211,3 +1211,12 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - L’intestazione della scheda storico mostra ora `Ultimi 5 tornei` a sinistra e `Stato di forma: V · S` a destra.
 - Ogni partita occupa una sola riga orizzontale con data, avversario, nazionalità e bandiera, ranking più data dello snapshot, turno ed esito/punteggio. Su schermi stretti la riga resta unica e il contenitore scorre orizzontalmente.
 - Corretto l’allineamento verticale della bandiera grande nell’intestazione mediante contenitori flex con altezza e linea comuni al nome.
+
+
+### Rifinitura righe storico avversario e collegamenti ai tabelloni
+
+- La data della singola partita non viene più mostrata nella riga: la prima colonna contiene il turno.
+- Il ranking degli avversari incontrati nello storico resta quello selezionato internamente alla data della partita, ma non mostra più tra parentesi la data della classifica.
+- Ogni nominativo incontrato è preceduto da `vs`.
+- Accanto al nome del torneo vengono mostrate le etichette evento effettivamente disputate dall’avversario, per esempio `GS14`; quando il match contiene il collegamento ufficiale al draw, l’etichetta apre direttamente quel tabellone in una nuova scheda.
+- La riga unica contiene ora turno, avversario con nazionalità/bandiera/ranking e risultato.

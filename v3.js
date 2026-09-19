@@ -1968,14 +1968,25 @@ function bindParticipantNavigation(root) {
 function opponentHistoryRanking(person) {
   if (!person?.ranking) return "";
   const category = /14$/.test(person.rankingCategory || "")
-      ? " U14"
-      : /16$/.test(person.rankingCategory || "")
-        ? " U16"
-        : "",
-    date = person.rankingDate
-      ? ` (ranking del ${displayDate(person.rankingDate)})`
+    ? " U14"
+    : /16$/.test(person.rankingCategory || "")
+      ? " U16"
       : "";
-  return `n°${person.ranking} TE${category}${date}`;
+  return `n°${person.ranking} TE${category}`;
+}
+function opponentTournamentEventLinks(tournament) {
+  const events = new Map();
+  for (const match of tournament.matches || []) {
+    const code = agendaEventCode(match);
+    if (code && !events.has(code)) events.set(code, match.drawUrl || "");
+  }
+  return [...events]
+    .map(([code, url]) =>
+      url
+        ? `<a class="type drawCode opponentTournamentDraw" href="${esc(url)}" target="_blank" rel="noopener">${esc(code)}</a>`
+        : `<span class="type drawCode">${esc(code)}</span>`,
+    )
+    .join("");
 }
 function renderOpponentHistory(data) {
   const tournaments = data.tournaments || [],
@@ -1991,7 +2002,7 @@ function renderOpponentHistory(data) {
     ? tournaments
         .map(
           (tournament) =>
-            `<section class="opponentHistoryTournament"><h4>${esc(readableText(tournament.name))}</h4><div class="opponentHistoryMatches">${(tournament.matches || [])
+            `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${esc(readableText(tournament.name))}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span></header><div class="opponentHistoryMatches">${(tournament.matches || [])
               .map((match) => {
                 const opponents = (match.opponents || [])
                     .map(
@@ -2003,7 +2014,7 @@ function renderOpponentHistory(data) {
                     match.status === "completed"
                       ? `${match.won ? "V" : "S"} ${readableText(match.score) || "—"}`
                       : readableText(match.status || "Programmato");
-                return `<div class="opponentHistoryMatch"><time>${esc(displayDate(match.date))}</time><span class="opponentHistoryOpponent">${opponents || "Avversario da definire"}</span><span class="opponentHistoryRound">${esc(readableText(match.round) || "—")}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
+                return `<div class="opponentHistoryMatch"><span class="opponentHistoryRound">${esc(readableText(match.round) || "—")}</span><span class="opponentHistoryOpponent">vs ${opponents || "Avversario da definire"}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
               })
               .join("")}</div></section>`,
         )

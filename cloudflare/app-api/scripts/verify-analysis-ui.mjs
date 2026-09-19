@@ -40,6 +40,8 @@ assert.ok(hasSource('(ranking del ${esc(displayDate(rankingDate))})'), 'opponent
 assert.ok(hasSource('function partnerHtml(') && hasSource('data-opponent-role'), 'partners must use opponent-profile navigation');
 assert.ok(hasSource('doublesPartnerLink'), 'doubles partners must remain bold');
 assert.ok(hasSource('function loadOpponentHistory(') && hasSource('/opponent-profile?name='), 'opponent page must load frozen history');
+assert.ok(hasSource('function opponentTournamentEventLinks(') && hasSource('opponentTournamentDraw'), 'opponent tournaments must link event badges to draws');
+assert.ok(hasSource('<span class="opponentHistoryOpponent">vs ${opponents'), 'opponent history rows must prefix the opponent with vs');
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
 assert.ok(hasSource('bindParticipantNavigation($("profileContent"))'), 'profile and tournament pages must bind participant links');
 assert.ok(hasSource('function dedupeAgendaMatches(') && hasSource('sameAgendaMatch(existing, match)'), 'agenda must deduplicate shared CourtWatch matches');
