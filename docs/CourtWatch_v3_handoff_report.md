@@ -1038,3 +1038,12 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 ### Rifinitura separatore anno
 
 - Aumentata la dimensione dell'anno nei separatori della pagina giocatore da 18 a 26 pixel e spostato l'allineamento sul margine destro, mantenendo invariato il raggruppamento dei tornei.
+
+## Aggiornamento 19 settembre 2026 — comando rimozione e luoghi ITF permanenti
+
+- Eliminato il comando `−` dalla testata generale della colonna Giocatori. `Rimuovi giocatore` viene ora mostrato esclusivamente quando il contenitore di dettaglio visualizza una pagina giocatore; viene esplicitamente nascosto nella pagina torneo, che riusa lo stesso contenitore.
+- Sostituita la lista di quattro circoli ITF scritta nel generatore con un registro persistente di metadati ufficiali. Per ogni torneo che contiene un giocatore Court Watch, il ciclo acceptance acquisisce dal fact sheet ufficiale data delle qualificazioni, nome del circolo e indirizzo, completa singolarmente gli eventuali campi mancanti e li include nell'artefatto dello shard.
+- Il merge degli shard conserva i metadati in `history/itf_official_metadata.json`; i cicli successivi li riusano anche quando il sito ITF non è momentaneamente leggibile. Il generatore del calendario consulta automaticamente questo registro per tornei storici, correnti e futuri. I workflow live, known-fast, safety e backfill includono il registro nei commit automatici.
+- Conservati nel registro i quattro luoghi ITF già verificati in precedenza e il fact sheet completo di J60 Pescara; non sono più eccezioni incorporate nel codice.
+- La correzione non aggiunge letture o scritture Cloudflare D1 e non modifica frequenze, trigger o schedulazioni dei motori. Aggiunge l'acquisizione del fact sheet soltanto per un torneo ITF in cui l'acceptance rileva almeno un giocatore monitorato e soltanto quando mancano metadati.
+- Validazione: sintassi Node dei componenti modificati, generazione calendario, release guard e verifica della visibilità del comando per route giocatore/torneo. L'audit Cloudflare del periodo corrente deve essere acquisito separatamente dal workflow autenticato prima della stima al 15 ottobre.

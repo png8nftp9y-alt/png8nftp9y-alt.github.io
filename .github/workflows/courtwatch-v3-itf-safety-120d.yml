@@ -101,7 +101,7 @@ jobs:
           set -euo pipefail
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
-          ITF_FILES="dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/entries_itf.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json history/itf_participant_cache_audit.json"
+          ITF_FILES="dist/v3/source_itf_entries.json dist/v3/source_itf_acceptance_audit.json dist/v3/entries_itf.json history/itf_official_metadata.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json history/itf_participant_cache_audit.json"
           tar -cf "$RUNNER_TEMP/itf-validated.tar" $ITF_FILES
           cp history/itf_draw_target_db.json "$RUNNER_TEMP/itf-incoming-state.json"
           published=false
