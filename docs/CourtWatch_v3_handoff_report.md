@@ -1093,3 +1093,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - La proiezione privata `/app/api/app-snapshot` resta deliberatamente `cache: no-store` con parametro temporale, così autenticazione e aggiornamento dei dati applicativi non cambiano.
 - Restano invariati rendering, aggiornamento automatico ogni 30 secondi, motori FITP/Tennis Europe/ITF, database D1, R2 e schedulazioni. Il beneficio riguarda soprattutto aperture successive e refresh; la prima apertura senza cache deve ancora scaricare i dati completi.
 - Cache-buster di `v3.js` aggiornato a `2026091903`. Verifica statica: sintassi JavaScript valida, dieci dataset invariati, API privata ancora no-store e timer di 30 secondi presente.
+
+
+## Aggiornamento 19 settembre 2026 — anticipo del primo caricamento
+
+- Il documento HTML avvia immediatamente, durante la lettura della testata e prima del download/esecuzione di `v3.js`, il preload CORS dei cinque dataset che rappresentano quasi tutto il peso iniziale: giocatori, tornei, agenda, iscrizioni e risultati.
+- La funzione applicativa continua a richiedere gli stessi dieci JSON, ad attendere gli stessi risultati e ad applicare lo stesso merge. Il browser riutilizza le richieste già avviate dal preload: cambiano esclusivamente il momento e la priorità di trasferimento, non dati o comportamento.
+- API privata, fallback, cache locale, refresh ogni 30 secondi, motori FITP/Tennis Europe/ITF, D1, R2 e schedulazioni restano invariati. L'intervento riduce anche il primo caricamento senza introdurre nuove chiamate: le cinque richieste anticipate sono le stesse che `load()` avrebbe comunque eseguito poco dopo.
