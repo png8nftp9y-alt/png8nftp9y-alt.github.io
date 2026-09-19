@@ -1116,3 +1116,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - La mancanza dell'indirizzo nel JSON statico FITP è trattata come avviso informativo quando iscrizione, identificativo P.U.C., torneo e sorgente ufficiale sono presenti; non rende più giallo il controllo critico Calendario, perché l'app può già mostrare il dato aggiornato proveniente dalla proiezione D1.
 - Restano gialli o rossi i problemi evidenti sui controlli critici: motore non aggiornato, soglie di copertura non rispettate, errori di acquisizione, identificativi ufficiali mancanti o sorgenti essenziali incomplete.
 - Aggiornati anche gli artefatti diagnostici correnti; la regola è permanente nelle generazioni successive. Nessuna modifica a dati sportivi, motori di acquisizione, D1, R2 o schedulazioni.
+
+
+## Aggiornamento 19 settembre 2026 — stati motore Admin uniformati
+
+- La riga FITP dell'Admin mostra ora il valore sintetico `green` quando il documento è recente, lo stato sorgente dichiara completezza e non contiene errori. La descrizione tecnica `fitp_entries_complete_from_versioned_participant_cache` resta nel dato sorgente e non viene alterata.
+- La riga ITF passerà automaticamente a `green` soltanto quando il sistema è certificato, il documento è recente, gli errori sono zero e risultano zero pubblicazioni e zero problemi tecnici pendenti nei controlli T−1.
+- Finché ITF dichiara tabelloni ufficiali non ancora pubblicati, l'Admin conserva lo stato descrittivo corrente. Nessun colore viene forzato e un problema reale continua a impedire il verde.
+- Nessuna modifica ai motori, ai dati sportivi, a D1, R2 o alle schedulazioni; cambia esclusivamente la normalizzazione del testo mostrato nell'Admin.
