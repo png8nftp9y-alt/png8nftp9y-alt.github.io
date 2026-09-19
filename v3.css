@@ -263,3 +263,24 @@
 .doublesPartnerLink{font-weight:800}
 .agendaMatchBody .opponentPlayerLink.courtWatchOpponent{font-size:17px;font-weight:850;line-height:1.25}
 .sharedCourtWatchResult{color:var(--green)!important;font-weight:800}
+
+
+/* Frozen opponent snapshot and compact five-tournament history. */
+.opponentProfileIdentity{align-items:center;line-height:36px}
+.opponentProfileIdentity h2,.opponentProfileNationality,.opponentProfileIdentity .nationality{display:inline-flex;align-items:center;height:36px;line-height:36px}
+.opponentProfileNationality .countryFlag{display:block;flex:0 0 auto;width:36px;height:24px;margin:0;object-fit:cover;vertical-align:middle}
+.opponentHistoryPlaceholder .cardHead{align-items:center}
+#opponentFormSummary{font-style:normal;font-weight:400}
+.opponentHistoryTournament{overflow-x:auto}
+.opponentHistoryTournament+.opponentHistoryTournament{border-top:1px solid var(--line)}
+.opponentHistoryTournament h4{margin:0;padding:10px 14px;background:#fafafa;white-space:nowrap}
+.opponentHistoryMatches{min-width:max-content}
+.opponentHistoryMatch{display:grid;grid-template-columns:105px minmax(430px,1fr) 110px 120px;align-items:center;gap:12px;min-height:38px;padding:7px 14px;border-top:1px solid var(--line);white-space:nowrap}
+.opponentHistoryPerson{display:inline-flex;align-items:center;gap:4px}
+.opponentHistoryPerson .nationality{display:inline-flex;align-items:center}
+.opponentHistoryPerson .countryFlag{vertical-align:middle}
+.opponentHistoryRanking{font-style:normal;font-weight:400;color:var(--muted)}
+.opponentHistoryRound{color:var(--muted)}
+.opponentHistoryMatch>strong{text-align:right}
+.opponentHistoryMatch>strong.win{color:var(--green)}
+.opponentHistoryMatch>strong.loss{color:var(--red)}

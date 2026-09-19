@@ -1201,3 +1201,13 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Precisazione visiva: il compagno di doppio resta in grassetto anche quando non è CourtWatch; il clic apre comunque la pagina avversario limitata.
 
 - Correzione terminologica richiesta: ranking e data usano peso normale, quindi non sono in grassetto; il compagno di doppio resta invece in grassetto.
+
+
+## Aggiornamento 19 settembre 2026 — fotografia avversario e ultimi cinque tornei
+
+- La pagina avversario è una fotografia temporale: la route conserva la partita di origine e la richiesta dello storico usa la data di quella partita come limite `asOf`. Ranking dell’intestazione, tornei e partite successive non possono modificare retroattivamente la fotografia.
+- Se lo stesso avversario viene incontrato tre mesi dopo, il nuovo link porta una nuova partita e una nuova data `asOf`; la pagina mostra quindi la fotografia aggiornata al secondo incontro, mentre il collegamento precedente resta congelato.
+- L’API protetta legge da D1 le partite Tennis Europe del partecipante non successive alla fotografia, raggruppa i cinque tornei più recenti disponibili e calcola lo stato di forma sulle partite concluse mostrate. Non vengono acquisiti o mostrati tornei futuri.
+- L’intestazione della scheda storico mostra ora `Ultimi 5 tornei` a sinistra e `Stato di forma: V · S` a destra.
+- Ogni partita occupa una sola riga orizzontale con data, avversario, nazionalità e bandiera, ranking più data dello snapshot, turno ed esito/punteggio. Su schermi stretti la riga resta unica e il contenitore scorre orizzontalmente.
+- Corretto l’allineamento verticale della bandiera grande nell’intestazione mediante contenitori flex con altezza e linea comuni al nome.
