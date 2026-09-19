@@ -1181,3 +1181,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Il ranking specifica `TE U14` oppure `TE U16`. La categoria proviene dallo snapshot D1; il codice evento viene usato soltanto come fallback quando lo snapshot storico non espone ancora la categoria.
 - Nella pagina avversario il comando della testata diventa `Segui giocatore`. Aprendo una pagina CourtWatch torna automaticamente a `Rimuovi giocatore`; nella pagina torneo resta nascosto.
 - La API include ora la categoria dello stesso snapshot che fornisce ranking e data. Nessuna nuova scansione, riscrittura massiva o modifica alle schedulazioni.
+
+
+### Navigazione pagina avversario da tutte le viste e per i compagni di doppio
+
+- La pagina avversario è ora raggiungibile cliccando il partecipante nell’Agenda, nella pagina del torneo e nella pagina del giocatore CourtWatch.
+- La stessa pagina limitata viene usata anche per un compagno di doppio non CourtWatch. Il link conserva il ruolo (`opponent` o `partner`), l’identità Tennis Europe, la partita e l’indice del partecipante, così intestazione, nazionalità e snapshot ranking vengono letti dai campi corretti.
+- Se avversario o compagno è già CourtWatch, il link continua ad aprire direttamente la pagina CourtWatch completa.
+- La proiezione espone anche l’identificativo sorgente del compagno come fallback; non vengono aggiunte acquisizioni, scansioni complete o riscritture D1.

@@ -36,6 +36,8 @@ assert.ok(hasSource('tennisEuropeRanking:retained.tennisEuropeRanking||retained.
 assert.ok(hasApiSource('player.tennisEuropeRanking=labels.join'), 'API must expose Tennis Europe ranking separately');
 assert.ok(hasSource('function renderOpponent(') && hasSource('opponentTeRankingDates'), 'opponent page must expose ranking date');
 assert.ok(hasSource('opponentTeRankingCategories') && hasSource('Segui giocatore'), 'opponent header must expose age category and follow action');
+assert.ok(hasSource('function partnerHtml(') && hasSource('data-opponent-role'), 'partners must use opponent-profile navigation');
+assert.ok(hasSource('bindParticipantNavigation($("profileContent"))'), 'profile and tournament pages must bind participant links');
 assert.ok(hasSource('function dedupeAgendaMatches(') && hasSource('sameAgendaMatch(existing, match)'), 'agenda must deduplicate shared CourtWatch matches');
 assert.ok(hasSource('function agendaResultHtml(') && hasSource('Vincitore:'), 'shared CourtWatch match must name the winner');
 assert.ok(hasSource('courtWatchOpponent') && hasSource('opponentPlayerLink'), 'opponent styling must distinguish CourtWatch players');
