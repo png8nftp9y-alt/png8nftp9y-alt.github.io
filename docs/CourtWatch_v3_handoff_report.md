@@ -1140,3 +1140,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - I controlli di manutenzione D1 e sicurezza ITF 120 giorni restano ogni 10 minuti e sono spostati ai minuti 03/13/23/33/43/53, separandoli dai dispatch principali.
 - La protezione contro duplicati nello stesso quarto d'ora, i controlli sui run già attivi e le frequenze di acquisizione restano invariati. Lo scaglionamento riduce la concorrenza simultanea su GitHub Actions, rete e R2 senza diminuire la copertura.
 - Aggiornati i test del watchdog per certificare l'esatta appartenenza dei workflow ai tre gruppi e la permanenza dei controlli di manutenzione.
+
+
+## Aggiornamento 19 settembre 2026 — diagnostica applicativa coerente con le pipeline autorevoli
+
+- `Agenda legacy` non è più gialla per definizione: segue lo stato fresco e congiuntamente verde di `Agenda/OOP Europe` e `D1 agenda Europe`, che sono le pipeline autorevoli usate dall'app.
+- `Risultati` non richiede più che il file legacy cambi entro 45 minuti. Verifica che il documento sia strutturalmente valido e che la pipeline Agenda/OOP + D1 sia operativa; l'assenza di nuovi risultati non viene confusa con un motore fermo.
+- `Avversari` considera valido un array vuoto quando il numero di record da completare è zero. Diventa giallo soltanto se il documento non è valido o contiene record incompleti.
+- I workflow operativi restano controllati separatamente e una loro anomalia rende ancora gialle le righe applicative collegate. Nessun dato, motore, database o schedulazione è stato modificato.

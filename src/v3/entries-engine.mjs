@@ -411,6 +411,14 @@ const fresh = (doc, max = 0.75) => {
   const age = ageHours(doc.generatedAt);
   return age != null && age <= max;
 };
+const operationalByLabel = new Map(
+  (operational.items || []).map((item) => [item.label, item.status]),
+);
+const agendaPipelineGreen =
+  fresh(operational) &&
+  ["Agenda/OOP Europe", "D1 agenda Europe"].every(
+    (label) => operationalByLabel.get(label) === "green",
+  );
 const diagnosticsItems = [
   light(
     fitpTournamentStatus,
@@ -456,21 +464,21 @@ const diagnosticsItems = [
     true,
   ),
   light(
-    "yellow",
+    agendaPipelineGreen ? "green" : "yellow",
     "Agenda legacy",
     `${(agendaDoc.agenda || []).length} voci legacy · vedere verifica Agenda/OOP Europe e D1`,
     false,
   ),
   light(
-    fresh(resultsDoc) && (resultsDoc.results || []).length > 0
+    agendaPipelineGreen && Array.isArray(resultsDoc.results)
       ? "green"
       : "yellow",
     "Risultati",
-    `${(resultsDoc.results || []).length} risultati · motore ${(resultsDoc.results || []).length ? "attivo" : "pending"}`,
+    `${(resultsDoc.results || []).length} risultati legacy · pipeline ${agendaPipelineGreen ? "operativa" : "da verificare"}`,
     false,
   ),
   light(
-    (opponentsDoc.opponents || []).length &&
+    Array.isArray(opponentsDoc.opponents) &&
       !(opponentsDoc.opponents || []).filter((o) => o.dataStatus !== "ok")
         .length
       ? "green"
