@@ -1100,3 +1100,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Il documento HTML avvia immediatamente, durante la lettura della testata e prima del download/esecuzione di `v3.js`, il preload CORS dei cinque dataset che rappresentano quasi tutto il peso iniziale: giocatori, tornei, agenda, iscrizioni e risultati.
 - La funzione applicativa continua a richiedere gli stessi dieci JSON, ad attendere gli stessi risultati e ad applicare lo stesso merge. Il browser riutilizza le richieste già avviate dal preload: cambiano esclusivamente il momento e la priorità di trasferimento, non dati o comportamento.
 - API privata, fallback, cache locale, refresh ogni 30 secondi, motori FITP/Tennis Europe/ITF, D1, R2 e schedulazioni restano invariati. L'intervento riduce anche il primo caricamento senza introdurre nuove chiamate: le cinque richieste anticipate sono le stesse che `load()` avrebbe comunque eseguito poco dopo.
+
+
+## Aggiornamento 19 settembre 2026 — stabilizzazione delle sorgenti Admin
+
+- La pagina Admin non forza più URL diversi con un timestamp per i sei documenti pubblici: gli URL restano stabili e possono essere riutilizzati.
+- Ogni risposta remota valida viene conservata nella Cache API del Worker. Per cinque minuti viene servita direttamente; dopo tale intervallo viene rivalidata e, se GitHub è temporaneamente lento, in errore o oltre il timeout di cinque secondi, viene usata automaticamente l'ultima risposta valida fino a 24 ore.
+- Un errore transitorio di GitHub non azzera più i documenti diagnostici e non trasforma le relative spie in gialle. La logica di freschezza interna ai documenti resta invariata: una sorgente realmente non aggiornata continua a essere segnalata in base al proprio `generatedAt`.
+- Nessuna modifica a motori, acquisizione, dati applicativi, D1, R2 o schedulazioni. Le chiamate remote dell'Admin diminuiscono e il caricamento della pagina risulta più stabile.
