@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: courtwatch-tennis-europe-ranking-history
+  group: courtwatch-tennis-europe-ranking-import
   cancel-in-progress: false
 jobs:
   discover:
@@ -76,7 +76,15 @@ jobs:
         run: |
           node scripts/guard-d1-import.mjs seed-tennis-europe-rankings/rankings-*.sql
           for sql_file in seed-tennis-europe-rankings/rankings-*.sql; do
-            npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"
+            imported=0
+            for attempt in 1 2 3 4 5 6 7 8; do
+              if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"; then
+                imported=1
+                break
+              fi
+              sleep $((attempt * 15))
+            done
+            test "$imported" -eq 1
           done
   verify:
     needs: backfill
