@@ -1986,7 +1986,7 @@ function matchResultText(match) {
   const value = readableText(match?.result || match?.score || "");
   const evidence = [match?.status, match?.reason, match?.resultStatus, match?.scoreStatus, match?.retirementReason, match?.retirementStatus, match?.resultDetail, match?.resultType, match?.completedBy, match?.notes, value].filter(Boolean).join(" ");
   const retired = Boolean(match?.retired || match?.retirement || /retir|withdraw|abandon|ritir|\bret\.?\b/i.test(evidence) || incompleteCompletedScore(value, match?.status, typeof match?.advances === "boolean" || typeof match?.won === "boolean"));
-  return value + (retired && !/\brit\.?\b/i.test(value) ? " · Rit." : "");
+  return value + (retired && !/\brit\.?\b/i.test(value) ? " Rit." : "");
 }
 function opponentHistoryRanking(person) {
   if (!person?.ranking) return "";
