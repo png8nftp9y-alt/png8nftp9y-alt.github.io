@@ -62,6 +62,8 @@ function entry(row) {
     address: row.address || "",
     addressSource: row.addressSource || "",
     addressSearchUrl: row.addressSearchUrl || "",
+    surface: row.surface || row.surfaceDesc || "",
+    environment: row.environment || row.indoorOutdoor || row.indoorOrOutDoor || "",
     startDate: row.qualificationStartDate || row.startDate || "",
     qualificationStartDate: row.qualificationStartDate || "",
     officialStartDate: row.officialStartDate || "",
@@ -111,6 +113,8 @@ function toTournament(e) {
     address: e.address || "",
     addressSource: e.addressSource || "",
     addressSearchUrl: e.addressSearchUrl || "",
+    surface: e.surface || "",
+    environment: e.environment || "",
     startDate: mapStartDate || e.startDate,
     qualificationStartDate: e.qualificationStartDate || "",
     officialStartDate,
@@ -253,6 +257,8 @@ const teEntries = [...(te.entries || []), ...(teHistory.entries || [])]
       circuit: "tennis-europe",
       venueName: r.venueName || official.venueName || "",
       address: r.address || official.address || "",
+      surface: r.surface || official.surface || official.surfaceDesc || "",
+      environment: r.environment || official.indoorOutdoor || official.indoorOrOutDoor || "",
     });
   })
   .filter((e) => e.playerId && e.startDate && validDate(e.endDate));
@@ -277,6 +283,8 @@ const fitpEntries = (fitp.entries || [])
       location: verified?.location || r.location,
       venueName: verified?.venueName || r.venueName || official.club || "",
       address,
+      surface: r.surface || official.surface || official.surfaceDesc || "",
+      environment: r.environment || official.indoorOutdoor || official.indoorOrOutDoor || "",
       addressSource,
       addressSearchUrl:
         addressSource === "google_search_required"
@@ -312,6 +320,8 @@ const itfEntries = [...(itfHistory.entries || []), ...(itf.entries || [])].map(
         official.clubName ||
         "",
       address: metadata.address || r.address || official.address || "",
+      surface: metadata.surface || r.surface || official.surface || official.surfaceDesc || "",
+      environment: metadata.environment || r.environment || official.indoorOutdoor || official.indoorOrOutDoor || "",
     });
   },
 );

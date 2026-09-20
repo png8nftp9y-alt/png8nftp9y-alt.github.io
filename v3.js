@@ -337,14 +337,29 @@ const playerRankingSummary = (player) => {
     ? `<span class="playerAllRankings"> · ${labels.map(esc).join(" · ")}</span>`
     : "";
 };
-const peopleHtml = (names, nationalities = [], rankings = []) =>
+const normalizedDesignation = (value) => {
+  const raw = String(value ?? "").trim().replace(/^[\[(]|[\])]$/g, "").toUpperCase();
+  if (/^\d{1,2}$/.test(raw)) return raw;
+  if (raw === "WC" || raw === "Q") return raw;
+  return "";
+};
+const participantDesignationHtml = (value) => {
+  const marker = normalizedDesignation(value);
+  return marker ? ` <span class="participantDesignation">${esc(marker)}</span>` : "";
+};
+const inlineParticipant = (value) => {
+  const raw = readablePerson(value),
+    match = raw.match(/\s*[\[(]\s*(\d{1,2}|WC|Q)\s*[\])]\s*$/i);
+  return { name: match ? raw.slice(0, match.index).trim() : raw, designation: match?.[1] || "" };
+};
+const peopleHtml = (names, nationalities = [], rankings = [], designations = []) =>
   String(names || "")
     .split(/\s*\/\s*/)
     .filter(Boolean)
-    .map(
-      (name, index) =>
-        `${esc(readablePerson(name))}${nationalityHtml(knownNationality(name, nationalities[index]))}${teRankHtml(rankings[index])}`,
-    )
+    .map((value, index) => {
+      const person = inlineParticipant(value);
+      return `${esc(person.name)}${participantDesignationHtml(designations[index] || person.designation)}${nationalityHtml(knownNationality(person.name, nationalities[index]))}${teRankHtml(rankings[index])}`;
+    })
     .join("/");
 const circuit = (x) => {
   const s = (
@@ -871,7 +886,7 @@ function partnerHtml(m) {
         "partner",
         name,
         index,
-        playerLabelHtml(name, nationalities[index] || "", rankings[index]),
+        playerLabelHtml(name, nationalities[index] || "", rankings[index], (m.partnerDesignations || [])[index]),
       ),
     )
     .join('<span class="teamSeparator">/</span>');
@@ -896,6 +911,7 @@ function opponentHtml(m, x) {
           name,
           nationalities[index] || "",
           rankings[index],
+          (m.opponentDesignations || [])[index],
         );
         return participantLinkHtml(
           m,
@@ -944,8 +960,9 @@ function monitoredNationality(playerId, fallback = "") {
     player?.nationality || player?.country || player?.countryCode || fallback
   );
 }
-function playerLabelHtml(player, nationality, ranking) {
-  return `${esc(readablePerson(player))}${nationalityHtml(nationality)}${teRankHtml(ranking)}`;
+function playerLabelHtml(player, nationality, ranking, designation = "") {
+  const person = inlineParticipant(player);
+  return `${esc(person.name)}${participantDesignationHtml(designation || person.designation)}${nationalityHtml(nationality)}${teRankHtml(ranking)}`;
 }
 function playerTeamHtml(m) {
   const source = circuit(m),
@@ -963,9 +980,10 @@ function playerTeamHtml(m) {
       m.playerNationality ||
       monitoredNationality(m.playerId),
     m.playerTeRanking,
+    m.playerDesignation,
   );
   return m.partner
-    ? `${player}/${peopleHtml(m.partner, m.partnerNationalities || [], m.partnerTeRankings || [])}`
+    ? `${player}/${peopleHtml(m.partner, m.partnerNationalities || [], m.partnerTeRankings || [], m.partnerDesignations || [])}`
     : player;
 }
 function analysisKey(m) {
@@ -2048,7 +2066,7 @@ function renderOpponentHistory(data) {
                       name = courtWatchPlayer
                         ? `<button type="button" class="opponentHistoryCourtWatch" data-open-player="${esc(courtWatchPlayer.id)}"><b>${esc(readablePerson(person.name))}</b></button>`
                         : `<b>${esc(readablePerson(person.name))}</b>`;
-                    return `<span class="opponentHistoryPerson">${name}${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`;
+                    return `<span class="opponentHistoryPerson">${name}${participantDesignationHtml(person.designation)}${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`;
                   },
                   partners = (match.partners || []).map(personHtml).join(" / "),
                   opponents = (match.opponents || []).map(personHtml).join(" / "),
@@ -2357,6 +2375,15 @@ function tournamentMapsUrl(place) {
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
     : "";
 }
+
+function tournamentSurfaceLabel(t) {
+  const surface = readableText(t.surface || t.courtSurface || t.playingSurface || ""),
+    environment = readableText(t.environment || t.courtEnvironment || (t.indoor === true ? "Indoor" : t.outdoor === true ? "Outdoor" : "")),
+    name = readableText(t.name || t.tournamentName || ""),
+    parts = [surface, environment].filter((value, index, list) => value && list.findIndex(x => x.toLowerCase() === value.toLowerCase()) === index).filter(value => !name.toLowerCase().includes(value.toLowerCase()));
+  return parts.join(" · ");
+}
+
 function renderTournament(key) {
   $("removeProfilePlayer").hidden = true;
   const t = groups(false).find((x) => tournamentKey(x) === key);
@@ -2459,7 +2486,7 @@ function renderTournament(key) {
           return `<div class="listItem matchWithAnalysis">${matchAnalysisButton(m)}<h4 class="matchDate">${esc(displayDate(m.date) || "data da pubblicare")}</h4>${doubleLabel ? `<p class="matchType">${doubleLabel}</p>` : ""}${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}<p>${opponentHtml(m, x)}</p>${matchResultText(m) ? `<p class="result${loss}${win}">Risultato: ${esc(matchResultText(m))}</p>` : ""}</div>`;
         })
         .join("");
-      return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}"><button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${nationalityHtml(playerNationality)}${playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button><span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
+      return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}"><button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(rows.find(row => row.playerDesignation)?.playerDesignation)}${nationalityHtml(playerNationality)}${playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button><span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
     })
     .join("");
   const officialUrl = tournamentOfficialUrl(t),
@@ -2472,9 +2499,10 @@ function renderTournament(key) {
     acceptanceLink = acceptanceUrl
       ? `<a class="btn tournamentAcceptanceLink" href="${esc(acceptanceUrl)}" target="_blank" rel="noopener" aria-label="Apri Acceptance List"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Acceptance List</span></a>`
       : "",
-    drawLinks = tournamentDrawLinks(t, matches);
+    drawLinks = tournamentDrawLinks(t, matches),
+    surfaceLabel = tournamentSurfaceLabel(t);
   $("profileContent").innerHTML =
-    `<div class="card tournamentHero"><div><h2>${title}</h2><p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(displayDate(t.startDate) || "data da pubblicare")} – ${esc(displayDate(t.endDate) || "data da pubblicare")}</p></div><div class="tournamentHeroActions">${acceptanceLink}<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div></div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
+    `<div class="card tournamentHero"><div><h2>${title}</h2>${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(displayDate(t.startDate) || "data da pubblicare")} – ${esc(displayDate(t.endDate) || "data da pubblicare")}</p></div><div class="tournamentHeroActions">${acceptanceLink}<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div></div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
   bindParticipantNavigation($("profileContent"));
   if (multiPlayer)
     $("profileContent")
