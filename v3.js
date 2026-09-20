@@ -1976,7 +1976,9 @@ function incompleteCompletedScore(value, status, decided = false) {
   for (const set of sets) {
     const points = set.match(/^(\d+)(?:\(\d+\))?-(\d+)/);
     if (!points) continue;
-    Number(points[1]) > Number(points[2]) ? left++ : right++;
+    const a = Number(points[1]), b = Number(points[2]), high = Math.max(a, b), low = Math.min(a, b), completeSet = high >= 6 && (high - low >= 2 || (high === 7 && low === 6));
+    if (!completeSet) continue;
+    a > b ? left++ : right++;
   }
   return Math.max(left, right) < 2;
 }

@@ -45,7 +45,7 @@ jobs:
     needs: discover
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 1
       matrix:
         publication: ${{ fromJSON(needs.discover.outputs.publications) }}
     runs-on: ubuntu-latest
