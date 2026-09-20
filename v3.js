@@ -1352,7 +1352,7 @@ function agendaRoundCode(m) {
     source = readableText(`${m.event || ""} ${m.draw || ""}`),
     bonus = /bonus\s*draw/i.test(source),
     upper = raw.toUpperCase();
-  if (/round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(raw))
+  if (m.roundRobin || m.isRoundRobin || /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(`${raw} ${source} ${JSON.stringify(m)}`))
     return "RR";
   let code = "";
   const explicit = raw.match(/\bS?Q\s*(\d+)\b/i),
@@ -2020,7 +2020,7 @@ function renderOpponentHistory(data) {
             const home = tournament.competitionId
               ? `https://te.tournamentsoftware.com/tournament/${encodeURIComponent(tournament.competitionId)}`
               : "";
-            return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}</h4>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}<span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span></header><div class="opponentHistoryMatches">${(tournament.matches || [])
+            return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header><div class="opponentHistoryMatches">${(tournament.matches || [])
               .map((match) => {
                 const personHtml = (person) =>
                     `<span class="opponentHistoryPerson"><b>${esc(readablePerson(person.name))}</b>${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`,
@@ -2028,8 +2028,8 @@ function renderOpponentHistory(data) {
                   opponents = (match.opponents || []).map(personHtml).join(" / "),
                   matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents || "Avversario da definire"}`,
                   outcome =
-                    match.status === "completed"
-                      ? readableText(match.score) || "—"
+                    match.status === "completed" || match.retired || match.score
+                      ? `${readableText(match.score) || "—"}${match.retired ? " · rit." : ""}`
                       : readableText(match.status || "Programmato");
                 return `<div class="opponentHistoryMatch"><span class="opponentHistoryRound">${esc(opponentHistoryRoundLabel(match.round, match.roundRobin))}</span><span class="opponentHistoryOpponent">${matchup}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
               })
