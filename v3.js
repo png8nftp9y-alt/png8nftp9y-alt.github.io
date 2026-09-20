@@ -1352,6 +1352,8 @@ function agendaRoundCode(m) {
     source = readableText(`${m.event || ""} ${m.draw || ""}`),
     bonus = /bonus\s*draw/i.test(source),
     upper = raw.toUpperCase();
+  if (/round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(raw))
+    return "RR";
   let code = "";
   const explicit = raw.match(/\bS?Q\s*(\d+)\b/i),
     qualSize = (raw.match(
@@ -1974,9 +1976,10 @@ function opponentHistoryRanking(person) {
       : "";
   return `n°${person.ranking} TE${category}`;
 }
-function opponentHistoryRoundLabel(value) {
+function opponentHistoryRoundLabel(value, roundRobin = false) {
   const round = readableText(value || "");
-  return /round\s*robin|(?:^|\b)rr(?:\b|$)|group\s*stage/i.test(round)
+  if (roundRobin) return "RR";
+  return /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(round)
     ? "RR"
     : round || "—";
 }
@@ -2000,9 +2003,9 @@ function renderOpponentHistory(data) {
     head = $("opponentFormSummary"),
     body = $("opponentTournamentHistory");
   if (head)
-    head.textContent = form.matches
-      ? `Stato di forma: ${form.wins} V · ${form.losses} S`
-      : "Stato di forma non disponibile";
+    head.innerHTML = form.matches
+      ? `<span class="opponentFormLabel">Stato di forma</span><span class="opponentFormCircle wins" aria-label="${form.wins} partite vinte">${form.wins}</span><span class="opponentFormCircle losses" aria-label="${form.losses} partite perse">${form.losses}</span>`
+      : '<span class="opponentFormLabel">Stato di forma</span>';
   if (!body) return;
   body.innerHTML = tournaments.length
     ? tournaments
@@ -2013,17 +2016,16 @@ function renderOpponentHistory(data) {
               : "";
             return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span></header><div class="opponentHistoryMatches">${(tournament.matches || [])
               .map((match) => {
-                const opponents = (match.opponents || [])
-                    .map(
-                      (person) =>
-                        `<span class="opponentHistoryPerson"><b>${esc(readablePerson(person.name))}</b>${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`,
-                    )
-                    .join(" / "),
+                const personHtml = (person) =>
+                    `<span class="opponentHistoryPerson"><b>${esc(readablePerson(person.name))}</b>${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`,
+                  partners = (match.partners || []).map(personHtml).join(" / "),
+                  opponents = (match.opponents || []).map(personHtml).join(" / "),
+                  matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents || "Avversario da definire"}`,
                   outcome =
                     match.status === "completed"
                       ? readableText(match.score) || "—"
                       : readableText(match.status || "Programmato");
-                return `<div class="opponentHistoryMatch"><span class="opponentHistoryRound">${esc(opponentHistoryRoundLabel(match.round))}</span><span class="opponentHistoryOpponent">vs ${opponents || "Avversario da definire"}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
+                return `<div class="opponentHistoryMatch"><span class="opponentHistoryRound">${esc(opponentHistoryRoundLabel(match.round, match.roundRobin))}</span><span class="opponentHistoryOpponent">${matchup}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
               })
               .join("")}</div></section>`;
           },

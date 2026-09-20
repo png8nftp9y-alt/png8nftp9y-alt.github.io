@@ -304,3 +304,11 @@
 /* Full round labels: no truncation or overlap. */
 .opponentHistoryMatch{grid-template-columns:minmax(190px,max-content) minmax(520px,1fr) 120px;column-gap:28px}
 .opponentHistoryRound{overflow:visible;text-overflow:clip;padding-right:16px;white-space:nowrap}
+
+
+/* Opponent form summary and doubles lineup. */
+#opponentFormSummary{display:inline-flex;align-items:center;gap:8px;color:var(--ink);font-style:normal;font-weight:700}
+.opponentFormLabel{color:var(--ink)}
+.opponentFormCircle{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;color:#fff;font-size:13px;font-weight:850}
+.opponentFormCircle.wins{background:var(--green)}
+.opponentFormCircle.losses{background:var(--red)}

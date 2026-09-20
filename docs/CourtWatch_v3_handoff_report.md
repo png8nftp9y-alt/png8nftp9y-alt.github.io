@@ -1238,3 +1238,12 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Il turno non viene più troncato: la colonna usa larghezza minima di 190 pixel espandibile, nessuna ellissi e 28 pixel di separazione dall’avversario. Le diciture round robin, group stage o RR vengono sintetizzate in `RR`.
 - Se lo snapshot specifico della partita non contiene il ranking, l’API cerca nello storico Tennis Europe la pubblicazione più recente non successiva alla data del match, privilegiando la stessa categoria B/G U14/U16. Il ranking torna quindi visibile sia nell’intestazione sia accanto agli avversari incontrati quando esiste una pubblicazione ufficiale applicabile.
 - Per gli incontri futuri, il link alla pagina avversario è disponibile automaticamente appena il match compare in Agenda; la pagina esclude il match futuro e mostra esclusivamente il materiale precedente.
+
+
+### Vincitore a sinistra, RR e stato di forma grafico
+
+- Il punteggio viene ora orientato sulla squadra vincente: il vincitore è sempre il lato sinistro di ogni set, indipendentemente dalla prospettiva del giocatore studiato.
+- Il riconoscimento round robin comprende RR, round robin, group, girone e pool. La sigla `RR` viene applicata sia alle righe della pagina avversario sia tramite `agendaRoundCode` nelle pagine dei giocatori CourtWatch.
+- Il recupero ranking degli altri partecipanti usa sia il nome normalizzato sia il profile ID Tennis Europe; resta vincolato alla pubblicazione non successiva alla partita e alla categoria corretta quando disponibile.
+- Lo stato di forma è nero; vittorie e sconfitte sono mostrate in due cerchi separati, rispettivamente verde e rosso.
+- Nei doppi lo storico include il compagno del giocatore studiato e rende la formazione come `con [compagno] vs [avversario 1] / [avversario 2]`, includendo nazionalità, bandiera e ranking disponibili.
