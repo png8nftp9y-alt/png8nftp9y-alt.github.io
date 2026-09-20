@@ -51,6 +51,7 @@ assert.ok(hasApiSource('tennis_europe_match_ranking_snapshots WHERE match_id IN'
 assert.ok(hasApiSource('tournament.drawFormat') && hasApiSource('retirementReason') && hasSource('· Rit.'), 'RR payload evidence and retirement labels must be preserved');
 assert.ok(hasSource('<h3>Tornei</h3>') && hasSource('m.roundName, m.stage, m.phase, m.group'), 'player page heading and extended RR recognition must be present');
 assert.ok(hasSource('matchResultText') && hasSource('data-follow-opponent') && hasSource('incompleteCompletedScore'), 'retirement formatting and opponent follow control must be present');
+assert.ok(hasSource('nextCalendarMonth') && hasSource('retirementStatus') && hasSource('completedBy'), 'independent next month and extended retirement evidence must be present');
 assert.ok(hasSource('/^round\\s*\\d+$/i.test(round)'), 'numbered round-robin rounds must render as RR in opponent history');
 assert.ok(hasApiSource('partners=people.filter') && hasSource('partners ? `con ${partners} `'), 'doubles partner must appear before vs');
 assert.ok(hasApiSource("const targets=[...new Set(matches.flatMap"), 'match snapshot must backfill participant rankings by date');
