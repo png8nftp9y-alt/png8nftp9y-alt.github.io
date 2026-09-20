@@ -27,8 +27,8 @@ for (const marker of [
 assert.ok(hasSource('playerRankingSummary(p)'), 'player profile must render both FITP and Tennis Europe rankings');
 assert.doesNotMatch(source, /profileTitle\.append\(profileRankings\)/, 'player rankings must remain in the muted detail row');
 assert.ok(hasSource("source==='tennis-europe'?tournamentTeRanking:source==='fitp'?playerRecord?.ranking:''"), 'tournament page must use the ranking appropriate to that tournament');
-assert.ok(hasSource('${nationalityHtml(playerNationality)}${playerRanking?'), 'tournament page must place ranking after nationality');
-assert.ok(hasSource('${nationalityHtml(knownNationality(name,nationalities[index]))}${teRankHtml(rankings[index])}'), 'participant rankings must follow nationality');
+assert.ok(hasSource('${participantDesignationHtml(rows.find(row=>row.playerDesignation)?.playerDesignation)}${nationalityHtml(playerNationality)}${playerRanking?'), 'tournament page must place designation before nationality and ranking after nationality');
+assert.ok(hasSource('${esc(person.name)}${participantDesignationHtml(designation||person.designation)}${nationalityHtml(nationality)}${teRankHtml(ranking)}'), 'participant labels must place designation before nationality and ranking after nationality');
 assert.ok(hasSource('const projection=await projectionPromise'), 'the UI must wait for the authoritative projection instead of flickering to a partial fallback');
 assert.ok(hasSource('retained=projected?.tennisEuropeRankings||projected?.tennisEuropeRanking?projected:previousPlayers.get(player.id)'), 'last known Tennis Europe rankings must survive a temporary projection gap');
 assert.ok(hasSource('retainedCurrentMatches=previousMatches.filter'), 'current matches must survive a temporary projection gap');
