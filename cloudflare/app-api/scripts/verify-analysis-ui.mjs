@@ -48,8 +48,9 @@ assert.ok(hasApiSource('tennisEuropePerspectiveScore') && hasSource('opponentHis
 assert.ok(hasApiSource('winnerTeam=people.find') && hasSource('opponentFormCircle'), 'winner score orientation and form circles must be present');
 assert.ok(hasSource('Per vedere tutti i tornei segui giocatore') && hasSource('opponentTournamentDateLabel'), 'opponent history must show follow prompt and tournament dates');
 assert.ok(hasApiSource('tennis_europe_match_ranking_snapshots WHERE match_id IN') && hasApiSource('snapshotFor(player,row.match_id)'), 'opponent-of-opponent rankings must use frozen match snapshots');
-assert.ok(hasApiSource('JSON.stringify(tournament)') && hasApiSource('retirementReason') && hasSource('· rit.'), 'RR payload evidence and retirement labels must be preserved');
+assert.ok(hasApiSource('tournament.drawFormat') && hasApiSource('retirementReason') && hasSource('· rit.'), 'RR payload evidence and retirement labels must be preserved');
 assert.ok(hasSource('<h3>Tornei</h3>') && hasSource('m.roundName, m.stage, m.phase, m.group'), 'player page heading and extended RR recognition must be present');
+assert.ok(hasSource('matchResultText') && hasSource('data-follow-opponent'), 'retirement formatting and opponent follow link must be present');
 assert.ok(hasApiSource('partners=people.filter') && hasSource('partners ? `con ${partners} `'), 'doubles partner must appear before vs');
 assert.ok(hasApiSource("const targets=[...new Set(matches.flatMap"), 'match snapshot must backfill participant rankings by date');
 assert.ok(hasSource('https://te.tournamentsoftware.com/tournament/'), 'opponent tournament name must link to its official homepage');

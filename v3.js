@@ -923,8 +923,8 @@ function agendaResultHtml(m, x) {
           ? readablePerson(courtWatchOpponent.name)
           : "";
   return winner
-    ? `<p class="result sharedCourtWatchResult">Vincitore: ${esc(winner)} · Risultato: ${esc(readableText(m.result))}</p>`
-    : `<p class="result${m.advances === false ? " loss" : m.advances === true ? " win" : ""}">Risultato: ${esc(readableText(m.result))}</p>`;
+    ? `<p class="result sharedCourtWatchResult">Vincitore: ${esc(winner)} · Risultato: ${esc(matchResultText(m))}</p>`
+    : `<p class="result${m.advances === false ? " loss" : m.advances === true ? " win" : ""}">Risultato: ${esc(matchResultText(m))}</p>`;
 }
 function plainOpponentHtml(m, x) {
   if (!x.op) return pendingOpponentHtml(m);
@@ -1352,7 +1352,7 @@ function agendaRoundCode(m) {
     source = readableText(`${m.event || ""} ${m.draw || ""}`),
     bonus = /bonus\s*draw/i.test(source),
     upper = raw.toUpperCase();
-  if (m.roundRobin || m.isRoundRobin || /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(`${raw} ${source} ${JSON.stringify(m)}`))
+  if (m.roundRobin || m.isRoundRobin || /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(`${raw} ${source}`))
     return "RR";
   let code = "";
   const explicit = raw.match(/\bS?Q\s*(\d+)\b/i),
@@ -1967,6 +1967,12 @@ function bindParticipantNavigation(root) {
       }),
   );
 }
+function matchResultText(match) {
+  const value = readableText(match?.result || match?.score || "");
+  const evidence = [match?.status, match?.reason, match?.resultStatus, match?.scoreStatus, match?.retirementReason, value].filter(Boolean).join(" ");
+  const retired = Boolean(match?.retired || match?.retirement || /retir|withdraw|abandon|ritir|\bret\.?\b/i.test(evidence));
+  return value + (retired && !/\brit\.?\b/i.test(value) ? " · Rit." : "");
+}
 function opponentHistoryRanking(person) {
   if (!person?.ranking) return "";
   const category = /14$/.test(person.rankingCategory || "")
@@ -2029,7 +2035,7 @@ function renderOpponentHistory(data) {
                   matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents || "Avversario da definire"}`,
                   outcome =
                     match.status === "completed" || match.retired || match.score
-                      ? `${readableText(match.score) || "—"}${match.retired ? " · rit." : ""}`
+                      ? `${matchResultText(match) || "—"}`
                       : readableText(match.status || "Programmato");
                 return `<div class="opponentHistoryMatch"><span class="opponentHistoryRound">${esc(opponentHistoryRoundLabel(match.round, match.roundRobin))}</span><span class="opponentHistoryOpponent">${matchup}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
               })
@@ -2112,9 +2118,13 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
   follow.title = "Segui giocatore";
   follow.setAttribute("aria-label", "Segui giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><span class="opponentProfileNationality">${flag || "Nazionalità non disponibile"}</span>${rankingLabel ? `<span class="opponentProfileRanking">${rankingLabel}</span>` : ""}</div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint">Per vedere tutti i tornei segui giocatore</p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><span class="opponentProfileNationality">${flag || "Nazionalità non disponibile"}</span>${rankingLabel ? `<span class="opponentProfileRanking">${rankingLabel}</span>` : ""}</div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint"><a href="#removeProfilePlayer" data-follow-opponent>Per vedere tutti i tornei segui giocatore</a></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
+  $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", () => {
+    follow.scrollIntoView({ behavior: "smooth", block: "center" });
+    follow.focus({ preventScroll: true });
+  });
   loadOpponentHistory(name, match.date, match.matchId || match.id || "");
 }
 function renderProfile(id) {
@@ -2183,7 +2193,7 @@ function renderProfile(id) {
                 const x = matchMeta(m),
                   loss = m.advances === false ? " loss" : "",
                   win = m.advances === true ? " win" : "";
-                return `<div class="listItem matchWithAnalysis">${matchAnalysisButton(m)}<h4 class="matchDate">${esc(displayDate(m.date) || "data da pubblicare")}</h4>${x.isDouble ? `<p class="matchType">Doppio${m.partner ? " con " + partnerHtml(m) : ""}</p>` : `<p class="matchType">Singolare</p>`}${agendaRoundCode(m) ? `<span class="type roundCode matchRoundCode">${esc(agendaRoundCode(m))}</span>` : ""}<p>${opponentHtml(m, x)}</p>${m.result ? `<p class="result${loss}${win}">Risultato: ${esc(readableText(m.result))}</p>` : ""}</div>`;
+                return `<div class="listItem matchWithAnalysis">${matchAnalysisButton(m)}<h4 class="matchDate">${esc(displayDate(m.date) || "data da pubblicare")}</h4>${x.isDouble ? `<p class="matchType">Doppio${m.partner ? " con " + partnerHtml(m) : ""}</p>` : `<p class="matchType">Singolare</p>`}${agendaRoundCode(m) ? `<span class="type roundCode matchRoundCode">${esc(agendaRoundCode(m))}</span>` : ""}<p>${opponentHtml(m, x)}</p>${m.result ? `<p class="result${loss}${win}">Risultato: ${esc(matchResultText(m))}</p>` : ""}</div>`;
               })
               .join("")
           : '<div class="empty">Nessuna partita pubblicata.</div>'
@@ -2424,7 +2434,7 @@ function renderTournament(key) {
                 ? [m.opponentNationality]
                 : [],
             round = agendaRoundCode(m);
-          return `<div class="listItem matchWithAnalysis">${matchAnalysisButton(m)}<h4 class="matchDate">${esc(displayDate(m.date) || "data da pubblicare")}</h4>${doubleLabel ? `<p class="matchType">${doubleLabel}</p>` : ""}${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}<p>${opponentHtml(m, x)}</p>${m.result ? `<p class="result${loss}${win}">Risultato: ${esc(readableText(m.result))}</p>` : ""}</div>`;
+          return `<div class="listItem matchWithAnalysis">${matchAnalysisButton(m)}<h4 class="matchDate">${esc(displayDate(m.date) || "data da pubblicare")}</h4>${doubleLabel ? `<p class="matchType">${doubleLabel}</p>` : ""}${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}<p>${opponentHtml(m, x)}</p>${m.result ? `<p class="result${loss}${win}">Risultato: ${esc(matchResultText(m))}</p>` : ""}</div>`;
         })
         .join("");
       return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}"><button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${nationalityHtml(playerNationality)}${playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button><span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
@@ -2840,6 +2850,11 @@ function wire() {
         renderCalendar();
       }),
   );
+  $("prevCalendarMonth").onclick = () => {
+    state.month = new Date(state.month.getFullYear(), state.month.getMonth() - 1, 1, 12);
+    saveUiState();
+    renderCalendar();
+  };
   $("calendarSex").onchange = () => {
     state.sexFilter = $("calendarSex").value;
     applyDemographicSelection();
