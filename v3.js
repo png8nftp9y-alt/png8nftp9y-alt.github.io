@@ -966,7 +966,8 @@ function playerLabelHtml(player, nationality, ranking, designation = "") {
 }
 function playerTeamHtml(m) {
   const source = circuit(m),
-    base = esc(readablePerson(m.playerName));
+    person = inlineParticipant(m.playerName),
+    base = esc(person.name) + participantDesignationHtml(m.playerDesignation || person.designation);
   if (source === "fitp") {
     const club =
       (state.data?.players || []).find((p) => p.id === m.playerId)?.club || "";
