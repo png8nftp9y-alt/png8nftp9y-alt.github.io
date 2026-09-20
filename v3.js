@@ -341,7 +341,19 @@ const playerRankingSummary = (player) => {
 const normalizedDesignation = (value) => {
   const raw = String(value ?? "").trim().replace(/^[\[(]|[\])]$/g, "").toUpperCase();
   if (/^\d{1,2}$/.test(raw)) return raw;
-  if (raw === "WC" || raw === "Q") return raw;
+  if (/^(?:WC|WILD\s*CARD)$/.test(raw)) return "WC";
+  if (/^(?:Q|QUALIFIER|QUALIFIED)$/.test(raw)) return "Q";
+  return "";
+};
+const participantDesignation = (row, prefix = "") => {
+  const direct = [
+    row?.[`${prefix}Designation`], row?.[`${prefix}EntryType`],
+    row?.[`${prefix}Seed`], row?.[`${prefix}SeedNumber`], row?.[`${prefix}Seeding`],
+    row?.[`${prefix}Qualifier`], row?.[`${prefix}WildCard`], row?.[`${prefix}Wildcard`],
+  ].map(normalizedDesignation).find(Boolean);
+  if (direct) return direct;
+  if (row?.[`${prefix}WildCard`] === true || row?.[`${prefix}Wildcard`] === true) return "WC";
+  if (row?.[`${prefix}Qualifier`] === true || row?.[`${prefix}Qualified`] === true) return "Q";
   return "";
 };
 const participantDesignationHtml = (value) => {
@@ -888,7 +900,8 @@ function partnerHtml(m) {
       .map(readablePerson)
       .filter(Boolean),
     nationalities = m.partnerNationalities || [],
-    rankings = m.partnerTeRankings || [];
+    rankings = m.partnerTeRankings || [],
+    designations = m.partnerDesignations || m.partnerEntryTypes || m.partnerSeeds || [];
   return names
     .map((name, index) =>
       participantLinkHtml(
@@ -896,7 +909,7 @@ function partnerHtml(m) {
         "partner",
         name,
         index,
-        playerLabelHtml(name, nationalities[index] || "", rankings[index], (m.partnerDesignations || [])[index]),
+        playerLabelHtml(name, nationalities[index] || "", rankings[index], designations[index]),
       ),
     )
     .join('<span class="teamSeparator">/</span>');
@@ -915,13 +928,14 @@ function opponentHtml(m, x) {
         ? [m.opponentNationality]
         : [],
     rankings = m.opponentTeRankings || [],
+    designations = m.opponentDesignations || m.opponentEntryTypes || m.opponentSeeds || [],
     people = names
       .map((name, index) => {
         const content = playerLabelHtml(
           name,
           nationalities[index] || "",
           rankings[index],
-          (m.opponentDesignations || [])[index],
+          designations[index],
         );
         return participantLinkHtml(
           m,
@@ -977,7 +991,7 @@ function playerLabelHtml(player, nationality, ranking, designation = "") {
 function playerTeamHtml(m) {
   const source = circuit(m),
     person = inlineParticipant(m.playerName),
-    base = esc(person.name) + participantDesignationHtml(m.playerDesignation || person.designation);
+    base = esc(person.name) + participantDesignationHtml(participantDesignation(m, "player") || person.designation);
   if (source === "fitp") {
     const club =
       (state.data?.players || []).find((p) => p.id === m.playerId)?.club || "";
@@ -991,10 +1005,10 @@ function playerTeamHtml(m) {
       m.playerNationality ||
       monitoredNationality(m.playerId),
     m.playerTeRanking,
-    m.playerDesignation,
+    participantDesignation(m, "player"),
   );
   return m.partner
-    ? `${player}/${peopleHtml(m.partner, m.partnerNationalities || [], m.partnerTeRankings || [], m.partnerDesignations || [])}`
+    ? `${player}/${peopleHtml(m.partner, m.partnerNationalities || [], m.partnerTeRankings || [], m.partnerDesignations || m.partnerEntryTypes || m.partnerSeeds || [])}`
     : player;
 }
 function analysisKey(m) {
@@ -1655,6 +1669,7 @@ function renderAgenda() {
               blockTournament?.name || sample.tournamentName || "Torneo",
             ),
             place = agendaTournamentLocation(blockTournament, sample),
+            courtConditions = tournamentSurfaceLabel(blockTournament || sample),
             source = circuit(sample),
             rows = agendaMatchRows(matches),
             blockIdentity = mixedChronological ? "" : [...identities][0] || "",
@@ -1666,7 +1681,7 @@ function renderAgenda() {
             chronologicalHeaderIdentity = mixedChronological
               ? ""
               : blockIdentity;
-          return `<section class="agendaTournamentBlock ${source}${isChronological ? " chronologicalAgendaBlock" : ""}">${showTournamentHead ? `<header class="agendaTournamentHead"><div><h3>${tKey ? `<button data-open-tournament="${esc(tKey)}">${esc(name)}</button>` : `<span>${esc(name)}</span>`}<small>${esc(place)}</small></h3></div><span class="type ${source}">${agendaCircuitLabel(sample)}</span></header>` : ""}<div class="agendaTournamentMatches">${rows
+          return `<section class="agendaTournamentBlock ${source}${isChronological ? " chronologicalAgendaBlock" : ""}">${showTournamentHead ? `<header class="agendaTournamentHead"><div><h3>${tKey ? `<button data-open-tournament="${esc(tKey)}">${esc(name)}</button>` : `<span>${esc(name)}</span>`}<small>${esc([place, courtConditions].filter(Boolean).join(" · "))}</small></h3></div><span class="type ${source}">${agendaCircuitLabel(sample)}</span></header>` : ""}<div class="agendaTournamentMatches">${rows
             .map(
               (row) =>
                 `<div class="agendaMatchRow matches-${row.length}">${row
@@ -2070,7 +2085,13 @@ function renderOpponentHistory(data) {
             const home = tournament.competitionId
               ? `https://te.tournamentsoftware.com/tournament/${encodeURIComponent(tournament.competitionId)}`
               : "";
-            return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header><div class="opponentHistoryMatches">${(tournament.matches || [])
+            const projectedTournament = (state.data?.tournaments || []).find(
+                (item) =>
+                  String(item.competitionId || item.sourceTournamentId || "") ===
+                  String(tournament.competitionId || ""),
+              ),
+              courtConditions = tournamentSurfaceLabel(projectedTournament || tournament);
+            return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header><div class="opponentHistoryMatches">${(tournament.matches || [])
               .map((match) => {
                 const personHtml = (person) => {
                     const courtWatchPlayer = courtWatchPlayerByName(person.name),
@@ -2236,8 +2257,9 @@ function renderProfile(id) {
         venue = summerCenter
           ? ""
           : readableText(t.venueName || t.clubName || t.club || ""),
-        place = summerCenter || cityCountry(t.location);
-      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${venue ? esc(venue) + " · " : ""}${esc(place)} · ${esc(displayDate(t.startDate))} – ${esc(displayDate(t.endDate))}${t.calendarListLabel ? " · " + esc(t.calendarListLabel) : ""}</p></div><div class="profileTournamentMatches">${
+        place = summerCenter || cityCountry(t.location),
+        courtConditions = tournamentSurfaceLabel(t);
+      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${venue ? esc(venue) + " · " : ""}${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(displayDate(t.startDate))} – ${esc(displayDate(t.endDate))}${t.calendarListLabel ? " · " + esc(t.calendarListLabel) : ""}</p></div><div class="profileTournamentMatches">${
         matches.length
           ? matches
               .map((m) => {
@@ -2497,7 +2519,7 @@ function renderTournament(key) {
           return `<div class="listItem matchWithAnalysis">${matchAnalysisButton(m)}<h4 class="matchDate">${esc(displayDate(m.date) || "data da pubblicare")}</h4>${doubleLabel ? `<p class="matchType">${doubleLabel}</p>` : ""}${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}<p>${opponentHtml(m, x)}</p>${matchResultText(m) ? `<p class="result${loss}${win}">Risultato: ${esc(matchResultText(m))}</p>` : ""}</div>`;
         })
         .join("");
-      return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}"><button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(rows.find(row => row.playerDesignation)?.playerDesignation)}${nationalityHtml(playerNationality)}${playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button><span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
+      return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}"><button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button><span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
     })
     .join("");
   const officialUrl = tournamentOfficialUrl(t),

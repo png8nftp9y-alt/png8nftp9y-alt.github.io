@@ -1247,3 +1247,13 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Il recupero ranking degli altri partecipanti usa sia il nome normalizzato sia il profile ID Tennis Europe; resta vincolato alla pubblicazione non successiva alla partita e alla categoria corretta quando disponibile.
 - Lo stato di forma è nero; vittorie e sconfitte sono mostrate in due cerchi separati, rispettivamente verde e rosso.
 - Nei doppi lo storico include il compagno del giocatore studiato e rende la formazione come `con [compagno] vs [avversario 1] / [avversario 2]`, includendo nazionalità, bandiera e ranking disponibili.
+
+
+
+## Aggiornamento 20 settembre 2026 — designazioni tabellone e condizioni campo
+
+- Corretto il riconoscimento trasversale delle designazioni dei partecipanti: testa di serie numerica, `WC` e `Q` vengono ora lette anche dagli alias sorgente `entryType`, `seed`, `seedNumber`, `seeding`, `wildCard` e `qualifier`, compresi i corrispondenti array per avversari e compagni di doppio.
+- L'ordine visivo resta nome, designazione, nazionalità/bandiera e ranking in Agenda, pagina giocatore, pagina torneo e pagina avversario. Se la fonte ufficiale non pubblica una designazione, l'app non ne inventa una.
+- Superficie e ambiente Indoor/Outdoor sono ora esposti non soltanto nella pagina torneo, ma anche nelle intestazioni torneo di Agenda e pagina giocatore; lo storico avversario li mostra quando lo snapshot del torneo li possiede.
+- La normalizzazione delle iscrizioni accetta anche `courtSurface`, `playingSurface`, `courtEnvironment` e i flag booleani `indoor`/`outdoor`, oltre ai campi già supportati.
+- Incrementata la versione dell'asset `v3.js` a `2026092017` per impedire che dispositivi già registrati continuino a usare una copia precedente. Non sono state modificate schedulazioni, selezione giocatori, punteggi o logica di navigazione.

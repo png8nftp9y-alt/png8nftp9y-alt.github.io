@@ -62,8 +62,8 @@ function entry(row) {
     address: row.address || "",
     addressSource: row.addressSource || "",
     addressSearchUrl: row.addressSearchUrl || "",
-    surface: row.surface || row.surfaceDesc || "",
-    environment: row.environment || row.indoorOutdoor || row.indoorOrOutDoor || "",
+    surface: row.surface || row.surfaceDesc || row.courtSurface || row.playingSurface || "",
+    environment: row.environment || row.indoorOutdoor || row.indoorOrOutDoor || row.courtEnvironment || (row.indoor === true ? "Indoor" : row.outdoor === true ? "Outdoor" : ""),
     startDate: row.qualificationStartDate || row.startDate || "",
     qualificationStartDate: row.qualificationStartDate || "",
     officialStartDate: row.officialStartDate || "",
@@ -257,8 +257,8 @@ const teEntries = [...(te.entries || []), ...(teHistory.entries || [])]
       circuit: "tennis-europe",
       venueName: r.venueName || official.venueName || "",
       address: r.address || official.address || "",
-      surface: r.surface || official.surface || official.surfaceDesc || "",
-      environment: r.environment || official.indoorOutdoor || official.indoorOrOutDoor || "",
+      surface: r.surface || official.surface || official.surfaceDesc || official.courtSurface || official.playingSurface || "",
+      environment: r.environment || official.environment || official.indoorOutdoor || official.indoorOrOutDoor || official.courtEnvironment || (official.indoor === true ? "Indoor" : official.outdoor === true ? "Outdoor" : ""),
     });
   })
   .filter((e) => e.playerId && e.startDate && validDate(e.endDate));
@@ -283,8 +283,8 @@ const fitpEntries = (fitp.entries || [])
       location: verified?.location || r.location,
       venueName: verified?.venueName || r.venueName || official.club || "",
       address,
-      surface: r.surface || official.surface || official.surfaceDesc || "",
-      environment: r.environment || official.indoorOutdoor || official.indoorOrOutDoor || "",
+      surface: r.surface || official.surface || official.surfaceDesc || official.courtSurface || official.playingSurface || "",
+      environment: r.environment || official.environment || official.indoorOutdoor || official.indoorOrOutDoor || official.courtEnvironment || (official.indoor === true ? "Indoor" : official.outdoor === true ? "Outdoor" : ""),
       addressSource,
       addressSearchUrl:
         addressSource === "google_search_required"
@@ -320,8 +320,8 @@ const itfEntries = [...(itfHistory.entries || []), ...(itf.entries || [])].map(
         official.clubName ||
         "",
       address: metadata.address || r.address || official.address || "",
-      surface: metadata.surface || r.surface || official.surface || official.surfaceDesc || "",
-      environment: metadata.environment || r.environment || official.indoorOutdoor || official.indoorOrOutDoor || "",
+      surface: metadata.surface || r.surface || official.surface || official.surfaceDesc || official.courtSurface || official.playingSurface || "",
+      environment: metadata.environment || r.environment || official.environment || official.indoorOutdoor || official.indoorOrOutDoor || official.courtEnvironment || (official.indoor === true ? "Indoor" : official.outdoor === true ? "Outdoor" : ""),
     });
   },
 );
