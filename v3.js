@@ -105,7 +105,8 @@ const state = {
 let calendarHeightObserver = null,
   loadRunning = false,
   renderedDataSignature = "",
-  uiSelectionRestored = Array.isArray(restoredUi.selected),
+  uiSelectionRestored =
+    Array.isArray(restoredUi.selected) && restoredUi.selected.length > 0,
   uiScrollRestored = false,
   calendarPlayerHoldTimer = null,
   suppressTournamentOpenUntil = 0,
