@@ -1,6 +1,10 @@
 name: Court Watch Tennis Europe ranking history
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ['Court Watch Cloudflare D1 and app API']
+    types: [completed]
+    branches: [main]
   push:
     branches: [main]
     paths:
@@ -12,6 +16,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   discover:
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_commit.message == 'Sync official Court Watch players') }}
     runs-on: ubuntu-latest
     outputs:
       publications: ${{ steps.history.outputs.publications }}

@@ -1,5 +1,5 @@
 name: Court Watch Cloudflare D1 usage audit
-# Diagnostic trigger: 2026-09-19 (billing projection through 2026-10-15)
+# Diagnostic trigger: 2026-09-20 (yesterday comparison and projection through 2026-10-15)
 on:
   workflow_dispatch:
   schedule:
@@ -35,7 +35,11 @@ jobs:
           const daily={},byDatabase={};for(const row of rows){const date=row.dimensions?.date||'unknown',databaseId=row.dimensions?.databaseId||'unknown';add(daily[date]||=empty(),row);const database=byDatabase[databaseId]||={databaseId,name:databaseNames.get(databaseId)||databaseId,totals:empty(),daily:{}};add(database.totals,row);add(database.daily[date]||=empty(),row)}
           const totals=Object.values(daily).reduce((out,row)=>add(out,row),empty());
           const databases=Object.values(byDatabase).sort((a,b)=>b.totals.rowsWritten-a.totals.rowsWritten||b.totals.rowsRead-a.totals.rowsRead).map(database=>({...database,overageRateCost:{readsUsd:Number((database.totals.rowsRead/1e9).toFixed(6)),writesUsd:Number((database.totals.rowsWritten/1e6).toFixed(6))}}));
+          const dates=Object.keys(daily).filter(date=>date!=='unknown').sort(),yesterday=new Date(now.getTime()-86400000).toISOString().slice(0,10),yesterdayUsage=daily[yesterday]||empty(),priorDates=dates.filter(date=>date<yesterday),recentDates=priorDates.slice(-7),average=(selected)=>{const out=empty();for(const date of selected)add(out,daily[date]);for(const field of Object.keys(out))out[field]=selected.length?Number((out[field]/selected.length).toFixed(2)):0;return out},priorAverage=average(priorDates),recentAverage=average(recentDates),ratio={};for(const field of Object.keys(yesterdayUsage))ratio[field]=priorAverage[field]?Number((yesterdayUsage[field]/priorAverage[field]).toFixed(3)):null;
+          const target=new Date('2026-10-15T00:00:00Z'),today=new Date(now.toISOString().slice(0,10)+'T00:00:00Z'),remainingDays=Math.max(0,Math.floor((target-today)/86400000)+1),project=(rate)=>{const out={};for(const field of Object.keys(totals))out[field]=Math.round(totals[field]+rate[field]*remainingDays);return out};
           console.log('CLOUDFLARE_D1_USAGE '+JSON.stringify({from,to,totals,daily}));
+          console.log('CLOUDFLARE_D1_YESTERDAY_COMPARISON '+JSON.stringify({yesterday,usage:yesterdayUsage,priorDays:priorDates.length,priorDailyAverage:priorAverage,yesterdayToPriorAverageRatio:ratio,recentDays:recentDates,recentDailyAverage:recentAverage}));
+          console.log('CLOUDFLARE_D1_PROJECTION_2026_10_15 '+JSON.stringify({observedThrough:yesterday,remainingDays,usingPriorDailyAverage:project(priorAverage),usingRecent7DayAverage:project(recentAverage),usingYesterdayRate:project(yesterdayUsage)}));
           console.log('CLOUDFLARE_D1_USAGE_BY_DATABASE '+JSON.stringify({from,to,databaseListStatus:databaseResponse.status,databases}));
           const subscriptionResponse=await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/subscriptions`,{headers:{Authorization:`Bearer ${process.env.CLOUDFLARE_API_TOKEN}`}});
           const subscriptionBody=await subscriptionResponse.json();
