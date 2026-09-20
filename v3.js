@@ -612,20 +612,21 @@ async function v3json(path) {
     clearTimeout(timer);
   }
 }
-async function apiProjection() {
+async function fetchProjection(url, timeoutMs) {
   const controller = new AbortController(),
-    timer = setTimeout(() => controller.abort(), 6000);
+    timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const r = await fetch(
-      APP_API + "?t=" + Date.now(),
+    const response = await fetch(
+      url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(),
       privateApiOptions({
         cache: "no-store",
         mode: "cors",
+        credentials: "same-origin",
         signal: controller.signal,
       }),
     );
-    if (!r.ok) throw Error("API Court Watch non disponibile");
-    const data = await r.json();
+    if (!response.ok) throw Error("API Court Watch non disponibile: " + response.status);
+    const data = await response.json();
     if (
       !Array.isArray(data.players) ||
       !data.players.length ||
@@ -636,6 +637,14 @@ async function apiProjection() {
     return data;
   } finally {
     clearTimeout(timer);
+  }
+}
+async function apiProjection() {
+  try {
+    return await fetchProjection(APP_API, 8000);
+  } catch (privateError) {
+    console.warn("Snapshot privato lento: recupero snapshot D1 rapido", privateError);
+    return fetchProjection(location.origin + "/v1/app-snapshot", 15000);
   }
 }
 function cachedData() {
