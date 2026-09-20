@@ -269,12 +269,14 @@ const IOC_REGION = {
   BRA: "BR",
   ARG: "AR",
   MEX: "MX",
+  KAZ: "KZ",
 };
 const COUNTRY_NAME_REGION = {
   SERBIA: "RS",
   SRBIJA: "RS",
   CZECHIA: "CZ",
   "CZECH REPUBLIC": "CZ",
+  KAZAKHSTAN: "KZ",
 };
 const countryCode = (value) =>
     String(value || "")
@@ -289,8 +291,13 @@ const nationalityHtml = (value) => {
   const code = countryCode(value);
   if (!code) return "";
   const flagCode = countryFlagCode(code),
-    flagFile = flagCode === "mx" ? "mx-flat" : flagCode;
-  return ` <span class="nationality">(${esc(code)})${flagFile ? ` <img class="countryFlag" src="flags/${flagFile}.svg" alt="Bandiera ${esc(code)}" loading="eager">` : ""}</span>`;
+    flagFile = flagCode === "mx" ? "mx-flat" : flagCode,
+    flag = flagCode === "kz"
+      ? '<span class="countryFlagEmoji" role="img" aria-label="Bandiera KAZ">🇰🇿</span>'
+      : flagFile
+        ? `<img class="countryFlag" src="flags/${flagFile}.svg" alt="Bandiera ${esc(code)}" loading="eager">`
+        : "";
+  return ` <span class="nationality">(${esc(code)})${flag ? ` ${flag}` : ""}</span>`;
 };
 const VERIFIED_NATIONALITY = {
   "MARIA SHILIGA": "RUS",

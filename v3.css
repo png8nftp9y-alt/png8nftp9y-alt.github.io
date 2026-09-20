@@ -369,3 +369,11 @@
 .opponentHistoryOpponent{min-width:0;margin-left:0}
 .opponentHistoryMatch>strong{justify-self:end;white-space:nowrap;min-width:max-content}
 @media(max-width:700px){.opponentHistoryMatch{grid-template-columns:52px minmax(180px,1fr) minmax(118px,max-content)!important;column-gap:7px!important}.opponentHistoryTournament{overflow-x:auto!important}}
+
+/* Prevent score clipping and add Kazakhstan flag alignment. */
+.opponentHistoryTournament{max-width:100%!important;overflow:hidden!important}
+.opponentHistoryMatches{max-width:100%!important;overflow:hidden!important}
+.opponentHistoryMatch{max-width:100%!important;overflow:hidden!important}
+.opponentHistoryOpponent{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+.opponentHistoryMatch>strong{position:relative;z-index:2;background:#fff;padding-left:6px;overflow:visible!important}
+.countryFlagEmoji{display:inline-flex;width:18px;height:13px;align-items:center;justify-content:center;font-size:16px;line-height:13px;vertical-align:-1px}
