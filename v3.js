@@ -1967,10 +1967,22 @@ function bindParticipantNavigation(root) {
       }),
   );
 }
+function incompleteCompletedScore(value, status) {
+  if (!/completed|terminat|conclus/i.test(String(status || ""))) return false;
+  const sets = String(value || "").match(/\d+(?:\(\d+\))?-\d+(?:\(\d+\))?/g) || [];
+  if (!sets.length) return false;
+  let left = 0, right = 0;
+  for (const set of sets) {
+    const points = set.match(/^(\d+)(?:\(\d+\))?-(\d+)/);
+    if (!points) continue;
+    Number(points[1]) > Number(points[2]) ? left++ : right++;
+  }
+  return Math.max(left, right) < 2;
+}
 function matchResultText(match) {
   const value = readableText(match?.result || match?.score || "");
   const evidence = [match?.status, match?.reason, match?.resultStatus, match?.scoreStatus, match?.retirementReason, value].filter(Boolean).join(" ");
-  const retired = Boolean(match?.retired || match?.retirement || /retir|withdraw|abandon|ritir|\bret\.?\b/i.test(evidence));
+  const retired = Boolean(match?.retired || match?.retirement || /retir|withdraw|abandon|ritir|\bret\.?\b/i.test(evidence) || incompleteCompletedScore(value, match?.status));
   return value + (retired && !/\brit\.?\b/i.test(value) ? " · Rit." : "");
 }
 function opponentHistoryRanking(person) {
@@ -1984,7 +1996,7 @@ function opponentHistoryRanking(person) {
 }
 function opponentHistoryRoundLabel(value, roundRobin = false) {
   const round = readableText(value || "");
-  if (roundRobin) return "RR";
+  if (roundRobin || /^round\s*\d+$/i.test(round)) return "RR";
   return /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(round)
     ? "RR"
     : round || "—";
@@ -2118,10 +2130,11 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
   follow.title = "Segui giocatore";
   follow.setAttribute("aria-label", "Segui giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><span class="opponentProfileNationality">${flag || "Nazionalità non disponibile"}</span>${rankingLabel ? `<span class="opponentProfileRanking">${rankingLabel}</span>` : ""}</div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint"><a href="#removeProfilePlayer" data-follow-opponent>Per vedere tutti i tornei segui giocatore</a></p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><span class="opponentProfileNationality">${flag || "Nazionalità non disponibile"}</span>${rankingLabel ? `<span class="opponentProfileRanking">${rankingLabel}</span>` : ""}</div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Per vedere tutti i tornei segui giocatore</button></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
-  $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", () => {
+  $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", (event) => {
+    event.preventDefault();
     follow.scrollIntoView({ behavior: "smooth", block: "center" });
     follow.focus({ preventScroll: true });
   });
