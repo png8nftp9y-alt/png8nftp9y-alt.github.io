@@ -291,13 +291,8 @@ const nationalityHtml = (value) => {
   const code = countryCode(value);
   if (!code) return "";
   const flagCode = countryFlagCode(code),
-    flagFile = flagCode === "mx" ? "mx-flat" : flagCode,
-    flag = flagCode === "kz"
-      ? '<span class="countryFlagEmoji" role="img" aria-label="Bandiera KAZ">🇰🇿</span>'
-      : flagFile
-        ? `<img class="countryFlag" src="flags/${flagFile}.svg" alt="Bandiera ${esc(code)}" loading="eager">`
-        : "";
-  return ` <span class="nationality">(${esc(code)})${flag ? ` ${flag}` : ""}</span>`;
+    flagFile = flagCode === "mx" ? "mx-flat" : flagCode;
+  return ` <span class="nationality">(${esc(code)})${flagFile ? ` <img class="countryFlag" src="flags/${flagFile}.svg" alt="Bandiera ${esc(code)}" loading="eager">` : ""}</span>`;
 };
 const VERIFIED_NATIONALITY = {
   "MARIA SHILIGA": "RUS",
@@ -1975,7 +1970,6 @@ function bindParticipantNavigation(root) {
   );
 }
 function incompleteCompletedScore(value, status, decided = false) {
-  if (!decided && !/completed|terminat|conclus|played|finished/i.test(String(status || ""))) return false;
   const sets = String(value || "").match(/\d+(?:\(\d+\))?-\d+(?:\(\d+\))?/g) || [];
   if (!sets.length) return false;
   let left = 0, right = 0;

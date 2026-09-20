@@ -377,3 +377,11 @@
 .opponentHistoryOpponent{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
 .opponentHistoryMatch>strong{position:relative;z-index:2;background:#fff;padding-left:6px;overflow:visible!important}
 .countryFlagEmoji{display:inline-flex;width:18px;height:13px;align-items:center;justify-content:center;font-size:16px;line-height:13px;vertical-align:-1px}
+
+/* Stable three-column opponent history: no overlap, no score clipping. */
+.opponentHistoryMatch{display:grid!important;grid-template-columns:minmax(82px,110px) minmax(0,1fr) max-content!important;gap:8px!important;align-items:center!important;min-width:0!important;width:100%!important;overflow:hidden!important}
+.opponentHistoryRound{grid-column:1;min-width:0!important;max-width:110px;overflow:hidden!important;text-overflow:ellipsis;white-space:nowrap}
+.opponentHistoryOpponent{grid-column:2;min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;margin:0!important}
+.opponentHistoryMatch>strong{grid-column:3;min-width:0!important;max-width:150px;overflow:visible!important;white-space:nowrap!important;justify-self:end!important;font-size:13px}
+.countryFlagEmoji{display:none!important}
+@media(max-width:700px){.opponentHistoryMatch{grid-template-columns:72px minmax(0,1fr) max-content!important;gap:6px!important}.opponentHistoryMatch>strong{font-size:12px!important;max-width:125px}.opponentHistoryRound{max-width:72px}}

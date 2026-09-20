@@ -50,7 +50,7 @@ assert.ok(hasSource('Per vedere tutti i tornei segui giocatore') && hasSource('o
 assert.ok(hasApiSource('tennis_europe_match_ranking_snapshots WHERE match_id IN') && hasApiSource('snapshotFor(player,row.match_id)'), 'opponent-of-opponent rankings must use frozen match snapshots');
 assert.ok(hasApiSource('participantTokens') && hasApiSource("nameKey(row.normalized_name)===playerNameKey") && hasApiSource('lookupClauses'), 'all opponent participants must resolve reordered Tennis Europe names with bounded D1 lookup');
 assert.ok(hasApiSource('tournament.drawFormat') && hasApiSource('retirementReason') && hasSource('· Rit.') && hasApiSource("?' · Rit.':''") && hasApiSource('self?.is_winner!=null') && hasApiSource("match.score||match.result"), 'RR payload evidence and API-visible retirement labels must be preserved');
-assert.ok(hasSource('KAZ: "KZ"') && hasSource('🇰🇿'), 'Kazakhstan nationality must render its flag');
+assert.ok(hasSource('KAZ: "KZ"') && hasSource('flags/${flagFile}.svg'), 'Kazakhstan nationality must render its flat flag asset');
 assert.ok(hasSource('<h3>Tornei</h3>') && hasSource('m.roundName, m.stage, m.phase, m.group'), 'player page heading and extended RR recognition must be present');
 assert.ok(hasSource('matchResultText') && hasSource('data-follow-opponent') && hasSource('incompleteCompletedScore'), 'retirement formatting and opponent follow control must be present');
 assert.ok(hasSource('nextCalendarMonth') && hasSource('retirementStatus') && hasSource('completedBy'), 'independent next month and extended retirement evidence must be present');

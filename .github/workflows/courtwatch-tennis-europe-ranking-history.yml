@@ -1,6 +1,10 @@
 name: Court Watch Tennis Europe ranking history
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-tennis-europe-ranking-history.yml'
 permissions:
   contents: read
 concurrency:
@@ -24,7 +28,7 @@ jobs:
       - run: npm install
       - run: node scripts/configure-d1.mjs
       - name: Read Europe matches once
-        run: npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT payload FROM app_matches WHERE lower(COALESCE(json_extract(payload,'$.circuit'),json_extract(payload,'$.sourceId'),json_extract(payload,'$.source'),json_extract(payload,'$.sourceName'),'')) LIKE '%tennis%europe%'" --json > te-ranking-matches.json
+        run: npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT payload FROM app_matches WHERE lower(COALESCE(json_extract(payload,'$.circuit'),json_extract(payload,'$.sourceId'),json_extract(payload,'$.source'),json_extract(payload,'$.sourceName'),'')) LIKE '%tennis%europe%' UNION ALL SELECT json_object('historyTargetsOnly',1,'opponentOptions',json_group_array(p.display_name)) AS payload FROM matches m JOIN match_participants p ON p.match_id=m.id WHERE m.circuit='tennis-europe' GROUP BY m.id" --json > te-ranking-matches.json
       - id: history
         name: Discover official historical publications
         run: |
