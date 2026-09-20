@@ -2040,8 +2040,13 @@ function renderOpponentHistory(data) {
               : "";
             return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header><div class="opponentHistoryMatches">${(tournament.matches || [])
               .map((match) => {
-                const personHtml = (person) =>
-                    `<span class="opponentHistoryPerson"><b>${esc(readablePerson(person.name))}</b>${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`,
+                const personHtml = (person) => {
+                    const courtWatchPlayer = courtWatchPlayerByName(person.name),
+                      name = courtWatchPlayer
+                        ? `<button type="button" class="opponentHistoryCourtWatch" data-open-player="${esc(courtWatchPlayer.id)}"><b>${esc(readablePerson(person.name))}</b></button>`
+                        : `<b>${esc(readablePerson(person.name))}</b>`;
+                    return `<span class="opponentHistoryPerson">${name}${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`;
+                  },
                   partners = (match.partners || []).map(personHtml).join(" / "),
                   opponents = (match.opponents || []).map(personHtml).join(" / "),
                   matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents || "Avversario da definire"}`,
@@ -2056,6 +2061,7 @@ function renderOpponentHistory(data) {
         )
         .join("")
     : '<div class="empty">Nessun torneo precedente disponibile prima di questo incontro.</div>';
+  bindParticipantNavigation(body);
 }
 async function loadOpponentHistory(name, asOf, excludeMatchId) {
   const body = $("opponentTournamentHistory");
