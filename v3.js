@@ -1348,7 +1348,7 @@ function agendaEventCode(m) {
   return gender && kind ? gender + kind + age : "";
 }
 function agendaRoundCode(m) {
-  const raw = readableText(m.round || ""),
+  const raw = readableText([m.round, m.roundName, m.stage, m.phase, m.group, m.format, m.drawFormat].filter(Boolean).join(" ")),
     source = readableText(`${m.event || ""} ${m.draw || ""}`),
     bonus = /bonus\s*draw/i.test(source),
     upper = raw.toUpperCase();
@@ -1983,6 +1983,12 @@ function opponentHistoryRoundLabel(value, roundRobin = false) {
     ? "RR"
     : round || "—";
 }
+function opponentTournamentDateLabel(tournament) {
+  const start = displayDate(tournament.startDate),
+    end = displayDate(tournament.endDate);
+  if (start && end && start !== end) return `${start} – ${end}`;
+  return start || end || "";
+}
 function opponentTournamentEventLinks(tournament) {
   const events = new Map();
   for (const match of tournament.matches || []) {
@@ -2004,7 +2010,7 @@ function renderOpponentHistory(data) {
     body = $("opponentTournamentHistory");
   if (head)
     head.innerHTML = form.matches
-      ? `<span class="opponentFormLabel">Stato di forma</span><span class="opponentFormCircle wins" aria-label="${form.wins} partite vinte">${form.wins}</span><span class="opponentFormCircle losses" aria-label="${form.losses} partite perse">${form.losses}</span>`
+      ? `<span class="opponentFormLabel">Stato di forma</span><span class="opponentFormCircle wins" aria-label="${form.wins} partite vinte"><b>${form.wins}</b><small>V</small></span><span class="opponentFormCircle losses" aria-label="${form.losses} partite perse"><b>${form.losses}</b><small>P</small></span>`
       : '<span class="opponentFormLabel">Stato di forma</span>';
   if (!body) return;
   body.innerHTML = tournaments.length
@@ -2014,7 +2020,7 @@ function renderOpponentHistory(data) {
             const home = tournament.competitionId
               ? `https://te.tournamentsoftware.com/tournament/${encodeURIComponent(tournament.competitionId)}`
               : "";
-            return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span></header><div class="opponentHistoryMatches">${(tournament.matches || [])
+            return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}</h4>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}<span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span></header><div class="opponentHistoryMatches">${(tournament.matches || [])
               .map((match) => {
                 const personHtml = (person) =>
                     `<span class="opponentHistoryPerson"><b>${esc(readablePerson(person.name))}</b>${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`,
@@ -2031,7 +2037,7 @@ function renderOpponentHistory(data) {
           },
         )
         .join("")
-    : '<div class="empty">Nessuno storico disponibile prima di questa data.</div>';
+    : '<div class="empty">Nessun torneo precedente disponibile prima di questo incontro.</div>';
 }
 async function loadOpponentHistory(name, asOf, excludeMatchId) {
   const body = $("opponentTournamentHistory");
@@ -2106,7 +2112,7 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
   follow.title = "Segui giocatore";
   follow.setAttribute("aria-label", "Segui giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><span class="opponentProfileNationality">${flag || "Nazionalità non disponibile"}</span>${rankingLabel ? `<span class="opponentProfileRanking">${rankingLabel}</span>` : ""}</div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2><span class="opponentProfileNationality">${flag || "Nazionalità non disponibile"}</span>${rankingLabel ? `<span class="opponentProfileRanking">${rankingLabel}</span>` : ""}</div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint">Per vedere tutti i tornei segui giocatore</p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
   loadOpponentHistory(name, match.date, match.matchId || match.id || "");
@@ -2185,7 +2191,7 @@ function renderProfile(id) {
     })
     .join("");
   $("profileContent").innerHTML =
-    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><h2>${esc(p.name)}</h2><p>${esc(p.club || "Tesseramento da completare")}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei e partite</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
+    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><h2>${esc(p.name)}</h2><p>${esc(p.club || "Tesseramento da completare")}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
   $("profileContent")
     .querySelectorAll("[data-open-tournament]")
     .forEach(

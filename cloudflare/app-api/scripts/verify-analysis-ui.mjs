@@ -41,11 +41,13 @@ assert.ok(hasSource('function partnerHtml(') && hasSource('data-opponent-role'),
 assert.ok(hasSource('doublesPartnerLink'), 'doubles partners must remain bold');
 assert.ok(hasSource('function loadOpponentHistory(') && hasSource('/opponent-profile?name='), 'opponent page must load frozen history');
 assert.ok(hasSource('function opponentTournamentEventLinks(') && hasSource('opponentTournamentDraw'), 'opponent tournaments must link event badges to draws');
-assert.ok(hasSource('<span class="opponentHistoryOpponent">vs ${opponents'), 'opponent history rows must prefix the opponent with vs');
+assert.ok(hasSource('matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents') && hasSource('<span class="opponentHistoryOpponent">${matchup}</span>'), 'opponent history rows must render partner plus vs opponent');
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
 assert.ok(hasApiSource('excludeMatchId') && hasSource('&excludeMatchId='), 'opponent study page must exclude the CourtWatch match');
 assert.ok(hasApiSource('tennisEuropePerspectiveScore') && hasSource('opponentHistoryRoundLabel'), 'opponent study rows must orient scores and show full rounds');
 assert.ok(hasApiSource('winnerTeam=people.find') && hasSource('opponentFormCircle'), 'winner score orientation and form circles must be present');
+assert.ok(hasSource('Per vedere tutti i tornei segui giocatore') && hasSource('opponentTournamentDateLabel'), 'opponent history must show follow prompt and tournament dates');
+assert.ok(hasSource('<h3>Tornei</h3>') && hasSource('m.roundName, m.stage, m.phase, m.group'), 'player page heading and extended RR recognition must be present');
 assert.ok(hasApiSource('partners=people.filter') && hasSource('partners ? `con ${partners} `'), 'doubles partner must appear before vs');
 assert.ok(hasApiSource("const targets=[...new Set(matches.flatMap"), 'match snapshot must backfill participant rankings by date');
 assert.ok(hasSource('https://te.tournamentsoftware.com/tournament/'), 'opponent tournament name must link to its official homepage');
