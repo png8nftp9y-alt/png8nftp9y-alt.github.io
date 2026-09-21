@@ -1276,3 +1276,9 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Superficie e ambiente non sono più incorporati nel badge arancione `TENNIS EUROPE`: vengono mostrati in un badge neutro separato, immediatamente alla sua destra, sia nella vista per circuito sia nella vista cronologica.
 - Il contenuto resta quello ufficiale già acquisito; quando non è pubblicato continua a comparire l'avviso esplicito, senza valori inventati.
 - Verificati sintassi del client e rendering delle due varianti di intestazione Agenda. Versione dell'asset incrementata a `2026092103`; nessuna modifica a dati, motori, database, FITP o ITF.
+
+
+### Correzione ambiente già presente nel nome torneo
+
+- Il badge condizioni dell'Agenda mostra sempre sia superficie sia Indoor/Outdoor, anche quando l'ambiente compare già nel nome ufficiale del torneo. `Bad Waltersdorf 2026 - Indoor` viene quindi visualizzato correttamente come `Carpet · Indoor`, non più come il solo `Carpet`.
+- La soppressione delle ripetizioni nel testo descrittivo delle altre viste resta invariata. Verificata la regressione specifica con i dati pubblicati di Bad Waltersdorf; asset aggiornato a `v3.js?v=2026092104`.

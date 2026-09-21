@@ -1476,7 +1476,7 @@ function agendaCircuitBadges(value, tournament = value) {
   const source = circuit(value),
     circuitBadge = `<span class="type ${source}">${esc(agendaCircuitLabel(value))}</span>`;
   if (source !== "tennis-europe") return circuitBadge;
-  const conditions = tournamentSurfaceLabel(tournament);
+  const conditions = tournamentSurfaceLabel(tournament, true);
   return `${circuitBadge}<span class="type tournamentConditions">${esc(conditions || "SUPERFICIE/AMBIENTE NON PUBBLICATI")}</span>`;
 }
 function agendaTournamentLocation(t, m) {
@@ -2449,11 +2449,13 @@ function tournamentMapsUrl(place) {
     : "";
 }
 
-function tournamentSurfaceLabel(t) {
+function tournamentSurfaceLabel(t, includeNameDuplicates = false) {
   const surface = readableText(t.surface || t.courtSurface || t.playingSurface || ""),
     environment = readableText(t.environment || t.courtEnvironment || (t.indoor === true ? "Indoor" : t.outdoor === true ? "Outdoor" : "")),
     name = readableText(t.name || t.tournamentName || ""),
-    parts = [surface, environment].filter((value, index, list) => value && list.findIndex(x => x.toLowerCase() === value.toLowerCase()) === index).filter(value => !name.toLowerCase().includes(value.toLowerCase()));
+    parts = [surface, environment]
+      .filter((value, index, list) => value && list.findIndex(x => x.toLowerCase() === value.toLowerCase()) === index)
+      .filter(value => includeNameDuplicates || !name.toLowerCase().includes(value.toLowerCase()));
   return parts.join(" · ");
 }
 
