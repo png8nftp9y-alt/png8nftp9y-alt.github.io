@@ -1297,3 +1297,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Aggiunti test deterministici distinti per testa di serie main draw, testa di serie qualificazioni, `Q`, `WC` e `LL`, oltre alle varianti già coperte.
 - La navigazione interna conserva per 15 secondi la posizione verticale della pagina appena lasciata. Aprendo un profilo, torneo o avversario e tornando indietro entro tale finestra, la vista precedente viene ripristinata allo stesso punto; una navigazione successiva o più tarda continua ad aprire la destinazione dall'alto.
 - Asset aggiornato a `v3.js?v=2026092201`. Nessuna modifica alle frequenze dei motori, alla selezione giocatori o alle sigle live dell'acceptance list.
+
+
+### Turno completo nello storico avversario
+
+- Nella pagina avversario il turno occupa una colonna autonoma dimensionata sul testo completo: non si sovrappone più ai giocatori e non viene più abbreviato con puntini di sospensione.
+- La colonna risultato resta separata e allineata a destra; sui display stretti è il nome dell'avversario a usare lo spazio residuo, senza alterare dati o designazioni.
+- Cache CSS aggiornata a `v3.css?v=2026092202`. Nessuna modifica alle sigle live dell'acceptance list.

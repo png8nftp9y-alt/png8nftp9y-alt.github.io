@@ -391,3 +391,8 @@
 
 .participantDesignation{display:inline-flex;align-items:center;justify-content:center;min-width:1.45em;height:1.45em;padding:0 .34em;margin-left:.28em;border:1px solid currentColor;border-radius:.38em;font-size:.72em;font-weight:700;line-height:1;vertical-align:.08em}
 .tournamentSurface{margin:.28rem 0;color:#475569;font-weight:650}
+
+/* Keep the complete round label in its own column on opponent pages. */
+.opponentHistoryMatch{grid-template-columns:max-content minmax(0,1fr) max-content!important}
+.opponentHistoryRound{min-width:max-content!important;max-width:none!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap!important}
+@media(max-width:700px){.opponentHistoryMatch{grid-template-columns:max-content minmax(0,1fr) max-content!important}}
