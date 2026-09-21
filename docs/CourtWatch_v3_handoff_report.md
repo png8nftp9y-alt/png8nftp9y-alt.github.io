@@ -1259,3 +1259,13 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Le teste di serie Tennis Europe vengono ora acquisite dalla pagina ufficiale `Seeded entries`, associandole a giocatore ed evento; `Q` e `WC` vengono acquisiti dalle righe ufficiali dell'acceptance list e trasferiti ai partecipanti dei match.
 - Superficie e Indoor/Outdoor vengono letti dal markup realmente pubblicato nel factsheet (`Court surface boys/girls`, `Location type`) e dal valore accanto all'icona campo, inclusa la grafia ufficiale `Acryllic`.
 - Aggiunta una verifica deterministica delle varianti HTML ufficiali. La modifica resta limitata a Tennis Europe; FITP e ITF non sono stati modificati.
+
+
+## Aggiornamento 21 settembre 2026 — etichetta Agenda e identità torneo nel calendario
+
+- Nell'Agenda l'etichetta del circuito Tennis Europe riporta ora nello stesso badge anche superficie e ambiente, per esempio `TENNIS EUROPE · Clay · Outdoor`. Le condizioni non vengono duplicate sotto il nome del torneo.
+- Quando Tennis Europe non pubblica superficie e ambiente, il badge indica esplicitamente `SUPERFICIE/AMBIENTE NON PUBBLICATI`; non viene attribuito un valore inventato.
+- Nel calendario i tornei Tennis Europe usano prioritariamente il nome ufficiale `tournamentName`/`searchTournamentName`, anziché il nome del circolo eventualmente presente nel campo generico `name`.
+- La seconda riga del calendario continua a mostrare città e nazione, seguite dai giocatori Court Watch. Il circolo resta disponibile nella pagina torneo e nell'indirizzo, ma non sostituisce più il nome della competizione.
+- Verifica sui dati pubblicati: 539 tornei su 608 espongono superficie e ambiente; i 69 rimanenti sono tutti contrassegnati dalla fonte come `qualifying_date_not_published` e le pagine ufficiali controllate non pubblicano condizioni del campo. La pipeline continuerà a recuperarli automaticamente quando Tennis Europe li renderà disponibili.
+- Incrementata la versione dell'asset `v3.js` a `2026092102`. Nessuna modifica a FITP, ITF, database, punteggi o selezione giocatori.
