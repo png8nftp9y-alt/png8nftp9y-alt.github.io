@@ -508,6 +508,21 @@ function fitpSummerCenterPlace(t) {
     : "";
 }
 function tournamentLocationLabel(t, fallback = "") {
+  if (circuit(t) === "tennis-europe") {
+    const venue = readableText(t?.venueName || ""),
+      parts = readableText(t?.location || t?.city || fallback)
+        .split(",")
+        .map(readableText)
+        .filter(Boolean);
+    if (
+      venue &&
+      parts[0]?.toLocaleLowerCase("it-IT") === venue.toLocaleLowerCase("it-IT")
+    )
+      parts.shift();
+    return parts.length > 1
+      ? parts.slice(-2).join(", ")
+      : parts[0] || "Città/stato da pubblicare";
+  }
   return (
     fitpSummerCenterPlace(t) || cityCountry(t?.location || t?.city || fallback)
   );
