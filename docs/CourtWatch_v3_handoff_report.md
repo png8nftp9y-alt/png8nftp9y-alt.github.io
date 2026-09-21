@@ -1304,3 +1304,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Nella pagina avversario il turno occupa una colonna autonoma dimensionata sul testo completo: non si sovrappone più ai giocatori e non viene più abbreviato con puntini di sospensione.
 - La colonna risultato resta separata e allineata a destra; sui display stretti è il nome dell'avversario a usare lo spazio residuo, senza alterare dati o designazioni.
 - Cache CSS aggiornata a `v3.css?v=2026092202`. Nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Ranking datato nell'intestazione avversario
+
+- L'intestazione della pagina avversario non dipende più esclusivamente dallo snapshot già allegato alla partita cliccata: l'API restituisce anche il ranking Tennis Europe storico più recente non successivo alla data della partita.
+- La categoria dell'evento cliccato seleziona prioritariamente `U14` o `U16`; l'intestazione mostra numero, categoria e data della pubblicazione della classifica.
+- Il fallback funziona anche quando l'avversario non possiede tornei precedenti da elencare. Asset aggiornato a `v3.js?v=2026092203`; nessuna modifica alle sigle live dell'acceptance list.

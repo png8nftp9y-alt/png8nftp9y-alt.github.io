@@ -2112,6 +2112,17 @@ function renderOpponentHistory(data) {
     form = data.form || { wins: 0, losses: 0, matches: 0 },
     head = $("opponentFormSummary"),
     body = $("opponentTournamentHistory");
+  const profileRanking = $("opponentProfileRanking"),
+    profile = data.profile || null;
+  if (profileRanking && profile?.ranking) {
+    const category = /14$/.test(profile.category || "")
+      ? " U14"
+      : /16$/.test(profile.category || "")
+        ? " U16"
+        : "";
+    profileRanking.textContent = `n°${profile.ranking} TE${category}${profile.ranking_date ? ` · (ranking del ${displayDate(profile.ranking_date)})` : ""}`;
+    profileRanking.hidden = false;
+  }
   if (head)
     head.innerHTML = form.matches
       ? `<span class="opponentFormLabel">Stato di forma</span><span class="opponentFormCircle wins" aria-label="${form.wins} partite vinte"><b>${form.wins}</b><small>V</small></span><span class="opponentFormCircle losses" aria-label="${form.losses} partite perse"><b>${form.losses}</b><small>P</small></span>`
@@ -2155,8 +2166,8 @@ function renderOpponentHistory(data) {
     : '<div class="empty">Nessun torneo precedente disponibile prima di questo incontro.</div>';
   bindParticipantNavigation(body);
 }
-async function loadOpponentHistory(name, asOf, excludeMatchId) {
-  const requestKey = [readablePerson(name), asOf || "", excludeMatchId || ""].join("|");
+async function loadOpponentHistory(name, asOf, excludeMatchId, event) {
+  const requestKey = [readablePerson(name), asOf || "", excludeMatchId || "", event || ""].join("|");
   const body = $("opponentTournamentHistory");
   if (opponentHistoryCache.has(requestKey)) {
     renderOpponentHistory(opponentHistoryCache.get(requestKey));
@@ -2173,7 +2184,9 @@ async function loadOpponentHistory(name, asOf, excludeMatchId) {
         "&asOf=" +
         encodeURIComponent(asOf || "") +
         "&excludeMatchId=" +
-        encodeURIComponent(excludeMatchId || ""),
+        encodeURIComponent(excludeMatchId || "") +
+        "&event=" +
+        encodeURIComponent(event || ""),
       privateApiOptions({ cache: "no-store" }),
     );
     const response = await opponentHistoryRequest;
@@ -2246,7 +2259,7 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
   follow.title = "Segui giocatore";
   follow.setAttribute("aria-label", "Segui giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2>${flag ? `<span class="opponentProfileNationality">${flag}</span>` : ""}${rankingLabel ? `<span class="opponentProfileRanking">${rankingLabel}</span>` : ""}</div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Per vedere tutti i tornei segui giocatore</button></p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2>${flag ? `<span class="opponentProfileNationality">${flag}</span>` : ""}<span id="opponentProfileRanking" class="opponentProfileRanking"${rankingLabel ? "" : " hidden"}>${rankingLabel}</span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Per vedere tutti i tornei segui giocatore</button></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
   $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", (event) => {
@@ -2254,7 +2267,12 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
     follow.scrollIntoView({ behavior: "smooth", block: "center" });
     follow.focus({ preventScroll: true });
   });
-  loadOpponentHistory(name, match.date, match.matchId || match.id || "");
+  loadOpponentHistory(
+    name,
+    match.date,
+    match.matchId || match.id || "",
+    match.event || match.draw || "",
+  );
 }
 function renderProfile(id) {
   activeOpponentRouteKey = "";
