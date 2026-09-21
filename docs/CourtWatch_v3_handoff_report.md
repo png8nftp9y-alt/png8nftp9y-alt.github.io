@@ -1282,3 +1282,9 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 
 - Il badge condizioni dell'Agenda mostra sempre sia superficie sia Indoor/Outdoor, anche quando l'ambiente compare già nel nome ufficiale del torneo. `Bad Waltersdorf 2026 - Indoor` viene quindi visualizzato correttamente come `Carpet · Indoor`, non più come il solo `Carpet`.
 - La soppressione delle ripetizioni nel testo descrittivo delle altre viste resta invariata. Verificata la regressione specifica con i dati pubblicati di Bad Waltersdorf; asset aggiornato a `v3.js?v=2026092104`.
+
+
+### Calendario Tennis Europe senza nome del circolo
+
+- La seconda riga delle bande Tennis Europe nel calendario elimina il `venueName` iniziale dalla località ufficiale e mostra esclusivamente città e nazione. Per i due nuovi tornei di Virginia Cereghini, i valori verificati sono `Telde (Las Palmas), Spain` e `Meneou Larnaka, Cyprus`.
+- Il nome ufficiale del torneo resta nella prima riga. Acceptance list, sigle live, posizioni, `Q`, `WC` e teste di serie non sono state modificate. Asset aggiornato a `v3.js?v=2026092105`.
