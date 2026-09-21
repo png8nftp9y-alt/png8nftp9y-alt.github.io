@@ -105,6 +105,10 @@ const state = {
 let calendarHeightObserver = null,
   loadRunning = false,
   renderedDataSignature = "",
+  activeOpponentRouteKey = "",
+  opponentHistoryRequestKey = "",
+  opponentHistoryRequest = null,
+  opponentHistoryCache = new Map(),
   uiSelectionRestored =
     Array.isArray(restoredUi.selected) && restoredUi.selected.length > 0,
   uiScrollRestored = false,
@@ -2117,10 +2121,17 @@ function renderOpponentHistory(data) {
   bindParticipantNavigation(body);
 }
 async function loadOpponentHistory(name, asOf, excludeMatchId) {
+  const requestKey = [readablePerson(name), asOf || "", excludeMatchId || ""].join("|");
   const body = $("opponentTournamentHistory");
-  if (body) body.innerHTML = '<div class="empty">Caricamento storico…</div>';
+  if (opponentHistoryCache.has(requestKey)) {
+    renderOpponentHistory(opponentHistoryCache.get(requestKey));
+    return;
+  }
+  if (opponentHistoryRequestKey === requestKey && opponentHistoryRequest) return opponentHistoryRequest;
+  if (body && !body.querySelector(".opponentHistoryTournament")) body.innerHTML = '<div class="empty">Caricamento storico…</div>';
   try {
-    const response = await fetch(
+    opponentHistoryRequestKey = requestKey;
+    opponentHistoryRequest = fetch(
       PRIVATE_API +
         "/opponent-profile?name=" +
         encodeURIComponent(name) +
@@ -2130,12 +2141,20 @@ async function loadOpponentHistory(name, asOf, excludeMatchId) {
         encodeURIComponent(excludeMatchId || ""),
       privateApiOptions({ cache: "no-store" }),
     );
+    const response = await opponentHistoryRequest;
     if (!response.ok) throw Error("opponent history");
-    renderOpponentHistory(await response.json());
+    const data = await response.json();
+    opponentHistoryCache.set(requestKey, data);
+    if (opponentHistoryRequestKey === requestKey) renderOpponentHistory(data);
   } catch {
     if (body)
       body.innerHTML =
         '<div class="empty">Storico temporaneamente non disponibile.</div>';
+  } finally {
+    if (opponentHistoryRequestKey === requestKey) {
+      opponentHistoryRequestKey = "";
+      opponentHistoryRequest = null;
+    }
   }
 }
 function renderOpponent(identity, matchId, index, role = "opponent") {
@@ -2148,6 +2167,9 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
     location.hash = "";
     return;
   }
+  const routeKey = [role, identity, matchId, index].join("|");
+  if (activeOpponentRouteKey === routeKey && $("profileView").classList.contains("active") && $("opponentTournamentHistory")) return;
+  activeOpponentRouteKey = routeKey;
   const partner = role === "partner",
     names = partner
       ? String(match.partner || "").split(/\s*\/\s*/)
@@ -2200,6 +2222,7 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
   loadOpponentHistory(name, match.date, match.matchId || match.id || "");
 }
 function renderProfile(id) {
+  activeOpponentRouteKey = "";
   const p = state.data.players.find((x) => x.id === id);
   if (!p) {
     location.hash = "";

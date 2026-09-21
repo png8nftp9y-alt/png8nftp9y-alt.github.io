@@ -1,16 +1,3 @@
-
-
-### Correzione acquisizione metadati Tennis Europe
-
-- I parser OOP live e storico Tennis Europe acquisiscono ora testa di serie, `WC` e `Q` anche quando Tournament Software pubblica la designazione fuori dal testo del nome, in un badge separato o in un attributo del partecipante.
-- La scoperta tornei Tennis Europe acquisisce superficie e ambiente Indoor/Outdoor sia dalla homepage ufficiale sia, come fallback, dal factsheet ufficiale. I valori vengono salvati nel catalogo torneo e raggiungono le quattro viste tramite la proiezione già esistente.
-- Aggiunta una verifica deterministica per le varianti HTML note. Questa correzione riguarda esclusivamente Tennis Europe e non modifica acquisizione, schedulazioni o dati FITP/ITF.
-Warning: truncated output (original token count: 50332)
-Total output lines: 997
-
-Warning: truncated output (original token count: 111930)
-Total output lines: 3014
-
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
 Revisione documento: **2026-09-13.146**
@@ -1264,3 +1251,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Superficie e ambiente Indoor/Outdoor sono ora esposti non soltanto nella pagina torneo, ma anche nelle intestazioni torneo di Agenda e pagina giocatore; lo storico avversario li mostra quando lo snapshot del torneo li possiede.
 - La normalizzazione delle iscrizioni accetta anche `courtSurface`, `playingSurface`, `courtEnvironment` e i flag booleani `indoor`/`outdoor`, oltre ai campi già supportati.
 - Incrementata la versione dell'asset `v3.js` a `2026092017` per impedire che dispositivi già registrati continuino a usare una copia precedente. Non sono state modificate schedulazioni, selezione giocatori, punteggi o logica di navigazione.
+
+
+### Correzione definitiva metadati e stabilità pagina avversario
+
+- La pagina avversario non viene più ricostruita dal refresh generale ogni 30 secondi: la route attiva resta stabile e lo storico viene richiesto una sola volta per combinazione giocatore/data/match escluso, con cache in memoria e deduplicazione delle richieste simultanee.
+- Le teste di serie Tennis Europe vengono ora acquisite dalla pagina ufficiale `Seeded entries`, associandole a giocatore ed evento; `Q` e `WC` vengono acquisiti dalle righe ufficiali dell'acceptance list e trasferiti ai partecipanti dei match.
+- Superficie e Indoor/Outdoor vengono letti dal markup realmente pubblicato nel factsheet (`Court surface boys/girls`, `Location type`) e dal valore accanto all'icona campo, inclusa la grafia ufficiale `Acryllic`.
+- Aggiunta una verifica deterministica delle varianti HTML ufficiali. La modifica resta limitata a Tennis Europe; FITP e ITF non sono stati modificati.
