@@ -1269,3 +1269,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - La seconda riga del calendario continua a mostrare città e nazione, seguite dai giocatori Court Watch. Il circolo resta disponibile nella pagina torneo e nell'indirizzo, ma non sostituisce più il nome della competizione.
 - Verifica sui dati pubblicati: 539 tornei su 608 espongono superficie e ambiente; i 69 rimanenti sono tutti contrassegnati dalla fonte come `qualifying_date_not_published` e le pagine ufficiali controllate non pubblicano condizioni del campo. La pipeline continuerà a recuperarli automaticamente quando Tennis Europe li renderà disponibili.
 - Incrementata la versione dell'asset `v3.js` a `2026092102`. Nessuna modifica a FITP, ITF, database, punteggi o selezione giocatori.
+
+
+### Rifinitura posizione condizioni campo in Agenda
+
+- Superficie e ambiente non sono più incorporati nel badge arancione `TENNIS EUROPE`: vengono mostrati in un badge neutro separato, immediatamente alla sua destra, sia nella vista per circuito sia nella vista cronologica.
+- Il contenuto resta quello ufficiale già acquisito; quando non è pubblicato continua a comparire l'avviso esplicito, senza valori inventati.
+- Verificati sintassi del client e rendering delle due varianti di intestazione Agenda. Versione dell'asset incrementata a `2026092103`; nessuna modifica a dati, motori, database, FITP o ITF.

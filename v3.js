@@ -1465,17 +1465,19 @@ function tournamentDisplayName(t, fallback = "Torneo") {
       : item.name || item.tournamentName || fallback,
   );
 }
-function agendaCircuitLabel(value, tournament = value) {
+function agendaCircuitLabel(value) {
   const source = circuit(value);
-  if (source === "tennis-europe") {
-    const conditions = tournamentSurfaceLabel(tournament);
-    return conditions
-      ? `TENNIS EUROPE · ${conditions}`
-      : "TENNIS EUROPE · SUPERFICIE/AMBIENTE NON PUBBLICATI";
-  }
+  if (source === "tennis-europe") return "TENNIS EUROPE";
   return source === "itf"
     ? "ITF"
     : "FITP";
+}
+function agendaCircuitBadges(value, tournament = value) {
+  const source = circuit(value),
+    circuitBadge = `<span class="type ${source}">${esc(agendaCircuitLabel(value))}</span>`;
+  if (source !== "tennis-europe") return circuitBadge;
+  const conditions = tournamentSurfaceLabel(tournament);
+  return `${circuitBadge}<span class="type tournamentConditions">${esc(conditions || "SUPERFICIE/AMBIENTE NON PUBBLICATI")}</span>`;
 }
 function agendaTournamentLocation(t, m) {
   const source = circuit(t || m),
@@ -1698,7 +1700,7 @@ function renderAgenda() {
             chronologicalHeaderIdentity = mixedChronological
               ? ""
               : blockIdentity;
-          return `<section class="agendaTournamentBlock ${source}${isChronological ? " chronologicalAgendaBlock" : ""}">${showTournamentHead ? `<header class="agendaTournamentHead"><div><h3>${tKey ? `<button data-open-tournament="${esc(tKey)}">${esc(name)}</button>` : `<span>${esc(name)}</span>`}<small>${esc([place, source === "tennis-europe" ? "" : courtConditions].filter(Boolean).join(" · "))}</small></h3></div><span class="type ${source}">${esc(agendaCircuitLabel(sample, blockTournament || sample))}</span></header>` : ""}<div class="agendaTournamentMatches">${rows
+          return `<section class="agendaTournamentBlock ${source}${isChronological ? " chronologicalAgendaBlock" : ""}">${showTournamentHead ? `<header class="agendaTournamentHead"><div><h3>${tKey ? `<button data-open-tournament="${esc(tKey)}">${esc(name)}</button>` : `<span>${esc(name)}</span>`}<small>${esc([place, source === "tennis-europe" ? "" : courtConditions].filter(Boolean).join(" · "))}</small></h3></div><div class="agendaTournamentBadges">${agendaCircuitBadges(sample, blockTournament || sample)}</div></header>` : ""}<div class="agendaTournamentMatches">${rows
             .map(
               (row) =>
                 `<div class="agendaMatchRow matches-${row.length}">${row
@@ -1729,7 +1731,7 @@ function renderAgenda() {
                       itemPlace = agendaTournamentLocation(itemTournament, m),
                       itemSource = circuit(m),
                       chronologicalMeta = mixedChronological
-                        ? `<div class="agendaChronologicalTournament"><div>${itemTKey ? `<button data-open-tournament="${esc(itemTKey)}">${esc(itemName)}</button>` : `<span>${esc(itemName)}</span>`}<small>${esc(itemPlace)}</small></div><span class="type ${itemSource}">${esc(agendaCircuitLabel(m, itemTournament || m))}</span></div>`
+                        ? `<div class="agendaChronologicalTournament"><div>${itemTKey ? `<button data-open-tournament="${esc(itemTKey)}">${esc(itemName)}</button>` : `<span>${esc(itemName)}</span>`}<small>${esc(itemPlace)}</small></div><div class="agendaTournamentBadges">${agendaCircuitBadges(m, itemTournament || m)}</div></div>`
                         : "";
                     return `<article class="agendaItem${loss}${win}${agendaLongCourt(m) ? " agendaLongCourt" : ""}"><div class="agendaWhen"><div class="agendaRoundLabels">${round ? (oopUrl ? `<a class="type roundCode agendaRoundOopLink" ${whenAttrs.trim()}>${esc(round)}</a>` : `<span class="type roundCode">${esc(round)}</span>`) : ""}${agendaDrawCodeHtml(m, itemTournament)}</div><${whenTag} class="agendaWhenDetails${oopUrl ? " agendaWhenLink" : ""}"${whenAttrs}><small class="agendaCourtField${m.court ? "" : " agendaFieldEmpty"}">${m.court ? esc(agendaCourtName(m)) : "—"}</small>${schedule.restText ? `<small class="agendaRestLabel"><span>${esc(schedule.restText)}</span>${schedule.restDetail ? `<em>${esc(schedule.restDetail)}</em>` : ""}</small>` : ""}<small class="agendaCourtMatch${numberText ? "" : " agendaFieldEmpty"}">${numberText ? `<span>${esc(numberText)}</span>${schedule.numberDetail ? `<em>${esc(schedule.numberDetail)}</em>` : ""}` : "—"}</small><time class="${schedule.timeText ? "" : "agendaFieldEmpty"}">${schedule.timeText ? esc(schedule.timeText) : "—"}</time></${whenTag}></div><div class="agendaMatchBody">${chronologicalMeta}<div class="agendaTitle">${agendaPlayerTeamLinksHtml(m)}</div><p class="versus">${opponentHtml(m, x)}</p>${agendaResultHtml(m, x)}${x.condition ? `<p class="condition">${esc(readableText(x.condition))}</p>` : ""}</div></article>`;
                   })
