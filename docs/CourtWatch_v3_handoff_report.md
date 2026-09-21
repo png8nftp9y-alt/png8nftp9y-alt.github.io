@@ -1,3 +1,10 @@
+
+
+### Correzione acquisizione metadati Tennis Europe
+
+- I parser OOP live e storico Tennis Europe acquisiscono ora testa di serie, `WC` e `Q` anche quando Tournament Software pubblica la designazione fuori dal testo del nome, in un badge separato o in un attributo del partecipante.
+- La scoperta tornei Tennis Europe acquisisce superficie e ambiente Indoor/Outdoor sia dalla homepage ufficiale sia, come fallback, dal factsheet ufficiale. I valori vengono salvati nel catalogo torneo e raggiungono le quattro viste tramite la proiezione già esistente.
+- Aggiunta una verifica deterministica per le varianti HTML note. Questa correzione riguarda esclusivamente Tennis Europe e non modifica acquisizione, schedulazioni o dati FITP/ITF.
 Warning: truncated output (original token count: 50332)
 Total output lines: 997
 
