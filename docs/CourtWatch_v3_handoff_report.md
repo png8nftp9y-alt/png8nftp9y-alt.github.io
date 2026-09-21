@@ -1288,3 +1288,12 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 
 - La seconda riga delle bande Tennis Europe nel calendario elimina il `venueName` iniziale dalla località ufficiale e mostra esclusivamente città e nazione. Per i due nuovi tornei di Virginia Cereghini, i valori verificati sono `Telde (Las Palmas), Spain` e `Meneou Larnaka, Cyprus`.
 - Il nome ufficiale del torneo resta nella prima riga. Acceptance list, sigle live, posizioni, `Q`, `WC` e teste di serie non sono state modificate. Asset aggiornato a `v3.js?v=2026092105`.
+
+
+## Aggiornamento 22 settembre 2026 — designazioni complete e ritorno alla posizione
+
+- Il motore OOP Tennis Europe distingue ora le teste di serie del main draw da quelle delle qualificazioni usando insieme codice evento e fase ufficiale. La pagina `Seeded entries` viene letta anche quando la tabella non usa la classe CSS storica `seeding`.
+- Le designazioni ufficiali `Q`, `WC` e il nuovo caso `LL` vengono acquisite sia dai badge accanto al partecipante sia dalle righe dell'acceptance list, comprese le diciture estese `Qualifier`, `Wild Card` e `Lucky Loser`. La propagazione resta partecipante-specifica attraverso OOP live, storico, D1 e UI; le etichette live dell'acceptance list non sono state modificate.
+- Aggiunti test deterministici distinti per testa di serie main draw, testa di serie qualificazioni, `Q`, `WC` e `LL`, oltre alle varianti già coperte.
+- La navigazione interna conserva per 15 secondi la posizione verticale della pagina appena lasciata. Aprendo un profilo, torneo o avversario e tornando indietro entro tale finestra, la vista precedente viene ripristinata allo stesso punto; una navigazione successiva o più tarda continua ad aprire la destinazione dall'alto.
+- Asset aggiornato a `v3.js?v=2026092201`. Nessuna modifica alle frequenze dei motori, alla selezione giocatori o alle sigle live dell'acceptance list.

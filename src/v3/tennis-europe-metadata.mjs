@@ -13,37 +13,40 @@ function attribute(tag,name){return decode((String(tag||'').match(new RegExp(`${
 function normalizeDesignation(value){
   const marker=String(value||'').trim().replace(/^[\[(]\s*|\s*[\])]$/g,'').toUpperCase();
   if(/^\d{1,2}$/.test(marker)&&Number(marker)>0)return String(Number(marker));
-  return /^(?:WC|Q)$/.test(marker)?marker:'';
+  if(/^(?:WILD\s*CARD|WC)$/.test(marker))return'WC';
+  if(/^(?:QUALIFIER|QUALIFIED|Q)$/.test(marker))return'Q';
+  if(/^(?:LUCKY\s*LOSER|LL)$/.test(marker))return'LL';
+  return'';
 }
 
 function normalizedName(value){return text(value).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase()}
-function normalizedEvent(value){return text(value).toUpperCase().replace(/\b(?:MAIN DRAW|QUALIFYING|DRAW)\b/g,' ').replace(/[^A-Z0-9]+/g,' ').trim()}
+function normalizedEvent(value){const source=text(value).toUpperCase(),code=(source.match(/\b(?:BS|GS|BD|GD)\d{2}\b/)||[])[0]||source.replace(/[^A-Z0-9]+/g,' ').trim(),phase=/\bQUALIF(?:YING|ICATION)?\b/.test(source)?'Q':/\bMAIN\s+DRAW\b/.test(source)?'MD':'';return[code,phase].filter(Boolean).join('|')}
 
 export function tennisEuropeParticipant(link){
   const source=String(link||''),valueHtml=(source.match(/<span\b[^>]*class=["'][^"']*nav-link__value[^"']*["'][^>]*>([\s\S]*?)<\/span>/i)||[])[1]||source;
   const rawName=text(valueHtml),allText=text(source);
   const explicit=['data-seed','data-seeding','data-entry-type','data-entry','data-designation'].map(name=>normalizeDesignation(attribute(source,name))).find(Boolean)||'';
-  const bracketed=[...allText.matchAll(/[\[(]\s*(\d{1,2}|WC|Q)\s*[\])]/gi)].map(match=>normalizeDesignation(match[1])).filter(Boolean);
-  const labelled=(allText.match(/\b(?:seed(?:ed)?|seeding|entry(?: type)?)\s*[:#-]?\s*(\d{1,2}|WC|Q)\b/i)||[])[1]||'';
-  const nameSuffix=(rawName.match(/\s*[\[(]\s*(\d{1,2}|WC|Q)\s*[\])]\s*$/i)||[])[1]||'';
+  const bracketed=[...allText.matchAll(/[\[(]\s*(\d{1,2}|WC|Q|LL)\s*[\])]/gi)].map(match=>normalizeDesignation(match[1])).filter(Boolean);
+  const labelled=(allText.match(/\b(?:seed(?:ed)?|seeding|entry(?: type)?)\s*[:#-]?\s*(\d{1,2}|WC|Q|LL|Wild\s*Card|Lucky\s*Loser|Qualifier)\b/i)||[])[1]||'';
+  const nameSuffix=(rawName.match(/\s*[\[(]\s*(\d{1,2}|WC|Q|LL)\s*[\])]\s*$/i)||[])[1]||'';
   const designation=explicit||normalizeDesignation(nameSuffix)||bracketed.at(-1)||normalizeDesignation(labelled);
-  const name=text(rawName.replace(/\s*[\[(]\s*(?:\d{1,2}|WC|Q)\s*[\])]\s*$/i,'').replace(/\s*\[[^\]]*\]\s*$/,''));
+  const name=text(rawName.replace(/\s*[\[(]\s*(?:\d{1,2}|WC|Q|LL)\s*[\])]\s*$/i,'').replace(/\s*\[[^\]]*\]\s*$/,''));
   const id=attribute(source,'data-player-id'),nationality=attribute(source,'data-nationality-id'),href=attribute(source,'href').replace(/&amp;/g,'&');
-  return{id,name,nationality,designation,seed:/^\d+$/.test(designation)?Number(designation):null,entryType:/^(?:WC|Q)$/.test(designation)?designation:'',href};
+  return{id,name,nationality,designation,seed:/^\d+$/.test(designation)?Number(designation):null,entryType:/^(?:WC|Q|LL)$/.test(designation)?designation:'',href};
 }
 
 export function tennisEuropeDesignationIndex(seedsHtml='',acceptanceHtml=''){
   const seeds=[],entries=[];
-  for(const table of String(seedsHtml||'').matchAll(/<table\b[^>]*class=["'][^"']*\bseeding\b[^"']*["'][^>]*>([\s\S]*?)<\/table>/gi)){
-    let event='';
+  for(const table of String(seedsHtml||'').matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)){
+    let event=normalizedEvent(text(table[1]));
     for(const row of table[1].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)){
       const header=(row[1].match(/<th\b[^>]*>([\s\S]*?)<\/th>/i)||[])[1];
-      if(header){event=text(header);continue}
+      if(header){const headerEvent=normalizedEvent(text(row[1]));if(headerEvent)event=headerEvent;continue}
       const cells=[...row[1].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)];
       const seed=normalizeDesignation(text(cells[0]?.[1]||''));
       if(!/^\d+$/.test(seed))continue;
-      const players=[...row[1].matchAll(/<a\b[^>]*href=["'][^"']*(?:player\.aspx|player-profile\/)[^"']*["'][^>]*>([\s\S]*?)<\/a>/gi)].map(match=>text(match[1])).filter(Boolean);
-      for(const name of players)seeds.push({name:normalizedName(name),event:normalizedEvent(event),designation:seed});
+      const players=[...row[1].matchAll(/<a\b[^>]*(?:data-player-id=["'][^"']+["']|href=["'][^"']*(?:player\.aspx|player-profile\/|\/sport\/player)[^"']*["'])[^>]*>([\s\S]*?)<\/a>/gi)].map(match=>text(match[1])).filter(Boolean);
+      for(const name of players)seeds.push({name:normalizedName(name),event,designation:seed});
     }
   }
   let section='';
@@ -51,24 +54,25 @@ export function tennisEuropeDesignationIndex(seedsHtml='',acceptanceHtml=''){
     const cells=[...row[1].matchAll(/<t[hd]\b[^>]*>([\s\S]*?)<\/t[hd]>/gi)].map(match=>text(match[1]));
     if(!cells.length)continue;
     if(/^(?:Main|Qualifying)$/i.test(cells[0])){section=cells[0];continue}
-    if(cells.length<2)continue;
-    const marker=(cells[0].match(/[\[(]\s*(WC|Q)\s*[\])]/i)||[])[1]||'';
-    if(marker)entries.push({name:normalizedName(cells[1].replace(/^\[[A-Z]{3}\]\s*/,'')),section,designation:marker.toUpperCase()});
+    const rowText=text(row[1]),marker=(rowText.match(/[\[(]\s*(WC|Q|LL)\s*[\])]/i)||[])[1]||(/\bLucky\s*Loser\b/i.test(rowText)?'LL':/\bWild\s*Card\b/i.test(rowText)?'WC':/\bQualifier\b/i.test(rowText)?'Q':'');
+    if(!marker)continue;
+    const linked=[...row[1].matchAll(/<a\b[^>]*(?:data-player-id=["'][^"']+["']|href=["'][^"']*(?:player\.aspx|player-profile\/|\/sport\/player)[^"']*["'])[^>]*>([\s\S]*?)<\/a>/gi)].map(match=>text(match[1])).find(Boolean),countryCell=cells.findIndex(cell=>/^\[[A-Z]{2,3}\]$/.test(cell)),fallback=countryCell>=0?cells[countryCell+1]:cells.find(cell=>/[A-Za-zÀ-ÿ]{2,}\s+[A-Za-zÀ-ÿ]{2,}/.test(cell)&&!/Wild\s*Card|Lucky\s*Loser|Qualifier/i.test(cell)),name=linked||fallback||'';
+    if(name)entries.push({name:normalizedName(name.replace(/^\[[A-Z]{2,3}\]\s*/,'')),section,designation:normalizeDesignation(marker)});
   }
   return{seeds,entries};
 }
 
 export function applyTennisEuropeDesignations(matches,index){
   for(const match of matches||[]){
-    const event=normalizedEvent(match.event||match.draw||'');
+    const event=normalizedEvent([match.event,match.draw,match.round].filter(Boolean).join(' '));
     for(const player of match.players||[]){
       if(player.designation)continue;
-      const name=normalizedName(player.name),entry=(index?.entries||[]).find(item=>item.name===name),seed=(index?.seeds||[]).find(item=>item.name===name&&(!item.event||!event||item.event.includes(event)||event.includes(item.event)))||(index?.seeds||[]).find(item=>item.name===name);
+      const name=normalizedName(player.name),entry=(index?.entries||[]).find(item=>item.name===name),candidates=(index?.seeds||[]).filter(item=>item.name===name),phase=event.split('|')[1]||'',seed=candidates.find(item=>item.event===event)||candidates.find(item=>{const itemPhase=item.event.split('|')[1]||'';return phase==='Q'?itemPhase==='Q':itemPhase!=='Q'})||candidates[0];
       const designation=entry?.designation||seed?.designation||'';
       if(!designation)continue;
       player.designation=designation;
       player.seed=/^\d+$/.test(designation)?Number(designation):null;
-      player.entryType=/^(?:WC|Q)$/.test(designation)?designation:'';
+      player.entryType=/^(?:WC|Q|LL)$/.test(designation)?designation:'';
     }
   }
   return matches;

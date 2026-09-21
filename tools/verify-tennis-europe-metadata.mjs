@@ -6,6 +6,7 @@ const participant=(body,attributes='')=>tennisEuropeParticipant(`<a data-player-
 assert.deepEqual(participant('Mario Rossi [3]'),{id:'p1',name:'Mario Rossi',nationality:'ITA',designation:'3',seed:3,entryType:'',href:'/player/p1'});
 assert.equal(tennisEuropeParticipant('<a data-player-id="p1" data-nationality-id="ITA" href="/player/p1"><span class="nav-link__value">Mario Rossi</span><span class="badge">(WC)</span></a>').entryType,'WC');
 assert.equal(tennisEuropeParticipant('<a data-player-id="p1" data-nationality-id="ITA" href="/player/p1"><span class="nav-link__value">Mario Rossi</span><small>[Q]</small></a>').entryType,'Q');
+assert.equal(tennisEuropeParticipant('<a data-player-id="p1" data-nationality-id="ITA" href="/player/p1"><span class="nav-link__value">Mario Rossi</span><small>[LL]</small></a>').entryType,'LL');
 assert.equal(participant('Mario Rossi','data-seed="8"').seed,8);
 assert.equal(participant('Mario Rossi').designation,'');
 
@@ -18,5 +19,11 @@ const designationIndex=tennisEuropeDesignationIndex('<table class="ruler seeding
 const matches=[{event:'BS16',players:[{name:'Mario Rossi'},{name:'Luigi Bianchi'},{name:'Paolo Verdi'}]}];
 applyTennisEuropeDesignations(matches,designationIndex);
 assert.deepEqual(matches[0].players.map(player=>player.designation),['3','Q','WC']);
+
+const completeIndex=tennisEuropeDesignationIndex('<table><tr><th>GS14 - Main Draw</th></tr><tr><td>2</td><td><a data-player-id="m1">Maria Main</a></td></tr></table><table><tr><th>GS14 - Qualifying</th></tr><tr><td>5</td><td><a data-player-id="q1">Quarta Quali</a></td></tr></table>','<table><tr><th>Main</th></tr><tr><td>17</td><td>[ITA]</td><td><a data-player-id="w1">Wanda Card</a></td><td>Main Draw Wildcard</td></tr><tr><td>18 (LL)</td><td>[ITA]</td><td><a data-player-id="l1">Lucia Loser</a></td></tr><tr><td>19 (Q)</td><td>[ITA]</td><td><a data-player-id="q2">Quirina Qualificata</a></td></tr></table>');
+const completeMatches=[{event:'GS14 - Main Draw',round:'R32',players:[{name:'Maria Main'},{name:'Wanda Card'},{name:'Lucia Loser'},{name:'Quirina Qualificata'}]},{event:'GS14 - Qualifying',round:'Qualifying R1',players:[{name:'Quarta Quali'}]}];
+applyTennisEuropeDesignations(completeMatches,completeIndex);
+assert.deepEqual(completeMatches[0].players.map(player=>player.designation),['2','WC','LL','Q']);
+assert.equal(completeMatches[1].players[0].designation,'5');
 
 console.log('Tennis Europe metadata verification passed');

@@ -109,6 +109,8 @@ let calendarHeightObserver = null,
   opponentHistoryRequestKey = "",
   opponentHistoryRequest = null,
   opponentHistoryCache = new Map(),
+  activeRouteScrollKey = location.hash || "#home",
+  routeScrollMemory = new Map(),
   uiSelectionRestored =
     Array.isArray(restoredUi.selected) && restoredUi.selected.length > 0,
   uiScrollRestored = false,
@@ -347,6 +349,7 @@ const normalizedDesignation = (value) => {
   if (/^\d{1,2}$/.test(raw)) return raw;
   if (/^(?:WC|WILD\s*CARD)$/.test(raw)) return "WC";
   if (/^(?:Q|QUALIFIER|QUALIFIED)$/.test(raw)) return "Q";
+  if (/^(?:LL|LUCKY\s*LOSER)$/.test(raw)) return "LL";
   return "";
 };
 const participantDesignation = (row, prefix = "") => {
@@ -354,10 +357,12 @@ const participantDesignation = (row, prefix = "") => {
     row?.[`${prefix}Designation`], row?.[`${prefix}EntryType`],
     row?.[`${prefix}Seed`], row?.[`${prefix}SeedNumber`], row?.[`${prefix}Seeding`],
     row?.[`${prefix}Qualifier`], row?.[`${prefix}WildCard`], row?.[`${prefix}Wildcard`],
+    row?.[`${prefix}LuckyLoser`],
   ].map(normalizedDesignation).find(Boolean);
   if (direct) return direct;
   if (row?.[`${prefix}WildCard`] === true || row?.[`${prefix}Wildcard`] === true) return "WC";
   if (row?.[`${prefix}Qualifier`] === true || row?.[`${prefix}Qualified`] === true) return "Q";
+  if (row?.[`${prefix}LuckyLoser`] === true) return "LL";
   return "";
 };
 const participantDesignationHtml = (value) => {
@@ -366,7 +371,7 @@ const participantDesignationHtml = (value) => {
 };
 const inlineParticipant = (value) => {
   const raw = readablePerson(value),
-    match = raw.match(/\s*[\[(]\s*(\d{1,2}|WC|Q)\s*[\])]\s*$/i);
+    match = raw.match(/\s*[\[(]\s*(\d{1,2}|WC|Q|LL)\s*[\])]\s*$/i);
   return { name: match ? raw.slice(0, match.index).trim() : raw, designation: match?.[1] || "" };
 };
 const peopleHtml = (names, nationalities = [], rankings = [], designations = []) =>
@@ -2012,7 +2017,6 @@ function renderIfDataChanged() {
 }
 function openProfile(id) {
   location.hash = "player/" + encodeURIComponent(id);
-  scrollTo({ top: 0, behavior: "smooth" });
 }
 function openOpponent(matchId, index, profileId, name, role = "opponent") {
   const identity = profileId || readablePerson(name);
@@ -2025,7 +2029,6 @@ function openOpponent(matchId, index, profileId, name, role = "opponent") {
     encodeURIComponent(matchId) +
     "/" +
     String(Number(index) || 0);
-  scrollTo({ top: 0, behavior: "smooth" });
 }
 function bindParticipantNavigation(root) {
   root.querySelectorAll("[data-open-player]").forEach(
@@ -3071,9 +3074,21 @@ function wire() {
     if (e.key === "Escape") $("datePopover").hidden = true;
   });
   addEventListener("hashchange", () => {
+    const now = Date.now(),
+      nextRouteScrollKey = location.hash || "#home";
+    routeScrollMemory.set(activeRouteScrollKey, {
+      y: Math.max(0, Math.round(scrollY || 0)),
+      leftAt: now,
+    });
+    const remembered = routeScrollMemory.get(nextRouteScrollKey),
+      restoreY =
+        remembered && now - remembered.leftAt <= 15000 ? remembered.y : 0;
+    activeRouteScrollKey = nextRouteScrollKey;
     saveUiState();
     route();
-    requestAnimationFrame(() => scrollTo({ top: 0, behavior: "smooth" }));
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => scrollTo({ top: restoreY, behavior: "auto" })),
+    );
   });
   addEventListener("pagehide", saveUiState);
 }
