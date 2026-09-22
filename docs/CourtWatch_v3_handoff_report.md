@@ -1318,3 +1318,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Il motore OOP apre ora ogni tabellone ufficiale collegato alle partite e legge accanto al partecipante teste di serie, `WC`, `Q` e `LL`; il dato del tabellone ha priorità sui fallback `Seeded entries` e acceptance list.
 - La chiave evento/fase distingue il main draw dalle qualificazioni, quindi una testa di serie del tabellone di qualificazione non viene confusa con la testa di serie del main draw.
 - Le designazioni vengono propagate ai partecipanti delle partite e quindi ad Agenda, pagina giocatore, pagina torneo e pagina avversario. Aggiunti test deterministici per tutti i casi; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Badge evento e condizioni campo nello storico avversario
+
+- I badge evento `GS`, `GD`, `BS` e `BD` della pagina avversario riutilizzano le stesse classi colore rosa/blu dell'Agenda e mantengono il collegamento al tabellone ufficiale.
+- L'API dello storico avversario trasferisce superficie e ambiente dal payload ufficiale del torneo, anche quando il torneo non appartiene al calendario di alcun giocatore Court Watch.
+- L'interfaccia usa prima l'eventuale torneo Court Watch corrispondente e poi il metadato autonomo dello storico, mostrando insieme superficie e Indoor/Outdoor. Asset aggiornato a `v3.js?v=2026092204`.

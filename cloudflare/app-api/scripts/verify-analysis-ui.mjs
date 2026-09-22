@@ -43,6 +43,7 @@ assert.ok(hasSource('function partnerHtml(') && hasSource('data-opponent-role'),
 assert.ok(hasSource('doublesPartnerLink'), 'doubles partners must remain bold');
 assert.ok(hasSource('function loadOpponentHistory(') && hasSource('/opponent-profile?name='), 'opponent page must load frozen history');
 assert.ok(hasSource('function opponentTournamentEventLinks(') && hasSource('opponentTournamentDraw'), 'opponent tournaments must link event badges to draws');
+assert.ok(hasSource('gender: agendaGenderClass(match)') && hasSource('drawCode ${esc(event.gender)}'), 'opponent event badges must reuse agenda gender colors');
 assert.ok(hasSource('matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents') && hasSource('<span class="opponentHistoryOpponent">${matchup}</span>'), 'opponent history rows must render partner plus vs opponent');
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
 assert.ok(hasApiSource('excludeMatchId') && hasSource('&excludeMatchId='), 'opponent study page must exclude the CourtWatch match');
@@ -68,5 +69,6 @@ assert.ok(hasSource('function agendaResultHtml(') && hasSource('Vincitore:'), 's
 assert.ok(hasSource('courtWatchOpponent') && hasSource('opponentPlayerLink'), 'opponent styling must distinguish CourtWatch players');
 assert.ok(hasApiSource("profileKey=prefix+'ProfileIds'") && hasApiSource("dateKey=prefix+'RankingDates'"), 'API must expose opponent ranking identity and date');
 assert.ok(hasApiSource('profileRows=await optionalRows') && hasApiSource('profile,tournaments:') && hasSource('profileRanking.textContent'), 'opponent header must fall back to dated ranking history');
+assert.ok(hasApiSource('surface:tournament.surface') && hasApiSource('environment:tournament.environment') && hasSource('tournamentSurfaceLabel(tournament)'), 'opponent tournaments must expose their own surface and environment');
 assert.doesNotMatch(apiSource, /player\.ranking=labels\.join/, 'Tennis Europe ranking must not overwrite FITP ranking');
 console.log(JSON.stringify({ analysisUi: 'green', nativePrompt: false, nativeConfirm: false, actions: ['read', 'save', 'update', 'delete'] }));

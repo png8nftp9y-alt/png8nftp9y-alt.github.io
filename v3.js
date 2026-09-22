@@ -2097,13 +2097,17 @@ function opponentTournamentEventLinks(tournament) {
   const events = new Map();
   for (const match of tournament.matches || []) {
     const code = agendaEventCode(match);
-    if (code && !events.has(code)) events.set(code, match.drawUrl || "");
+    if (code && !events.has(code))
+      events.set(code, {
+        url: match.drawUrl || "",
+        gender: agendaGenderClass(match),
+      });
   }
   return [...events]
-    .map(([code, url]) =>
-      url
-        ? `<a class="type drawCode opponentTournamentDraw" href="${esc(url)}" target="_blank" rel="noopener">${esc(code)}</a>`
-        : `<span class="type drawCode">${esc(code)}</span>`,
+    .map(([code, event]) =>
+      event.url
+        ? `<a class="type drawCode ${esc(event.gender)} opponentTournamentDraw" href="${esc(event.url)}" target="_blank" rel="noopener">${esc(code)}</a>`
+        : `<span class="type drawCode ${esc(event.gender)}">${esc(code)}</span>`,
     )
     .join("");
 }
@@ -2140,7 +2144,9 @@ function renderOpponentHistory(data) {
                   String(item.competitionId || item.sourceTournamentId || "") ===
                   String(tournament.competitionId || ""),
               ),
-              courtConditions = tournamentSurfaceLabel(projectedTournament || tournament);
+              courtConditions =
+                tournamentSurfaceLabel(projectedTournament || tournament) ||
+                tournamentSurfaceLabel(tournament);
             return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header><div class="opponentHistoryMatches">${(tournament.matches || [])
               .map((match) => {
                 const personHtml = (person) => {
