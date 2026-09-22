@@ -2403,7 +2403,7 @@ function matchHistoryRowHtml(m) {
     matchType = x.isDouble
       ? `Doppio${m.partner ? " con " + partnerHtml(m) : ""}`
       : "Singolare";
-  return `<div class="opponentHistoryMatch unifiedMatchRow matchWithAnalysis">${matchAnalysisButton(m)}<span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(m.date) || "data da pubblicare")}</time>${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}</span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span class="matchType">${matchType}</span><span>${opponentHtml(m, x)}</span></span><strong class="${outcome}">${result ? esc(result) : ""}</strong></div>`;
+  return `<div class="opponentHistoryMatch unifiedMatchRow matchWithAnalysis">${matchAnalysisButton(m)}<span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(m.date) || "data da pubblicare")}</time>${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}</span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span class="matchType">${matchType}</span><span>${opponentHtml(m, x)}</span></span><strong class="result ${outcome}">${result ? esc(result) : ""}</strong></div>`;
 }
 function tournamentOfficialUrl(t) {
   const source = circuit(t),
@@ -2735,7 +2735,7 @@ renderProfile = function (id) {
       '<div class="profileMatchFilter"><label for="profileCircuitFilter">Circuito</label><select id="profileCircuitFilter"><option value="all">Tutti</option><option value="fitp">FITP</option><option value="tennis-europe">Tennis Europe</option><option value="itf">ITF</option></select><label for="profileMatchTypeFilter">Partita</label><select id="profileMatchTypeFilter"><option value="all">Singolo e doppio</option><option value="singles">Singolo</option><option value="doubles">Doppio</option></select></div>',
     );
   for (const section of list?.querySelectorAll(".profileTournament") || []) {
-    const items = [...section.querySelectorAll(".listItem")],
+    const items = [...section.querySelectorAll(".unifiedMatchRow")],
       wins = items.filter((x) => x.querySelector(".result.win")).length,
       losses = items.filter((x) => x.querySelector(".result.loss")).length,
       body = section.querySelector(".profileTournamentMatches"),
@@ -2806,7 +2806,7 @@ renderProfile = function (id) {
             ) || "",
           circuitVisible =
             profileCircuitFilter === "all" || source === profileCircuitFilter,
-          items = [...section.querySelectorAll(".listItem")];
+          items = [...section.querySelectorAll(".unifiedMatchRow")];
         let visibleMatches = 0;
         for (const item of items) {
           const isDouble = /Doppio/i.test(
@@ -3121,6 +3121,10 @@ function wire() {
       return;
     }
     location.hash = "";
+  };
+  $("brandHome").onclick = () => {
+    location.hash = "";
+    scrollTo({ top: 0, behavior: "smooth" });
   };
   $("resetHome").onclick = () => {
     state.agenda = new Date();
@@ -3580,7 +3584,7 @@ renderProfile = function (id) {
       if (section.dataset.tournamentStatus !== "scheduled") {
         const stats = section.querySelector(".tournamentStats"),
           statRows = [
-            ...section.querySelectorAll(".profileTournamentMatches .listItem"),
+            ...section.querySelectorAll(".profileTournamentMatches .unifiedMatchRow"),
           ].filter((item) => !item.hidden),
           statSpans = [...(stats?.querySelectorAll(":scope > span") || [])],
           statWins = statRows.filter((item) =>

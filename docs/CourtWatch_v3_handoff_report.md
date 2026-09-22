@@ -1349,3 +1349,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Restano presenti tutti i dati già mostrati, inclusi compagno di doppio, designazioni, nazionalità, risultato e accesso all'analisi della partita.
 - Il comando `Tornei della settimana` è ora allineato a sinistra sopra l'Agenda. La memoria della posizione per il ritorno Indietro entro 15 secondi resta invariata.
 - Asset aggiornati a `v3.css?v=2026092208` e `v3.js?v=2026092208`; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Contatori torneo e ritorno dal logo
+
+- I contatori delle partite nei singoli tornei leggono ora le nuove righe uniformate, ripristinando i valori di giocate, vinte e perse dopo il cambio grafico.
+- Logo e nome `Court Watch` sono cliccabili da ogni ambiente e riportano alla home senza alterare filtri o dati.
+- Asset aggiornati a `v3.css?v=2026092209` e `v3.js?v=2026092209`; nessuna modifica alle sigle live dell'acceptance list.

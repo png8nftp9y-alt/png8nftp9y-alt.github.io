@@ -448,3 +448,8 @@
 .unifiedMatchRow>.matchAnalysisButton{right:10px;top:50%;transform:translateY(-50%)}
 .unifiedMatchRow>strong:empty:after{content:"—";color:var(--muted)}
 @media(max-width:700px){.unifiedMatchRow{padding-left:10px!important;padding-right:48px!important}.unifiedMatchMeta time{font-size:10px}}
+
+/* Clickable Court Watch brand. */
+button.brand{border:0;background:transparent;padding:0;text-align:left;cursor:pointer;color:inherit}
+button.brand:hover h1,button.brand:focus-visible h1{color:var(--blue)}
+button.brand:focus-visible{outline:2px solid var(--blue);outline-offset:4px;border-radius:8px}
