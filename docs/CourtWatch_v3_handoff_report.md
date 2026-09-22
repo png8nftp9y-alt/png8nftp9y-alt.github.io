@@ -1311,3 +1311,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - L'intestazione della pagina avversario non dipende più esclusivamente dallo snapshot già allegato alla partita cliccata: l'API restituisce anche il ranking Tennis Europe storico più recente non successivo alla data della partita.
 - La categoria dell'evento cliccato seleziona prioritariamente `U14` o `U16`; l'intestazione mostra numero, categoria e data della pubblicazione della classifica.
 - Il fallback funziona anche quando l'avversario non possiede tornei precedenti da elencare. Asset aggiornato a `v3.js?v=2026092203`; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Designazioni acquisite dai tabelloni ufficiali
+
+- Il motore OOP apre ora ogni tabellone ufficiale collegato alle partite e legge accanto al partecipante teste di serie, `WC`, `Q` e `LL`; il dato del tabellone ha priorità sui fallback `Seeded entries` e acceptance list.
+- La chiave evento/fase distingue il main draw dalle qualificazioni, quindi una testa di serie del tabellone di qualificazione non viene confusa con la testa di serie del main draw.
+- Le designazioni vengono propagate ai partecipanti delle partite e quindi ad Agenda, pagina giocatore, pagina torneo e pagina avversario. Aggiunti test deterministici per tutti i casi; nessuna modifica alle sigle live dell'acceptance list.

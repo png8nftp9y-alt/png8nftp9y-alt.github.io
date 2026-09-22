@@ -26,4 +26,13 @@ applyTennisEuropeDesignations(completeMatches,completeIndex);
 assert.deepEqual(completeMatches[0].players.map(player=>player.designation),['2','WC','LL','Q']);
 assert.equal(completeMatches[1].players[0].designation,'5');
 
+const drawIndex=tennisEuropeDesignationIndex('','',[
+  {event:'GS14 - Main Draw',url:'https://example.test/main',html:'<div><a data-player-id="d1" href="/player-profile/d1"><span class="nav-link__value">Seed Main</span></a> [4]</div><div><a data-player-id="d2" href="/player-profile/d2"><span class="nav-link__value">Qualificata Draw</span></a> (Q)</div><div><a data-player-id="d3" href="/player-profile/d3"><span class="nav-link__value">Wild Draw</span></a> [WC]</div><div><a data-player-id="d4" href="/player-profile/d4"><span class="nav-link__value">Lucky Draw</span></a> [LL]</div>'},
+  {event:'GS14 - Qualifying',url:'https://example.test/qualifying',html:'<div><a data-player-id="dq" href="/player-profile/dq"><span class="nav-link__value">Seed Quali</span></a> [7]</div>'},
+]);
+const drawMatches=[{event:'GS14 - Main Draw',round:'R32',players:[{name:'Seed Main'},{name:'Qualificata Draw'},{name:'Wild Draw'},{name:'Lucky Draw'}]},{event:'GS14 - Qualifying',round:'Qualifying R1',players:[{name:'Seed Quali'}]}];
+applyTennisEuropeDesignations(drawMatches,drawIndex);
+assert.deepEqual(drawMatches[0].players.map(player=>player.designation),['4','Q','WC','LL']);
+assert.equal(drawMatches[1].players[0].designation,'7');
+
 console.log('Tennis Europe metadata verification passed');

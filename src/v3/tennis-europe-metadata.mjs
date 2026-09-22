@@ -35,8 +35,8 @@ export function tennisEuropeParticipant(link){
   return{id,name,nationality,designation,seed:/^\d+$/.test(designation)?Number(designation):null,entryType:/^(?:WC|Q|LL)$/.test(designation)?designation:'',href};
 }
 
-export function tennisEuropeDesignationIndex(seedsHtml='',acceptanceHtml=''){
-  const seeds=[],entries=[];
+export function tennisEuropeDesignationIndex(seedsHtml='',acceptanceHtml='',drawPages=[]){
+  const seeds=[],entries=[],draws=[];
   for(const table of String(seedsHtml||'').matchAll(/<table\b[^>]*>([\s\S]*?)<\/table>/gi)){
     let event=normalizedEvent(text(table[1]));
     for(const row of table[1].matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)){
@@ -59,7 +59,14 @@ export function tennisEuropeDesignationIndex(seedsHtml='',acceptanceHtml=''){
     const linked=[...row[1].matchAll(/<a\b[^>]*(?:data-player-id=["'][^"']+["']|href=["'][^"']*(?:player\.aspx|player-profile\/|\/sport\/player)[^"']*["'])[^>]*>([\s\S]*?)<\/a>/gi)].map(match=>text(match[1])).find(Boolean),countryCell=cells.findIndex(cell=>/^\[[A-Z]{2,3}\]$/.test(cell)),fallback=countryCell>=0?cells[countryCell+1]:cells.find(cell=>/[A-Za-zÀ-ÿ]{2,}\s+[A-Za-zÀ-ÿ]{2,}/.test(cell)&&!/Wild\s*Card|Lucky\s*Loser|Qualifier/i.test(cell)),name=linked||fallback||'';
     if(name)entries.push({name:normalizedName(name.replace(/^\[[A-Z]{2,3}\]\s*/,'')),section,designation:normalizeDesignation(marker)});
   }
-  return{seeds,entries};
+  for(const page of drawPages||[]){
+    const source=String(page?.html||''),event=normalizedEvent(page?.event||text(source.slice(0,5000))),links=[...source.matchAll(/<a\b[^>]*(?:data-player-id=["'][^"']+["']|href=["'][^"']*(?:player\.aspx|player-profile\/|\/sport\/player)[^"']*["'])[^>]*>[\s\S]*?<\/a>/gi)];
+    for(let index=0;index<links.length;index++){
+      const participant=tennisEuropeParticipant(links[index][0]),next=links[index+1]?.index??source.length,following=source.slice((links[index].index||0)+links[index][0].length,Math.min(next,(links[index].index||0)+links[index][0].length+240)),visible=text(following),marker=participant.designation||normalizeDesignation((visible.match(/^[\s,:;·-]*[\[(]\s*(\d{1,2}|WC|Q|LL)\s*[\])]/i)||[])[1]||'')||normalizeDesignation((visible.match(/^(?:\s|[:;·-])*(?:seed(?:ed)?|entry(?: type)?)\s*[:#-]?\s*(\d{1,2}|WC|Q|LL|Wild\s*Card|Lucky\s*Loser|Qualifier)\b/i)||[])[1]||'');
+      if(participant.name&&marker)draws.push({name:normalizedName(participant.name),event,designation:marker,sourceUrl:String(page?.url||'')});
+    }
+  }
+  return{seeds,entries,draws};
 }
 
 export function applyTennisEuropeDesignations(matches,index){
@@ -67,8 +74,8 @@ export function applyTennisEuropeDesignations(matches,index){
     const event=normalizedEvent([match.event,match.draw,match.round].filter(Boolean).join(' '));
     for(const player of match.players||[]){
       if(player.designation)continue;
-      const name=normalizedName(player.name),entry=(index?.entries||[]).find(item=>item.name===name),candidates=(index?.seeds||[]).filter(item=>item.name===name),phase=event.split('|')[1]||'',seed=candidates.find(item=>item.event===event)||candidates.find(item=>{const itemPhase=item.event.split('|')[1]||'';return phase==='Q'?itemPhase==='Q':itemPhase!=='Q'})||candidates[0];
-      const designation=entry?.designation||seed?.designation||'';
+      const name=normalizedName(player.name),entry=(index?.entries||[]).find(item=>item.name===name),candidates=(index?.seeds||[]).filter(item=>item.name===name),drawCandidates=(index?.draws||[]).filter(item=>item.name===name),phase=event.split('|')[1]||'',phaseMatch=item=>{const itemPhase=item.event.split('|')[1]||'';return phase==='Q'?itemPhase==='Q':itemPhase!=='Q'},draw=drawCandidates.find(item=>item.event===event)||drawCandidates.find(phaseMatch)||drawCandidates[0],seed=candidates.find(item=>item.event===event)||candidates.find(phaseMatch)||candidates[0];
+      const designation=draw?.designation||entry?.designation||seed?.designation||'';
       if(!designation)continue;
       player.designation=designation;
       player.seed=/^\d+$/.test(designation)?Number(designation):null;
