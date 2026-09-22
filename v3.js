@@ -2863,7 +2863,9 @@ function route() {
     legacyOpponent = location.hash.match(
       /^#opponent\/([^/]+)\/([^/]+)\/(\d+)$/,
     ),
-    tournament = location.hash.match(/^#tournament\/(.+)$/);
+    tournament = location.hash.match(/^#tournament\/(.+)$/),
+    primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
+  document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
   if (!player) {
     profileYearFilter = String(new Date().getFullYear());
     profileStatusPlayerId = "";
@@ -2892,8 +2894,7 @@ function route() {
     if (tournament && state.data)
       renderTournament(decodeURIComponent(tournament[1]));
     else {
-      $("profileView").classList.remove("active");
-      $("homeView").classList.add("active");
+      $(`${primaryView}View`).classList.add("active");
       if (state.data) renderHome();
     }
   }
@@ -3063,6 +3064,12 @@ function wire() {
     saveUiState();
     renderHome();
   };
+  document.querySelectorAll("[data-home-route]").forEach(
+    (button) =>
+      (button.onclick = () => {
+        location.hash = button.dataset.homeRoute;
+      }),
+  );
   $("backHome").onclick = () => {
     if (history.length > 1) {
       history.back();

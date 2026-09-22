@@ -1325,3 +1325,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - I badge evento `GS`, `GD`, `BS` e `BD` della pagina avversario riutilizzano le stesse classi colore rosa/blu dell'Agenda e mantengono il collegamento al tabellone ufficiale.
 - L'API dello storico avversario trasferisce superficie e ambiente dal payload ufficiale del torneo, anche quando il torneo non appartiene al calendario di alcun giocatore Court Watch.
 - L'interfaccia usa prima l'eventuale torneo Court Watch corrispondente e poi il metadato autonomo dello storico, mostrando insieme superficie e Indoor/Outdoor. Asset aggiornato a `v3.js?v=2026092204`.
+
+
+### Home a tre sezioni dedicate
+
+- La pagina iniziale presenta tre grandi accessi, nell'ordine `Giocatori`, `Calendario`, `Agenda`, adattati in colonna sui display stretti.
+- `Giocatori` apre una griglia di avatar iniziali e conserva l'accesso alla pagina completa di ciascun giocatore; `Calendario` e `Agenda` aprono le rispettive viste già esistenti in pagine dedicate.
+- Logo Court Watch e avatar dell'utente restano nell'intestazione comune a tutte le viste. Nessuna modifica ai dati, ai motori, alle classifiche, alle designazioni o alle sigle live dell'acceptance list.
+- Asset aggiornati a `v3.css?v=2026092206` e `v3.js?v=2026092206`.

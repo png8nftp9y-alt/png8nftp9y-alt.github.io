@@ -396,3 +396,24 @@
 .opponentHistoryMatch{grid-template-columns:max-content minmax(0,1fr) max-content!important}
 .opponentHistoryRound{min-width:max-content!important;max-width:none!important;overflow:visible!important;text-overflow:clip!important;white-space:nowrap!important}
 @media(max-width:700px){.opponentHistoryMatch{grid-template-columns:max-content minmax(0,1fr) max-content!important}}
+
+/* Court Watch section launcher and dedicated primary pages. */
+.homeLauncher{min-height:calc(100vh - 130px);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;align-content:center;padding:36px 4vw 72px}
+.homeLauncherCard{min-height:310px;border:1px solid var(--line);border-radius:24px;background:#fff;box-shadow:0 16px 42px rgba(35,35,35,.09);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.homeLauncherCard:hover,.homeLauncherCard:focus-visible{transform:translateY(-5px);box-shadow:0 22px 52px rgba(35,35,35,.14);border-color:#c9c5be;outline:0}
+.homeLauncherIcon{display:grid;place-items:center;width:142px;height:142px;border-radius:34px;font-size:78px;line-height:1;background:#f4f3f0}
+.homeLauncherCard.players .homeLauncherIcon{background:#e7f1f8}
+.homeLauncherCard.calendar .homeLauncherIcon{background:#fff3d6}
+.homeLauncherCard.agenda .homeLauncherIcon{background:#fce7f3}
+.homeLauncherCard strong{font-size:28px;letter-spacing:-.02em}
+.calendarPageLayout,.playersPageLayout{width:100%}
+#calendarView .calendarCard{width:100%}
+#playersView .playersCard{width:100%;max-height:none}
+#playersView .playersList{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;max-height:none;overflow:visible;padding:18px}
+#playersView .playerRow{min-height:150px;border:1px solid var(--line);border-radius:16px;padding:18px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#fff}
+#playersView .playerRow:hover{background:var(--blueSoft)}
+#playersView .playerRow .avatar{width:68px;height:68px;font-size:21px}
+#playersView .playerRow>div:nth-child(2){width:100%;flex:0}
+#playersView .playerRow strong,#playersView .playerRow small{white-space:normal;overflow:visible;text-overflow:clip}
+#playersView .playerRow>i{display:none}
+@media(max-width:800px){.homeLauncher{grid-template-columns:1fr;gap:18px;align-content:start;padding:24px 0}.homeLauncherCard{min-height:190px}.homeLauncherIcon{width:96px;height:96px;border-radius:24px;font-size:54px}.homeLauncherCard strong{font-size:23px}}
