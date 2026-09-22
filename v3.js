@@ -1611,6 +1611,33 @@ function agendaMatchRows(matches) {
     return rows;
   });
 }
+function renderWeeklyAgenda() {
+  const start = monday(state.agenda),
+    end = add(start, 6),
+    first = iso(start),
+    last = iso(end),
+    tournaments = groups(false).filter((tournament) =>
+      overlap(tournament, first, last),
+    );
+  $("weeklyAgendaTitle").textContent = `Tornei · ${fmt(start)}–${fmt(end)}`;
+  $("weeklyAgendaContent").innerHTML = tournaments.length
+    ? `<div class="weeklyTournamentList">${tournaments
+        .map(
+          (tournament) =>
+            `<button type="button" class="weeklyTournament ${circuit(tournament)}" data-weekly-tournament="${esc(tournamentKey(tournament))}"><span class="weeklyTournamentCircuit">${esc(circuit(tournament) === "tennis-europe" ? "Tennis Europe" : circuit(tournament).toUpperCase())}</span><strong>${esc(tournamentDisplayName(tournament))}</strong><small>${esc(tournamentLocationLabel(tournament))}</small><span>${tournament.players.map((player) => `<b>${esc(player)}</b>`).join(", ")}</span></button>`,
+        )
+        .join("")}</div>`
+    : '<div class="empty">Nessun giocatore iscritto a tornei in questa settimana.</div>';
+  document
+    .querySelectorAll("[data-weekly-tournament]")
+    .forEach(
+      (button) =>
+        (button.onclick = () => {
+          location.hash =
+            "tournament/" + encodeURIComponent(button.dataset.weeklyTournament);
+        }),
+    );
+}
 function renderAgenda() {
   const key = iso(state.agenda),
     items = dedupeAgendaMatches(
@@ -1621,6 +1648,8 @@ function renderAgenda() {
   items.sort(agendaChronologicalCompare);
   $("agendaToday").textContent =
     key === iso(new Date()) ? "Oggi" : agendaBtnFmt(state.agenda);
+  $("agendaGoToday").hidden = key === iso(new Date());
+  renderWeeklyAgenda();
   if ($("agendaMode")) $("agendaMode").value = state.agendaMode;
   const groups = new Map();
   for (const m of items) {
@@ -2865,6 +2894,16 @@ function route() {
     ),
     tournament = location.hash.match(/^#tournament\/(.+)$/),
     primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
+  const isHomeRoute = !location.hash;
+  $("resetHome").hidden = !isHomeRoute;
+  $("quickSectionNav").hidden = isHomeRoute;
+  document.querySelectorAll("#quickSectionNav [data-home-route]").forEach(
+    (button) =>
+      button.classList.toggle(
+        "active",
+        location.hash === `#${button.dataset.homeRoute}`,
+      ),
+  );
   document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
   if (!player) {
     profileYearFilter = String(new Date().getFullYear());
@@ -3054,6 +3093,17 @@ function wire() {
     renderSynchronizedDates();
   };
   $("agendaToday").onclick = toggleDatePopover;
+  $("agendaGoToday").onclick = () => {
+    state.agenda = new Date();
+    syncMonthFromAgenda();
+    renderSynchronizedDates();
+  };
+  $("weeklyAgendaToggle").onclick = () => {
+    const panel = $("weeklyAgendaPanel"),
+      opening = panel.hidden;
+    panel.hidden = !opening;
+    $("weeklyAgendaToggle").setAttribute("aria-expanded", String(opening));
+  };
   $("datePopover").onclick = (e) => e.stopPropagation();
   $("toggleAll").onclick = () => {
     const all = state.data.players || [];

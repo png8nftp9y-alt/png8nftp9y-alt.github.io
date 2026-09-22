@@ -1333,3 +1333,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - `Giocatori` apre una griglia di avatar iniziali e conserva l'accesso alla pagina completa di ciascun giocatore; `Calendario` e `Agenda` aprono le rispettive viste già esistenti in pagine dedicate.
 - Logo Court Watch e avatar dell'utente restano nell'intestazione comune a tutte le viste. Nessuna modifica ai dati, ai motori, alle classifiche, alle designazioni o alle sigle live dell'acceptance list.
 - Asset aggiornati a `v3.css?v=2026092206` e `v3.js?v=2026092206`.
+
+
+### Navigazione rapida e riepilogo settimanale Agenda
+
+- Fuori dalla home, il pulsante centrale `Home` viene sostituito dai tre accessi rapidi a `Giocatori`, `Calendario` e `Agenda`; logo e avatar restano invariati.
+- In Agenda, quando la data selezionata non è oggi, compare un pulsante `Oggi` separato che riporta immediatamente alla giornata corrente.
+- Sopra l'Agenda è disponibile l'icona `Tornei della settimana`, che apre l'elenco dei tornei compresi nella settimana visualizzata e dei relativi giocatori Court Watch iscritti.
+- La modifica usa esclusivamente i dati già caricati e non cambia motori, frequenze, classifiche, designazioni o sigle live dell'acceptance list. Asset aggiornati a `v3.css?v=2026092207` e `v3.js?v=2026092207`.

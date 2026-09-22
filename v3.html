@@ -16,7 +16,7 @@
     <link rel="preload" as="fetch" href="https://png8nftp9y-alt.github.io/dist/v3/tournament_entries.json" crossorigin="anonymous" />
     <link rel="preload" as="fetch" href="https://png8nftp9y-alt.github.io/dist/v3/results.json" crossorigin="anonymous" />
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=2026092206" />
+    <link rel="stylesheet" href="v3.css?v=2026092207" />
   </head>
   <body>
     <div class="shell">
@@ -26,6 +26,11 @@
           <div><h1>Court Watch</h1></div>
         </div>
         <button id="resetHome" class="btn">Home</button>
+        <nav id="quickSectionNav" class="quickSectionNav" aria-label="Navigazione principale" hidden>
+          <button type="button" data-home-route="players" aria-label="Giocatori" title="Giocatori">👤</button>
+          <button type="button" data-home-route="calendar" aria-label="Calendario" title="Calendario">🗓️</button>
+          <button type="button" data-home-route="agenda" aria-label="Agenda" title="Agenda">📌</button>
+        </nav>
         <div class="status" id="syncStatus">Caricamento…</div>
         <div class="accountControl" id="accountControl">
           <button
@@ -62,6 +67,15 @@
         </section>
       </main>
       <main id="agendaView" class="view">
+        <div class="agendaTopTools">
+          <button id="weeklyAgendaToggle" class="weeklyAgendaToggle" type="button" aria-expanded="false" aria-controls="weeklyAgendaPanel">
+            <span aria-hidden="true">📋</span><strong>Tornei della settimana</strong>
+          </button>
+        </div>
+        <section id="weeklyAgendaPanel" class="card weeklyAgendaPanel" hidden>
+          <div class="cardHead"><h3 id="weeklyAgendaTitle">Tornei della settimana</h3></div>
+          <div id="weeklyAgendaContent"></div>
+        </section>
         <section class="card agendaCard">
           <div class="cardHead agendaHead">
             <div>
@@ -89,6 +103,7 @@
               >
                 ‹</button
               ><button id="agendaToday" class="btn dateBtn">Oggi</button
+              ><button id="agendaGoToday" class="btn agendaGoToday" hidden>Oggi</button
               ><button
                 id="nextAgenda"
                 class="btn icon"
@@ -243,6 +258,6 @@
         <div id="profileContent"></div>
       </main>
     </div>
-    <script src="v3.js?v=2026092206"></script>
+    <script src="v3.js?v=2026092207"></script>
   </body>
 </html>
