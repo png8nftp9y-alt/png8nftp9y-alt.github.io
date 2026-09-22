@@ -2374,10 +2374,7 @@ function renderProfile(id) {
         matches.length
           ? matches
               .map((m) => {
-                const x = matchMeta(m),
-                  loss = m.advances === false ? " loss" : "",
-                  win = m.advances === true ? " win" : "";
-                return `<div class="listItem matchWithAnalysis">${matchAnalysisButton(m)}<h4 class="matchDate">${esc(displayDate(m.date) || "data da pubblicare")}</h4>${x.isDouble ? `<p class="matchType">Doppio${m.partner ? " con " + partnerHtml(m) : ""}</p>` : `<p class="matchType">Singolare</p>`}${agendaRoundCode(m) ? `<span class="type roundCode matchRoundCode">${esc(agendaRoundCode(m))}</span>` : ""}<p>${opponentHtml(m, x)}</p>${matchResultText(m) ? `<p class="result${loss}${win}">Risultato: ${esc(matchResultText(m))}</p>` : ""}</div>`;
+                return matchHistoryRowHtml(m);
               })
               .join("")
           : '<div class="empty">Nessuna partita pubblicata.</div>'
@@ -2397,6 +2394,16 @@ function renderProfile(id) {
   bindParticipantNavigation($("profileContent"));
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
+}
+function matchHistoryRowHtml(m) {
+  const x = matchMeta(m),
+    result = matchResultText(m),
+    outcome = m.advances === true ? "win" : m.advances === false ? "loss" : "",
+    round = agendaRoundCode(m),
+    matchType = x.isDouble
+      ? `Doppio${m.partner ? " con " + partnerHtml(m) : ""}`
+      : "Singolare";
+  return `<div class="opponentHistoryMatch unifiedMatchRow matchWithAnalysis">${matchAnalysisButton(m)}<span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(m.date) || "data da pubblicare")}</time>${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}</span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span class="matchType">${matchType}</span><span>${opponentHtml(m, x)}</span></span><strong class="${outcome}">${result ? esc(result) : ""}</strong></div>`;
 }
 function tournamentOfficialUrl(t) {
   const source = circuit(t),
@@ -2617,19 +2624,7 @@ function renderTournament(key) {
               : "";
       const matchRows = rows
         .map((m) => {
-          const x = matchMeta(m),
-            loss = m.advances === false ? " loss" : "",
-            win = m.advances === true ? " win" : "",
-            doubleLabel = x.isDouble
-              ? `Doppio${m.partner ? " con " + partnerHtml(m) : ""}`
-              : "Singolare",
-            nationalities = m.opponentNationalities?.length
-              ? m.opponentNationalities
-              : m.opponentNationality
-                ? [m.opponentNationality]
-                : [],
-            round = agendaRoundCode(m);
-          return `<div class="listItem matchWithAnalysis">${matchAnalysisButton(m)}<h4 class="matchDate">${esc(displayDate(m.date) || "data da pubblicare")}</h4>${doubleLabel ? `<p class="matchType">${doubleLabel}</p>` : ""}${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}<p>${opponentHtml(m, x)}</p>${matchResultText(m) ? `<p class="result${loss}${win}">Risultato: ${esc(matchResultText(m))}</p>` : ""}</div>`;
+          return matchHistoryRowHtml(m);
         })
         .join("");
       return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}"><button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button><span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;

@@ -57,7 +57,7 @@ assert.ok(hasSource('KAZ: "KZ"') && hasSource('flags/${flagFile}.svg'), 'Kazakhs
 assert.ok(hasSource('<h3>Tornei</h3>') && hasSource('m.roundName, m.stage, m.phase, m.group'), 'player page heading and extended RR recognition must be present');
 assert.ok(hasSource('matchResultText') && hasSource('data-follow-opponent') && hasSource('incompleteCompletedScore'), 'retirement formatting and opponent follow control must be present');
 assert.ok(hasSource('nextCalendarMonth') && hasSource('retirementStatus') && hasSource('completedBy'), 'independent next month and extended retirement evidence must be present');
-assert.ok(hasSource('if (!matchResultText(m)) return ""') && hasSource('matchResultText(m) ? `<p class="result'), 'all public match views must render score fallback and retirement labels');
+assert.ok(hasSource('if (!matchResultText(m)) return ""') && (hasSource('matchResultText(m) ? `<p class="result') || hasSource('result = matchResultText(m)')), 'all public match views must render score fallback and retirement labels');
 assert.ok(hasSource('/^round\\s*\\d+$/i.test(round)'), 'numbered round-robin rounds must render as RR in opponent history');
 assert.ok(hasApiSource('partners=people.filter') && hasSource('partners ? `con ${partners} `'), 'doubles partner must appear before vs');
 assert.ok(hasApiSource("const targets=[...new Set(matches.flatMap"), 'match snapshot must backfill participant rankings by date');
@@ -72,5 +72,6 @@ assert.ok(hasApiSource('profileRows=await optionalRows') && hasApiSource('profil
 assert.ok(hasApiSource('surface:tournament.surface') && hasApiSource('environment:tournament.environment') && hasSource('tournamentSurfaceLabel(tournament)'), 'opponent tournaments must expose their own surface and environment');
 assert.ok(hasSource('[data-home-route]') && hasSource('primaryView = location.hash.match') && hasSource('${primaryView}View'), 'home must route to dedicated players, calendar and agenda pages');
 assert.ok(hasSource('quickSectionNav') && hasSource('renderWeeklyAgenda()') && hasSource('agendaGoToday'), 'internal views must expose quick navigation, weekly tournaments and today return');
+assert.ok(hasSource('function matchHistoryRowHtml(') && hasSource('opponentHistoryMatch unifiedMatchRow matchWithAnalysis') && hasSource('return matchHistoryRowHtml(m)'), 'player and tournament matches must share the opponent-history row structure');
 assert.doesNotMatch(apiSource, /player\.ranking=labels\.join/, 'Tennis Europe ranking must not overwrite FITP ranking');
 console.log(JSON.stringify({ analysisUi: 'green', nativePrompt: false, nativeConfirm: false, actions: ['read', 'save', 'update', 'delete'] }));

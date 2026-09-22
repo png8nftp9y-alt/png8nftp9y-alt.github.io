@@ -1341,3 +1341,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - In Agenda, quando la data selezionata non è oggi, compare un pulsante `Oggi` separato che riporta immediatamente alla giornata corrente.
 - Sopra l'Agenda è disponibile l'icona `Tornei della settimana`, che apre l'elenco dei tornei compresi nella settimana visualizzata e dei relativi giocatori Court Watch iscritti.
 - La modifica usa esclusivamente i dati già caricati e non cambia motori, frequenze, classifiche, designazioni o sigle live dell'acceptance list. Asset aggiornati a `v3.css?v=2026092207` e `v3.js?v=2026092207`.
+
+
+### Righe partita uniformate allo storico avversario
+
+- Le partite nelle pagine giocatore e torneo adottano la struttura a colonne della pagina avversario: data e turno, tipo e avversario, risultato.
+- Restano presenti tutti i dati già mostrati, inclusi compagno di doppio, designazioni, nazionalità, risultato e accesso all'analisi della partita.
+- Il comando `Tornei della settimana` è ora allineato a sinistra sopra l'Agenda. La memoria della posizione per il ritorno Indietro entro 15 secondi resta invariata.
+- Asset aggiornati a `v3.css?v=2026092208` e `v3.js?v=2026092208`; nessuna modifica alle sigle live dell'acceptance list.
