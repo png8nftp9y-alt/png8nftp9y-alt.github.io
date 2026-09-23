@@ -1438,3 +1438,9 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - I profili avversari preparati sono conservati in cache persistente, renderizzati prima della richiesta di aggiornamento e non vengono più sostituiti da uno stato di errore. Il testo `Caricamento storico…` è stato rimosso.
 - Il prefetch resta limitato ma prepara fino a sei profili contemporaneamente. Le sigle live dell'acceptance list non sono state modificate.
 - Asset aggiornati a `v3.css?v=2026092309` e `v3.js?v=2026092309` per impedire che il browser riutilizzi il JavaScript precedente.
+
+### Persistenza del profilo avversario al refresh
+
+- L'ultimo profilo avversario aperto viene salvato separatamente dalla cache generale e ripristinato sincronicamente prima di qualunque richiesta API: un refresh manuale non svuota più intestazione, ranking, tornei o partite.
+- La cache generale conserva fino a venti profili per lasciare sempre spazio alla copia protetta del profilo attivo; l'aggiornamento di rete avviene soltanto dopo il rendering dei dati salvati.
+- Asset aggiornati a `v3.css?v=2026092310` e `v3.js?v=2026092310`; nessuna modifica alle sigle live dell'acceptance list.

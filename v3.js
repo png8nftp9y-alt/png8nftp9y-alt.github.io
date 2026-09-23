@@ -11,6 +11,7 @@ const UI_STATE_CACHE = "courtwatch-v3-ui-state-v1";
 const DEVICE_ID_CACHE = "courtwatch-device-id-v1";
 const PLAYER_RANKING_CACHE = "courtwatch-player-rankings-v1";
 const OPPONENT_HISTORY_CACHE = "courtwatch-opponent-history-v1";
+const ACTIVE_OPPONENT_CACHE = "courtwatch-active-opponent-v1";
 function courtWatchDeviceId() {
   try {
     let id = localStorage.getItem(DEVICE_ID_CACHE) || "";
@@ -85,6 +86,19 @@ function savedEntries(key, storage = localStorage) {
 function saveEntries(key, map, storage = localStorage, limit = 30) {
   try {
     storage.setItem(key, JSON.stringify([...map.entries()].slice(-limit)));
+  } catch {}
+}
+function savedActiveOpponent(requestKey) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ACTIVE_OPPONENT_CACHE) || "null");
+    return saved?.requestKey === requestKey && saved?.data ? saved.data : null;
+  } catch {
+    return null;
+  }
+}
+function saveActiveOpponent(requestKey, data) {
+  try {
+    localStorage.setItem(ACTIVE_OPPONENT_CACHE, JSON.stringify({ requestKey, data }));
   } catch {}
 }
 const restoredUi = savedUiState(),
@@ -2438,7 +2452,7 @@ async function fetchOpponentHistory(name, event = "", refresh = false) {
       OPPONENT_HISTORY_CACHE,
       opponentHistoryCache,
       localStorage,
-      80,
+      20,
     );
       return data;
     }).finally(() => {
@@ -2484,11 +2498,16 @@ async function loadOpponentHistory(name, event = "") {
   const body = $("opponentTournamentHistory"),
     routeKey = activeOpponentRouteKey,
     { requestKey } = opponentHistoryKey(name, event),
-    cached = opponentHistoryCache.get(requestKey);
+    cached = opponentHistoryCache.get(requestKey) || savedActiveOpponent(requestKey);
+  if (cached && !opponentHistoryCache.has(requestKey))
+    opponentHistoryCache.set(requestKey, cached);
   if (cached) renderOpponentHistory(cached);
   try {
     const data = await fetchOpponentHistory(name, event, Boolean(cached));
-    if (activeOpponentRouteKey === routeKey) renderOpponentHistory(data);
+    if (activeOpponentRouteKey === routeKey) {
+      saveActiveOpponent(requestKey, data);
+      renderOpponentHistory(data);
+    }
   } catch {
     if (body && !cached)
       body.innerHTML =
@@ -2526,7 +2545,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   if (activeOpponentRouteKey === routeKey && $("profileView").classList.contains("active") && $("opponentTournamentHistory")) return;
   activeOpponentRouteKey = routeKey;
   const { requestKey } = opponentHistoryKey(name, event),
-    prepared = opponentHistoryCache.get(requestKey),
+    prepared = opponentHistoryCache.get(requestKey) || savedActiveOpponent(requestKey),
     flag = nationalityHtml(initialNationality || prepared?.profile?.nationality),
     follow = $("removeProfilePlayer");
   follow.hidden = false;
@@ -2542,7 +2561,10 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
     follow.scrollIntoView({ behavior: "smooth", block: "center" });
     follow.focus({ preventScroll: true });
   });
-  if (prepared) renderOpponentHistory(prepared);
+  if (prepared) {
+    opponentHistoryCache.set(requestKey, prepared);
+    renderOpponentHistory(prepared);
+  }
   loadOpponentHistory(name, event);
 }
 function renderProfile(id) {
