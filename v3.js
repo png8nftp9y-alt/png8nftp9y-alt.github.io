@@ -108,6 +108,7 @@ let calendarHeightObserver = null,
   activeOpponentRouteKey = "",
   opponentHistoryCache = new Map(),
   opponentHistoryRequests = new Map(),
+  playerRankingRequests = new Map(),
   activeRouteScrollKey = location.hash || "#home",
   routeScrollMemory = new Map(),
   uiSelectionRestored =
@@ -340,9 +341,41 @@ const playerRankingSummary = (player) => {
   if (player?.tennisEuropeRanking)
     labels.push(readableText(player.tennisEuropeRanking));
   return labels.length
-    ? `<span class="playerAllRankings"> · ${labels.map(esc).join(" · ")}</span>`
-    : "";
+    ? `<span id="playerLiveRankings" class="playerAllRankings"> · ${labels.map(esc).join(" · ")}</span>`
+    : '<span id="playerLiveRankings" class="playerAllRankings"></span>';
 };
+function currentPlayerRankingLabels(player, rows = []) {
+  const labels = [];
+  if (player?.ranking) labels.push(`${readableText(player.ranking)} FITP`);
+  for (const row of rows)
+    if (row?.ranking)
+      labels.push(`n°${row.ranking} TE${row.category ? ` ${row.category.replace(/^[BG]/, "U")}` : ""}${row.ranking_date ? ` (ranking del ${displayDate(row.ranking_date)})` : ""}`);
+  return labels;
+}
+async function loadCurrentPlayerRanking(player) {
+  const key = String(player?.id || readablePerson(player?.name));
+  if (!key) return;
+  if (!playerRankingRequests.has(key))
+    playerRankingRequests.set(
+      key,
+      fetch(
+        `${PRIVATE_API}/player-ranking?playerId=${encodeURIComponent(player.id || "")}&name=${encodeURIComponent(player.name || "")}`,
+        privateApiOptions({ cache: "no-store" }),
+      )
+        .then((response) => {
+          if (!response.ok) throw Error("player ranking");
+          return response.json();
+        })
+        .finally(() => playerRankingRequests.delete(key)),
+    );
+  try {
+    const data = await playerRankingRequests.get(key),
+      target = $("playerLiveRankings"),
+      labels = currentPlayerRankingLabels(player, data.rankings || []);
+    if (target && location.hash === `#player/${encodeURIComponent(player.id)}`)
+      target.textContent = labels.length ? ` · ${labels.join(" · ")}` : "";
+  } catch {}
+}
 const normalizedDesignation = (value) => {
   const raw = String(value ?? "").trim().replace(/^[\[(]|[\])]$/g, "").toUpperCase();
   if (/^\d{1,2}$/.test(raw)) return raw;
@@ -2142,6 +2175,26 @@ function opponentHistoryRoundLabel(value, roundRobin = false) {
     ? "RR"
     : round || "—";
 }
+function fullMatchRoundLabel(match, contextMatches = []) {
+  const raw = readableText(
+      match?.round || match?.roundName || match?.stage || match?.phase || match?.group || "",
+    ),
+    source = `${raw} ${match?.event || ""} ${match?.draw || ""}`;
+  if (match?.roundRobin || match?.isRoundRobin || /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(source))
+    return "Round robin";
+  const explicitQualification = raw.match(/\bS?Q\s*(\d+)\b/i) || raw.match(/(?:qualification|qualifying)\s*round\s*(\d+)/i);
+  if (explicitQualification) return `Qualification round ${explicitQualification[1]}`;
+  const qualificationSize = Number((raw.match(/QUALIF(?:YING|ICATION)?\s+ROUND\s+OF\s+(128|64|32|16|8)/i) || [])[1]);
+  if (qualificationSize) {
+    const sizes = [...new Set(contextMatches.map((item) => Number((readableText(item?.round || item?.roundName || "").match(/QUALIF(?:YING|ICATION)?\s+ROUND\s+OF\s+(128|64|32|16|8)/i) || [])[1])).filter(Boolean))].sort((a, b) => b - a);
+    return `Qualification round ${Math.max(0, sizes.indexOf(qualificationSize)) + 1}`;
+  }
+  if (/quarter|\bqf\b/i.test(raw)) return "Quarterfinal";
+  if (/semi|\bsf\b/i.test(raw)) return "Semifinal";
+  if (/^f$|\bfinal\b/i.test(raw)) return "Final";
+  const mainSize = (raw.match(/(?:round\s+of|\br)\s*(128|64|32|16|8)\b/i) || [])[1];
+  return mainSize ? `Round of ${mainSize}` : raw || "—";
+}
 function opponentTournamentDateLabel(tournament) {
   const start = displayDate(tournament.startDate),
     end = displayDate(tournament.endDate);
@@ -2173,7 +2226,7 @@ function opponentHistoryPersonHtml(person, event = "") {
       : `<button type="button" class="opponentHistoryPersonLink" data-open-current-opponent="${esc(person.profileId || "")}" data-opponent-name="${esc(readablePerson(person.name))}" data-opponent-event="${esc(event)}"><b>${esc(readablePerson(person.name))}</b></button>`;
   return `<span class="opponentHistoryPerson">${name}${participantDesignationHtml(person.designation)}${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`;
 }
-function opponentHistoryMatchRowHtml(match) {
+function opponentHistoryMatchRowHtml(match, contextMatches = []) {
   const partners = (match.partners || [])
       .map((person) => opponentHistoryPersonHtml(person, match.event || ""))
       .join(" / "),
@@ -2185,7 +2238,7 @@ function opponentHistoryMatchRowHtml(match) {
       match.status === "completed" || match.retired || match.score
         ? matchResultText(match) || "—"
         : readableText(match.status || "Programmato");
-  return `<div class="opponentHistoryMatch"><span class="opponentHistoryRound">${esc(opponentHistoryRoundLabel(match.round, match.roundRobin))}</span><span class="opponentHistoryOpponent">${matchup}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
+  return `<div class="opponentHistoryMatch unifiedMatchRow"><span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(match.date) || "data da pubblicare")}</time><span class="matchRoundFull">${esc(fullMatchRoundLabel(match, contextMatches))}</span></span><span class="opponentHistoryOpponent unifiedMatchOpponent">${matchup}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
 }
 function groupedMatchSections(matches, rowHtml, doublesKey) {
   const singles = matches.filter((match) => !doublesKey(match)),
@@ -2210,7 +2263,7 @@ function groupedMatchSections(matches, rowHtml, doublesKey) {
 function opponentHistoryMatchSectionsHtml(matches) {
   return groupedMatchSections(
     matches,
-    opponentHistoryMatchRowHtml,
+    (match) => opponentHistoryMatchRowHtml(match, matches),
     (match) =>
       (match.partners || []).length
         ? (match.partners || [])
@@ -2418,6 +2471,7 @@ function renderProfile(id) {
     .join("");
   $("profileContent").innerHTML =
     `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><h2>${esc(p.name)}</h2><p>${esc(p.club || "Tesseramento da completare")}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
+  loadCurrentPlayerRanking(p);
   $("profileContent")
     .querySelectorAll("[data-open-tournament]")
     .forEach(
@@ -2430,17 +2484,17 @@ function renderProfile(id) {
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
 }
-function matchHistoryRowHtml(m) {
+function matchHistoryRowHtml(m, contextMatches = []) {
   const x = matchMeta(m),
     result = matchResultText(m),
     outcome = m.advances === true ? "win" : m.advances === false ? "loss" : "",
-    round = agendaRoundCode(m);
-  return `<div class="opponentHistoryMatch unifiedMatchRow matchWithAnalysis">${matchAnalysisButton(m)}<span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(m.date) || "data da pubblicare")}</time>${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}</span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span>${opponentHtml(m, x)}</span></span><strong class="result ${outcome}">${result ? esc(result) : ""}</strong></div>`;
+    round = fullMatchRoundLabel(m, contextMatches);
+  return `<div class="opponentHistoryMatch unifiedMatchRow matchWithAnalysis">${matchAnalysisButton(m)}<span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(m.date) || "data da pubblicare")}</time><span class="matchRoundFull">${esc(round)}</span></span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span>${opponentHtml(m, x)}</span></span><strong class="result ${outcome}">${result ? esc(result) : ""}</strong></div>`;
 }
 function matchHistorySectionsHtml(matches) {
   return groupedMatchSections(
     matches,
-    matchHistoryRowHtml,
+    (match) => matchHistoryRowHtml(match, matches),
     (match) =>
       matchMeta(match).isDouble
         ? match.partner

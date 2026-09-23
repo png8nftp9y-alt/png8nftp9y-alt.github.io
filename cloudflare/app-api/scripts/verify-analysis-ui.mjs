@@ -37,6 +37,7 @@ assert.ok(hasSource('retained=projected?.tennisEuropeRankings||projected?.tennis
 assert.ok(hasSource('retainedCurrentMatches=previousMatches.filter'), 'current matches must survive a temporary projection gap');
 assert.ok(hasSource('tennisEuropeRanking:retained.tennisEuropeRanking||retained.ranking'), 'JSON merge must preserve the FITP ranking');
 assert.ok(hasApiSource('player.tennisEuropeRanking=labels.join'), 'API must expose Tennis Europe ranking separately');
+assert.ok(hasApiSource("apiPath==='/player-ranking'") && hasApiSource('currentTennisEuropePlayerRanking') && hasSource('loadCurrentPlayerRanking(p)'), 'player page must read the current Tennis Europe ranking directly from D1');
 assert.ok(hasApiSource('player.tennisEuropeRankingDates') && hasApiSource("if(player.tennisEuropeRankingDates[key]&&player.tennisEuropeRankingDates[key]>date)return"), 'API must retain the newest Tennis Europe ranking by date');
 assert.ok(hasApiSource('tennisEuropeNameKey') && hasApiSource('h.normalized_name LIKE ?') && hasApiSource('playersByName.get(tennisEuropeNameKey(row.normalized_name))'), 'current player rankings must resolve reversed Tennis Europe names');
 assert.ok(hasSource('function renderOpponentProfile(') && hasSource('profile.ranking_date'), 'opponent page must expose the current ranking date');
@@ -47,7 +48,7 @@ assert.ok(hasSource('doublesPartnerLink'), 'doubles partners must remain bold');
 assert.ok(hasSource('function loadOpponentHistory(') && hasSource('/opponent-profile?name='), 'opponent page must load current history with frozen match rankings');
 assert.ok(hasSource('function opponentTournamentEventLinks(') && hasSource('opponentTournamentDraw'), 'opponent tournaments must link event badges to draws');
 assert.ok(hasSource('gender: agendaGenderClass(match)') && hasSource('drawCode ${esc(event.gender)}'), 'opponent event badges must reuse agenda gender colors');
-assert.ok(hasSource('matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents') && hasSource('<span class="opponentHistoryOpponent">${matchup}</span>'), 'opponent history rows must render partner plus vs opponent');
+assert.ok(hasSource('matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents') && hasSource('<span class="opponentHistoryOpponent unifiedMatchOpponent">${matchup}</span>'), 'opponent history rows must render partner plus vs opponent');
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
 assert.ok(hasSource('const asOf = iso(new Date())') && !hasSource('&excludeMatchId='), 'opponent profile must always load through today without excluding the clicked match');
 assert.ok(hasApiSource('tennisEuropePerspectiveScore') && hasSource('opponentHistoryRoundLabel'), 'opponent study rows must orient scores and show full rounds');
@@ -81,8 +82,9 @@ assert.ok(hasSource('[data-home-route]') && hasSource('primaryView = location.ha
 assert.ok(hasSource('quickSectionNav') && hasSource('renderWeeklyAgenda()') && hasSource('agendaGoToday'), 'internal views must expose quick navigation, weekly tournaments and today return');
 assert.ok(hasSource('function matchHistoryRowHtml(') && hasSource('opponentHistoryMatch unifiedMatchRow matchWithAnalysis') && hasSource('matchHistorySectionsHtml(matches)'), 'player and tournament matches must share the opponent-history row structure');
 assert.ok(hasSource('function groupedMatchSections(') && hasSource('matchTypeHeading') && hasSource('opponentHistoryMatchSectionsHtml'), 'player, tournament and opponent pages must group singles and doubles');
+assert.ok(hasSource('function fullMatchRoundLabel(') && hasSource('Qualification round ${Math.max') && hasSource('matchRoundFull'), 'all match pages must use full round labels and ordinal qualification rounds');
 assert.ok(!hasSource('<span class="matchType">${matchType}</span>'), 'grouped match rows must not repeat the match type');
-assert.ok(html.includes('Vai a Altri') && (html.match(/>Altri<\/button>/g) || []).length >= 2, 'inactive Altri labels must exist in home, agenda and calendar');
+assert.ok(html.includes('id="homeOthers" class="playersHeaderAction"') && (html.match(/class="playersHeaderAction"[^>]*>Altri<\/button>/g) || []).length >= 2, 'inactive Altri labels must match the players environment');
 assert.ok(hasSource('Acceptance list: '), 'scheduled Tennis Europe tournaments must label the acceptance list');
 assert.ok(hasSource('querySelectorAll(".unifiedMatchRow")') && hasSource('class="result ${outcome}"') && hasSource('$("brandHome").onclick'), 'tournament counters must read unified rows and the brand must return home');
 assert.ok(!hasSource('$("resetHome")') && hasSource('String(a.startDate || "").localeCompare'), 'home label must be absent and weekly tournaments must be ordered');

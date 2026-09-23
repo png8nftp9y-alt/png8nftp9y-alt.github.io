@@ -16,7 +16,7 @@
     <link rel="preload" as="fetch" href="https://png8nftp9y-alt.github.io/dist/v3/tournament_entries.json" crossorigin="anonymous" />
     <link rel="preload" as="fetch" href="https://png8nftp9y-alt.github.io/dist/v3/results.json" crossorigin="anonymous" />
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=2026092305" />
+    <link rel="stylesheet" href="v3.css?v=2026092306" />
   </head>
   <body>
     <div class="shell">
@@ -30,7 +30,7 @@
           <button type="button" data-home-route="calendar" aria-label="Calendario" title="Calendario">🗓️</button>
           <button type="button" data-home-route="agenda" aria-label="Agenda" title="Agenda">📌</button>
         </nav>
-        <button type="button" id="homeOthers" class="inactiveOtherLink" disabled>Vai a Altri</button>
+        <button type="button" id="homeOthers" class="playersHeaderAction">Vai a Altri</button>
         <div class="status" id="syncStatus">Caricamento…</div>
         <div class="accountControl" id="accountControl">
           <button
@@ -71,7 +71,7 @@
           <button id="weeklyAgendaToggle" class="weeklyAgendaToggle" type="button" aria-expanded="false" aria-controls="weeklyAgendaPanel">
             <span aria-hidden="true">📋</span><strong>Tornei della settimana</strong>
           </button>
-          <button type="button" class="inactiveOtherLink" disabled>Altri</button>
+          <button type="button" class="playersHeaderAction">Altri</button>
         </div>
         <section id="weeklyAgendaPanel" class="card weeklyAgendaPanel" hidden>
           <div class="cardHead"><h3 id="weeklyAgendaTitle">Tornei della settimana</h3></div>
@@ -190,7 +190,7 @@
                     <option value="F">F</option>
                   </select></label
                 >
-                <button type="button" class="inactiveOtherLink" disabled>Altri</button>
+                <button type="button" class="playersHeaderAction">Altri</button>
               </div>
               <button id="toggleAll" class="btn">Deseleziona tutti</button>
             </div>
@@ -260,6 +260,6 @@
         <div id="profileContent"></div>
       </main>
     </div>
-    <script src="v3.js?v=2026092305"></script>
+    <script src="v3.js?v=2026092306"></script>
   </body>
 </html>

@@ -1397,3 +1397,12 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - I profili collegati nella pagina visibile vengono precaricati in background e condividono richiesta e cache: al clic i dati già disponibili vengono mostrati immediatamente, anche proseguendo verso gli avversari degli avversari.
 - Durante una pagina avversario l'aggiornamento periodico generale viene sospeso e un eventuale caricamento già avviato non forza un nuovo rendering della pagina.
 - Asset aggiornati a `v3.css?v=2026092305` e `v3.js?v=2026092305`; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Ranking giocatore diretto e turni uniformi
+
+- La pagina giocatore interroga ora direttamente D1 tramite `/app/api/player-ranking` a ogni apertura e seleziona la data più recente per ciascuna categoria Tennis Europe, senza dipendere dal ranking incorporato nello snapshot generale.
+- Pagina giocatore, pagina torneo e pagina avversario condividono la stessa struttura di riga e mostrano il turno per esteso come testo, non come badge.
+- I turni di qualificazione basati sulla dimensione del tabellone vengono convertiti in `Qualification round 1`, `Qualification round 2` e successivi.
+- `Altri` e `Vai a Altri` usano esattamente la classe grafica `playersHeaderAction` già presente nell'ambiente Giocatori e restano per ora privi di azione.
+- Asset aggiornati a `v3.css?v=2026092306` e `v3.js?v=2026092306`; nessuna modifica alle sigle live dell'acceptance list.
