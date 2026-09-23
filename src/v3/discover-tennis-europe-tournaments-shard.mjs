@@ -3,7 +3,7 @@ import {tennisEuropeCourtConditions} from './tennis-europe-metadata.mjs';
 
 const NOW=new Date().toISOString(), BASE='https://te.tournamentsoftware.com';
 const SHARDS=['core','west','east','north'], SHARD=process.env.TE_SHARD||'core', SHARD_INDEX=Math.max(0,SHARDS.indexOf(SHARD));
-const PAST_DAYS=Number(process.env.TE_PAST_DAYS||240), HORIZON_DAYS=Number(process.env.TE_HORIZON_DAYS||730), WINDOW_DAYS=93, WINDOW_STEP_DAYS=72, MAX_PAGES=60, REQUEST_TIMEOUT_MS=15000;
+const PAST_DAYS=Number(process.env.TE_PAST_DAYS||300), HORIZON_DAYS=Number(process.env.TE_HORIZON_DAYS||730), WINDOW_DAYS=93, WINDOW_STEP_DAYS=72, MAX_PAGES=60, REQUEST_TIMEOUT_MS=15000;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function writeJson(p,v){await fs.mkdir(p.split('/').slice(0,-1).join('/'),{recursive:true});await fs.writeFile(p,JSON.stringify(v,null,2)+'\n')}
 function decode(s){return String(s||'').replace(/&#(x?[0-9a-f]+);/gi,(_,n)=>String.fromCodePoint(n[0].toLowerCase()==='x'?parseInt(n.slice(1),16):parseInt(n,10))).replace(/&nbsp;/gi,' ').replace(/&amp;/gi,'&').replace(/&quot;/gi,'"').replace(/&#39;|&apos;/gi,"'")}
