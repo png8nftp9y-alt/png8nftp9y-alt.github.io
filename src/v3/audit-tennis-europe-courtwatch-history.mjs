@@ -32,7 +32,7 @@ for(const match of matchMap.values()){
 }
 const identityCollisions=[...officialPlayers].filter(([,identities])=>identities.size>1).map(([scopedSourceId,identities])=>({scopedSourceId,identities:[...identities]}));
 const metadataByTournament=new Map((tournamentCatalog.tournaments||[]).map(t=>[String(t.competitionId||''),t]));
-const archivedMetadataByTournament=new Map((tournamentHistory.tournaments||[]).map(t=>[String(t.competitionId||''),t]));
+const archivedMetadataByTournament=new Map(Object.values(tournamentHistory.tournaments||{}).map(t=>[String(t.competitionId||''),t]));
 const recentTournamentIds=new Set([...matchMap.values()].filter(match=>String(match.date||'')>='2026-01-25').map(match=>String(match.competitionId||'')));
 const tournamentMetadata=competitionId=>{const current=metadataByTournament.get(competitionId)||{},catalogArchive=archivedMetadataByTournament.get(competitionId)||{},oopArchive=tournamentMap.get(competitionId)||{},sources=[current,catalogArchive,oopArchive],first=(...fields)=>{for(const source of sources)for(const field of fields)if(source[field])return source[field];return''},flag=field=>sources.some(source=>source[field]===true);return{tournamentName:first('tournamentName','name'),startDate:first('startDate','officialStartDate'),endDate:first('endDate'),surface:first('surface','courtSurface','playingSurface'),environment:first('environment','courtEnvironment','indoorOutdoor')||(flag('indoor')?'Indoor':flag('outdoor')?'Outdoor':'')}};
 const incompleteTournamentMetadata=[...recentTournamentIds].filter(Boolean).map(competitionId=>({competitionId,...tournamentMetadata(competitionId)})).filter(item=>!item.tournamentName||!item.startDate||!item.endDate||!item.surface||!item.environment);

@@ -1459,3 +1459,9 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - L'identificativo numerico esposto nei tabelloni Tennis Europe è locale al singolo tabellone: l'audit lo verifica ora nel perimetro `torneo + evento`, evitando collisioni false tra giocatori di tornei diversi e continuando a bloccare conflitti reali nello stesso tabellone.
 - La verifica di nome, date, superficie e indoor/outdoor usa in ordine il catalogo corrente, il catalogo storico e il torneo conservato negli archivi OOP; i tornei usciti dalla finestra del calendario corrente non vengono più erroneamente considerati privi di metadati.
 - Le regole restano restrittive: un dato realmente mancante dopo tutte e tre le fonti mantiene il run rosso. Nessuna modifica alle sigle live dell'acceptance list.
+
+### Identità corretta nelle pagine avversario Tennis Europe
+
+- Gli ID numerici dei partecipanti provenienti dai tabelloni non vengono più usati per ricostruire lo storico globale: sono locali al tabellone e possono essere riutilizzati per persone diverse.
+- Tornei e partite della pagina avversario vengono selezionati tramite il nome normalizzato esatto indicizzato in D1. Anche ranking corrente e ranking storico ignorano gli ID numerici locali; un ID viene considerato profilo soltanto quando ha una forma non locale stabile.
+- Il controllo automatico impedisce il ripristino della ricerca globale tramite `source_player_id`. Nessuna modifica alle sigle live dell'acceptance list.
