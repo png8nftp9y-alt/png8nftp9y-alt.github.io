@@ -1389,3 +1389,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Le righe delle partite non ripetono più `Singolare` o `Doppio con`: l'informazione è già esposta dalla relativa mini-intestazione.
 - Sono state predisposte, ancora inattive, le etichette `Altri` accanto a `Tornei della settimana` e al filtro `Sesso`, oltre a `Vai a Altri` nella testata della home.
 - Asset aggiornati a `v3.css?v=2026092304` e `v3.js?v=2026092304`; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Profili avversario precaricati e stabili
+
+- Rimossa dalla pagina avversario la scritta `Aggiornato al ...`; resta visibile soltanto la data propria della classifica, quando disponibile.
+- I profili collegati nella pagina visibile vengono precaricati in background e condividono richiesta e cache: al clic i dati già disponibili vengono mostrati immediatamente, anche proseguendo verso gli avversari degli avversari.
+- Durante una pagina avversario l'aggiornamento periodico generale viene sospeso e un eventuale caricamento già avviato non forza un nuovo rendering della pagina.
+- Asset aggiornati a `v3.css?v=2026092305` e `v3.js?v=2026092305`; nessuna modifica alle sigle live dell'acceptance list.

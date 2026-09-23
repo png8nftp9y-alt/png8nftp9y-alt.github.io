@@ -51,10 +51,12 @@ assert.ok(hasSource('matchup = `${partners ? `con ${partners} ` : ""}vs ${oppone
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
 assert.ok(hasSource('const asOf = iso(new Date())') && !hasSource('&excludeMatchId='), 'opponent profile must always load through today without excluding the clicked match');
 assert.ok(hasApiSource('tennisEuropePerspectiveScore') && hasSource('opponentHistoryRoundLabel'), 'opponent study rows must orient scores and show full rounds');
-assert.ok(hasApiSource('winnerTeam=people.find') && hasSource('opponentProfileCurrentDate'), 'winner score orientation and current profile date must be present');
+assert.ok(hasApiSource('winnerTeam=people.find') && !source.includes('Aggiornato al'), 'winner score orientation must remain and opponent profile must not show an updated-at label');
 assert.ok(hasSource('Per vedere tutti i tornei segui giocatore') && hasSource('opponentTournamentDateLabel'), 'opponent history must show follow prompt and tournament dates');
 assert.ok(hasApiSource('tennis_europe_match_ranking_snapshots WHERE match_id IN') && hasApiSource('snapshotFor(player,row.match_id)'), 'opponent-of-opponent rankings must use frozen match snapshots');
 assert.ok(hasSource('opponentHistoryPersonLink') && hasSource('openCurrentOpponent(') && hasSource('#opponent-profile'), 'every non-CourtWatch participant must support recursive profile navigation');
+assert.ok(hasSource('preloadOpponentHistory(') && hasSource('opponentHistoryRequests = new Map()') && hasSource('requestIdleCallback'), 'clickable opponent profiles must be prefetched and share in-flight requests');
+assert.ok(hasSource("if (!/^#opponent(?:-profile)?\\//.test(location.hash)) load()") && hasSource("if (/^#opponent(?:-profile)?\\//.test(location.hash))"), 'opponent profiles must not rerender during the periodic refresh');
 assert.ok(hasApiSource('participantTokens') && hasApiSource("nameKey(row.normalized_name)===playerNameKey") && hasApiSource('lookupClauses'), 'all opponent participants must resolve reordered Tennis Europe names with bounded D1 lookup');
 assert.ok(hasApiSource('tournament.drawFormat') && hasApiSource('retirementReason') && hasSource('Rit.') && hasApiSource("?' Rit.':''") && hasApiSource('self?.is_winner!=null') && hasApiSource("match.score||match.result") && hasSource('completeSet = high >= 6') && hasApiSource('completeSet=high>=6'), 'RR payload evidence, valid tennis sets and API-visible retirement labels must be preserved');
 assert.ok(hasSource('KAZ: "KZ"') && hasSource('flags/${flagFile}.svg'), 'Kazakhstan nationality must render its flat flag asset');

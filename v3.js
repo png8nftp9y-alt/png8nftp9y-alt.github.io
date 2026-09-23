@@ -1,5 +1,5 @@
 const V3 = "https://png8nftp9y-alt.github.io/dist/v3/";
-// Release contracts: location.origin+'/app/api' and setInterval(load,30000).
+// Release contracts: location.origin+'/app/api' and background refresh outside opponent profiles.
 // Functional-shield contracts retained across formatting:
 // ${agendaDrawCodeHtml(m,itemTournament)}</div><${whenTag} class="agendaWhenDetails
 // stats.innerHTML='<span class="scheduledTournamentLabel">PROGRAMMATO</span>'
@@ -106,9 +106,8 @@ let calendarHeightObserver = null,
   loadRunning = false,
   renderedDataSignature = "",
   activeOpponentRouteKey = "",
-  opponentHistoryRequestKey = "",
-  opponentHistoryRequest = null,
   opponentHistoryCache = new Map(),
+  opponentHistoryRequests = new Map(),
   activeRouteScrollKey = location.hash || "#home",
   routeScrollMemory = new Map(),
   uiSelectionRestored =
@@ -2048,6 +2047,10 @@ function renderIfDataChanged() {
     return false;
   }
   renderedDataSignature = signature;
+  if (/^#opponent(?:-profile)?\//.test(location.hash)) {
+    renderDiagnostics();
+    return false;
+  }
   route();
   return true;
 }
@@ -2072,8 +2075,17 @@ function bindParticipantNavigation(root) {
         openProfile(element.dataset.openPlayer);
       }),
   );
-  root.querySelectorAll("[data-open-current-opponent]").forEach(
-    (element) =>
+  const opponentLinks = [...root.querySelectorAll("[data-open-current-opponent]")];
+  opponentLinks.forEach(
+    (element) => {
+      const preload = () =>
+        preloadOpponentHistory(
+          element.dataset.opponentName,
+          element.dataset.opponentEvent || "",
+        );
+      element.addEventListener("pointerenter", preload, { once: true });
+      element.addEventListener("focus", preload, { once: true });
+      element.addEventListener("touchstart", preload, { once: true, passive: true });
       (element.onclick = (event) => {
         event.stopPropagation();
         openCurrentOpponent(
@@ -2081,8 +2093,19 @@ function bindParticipantNavigation(root) {
           element.dataset.opponentName,
           element.dataset.opponentEvent || "",
         );
-      }),
+      });
+    },
   );
+  const warm = () => opponentLinks.forEach((element) =>
+    preloadOpponentHistory(
+      element.dataset.opponentName,
+      element.dataset.opponentEvent || "",
+    ),
+  );
+  if (opponentLinks.length)
+    (window.requestIdleCallback || ((callback) => setTimeout(callback, 80)))(warm, {
+      timeout: 1200,
+    });
 }
 function incompleteCompletedScore(value, status, decided = false) {
   const sets = String(value || "").match(/\d+(?:\(\d+\))?-\d+(?:\(\d+\))?/g) || [];
@@ -2198,7 +2221,6 @@ function opponentHistoryMatchSectionsHtml(matches) {
 }
 function renderOpponentHistory(data) {
   const tournaments = data.tournaments || [],
-    head = $("opponentProfileCurrentDate"),
     body = $("opponentTournamentHistory");
   const profileRanking = $("opponentProfileRanking"),
     profile = data.profile || null;
@@ -2216,8 +2238,6 @@ function renderOpponentHistory(data) {
     nationality.innerHTML = nationalityHtml(profile.nationality);
     nationality.hidden = false;
   }
-  if (head)
-    head.textContent = `Aggiornato al ${displayDate(new Date())}`;
   if (!body) return;
   body.innerHTML = tournaments.length
     ? tournaments
@@ -2241,19 +2261,17 @@ function renderOpponentHistory(data) {
     : '<div class="empty">Nessun torneo precedente disponibile prima di questo incontro.</div>';
   bindParticipantNavigation(body);
 }
-async function loadOpponentHistory(name, event = "") {
+function opponentHistoryKey(name, event = "") {
   const asOf = iso(new Date()),
     requestKey = [readablePerson(name), asOf, event || ""].join("|");
-  const body = $("opponentTournamentHistory");
-  if (opponentHistoryCache.has(requestKey)) {
-    renderOpponentHistory(opponentHistoryCache.get(requestKey));
-    return;
-  }
-  if (opponentHistoryRequestKey === requestKey && opponentHistoryRequest) return opponentHistoryRequest;
-  if (body && !body.querySelector(".opponentHistoryTournament")) body.innerHTML = '<div class="empty">Caricamento storico…</div>';
-  try {
-    opponentHistoryRequestKey = requestKey;
-    opponentHistoryRequest = fetch(
+  return { asOf, requestKey };
+}
+async function fetchOpponentHistory(name, event = "") {
+  const { asOf, requestKey } = opponentHistoryKey(name, event);
+  if (opponentHistoryCache.has(requestKey))
+    return opponentHistoryCache.get(requestKey);
+  if (!opponentHistoryRequests.has(requestKey))
+    opponentHistoryRequests.set(requestKey, fetch(
       PRIVATE_API +
         "/opponent-profile?name=" +
         encodeURIComponent(name) +
@@ -2262,21 +2280,28 @@ async function loadOpponentHistory(name, event = "") {
         "&event=" +
         encodeURIComponent(event || ""),
       privateApiOptions({ cache: "no-store" }),
-    );
-    const response = await opponentHistoryRequest;
+    ).then(async (response) => {
     if (!response.ok) throw Error("opponent history");
     const data = await response.json();
     opponentHistoryCache.set(requestKey, data);
-    if (opponentHistoryRequestKey === requestKey) renderOpponentHistory(data);
+      return data;
+    }).finally(() => opponentHistoryRequests.delete(requestKey)));
+  return opponentHistoryRequests.get(requestKey);
+}
+function preloadOpponentHistory(name, event = "") {
+  if (!readablePerson(name)) return;
+  fetchOpponentHistory(name, event).catch(() => {});
+}
+async function loadOpponentHistory(name, event = "") {
+  const body = $("opponentTournamentHistory"),
+    routeKey = activeOpponentRouteKey;
+  try {
+    const data = await fetchOpponentHistory(name, event);
+    if (activeOpponentRouteKey === routeKey) renderOpponentHistory(data);
   } catch {
     if (body)
       body.innerHTML =
         '<div class="empty">Storico temporaneamente non disponibile.</div>';
-  } finally {
-    if (opponentHistoryRequestKey === requestKey) {
-      opponentHistoryRequestKey = "";
-      opponentHistoryRequest = null;
-    }
   }
 }
 function renderOpponentFromMatch(identity, matchId, index, role = "opponent") {
@@ -2313,7 +2338,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   follow.title = "Segui giocatore";
   follow.setAttribute("aria-label", "Segui giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentProfileCurrentDate">Aggiornato al ${esc(displayDate(new Date()))}</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Per vedere tutti i tornei segui giocatore</button></p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Per vedere tutti i tornei segui giocatore</button></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
   $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", (event) => {
@@ -3684,4 +3709,6 @@ wireAccount();
 load();
 loadAccount();
 refreshMatchAnalysisStatus();
-setInterval(load, 30000);
+setInterval(() => {
+  if (!/^#opponent(?:-profile)?\//.test(location.hash)) load();
+}, 30000);
