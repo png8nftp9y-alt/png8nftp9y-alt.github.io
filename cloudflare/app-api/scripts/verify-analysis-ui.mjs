@@ -36,6 +36,7 @@ assert.ok(hasSource('retained=projected?.tennisEuropeRankings||projected?.tennis
 assert.ok(hasSource('retainedCurrentMatches=previousMatches.filter'), 'current matches must survive a temporary projection gap');
 assert.ok(hasSource('tennisEuropeRanking:retained.tennisEuropeRanking||retained.ranking'), 'JSON merge must preserve the FITP ranking');
 assert.ok(hasApiSource('player.tennisEuropeRanking=labels.join'), 'API must expose Tennis Europe ranking separately');
+assert.ok(hasApiSource('tennisEuropeNameKey') && hasApiSource('h.normalized_name LIKE ?') && hasApiSource('playersByName.get(tennisEuropeNameKey(row.normalized_name))'), 'current player rankings must resolve reversed Tennis Europe names');
 assert.ok(hasSource('function renderOpponent(') && hasSource('opponentTeRankingDates'), 'opponent page must expose ranking date');
 assert.ok(hasSource('opponentTeRankingCategories') && hasSource('Segui giocatore'), 'opponent header must expose age category and follow action');
 assert.ok(hasSource('(ranking del ${esc(displayDate(rankingDate))})'), 'opponent ranking date must be parenthesized');
@@ -73,7 +74,9 @@ assert.ok(hasApiSource('surface:tournament.surface') && hasApiSource('environmen
 assert.ok(hasApiSource('tennisEuropeTournamentMetadata()') && hasApiSource('officialTournament.surface') && hasApiSource('officialTournament.indoorOutdoor'), 'opponent tournaments must recover official conditions outside the CourtWatch projection');
 assert.ok(hasSource('[data-home-route]') && hasSource('primaryView = location.hash.match') && hasSource('${primaryView}View'), 'home must route to dedicated players, calendar and agenda pages');
 assert.ok(hasSource('quickSectionNav') && hasSource('renderWeeklyAgenda()') && hasSource('agendaGoToday'), 'internal views must expose quick navigation, weekly tournaments and today return');
-assert.ok(hasSource('function matchHistoryRowHtml(') && hasSource('opponentHistoryMatch unifiedMatchRow matchWithAnalysis') && hasSource('return matchHistoryRowHtml(m)'), 'player and tournament matches must share the opponent-history row structure');
+assert.ok(hasSource('function matchHistoryRowHtml(') && hasSource('opponentHistoryMatch unifiedMatchRow matchWithAnalysis') && hasSource('matchHistorySectionsHtml(matches)'), 'player and tournament matches must share the opponent-history row structure');
+assert.ok(hasSource('function groupedMatchSections(') && hasSource('matchTypeHeading') && hasSource('opponentHistoryMatchSectionsHtml'), 'player, tournament and opponent pages must group singles and doubles');
+assert.ok(hasSource('Acceptance list: '), 'scheduled Tennis Europe tournaments must label the acceptance list');
 assert.ok(hasSource('querySelectorAll(".unifiedMatchRow")') && hasSource('class="result ${outcome}"') && hasSource('$("brandHome").onclick'), 'tournament counters must read unified rows and the brand must return home');
 assert.ok(!hasSource('$("resetHome")') && hasSource('String(a.startDate || "").localeCompare'), 'home label must be absent and weekly tournaments must be ordered');
 assert.doesNotMatch(apiSource, /player\.ranking=labels\.join/, 'Tennis Europe ranking must not overwrite FITP ranking');

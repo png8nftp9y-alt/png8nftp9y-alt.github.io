@@ -1364,3 +1364,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Lo storico avversario recupera superficie e ambiente dal catalogo ufficiale Tennis Europe completo quando il torneo non appartiene alla proiezione dei giocatori Court Watch; il catalogo è riutilizzato dalla cache edge per non moltiplicare le richieste.
 - `Tornei della settimana` mostra ora un elenco ordinato cronologicamente a righe, con circuito, torneo, luogo e giocatori iscritti.
 - Asset aggiornati a `v3.css?v=2026092301` e `v3.js?v=2026092301`; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Gruppi singolare/doppio e ranking Tennis Europe correnti
+
+- Le pagine giocatore, torneo e avversario dividono le partite di ciascun torneo in `Singolare` e in uno o più gruppi `Doppio con [compagno]`, mantenendo turno, avversari, designazioni, nazionalità, punteggio e analisi.
+- Nei tornei Tennis Europe programmati della pagina giocatore la sigla già acquisita è preceduta dall'etichetta `Acceptance list:`; il valore live non viene modificato.
+- Il ranking corrente della pagina giocatore risolve anche i nomi pubblicati da Tennis Europe nell'ordine `Cognome Nome`, mentre Court Watch usa `Nome Cognome`. La sincronizzazione ufficiale resta invariata e continua a fornire il valore più recente per categoria.
+- Asset aggiornati a `v3.css?v=2026092302` e `v3.js?v=2026092302`; nessuna modifica alle sigle live dell'acceptance list.

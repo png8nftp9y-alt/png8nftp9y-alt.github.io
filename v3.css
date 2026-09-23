@@ -456,3 +456,9 @@ button.brand{border:0;background:transparent;padding:0;text-align:left;cursor:po
 button.brand:hover h1,button.brand:focus-visible h1{color:var(--blue)}
 button.brand:focus-visible{outline:2px solid var(--blue);outline-offset:4px;border-radius:8px}
 .top .status{grid-column:3}
+
+/* Singles and doubles groups inside every tournament. */
+.matchTypeSection[hidden]{display:none}
+.matchTypeHeading{margin:0;padding:7px 14px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#f4f3f0;color:#494641;font-size:11px;font-weight:850;text-transform:none;letter-spacing:.02em}
+.matchTypeSection:first-child>.matchTypeHeading{border-top:0}
+.opponentHistoryMatches>.matchTypeSection{min-width:0}
