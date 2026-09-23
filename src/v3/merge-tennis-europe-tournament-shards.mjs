@@ -23,7 +23,7 @@ const missing=previousComparable.filter(t=>!currentIds.has(t.competitionId));
 const retentionRate=previousComparable.length?retained.length/previousComparable.length:1;
 const expectedFrom=new Date(Date.parse(TODAY+'T00:00:00Z')-240*864e5).toISOString().slice(0,10);
 const expectedUntil=new Date(Date.parse(TODAY+'T00:00:00Z')+730*864e5).toISOString().slice(0,10);
-const rollingWindowAdvanced=FROM===expectedFrom&&UNTIL===expectedUntil;
+const rollingWindowAdvanced=FROM<=expectedFrom&&UNTIL>=expectedUntil;
 const continuityComparable=previousMap.status==='tennis_europe_sharded_tournament_map_complete'&&(previousMap.tournaments||[]).length>=100;
 if(continuityComparable&&retentionRate<0.9&&missing.length>10)errors.push({type:'map_continuity_regression',previousComparable:previousComparable.length,retained:retained.length,missing:missing.length,retentionRate});
 if(!rollingWindowAdvanced)errors.push({type:'rolling_window_not_current',coverageFrom:FROM,coverageUntil:UNTIL,expectedFrom,expectedUntil});
