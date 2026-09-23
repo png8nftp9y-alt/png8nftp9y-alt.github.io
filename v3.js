@@ -9,6 +9,8 @@ const APP_API = PRIVATE_API + "/app-snapshot";
 const LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1";
 const UI_STATE_CACHE = "courtwatch-v3-ui-state-v1";
 const DEVICE_ID_CACHE = "courtwatch-device-id-v1";
+const PLAYER_RANKING_CACHE = "courtwatch-player-rankings-v1";
+const OPPONENT_HISTORY_CACHE = "courtwatch-opponent-history-v1";
 function courtWatchDeviceId() {
   try {
     let id = localStorage.getItem(DEVICE_ID_CACHE) || "";
@@ -72,6 +74,19 @@ function savedUiState() {
     return {};
   }
 }
+function savedEntries(key, storage = localStorage) {
+  try {
+    const value = JSON.parse(storage.getItem(key) || "[]");
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+}
+function saveEntries(key, map, storage = localStorage, limit = 30) {
+  try {
+    storage.setItem(key, JSON.stringify([...map.entries()].slice(-limit)));
+  } catch {}
+}
 const restoredUi = savedUiState(),
   restoredMonth = /^\d{4}-\d{2}$/.test(restoredUi.month)
     ? new Date(restoredUi.month + "-01T12:00:00")
@@ -106,9 +121,13 @@ let calendarHeightObserver = null,
   loadRunning = false,
   renderedDataSignature = "",
   activeOpponentRouteKey = "",
-  opponentHistoryCache = new Map(),
+  opponentHistoryCache = new Map(savedEntries(OPPONENT_HISTORY_CACHE, sessionStorage)),
   opponentHistoryRequests = new Map(),
+  opponentPrefetchQueue = [],
+  opponentPrefetchQueued = new Set(),
+  opponentPrefetchActive = 0,
   playerRankingRequests = new Map(),
+  playerRankingCache = new Map(savedEntries(PLAYER_RANKING_CACHE)),
   playerSearchSequence = 0,
   playerSearchTimer = null,
   activeRouteScrollKey = location.hash || "#home",
@@ -338,10 +357,15 @@ const teRankHtml = (value) => {
     : "";
 };
 const playerRankingSummary = (player) => {
-  const labels = [];
-  if (player?.ranking) labels.push(`${readableText(player.ranking)} FITP`);
-  if (player?.tennisEuropeRanking)
-    labels.push(readableText(player.tennisEuropeRanking));
+  const cached = playerRankingCache.get(String(player?.id || "")),
+    labels = cached?.rankings?.length
+      ? currentPlayerRankingLabels(player, cached.rankings)
+      : [
+          player?.ranking ? `${readableText(player.ranking)} FITP` : "",
+          player?.tennisEuropeRanking
+            ? readableText(player.tennisEuropeRanking)
+            : "",
+        ].filter(Boolean);
   return labels.length
     ? `<span id="playerLiveRankings" class="playerAllRankings"> · ${labels.map(esc).join(" · ")}</span>`
     : '<span id="playerLiveRankings" class="playerAllRankings"></span>';
@@ -351,7 +375,7 @@ function currentPlayerRankingLabels(player, rows = []) {
   if (player?.ranking) labels.push(`${readableText(player.ranking)} FITP`);
   for (const row of rows)
     if (row?.ranking)
-      labels.push(`n°${row.ranking} TE${row.category ? ` ${row.category.replace(/^[BG]/, "U")}` : ""}${row.ranking_date ? ` (ranking del ${displayDate(row.ranking_date)})` : ""}`);
+      labels.push(`n°${row.ranking} TE${row.category ? ` ${row.category.replace(/^[BG]/, "U")}` : ""}`);
   return labels;
 }
 async function loadCurrentPlayerRanking(player) {
@@ -374,6 +398,8 @@ async function loadCurrentPlayerRanking(player) {
     const data = await playerRankingRequests.get(key),
       target = $("playerLiveRankings"),
       labels = currentPlayerRankingLabels(player, data.rankings || []);
+    playerRankingCache.set(key, data);
+    saveEntries(PLAYER_RANKING_CACHE, playerRankingCache);
     if (target && location.hash === `#player/${encodeURIComponent(player.id)}`)
       target.textContent = labels.length ? ` · ${labels.join(" · ")}` : "";
   } catch {}
@@ -2031,11 +2057,16 @@ function renderPlayers() {
     })
     .join("");
   document.querySelectorAll("[data-profile]").forEach(
-    (x) =>
+    (x) => {
+      const player = ps.find((item) => item.id === x.dataset.profile),
+        preloadRanking = () => player && loadCurrentPlayerRanking(player);
+      x.addEventListener("pointerenter", preloadRanking, { once: true });
+      x.addEventListener("touchstart", preloadRanking, { once: true, passive: true });
       (x.onclick = () => {
         if (String(getSelection() || "").trim()) return;
         openProfile(x.dataset.profile);
-      }),
+      });
+    },
   );
 }
 async function searchPlayers(query) {
@@ -2177,6 +2208,10 @@ function bindParticipantNavigation(root) {
       element.addEventListener("pointerenter", preload, { once: true });
       element.addEventListener("focus", preload, { once: true });
       element.addEventListener("touchstart", preload, { once: true, passive: true });
+      queueOpponentPreload(
+        element.dataset.opponentName,
+        element.dataset.opponentEvent || "",
+      );
       (element.onclick = (event) => {
         event.stopPropagation();
         openCurrentOpponent(
@@ -2227,21 +2262,23 @@ function fullMatchRoundLabel(match, contextMatches = []) {
   const raw = readableText(
       match?.round || match?.roundName || match?.stage || match?.phase || match?.group || "",
     ),
-    source = `${raw} ${match?.event || ""} ${match?.draw || ""}`;
+    source = `${raw} ${match?.event || ""} ${match?.draw || ""}`,
+    bonus = /bonus\s*draw/i.test(source),
+    label = (value) => bonus ? `Bonus ${value}` : value;
   if (match?.roundRobin || match?.isRoundRobin || /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(source))
-    return "Round robin";
+    return label("Round robin");
   const explicitQualification = raw.match(/\bS?Q\s*(\d+)\b/i) || raw.match(/(?:qualification|qualifying)\s*round\s*(\d+)/i);
-  if (explicitQualification) return `Qualification round ${explicitQualification[1]}`;
+  if (explicitQualification) return label(`Qualification round ${explicitQualification[1]}`);
   const qualificationSize = Number((raw.match(/QUALIF(?:YING|ICATION)?\s+ROUND\s+OF\s+(128|64|32|16|8)/i) || [])[1]);
   if (qualificationSize) {
     const sizes = [...new Set(contextMatches.map((item) => Number((readableText(item?.round || item?.roundName || "").match(/QUALIF(?:YING|ICATION)?\s+ROUND\s+OF\s+(128|64|32|16|8)/i) || [])[1])).filter(Boolean))].sort((a, b) => b - a);
-    return `Qualification round ${Math.max(0, sizes.indexOf(qualificationSize)) + 1}`;
+    return label(`Qualification round ${Math.max(0, sizes.indexOf(qualificationSize)) + 1}`);
   }
-  if (/quarter|\bqf\b/i.test(raw)) return "Quarterfinal";
-  if (/semi|\bsf\b/i.test(raw)) return "Semifinal";
-  if (/^f$|\bfinal\b/i.test(raw)) return "Final";
+  if (/quarter|\bqf\b/i.test(raw)) return label("Quarter final");
+  if (/semi|\bsf\b/i.test(raw)) return label("Semi final");
+  if (/^f$|\bfinal\b/i.test(raw)) return label("Final");
   const mainSize = (raw.match(/(?:round\s+of|\br)\s*(128|64|32|16|8)\b/i) || [])[1];
-  return mainSize ? `Round of ${mainSize}` : raw || "—";
+  return label(mainSize ? `Round of ${mainSize}` : raw || "—");
 }
 function opponentTournamentDateLabel(tournament) {
   const start = displayDate(tournament.startDate),
@@ -2387,6 +2424,12 @@ async function fetchOpponentHistory(name, event = "") {
     if (!response.ok) throw Error("opponent history");
     const data = await response.json();
     opponentHistoryCache.set(requestKey, data);
+    saveEntries(
+      OPPONENT_HISTORY_CACHE,
+      opponentHistoryCache,
+      sessionStorage,
+      12,
+    );
       return data;
     }).finally(() => {
       clearTimeout(timer);
@@ -2398,6 +2441,34 @@ async function fetchOpponentHistory(name, event = "") {
 function preloadOpponentHistory(name, event = "") {
   if (!readablePerson(name)) return;
   fetchOpponentHistory(name, event).catch(() => {});
+}
+function runOpponentPrefetchQueue() {
+  while (opponentPrefetchActive < 2 && opponentPrefetchQueue.length) {
+    const item = opponentPrefetchQueue.shift(),
+      { requestKey } = opponentHistoryKey(item.name, item.event);
+    opponentPrefetchQueued.delete(requestKey);
+    if (opponentHistoryCache.has(requestKey)) continue;
+    opponentPrefetchActive++;
+    fetchOpponentHistory(item.name, item.event)
+      .catch(() => {})
+      .finally(() => {
+        opponentPrefetchActive--;
+        runOpponentPrefetchQueue();
+      });
+  }
+}
+function queueOpponentPreload(name, event = "") {
+  if (!readablePerson(name)) return;
+  const { requestKey } = opponentHistoryKey(name, event);
+  if (
+    opponentHistoryCache.has(requestKey) ||
+    opponentHistoryRequests.has(requestKey) ||
+    opponentPrefetchQueued.has(requestKey)
+  )
+    return;
+  opponentPrefetchQueued.add(requestKey);
+  opponentPrefetchQueue.push({ name, event });
+  runOpponentPrefetchQueue();
 }
 async function loadOpponentHistory(name, event = "") {
   const body = $("opponentTournamentHistory"),

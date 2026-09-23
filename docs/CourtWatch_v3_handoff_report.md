@@ -1422,3 +1422,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Nell'ambiente Giocatori, accanto al totale, è disponibile la ricerca D1 per nome, cognome o frammento. I suggerimenti aprono direttamente il profilo; Invio apre una pagina completa con tutti i risultati trovati.
 - I giocatori Court Watch aprono la pagina giocatore completa; gli altri risultati aprono la pagina avversario.
 - Asset aggiornati a `v3.css?v=2026092307` e `v3.js?v=2026092307`; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Ranking immediato, turni Bonus e prefetch avversari limitato
+
+- L'ultimo ranking Tennis Europe live ricevuto per ciascun giocatore Court Watch viene conservato localmente e mostrato già al primo rendering della pagina; la richiesta D1 continua in background ad aggiornarlo. La data tra parentesi non viene mostrata nella pagina giocatore.
+- Nei tabelloni `Bonus draw` il turno completo è preceduto da `Bonus`, per esempio `Bonus Round of 16`, `Bonus Quarter final` e `Bonus Semi final`.
+- Le pagine avversario collegate vengono precaricate in una coda con massimo due richieste concorrenti e mantenute nella cache di sessione. Il caricamento diretto del profilo cliccato conserva la priorità.
+- Asset aggiornati a `v3.css?v=2026092308` e `v3.js?v=2026092308`; nessuna modifica alle sigle live dell'acceptance list.
