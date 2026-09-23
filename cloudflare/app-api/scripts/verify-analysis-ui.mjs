@@ -54,6 +54,8 @@ assert.ok(hasSource('function opponentTournamentEventLinks(') && hasSource('oppo
 assert.ok(hasSource('gender: agendaGenderClass(match)') && hasSource('drawCode ${esc(event.gender)}'), 'opponent event badges must reuse agenda gender colors');
 assert.ok(hasSource('matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents') && hasSource('<span class="opponentHistoryOpponent unifiedMatchOpponent">${matchup}</span>'), 'opponent history rows must render partner plus vs opponent');
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
+assert.ok(hasApiSource('universalOpponentHistory') && hasApiSource('opponentEntryTournaments') && hasApiSource('opponent_entry_profiles'), 'opponent profiles must merge Tennis Europe history with FITP and ITF tournament entries');
+assert.ok(hasSource('opponentTournamentEntry') && hasSource('tournament.acceptanceCode') && hasSource('sourceDot ${esc(source)}'), 'opponent profiles must distinguish entry-only FITP and ITF tournaments without inventing matches');
 assert.ok(hasSource('&profileId=') && hasApiSource('WHERE self.normalized_name IN') && !hasApiSource('WHERE self.source_player_id=?'), 'opponent match history must use exact normalized name variants because draw-local player IDs are reused');
 assert.ok(hasApiSource('tennisEuropeNameVariants') && hasApiSource('self.normalized_name IN') && hasApiSource('targetNameKey'), 'opponent history must join exact name/surname inversions without using draw-local IDs');
 assert.ok(hasSource('const asOf = iso(new Date())') && !hasSource('&excludeMatchId='), 'opponent profile must always load through today without excluding the clicked match');

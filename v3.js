@@ -2409,9 +2409,10 @@ function renderOpponentHistory(data) {
     ? tournaments
         .map(
           (tournament) => {
-            const home = tournament.competitionId
-              ? `https://te.tournamentsoftware.com/tournament/${encodeURIComponent(tournament.competitionId)}`
-              : "";
+            const source = circuit(tournament),
+              home = tournament.sourceUrl || (source === "tennis-europe" && tournament.competitionId
+                ? `https://te.tournamentsoftware.com/tournament/${encodeURIComponent(tournament.competitionId)}`
+                : "");
             const projectedTournament = (state.data?.tournaments || []).find(
                 (item) =>
                   String(item.competitionId || item.sourceTournamentId || "") ===
@@ -2420,7 +2421,10 @@ function renderOpponentHistory(data) {
               courtConditions =
                 tournamentSurfaceLabel(projectedTournament || tournament) ||
                 tournamentSurfaceLabel(tournament);
-            return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header><div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [])}</div></section>`;
+            const entryLabel = !(tournament.matches || []).length && tournament.entryStatus
+              ? `<p class="opponentTournamentEntry">${esc(source === "itf" && tournament.acceptanceCode ? `Iscritto · ${tournament.acceptanceCode}` : "Iscritto")}</p>`
+              : "";
+            return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header>${entryLabel}<div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [])}</div></section>`;
           },
         )
         .join("")

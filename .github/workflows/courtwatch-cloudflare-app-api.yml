@@ -12,6 +12,9 @@ on:
     # follows it, including exact drawUrl values from the latest verified OOP snapshot.
     workflows:
       - Court Watch Tennis Europe agenda D1
+      - Court Watch v3 FITP player entries
+      - Court Watch v3 ITF acceptance discovery 42d
+      - Court Watch v3 ITF known labels fast
     types: [completed]
     branches: [main]
   push:
@@ -86,6 +89,8 @@ jobs:
       - name: Restore current observed-player indexes from R2
         if: env.D1_SKIP_OBSERVED != '1'
         run: bash scripts/restore-observed-indexes.sh
+      - name: Restore FITP and ITF opponent-entry indexes from R2
+        run: bash scripts/restore-opponent-entry-indexes.sh
       - name: Restore verified Europe OOP history and live snapshot
         run: bash scripts/restore-tennis-europe-oop.sh
       - name: Build universal observed-player index
@@ -124,6 +129,21 @@ jobs:
               test "$imported" -eq 1
             done
             echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build and import opponent tournament entries
+        run: |
+          node scripts/generate-opponent-entry-seed.mjs
+          LOCAL_ENTRY_HASH=$(tr -d '\r\n' < seed-opponent-entries/hash.txt)
+          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --json \
+            --command "SELECT value FROM app_state WHERE key='opponentEntryHash'" > remote-opponent-entry-hash.json
+          REMOTE_ENTRY_HASH=$(node -e "const fs=require('fs'),x=JSON.parse(fs.readFileSync('remote-opponent-entry-hash.json','utf8'));let found='';const walk=v=>{if(!v||found)return;if(Array.isArray(v))return v.forEach(walk);if(typeof v==='object'){if(typeof v.value==='string')found=v.value;else Object.values(v).forEach(walk)}};walk(x);process.stdout.write(found)")
+          if [ -n "$REMOTE_ENTRY_HASH" ] && [ "$LOCAL_ENTRY_HASH" = "$REMOTE_ENTRY_HASH" ]; then
+            echo "OPPONENT_ENTRY_IMPORT_SKIPPED unchanged=$LOCAL_ENTRY_HASH rows_written=0"
+          else
+            for sql_file in seed-opponent-entries/*.sql; do
+              echo "Importing $sql_file"
+              npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"
+            done
           fi
       - name: Build read-only Europe parity manifests
         run: |

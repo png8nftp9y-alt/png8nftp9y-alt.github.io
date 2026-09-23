@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 60300)
+Total output lines: 1388
+
 Warning: truncated output (original token count: 65010)
 Total output lines: 1480
 
@@ -430,11 +433,7 @@ Le informazioni superate non devono essere semplicemente cancellate quando sono 
 ### 2026-09-09 — Document ITF retry fix and loading diagnosis (`ef9adcaa`)
 
 ## Revisione 239 — 2026-09-09 — retry ITF completo e caricamento con cache HTTP
-- Chiuso il percorso residuo ITF: anche il retry delle acceptance list legge ora il factsheet ufficiale e propaga `qualificationStartDate`, sede e indirizzo…5010 tokens truncated…a della sessione JavaScript impostava `FQ`. Ora `FQ` è presente già nel primo HTML e anche nel fallback della sessione.
-- Pagina torneo ITF: rimossa completamente la parola `live`. Il collegamento ufficiale è applicato alla dicitura `Acceptance list`, mentre posizione e codice restano testo.
-- Per una giocatrice con genere `Girls` certificato nell'entry ITF, il collegamento aggiunge `entryType=Girls` e apre direttamente la sezione femminile. Restano valide le regole precedenti: link rimosso al T−1 o quando la lista non è più pubblicata; intera etichetta rimossa alla conferma nel tabellone.
-- I controlli provvisori `+` e `Altri` sono stati distanziati di 12 px dal titolo Giocatori, portati a 14 px e dotati di padding maggiore. Restano intenzionalmente senza azione.
-- Verifica operativa ITF: il ciclo live n. 636 del 10 settembre si è concluso con successo; l'audit successivo dichiara `itf_acceptance_complete`, 2 tornei controllati, 1.105 partecipanti, zero retry e zero errori. Pescara conserva `qualificationStartDate=2026-09-26`, `venueName=CIRCOLO TENNIS PESCARA` e l'indirizzo ufficiale, con sorgente factsheet persistita.
+- Chiuso il percorso residuo ITF: anche il retry delle acceptance list leg…300 tokens truncated…indirizzo ufficiale, con sorgente factsheet persistita.
 - La protezione contro pagina vuota è attiva, ma un primo accesso senza cache non può essere garantito sempre istantaneo: dipende dalla rete fino al caricamento dei dataset essenziali. Con cache valida il rendering è immediato; senza fonti e senza cache viene mostrato un errore esplicito, non una pagina vuota.
 - Cache-buster aggiornati a `v3.js?v=2026091015` e `v3.css?v=2026091006`; sintassi JavaScript verificata. Nessuna modifica a motori, frequenze o schedulazioni.
 
@@ -1379,3 +1378,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Il cerca raggruppa le forme `Nome Cognome` / `Cognome Nome` e presenta un solo risultato quando FITP e Tennis Europe identificano senza ambiguità la stessa persona.
 - Il risultato conserva e mostra entrambe le fonti (`FITP · Tennis Europe`); un eventuale profilo Court Watch mantiene la precedenza di apertura.
 - Omonimi, duplicati nello stesso circuito o nazionalità incompatibili non vengono uniti automaticamente. Asset aggiornato a `v3.js?v=2026092313`; nessuna modifica alle sigle live dell'acceptance list.
+
+### Profilo avversario predisposto per FITP e ITF
+
+- La pagina avversario diventa un contenitore universale: mantiene partite e ranking Tennis Europe già disponibili e aggiunge i tornei FITP/ITF nei quali la persona risulta iscritta negli archivi ufficiali correnti.
+- Un torneo privo di tabellone viene indicato esclusivamente come `Iscritto`; non vengono inventati avversari, punteggi, turni o presenze effettive. Le partite FITP e lo storico ITF completo entreranno nello stesso gruppo torneo quando i rispettivi motori saranno implementati.
+- Il nuovo indice D1 compatto raggruppa le iscrizioni per identità ufficiale e circuito, viene ricostruito dagli snapshot permanenti R2 e usa un hash semantico per evitare riscritture quando i dati non cambiano. Gli omonimi non vengono uniti se l'identità non è univoca.
+- La pagina continua a mostrare al massimo cinque tornei complessivi, ordinati per data, con sorgente colorata; le iscrizioni non incrementano vittorie, sconfitte o partite. Asset aggiornato a `v3.js?v=2026092401`. Nessuna modifica alle sigle live dell'acceptance list.
