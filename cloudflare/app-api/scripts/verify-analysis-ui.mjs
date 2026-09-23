@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const source = await readFile(fileURLToPath(new URL('../../../v3.js', import.meta.url)), 'utf8');
 const apiSource = await readFile(fileURLToPath(new URL('../src/index.js', import.meta.url)), 'utf8');
+const html = await readFile(fileURLToPath(new URL('../../../v3.html', import.meta.url)), 'utf8');
 const canonical = value => String(value).replace(/\s+/g, '').replace(/"/g, "'");
 const hasSource = marker => canonical(source).includes(canonical(marker));
 const hasApiSource = marker => canonical(apiSource).includes(canonical(marker));
@@ -36,6 +37,7 @@ assert.ok(hasSource('retained=projected?.tennisEuropeRankings||projected?.tennis
 assert.ok(hasSource('retainedCurrentMatches=previousMatches.filter'), 'current matches must survive a temporary projection gap');
 assert.ok(hasSource('tennisEuropeRanking:retained.tennisEuropeRanking||retained.ranking'), 'JSON merge must preserve the FITP ranking');
 assert.ok(hasApiSource('player.tennisEuropeRanking=labels.join'), 'API must expose Tennis Europe ranking separately');
+assert.ok(hasApiSource('player.tennisEuropeRankingDates') && hasApiSource("if(player.tennisEuropeRankingDates[key]&&player.tennisEuropeRankingDates[key]>date)return"), 'API must retain the newest Tennis Europe ranking by date');
 assert.ok(hasApiSource('tennisEuropeNameKey') && hasApiSource('h.normalized_name LIKE ?') && hasApiSource('playersByName.get(tennisEuropeNameKey(row.normalized_name))'), 'current player rankings must resolve reversed Tennis Europe names');
 assert.ok(hasSource('function renderOpponentProfile(') && hasSource('profile.ranking_date'), 'opponent page must expose the current ranking date');
 assert.ok(hasSource('profile.category') && hasSource('Segui giocatore'), 'opponent header must expose current age category and follow action');
@@ -77,6 +79,8 @@ assert.ok(hasSource('[data-home-route]') && hasSource('primaryView = location.ha
 assert.ok(hasSource('quickSectionNav') && hasSource('renderWeeklyAgenda()') && hasSource('agendaGoToday'), 'internal views must expose quick navigation, weekly tournaments and today return');
 assert.ok(hasSource('function matchHistoryRowHtml(') && hasSource('opponentHistoryMatch unifiedMatchRow matchWithAnalysis') && hasSource('matchHistorySectionsHtml(matches)'), 'player and tournament matches must share the opponent-history row structure');
 assert.ok(hasSource('function groupedMatchSections(') && hasSource('matchTypeHeading') && hasSource('opponentHistoryMatchSectionsHtml'), 'player, tournament and opponent pages must group singles and doubles');
+assert.ok(!hasSource('<span class="matchType">${matchType}</span>'), 'grouped match rows must not repeat the match type');
+assert.ok(html.includes('Vai a Altri') && (html.match(/>Altri<\/button>/g) || []).length >= 2, 'inactive Altri labels must exist in home, agenda and calendar');
 assert.ok(hasSource('Acceptance list: '), 'scheduled Tennis Europe tournaments must label the acceptance list');
 assert.ok(hasSource('querySelectorAll(".unifiedMatchRow")') && hasSource('class="result ${outcome}"') && hasSource('$("brandHome").onclick'), 'tournament counters must read unified rows and the brand must return home');
 assert.ok(!hasSource('$("resetHome")') && hasSource('String(a.startDate || "").localeCompare'), 'home label must be absent and weekly tournaments must be ordered');

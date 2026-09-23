@@ -1381,3 +1381,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Ogni avversario o compagno non Court Watch nello storico è cliccabile e apre a sua volta il profilo corrente; la navigazione può proseguire senza limiti tra avversari successivi. I giocatori Court Watch continuano ad aprire il profilo Court Watch completo.
 - Lo stato di forma riferito alla vecchia data di studio è sostituito dall'indicazione della data corrente del profilo. Il ritorno Indietro con ripristino della posizione resta invariato.
 - Asset aggiornati a `v3.css?v=2026092303` e `v3.js?v=2026092303`; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Classifica Europe live e accesso futuro ad Altri
+
+- La classifica Tennis Europe nell'intestazione giocatore sceglie ora, per ciascuna categoria, il record con la data più recente anche quando esistono più profili o alias associati.
+- Le righe delle partite non ripetono più `Singolare` o `Doppio con`: l'informazione è già esposta dalla relativa mini-intestazione.
+- Sono state predisposte, ancora inattive, le etichette `Altri` accanto a `Tornei della settimana` e al filtro `Sesso`, oltre a `Vai a Altri` nella testata della home.
+- Asset aggiornati a `v3.css?v=2026092304` e `v3.js?v=2026092304`; nessuna modifica alle sigle live dell'acceptance list.

@@ -2409,11 +2409,8 @@ function matchHistoryRowHtml(m) {
   const x = matchMeta(m),
     result = matchResultText(m),
     outcome = m.advances === true ? "win" : m.advances === false ? "loss" : "",
-    round = agendaRoundCode(m),
-    matchType = x.isDouble
-      ? `Doppio${m.partner ? " con " + partnerHtml(m) : ""}`
-      : "Singolare";
-  return `<div class="opponentHistoryMatch unifiedMatchRow matchWithAnalysis">${matchAnalysisButton(m)}<span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(m.date) || "data da pubblicare")}</time>${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}</span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span class="matchType">${matchType}</span><span>${opponentHtml(m, x)}</span></span><strong class="result ${outcome}">${result ? esc(result) : ""}</strong></div>`;
+    round = agendaRoundCode(m);
+  return `<div class="opponentHistoryMatch unifiedMatchRow matchWithAnalysis">${matchAnalysisButton(m)}<span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(m.date) || "data da pubblicare")}</time>${round ? `<span class="type roundCode matchRoundCode">${esc(round)}</span>` : ""}</span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span>${opponentHtml(m, x)}</span></span><strong class="result ${outcome}">${result ? esc(result) : ""}</strong></div>`;
 }
 function matchHistorySectionsHtml(matches) {
   return groupedMatchSections(
@@ -2918,6 +2915,7 @@ function route() {
     primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
   const isHomeRoute = !location.hash;
   $("quickSectionNav").hidden = isHomeRoute;
+  $("homeOthers").hidden = !isHomeRoute;
   document.querySelectorAll("#quickSectionNav [data-home-route]").forEach(
     (button) =>
       button.classList.toggle(
@@ -3288,6 +3286,7 @@ async function load() {
               tennisEuropeRanking:
                 retained.tennisEuropeRanking || retained.ranking,
               tennisEuropeRankings: retained.tennisEuropeRankings,
+              tennisEuropeRankingDates: retained.tennisEuropeRankingDates,
             }
           : player;
       });
