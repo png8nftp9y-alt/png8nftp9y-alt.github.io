@@ -2106,9 +2106,11 @@ function openPlayerSearchResult(result) {
   else openCurrentOpponent(result.identity, result.name, "");
 }
 function playerSearchResultHtml(result, className) {
-  const detail = result.courtwatchId
-    ? "Court Watch"
-    : readableText(result.circuit || "Giocatore");
+  const sourceLabels = (result.sources || [])
+      .map((source) => source === "tennis-europe" ? "Tennis Europe" : source.toUpperCase()),
+    detail = [result.courtwatchId ? "Court Watch" : "", ...sourceLabels]
+      .filter(Boolean)
+      .join(" · ") || readableText(result.circuit || "Giocatore");
   return `<button type="button" class="${className}" data-search-player="${esc(result.identity || result.courtwatchId)}" data-search-name="${esc(result.name)}" data-search-courtwatch="${esc(result.courtwatchId || "")}"><span><b>${esc(readablePerson(result.name))}</b>${result.nationality ? nationalityHtml(result.nationality) : ""}${result.club ? `<small>${esc(result.club)}</small>` : ""}</span><small>${esc(detail)}</small></button>`;
 }
 function bindPlayerSearchResults(root, results) {

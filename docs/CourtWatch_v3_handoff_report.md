@@ -1,5 +1,5 @@
-Warning: truncated output (original token count: 64869)
-Total output lines: 1474
+Warning: truncated output (original token count: 65010)
+Total output lines: 1480
 
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
@@ -430,13 +430,7 @@ Le informazioni superate non devono essere semplicemente cancellate quando sono 
 ### 2026-09-09 — Document ITF retry fix and loading diagnosis (`ef9adcaa`)
 
 ## Revisione 239 — 2026-09-09 — retry ITF completo e caricamento con cache HTTP
-- Chiuso il percorso residuo ITF: anche il retry delle acceptance list legge ora il factsheet ufficiale e propaga `qualificationStartDate`, sede e indirizzo…4869 tokens truncated…ript verificata.
-- Stato dichiarato con precisione: la protezione contro la pagina vuota è presente nel codice; il recupero futuro di luogo e data qualificazioni ITF è attivo ma diventa certificato operativamente soltanto dopo un ciclo reale completato con successo dall'acquisitore factsheet.
-
-### 2026-09-10 — Document stable FQ and verified ITF metadata (`ab6e0c15`)
-
-## Revisione 247 — 2026-09-10 — FQ stabile, acceptance Girls e verifica ITF operativa
-- Eliminato il lampo delle iniziali account: l'HTML iniziale mostrava `F` e soltanto dopo la risposta della sessione JavaScript impostava `FQ`. Ora `FQ` è presente già nel primo HTML e anche nel fallback della sessione.
+- Chiuso il percorso residuo ITF: anche il retry delle acceptance list legge ora il factsheet ufficiale e propaga `qualificationStartDate`, sede e indirizzo…5010 tokens truncated…a della sessione JavaScript impostava `FQ`. Ora `FQ` è presente già nel primo HTML e anche nel fallback della sessione.
 - Pagina torneo ITF: rimossa completamente la parola `live`. Il collegamento ufficiale è applicato alla dicitura `Acceptance list`, mentre posizione e codice restano testo.
 - Per una giocatrice con genere `Girls` certificato nell'entry ITF, il collegamento aggiunge `entryType=Girls` e apre direttamente la sezione femminile. Restano valide le regole precedenti: link rimosso al T−1 o quando la lista non è più pubblicata; intera etichetta rimossa alla conferma nel tabellone.
 - I controlli provvisori `+` e `Altri` sono stati distanziati di 12 px dal titolo Giocatori, portati a 14 px e dotati di padding maggiore. Restano intenzionalmente senza azione.
@@ -1379,3 +1373,9 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - La stessa equivalenza viene applicata al ranking corrente, alla selezione del giocatore dentro la partita e ai ranking storici degli altri partecipanti, senza riutilizzare gli ID numerici locali dei tabelloni.
 - Le cache persistenti dei profili avversario passano alla versione 2 e gli asset a `v3.js?v=2026092312`, così i profili incompleti salvati in precedenza non vengono riproposti. Nessuna modifica alle sigle live dell'acceptance list.
 - Il punteggio è orientato rispetto al giocatore della pagina, non rispetto alla squadra vincitrice: nel caso verificato Paolo Loi–Alessandro Di Giorgio viene mostrato correttamente `4-6 3-6`, non `6-4 6-3`.
+
+### Unificazione profili nel cerca giocatori
+
+- Il cerca raggruppa le forme `Nome Cognome` / `Cognome Nome` e presenta un solo risultato quando FITP e Tennis Europe identificano senza ambiguità la stessa persona.
+- Il risultato conserva e mostra entrambe le fonti (`FITP · Tennis Europe`); un eventuale profilo Court Watch mantiene la precedenza di apertura.
+- Omonimi, duplicati nello stesso circuito o nazionalità incompatibili non vengono uniti automaticamente. Asset aggiornato a `v3.js?v=2026092313`; nessuna modifica alle sigle live dell'acceptance list.
