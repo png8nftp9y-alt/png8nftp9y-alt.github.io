@@ -1,0 +1,38 @@
+name: Court Watch Cloudflare full cost audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-cloudflare-full-cost-audit.yml'
+      - '.github/scripts/cloudflare-full-cost-audit.mjs'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read Cloudflare account usage
+        run: node .github/scripts/cloudflare-full-cost-audit.mjs
+      - name: Measure current R2 storage
+        run: |
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          export AWS_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID" AWS_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY" AWS_DEFAULT_REGION=auto
+          aws s3api list-objects-v2 --bucket "$R2_BUCKET" --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" --output json > /tmp/r2-objects.json
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          const body=JSON.parse(fs.readFileSync('/tmp/r2-objects.json','utf8'));
+          const objects=body.Contents||[],bytes=objects.reduce((sum,x)=>sum+Number(x.Size||0),0);
+          const gb=bytes/1e9,monthlyStorageUsd=Math.max(0,gb-10)*0.015;
+          console.log('CLOUDFLARE_R2_CURRENT_STORAGE='+JSON.stringify({objects:objects.length,bytes,gb:Number(gb.toFixed(6)),truncated:Boolean(body.IsTruncated),steadyStateMonthlyStorageUsd:Number(monthlyStorageUsd.toFixed(6)),pricingAssumption:{freeGbMonth:10,usdPerGbMonth:0.015}}));
+          if(body.IsTruncated)throw new Error('R2 object listing exceeded 1000 objects; audit must paginate before projection');
+          NODE
