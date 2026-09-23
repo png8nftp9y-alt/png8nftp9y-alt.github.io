@@ -916,7 +916,7 @@ function participantLinkHtml(m, role, name, index, content, courtWatchClass = ""
         : m.opponentTeProfileIds || m.opponentSourceIds || [];
   return monitored
     ? `<button class="inlinePlayerLink ${courtWatchClass}" data-open-player="${esc(monitored.id)}">${content}</button>`
-    : `<button class="inlinePlayerLink opponentPlayerLink${role === "partner" ? " doublesPartnerLink" : ""}" data-open-opponent="${esc(profileIds[index] || "")}" data-opponent-role="${esc(role)}" data-opponent-name="${esc(readablePerson(name))}" data-opponent-index="${index}" data-opponent-match="${esc(m.matchId || m.id || "")}">${content}</button>`;
+    : `<button class="inlinePlayerLink opponentPlayerLink${role === "partner" ? " doublesPartnerLink" : ""}" data-open-current-opponent="${esc(profileIds[index] || "")}" data-opponent-name="${esc(readablePerson(name))}" data-opponent-event="${esc(m.event || m.draw || "")}">${content}</button>`;
 }
 function partnerHtml(m) {
   const names = String(m.partner || "")
@@ -2054,17 +2054,15 @@ function renderIfDataChanged() {
 function openProfile(id) {
   location.hash = "player/" + encodeURIComponent(id);
 }
-function openOpponent(matchId, index, profileId, name, role = "opponent") {
+function openCurrentOpponent(profileId, name, event = "") {
   const identity = profileId || readablePerson(name);
   location.hash =
-    "opponent/" +
-    encodeURIComponent(role) +
-    "/" +
+    "opponent-profile/" +
     encodeURIComponent(identity) +
     "/" +
-    encodeURIComponent(matchId) +
+    encodeURIComponent(readablePerson(name)) +
     "/" +
-    String(Number(index) || 0);
+    encodeURIComponent(event || "-");
 }
 function bindParticipantNavigation(root) {
   root.querySelectorAll("[data-open-player]").forEach(
@@ -2074,16 +2072,14 @@ function bindParticipantNavigation(root) {
         openProfile(element.dataset.openPlayer);
       }),
   );
-  root.querySelectorAll("[data-open-opponent]").forEach(
+  root.querySelectorAll("[data-open-current-opponent]").forEach(
     (element) =>
       (element.onclick = (event) => {
         event.stopPropagation();
-        openOpponent(
-          element.dataset.opponentMatch,
-          element.dataset.opponentIndex,
-          element.dataset.openOpponent,
+        openCurrentOpponent(
+          element.dataset.openCurrentOpponent,
           element.dataset.opponentName,
-          element.dataset.opponentRole || "opponent",
+          element.dataset.opponentEvent || "",
         );
       }),
   );
@@ -2147,19 +2143,19 @@ function opponentTournamentEventLinks(tournament) {
     )
     .join("");
 }
-function opponentHistoryPersonHtml(person) {
+function opponentHistoryPersonHtml(person, event = "") {
   const courtWatchPlayer = courtWatchPlayerByName(person.name),
     name = courtWatchPlayer
       ? `<button type="button" class="opponentHistoryCourtWatch" data-open-player="${esc(courtWatchPlayer.id)}"><b>${esc(readablePerson(person.name))}</b></button>`
-      : `<b>${esc(readablePerson(person.name))}</b>`;
+      : `<button type="button" class="opponentHistoryPersonLink" data-open-current-opponent="${esc(person.profileId || "")}" data-opponent-name="${esc(readablePerson(person.name))}" data-opponent-event="${esc(event)}"><b>${esc(readablePerson(person.name))}</b></button>`;
   return `<span class="opponentHistoryPerson">${name}${participantDesignationHtml(person.designation)}${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`;
 }
 function opponentHistoryMatchRowHtml(match) {
   const partners = (match.partners || [])
-      .map(opponentHistoryPersonHtml)
+      .map((person) => opponentHistoryPersonHtml(person, match.event || ""))
       .join(" / "),
     opponents = (match.opponents || [])
-      .map(opponentHistoryPersonHtml)
+      .map((person) => opponentHistoryPersonHtml(person, match.event || ""))
       .join(" / "),
     matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents || "Avversario da definire"}`,
     outcome =
@@ -2195,15 +2191,14 @@ function opponentHistoryMatchSectionsHtml(matches) {
     (match) =>
       (match.partners || []).length
         ? (match.partners || [])
-            .map((person) => opponentHistoryPersonHtml(person))
+            .map((person) => opponentHistoryPersonHtml(person, match.event || ""))
             .join(" / ")
         : "",
   );
 }
 function renderOpponentHistory(data) {
   const tournaments = data.tournaments || [],
-    form = data.form || { wins: 0, losses: 0, matches: 0 },
-    head = $("opponentFormSummary"),
+    head = $("opponentProfileCurrentDate"),
     body = $("opponentTournamentHistory");
   const profileRanking = $("opponentProfileRanking"),
     profile = data.profile || null;
@@ -2216,10 +2211,13 @@ function renderOpponentHistory(data) {
     profileRanking.textContent = `n°${profile.ranking} TE${category}${profile.ranking_date ? ` · (ranking del ${displayDate(profile.ranking_date)})` : ""}`;
     profileRanking.hidden = false;
   }
+  const nationality = $("opponentProfileCurrentNationality");
+  if (nationality && profile?.nationality) {
+    nationality.innerHTML = nationalityHtml(profile.nationality);
+    nationality.hidden = false;
+  }
   if (head)
-    head.innerHTML = form.matches
-      ? `<span class="opponentFormLabel">Stato di forma</span><span class="opponentFormCircle wins" aria-label="${form.wins} partite vinte"><b>${form.wins}</b><small>V</small></span><span class="opponentFormCircle losses" aria-label="${form.losses} partite perse"><b>${form.losses}</b><small>P</small></span>`
-      : '<span class="opponentFormLabel">Stato di forma</span>';
+    head.textContent = `Aggiornato al ${displayDate(new Date())}`;
   if (!body) return;
   body.innerHTML = tournaments.length
     ? tournaments
@@ -2243,8 +2241,9 @@ function renderOpponentHistory(data) {
     : '<div class="empty">Nessun torneo precedente disponibile prima di questo incontro.</div>';
   bindParticipantNavigation(body);
 }
-async function loadOpponentHistory(name, asOf, excludeMatchId, event) {
-  const requestKey = [readablePerson(name), asOf || "", excludeMatchId || "", event || ""].join("|");
+async function loadOpponentHistory(name, event = "") {
+  const asOf = iso(new Date()),
+    requestKey = [readablePerson(name), asOf, event || ""].join("|");
   const body = $("opponentTournamentHistory");
   if (opponentHistoryCache.has(requestKey)) {
     renderOpponentHistory(opponentHistoryCache.get(requestKey));
@@ -2259,9 +2258,7 @@ async function loadOpponentHistory(name, asOf, excludeMatchId, event) {
         "/opponent-profile?name=" +
         encodeURIComponent(name) +
         "&asOf=" +
-        encodeURIComponent(asOf || "") +
-        "&excludeMatchId=" +
-        encodeURIComponent(excludeMatchId || "") +
+        encodeURIComponent(asOf) +
         "&event=" +
         encodeURIComponent(event || ""),
       privateApiOptions({ cache: "no-store" }),
@@ -2282,7 +2279,7 @@ async function loadOpponentHistory(name, asOf, excludeMatchId, event) {
     }
   }
 }
-function renderOpponent(identity, matchId, index, role = "opponent") {
+function renderOpponentFromMatch(identity, matchId, index, role = "opponent") {
   const sources = [...(state.data.matches || []), ...(state.data.agenda || [])],
     match =
       sources.find(
@@ -2292,9 +2289,6 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
     location.hash = "";
     return;
   }
-  const routeKey = [role, identity, matchId, index].join("|");
-  if (activeOpponentRouteKey === routeKey && $("profileView").classList.contains("active") && $("opponentTournamentHistory")) return;
-  activeOpponentRouteKey = routeKey;
   const partner = role === "partner",
     names = partner
       ? String(match.partner || "").split(/\s*\/\s*/)
@@ -2305,38 +2299,21 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
     nationality = partner
       ? (match.partnerNationalities || [])[index] || ""
       : (match.opponentNationalities || [match.opponentNationality || ""])[index] || "",
-    ranking = (
-      partner ? match.partnerTeRankings || [] : match.opponentTeRankings || []
-    )[index],
-    rankingDate = (
-      partner
-        ? match.partnerTeRankingDates || []
-        : match.opponentTeRankingDates || []
-    )[index] || "",
-    snapshotCategory = (
-      partner
-        ? match.partnerTeRankingCategories || []
-        : match.opponentTeRankingCategories || []
-    )[index] || "",
-    eventAge = String(match.event || match.draw || "").match(/(?:^|[^0-9])(14|16)(?:[^0-9]|$)/)?.[1] || "",
-    rankingCategory = /14$/.test(snapshotCategory)
-      ? "U14"
-      : /16$/.test(snapshotCategory)
-        ? "U16"
-        : eventAge
-          ? "U" + eventAge
-          : "",
-    flag = nationalityHtml(nationality),
-    rankingLabel = ranking
-      ? `n°${esc(ranking)} TE${rankingCategory ? ` ${esc(rankingCategory)}` : ""}${rankingDate ? ` · (ranking del ${esc(displayDate(rankingDate))})` : ""}`
-      : "",
+    event = match.event || match.draw || "";
+  renderOpponentProfile(identity, name, event, nationality);
+}
+function renderOpponentProfile(identity, name, event = "", initialNationality = "") {
+  const routeKey = [identity, readablePerson(name), event].join("|");
+  if (activeOpponentRouteKey === routeKey && $("profileView").classList.contains("active") && $("opponentTournamentHistory")) return;
+  activeOpponentRouteKey = routeKey;
+  const flag = nationalityHtml(initialNationality),
     follow = $("removeProfilePlayer");
   follow.hidden = false;
   follow.textContent = "Segui giocatore";
   follow.title = "Segui giocatore";
   follow.setAttribute("aria-label", "Segui giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(name)}</h2>${flag ? `<span class="opponentProfileNationality">${flag}</span>` : ""}<span id="opponentProfileRanking" class="opponentProfileRanking"${rankingLabel ? "" : " hidden"}>${rankingLabel}</span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentFormSummary">Stato di forma</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Per vedere tutti i tornei segui giocatore</button></p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3><span id="opponentProfileCurrentDate">Aggiornato al ${esc(displayDate(new Date()))}</span></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Per vedere tutti i tornei segui giocatore</button></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
   $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", (event) => {
@@ -2344,12 +2321,7 @@ function renderOpponent(identity, matchId, index, role = "opponent") {
     follow.scrollIntoView({ behavior: "smooth", block: "center" });
     follow.focus({ preventScroll: true });
   });
-  loadOpponentHistory(
-    name,
-    match.date,
-    match.matchId || match.id || "",
-    match.event || match.draw || "",
-  );
+  loadOpponentHistory(name, event);
 }
 function renderProfile(id) {
   activeOpponentRouteKey = "";
@@ -2933,6 +2905,9 @@ renderProfile = function (id) {
 };
 function route() {
   const player = location.hash.match(/^#player\/(.+)$/),
+    currentOpponent = location.hash.match(
+      /^#opponent-profile\/([^/]+)\/([^/]+)\/([^/]+)$/,
+    ),
     opponent = location.hash.match(
       /^#opponent\/(opponent|partner)\/([^/]+)\/([^/]+)\/(\d+)$/,
     ),
@@ -2961,9 +2936,17 @@ function route() {
     saveUiState();
   }
   if (player && state.data) renderProfile(decodeURIComponent(player[1]));
+  else if (currentOpponent && state.data)
+    renderOpponentProfile(
+      decodeURIComponent(currentOpponent[1]),
+      decodeURIComponent(currentOpponent[2]),
+      decodeURIComponent(currentOpponent[3]) === "-"
+        ? ""
+        : decodeURIComponent(currentOpponent[3]),
+    );
   else if ((opponent || legacyOpponent) && state.data) {
     const routeMatch = opponent || legacyOpponent;
-    renderOpponent(
+    renderOpponentFromMatch(
       decodeURIComponent(routeMatch[opponent ? 2 : 1]),
       decodeURIComponent(routeMatch[opponent ? 3 : 2]),
       Number(routeMatch[opponent ? 4 : 3]),

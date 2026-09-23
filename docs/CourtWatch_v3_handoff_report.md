@@ -1372,3 +1372,12 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Nei tornei Tennis Europe programmati della pagina giocatore la sigla già acquisita è preceduta dall'etichetta `Acceptance list:`; il valore live non viene modificato.
 - Il ranking corrente della pagina giocatore risolve anche i nomi pubblicati da Tennis Europe nell'ordine `Cognome Nome`, mentre Court Watch usa `Nome Cognome`. La sincronizzazione ufficiale resta invariata e continua a fornire il valore più recente per categoria.
 - Asset aggiornati a `v3.css?v=2026092302` e `v3.js?v=2026092302`; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Profilo avversario corrente e navigazione ricorsiva
+
+- La pagina avversario non è più limitata alla data della partita cliccata: mostra l'ultima classifica disponibile alla data odierna e gli ultimi cinque tornei disputati fino a oggi, includendo tutte le relative partite.
+- Dentro ogni partita storica, ranking e nazionalità dei partecipanti continuano a provenire dallo snapshot congelato alla data dell'incontro.
+- Ogni avversario o compagno non Court Watch nello storico è cliccabile e apre a sua volta il profilo corrente; la navigazione può proseguire senza limiti tra avversari successivi. I giocatori Court Watch continuano ad aprire il profilo Court Watch completo.
+- Lo stato di forma riferito alla vecchia data di studio è sostituito dall'indicazione della data corrente del profilo. Il ritorno Indietro con ripristino della posizione resta invariato.
+- Asset aggiornati a `v3.css?v=2026092303` e `v3.js?v=2026092303`; nessuna modifica alle sigle live dell'acceptance list.
