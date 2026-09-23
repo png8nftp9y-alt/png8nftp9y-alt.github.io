@@ -1453,3 +1453,9 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - La misurazione disponibile al 19 settembre 2026 sui precedenti 31 giorni registra circa 1,446 miliardi di righe lette e 566 mila scritte nelle query principali: rispettivamente circa il 5,8% e l'1,1% delle quote mensili incluse Paid. Le protezioni no-op introdotte successivamente evitano di ripetere le verifiche D1 globali quando l'impronta dei dati non cambia.
 - L'API dei profili avversario usa ora prioritariamente l'ID ufficiale Tennis Europe già presente nei tabelloni e ricorre al nome normalizzato soltanto se l'ID non produce risultati. Due indici D1 dedicati rendono indicizzate sia la ricerca delle partite per giocatore sia quella del ranking per profilo.
 - Asset aggiornati a `v3.css?v=2026092311` e `v3.js?v=2026092311`; nessuna modifica alle sigle live dell'acceptance list.
+
+### Correzione audit completo Tennis Europe
+
+- L'identificativo numerico esposto nei tabelloni Tennis Europe è locale al singolo tabellone: l'audit lo verifica ora nel perimetro `torneo + evento`, evitando collisioni false tra giocatori di tornei diversi e continuando a bloccare conflitti reali nello stesso tabellone.
+- La verifica di nome, date, superficie e indoor/outdoor usa in ordine il catalogo corrente, il catalogo storico e il torneo conservato negli archivi OOP; i tornei usciti dalla finestra del calendario corrente non vengono più erroneamente considerati privi di metadati.
+- Le regole restano restrittive: un dato realmente mancante dopo tutte e tre le fonti mantiene il run rosso. Nessuna modifica alle sigle live dell'acceptance list.
