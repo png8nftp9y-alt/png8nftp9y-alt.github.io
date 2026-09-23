@@ -55,8 +55,8 @@ assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose oppone
 assert.ok(hasSource('&profileId=') && hasApiSource('WHERE self.normalized_name IN') && !hasApiSource('WHERE self.source_player_id=?'), 'opponent match history must use exact normalized name variants because draw-local player IDs are reused');
 assert.ok(hasApiSource('tennisEuropeNameVariants') && hasApiSource('self.normalized_name IN') && hasApiSource('targetNameKey'), 'opponent history must join exact name/surname inversions without using draw-local IDs');
 assert.ok(hasSource('const asOf = iso(new Date())') && !hasSource('&excludeMatchId='), 'opponent profile must always load through today without excluding the clicked match');
-assert.ok(hasApiSource('tennisEuropePerspectiveScore') && hasSource('opponentHistoryRoundLabel'), 'opponent study rows must orient scores and show full rounds');
-assert.ok(hasApiSource('winnerTeam=people.find') && !source.includes('Aggiornato al'), 'winner score orientation must remain and opponent profile must not show an updated-at label');
+assert.ok(hasApiSource('tennisEuropePerspectiveScore(rawScore,self?.team_index)') && hasSource('opponentHistoryRoundLabel'), 'opponent study rows must orient scores to the viewed player and show full rounds');
+assert.ok(!hasApiSource('tennisEuropePerspectiveScore(rawScore,winnerTeam)') && !source.includes('Aggiornato al'), 'opponent scores must never be forced into the winner perspective and profile must not show an updated-at label');
 assert.ok(hasSource('Per vedere tutti i tornei segui giocatore') && hasSource('opponentTournamentDateLabel'), 'opponent history must show follow prompt and tournament dates');
 assert.ok(hasApiSource('tennis_europe_match_ranking_snapshots WHERE match_id IN') && hasApiSource('snapshotFor(player,row.match_id)'), 'opponent-of-opponent rankings must use frozen match snapshots');
 assert.ok(hasSource('opponentHistoryPersonLink') && hasSource('openCurrentOpponent(') && hasSource('#opponent-profile'), 'every non-CourtWatch participant must support recursive profile navigation');

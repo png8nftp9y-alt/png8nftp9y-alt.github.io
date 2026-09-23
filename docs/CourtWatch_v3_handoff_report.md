@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 64869)
+Total output lines: 1474
+
 # Court Watch v3 — report completo di progetto e passaggio di consegne
 
 Revisione documento: **2026-09-13.146**
@@ -427,103 +430,7 @@ Le informazioni superate non devono essere semplicemente cancellate quando sono 
 ### 2026-09-09 — Document ITF retry fix and loading diagnosis (`ef9adcaa`)
 
 ## Revisione 239 — 2026-09-09 — retry ITF completo e caricamento con cache HTTP
-- Chiuso il percorso residuo ITF: anche il retry delle acceptance list legge ora il factsheet ufficiale e propaga `qualificationStartDate`, sede e indirizzo. Il lettore del factsheet è condiviso tra prima acquisizione e retry, evitando divergenze future. Non viene applicata alcuna sottrazione matematica D−2.
-- J60 Pescara resta attualmente pubblicato dal ciclo precedente con main draw 28 settembre; al primo ciclo ITF eseguito sul nuovo codice deve essere rigenerato con qualificazioni dal 26 settembre. La certificazione del dato vivo richiede quindi il completamento di quel ciclo, non il solo deploy dell’interfaccia.
-- Verificato lo stato pubblicato al 9 settembre: motori critici FITP, Tennis Europe, ITF, Agenda/OOP Europe, D1 generale e D1 Agenda risultano verdi. Il database ITF dichiara 1.054 tornei, 15.018 giocatori, 87.499 risultati e nessun errore strutturale.
-- Lo stato generale giallo non indica motori rotti: deriva da sezioni informative parziali/legacy e da 19 tabelloni ITF non ancora pubblicati o completi alla fonte; gli errori tecnici ITF sono zero.
-- Individuata la causa principale del caricamento ripetuto lento: circa 1,58 MB di JSON venivano richiesti con cache disabilitata e un URL sempre diverso a ogni apertura e controllo periodico. I JSON mantengono ora la convalida HTTP ma possono riutilizzare la copia browser quando invariati; la proiezione D1 resta richiesta in tempo reale e i controlli di freschezza non cambiano.
-- Cache-buster JavaScript aggiornato a `2026090902`. Frequenze, schedulazioni, contenuto dei database e regole Agenda non sono stati modificati.
-
-### 2026-09-09 — Document verified Pescara path and tournament UX fixes (`51c2db72`)
-
-## Revisione 240 — 2026-09-09 — primo rendering immediato, iscritti programmati e factsheet ITF senza seconda apertura
-- Il verde del deploy 239 certificava la distribuzione del codice, non ancora il valore vivo di Pescara. Il ciclo ITF successivo ha confermato che la seconda apertura del factsheet poteva essere bloccata: J60 Pescara risultava ancora dal 28 settembre con `qualificationStartDate` vuota.
-- Prima acquisizione e retry ora estraggono la data qualificazioni direttamente dalla stessa risposta HTML di bootstrap già riuscita che abilita la lettura dell’acceptance list. La seconda richiesta resta soltanto come fallback. Il parser è stato verificato sulla dicitura ufficiale di Pescara e restituisce `2026-09-26`.
-- Il primo rendering su un dispositivo già utilizzato mostra immediatamente l’ultima copia locale valida mentre parte la verifica in rete. Il controllo anti-sfarfallio della revisione 234 impedisce di ricostruire Agenda, calendario e bandiere se i dati verificati sono invariati; una modifica reale viene invece pubblicata normalmente.
-- Nella pagina torneo, l’elenco dei giocatori viene ora costruito anche dalle iscrizioni del torneo e non soltanto dai match. Per i tornei programmati compaiono quindi i giocatori iscritti con l’indicazione `Iscritto`, anche prima della pubblicazione delle partite.
-- Il separatore tra due tornei consecutivi in corso è forzato a 8 px bianchi, senza ereditare il bordo giallo delle schede evidenziate.
-- Cache-buster CSS/JavaScript aggiornati a `2026090901`/`2026090903`. Motori, frequenze, schedulazioni e schema dei database non sono stati modificati.
-
-### 2026-09-09 — Document emergency loader rollback (`ad131baf`)
-
-## Revisione 241 — 2026-09-09 — rollback immediato caricamento cache non affidabile
-- Ritirata integralmente l’ottimizzazione di caricamento introdotta nelle revisioni 239-240: in produzione il browser poteva restare sulla copia locale delle 17:05, mostrare lo stato di fallback e non popolare l’app.
-- Ripristinato il percorso stabile precedente: ogni ciclo legge i JSON correnti con URL univoco e `cache: no-store`; la copia locale viene usata soltanto dopo un errore della sorgente, non come primo rendering.
-- Aggiornato il cache-buster JavaScript a `2026090904` per impedire ai browser di conservare il loader difettoso.
-- Restano attive la visualizzazione degli iscritti nei tornei programmati e la separazione bianca tra tornei in corso. Motori, schedulazioni e database non sono stati modificati da questo rollback.
-
-### 2026-09-09 — Document live shield and agenda fixes (`585176cd`)
-
-## Revisione 242 — 2026-09-09 — Scudo dati reali, factsheet Pescara e regole Agenda/pagina torneo
-- Spiegato e chiuso il buco dello Scudo: il test pre-deploy usava i JSON del checkout e una proiezione D1 controllata; il controllo post-deploy verificava soltanto la presenza degli asset. Ora il post-deploy apre realmente l’app pubblicata, pretende giocatori e calendario popolati, verifica i dataset essenziali e fallisce se la pagina resta sulla copia locale di fallback o produce errori browser.
-- Aggiunto un archivio persistente di metadati factsheet ITF verificati, separato dai dati transitori. Prima acquisizione e retry usano il dato estratto automaticamente e, se ITF non espone il factsheet nell’HTML ricevuto dal motore, il metadato ufficiale verificato; i cicli successivi non possono più cancellarlo.
-- J60 Pescara è corretto anche nei dati pubblicati: qualificazioni e calendario dal 26 settembre 2026, main draw 28 settembre, sede `CIRCOLO TENNIS PESCARA`, indirizzo `VIA GUGLIELMO MARCONI 355, Pescara, ITALIA, 65126, Italy`.
-- Pagina torneo: per ITF e Tennis Europe programmati viene mostrata accanto al giocatore la posizione acceptance con pillola `live`. L’etichetta viene nascosta quando `calendarState` o `entryStatus` certificano l’ingresso nel tabellone ufficiale al T−1.
-- Agenda: la priorità dei blocchi è ora vincolante `ITF → Tennis Europe → FITP`; l’orario ordina soltanto all’interno della stessa priorità. Se un torneo ha più di tre match nella giornata, ogni match occupa una riga separata anche quando due orari coincidono; l’affiancamento resta consentito soltanto fino a tre match complessivi.
-- Tra due tornei consecutivi evidenziati in giallo non viene più usato un bordo colorato: il secondo blocco ha margine superiore di 8 px e lo sfondo bianco del contenitore resta visibile.
-- Cache-buster CSS/JavaScript aggiornati a `2026090902`/`2026090906`. Report, sintassi JavaScript, JSON e valori Pescara verificati prima del deploy.
-
-### 2026-09-09 — Document agenda alignment and deploy shield diagnosis (`fa8176a0`)
-
-- 9 settembre 2026 — Corretto l’allineamento dell’agenda secondo l’orario effettivo: i match con lo stesso orario occupano la stessa riga a coppie, sia quando l’orario è ufficiale sia quando è stimato per gli incontri “a seguire”; la regola vale anche se il torneo ha più di tre match nella giornata. Aggiornato il cache-buster del client. Analizzato il rosso del deploy `34402132006`: build, guardia pre-deploy, scudo funzionale e pubblicazione Pages erano riusciti; era fallito soltanto lo scudo live, avviato durante la propagazione, perché entro 45 secondi non vedeva ancora giocatori e calendario. Una successiva verifica browser sulla pagina pubblicata ha rilevato 23 giocatori, 53 barre torneo e nessun fallback. Lo scudo post-deploy prova ora fino a tre aperture separate da attese brevi, ma resta bloccante se la pagina continua a essere vuota o in errore. La correzione ITF persistente copre Pescara tramite metadati versionati (inizio qualificazioni, circolo e indirizzo); l’estrazione automatica delle factsheet ITF dinamiche resta best-effort e non costituisce ancora una garanzia universale per tutti i tornei futuri. Non viene inventata una data D−2 quando la fonte ufficiale non espone le qualificazioni.
-
-### 2026-09-09 — Document auth-aware deploy shield and faster startup (`db9372bb`)
-
-- 9 settembre 2026 — Risolto il secondo falso rosso del deploy `34402947151`. Evidenza dei log: release guard, scudo funzionale, upload e deploy Pages tutti verdi; lo step live vedeva gli asset corretti (`v3.js?v=2026090907`) ma il browser anonimo veniva immediatamente reindirizzato dal documento Pages al gate di accesso del Worker, dove gli elementi CourtWatch non esistono, producendo `players:0`, `tournaments:0`, stato e avviso vuoti. Lo scudo ora verifica separatamente: asset e dataset realmente pubblicati su Pages, interfaccia eseguita dagli stessi asset neutralizzando soltanto il redirect di autenticazione durante il test, e blocco dell’accesso anonimo sul Worker. Resta bloccante per dataset vuoti, errori JavaScript, fallback o interfaccia non popolata. Ridotta inoltre la latenza percepita del primo caricamento: una copia locale valida viene renderizzata prima delle richieste di aggiornamento e la proiezione D1 non può trattenere il primo rendering oltre 1,5 secondi; i JSON pubblicati restano la base completa. Sintassi dei due script verificata e cache-buster aggiornato a `2026090908`. La limitazione ITF resta esplicita: Pescara è coperto in modo persistente; per garantire tutti i futuri tornei serve acquisire i dati caricati dinamicamente tramite l’endpoint usato dalla pagina o un browser automatizzato, non il solo HTML iniziale.
-
-### 2026-09-09 — Document stale authenticated shell root cause (`1d2d067b`)
-
-- 9 settembre 2026 — Individuata con verifica browser autenticata la causa della pagina apparentemente vuota nonostante il deploy verde: il percorso Worker `/app` serviva ancora un HTML agganciato a `v3.js?v=2026090906`, mentre Pages aveva già pubblicato `2026090908`. Il Worker fissava infatti `PUBLIC_APP` a `v3.html?protected=2026090717`; eliminato il riferimento congelato e aggiunta una lettura esplicitamente `no-store/no-cache` con parametro univoco a ogni richiesta. La stessa verifica ha mostrato 23 giocatori e 52 barre torneo una volta completato il fallback, ma numerosi errori `Proiezione API incompleta`: il client chiamava l’endpoint pubblico `/v1/app-snapshot` invece della proiezione privata della sessione. `APP_API` punta ora a `/app/api/app-snapshot`, che usa l’utente autenticato e la proiezione D1 associata. Cache-buster aggiornato a `2026090909`. Il verde precedente certificava Pages ma non l’HTML effettivamente restituito dal Worker autenticato; questa lacuna è stata documentata e la causa è stata rimossa alla fonte.
-
-### 2026-09-09 — Document cached startup blank-page fix (`a13f9f53`)
-
-- 9 settembre 2026 — Risolta la causa riprodotta della pagina vuota con run verdi. Sulla versione autenticata `2026090909`, dopo 2,5 secondi risultavano `players=0`, `bands=0`, stato `Aggiornamento in corso`, con errore JavaScript bloccante `ReferenceError: Cannot access 'profileYearFilter' before initialization`. L’ottimizzazione della cache introdotta nella revisione 244 rendeva il rendering sincrono, ma la chiamata iniziale a `load()` era collocata prima delle dichiarazioni aggiunte in fondo al file per i filtri profilo; sui dispositivi con una cache valida il renderer accedeva quindi a una variabile ancora nella temporal dead zone. Spostato l’intero avvio (`wire`, account, `load`, stato analisi e intervallo) dopo tutte le dichiarazioni, preservando la versione precedente dell’interfaccia e il rendering immediato della cache. Lo scudo post-deploy ora esegue anche un secondo caricamento nello stesso browser dopo che la cache locale è stata creata, richiede nuovamente giocatori e calendario e fallisce per qualsiasi errore JavaScript: copre esattamente la condizione che prima sfuggiva al primo caricamento pulito. Cache-buster aggiornato a `2026090910`; sintassi verificata.
-
-### 2026-09-09 — Document acceptance label and definitive ITF metadata path (`ffc580e9`)
-
-- 9 settembre 2026 — Pagina torneo: rimossa l’etichetta isolata `live`; per ITF e Tennis Europe in programma viene ora mostrata la dicitura completa `Acceptance list: <posizione> (live)`, per esempio `Acceptance list: Q-12 (live)`. Restano invariati il collegamento alla lista ufficiale e la rimozione della dicitura quando il tabellone ufficiale è confermato a T−1. Cache-buster aggiornato a `2026090911`; sintassi verificata. Definita inoltre la soluzione strutturale per data d’inizio qualificazioni e luogo ITF: l’acquisitore persistente Chromium già presente in `infra/itf-acquirer` oggi ammette soltanto URL `TournamentApi`, mentre questi metadati possono essere caricati dinamicamente nella pagina factsheet. Per renderli garantiti occorre estendere l’acquisitore a una rotta factsheet limitata agli URL torneo ITF, attendere i dati renderizzati o intercettare la risposta JSON che li alimenta, restituire `qualificationStartDate`, `venueName` e `address`, integrare tale rotta come fallback obbligatorio quando l’HTML iniziale è incompleto, conservare per `competitionId` l’ultima terna ufficiale valida e rendere bloccante la pubblicazione di ogni futuro torneo monitorato privo di uno dei dati richiesti. Pescara resta coperto dall’override versionato; la soluzione universale descritta non è ancora dichiarata operativa.
-
-### 2026-09-09 — Document isolated ITF factsheet acquisition groundwork (`0c628237`)
-
-- 9 settembre 2026 — Rimossa completamente la parola `live` dalla posizione in pagina torneo: la forma è ora soltanto `Acceptance list: <posizione>`, per esempio `Acceptance list: Q-12`. Avviata in modo isolato la soluzione strutturale dei metadati factsheet ITF senza modificare il comportamento operativo dei motori correnti. L’acquisitore persistente conserva invariata `/v1/fetch` e aggiunge `/v1/factsheet`, limitata tramite allowlist agli URL ufficiali `/en/tournament/...` e inserita nella medesima coda Chromium seriale con lo stesso intervallo minimo; attende i campi renderizzati e restituisce testo soltanto se non rileva challenge. `itf-common.mjs` consulta questo fallback esclusivamente quando sono presenti le nuove variabili `ITF_FACTSHEET_ACQUISITION_URL` e `ITF_FACTSHEET_ACQUIRER_TOKEN`; nessun workflow corrente le imposta, quindi ITF live e ITF T−1 continuano a eseguire esattamente le richieste e le frequenze precedenti. La nuova via resta disattivata finché non viene collaudata separatamente e configurata consapevolmente. Documentazione aggiornata, sintassi verificata e cache-buster UI portato a `2026090912`.
-
-### 2026-09-09 — Document white separator and ITF factsheet status (`e72190a5`)
-
-## Revisione 243 — 2026-09-09 — separatore bianco e stato metadati factsheet ITF
-- Corretta la causa dello spazio giallo tra due tornei consecutivi in corso: la regola precedente rimuoveva il bordo e creava un margine trasparente di 8 px, lasciando affiorare lo sfondo giallo. Ora il distacco è un bordo bianco reale di 8 px, senza margine trasparente.
-- Aggiornato il cache-buster CSS a `2026090903`, così i browser caricano immediatamente la correzione.
-- In pagina torneo la posizione viene presentata come `Acceptance list: <posizione>`; la parola/etichetta `live` non viene mostrata.
-- Il recupero universale di data qualificazioni e luogo dai factsheet dinamici è stato predisposto in un percorso di acquisizione isolato e opzionale. Le variabili di attivazione non sono impostate: quindi il nuovo percorso non interferisce con i motori ITF e ITF T−1 attuali, ma non può ancora essere dichiarato risolutivo per tutti i tornei futuri.
-- Pescara resta protetto nell'archivio persistente dei metadati factsheet verificati. Nessuna modifica a regole di durata/stato dei tornei, frequenze, schedulazioni o database pubblicati.
-
-### 2026-09-09 — Document universal separator and active ITF factsheets (`268380d7`)
-
-## Revisione 244 — 2026-09-09 — separatore universale e attivazione factsheet ITF isolata
-- Riprodotto il caso reale segnalato nella pagina di Martina Danesi: Milano è un torneo in corso, mentre Pescara è programmato. La precedente correzione riguardava soltanto due sezioni entrambe `ongoing` e quindi non poteva intercettare questa coppia.
-- Il separatore di 8 px è ora bianco per ogni coppia consecutiva di tornei nella pagina giocatore, indipendentemente dallo stato in corso, programmato o concluso. Aggiornato il cache-buster CSS a `2026090904`.
-- Attivato nei cicli ITF acceptance live e known-fast il recupero isolato dei metadati factsheet. I workflow passano le credenziali dell'acquisitore persistente già esistente; `itf-common.mjs` deriva in modo deterministico la rotta dedicata `/v1/factsheet` dalla rotta esistente `/v1/fetch` e riusa il token, salvo configurazione factsheet specifica.
-- Il fallback viene invocato esclusivamente dalla lettura dei metadati factsheet per ottenere `qualificationStartDate`, `venueName` e `address`. La rotta `/v1/fetch`, le API TournamentApi, il motore dei tabelloni e il workflow ITF T−1 restano invariati.
-- Il merge continua a privilegiare il nuovo metadato non vuoto e a conservare quello verificato già persistito, evitando che una risposta dinamica assente cancelli data qualificazioni o luogo nei cicli successivi.
-- Aggiornata la documentazione dell'acquisitore. Nessuna modifica a frequenze, priorità Agenda, database dei risultati o regole dei tabelloni.
-
-### 2026-09-09 — Document three-match rows and loading guarantees (`bca29df6`)
-
-## Revisione 245 — 2026-09-09 — tre match simultanei per riga e stato caricamento
-- Corretta la cardinalità del raggruppamento Agenda: i match dello stesso torneo con identico orario reale o identica stima temporale vengono ora disposti fino a un massimo di tre sulla stessa riga. La precedente implementazione li suddivideva erroneamente a coppie nonostante la griglia CSS fosse già predisposta per tre colonne.
-- Se allo stesso orario esistono più di tre match, il quarto apre la riga successiva; l'ordinamento e la priorità ITF → Tennis Europe → FITP restano invariati.
-- Aggiornato il cache-buster JavaScript a `2026090913`.
-- Confermato il comportamento di caricamento: una copia locale valida viene resa immediatamente mentre prosegue la verifica di rete; i dataset essenziali hanno timeout e convalida; in assenza sia delle fonti sia di una cache valida viene mostrato un messaggio esplicito invece di lasciare l'Agenda vuota.
-- Lo Scudo post-deploy apre l'app pubblicata e richiede giocatori e calendario popolati. Questo copre la regressione applicativa della pagina bianca, senza poter eliminare la latenza fisica di un primo accesso privo di cache o di una rete indisponibile.
-- Nessuna modifica a motori, database, factsheet ITF, frequenze o schedulazioni.
-
-### 2026-09-10 — Document ITF live links and player header controls (`2d81c333`)
-
-## Revisione 246 — 2026-09-10 — link live ITF, azioni giocatori e stato di caricamento nascosto
-- Pagina torneo ITF programmato: accanto a `Acceptance list: <posizione>` compare ora l'etichetta `live` collegata alla pagina ufficiale ITF della acceptance list.
-- Il link `live` viene rimosso dal T−1 calcolato sulla data di inizio qualificazioni, oppure prima se il dato certifica che la acceptance list non è più pubblicata. La posizione resta testo fino alla conferma del giocatore nel tabellone; quando `calendarState` o `entryStatus` certificano il tabellone ufficiale, l'intera etichetta acceptance viene rimossa come già stabilito.
-- Nella testata della colonna Giocatori sono stati aggiunti, accanto al titolo, i due controlli provvisori `+` e `Altri`. Sono intenzionalmente privi di azione in attesa della specifica successiva.
-- Durante l'uso della copia locale di sicurezza non viene più mostrata la scritta `Aggiornamento in corso`. La modifica è esclusivamente grafica: caricamento, timeout, fallback, cache valida e Scudo post-deploy restano invariati.
-- Cache-buster aggiornati a `v3.js?v=2026091014` e `v3.css?v=2026091005`; sintassi JavaScript verificata.
+- Chiuso il percorso residuo ITF: anche il retry delle acceptance list legge ora il factsheet ufficiale e propaga `qualificationStartDate`, sede e indirizzo…4869 tokens truncated…ript verificata.
 - Stato dichiarato con precisione: la protezione contro la pagina vuota è presente nel codice; il recupero futuro di luogo e data qualificazioni ITF è attivo ma diventa certificato operativamente soltanto dopo un ciclo reale completato con successo dall'acquisitore factsheet.
 
 ### 2026-09-10 — Document stable FQ and verified ITF metadata (`ab6e0c15`)
@@ -1471,3 +1378,4 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Le forme ufficiali `Nome Cognome` e `Cognome Nome` vengono interrogate entrambe con lookup esatti indicizzati e ricondotte alla stessa chiave canonica; il caso verificato è `Paolo Loi` / `Loi Paolo`.
 - La stessa equivalenza viene applicata al ranking corrente, alla selezione del giocatore dentro la partita e ai ranking storici degli altri partecipanti, senza riutilizzare gli ID numerici locali dei tabelloni.
 - Le cache persistenti dei profili avversario passano alla versione 2 e gli asset a `v3.js?v=2026092312`, così i profili incompleti salvati in precedenza non vengono riproposti. Nessuna modifica alle sigle live dell'acceptance list.
+- Il punteggio è orientato rispetto al giocatore della pagina, non rispetto alla squadra vincitrice: nel caso verificato Paolo Loi–Alessandro Di Giorgio viene mostrato correttamente `4-6 3-6`, non `6-4 6-3`.
