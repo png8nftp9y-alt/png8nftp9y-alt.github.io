@@ -1356,3 +1356,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - I contatori delle partite nei singoli tornei leggono ora le nuove righe uniformate, ripristinando i valori di giocate, vinte e perse dopo il cambio grafico.
 - Logo e nome `Court Watch` sono cliccabili da ogni ambiente e riportano alla home senza alterare filtri o dati.
 - Asset aggiornati a `v3.css?v=2026092209` e `v3.js?v=2026092209`; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Condizioni dei tornei avversari e righe settimanali
+
+- Rimossa l'etichetta centrale `Home`: il ritorno alla home resta affidato al logo e al nome `Court Watch`.
+- Lo storico avversario recupera superficie e ambiente dal catalogo ufficiale Tennis Europe completo quando il torneo non appartiene alla proiezione dei giocatori Court Watch; il catalogo è riutilizzato dalla cache edge per non moltiplicare le richieste.
+- `Tornei della settimana` mostra ora un elenco ordinato cronologicamente a righe, con circuito, torneo, luogo e giocatori iscritti.
+- Asset aggiornati a `v3.css?v=2026092301` e `v3.js?v=2026092301`; nessuna modifica alle sigle live dell'acceptance list.

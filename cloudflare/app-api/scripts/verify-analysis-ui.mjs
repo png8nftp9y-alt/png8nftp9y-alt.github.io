@@ -70,9 +70,11 @@ assert.ok(hasSource('courtWatchOpponent') && hasSource('opponentPlayerLink'), 'o
 assert.ok(hasApiSource("profileKey=prefix+'ProfileIds'") && hasApiSource("dateKey=prefix+'RankingDates'"), 'API must expose opponent ranking identity and date');
 assert.ok(hasApiSource('profileRows=await optionalRows') && hasApiSource('profile,tournaments:') && hasSource('profileRanking.textContent'), 'opponent header must fall back to dated ranking history');
 assert.ok(hasApiSource('surface:tournament.surface') && hasApiSource('environment:tournament.environment') && hasSource('tournamentSurfaceLabel(tournament)'), 'opponent tournaments must expose their own surface and environment');
+assert.ok(hasApiSource('tennisEuropeTournamentMetadata()') && hasApiSource('officialTournament.surface') && hasApiSource('officialTournament.indoorOutdoor'), 'opponent tournaments must recover official conditions outside the CourtWatch projection');
 assert.ok(hasSource('[data-home-route]') && hasSource('primaryView = location.hash.match') && hasSource('${primaryView}View'), 'home must route to dedicated players, calendar and agenda pages');
 assert.ok(hasSource('quickSectionNav') && hasSource('renderWeeklyAgenda()') && hasSource('agendaGoToday'), 'internal views must expose quick navigation, weekly tournaments and today return');
 assert.ok(hasSource('function matchHistoryRowHtml(') && hasSource('opponentHistoryMatch unifiedMatchRow matchWithAnalysis') && hasSource('return matchHistoryRowHtml(m)'), 'player and tournament matches must share the opponent-history row structure');
 assert.ok(hasSource('querySelectorAll(".unifiedMatchRow")') && hasSource('class="result ${outcome}"') && hasSource('$("brandHome").onclick'), 'tournament counters must read unified rows and the brand must return home');
+assert.ok(!hasSource('$("resetHome")') && hasSource('String(a.startDate || "").localeCompare'), 'home label must be absent and weekly tournaments must be ordered');
 assert.doesNotMatch(apiSource, /player\.ranking=labels\.join/, 'Tennis Europe ranking must not overwrite FITP ranking');
 console.log(JSON.stringify({ analysisUi: 'green', nativePrompt: false, nativeConfirm: false, actions: ['read', 'save', 'update', 'delete'] }));

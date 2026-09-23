@@ -1616,9 +1616,16 @@ function renderWeeklyAgenda() {
     end = add(start, 6),
     first = iso(start),
     last = iso(end),
-    tournaments = groups(false).filter((tournament) =>
-      overlap(tournament, first, last),
-    );
+    tournaments = groups(false)
+      .filter((tournament) => overlap(tournament, first, last))
+      .sort(
+        (a, b) =>
+          String(a.startDate || "").localeCompare(String(b.startDate || "")) ||
+          String(a.name || a.tournamentName || "").localeCompare(
+            String(b.name || b.tournamentName || ""),
+            "it",
+          ),
+      );
   $("weeklyAgendaTitle").textContent = `Tornei · ${fmt(start)}–${fmt(end)}`;
   $("weeklyAgendaContent").innerHTML = tournaments.length
     ? `<div class="weeklyTournamentList">${tournaments
@@ -2890,7 +2897,6 @@ function route() {
     tournament = location.hash.match(/^#tournament\/(.+)$/),
     primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
   const isHomeRoute = !location.hash;
-  $("resetHome").hidden = !isHomeRoute;
   $("quickSectionNav").hidden = isHomeRoute;
   document.querySelectorAll("#quickSectionNav [data-home-route]").forEach(
     (button) =>
@@ -3124,19 +3130,6 @@ function wire() {
   };
   $("brandHome").onclick = () => {
     location.hash = "";
-    scrollTo({ top: 0, behavior: "smooth" });
-  };
-  $("resetHome").onclick = () => {
-    state.agenda = new Date();
-    state.month = new Date();
-    $("datePopover").hidden = true;
-    history.replaceState(
-      null,
-      "",
-      location.origin + location.pathname + location.search,
-    );
-    saveUiState();
-    route();
     scrollTo({ top: 0, behavior: "smooth" });
   };
   document.addEventListener("click", (e) => {
