@@ -52,6 +52,7 @@ assert.ok(hasSource('function opponentTournamentEventLinks(') && hasSource('oppo
 assert.ok(hasSource('gender: agendaGenderClass(match)') && hasSource('drawCode ${esc(event.gender)}'), 'opponent event badges must reuse agenda gender colors');
 assert.ok(hasSource('matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents') && hasSource('<span class="opponentHistoryOpponent unifiedMatchOpponent">${matchup}</span>'), 'opponent history rows must render partner plus vs opponent');
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
+assert.ok(hasSource('&profileId=') && hasApiSource('sourceById.length?sourceById:') && hasApiSource('self.source_player_id=?'), 'opponent history must prefer the official Tennis Europe player ID before name fallback');
 assert.ok(hasSource('const asOf = iso(new Date())') && !hasSource('&excludeMatchId='), 'opponent profile must always load through today without excluding the clicked match');
 assert.ok(hasApiSource('tennisEuropePerspectiveScore') && hasSource('opponentHistoryRoundLabel'), 'opponent study rows must orient scores and show full rounds');
 assert.ok(hasApiSource('winnerTeam=people.find') && !source.includes('Aggiornato al'), 'winner score orientation must remain and opponent profile must not show an updated-at label');
@@ -81,7 +82,7 @@ assert.ok(hasSource('function dedupeAgendaMatches(') && hasSource('sameAgendaMat
 assert.ok(hasSource('function agendaResultHtml(') && hasSource('Vincitore:'), 'shared CourtWatch match must name the winner');
 assert.ok(hasSource('courtWatchOpponent') && hasSource('opponentPlayerLink'), 'opponent styling must distinguish CourtWatch players');
 assert.ok(hasApiSource("profileKey=prefix+'ProfileIds'") && hasApiSource("dateKey=prefix+'RankingDates'"), 'API must expose opponent ranking identity and date');
-assert.ok(hasApiSource('profileRows=await optionalRows') && hasApiSource('profile,tournaments:') && hasSource('profileRanking.textContent'), 'opponent header must fall back to dated ranking history');
+assert.ok(hasApiSource('profileRows=profileById.length?profileById:await optionalRows') && hasApiSource('profile,tournaments:') && hasSource('profileRanking.textContent'), 'opponent header must prefer official identity and fall back to dated ranking history by name');
 assert.ok(hasApiSource('surface:tournament.surface') && hasApiSource('environment:tournament.environment') && hasSource('tournamentSurfaceLabel(tournament)'), 'opponent tournaments must expose their own surface and environment');
 assert.ok(hasApiSource('tennisEuropeTournamentMetadata()') && hasApiSource('officialTournament.surface') && hasApiSource('officialTournament.indoorOutdoor'), 'opponent tournaments must recover official conditions outside the CourtWatch projection');
 assert.ok(hasSource('[data-home-route]') && hasSource('primaryView = location.hash.match') && hasSource('${primaryView}View'), 'home must route to dedicated players, calendar and agenda pages');

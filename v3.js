@@ -2228,6 +2228,7 @@ function bindParticipantNavigation(root) {
         preloadOpponentHistory(
           element.dataset.opponentName,
           element.dataset.opponentEvent || "",
+          element.dataset.openCurrentOpponent || "",
         );
       element.addEventListener("pointerenter", preload, { once: true });
       element.addEventListener("focus", preload, { once: true });
@@ -2235,6 +2236,7 @@ function bindParticipantNavigation(root) {
       queueOpponentPreload(
         element.dataset.opponentName,
         element.dataset.opponentEvent || "",
+        element.dataset.openCurrentOpponent || "",
       );
       (element.onclick = (event) => {
         event.stopPropagation();
@@ -2423,13 +2425,13 @@ function renderOpponentHistory(data) {
     : '<div class="empty">Nessun torneo precedente disponibile prima di questo incontro.</div>';
   bindParticipantNavigation(body);
 }
-function opponentHistoryKey(name, event = "") {
+function opponentHistoryKey(name, event = "", profileId = "") {
   const asOf = iso(new Date()),
-    requestKey = [readablePerson(name), asOf, event || ""].join("|");
+    requestKey = [profileId || "", readablePerson(name), asOf, event || ""].join("|");
   return { asOf, requestKey };
 }
-async function fetchOpponentHistory(name, event = "", refresh = false) {
-  const { asOf, requestKey } = opponentHistoryKey(name, event);
+async function fetchOpponentHistory(name, event = "", profileId = "", refresh = false) {
+  const { asOf, requestKey } = opponentHistoryKey(name, event, profileId);
   if (!refresh && opponentHistoryCache.has(requestKey))
     return opponentHistoryCache.get(requestKey);
   if (!opponentHistoryRequests.has(requestKey)) {
@@ -2439,6 +2441,8 @@ async function fetchOpponentHistory(name, event = "", refresh = false) {
       PRIVATE_API +
         "/opponent-profile?name=" +
         encodeURIComponent(name) +
+        "&profileId=" +
+        encodeURIComponent(profileId || "") +
         "&asOf=" +
         encodeURIComponent(asOf) +
         "&event=" +
@@ -2462,18 +2466,18 @@ async function fetchOpponentHistory(name, event = "", refresh = false) {
   }
   return opponentHistoryRequests.get(requestKey);
 }
-function preloadOpponentHistory(name, event = "") {
+function preloadOpponentHistory(name, event = "", profileId = "") {
   if (!readablePerson(name)) return;
-  fetchOpponentHistory(name, event).catch(() => {});
+  fetchOpponentHistory(name, event, profileId).catch(() => {});
 }
 function runOpponentPrefetchQueue() {
   while (opponentPrefetchActive < 6 && opponentPrefetchQueue.length) {
     const item = opponentPrefetchQueue.shift(),
-      { requestKey } = opponentHistoryKey(item.name, item.event);
+      { requestKey } = opponentHistoryKey(item.name, item.event, item.profileId);
     opponentPrefetchQueued.delete(requestKey);
     if (opponentHistoryCache.has(requestKey)) continue;
     opponentPrefetchActive++;
-    fetchOpponentHistory(item.name, item.event)
+    fetchOpponentHistory(item.name, item.event, item.profileId)
       .catch(() => {})
       .finally(() => {
         opponentPrefetchActive--;
@@ -2481,9 +2485,9 @@ function runOpponentPrefetchQueue() {
       });
   }
 }
-function queueOpponentPreload(name, event = "") {
+function queueOpponentPreload(name, event = "", profileId = "") {
   if (!readablePerson(name)) return;
-  const { requestKey } = opponentHistoryKey(name, event);
+  const { requestKey } = opponentHistoryKey(name, event, profileId);
   if (
     opponentHistoryCache.has(requestKey) ||
     opponentHistoryRequests.has(requestKey) ||
@@ -2491,19 +2495,19 @@ function queueOpponentPreload(name, event = "") {
   )
     return;
   opponentPrefetchQueued.add(requestKey);
-  opponentPrefetchQueue.push({ name, event });
+  opponentPrefetchQueue.push({ name, event, profileId });
   runOpponentPrefetchQueue();
 }
-async function loadOpponentHistory(name, event = "") {
+async function loadOpponentHistory(name, event = "", profileId = "") {
   const body = $("opponentTournamentHistory"),
     routeKey = activeOpponentRouteKey,
-    { requestKey } = opponentHistoryKey(name, event),
+    { requestKey } = opponentHistoryKey(name, event, profileId),
     cached = opponentHistoryCache.get(requestKey) || savedActiveOpponent(requestKey);
   if (cached && !opponentHistoryCache.has(requestKey))
     opponentHistoryCache.set(requestKey, cached);
   if (cached) renderOpponentHistory(cached);
   try {
-    const data = await fetchOpponentHistory(name, event, Boolean(cached));
+    const data = await fetchOpponentHistory(name, event, profileId, Boolean(cached));
     if (activeOpponentRouteKey === routeKey) {
       saveActiveOpponent(requestKey, data);
       renderOpponentHistory(data);
@@ -2513,7 +2517,7 @@ async function loadOpponentHistory(name, event = "") {
       body.innerHTML =
         `<div class="empty">Storico temporaneamente non disponibile. <button type="button" class="btn" data-retry-opponent>Riprova</button></div>`;
     body?.querySelector("[data-retry-opponent]")?.addEventListener("click", () =>
-      loadOpponentHistory(name, event),
+      loadOpponentHistory(name, event, profileId),
     );
   }
 }
@@ -2544,7 +2548,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   const routeKey = [identity, readablePerson(name), event].join("|");
   if (activeOpponentRouteKey === routeKey && $("profileView").classList.contains("active") && $("opponentTournamentHistory")) return;
   activeOpponentRouteKey = routeKey;
-  const { requestKey } = opponentHistoryKey(name, event),
+  const { requestKey } = opponentHistoryKey(name, event, identity),
     prepared = opponentHistoryCache.get(requestKey) || savedActiveOpponent(requestKey),
     flag = nationalityHtml(initialNationality || prepared?.profile?.nationality),
     follow = $("removeProfilePlayer");
@@ -2565,7 +2569,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
     opponentHistoryCache.set(requestKey, prepared);
     renderOpponentHistory(prepared);
   }
-  loadOpponentHistory(name, event);
+  loadOpponentHistory(name, event, identity);
 }
 function renderProfile(id) {
   activeOpponentRouteKey = "";

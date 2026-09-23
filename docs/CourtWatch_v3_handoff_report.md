@@ -1444,3 +1444,12 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - L'ultimo profilo avversario aperto viene salvato separatamente dalla cache generale e ripristinato sincronicamente prima di qualunque richiesta API: un refresh manuale non svuota più intestazione, ranking, tornei o partite.
 - La cache generale conserva fino a venti profili per lasciare sempre spazio alla copia protetta del profilo attivo; l'aggiornamento di rete avviene soltanto dopo il rendering dei dati salvati.
 - Asset aggiornati a `v3.css?v=2026092310` e `v3.js?v=2026092310`; nessuna modifica alle sigle live dell'acceptance list.
+
+### Completezza avversari Tennis Europe e controllo costi Cloudflare
+
+- Le pagine avversario interrogano lo storico con la data corrente (`asOf`) e usano una chiave cache giornaliera: a ogni nuova giornata consultano l'archivio aggiornato, mentre ranking e partite vengono alimentati dai workflow Tennis Europe live e ranking.
+- L'audit completo Tennis Europe viene eseguito ogni giorno e diventa rosso per ID ufficiali mancanti, struttura partita incompleta, collisioni di identità o assenza di nome, date, superficie e indoor/outdoor nei tornei recenti mostrabili nella pagina avversario.
+- L'audit consumi D1 viene eseguito ogni lunedì, proietta su trenta giorni le prime cinquanta query di lettura e le prime trenta di scrittura e applica una soglia prudenziale pari a 20 miliardi di righe lette e 40 milioni scritte, sotto le quote incluse nel piano Workers Paid.
+- La misurazione disponibile al 19 settembre 2026 sui precedenti 31 giorni registra circa 1,446 miliardi di righe lette e 566 mila scritte nelle query principali: rispettivamente circa il 5,8% e l'1,1% delle quote mensili incluse Paid. Le protezioni no-op introdotte successivamente evitano di ripetere le verifiche D1 globali quando l'impronta dei dati non cambia.
+- L'API dei profili avversario usa ora prioritariamente l'ID ufficiale Tennis Europe già presente nei tabelloni e ricorre al nome normalizzato soltanto se l'ID non produce risultati. Due indici D1 dedicati rendono indicizzate sia la ricerca delle partite per giocatore sia quella del ranking per profilo.
+- Asset aggiornati a `v3.css?v=2026092311` e `v3.js?v=2026092311`; nessuna modifica alle sigle live dell'acceptance list.
