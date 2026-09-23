@@ -1430,3 +1430,11 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Nei tabelloni `Bonus draw` il turno completo è preceduto da `Bonus`, per esempio `Bonus Round of 16`, `Bonus Quarter final` e `Bonus Semi final`.
 - Le pagine avversario collegate vengono precaricate in una coda con massimo due richieste concorrenti e mantenute nella cache di sessione. Il caricamento diretto del profilo cliccato conserva la priorità.
 - Asset aggiornati a `v3.css?v=2026092308` e `v3.js?v=2026092308`; nessuna modifica alle sigle live dell'acceptance list.
+
+### Ranking sempre visibile e profili avversari pronti
+
+- La pagina giocatore conserva il ranking Tennis Europe già noto anche se una richiesta live restituisce temporaneamente zero righe; l'endpoint riconosce inoltre i nomi invertiti senza dipendere esclusivamente dall'alias Court Watch.
+- La cronologia avversari non esegue più scansioni D1 con `LIKE '%token%'` e `lower(profile_id)`: usa lookup esatti indicizzati per nomi e profili, riducendo timeout e consumo CPU.
+- I profili avversari preparati sono conservati in cache persistente, renderizzati prima della richiesta di aggiornamento e non vengono più sostituiti da uno stato di errore. Il testo `Caricamento storico…` è stato rimosso.
+- Il prefetch resta limitato ma prepara fino a sei profili contemporaneamente. Le sigle live dell'acceptance list non sono state modificate.
+- Asset aggiornati a `v3.css?v=2026092309` e `v3.js?v=2026092309` per impedire che il browser riutilizzi il JavaScript precedente.

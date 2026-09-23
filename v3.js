@@ -121,7 +121,7 @@ let calendarHeightObserver = null,
   loadRunning = false,
   renderedDataSignature = "",
   activeOpponentRouteKey = "",
-  opponentHistoryCache = new Map(savedEntries(OPPONENT_HISTORY_CACHE, sessionStorage)),
+  opponentHistoryCache = new Map(savedEntries(OPPONENT_HISTORY_CACHE)),
   opponentHistoryRequests = new Map(),
   opponentPrefetchQueue = [],
   opponentPrefetchQueued = new Set(),
@@ -373,9 +373,17 @@ const playerRankingSummary = (player) => {
 function currentPlayerRankingLabels(player, rows = []) {
   const labels = [];
   if (player?.ranking) labels.push(`${readableText(player.ranking)} FITP`);
-  for (const row of rows)
+  const liveRows = rows.length
+    ? rows
+    : Object.entries(player?.tennisEuropeRankings || {}).map(([category, ranking]) => ({
+        category: category === "u14" ? "U14" : category === "u16" ? "U16" : category,
+        ranking,
+      }));
+  for (const row of liveRows)
     if (row?.ranking)
       labels.push(`n°${row.ranking} TE${row.category ? ` ${row.category.replace(/^[BG]/, "U")}` : ""}`);
+  if (!liveRows.length && player?.tennisEuropeRanking)
+    labels.push(...String(player.tennisEuropeRanking).split(/\s*·\s*/).filter(Boolean));
   return labels;
 }
 async function loadCurrentPlayerRanking(player) {
@@ -398,8 +406,10 @@ async function loadCurrentPlayerRanking(player) {
     const data = await playerRankingRequests.get(key),
       target = $("playerLiveRankings"),
       labels = currentPlayerRankingLabels(player, data.rankings || []);
-    playerRankingCache.set(key, data);
-    saveEntries(PLAYER_RANKING_CACHE, playerRankingCache);
+    if ((data.rankings || []).length) {
+      playerRankingCache.set(key, data);
+      saveEntries(PLAYER_RANKING_CACHE, playerRankingCache);
+    }
     if (target && location.hash === `#player/${encodeURIComponent(player.id)}`)
       target.textContent = labels.length ? ` · ${labels.join(" · ")}` : "";
   } catch {}
@@ -2404,9 +2414,9 @@ function opponentHistoryKey(name, event = "") {
     requestKey = [readablePerson(name), asOf, event || ""].join("|");
   return { asOf, requestKey };
 }
-async function fetchOpponentHistory(name, event = "") {
+async function fetchOpponentHistory(name, event = "", refresh = false) {
   const { asOf, requestKey } = opponentHistoryKey(name, event);
-  if (opponentHistoryCache.has(requestKey))
+  if (!refresh && opponentHistoryCache.has(requestKey))
     return opponentHistoryCache.get(requestKey);
   if (!opponentHistoryRequests.has(requestKey)) {
     const controller = new AbortController(),
@@ -2427,8 +2437,8 @@ async function fetchOpponentHistory(name, event = "") {
     saveEntries(
       OPPONENT_HISTORY_CACHE,
       opponentHistoryCache,
-      sessionStorage,
-      12,
+      localStorage,
+      80,
     );
       return data;
     }).finally(() => {
@@ -2443,7 +2453,7 @@ function preloadOpponentHistory(name, event = "") {
   fetchOpponentHistory(name, event).catch(() => {});
 }
 function runOpponentPrefetchQueue() {
-  while (opponentPrefetchActive < 2 && opponentPrefetchQueue.length) {
+  while (opponentPrefetchActive < 6 && opponentPrefetchQueue.length) {
     const item = opponentPrefetchQueue.shift(),
       { requestKey } = opponentHistoryKey(item.name, item.event);
     opponentPrefetchQueued.delete(requestKey);
@@ -2472,12 +2482,15 @@ function queueOpponentPreload(name, event = "") {
 }
 async function loadOpponentHistory(name, event = "") {
   const body = $("opponentTournamentHistory"),
-    routeKey = activeOpponentRouteKey;
+    routeKey = activeOpponentRouteKey,
+    { requestKey } = opponentHistoryKey(name, event),
+    cached = opponentHistoryCache.get(requestKey);
+  if (cached) renderOpponentHistory(cached);
   try {
-    const data = await fetchOpponentHistory(name, event);
+    const data = await fetchOpponentHistory(name, event, Boolean(cached));
     if (activeOpponentRouteKey === routeKey) renderOpponentHistory(data);
   } catch {
-    if (body)
+    if (body && !cached)
       body.innerHTML =
         `<div class="empty">Storico temporaneamente non disponibile. <button type="button" class="btn" data-retry-opponent>Riprova</button></div>`;
     body?.querySelector("[data-retry-opponent]")?.addEventListener("click", () =>
@@ -2512,14 +2525,16 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   const routeKey = [identity, readablePerson(name), event].join("|");
   if (activeOpponentRouteKey === routeKey && $("profileView").classList.contains("active") && $("opponentTournamentHistory")) return;
   activeOpponentRouteKey = routeKey;
-  const flag = nationalityHtml(initialNationality),
+  const { requestKey } = opponentHistoryKey(name, event),
+    prepared = opponentHistoryCache.get(requestKey),
+    flag = nationalityHtml(initialNationality || prepared?.profile?.nationality),
     follow = $("removeProfilePlayer");
   follow.hidden = false;
   follow.textContent = "Segui giocatore";
   follow.title = "Segui giocatore";
   follow.setAttribute("aria-label", "Segui giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3></div><div id="opponentTournamentHistory"><div class="empty">Caricamento storico…</div></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Per vedere tutti i tornei segui giocatore</button></p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3></div><div id="opponentTournamentHistory"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Per vedere tutti i tornei segui giocatore</button></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
   $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", (event) => {
@@ -2527,6 +2542,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
     follow.scrollIntoView({ behavior: "smooth", block: "center" });
     follow.focus({ preventScroll: true });
   });
+  if (prepared) renderOpponentHistory(prepared);
   loadOpponentHistory(name, event);
 }
 function renderProfile(id) {
