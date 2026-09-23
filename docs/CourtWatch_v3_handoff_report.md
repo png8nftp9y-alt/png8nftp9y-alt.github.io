@@ -1465,3 +1465,9 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Gli ID numerici dei partecipanti provenienti dai tabelloni non vengono più usati per ricostruire lo storico globale: sono locali al tabellone e possono essere riutilizzati per persone diverse.
 - Tornei e partite della pagina avversario vengono selezionati tramite il nome normalizzato esatto indicizzato in D1. Anche ranking corrente e ranking storico ignorano gli ID numerici locali; un ID viene considerato profilo soltanto quando ha una forma non locale stabile.
 - Il controllo automatico impedisce il ripristino della ricerca globale tramite `source_player_id`. Nessuna modifica alle sigle live dell'acceptance list.
+
+### Nomi invertiti nelle pagine avversario
+
+- Le forme ufficiali `Nome Cognome` e `Cognome Nome` vengono interrogate entrambe con lookup esatti indicizzati e ricondotte alla stessa chiave canonica; il caso verificato è `Paolo Loi` / `Loi Paolo`.
+- La stessa equivalenza viene applicata al ranking corrente, alla selezione del giocatore dentro la partita e ai ranking storici degli altri partecipanti, senza riutilizzare gli ID numerici locali dei tabelloni.
+- Le cache persistenti dei profili avversario passano alla versione 2 e gli asset a `v3.js?v=2026092312`, così i profili incompleti salvati in precedenza non vengono riproposti. Nessuna modifica alle sigle live dell'acceptance list.

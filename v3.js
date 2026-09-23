@@ -10,8 +10,8 @@ const LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1";
 const UI_STATE_CACHE = "courtwatch-v3-ui-state-v1";
 const DEVICE_ID_CACHE = "courtwatch-device-id-v1";
 const PLAYER_RANKING_CACHE = "courtwatch-player-rankings-v1";
-const OPPONENT_HISTORY_CACHE = "courtwatch-opponent-history-v1";
-const ACTIVE_OPPONENT_CACHE = "courtwatch-active-opponent-v1";
+const OPPONENT_HISTORY_CACHE = "courtwatch-opponent-history-v2";
+const ACTIVE_OPPONENT_CACHE = "courtwatch-active-opponent-v2";
 function courtWatchDeviceId() {
   try {
     let id = localStorage.getItem(DEVICE_ID_CACHE) || "";
