@@ -16,7 +16,7 @@
     <link rel="preload" as="fetch" href="https://png8nftp9y-alt.github.io/dist/v3/tournament_entries.json" crossorigin="anonymous" />
     <link rel="preload" as="fetch" href="https://png8nftp9y-alt.github.io/dist/v3/results.json" crossorigin="anonymous" />
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=2026092306" />
+    <link rel="stylesheet" href="v3.css?v=2026092307" />
   </head>
   <body>
     <div class="shell">
@@ -239,6 +239,11 @@
                   </button>
                 </div>
                 <span id="playerTotal"></span>
+                <form id="playerSearchForm" class="playerSearchForm" role="search" autocomplete="off">
+                  <label class="srOnly" for="playerSearchInput">Cerca qualsiasi giocatore</label>
+                  <input id="playerSearchInput" type="search" minlength="2" placeholder="Cerca giocatore…" aria-label="Cerca qualsiasi giocatore" aria-controls="playerSearchSuggestions" aria-expanded="false" />
+                  <div id="playerSearchSuggestions" class="playerSearchSuggestions" role="listbox" hidden></div>
+                </form>
               </div>
               <div id="playersList" class="playersList"></div>
             </div>
@@ -260,6 +265,6 @@
         <div id="profileContent"></div>
       </main>
     </div>
-    <script src="v3.js?v=2026092306"></script>
+    <script src="v3.js?v=2026092307"></script>
   </body>
 </html>

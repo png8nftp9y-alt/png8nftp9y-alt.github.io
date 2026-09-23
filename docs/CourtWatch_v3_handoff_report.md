@@ -1406,3 +1406,19 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - I turni di qualificazione basati sulla dimensione del tabellone vengono convertiti in `Qualification round 1`, `Qualification round 2` e successivi.
 - `Altri` e `Vai a Altri` usano esattamente la classe grafica `playersHeaderAction` già presente nell'ambiente Giocatori e restano per ora privi di azione.
 - Asset aggiornati a `v3.css?v=2026092306` e `v3.js?v=2026092306`; nessuna modifica alle sigle live dell'acceptance list.
+
+
+### Riparazione una tantum della parità D1
+
+- Dopo il deploy del ranking diretto, il run D1 `35811364336` ha fallito la verifica di parità mentre il ripristino e la ricostruzione di `observed_players` erano stati saltati dal percorso rapido.
+- Il workflow riconosce ora un commit con prefisso `Repair D1 observed index` e forza per quel solo run la ricostruzione completa; i run ordinari successivi conservano il percorso rapido.
+- Il workflow storico ranking ricevuto tramite `workflow_run` resta intenzionalmente saltato salvo una sincronizzazione ufficiale dei giocatori; l'aggiornamento corrente delle classifiche è gestito dal workflow dedicato `courtwatch-tennis-europe-rankings.yml`.
+
+
+### Stabilità profilo avversario e ricerca globale giocatori
+
+- Il prefetch massivo dei profili avversari è stato rimosso: rimane soltanto il precaricamento mirato su hover, focus o primo tocco, con richieste concorrenti condivise.
+- Il caricamento dello storico ha un limite di 15 secondi e offre `Riprova` in caso di errore; la route `#opponent-profile` viene renderizzata anche prima dello snapshot generale, quindi il refresh manuale conserva la pagina avversario.
+- Nell'ambiente Giocatori, accanto al totale, è disponibile la ricerca D1 per nome, cognome o frammento. I suggerimenti aprono direttamente il profilo; Invio apre una pagina completa con tutti i risultati trovati.
+- I giocatori Court Watch aprono la pagina giocatore completa; gli altri risultati aprono la pagina avversario.
+- Asset aggiornati a `v3.css?v=2026092307` e `v3.js?v=2026092307`; nessuna modifica alle sigle live dell'acceptance list.

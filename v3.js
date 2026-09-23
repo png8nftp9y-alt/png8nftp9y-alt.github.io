@@ -109,6 +109,8 @@ let calendarHeightObserver = null,
   opponentHistoryCache = new Map(),
   opponentHistoryRequests = new Map(),
   playerRankingRequests = new Map(),
+  playerSearchSequence = 0,
+  playerSearchTimer = null,
   activeRouteScrollKey = location.hash || "#home",
   routeScrollMemory = new Map(),
   uiSelectionRestored =
@@ -2036,6 +2038,58 @@ function renderPlayers() {
       }),
   );
 }
+async function searchPlayers(query) {
+  const response = await fetch(
+    `${PRIVATE_API}/player-search?q=${encodeURIComponent(query)}`,
+    privateApiOptions({ cache: "no-store" }),
+  );
+  if (!response.ok) throw Error("player search");
+  return (await response.json()).results || [];
+}
+function openPlayerSearchResult(result) {
+  if (result.courtwatchId) openProfile(result.courtwatchId);
+  else openCurrentOpponent(result.identity, result.name, "");
+}
+function playerSearchResultHtml(result, className) {
+  const detail = result.courtwatchId
+    ? "Court Watch"
+    : readableText(result.circuit || "Giocatore");
+  return `<button type="button" class="${className}" data-search-player="${esc(result.identity || result.courtwatchId)}" data-search-name="${esc(result.name)}" data-search-courtwatch="${esc(result.courtwatchId || "")}"><span><b>${esc(readablePerson(result.name))}</b>${result.nationality ? nationalityHtml(result.nationality) : ""}${result.club ? `<small>${esc(result.club)}</small>` : ""}</span><small>${esc(detail)}</small></button>`;
+}
+function bindPlayerSearchResults(root, results) {
+  root.querySelectorAll("[data-search-player]").forEach((button) => {
+    button.onclick = () => {
+      const result = results.find(
+        (item) =>
+          String(item.identity || item.courtwatchId) ===
+            button.dataset.searchPlayer &&
+          readablePerson(item.name) === readablePerson(button.dataset.searchName),
+      );
+      if (result) openPlayerSearchResult(result);
+    };
+  });
+}
+async function renderPlayerSearchPage(query) {
+  activeOpponentRouteKey = "";
+  $("removeProfilePlayer").hidden = true;
+  $("profileContent").innerHTML =
+    `<section class="card playerSearchResults"><div class="cardHead"><div><h2>Risultati giocatori</h2><p>Ricerca: ${esc(query)}</p></div></div><div id="playerSearchPageContent"><div class="empty">Ricerca in corso…</div></div></section>`;
+  $("profileView").classList.add("active");
+  const routeHash = location.hash;
+  try {
+    const results = await searchPlayers(query);
+    if (location.hash !== routeHash) return;
+    const body = $("playerSearchPageContent");
+    body.innerHTML = results.length
+      ? results.map((result) => playerSearchResultHtml(result, "playerSearchResult")).join("")
+      : '<div class="empty">Nessun giocatore trovato.</div>';
+    bindPlayerSearchResults(body, results);
+  } catch {
+    if (location.hash === routeHash)
+      $("playerSearchPageContent").innerHTML =
+        '<div class="empty">Ricerca temporaneamente non disponibile.</div>';
+  }
+}
 function statusEmoji(s) {
   return s === "green" ? "🟢" : s === "red" ? "🔴" : "🟡";
 }
@@ -2084,6 +2138,10 @@ function renderIfDataChanged() {
     renderDiagnostics();
     return false;
   }
+  if (/^#player-search\//.test(location.hash)) {
+    renderDiagnostics();
+    return false;
+  }
   route();
   return true;
 }
@@ -2129,16 +2187,6 @@ function bindParticipantNavigation(root) {
       });
     },
   );
-  const warm = () => opponentLinks.forEach((element) =>
-    preloadOpponentHistory(
-      element.dataset.opponentName,
-      element.dataset.opponentEvent || "",
-    ),
-  );
-  if (opponentLinks.length)
-    (window.requestIdleCallback || ((callback) => setTimeout(callback, 80)))(warm, {
-      timeout: 1200,
-    });
 }
 function incompleteCompletedScore(value, status, decided = false) {
   const sets = String(value || "").match(/\d+(?:\(\d+\))?-\d+(?:\(\d+\))?/g) || [];
@@ -2323,7 +2371,9 @@ async function fetchOpponentHistory(name, event = "") {
   const { asOf, requestKey } = opponentHistoryKey(name, event);
   if (opponentHistoryCache.has(requestKey))
     return opponentHistoryCache.get(requestKey);
-  if (!opponentHistoryRequests.has(requestKey))
+  if (!opponentHistoryRequests.has(requestKey)) {
+    const controller = new AbortController(),
+      timer = setTimeout(() => controller.abort(), 15000);
     opponentHistoryRequests.set(requestKey, fetch(
       PRIVATE_API +
         "/opponent-profile?name=" +
@@ -2332,13 +2382,17 @@ async function fetchOpponentHistory(name, event = "") {
         encodeURIComponent(asOf) +
         "&event=" +
         encodeURIComponent(event || ""),
-      privateApiOptions({ cache: "no-store" }),
+      privateApiOptions({ cache: "no-store", signal: controller.signal }),
     ).then(async (response) => {
     if (!response.ok) throw Error("opponent history");
     const data = await response.json();
     opponentHistoryCache.set(requestKey, data);
       return data;
-    }).finally(() => opponentHistoryRequests.delete(requestKey)));
+    }).finally(() => {
+      clearTimeout(timer);
+      opponentHistoryRequests.delete(requestKey);
+    }));
+  }
   return opponentHistoryRequests.get(requestKey);
 }
 function preloadOpponentHistory(name, event = "") {
@@ -2354,7 +2408,10 @@ async function loadOpponentHistory(name, event = "") {
   } catch {
     if (body)
       body.innerHTML =
-        '<div class="empty">Storico temporaneamente non disponibile.</div>';
+        `<div class="empty">Storico temporaneamente non disponibile. <button type="button" class="btn" data-retry-opponent>Riprova</button></div>`;
+    body?.querySelector("[data-retry-opponent]")?.addEventListener("click", () =>
+      loadOpponentHistory(name, event),
+    );
   }
 }
 function renderOpponentFromMatch(identity, matchId, index, role = "opponent") {
@@ -2990,6 +3047,7 @@ function route() {
     legacyOpponent = location.hash.match(
       /^#opponent\/([^/]+)\/([^/]+)\/(\d+)$/,
     ),
+    playerSearch = location.hash.match(/^#player-search\/(.+)$/),
     tournament = location.hash.match(/^#tournament\/(.+)$/),
     primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
   const isHomeRoute = !location.hash;
@@ -3012,8 +3070,9 @@ function route() {
     openTournamentPlayerKeys.clear();
     saveUiState();
   }
-  if (player && state.data) renderProfile(decodeURIComponent(player[1]));
-  else if (currentOpponent && state.data)
+  if (playerSearch) renderPlayerSearchPage(decodeURIComponent(playerSearch[1]));
+  else if (player && state.data) renderProfile(decodeURIComponent(player[1]));
+  else if (currentOpponent)
     renderOpponentProfile(
       decodeURIComponent(currentOpponent[1]),
       decodeURIComponent(currentOpponent[2]),
@@ -3143,6 +3202,45 @@ function toggleDatePopover() {
 }
 function wire() {
   wirePlayersColumnHeight();
+  const playerSearchForm = $("playerSearchForm"),
+    playerSearchInput = $("playerSearchInput"),
+    playerSearchSuggestions = $("playerSearchSuggestions");
+  playerSearchInput.oninput = () => {
+    clearTimeout(playerSearchTimer);
+    const query = playerSearchInput.value.trim(),
+      sequence = ++playerSearchSequence;
+    if (query.length < 2) {
+      playerSearchSuggestions.hidden = true;
+      playerSearchInput.setAttribute("aria-expanded", "false");
+      return;
+    }
+    playerSearchTimer = setTimeout(async () => {
+      try {
+        const results = await searchPlayers(query);
+        if (sequence !== playerSearchSequence) return;
+        playerSearchSuggestions.innerHTML = results.length
+          ? results.slice(0, 10).map((result) => playerSearchResultHtml(result, "playerSearchSuggestion")).join("")
+          : '<div class="empty">Nessun giocatore trovato.</div>';
+        bindPlayerSearchResults(playerSearchSuggestions, results);
+        playerSearchSuggestions.hidden = false;
+        playerSearchInput.setAttribute("aria-expanded", "true");
+      } catch {
+        if (sequence === playerSearchSequence) {
+          playerSearchSuggestions.innerHTML =
+            '<div class="empty">Ricerca temporaneamente non disponibile.</div>';
+          playerSearchSuggestions.hidden = false;
+        }
+      }
+    }, 220);
+  };
+  playerSearchForm.onsubmit = (event) => {
+    event.preventDefault();
+    const query = playerSearchInput.value.trim();
+    if (query.length < 2) return;
+    playerSearchSuggestions.hidden = true;
+    playerSearchInput.setAttribute("aria-expanded", "false");
+    location.hash = `player-search/${encodeURIComponent(query)}`;
+  };
   $("agendaMode").onchange = () => {
     state.agendaMode =
       $("agendaMode").value === "chronological"
@@ -3240,6 +3338,10 @@ function wire() {
   document.addEventListener("click", (e) => {
     const category = $("calendarCategory");
     if (category?.open && !category.contains(e.target)) category.open = false;
+    if (!playerSearchForm.contains(e.target)) {
+      playerSearchSuggestions.hidden = true;
+      playerSearchInput.setAttribute("aria-expanded", "false");
+    }
     const pop = $("datePopover");
     if (
       !pop.hidden &&
@@ -3249,7 +3351,11 @@ function wire() {
       pop.hidden = true;
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") $("datePopover").hidden = true;
+    if (e.key === "Escape") {
+      $("datePopover").hidden = true;
+      playerSearchSuggestions.hidden = true;
+      playerSearchInput.setAttribute("aria-expanded", "false");
+    }
   });
   addEventListener("hashchange", () => {
     const now = Date.now(),
@@ -3760,6 +3866,7 @@ renderProfile = function (id) {
 };
 wire();
 wireAccount();
+route();
 load();
 loadAccount();
 refreshMatchAnalysisStatus();
