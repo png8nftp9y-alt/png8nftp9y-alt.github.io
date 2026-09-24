@@ -6,6 +6,7 @@ ARCHIVE=dist/v3/tennis_europe_oop_historical.json
 MIN_TOURNAMENTS="${TE_OOP_MIN_TOURNAMENTS:-453}"
 MIN_MATCHES="${TE_OOP_MIN_MATCHES:-47048}"
 aws_r2(){ aws --endpoint-url "$ENDPOINT" "$@"; }
+prune(){ node src/v3/prune-r2-generations.mjs "$PREFIX"; }
 pointer(){ aws_r2 s3 cp "s3://$R2_BUCKET/$PREFIX/pointers/$1.json" "$2" --only-show-errors 2>/dev/null; }
 publish(){
   work="$(mktemp -d)"
@@ -13,7 +14,7 @@ publish(){
   archive_hash="$(sha256sum "$ARCHIVE"|cut -d' ' -f1)"
   generation="$archive_hash"
   jq -n --arg generation "$generation" --arg archive "$archive_hash" --arg createdAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '{schemaVersion:1,generation:$generation,createdAt:$createdAt,files:{archive:{name:"tennis_europe_oop_historical.json",sha256:$archive}}}' > "$work/new.json"
-  if pointer current "$work/current.json"; then current_generation="$(jq -r .generation "$work/current.json")"; if test "$current_generation" = "$generation"; then rm -rf "$work"; echo 'Europe OOP historical archive unchanged; R2 not rewritten.'; return; fi; fi
+  if pointer current "$work/current.json"; then current_generation="$(jq -r .generation "$work/current.json")"; if test "$current_generation" = "$generation"; then prune; rm -rf "$work"; echo 'Europe OOP historical archive unchanged; R2 not rewritten.'; return; fi; fi
   aws_r2 s3 cp "$ARCHIVE" "s3://$R2_BUCKET/$PREFIX/generations/$generation/tennis_europe_oop_historical.json" --only-show-errors
   aws_r2 s3 cp "s3://$R2_BUCKET/$PREFIX/generations/$generation/tennis_europe_oop_historical.json" "$work/archive.json" --only-show-errors
   test "$(sha256sum "$work/archive.json"|cut -d' ' -f1)" = "$archive_hash"
@@ -21,6 +22,7 @@ publish(){
   test ! -s "$work/backup-1.json" || aws_r2 s3 cp "$work/backup-1.json" "s3://$R2_BUCKET/$PREFIX/pointers/backup-2.json" --only-show-errors
   test ! -s "$work/current.json" || aws_r2 s3 cp "$work/current.json" "s3://$R2_BUCKET/$PREFIX/pointers/backup-1.json" --only-show-errors
   aws_r2 s3 cp "$work/new.json" "s3://$R2_BUCKET/$PREFIX/pointers/current.json" --only-show-errors
+  prune
   rm -rf "$work"
   echo "Published verified Europe OOP historical generation $generation."
 }
