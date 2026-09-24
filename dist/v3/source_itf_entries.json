@@ -1,7 +1,7 @@
 {
-  "version": 8,
-  "generatedAt": "2026-09-24T04:20:11.109Z",
-  "status": "itf_acceptance_complete_state_machine",
+  "version": 7,
+  "generatedAt": "2026-09-24T04:30:00.046Z",
+  "status": "itf_acceptance_complete",
   "mode": "window_discovery",
   "shards": [
     {
@@ -23,7 +23,7 @@
       "participantsFound": 5833,
       "entriesFound": 1,
       "withdrawalsFound": 0,
-      "retriesUsed": 68,
+      "retriesUsed": 72,
       "errors": 0
     },
     {
@@ -34,7 +34,7 @@
       "participantsFound": 2049,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 22,
+      "retriesUsed": 20,
       "errors": 0
     },
     {
@@ -45,7 +45,7 @@
       "participantsFound": 1552,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 16,
+      "retriesUsed": 18,
       "errors": 0
     },
     {
@@ -54,9 +54,9 @@
       "status": "itf_acceptance_shard_complete",
       "tournamentsChecked": 16,
       "participantsFound": 2427,
-      "entriesFound": 1,
-      "withdrawalsFound": 0,
-      "retriesUsed": 33,
+      "entriesFound": 0,
+      "withdrawalsFound": 1,
+      "retriesUsed": 3,
       "errors": 0
     },
     {
@@ -67,7 +67,7 @@
       "participantsFound": 2379,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 26,
+      "retriesUsed": 27,
       "errors": 0
     },
     {
@@ -78,7 +78,7 @@
       "participantsFound": 1335,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 43,
+      "retriesUsed": 11,
       "errors": 0
     },
     {
@@ -89,7 +89,7 @@
       "participantsFound": 4801,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 13,
+      "retriesUsed": 33,
       "errors": 0
     },
     {
@@ -100,7 +100,7 @@
       "participantsFound": 1953,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 26,
+      "retriesUsed": 33,
       "errors": 0
     },
     {
@@ -111,7 +111,7 @@
       "participantsFound": 1142,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 19,
+      "retriesUsed": 20,
       "errors": 0
     },
     {
@@ -122,7 +122,7 @@
       "participantsFound": 795,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 13,
+      "retriesUsed": 38,
       "errors": 0
     },
     {
@@ -133,7 +133,7 @@
       "participantsFound": 1810,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 36,
+      "retriesUsed": 17,
       "errors": 0
     },
     {
@@ -144,7 +144,7 @@
       "participantsFound": 2289,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 42,
+      "retriesUsed": 13,
       "errors": 0
     },
     {
@@ -166,7 +166,7 @@
       "participantsFound": 2848,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 34,
+      "retriesUsed": 32,
       "errors": 0
     },
     {
@@ -177,15 +177,15 @@
       "participantsFound": 2855,
       "entriesFound": 0,
       "withdrawalsFound": 0,
-      "retriesUsed": 53,
+      "retriesUsed": 60,
       "errors": 0
     }
   ],
   "tournamentsChecked": 260,
   "participantsFound": 39868,
-  "currentAcceptanceEntries": 3,
-  "withdrawalsFound": 0,
-  "entriesFound": 7,
+  "currentAcceptanceEntries": 2,
+  "withdrawalsFound": 1,
+  "entriesFound": 6,
   "entries": [
     {
       "playerId": "martina-danesi",
@@ -344,11 +344,11 @@
       "entryStatus": "confirmed_on_official_acceptance_list",
       "calendarState": "acceptance_live",
       "acceptanceListPublished": true,
-      "acceptanceLastUpdated": "2026-09-24T03:30:52.387Z",
+      "acceptanceLastUpdated": "2026-09-24T04:15:38.146Z",
       "acceptanceCode": "A",
       "acceptancePosition": 1,
       "calendarListLabel": "A-1",
-      "lastSeen": "2026-09-24T03:30:52.387Z"
+      "lastSeen": "2026-09-24T04:15:38.146Z"
     },
     {
       "playerId": "martina-danesi",
@@ -370,12 +370,14 @@
       "entryStatus": "confirmed_on_official_acceptance_list",
       "calendarState": "acceptance_live",
       "acceptanceListPublished": true,
-      "acceptanceLastUpdated": "2026-09-24T03:30:52.902Z",
+      "acceptanceLastUpdated": "2026-09-24T04:15:38.809Z",
       "acceptanceCode": "A",
       "acceptancePosition": 3,
       "calendarListLabel": "A-3",
-      "lastSeen": "2026-09-24T03:30:52.902Z"
-    },
+      "lastSeen": "2026-09-24T04:15:38.809Z"
+    }
+  ],
+  "withdrawals": [
     {
       "playerId": "martina-danesi",
       "playerName": "Martina Danesi",
@@ -383,32 +385,47 @@
       "circuit": "itf",
       "competitionId": "J-J30-FRA-2026-007",
       "tournamentName": "J30 Ponts de Ce",
-      "location": "Ponts de Ce, France",
-      "venueName": "",
-      "address": "",
-      "startDate": "2026-10-12",
+      "startDate": "2026-10-10",
       "endDate": "2026-10-17",
-      "qualificationStartDate": null,
-      "category": "J30",
-      "gender": "Girls",
+      "qualificationStartDate": "2026-10-10",
+      "entryStatus": "withdrawn",
+      "withdrawnAt": "2026-09-24T04:15:40.901Z",
       "sourceUrl": "https://www.itftennis.com/en/tournament/j30-ponts-de-ce/fra/2026/j-j30-fra-2026-007/",
-      "acceptanceListUrl": "https://www.itftennis.com/en/tournament/j30-ponts-de-ce/fra/2026/j-j30-fra-2026-007/acceptance-list/",
-      "entryStatus": "confirmed_on_official_acceptance_list",
-      "calendarState": "acceptance_live",
-      "acceptanceListPublished": true,
-      "acceptanceLastUpdated": "2026-09-24T03:30:53.041Z",
-      "acceptanceCode": "A",
-      "acceptancePosition": 31,
-      "calendarListLabel": "A-31",
-      "lastSeen": "2026-09-24T03:30:53.041Z"
+      "acceptanceListUrl": "https://www.itftennis.com/en/tournament/j30-ponts-de-ce/fra/2026/j-j30-fra-2026-007/acceptance-list/"
     }
   ],
-  "withdrawals": [],
   "cache": {
     "permanentParticipants": 61157,
-    "changed": false,
-    "changedTournaments": [],
-    "sha256": "6e46f7977573a4b7c6dae1ed27e575f5adffed8190fb80b0d37382d1aac487d2"
+    "changed": true,
+    "changedTournaments": [
+      "J-J60-ITA-2026-001",
+      "J-J100-GRE-2026-002",
+      "J-J30-LAT-2026-006",
+      "J-J300-KOR-2026-001",
+      "J-J60-ALG-2026-002",
+      "J-J200-UZB-2026-001",
+      "J-J60-FIJ-2026-004",
+      "J-J60-UKR-2026-003",
+      "J-J30-CYP-2026-002",
+      "J-J30-VIE-2026-008",
+      "J-J30-AUT-2026-004",
+      "J-J30-FRA-2026-008",
+      "J-J60-CRO-2026-002",
+      "J-J60-DEN-2026-003",
+      "J-J100-CRO-2026-002",
+      "J-J30-GER-2026-008",
+      "J-J30-LAT-2026-005",
+      "J-J60-PAN-2026-001",
+      "J-J30-BAN-2026-001",
+      "J-J30-TUR-2026-006",
+      "J-J200-BOL-2026-001",
+      "J-J30-ARM-2026-006",
+      "J-J60-DOM-2026-004",
+      "J-J30-NED-2026-005",
+      "J-J30-TUN-2026-005",
+      "J-J60-HUN-2026-002"
+    ],
+    "sha256": "acb03b90b220ef7578fe78020b4c9330324c8d8a72772de8ed2e4495156ac90b"
   },
   "errors": []
 }
