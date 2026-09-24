@@ -122,7 +122,11 @@ async function checkTarget(target, env, now) {
 async function checkLiveSchedule(target, env, scheduledTime) {
   const runs = await latestRuns(target, env);
   const slotStart = Math.floor(scheduledTime / 900000) * 900000;
-  const active = runs.find((run) => run.status !== "completed");
+  const active = runs.find(
+    (run) =>
+      run.status !== "completed" &&
+      ageMinutes(run.created_at, scheduledTime) <= 120,
+  );
   if (active) return { id: target.id, action: "active", runId: active.id };
   const inSlot = runs.find((run) => Date.parse(run.created_at) >= slotStart);
   if (inSlot) return { id: target.id, action: "already_started", runId: inSlot.id };
