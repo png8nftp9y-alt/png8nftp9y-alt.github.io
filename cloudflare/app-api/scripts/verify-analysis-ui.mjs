@@ -43,6 +43,7 @@ assert.ok(hasApiSource("apiPath==='/player-search'") && hasApiSource('searchPlay
 assert.ok(hasApiSource('tennisEuropeNameKey(row.display_name)') && hasApiSource("row.circuit==='tennis-europe'") && hasApiSource('sources:[row.circuit]'), 'global player search must merge unambiguous FITP and Tennis Europe identities while preserving ambiguous names');
 assert.ok(hasSource('result.sources || []') && hasSource('Court Watch" : "", ...sourceLabels'), 'player search must render all merged profile sources');
 assert.ok(hasApiSource('player.tennisEuropeRankingDates') && hasApiSource("if(player.tennisEuropeRankingDates[key]&&player.tennisEuropeRankingDates[key]>date)return"), 'API must retain the newest Tennis Europe ranking by date');
+assert.ok(hasApiSource('applyPreparedTennisEuropeRankings') && hasApiSource('tennis_europe_current_player_rankings') && hasApiSource("prepared_tennis_europe_projection_failed"), 'private snapshot must read prepared Tennis Europe projections and remain available if optional ranking enrichment fails');
 assert.ok(hasApiSource('tennisEuropeNameKey') && hasApiSource('h.normalized_name LIKE ?') && hasApiSource('playersByName.get(tennisEuropeNameKey(row.normalized_name))'), 'current player rankings must resolve reversed Tennis Europe names');
 assert.ok(hasSource('function renderOpponentProfile(') && hasSource('profile.ranking_date'), 'opponent page must expose the current ranking date');
 assert.ok(hasSource('profile.category') && hasSource('Segui giocatore'), 'opponent header must expose current age category and follow action');
