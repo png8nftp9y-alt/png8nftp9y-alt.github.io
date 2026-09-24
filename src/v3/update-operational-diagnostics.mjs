@@ -19,7 +19,7 @@ const items=await Promise.all(targets.map(async([label,workflow,maxAge])=>{
   const active=runs.find(r=>r.status!=='completed');
   const age=completed?(Date.now()-Date.parse(completed.updated_at))/60000:Infinity;
   const status=!completed?'yellow':completed.conclusion!=='success'?'red':age>maxAge?'yellow':'green';
-  return {label,status,critical:true,workflow,runId:completed?.id||null,url:completed?.html_url||null,checkedAt:new Date().toISOString(),detail:`${completed?.conclusion||'nessuna verifica'} · ${Number.isFinite(age)?Math.round(age)+' min fa':'data n/d'}${active?' · nuova esecuzione in corso':''}`};
+  return {label,status,critical:true,workflow,runId:completed?.id||null,url:completed?.html_url||null,generatedAt:completed?.updated_at||null,checkedAt:new Date().toISOString(),detail:`${completed?.conclusion||'nessuna verifica'} · ${Number.isFinite(age)?Math.round(age)+' min fa':'data n/d'}${active?' · nuova esecuzione in corso':''}`};
  }catch(error){return {label,status:'yellow',critical:true,workflow,detail:String(error)}}
 }));
 await fs.mkdir('dist/v3',{recursive:true});

@@ -530,6 +530,25 @@ if (!(operational.items || []).length)
       true,
     ),
   );
+const diagnosticGeneratedAtByLabel = new Map([
+  ["FITP tornei", fitpTournaments.generatedAt || NOW],
+  ["FITP iscrizioni", fitp.generatedAt || NOW],
+  ["Tennis Europe", teSystem.generatedAt || te.generatedAt || NOW],
+  ["ITF", itf.generatedAt || NOW],
+  ["ITF archivio permanente", itfDatabase.generatedAt || NOW],
+  ["Calendario", NOW],
+  ["Agenda legacy", agendaDoc.generatedAt || NOW],
+  ["Risultati", resultsDoc.generatedAt || NOW],
+  ["Avversari", opponentsDoc.generatedAt || NOW],
+  ["App/UI", NOW],
+]);
+for (const item of diagnosticsItems) {
+  item.generatedAt =
+    item.generatedAt ||
+    diagnosticGeneratedAtByLabel.get(item.label) ||
+    NOW;
+}
+
 const diagnostics = {
   version: VERSION,
   generatedAt: NOW,
