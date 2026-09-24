@@ -4,8 +4,8 @@ if (!token || !account) throw new Error('Missing Cloudflare audit credentials');
 
 const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
 const now = new Date();
-const from = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString().slice(0, 10);
-const to = new Date(now.getTime() - 86400000).toISOString().slice(0, 10);
+const from = process.env.CLOUDFLARE_AUDIT_FROM || '2026-09-15';
+const to = now.toISOString().slice(0, 10);
 const target = '2026-10-15';
 
 async function rest(path) {
