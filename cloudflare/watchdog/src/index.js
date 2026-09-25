@@ -7,6 +7,7 @@ const LIVE_GROUPS = new Map([
   ["0,15,30,45 * * * *", new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one"])],
   ["5,20,35,50 * * * *", new Set(["tennis-europe-oop", "tennis-europe"])],
   ["10,25,40,55 * * * *", new Set(["fitp"])],
+    ["12 * * * *", new Set(["cloudflare-cost-audit"])],
 ]);
 const LIVE_IDS = new Set([...LIVE_GROUPS.values()].flatMap((ids) => [...ids]));
 
@@ -39,6 +40,7 @@ const TARGETS = [
     id: "itf-t-minus-one",
     workflow: "courtwatch-v3-itf-t-minus-one.yml",
   },
+  { id: "cloudflare-cost-audit", workflow: "courtwatch-cloudflare-full-cost-audit.yml" },
   {
     id: "itf-safety-120d",
     workflow: "courtwatch-v3-itf-safety-120d.yml",

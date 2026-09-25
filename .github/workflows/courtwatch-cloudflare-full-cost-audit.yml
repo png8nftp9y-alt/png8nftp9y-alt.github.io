@@ -1,8 +1,6 @@
 name: Court Watch Cloudflare full cost audit
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '42 * * * *'
   push:
     branches: [main]
     paths:

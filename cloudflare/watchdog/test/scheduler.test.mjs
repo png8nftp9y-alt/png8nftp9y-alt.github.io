@@ -12,7 +12,8 @@ const europeWorkflows = [
   "courtwatch-v3-tennis-europe-live.yml",
 ];
 const fitpWorkflows = ["courtwatch-v3-fitp-entries.yml"];
-const workflows = [...itfWorkflows, ...europeWorkflows, ...fitpWorkflows];
+const auditWorkflows = ["courtwatch-cloudflare-full-cost-audit.yml"];
+const workflows = [...itfWorkflows, ...europeWorkflows, ...fitpWorkflows, ...auditWorkflows];
 const slot = Math.floor(Date.now() / 900000) * 900000;
 async function tick(cron, runs = [], failWorkflow = null) {
   const requests = [], pending = [];
@@ -46,6 +47,7 @@ test("staggered live crons dispatch only their circuit group", async () => {
     ["0,15,30,45 * * * *", itfWorkflows],
     ["5,20,35,50 * * * *", europeWorkflows],
     ["10,25,40,55 * * * *", fitpWorkflows],
+      ["12 * * * *", auditWorkflows],
   ]) {
     const requests = await tick(cron, previous);
     const posts = requests.filter(r => r.method === "POST");
