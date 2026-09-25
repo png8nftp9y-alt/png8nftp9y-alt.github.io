@@ -27,7 +27,7 @@ forbidText(crud,"workflow_run:",'test CRUD nuovamente collegato a ogni deploy');
 requireText(universal,'counts.importHash=crypto.createHash','impronta universale assente');
 requireText(universal,'volatileHashKeys','timestamp tecnici inclusi nuovamente nell’impronta universale');
 forbidText(opponentEntries,"DELETE FROM opponent_entry_profiles WHERE circuit IN ('fitp','itf')",'profili avversari cancellati integralmente');
-requireText(opponentEntries,'delta>maxDelta','delta profili avversari senza limite di sicurezza');
+requireText(opponentEntries,'riskyDelta>maxDelta','delta distruttivo profili avversari senza limite di sicurezza');
 requireText(opponentEntries,'previous.payload===payload','profili avversari invariati non confrontati');
 requireText(opponentRestore,'test "$count" -gt "$best_count"','snapshot ITF avversari non selezionato per completezza massima');
 forbidText(teOop,'INSERT OR REPLACE INTO tournaments','tornei Tennis Europe riscritti senza confronto');

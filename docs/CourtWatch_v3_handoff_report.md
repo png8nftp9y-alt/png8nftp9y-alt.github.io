@@ -1402,3 +1402,4 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Le righe invariate non producono alcuna scrittura. L'indice e le funzioni dell'app restano invariati; cambia soltanto il metodo di sincronizzazione.
 - Il primo run protetto (`36084550903`) ha bloccato correttamente un delta anomalo di `37.815` profili su `51.598` righe remote prima di eseguire scritture. La causa era la selezione del primo snapshot ITF sopra una soglia minima, anche quando uno dei backup conservava una copia più completa.
 - Il ripristino confronta ora `current`, `backup-1` e `backup-2` e usa sempre lo snapshot valido con il maggior numero di partecipanti; slot e conteggio scelti vengono riportati nel log. Il limite sul delta rimane attivo.
+- Dopo l'interruzione del vecchio reinserimento sono consentiti recuperi anche numerosi di sole righe mancanti; modifiche e cancellazioni massive restano bloccate prima delle scritture.
