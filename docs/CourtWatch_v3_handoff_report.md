@@ -1393,3 +1393,10 @@ La settimana 37-2026 resta verificata sulla pagina ufficiale come **07 settembre
 - Il run Cloudflare `36079860907` ha raccolto correttamente tutte le metriche, ma è diventato rosso esclusivamente durante il salvataggio del riepilogo in D1 (`code 7500`, errore interno), mentre un altro flusso D1 era attivo. I dati dell'audit non erano errati né persi.
 - Il riepilogo viene ora sovrascritto ogni ora in un unico oggetto R2, `monitoring/cloudflare-usage/current.json`, e l'Admin lo legge dal binding R2 `ARCHIVE`: il monitoraggio produce zero scritture D1, non accumula versioni e aggiunge soltanto una piccola operazione R2 per ora.
 - Nell'ultima rilevazione disponibile: D1 `1.978.356.615` righe lette, `31.934.397` scritte e `795.996.160` byte; Workers `32.613` richieste e zero errori; R2 `211.324` operazioni e `753.250.180` byte conservati. La proiezione D1 iniziale include ancora il picco anomalo del 24 settembre precedente alla riduzione dei trigger; le successive rilevazioni orarie devono misurare il nuovo regime.
+
+### Sincronizzazione incrementale dei profili avversari FITP/ITF
+
+- Il confronto dei run `36080745148` e `36081792559` ha isolato la causa dei tempi anomali: la fase profili avversari passava da `9` secondi a `10m 27s` quando cambiava l'impronta e cancellava integralmente la tabella prima di reinserirla.
+- La sincronizzazione esporta ora la sola versione corrente delle righe D1 e costruisce un delta esatto: inserisce i nuovi profili, aggiorna soltanto payload realmente differenti ed elimina esclusivamente le chiavi non più presenti.
+- La cancellazione generale di FITP/ITF è vietata da un test automatico. Se una sorgente risulta vuota o il delta supera il maggiore tra 500 righe e il 10% dell'archivio, con tetto massimo di 2.000, il run si ferma prima di modificare D1.
+- Le righe invariate non producono alcuna scrittura. L'indice e le funzioni dell'app restano invariati; cambia soltanto il metodo di sincronizzazione.

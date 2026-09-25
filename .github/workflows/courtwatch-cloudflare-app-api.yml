@@ -129,6 +129,7 @@ jobs:
           fi
       - name: Build and import opponent tournament entries
         run: |
+          node scripts/export-opponent-entry-state.mjs
           node scripts/generate-opponent-entry-seed.mjs
           LOCAL_ENTRY_HASH=$(tr -d '\r\n' < seed-opponent-entries/hash.txt)
           npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --json \
