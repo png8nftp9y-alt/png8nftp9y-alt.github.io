@@ -10,6 +10,7 @@ const teOop=read('scripts/generate-tennis-europe-oop-seed.mjs');
 const teCandidates=read('scripts/generate-tennis-europe-app-candidates.mjs');
 const worker=read('src/index.js');
 const opponentEntries=read('scripts/generate-opponent-entry-seed.mjs');
+const opponentRestore=read('scripts/restore-opponent-entry-indexes.sh');
 
 const failures=[];
 const requireText=(document,text,label)=>{if(!document.includes(text))failures.push(label)};
@@ -28,6 +29,7 @@ requireText(universal,'volatileHashKeys','timestamp tecnici inclusi nuovamente n
 forbidText(opponentEntries,"DELETE FROM opponent_entry_profiles WHERE circuit IN ('fitp','itf')",'profili avversari cancellati integralmente');
 requireText(opponentEntries,'delta>maxDelta','delta profili avversari senza limite di sicurezza');
 requireText(opponentEntries,'previous.payload===payload','profili avversari invariati non confrontati');
+requireText(opponentRestore,'test "$count" -gt "$best_count"','snapshot ITF avversari non selezionato per completezza massima');
 forbidText(teOop,'INSERT OR REPLACE INTO tournaments','tornei Tennis Europe riscritti senza confronto');
 forbidText(teOop,'INSERT OR REPLACE INTO tennis_europe_players','identità Tennis Europe riscritte senza confronto');
 forbidText(teCandidates,'INSERT OR REPLACE INTO app_match_candidates','candidati Tennis Europe riscritti senza confronto');
@@ -37,4 +39,4 @@ if(failures.length){
   console.error(JSON.stringify({policy:'d1-cost-invariants',status:'red',failures},null,2));
   process.exit(1);
 }
-console.log(JSON.stringify({policy:'d1-cost-invariants',status:'green',checks:17}));
+console.log(JSON.stringify({policy:'d1-cost-invariants',status:'green',checks:18}));

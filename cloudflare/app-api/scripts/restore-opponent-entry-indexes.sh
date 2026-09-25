@@ -15,7 +15,7 @@ restore_fitp(){
 }
 
 restore_itf(){
-  local slot pointer generation candidate count
+  local slot pointer generation candidate count best_count=0 best_candidate='' best_slot=''
   for slot in current backup-1 backup-2; do
     pointer="tmp/opponent-entries/itf-$slot-pointer.json"
     if ! get_object "itf/database/pointers/$slot.json" "$pointer"; then continue; fi
@@ -24,14 +24,20 @@ restore_itf(){
     if ! get_object "itf/database/generations/$generation/itf_participant_cache.json.gz" "$candidate"; then continue; fi
     gzip -t "$candidate"
     count="$(gzip -cd "$candidate" | jq -r '(.participants // []) | length')"
-    if test "$count" -ge "$ITF_MIN_PERMANENT_PARTICIPANTS"; then
-      cp "$candidate" tmp/opponent-entries/itf_participant_cache.json.gz
-      printf '%s' "$slot" > tmp/opponent-entries/itf-source-slot.txt
-      return
+    echo "ITF opponent-entry candidate slot=$slot participants=$count"
+    if test "$count" -ge "$ITF_MIN_PERMANENT_PARTICIPANTS" && test "$count" -gt "$best_count"; then
+      best_count="$count"
+      best_candidate="$candidate"
+      best_slot="$slot"
     fi
   done
-  echo "No complete ITF participant cache for opponent entries." >&2
-  exit 1
+  if test -z "$best_candidate"; then
+    echo "No complete ITF participant cache for opponent entries." >&2
+    exit 1
+  fi
+  cp "$best_candidate" tmp/opponent-entries/itf_participant_cache.json.gz
+  printf '%s' "$best_slot" > tmp/opponent-entries/itf-source-slot.txt
+  echo "Selected ITF opponent-entry slot=$best_slot participants=$best_count"
 }
 
 restore_fitp
