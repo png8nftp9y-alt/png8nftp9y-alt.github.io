@@ -69,6 +69,7 @@ const diffs = [
 ].filter(Boolean);
 
 const affected = new Set();
+const changedSources = new Set();
 
 for (const diff of diffs) {
   let file = "";
@@ -76,19 +77,31 @@ for (const diff of diffs) {
   for (const line of diff.split("\n")) {
     if (line.startsWith("+++ b/")) {
       file = line.slice(6);
+      if (
+        file &&
+        !ignored(file) &&
+        sourceExtensions.has(extname(file).toLowerCase())
+      ) {
+        changedSources.add(file);
+      }
       continue;
     }
 
     if (
       file &&
-      !ignored(file) &&
-      sourceExtensions.has(extname(file).toLowerCase()) &&
+      changedSources.has(file) &&
       line.startsWith("+") &&
       !line.startsWith("+++") &&
       mutationPattern.test(line)
     ) {
       affected.add(file);
     }
+  }
+}
+
+for (const file of changedSources) {
+  if (existsSync(file) && mutationPattern.test(readFileSync(file, "utf8"))) {
+    affected.add(file);
   }
 }
 
