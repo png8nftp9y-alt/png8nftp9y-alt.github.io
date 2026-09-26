@@ -108,7 +108,10 @@ jobs:
             > remote-import-hash.json
           REMOTE_IMPORT_HASH=$(node -e "const fs=require('fs'),x=JSON.parse(fs.readFileSync('remote-import-hash.json','utf8'));let found='';const walk=v=>{if(!v||found)return;if(Array.isArray(v))return v.forEach(walk);if(typeof v==='object'){if(typeof v.import_hash==='string')found=v.import_hash;else Object.values(v).forEach(walk)}};walk(x);process.stdout.write(found)")
           if [ -n "$REMOTE_IMPORT_HASH" ] && [ "$LOCAL_IMPORT_HASH" = "$REMOTE_IMPORT_HASH" ]; then
+            VERIFIED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc               --command "UPDATE generations SET generated_at='$VERIFIED_AT' WHERE id='current' AND json_extract(counts_json, '$.importHash')='$LOCAL_IMPORT_HASH'"
             echo "D1_IMPORT_SKIPPED unchanged=$LOCAL_IMPORT_HASH rows_written=0"
+            echo "D1_METADATA_REFRESHED rows_written=1 verified_at=$VERIFIED_AT"
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             node scripts/guard-d1-import.mjs seed-universal/*.sql

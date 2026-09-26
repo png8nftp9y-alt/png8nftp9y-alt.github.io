@@ -49,7 +49,28 @@ function auditR2Structure(){
   const objects=JSON.parse(listed.stdout||'{}').Contents||[],referenced=new Map(),prefixes=new Map(),duplicates=new Map();
   for(const item of objects){const match=String(item.Key||'').match(/^([^/]+\/[^/]+)\/pointers\/(?:current|backup-1|backup-2)\.json$/);if(!match)continue;const read=aws(['s3','cp',`s3://${bucket}/${item.Key}`,'-','--only-show-errors']);if(read.status!==0)continue;try{const generation=JSON.parse(read.stdout).generation;if(generation){let keep=referenced.get(match[1]);if(!keep){keep=new Set();referenced.set(match[1],keep)}keep.add(generation)}}catch{}}
   for(const item of objects){const key=String(item.Key||''),prefix=key.split('/').slice(0,2).join('/')||'(root)',size=Number(item.Size||0),row=prefixes.get(prefix)||{objects:0,bytes:0,generations:new Map(),nonGenerationBytes:0};row.objects++;row.bytes+=size;const generation=key.match(/^[^/]+\/[^/]+\/generations\/([^/]+)\//);if(generation)row.generations.set(generation[1],(row.generations.get(generation[1])||0)+size);else row.nonGenerationBytes+=size;prefixes.set(prefix,row);const etag=String(item.ETag||'').replaceAll('"','');if(etag){const id=`${size}:${etag}`,dup=duplicates.get(id)||{count:0,size};dup.count++;duplicates.set(id,dup)}}
-  const result={};for(const[prefix,row]of prefixes){const keep=referenced.get(prefix)||new Set(),unused=[...row.generations].filter(([generation])=>!keep.has(generation));result[prefix]={objects:row.objects,bytes:row.bytes,generations:row.generations.size,referencedGenerations:keep.size,unreferencedGenerations:unused.length,unreferencedGenerationBytes:unused.reduce((sum,[,bytes])=>sum+bytes,0),nonGenerationBytes:row.nonGenerationBytes}}
+  const objectByKey=new Map(objects.map(item=>[String(item.Key||''),item])),etagOf=item=>String(item?.ETag||'').replaceAll('"','');
+  const result={};
+  for(const[prefix,row]of prefixes){
+    const keep=referenced.get(prefix)||new Set(),unused=[...row.generations].filter(([generation])=>!keep.has(generation));
+    const unreferencedGenerationDetails=unused.map(([generation,bytes])=>{
+      const marker=`${prefix}/generations/${generation}/`;
+      const comparedObjects=objects
+        .filter(item=>String(item.Key||'').startsWith(marker))
+        .map(item=>{
+          const key=String(item.Key||''),relativeKey=key.slice(marker.length);
+          const matchingReferencedKeys=[...keep]
+            .map(reference=>`${prefix}/generations/${reference}/${relativeKey}`)
+            .filter(referenceKey=>{
+              const reference=objectByKey.get(referenceKey);
+              return reference&&Number(reference.Size||0)===Number(item.Size||0)&&etagOf(reference)===etagOf(item);
+            });
+          return{key,relativeKey,bytes:Number(item.Size||0),etag:etagOf(item),byteIdentical:Boolean(matchingReferencedKeys.length),matchingReferencedKeys};
+        });
+      return{generation,bytes,objects:comparedObjects.length,safeToDelete:comparedObjects.length>0&&comparedObjects.every(item=>item.byteIdentical),verification:'same_size_and_r2_etag_for_every_object',comparedObjects};
+    });
+    result[prefix]={objects:row.objects,bytes:row.bytes,generations:row.generations.size,referencedGenerations:keep.size,referencedGenerationIds:[...keep],unreferencedGenerations:unused.length,unreferencedGenerationBytes:unused.reduce((sum,[,bytes])=>sum+bytes,0),unreferencedGenerationDetails,nonGenerationBytes:row.nonGenerationBytes};
+  }
   return{success:true,objects:objects.length,bytes:objects.reduce((sum,row)=>sum+Number(row.Size||0),0),duplicateBytes:[...duplicates.values()].reduce((sum,row)=>sum+(row.count>1?(row.count-1)*row.size:0),0),prefixes:result};
 }
 function persistR2Snapshot(snapshot){
