@@ -1413,3 +1413,15 @@ verificate. Sono vietate riscritture complete nei run ordinari.
 
 I motori esistenti non vengono modificati da questa decisione. La specifica
 completa è in `docs/D1_NEW_FEATURE_POLICY.md`.
+
+## Correzioni UI e diagnostica 27 settembre 2026
+
+- Dichiarata risolta l'anomalia indirizzo Darko Sartori per Rodeo Under 14/16.
+- Indoor viene mostrato anche quando è già presente nel nome del torneo, incluso Bad Waltersdorf.
+- Nelle pagine avversario il compagno appare solo nell'intestazione Doppio con e non viene ripetuto nella singola partita.
+
+## Verifica R2 e allineamento D1 27 settembre 2026
+
+- L'audit R2 identifica le generazioni non referenziate e le dichiara eliminabili solo quando ogni oggetto coincide con una copia referenziata.
+- I cicli D1 invariati aggiornano una sola riga tecnica di verifica e non riscrivono giocatori, tornei o match.
+- Il timestamp API rappresenta l'ultima verifica positiva della corrispondenza dell'import hash.

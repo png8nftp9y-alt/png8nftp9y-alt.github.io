@@ -2340,13 +2340,10 @@ function opponentHistoryPersonHtml(person, event = "") {
   return `<span class="opponentHistoryPerson">${name}${participantDesignationHtml(person.designation)}${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`;
 }
 function opponentHistoryMatchRowHtml(match, contextMatches = []) {
-  const partners = (match.partners || [])
+  const opponents = (match.opponents || [])
       .map((person) => opponentHistoryPersonHtml(person, match.event || ""))
       .join(" / "),
-    opponents = (match.opponents || [])
-      .map((person) => opponentHistoryPersonHtml(person, match.event || ""))
-      .join(" / "),
-    matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents || "Avversario da definire"}`,
+    matchup = `vs ${opponents || "Avversario da definire"}`,
     outcome =
       match.status === "completed" || match.retired || match.score
         ? matchResultText(match) || "—"
@@ -2807,7 +2804,13 @@ function tournamentSurfaceLabel(t, includeNameDuplicates = false) {
     name = readableText(t.name || t.tournamentName || ""),
     parts = [surface, environment]
       .filter((value, index, list) => value && list.findIndex(x => x.toLowerCase() === value.toLowerCase()) === index)
-      .filter(value => includeNameDuplicates || !name.toLowerCase().includes(value.toLowerCase()));
+      .filter(
+        (value) =>
+          includeNameDuplicates ||
+          (environment &&
+            value.toLowerCase() === environment.toLowerCase()) ||
+          !name.toLowerCase().includes(value.toLowerCase()),
+      );
   return parts.join(" · ");
 }
 

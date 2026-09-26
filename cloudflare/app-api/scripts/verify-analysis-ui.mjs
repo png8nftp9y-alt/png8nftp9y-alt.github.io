@@ -53,7 +53,7 @@ assert.ok(hasSource('doublesPartnerLink'), 'doubles partners must remain bold');
 assert.ok(hasSource('function loadOpponentHistory(') && hasSource('/opponent-profile?name='), 'opponent page must load current history with frozen match rankings');
 assert.ok(hasSource('function opponentTournamentEventLinks(') && hasSource('opponentTournamentDraw'), 'opponent tournaments must link event badges to draws');
 assert.ok(hasSource('gender: agendaGenderClass(match)') && hasSource('drawCode ${esc(event.gender)}'), 'opponent event badges must reuse agenda gender colors');
-assert.ok(hasSource('matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents') && hasSource('<span class="opponentHistoryOpponent unifiedMatchOpponent">${matchup}</span>'), 'opponent history rows must render partner plus vs opponent');
+assert.ok(hasSource('matchup = `vs ${opponents || "Avversario da definire"}`') && hasSource('Doppio${partner === "__double__" ? "" : ` con ${partner}`}') && !hasSource('matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents'), 'opponent doubles must show the partner only in the section heading');
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
 assert.ok(hasApiSource('universalOpponentHistory') && hasApiSource('opponentEntryTournaments') && hasApiSource('opponent_entry_profiles'), 'opponent profiles must merge Tennis Europe history with FITP and ITF tournament entries');
 assert.ok(hasSource('opponentTournamentEntry') && hasSource('tournament.acceptanceCode') && hasSource('sourceDot ${esc(source)}'), 'opponent profiles must distinguish entry-only FITP and ITF tournaments without inventing matches');
@@ -79,7 +79,7 @@ assert.ok(hasSource('matchResultText') && hasSource('data-follow-opponent') && h
 assert.ok(hasSource('nextCalendarMonth') && hasSource('retirementStatus') && hasSource('completedBy'), 'independent next month and extended retirement evidence must be present');
 assert.ok(hasSource('if (!matchResultText(m)) return ""') && (hasSource('matchResultText(m) ? `<p class="result') || hasSource('result = matchResultText(m)')), 'all public match views must render score fallback and retirement labels');
 assert.ok(hasSource('/^round\\s*\\d+$/i.test(round)'), 'numbered round-robin rounds must render as RR in opponent history');
-assert.ok(hasApiSource('partners=people.filter') && hasSource('partners ? `con ${partners} `'), 'doubles partner must appear before vs');
+assert.ok(hasApiSource('partners=people.filter') && hasSource('Doppio${partner === "__double__" ? "" : ` con ${partner}`}'), 'doubles partner must appear in the section heading and not before vs');
 assert.ok(hasApiSource("const targets=[...new Set(matches.flatMap"), 'match snapshot must backfill participant rankings by date');
 assert.ok(hasSource('https://te.tournamentsoftware.com/tournament/'), 'opponent tournament name must link to its official homepage');
 assert.ok(hasSource('bindParticipantNavigation($("profileContent"))'), 'profile and tournament pages must bind participant links');

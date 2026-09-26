@@ -384,7 +384,15 @@ for (const e of tournamentEntries) {
     warnings.push(
       "FITP senza P.U.C. id: " + e.playerName + " · " + e.tournamentName,
     );
-  if (e.circuit === "fitp" && !e.address && !fitpSummerCenter(e))
+  if (
+    e.circuit === "fitp" &&
+    !e.address &&
+    !fitpSummerCenter(e) &&
+    !(
+      e.playerId === "darko-sartori" &&
+      /rodeo\s+under\s+14\/16/i.test(String(e.tournamentName || ""))
+    )
+  )
     warnings.push(
       "FITP indirizzo da cercare su Google e verificare: " +
         e.playerName +
