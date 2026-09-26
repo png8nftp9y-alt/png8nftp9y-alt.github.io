@@ -1,6 +1,6 @@
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
-import { basename, extname } from "node:path";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { basename, extname, join } from "node:path";
 
 const verifier = "cloudflare/app-api/scripts/verify-d1-new-feature-policy.mjs";
 const helper = "cloudflare/app-api/lib/d1-incremental-sync.mjs";
@@ -17,6 +17,21 @@ const requiredTestMarkers = [
   "D1_TEST_INCOMPLETE_SOURCE_GUARD"
 ];
 
+const ignoredPrefixes = [
+  ".git/",
+  "node_modules/",
+  "dist/",
+  "history/",
+  "cloudflare/app-api/migrations/"
+];
+
+const sourceExtensions = new Set([
+  ".js", ".mjs", ".cjs", ".ts", ".mts", ".cts", ".sh", ".py", ".sql", ".yml", ".yaml"
+]);
+
+const mutationPattern =
+  /\b(INSERT\s+INTO|UPDATE\s+[A-Za-z0-9_."'\`]+\s+SET|DELETE\s+FROM|REPLACE\s+INTO|UPSERT)\b|wrangler\s+d1\s+(execute|migrations)|\/query\b/i;
+
 function git(args) {
   try {
     return execFileSync("git", args, { encoding: "utf8" });
@@ -25,10 +40,32 @@ function git(args) {
   }
 }
 
+function ignored(file) {
+  return ignoredPrefixes.some(prefix => file.startsWith(prefix)) ||
+    file === verifier ||
+    file === helper ||
+    file.includes("/test/") ||
+    file.includes("/tests/");
+}
+
+function allTestFiles(root = ".") {
+  const found = [];
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const path = join(root, entry.name).replace(/^\.\//, "");
+    if (entry.isDirectory()) {
+      if (ignoredPrefixes.some(prefix => path.startsWith(prefix.replace(/\/$/, "")))) continue;
+      found.push(...allTestFiles(path));
+    } else if (/\.test\.(mjs|js|cjs)$/i.test(entry.name)) {
+      found.push(path);
+    }
+  }
+  return found;
+}
+
 const diffs = [
-  git(["diff", "--unified=0", "--", "cloudflare/app-api"]),
-  git(["diff", "--cached", "--unified=0", "--", "cloudflare/app-api"]),
-  git(["diff", "HEAD^", "HEAD", "--unified=0", "--", "cloudflare/app-api"])
+  git(["diff", "--unified=0"]),
+  git(["diff", "--cached", "--unified=0"]),
+  git(["diff", "HEAD^", "HEAD", "--unified=0"])
 ].filter(Boolean);
 
 const affected = new Set();
@@ -44,12 +81,11 @@ for (const diff of diffs) {
 
     if (
       file &&
-      file !== verifier &&
-      file !== helper &&
-      !file.includes("/test/") &&
+      !ignored(file) &&
+      sourceExtensions.has(extname(file).toLowerCase()) &&
       line.startsWith("+") &&
       !line.startsWith("+++") &&
-      /\b(INSERT|UPDATE|DELETE|REPLACE)\b|wrangler\s+d1\s+execute|\/query\b/i.test(line)
+      mutationPattern.test(line)
     ) {
       affected.add(file);
     }
@@ -57,29 +93,37 @@ for (const diff of diffs) {
 }
 
 const failures = [];
+const tests = allTestFiles();
 
 for (const file of affected) {
   if (!existsSync(file)) continue;
 
   const source = readFileSync(file, "utf8");
 
-  for (const marker of requiredSourceMarkers) {
-    if (!source.includes(marker)) {
-      failures.push(`${file}: manca "${marker}"`);
-    }
+  if (!source.includes("D1_WRITE_POLICY: incremental")) {
+    failures.push(`${file}: manca "D1_WRITE_POLICY: incremental"`);
   }
 
-  const stem = basename(file, extname(file));
-  const candidates = [
-    `cloudflare/app-api/test/${stem}.test.mjs`,
-    `cloudflare/app-api/tests/${stem}.test.mjs`,
-    `cloudflare/app-api/scripts/${stem}.test.mjs`
-  ];
+  const extension = extname(file).toLowerCase();
+  const isJavaScript = [".js", ".mjs", ".cjs", ".ts", ".mts", ".cts"].includes(extension);
+  const isWorkflowOrShell = [".yml", ".yaml", ".sh"].includes(extension);
 
-  const testFile = candidates.find(existsSync);
+  if (isJavaScript && !source.includes("buildIncrementalSyncPlan")) {
+    failures.push(`${file}: deve usare buildIncrementalSyncPlan`);
+  }
+
+  if (
+    isWorkflowOrShell &&
+    !/(guard-d1-import|import-hash|incremental)/i.test(source)
+  ) {
+    failures.push(`${file}: manca un guard incrementale prima della scrittura D1`);
+  }
+
+  const stem = basename(file, extension);
+  const testFile = tests.find(path => basename(path).startsWith(stem + ".test."));
 
   if (!testFile) {
-    failures.push(`${file}: manca il test incrementale ${stem}.test.mjs`);
+    failures.push(`${file}: manca un test incrementale associato a ${stem}`);
     continue;
   }
 
@@ -101,9 +145,10 @@ for (const file of affected) {
 }
 
 if (failures.length) {
-  console.error("\nD1 NEW FEATURE POLICY: BLOCCATA");
+  console.error("\nD1 GLOBAL NEW FEATURE POLICY: BLOCCATA");
   for (const failure of failures) console.error(`- ${failure}`);
+  console.error("Prima importazione completa; poi soltanto aggiunte, modifiche e cancellazioni reali; dati identici = zero scritture.");
   process.exit(1);
 }
 
-console.log("D1 NEW FEATURE POLICY: OK");
+console.log(`D1 GLOBAL NEW FEATURE POLICY: OK (file D1 controllati: ${affected.size})`);
