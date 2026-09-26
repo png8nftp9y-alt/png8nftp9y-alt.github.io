@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { gunzipSync } from 'node:zlib';
 
 const token = process.env.CLOUDFLARE_API_TOKEN;
 const account = process.env.CLOUDFLARE_ACCOUNT_ID;
@@ -50,6 +51,10 @@ function auditR2Structure(){
   for(const item of objects){const match=String(item.Key||'').match(/^([^/]+\/[^/]+)\/pointers\/(?:current|backup-1|backup-2)\.json$/);if(!match)continue;const read=aws(['s3','cp',`s3://${bucket}/${item.Key}`,'-','--only-show-errors']);if(read.status!==0)continue;try{const generation=JSON.parse(read.stdout).generation;if(generation){let keep=referenced.get(match[1]);if(!keep){keep=new Set();referenced.set(match[1],keep)}keep.add(generation)}}catch{}}
   for(const item of objects){const key=String(item.Key||''),prefix=key.split('/').slice(0,2).join('/')||'(root)',size=Number(item.Size||0),row=prefixes.get(prefix)||{objects:0,bytes:0,generations:new Map(),nonGenerationBytes:0};row.objects++;row.bytes+=size;const generation=key.match(/^[^/]+\/[^/]+\/generations\/([^/]+)\//);if(generation)row.generations.set(generation[1],(row.generations.get(generation[1])||0)+size);else row.nonGenerationBytes+=size;prefixes.set(prefix,row);const etag=String(item.ETag||'').replaceAll('"','');if(etag){const id=`${size}:${etag}`,dup=duplicates.get(id)||{count:0,size};dup.count++;duplicates.set(id,dup)}}
   const objectByKey=new Map(objects.map(item=>[String(item.Key||''),item])),etagOf=item=>String(item?.ETag||'').replaceAll('"','');
+  const readGenerationJson=key=>{const read=spawnSync('aws',['--endpoint-url',endpoint,'s3','cp',`s3://${bucket}/${key}`,'-','--only-show-errors'],{env,maxBuffer:64*1024*1024});if(read.status!==0)return null;try{const body=key.endsWith('.gz')?gunzipSync(read.stdout):read.stdout;return JSON.parse(body.toString('utf8'))}catch{return null}};
+  const identityContainers=new Set(['relations','targets','tournaments','players','results','participants','draws','matches','entries']);
+  const identityFields=['id','competitionId','tournamentId','sourceTournamentId','playerId','worldTennisId','matchId','profileId'];
+  const semanticIds=(value,path='',out=new Set())=>{if(Array.isArray(value)){value.forEach((item,index)=>semanticIds(item,`${path}[]`,out));return out}if(!value||typeof value!=='object')return out;const parts=identityFields.filter(field=>value[field]!=null&&String(value[field])!=='').map(field=>`${field}:${String(value[field])}`);if(parts.length)out.add(`record:${parts.join('|')}`);for(const[key,child]of Object.entries(value)){if(identityContainers.has(key)&&child&&typeof child==='object'&&!Array.isArray(child))for(const childKey of Object.keys(child))out.add(`${key}:${childKey}`);semanticIds(child,path?`${path}.${key}`:key,out)}return out};
   const result={};
   for(const[prefix,row]of prefixes){
     const keep=referenced.get(prefix)||new Set(),unused=[...row.generations].filter(([generation])=>!keep.has(generation));
@@ -67,7 +72,8 @@ function auditR2Structure(){
             });
           return{key,relativeKey,bytes:Number(item.Size||0),etag:etagOf(item),byteIdentical:Boolean(matchingReferencedKeys.length),matchingReferencedKeys};
         });
-      return{generation,bytes,objects:comparedObjects.length,safeToDelete:comparedObjects.length>0&&comparedObjects.every(item=>item.byteIdentical),verification:'same_size_and_r2_etag_for_every_object',comparedObjects};
+      const semanticComparisons=comparedObjects.map(item=>{const candidate=readGenerationJson(item.key),candidateIds=candidate?semanticIds(candidate):new Set(),referencedIds=new Set();for(const reference of keep){const referenceKey=`${prefix}/generations/${reference}/${item.relativeKey}`,document=readGenerationJson(referenceKey);if(document)for(const id of semanticIds(document))referencedIds.add(id)}const missing=[...candidateIds].filter(id=>!referencedIds.has(id));return{key:item.key,parsed:Boolean(candidate),candidateIdentityCount:candidateIds.size,referencedIdentityCount:referencedIds.size,missingIdentityCount:missing.length,missingIdentityExamples:missing.slice(0,25),semanticCovered:Boolean(candidate)&&missing.length===0}}),semanticCovered=semanticComparisons.every(item=>item.semanticCovered);
+      return{generation,bytes,objects:comparedObjects.length,safeToDelete:comparedObjects.length>0&&comparedObjects.every(item=>item.byteIdentical),semanticCovered,safeToDeleteAfterSemanticReview:semanticCovered,verification:'same_size_and_r2_etag_plus_semantic_identity_coverage',comparedObjects,semanticComparisons};
     });
     result[prefix]={objects:row.objects,bytes:row.bytes,generations:row.generations.size,referencedGenerations:keep.size,referencedGenerationIds:[...keep],unreferencedGenerations:unused.length,unreferencedGenerationBytes:unused.reduce((sum,[,bytes])=>sum+bytes,0),unreferencedGenerationDetails,nonGenerationBytes:row.nonGenerationBytes};
   }
