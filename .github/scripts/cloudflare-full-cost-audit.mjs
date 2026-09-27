@@ -1,3 +1,4 @@
+// R2 semantic audit rerun after ITF archive recovery.
 import { spawnSync } from 'node:child_process';
 import { gunzipSync } from 'node:zlib';
 
