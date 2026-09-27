@@ -30,7 +30,7 @@ const paritySets={
  team_excluded:new Set([...ids].filter(id=>isTeamCompetition(catalogById.get(id)))),
  ordinary:queueIds('ordinary'),
  extraordinary:queueIds('extraordinary'),
- future_beyond_d3:new Set([...ids].filter(id=>String(catalogById.get(id)?.startDate||'')>windowEnd))
+ future_beyond_d3:new Set([...ids].filter(id=>!isTeamCompetition(catalogById.get(id))&&String(catalogById.get(id)?.startDate||'')>windowEnd))
 };
 const memberships=new Map([...ids].map(id=>[id,Object.entries(paritySets).filter(([,set])=>set.has(id)).map(([name])=>name)]));
 const parityOverlaps=[...memberships].filter(([,groups])=>groups.length>1).map(([competitionId,groups])=>({competitionId,groups})).sort((a,b)=>a.competitionId.localeCompare(b.competitionId));
