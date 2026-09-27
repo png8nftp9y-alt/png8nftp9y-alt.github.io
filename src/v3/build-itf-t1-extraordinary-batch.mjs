@@ -36,7 +36,7 @@ const activeBacklog=BACKLOG
  .filter(Boolean);
 
 const concludedPending=Object.values(state.tournaments||{})
- .filter(t=>t?.decision==='pending'&&t.competitionId&&t.endDate&&t.endDate<TODAY)
+ .filter(t=>t?.decision==='pending'&&t.competitionId&&(!t.endDate||t.endDate<TODAY))
  .sort((a,b)=>String(a.checkedAt||'').localeCompare(String(b.checkedAt||''))||String(a.competitionId).localeCompare(String(b.competitionId)));
 
 const queueMap=new Map();
