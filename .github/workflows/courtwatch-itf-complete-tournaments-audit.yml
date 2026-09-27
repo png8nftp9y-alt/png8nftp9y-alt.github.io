@@ -1,0 +1,40 @@
+name: Court Watch ITF complete tournaments audit
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: python -m pip install --quiet awscli
+      - name: Download certified ITF history blocks
+        run: |
+          set -euo pipefail
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          prefix="itf/history-draws"
+          mkdir -p /tmp/itf-complete-audit
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/pointers/current.json" /tmp/itf-pointer.json --only-show-errors
+          generation="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/itf-pointer.json')).generation")"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/generations/$generation/manifest.json" /tmp/itf-manifest.json --only-show-errors
+          node -e "const m=require('/tmp/itf-manifest.json');if(m.status!=='itf_history_draw_archive_complete'||m.complete!==4291||m.missing||m.retry||m.unreadable)process.exit(2)"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/generations/$generation/" /tmp/itf-blocks --recursive --exclude "*" --include "blocks/*.tar.gz" --only-show-errors
+          find /tmp/itf-blocks -name '*.tar.gz' -print0 | while IFS= read -r -d '' file; do tar -xzf "$file" -C /tmp/itf-complete-audit; done
+      - name: Count fully archived tournaments
+        run: node src/v3/audit-itf-complete-tournaments.mjs /tmp/itf-complete-audit
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-complete-tournaments-audit
+          path: dist/v3/audits/itf-complete-tournaments.json
+          retention-days: 30
