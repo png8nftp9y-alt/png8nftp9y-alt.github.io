@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-27T19:55:42.377Z",
+  "generatedAt": "2026-09-27T19:59:47.704Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,27 +8,27 @@
     "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
-    "declaredSections": 6,
-    "requestedSections": 5,
-    "acquiredSections": 4,
-    "unusedAlternativeSections": 1,
+    "declaredSections": 8,
+    "requestedSections": 6,
+    "acquiredSections": 3,
+    "unusedAlternativeSections": 2,
     "declaredButUnusedSections": 0,
     "resolvedSections": 5,
-    "missingSections": 1,
-    "newSectionsCached": 4,
+    "missingSections": 3,
+    "newSectionsCached": 3,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 1,
-    "retrySections": 1,
-    "technicalErrorSections": 0,
+    "newPolicyResolutions": 2,
+    "retrySections": 3,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 1,
+    "notPublishedOrIncompleteSections": 2,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 59,
+    "globalCompleteTournaments": 60,
     "globalCancelledNoDraws": 4,
-    "globalPendingTotal": 61,
-    "globalPendingTechnical": 9,
+    "globalPendingTotal": 62,
+    "globalPendingTechnical": 10,
     "globalPendingPublication": 52,
     "technicalPendingCompetitionIds": [
       "J-J100-BIH-2026-001",
@@ -39,7 +39,8 @@
       "J-J100-USA-2026-005",
       "J-J200-CHN-2026-001",
       "J-J200-JPN-2026-001",
-      "J-J200-URU-2026-001"
+      "J-J200-URU-2026-001",
+      "J-J30-BEL-2026-007"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-ARG-2026-003",
@@ -98,16 +99,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-ALG-2026-003",
-      "tournamentName": "J30 Algiers",
+      "competitionId": "J-J30-BEL-2026-007",
+      "tournamentName": "J30 Liege",
       "decision": "pending",
       "playersFound": [],
-      "declaredSections": 6,
-      "acquiredSections": 4,
-      "unusedAlternativeSections": 1,
+      "declaredSections": 8,
+      "acquiredSections": 3,
+      "unusedAlternativeSections": 2,
       "declaredButUnusedSections": 0,
       "resolvedSections": 5,
-      "missingSections": 1,
+      "missingSections": 3,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -140,6 +141,20 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
+          "acquired": false,
+          "resolved": true,
+          "status": "unused_alternative_structure"
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -147,9 +162,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         }
       ],
       "families": [
@@ -179,7 +194,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 18,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -192,7 +207,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 28,
+              "players": 16,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -201,11 +216,31 @@
         },
         {
           "family": "G-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 23,
+              "players": 0,
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 16,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -214,19 +249,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 18,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge"
     }
   ]
 }
