@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-27T22:26:06.510Z",
+  "generatedAt": "2026-09-27T22:30:51.498Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,28 +8,28 @@
     "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
-    "declaredSections": 8,
+    "declaredSections": 6,
     "requestedSections": 6,
-    "acquiredSections": 3,
-    "unusedAlternativeSections": 2,
+    "acquiredSections": 5,
+    "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
     "resolvedSections": 5,
-    "missingSections": 3,
-    "newSectionsCached": 3,
+    "missingSections": 1,
+    "newSectionsCached": 5,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 2,
-    "retrySections": 3,
+    "newPolicyResolutions": 0,
+    "retrySections": 1,
     "technicalErrorSections": 1,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 2,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 67,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 104,
-    "globalPendingTechnical": 41,
-    "globalPendingPublication": 63,
+    "globalPendingTotal": 106,
+    "globalPendingTechnical": 42,
+    "globalPendingPublication": 64,
     "technicalPendingCompetitionIds": [
       "J-J100-BIH-2026-001",
       "J-J100-CAN-2026-002",
@@ -71,7 +71,8 @@
       "J-J60-ESP-2026-008",
       "J-J60-SRI-2026-001",
       "J-J60-SRI-2026-002",
-      "J-J60-USA-2026-005"
+      "J-J60-USA-2026-005",
+      "J-JGS-USA-2026-001"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-ARG-2026-003",
@@ -136,35 +137,29 @@
       "J-J60-ECU-2026-003",
       "J-J60-GHA-2026-001",
       "J-J60-GHA-2026-002",
-      "J-J60-MRI-2026-001"
+      "J-J60-MRI-2026-001",
+      "J-J60-USA-2026-008"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J60-USA-2026-005",
-      "tournamentName": "J60 Dallas",
+      "competitionId": "J-JGS-USA-2026-001",
+      "tournamentName": "US Open Junior Tennis Championships",
       "decision": "pending",
       "playersFound": [],
-      "declaredSections": 8,
-      "acquiredSections": 3,
-      "unusedAlternativeSections": 2,
+      "declaredSections": 6,
+      "acquiredSections": 5,
+      "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
       "resolvedSections": 5,
-      "missingSections": 3,
+      "missingSections": 1,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
-          "acquired": false,
+          "acquired": true,
           "resolved": true,
-          "status": "unused_alternative_structure"
-        },
-        {
-          "event": "B-S-M-RR",
-          "family": "B-S-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "status": "acquired"
         },
         {
           "event": "B-S-Q-KO",
@@ -183,16 +178,9 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": false,
+          "acquired": true,
           "resolved": true,
-          "status": "unused_alternative_structure"
-        },
-        {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "status": "acquired"
         },
         {
           "event": "G-S-Q-KO",
@@ -212,21 +200,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
+              "players": 64,
+              "error": null,
+              "failureType": null,
               "resolved": true
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
             }
           ]
         },
@@ -236,7 +217,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -249,7 +230,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 28,
+              "players": 64,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -258,21 +239,14 @@
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
+              "players": 64,
+              "error": null,
+              "failureType": null,
               "resolved": true
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
             }
           ]
         },
@@ -282,7 +256,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 13,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
