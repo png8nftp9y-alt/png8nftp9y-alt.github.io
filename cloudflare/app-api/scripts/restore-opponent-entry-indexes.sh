@@ -2,6 +2,7 @@
 set -euo pipefail
 
 readonly ITF_MIN_PERMANENT_PARTICIPANTS=10000
+readonly TE_MIN_PERMANENT_PARTICIPANTS=1000
 mkdir -p tmp/opponent-entries
 
 get_object(){ npx wrangler r2 object get "$R2_BUCKET/$1" --remote --config wrangler.generated.jsonc --file "$2"; }
@@ -40,5 +41,29 @@ restore_itf(){
   echo "Selected ITF opponent-entry slot=$best_slot participants=$best_count"
 }
 
+restore_tennis_europe(){
+  local slot pointer generation candidate count best_count=0 best_candidate='' best_slot=''
+  for slot in current backup-1 backup-2; do
+    pointer="tmp/opponent-entries/te-$slot-pointer.json"
+    if ! get_object "tennis-europe/cache/pointers/$slot.json" "$pointer"; then continue; fi
+    generation="$(jq -er .generation "$pointer")"
+    candidate="tmp/opponent-entries/te-$slot.json.gz"
+    if ! get_object "tennis-europe/cache/generations/$generation/tennis_europe_participant_cache.json.gz" "$candidate"; then continue; fi
+    gzip -t "$candidate"
+    count="$(gzip -cd "$candidate" | jq -r '[.tournaments[]?.participants[]?] | length')"
+    echo "Tennis Europe opponent-entry candidate slot=$slot participants=$count"
+    if test "$count" -ge "$TE_MIN_PERMANENT_PARTICIPANTS" && test "$count" -gt "$best_count"; then
+      best_count="$count"; best_candidate="$candidate"; best_slot="$slot"
+    fi
+  done
+  if test -z "$best_candidate"; then
+    echo "No complete Tennis Europe participant cache for opponent entries." >&2
+    exit 1
+  fi
+  cp "$best_candidate" tmp/opponent-entries/tennis_europe_participant_cache.json.gz
+  echo "Selected Tennis Europe opponent-entry slot=$best_slot participants=$best_count"
+}
+
 restore_fitp
 restore_itf
+restore_tennis_europe
