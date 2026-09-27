@@ -40,6 +40,6 @@ jobs:
         run: node src/v3/audit-itf-complete-tournaments.mjs /tmp/itf-complete-audit
       - uses: actions/upload-artifact@v4
         with:
-          name: itf-complete-tournaments-audit-v3
+          name: itf-complete-tournaments-audit-v4
           path: dist/v3/audits/itf-complete-tournaments.json
           retention-days: 30
