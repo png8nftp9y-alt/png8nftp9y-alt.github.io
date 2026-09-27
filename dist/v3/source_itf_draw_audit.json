@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-27T21:28:00.112Z",
+  "generatedAt": "2026-09-27T21:50:35.201Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,21 +9,21 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 6,
-    "acquiredSections": 5,
+    "requestedSections": 2,
+    "acquiredSections": 4,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 5,
-    "missingSections": 1,
-    "newSectionsCached": 5,
+    "resolvedSections": 4,
+    "missingSections": 2,
+    "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 1,
-    "technicalErrorSections": 1,
+    "retrySections": 2,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 0,
-    "confirmedInDraw": 0,
+    "notPublishedOrIncompleteSections": 2,
+    "confirmedInDraw": 1,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 64,
     "globalCancelledNoDraws": 8,
@@ -131,16 +131,18 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-CHI-2026-002",
-      "tournamentName": "J60 Concepcion",
+      "competitionId": "J-J60-ITA-2026-001",
+      "tournamentName": "J60 Pescara",
       "decision": "pending",
-      "playersFound": [],
+      "playersFound": [
+        "martina-danesi"
+      ],
       "declaredSections": 6,
-      "acquiredSections": 5,
+      "acquiredSections": 4,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 5,
-      "missingSections": 1,
+      "resolvedSections": 4,
+      "missingSections": 2,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -159,9 +161,9 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "G-S-M-KO",
@@ -192,7 +194,7 @@
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 32,
+              "players": 28,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -214,14 +216,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -231,7 +233,7 @@
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 32,
+              "players": 28,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -244,7 +246,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 16,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -258,14 +260,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
