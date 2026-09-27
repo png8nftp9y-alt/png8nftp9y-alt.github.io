@@ -34,7 +34,7 @@ jobs:
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/courtwatch-v3-itf-t-minus-one.yml/dispatches" \
-            -d "$(jq -n --arg ref main --arg ids "$IDS" '{ref:$ref,inputs:{competition_id:$ids}}')"
+            -d "$(jq -n --arg ref main --arg ids "$IDS" '{ref:$ref,inputs:{competition_id:$ids,extraordinary_chain:true}}')"
           echo "Dispatched extraordinary ITF T-1 recovery for $IDS"
       - uses: actions/upload-artifact@v4
         with:
