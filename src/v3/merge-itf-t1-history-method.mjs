@@ -57,7 +57,7 @@ const acquiredSections=eventInventory.filter(section=>eventCache[section.event]?
 const declaredButUnusedSections=eventInventory.filter(section=>eventCache[section.event]?.resolution==='declared_but_unused').length;
 const unusedAlternativeSections=eventInventory.filter(section=>eventCache[section.event]?.terminalAlternative&&eventCache[section.event]?.resolution!=='declared_but_unused').length;
 const resolvedSections=acquiredSections+unusedAlternativeSections+declaredButUnusedSections;
-const missingSections=Math.max(0,eventInventory.length-resolvedSections),complete=eventInventory.length>0&&missingSections===0,cancelledName=/\bcancel(?:led|ed)\b/i.test(String(tournament.tournamentName||inventory.tournamentName||'')),cancelledNoDraws=inventory.status==='complete'&&eventInventory.length===0&&cancelledName,decision=complete?'complete':cancelledNoDraws?'cancelled_no_draws':'pending';
+const missingSections=Math.max(0,eventInventory.length-resolvedSections),complete=eventInventory.length>0&&missingSections===0,cancelledName=/\bcancel(?:led|ed)\b/i.test(String(tournament.tournamentName||inventory.tournamentName||'')),cancelledNoDraws=!inventory.inventoryError&&eventInventory.length===0&&cancelledName,decision=complete?'complete':cancelledNoDraws?'cancelled_no_draws':'pending';
 const found=new Map();
 for(const section of eventInventory)for(const raw of eventCache[section.event]?.players||[])for(const player of watched)if(aliases(player).some(alias=>norm(raw.name)===alias))found.set(player.id,{player,raw});
 for(const {player,raw} of found.values()){
