@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-27T23:19:43.368Z",
+  "generatedAt": "2026-09-27T23:32:13.914Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,20 +9,20 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 8,
-    "requestedSections": 5,
-    "acquiredSections": 1,
+    "requestedSections": 2,
+    "acquiredSections": 4,
     "unusedAlternativeSections": 2,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 3,
-    "missingSections": 5,
+    "resolvedSections": 6,
+    "missingSections": 2,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 2,
-    "retrySections": 5,
+    "newPolicyResolutions": 0,
+    "retrySections": 2,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 5,
+    "notPublishedOrIncompleteSections": 2,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 76,
@@ -134,16 +134,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-MEX-2026-011",
-      "tournamentName": "J60 Leon",
+      "competitionId": "J-J30-BEL-2026-007",
+      "tournamentName": "J30 Liege",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 8,
-      "acquiredSections": 1,
+      "acquiredSections": 4,
       "unusedAlternativeSections": 2,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 3,
-      "missingSections": 5,
+      "resolvedSections": 6,
+      "missingSections": 2,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -169,9 +169,9 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-M-KO",
@@ -190,16 +190,16 @@
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -229,7 +229,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -238,14 +238,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 16,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -271,27 +271,27 @@
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 16,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 14,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
