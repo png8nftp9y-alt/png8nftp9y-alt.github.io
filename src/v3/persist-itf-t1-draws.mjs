@@ -48,7 +48,7 @@ for(const file of files){
 const changed=newTournaments+newMatches+changedMatches+newResults+changedResults;
 const now=new Date().toISOString();
 if(changed){
- if(newTournaments)await fs.writeFile('dist/v3/universal/tournaments.json',JSON.stringify({...tournamentsDoc,generatedAt:now,tournaments:tournamentRows.sort((a,b)=>a.id.localeCompare(b.id))},null,2)+'\\n');
+ if(newTournaments)await fs.writeFile('dist/v3/universal/tournaments.json',JSON.stringify({...tournamentsDoc,generatedAt:now,tournaments:tournamentRows.sort((a,b)=>a.id.localeCompare(b.id))},null,2)+'\n');
  await fs.writeFile('dist/v3/universal/matches.json',JSON.stringify({...matchesDoc,generatedAt:now,matches:[...matches.values()].sort((a,b)=>a.id.localeCompare(b.id))},null,2)+'\n');
  await fs.writeFile('dist/v3/universal/results.json',JSON.stringify({...resultsDoc,generatedAt:now,results:[...results.values()].sort((a,b)=>a.id.localeCompare(b.id))},null,2)+'\n');
 }
