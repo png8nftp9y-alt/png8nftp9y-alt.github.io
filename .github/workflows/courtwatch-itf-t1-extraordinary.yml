@@ -1,13 +1,6 @@
 name: Court Watch ITF T-1 extraordinary concluded recovery
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '7,37 * * * *'
-  push:
-    branches: [main]
-    paths:
-      - 'src/v3/build-itf-t1-extraordinary-batch.mjs'
-      - '.github/workflows/courtwatch-itf-t1-extraordinary.yml'
 
 permissions:
   contents: read
