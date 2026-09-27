@@ -1,0 +1,80 @@
+name: Court Watch ITF complete draw archive D1 backfill
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Download the certified 4,291-document archive and live draws
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet awscli
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          prefix="itf/history-draws"
+          mkdir -p /tmp/itf-draw-archive /tmp/itf-live-draws /tmp/itf-blocks
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/pointers/current.json" /tmp/itf-pointer.json --only-show-errors
+          generation="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/itf-pointer.json')).generation")"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/generations/$generation/manifest.json" /tmp/itf-manifest.json --only-show-errors
+          node -e "const m=require('/tmp/itf-manifest.json');if(m.status!=='itf_history_draw_archive_complete'||m.complete!==4291||m.missing||m.retry||m.unreadable)process.exit(2)"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/generations/$generation/blocks/" /tmp/itf-blocks --recursive --exclude "*" --include "*.tar.gz" --only-show-errors
+          test "$(find /tmp/itf-blocks -name '*.tar.gz' | wc -l)" -eq 17
+          find /tmp/itf-blocks -name '*.tar.gz' -print0 | while IFS= read -r -d '' file; do tar -xzf "$file" -C /tmp/itf-draw-archive; done
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/live-draws/" /tmp/itf-live-draws --recursive --only-show-errors
+      - name: Build idempotent ITF-only D1 seed
+        run: node src/v3/build-itf-draw-d1-seed.mjs /tmp/itf-draw-archive /tmp/itf-live-draws
+      - name: Configure D1
+        working-directory: cloudflare/app-api
+        run: |
+          npm install
+          node scripts/configure-d1.mjs
+      - name: Import every acquired ITF match without rewriting identical rows
+        working-directory: cloudflare/app-api
+        run: |
+          set -euo pipefail
+          for sql_file in ../../seed-itf-draws/*.sql; do
+            echo "Importing $sql_file"
+            imported=0
+            for attempt in 1 2 3 4; do
+              if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"; then imported=1; break; fi
+              sleep $((attempt * 5))
+            done
+            test "$imported" -eq 1
+          done
+      - name: Verify complete ITF archive parity in D1
+        working-directory: cloudflare/app-api
+        run: |
+          set -euo pipefail
+          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --json --command "SELECT (SELECT COUNT(*) FROM tournaments WHERE circuit='itf') AS tournaments,(SELECT COUNT(*) FROM matches WHERE circuit='itf') AS matches,(SELECT COUNT(*) FROM results WHERE circuit='itf') AS results" > /tmp/itf-d1-counts.json
+          node - <<'NODE'
+          const fs=require('fs'),expected=require('../../dist/v3/audits/itf-draw-d1-sync.json'),raw=JSON.parse(fs.readFileSync('/tmp/itf-d1-counts.json','utf8'));
+          let row;const walk=v=>{if(row)return;if(Array.isArray(v))for(const x of v)walk(x);else if(v&&typeof v==='object'){if(Number.isFinite(Number(v.matches))&&Number.isFinite(Number(v.results)))row=v;else for(const x of Object.values(v))walk(x)}};walk(raw);
+          if(!row)throw new Error('D1 count response unreadable');
+          for(const key of ['tournaments','matches','results'])if(Number(row[key])<Number(expected[key]))throw new Error(`D1 ITF ${key} below archive: ${row[key]} < ${expected[key]}`);
+          console.log('ITF_D1_PARITY='+JSON.stringify({expected,remote:row}));
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-complete-draw-d1-backfill-audit
+          path: dist/v3/audits/itf-draw-d1-sync.json
+          retention-days: 30
