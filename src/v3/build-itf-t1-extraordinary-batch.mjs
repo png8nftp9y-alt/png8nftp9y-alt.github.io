@@ -30,12 +30,29 @@ J-J60-ALB-2026-002 J-J60-ARM-2026-009 J-J60-GHA-2026-002 J-J60-MRI-2026-001
 const state=await readJson('history/itf_draw_target_db.json',{tournaments:{}});
 const catalog=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]});
 const catalogById=new Map((catalog.tournaments||[]).map(t=>[String(t.competitionId||'').toUpperCase(),t]));
-const cancelledPending=BACKLOG.filter(id=>state.tournaments?.[id]?.decision==='pending'&&Number(state.tournaments[id].declaredSections||0)===0&&/\bcancel(?:led|ed)\b/i.test(String(catalogById.get(id)?.tournamentName||''))).map(id=>catalogById.get(id)).filter(Boolean);
-const unseen=BACKLOG.filter(id=>!state.tournaments?.[id]).map(id=>catalogById.get(id)).filter(Boolean);
-const concludedPending=Object.values(state.tournaments||{}).filter(t=>t?.decision==='pending'&&t.competitionId&&t.endDate&&t.endDate<TODAY).sort((a,b)=>String(a.checkedAt||'').localeCompare(String(b.checkedAt||''))||String(a.competitionId).localeCompare(String(b.competitionId)));
-const mode=cancelledPending.length?'cancelled_no_draws_recheck':unseen.length?'unarchived_concluded':'pending_concluded';
-const selected=(cancelledPending.length?cancelledPending:unseen.length?unseen:concludedPending).slice(0,2);
+const activeBacklog=BACKLOG
+ .filter(id=>!['complete','cancelled_no_draws'].includes(state.tournaments?.[id]?.decision))
+ .map(id=>catalogById.get(id)||state.tournaments?.[id])
+ .filter(Boolean);
+
+const concludedPending=Object.values(state.tournaments||{})
+ .filter(t=>t?.decision==='pending'&&t.competitionId&&t.endDate&&t.endDate<TODAY)
+ .sort((a,b)=>String(a.checkedAt||'').localeCompare(String(b.checkedAt||''))||String(a.competitionId).localeCompare(String(b.competitionId)));
+
+const queueMap=new Map();
+for(const tournament of [...activeBacklog,...concludedPending]){
+ const id=String(tournament.competitionId||'').toUpperCase();
+ if(id&&!queueMap.has(id))queueMap.set(id,tournament);
+}
+const queue=[...queueMap.values()];
+const unseenIds=new Set(BACKLOG.filter(id=>!state.tournaments?.[id]));
+queue.sort((a,b)=>
+ Number(unseenIds.has(String(b.competitionId).toUpperCase()))-Number(unseenIds.has(String(a.competitionId).toUpperCase()))||
+ String(a.checkedAt||'').localeCompare(String(b.checkedAt||''))||
+ String(a.competitionId).localeCompare(String(b.competitionId))
+);
+const selected=queue.slice(0,2);
 const competitionIds=selected.map(t=>String(t.competitionId).toUpperCase());
-await writeJson('dist/v3/itf_t1_extraordinary_batch.json',{version:3,generatedAt:new Date().toISOString(),today:TODAY,mode,backlogTotal:BACKLOG.length,cancelledPendingToClose:cancelledPending.length,backlogUnseen:unseen.length,pendingConcluded:concludedPending.length,selected:selected.map(t=>({competitionId:t.competitionId,tournamentName:t.tournamentName||'',endDate:t.endDate||'',checkedAt:t.checkedAt||null}))});
+await writeJson('dist/v3/itf_t1_extraordinary_batch.json',{version:4,generatedAt:new Date().toISOString(),today:TODAY,extraordinaryTotal:queue.length,activeBacklog:activeBacklog.length,pendingConcluded:concludedPending.length,selected:selected.map(t=>({competitionId:t.competitionId,tournamentName:t.tournamentName||'',endDate:t.endDate||'',checkedAt:t.checkedAt||null}))});
 if(process.env.GITHUB_OUTPUT)await fs.appendFile(process.env.GITHUB_OUTPUT,`competition_ids=${competitionIds.join(',')}\nselected=${competitionIds.length}\n`);
-console.log(JSON.stringify({today:TODAY,mode,backlogTotal:BACKLOG.length,cancelledPendingToClose:cancelledPending.length,backlogUnseen:unseen.length,pendingConcluded:concludedPending.length,selected:competitionIds},null,2));
+console.log(JSON.stringify({today:TODAY,extraordinaryTotal:queue.length,activeBacklog:activeBacklog.length,pendingConcluded:concludedPending.length,selected:competitionIds},null,2));
