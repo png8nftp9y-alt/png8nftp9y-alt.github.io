@@ -30,6 +30,8 @@ forbidText(opponentEntries,"DELETE FROM opponent_entry_profiles WHERE circuit IN
 requireText(opponentEntries,'riskyDelta>maxDelta','delta distruttivo profili avversari senza limite di sicurezza');
 requireText(opponentEntries,'previous.payload===payload','profili avversari invariati non confrontati');
 requireText(opponentRestore,'test "$count" -gt "$best_count"','snapshot ITF avversari non selezionato per completezza massima');
+requireText(opponentEntries,"row.circuit==='tennis-europe'",'iscrizioni future Tennis Europe non indicizzate per avversario');
+requireText(opponentRestore,'tennis_europe_participant_cache.json.gz','cache Tennis Europe non ripristinata per indice iscrizioni');
 forbidText(teOop,'INSERT OR REPLACE INTO tournaments','tornei Tennis Europe riscritti senza confronto');
 forbidText(teOop,'INSERT OR REPLACE INTO tennis_europe_players','identità Tennis Europe riscritte senza confronto');
 forbidText(teCandidates,'INSERT OR REPLACE INTO app_match_candidates','candidati Tennis Europe riscritti senza confronto');
