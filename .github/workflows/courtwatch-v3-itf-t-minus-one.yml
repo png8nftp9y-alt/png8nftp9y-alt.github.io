@@ -7,6 +7,21 @@ on:
         description: Optional comma-separated pending competition IDs
         required: false
         type: string
+      extraordinary_chain:
+        description: Continue the bounded extraordinary chain after success
+        required: false
+        type: boolean
+        default: false
+      extraordinary_remaining:
+        description: Remaining extraordinary batches allowed
+        required: false
+        type: string
+        default: '0'
+      extraordinary_previous_ids:
+        description: IDs processed by this extraordinary batch
+        required: false
+        type: string
+        default: ''
   # Dispatched every 15 minutes by the Cloudflare watchdog ITF cron.
   push:
     branches: [main]
@@ -14,7 +29,7 @@ on:
       - 'src/v3/build-itf-t1-tournament-matrix.mjs'
       - '.github/workflows/courtwatch-v3-itf-t-minus-one.yml'
 
-permissions: {contents: write}
+permissions: {contents: write, actions: write}
 concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: false}
 jobs:
   select:
@@ -180,6 +195,8 @@ jobs:
           node src/v3/maintain-itf-database.mjs
           node src/v3/validate-itf-system.mjs
           node src/v3/entries-engine.mjs
+          node src/v3/build-itf-t1-extraordinary-batch.mjs
+          node src/v3/build-itf-t1-admin-status.mjs
       - name: Publish changed database generation to R2
         run: bash src/v3/itf-r2-cache.sh publish
       - name: Commit validated T-1 decisions and map
@@ -189,7 +206,7 @@ jobs:
           git config user.email courtwatch-bot@users.noreply.github.com
           snapshot=/tmp/courtwatch-itf-publish
           rm -rf "$snapshot"; mkdir -p "$snapshot"
-          files=("dist/v3/source_itf_entries.json" "dist/v3/source_itf_draw_audit.json" "dist/v3/itf_system_diagnostics.json" "history/itf_draw_target_db.json" "history/itf_player_tournament_db.json" "history/itf_database_audit.json" "dist/v3/universal/tournaments.json" "dist/v3/universal/matches.json" "dist/v3/universal/results.json")
+          files=("dist/v3/source_itf_entries.json" "dist/v3/source_itf_draw_audit.json" "dist/v3/itf_system_diagnostics.json" "history/itf_draw_target_db.json" "history/itf_player_tournament_db.json" "history/itf_database_audit.json" "dist/v3/universal/tournaments.json" "dist/v3/universal/matches.json" "dist/v3/universal/results.json" "dist/v3/itf_t1_queue_status.json" "dist/v3/itf_t1_extraordinary_batch.json")
           for file in "${files[@]}"; do test -f "$file" || continue; mkdir -p "$snapshot/$(dirname "$file")"; cp "$file" "$snapshot/$file"; done
           for attempt in 1 2 3; do
             git fetch origin main; git reset --hard origin/main
@@ -198,7 +215,7 @@ jobs:
             cp -R "$snapshot"/* ./
             node src/v3/merge-itf-draw-target-ownership.mjs t-minus-one /tmp/itf-current-state.json /tmp/itf-incoming-state.json history/itf_draw_target_db.json
             node src/v3/entries-engine.mjs
-            git add dist/v3/source_itf_entries.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json dist/v3/universal/tournaments.json dist/v3/universal/matches.json dist/v3/universal/results.json
+            git add dist/v3/source_itf_entries.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json dist/v3/universal/tournaments.json dist/v3/universal/matches.json dist/v3/universal/results.json dist/v3/itf_t1_queue_status.json dist/v3/itf_t1_extraordinary_batch.json
             if git diff --cached --quiet; then echo "No validated ITF T-1 changes"; exit 0; fi
             git commit -m "Publish validated ITF T-1 decisions"
             git push origin HEAD:main && exit 0
@@ -214,3 +231,24 @@ jobs:
             history/itf_database_audit.json
             dist/v3/audits/itf-t1-persistence.json
           retention-days: 14
+
+  continue-extraordinary:
+    needs: review
+    if: ${{ success() && inputs.extraordinary_chain == true && fromJSON(inputs.extraordinary_remaining) > 0 }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch next bounded extraordinary selector
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REMAINING: ${{ inputs.extraordinary_remaining }}
+          PREVIOUS_IDS: ${{ inputs.extraordinary_previous_ids }}
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/courtwatch-itf-t1-extraordinary.yml/dispatches" \
+            -d "$(jq -n --arg ref main --arg remaining "$REMAINING" --arg previous "$PREVIOUS_IDS" '{ref:$ref,inputs:{remaining:$remaining,previous_ids:$previous}}')"
+          echo "Next extraordinary selector dispatched with remaining=$REMAINING"
