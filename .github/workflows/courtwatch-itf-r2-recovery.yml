@@ -53,7 +53,9 @@ jobs:
           set -euo pipefail
           bash src/v3/itf-r2-cache.sh restore
           endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
-          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/generations/cb8dcf33c760fb7864fce61f0038dfd6cf4c598298ad1aaa63cec66285c35edf/itf_participant_cache.json.gz" /tmp/itf-cache-retained.gz --only-show-errors
+          retained_generation="cb8dcf33c760fb7864fce61f0038dfd6cf4c598298ad1aaa63cec66285c35edf"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/generations/$retained_generation/itf_participant_cache.json.gz" /tmp/itf-cache-retained.gz --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/generations/$retained_generation/itf_draw_target_db.json" /tmp/itf-draw-targets-retained.json --only-show-errors
           node --input-type=module <<'JS'
           import fs from 'node:fs';
           import {gunzipSync,gzipSync} from 'node:zlib';
@@ -64,7 +66,18 @@ jobs:
           const existing=new Set(current.participants.map(p=>p.competitionId));
           const added=retained.participants.filter(p=>!existing.has(p.competitionId));
           fs.writeFileSync('history/itf_participant_cache.json.gz',gzipSync(JSON.stringify({...current,generatedAt:new Date().toISOString(),participants:[...current.participants,...added]})));
-          console.log(JSON.stringify({current:current.participants.length,recovered:added.length,total:current.participants.length+added.length}));
+          const currentTargets=JSON.parse(fs.readFileSync('history/itf_draw_target_db.json','utf8'));
+          const retainedTargets=JSON.parse(fs.readFileSync('/tmp/itf-draw-targets-retained.json','utf8'));
+          if(!Array.isArray(currentTargets.targets)||!Array.isArray(retainedTargets.targets))throw new Error('Unexpected ITF draw-target schema');
+          const recoveredTargets=retainedTargets.targets.filter(row=>String(row.tournamentId)==='1100203396');
+          if(recoveredTargets.length<3)throw new Error('J30 Adelaide draw targets unexpectedly incomplete');
+          const signature=row=>['tournamentId','tourType','circuitCode','playerTypeCode','matchTypeCode','eventClassificationCode','drawsheetStructureCode'].map(key=>String(row[key]??'')).join('|');
+          const signatures=new Set(currentTargets.targets.map(signature));
+          const addedTargets=recoveredTargets.filter(row=>!signatures.has(signature(row)));
+          currentTargets.targets.push(...addedTargets);
+          currentTargets.generatedAt=new Date().toISOString();
+          fs.writeFileSync('history/itf_draw_target_db.json',JSON.stringify(currentTargets,null,2)+'\n');
+          console.log(JSON.stringify({currentParticipants:current.participants.length,recoveredParticipants:added.length,totalParticipants:current.participants.length+added.length,recoveredTournamentId:'1100203396',recoveredDrawTargets:addedTargets.length}));
           JS
           bash src/v3/itf-r2-cache.sh publish
       - name: Identify retained permanent archives
