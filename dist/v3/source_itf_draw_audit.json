@@ -1,41 +1,42 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-27T19:38:49.649Z",
+  "generatedAt": "2026-09-27T19:43:44.765Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
     "completeTournaments": 0,
-    "cancelledNoDrawsTournaments": 1,
-    "pendingTournaments": 0,
-    "declaredSections": 0,
-    "requestedSections": 0,
-    "acquiredSections": 0,
+    "cancelledNoDrawsTournaments": 0,
+    "pendingTournaments": 1,
+    "declaredSections": 6,
+    "requestedSections": 6,
+    "acquiredSections": 5,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 0,
-    "missingSections": 0,
-    "newSectionsCached": 0,
+    "resolvedSections": 5,
+    "missingSections": 1,
+    "newSectionsCached": 5,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 0,
-    "technicalErrorSections": 0,
+    "retrySections": 1,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 57,
-    "globalCancelledNoDraws": 3,
-    "globalPendingTotal": 56,
-    "globalPendingTechnical": 5,
+    "globalCancelledNoDraws": 4,
+    "globalPendingTotal": 57,
+    "globalPendingTechnical": 6,
     "globalPendingPublication": 51,
     "technicalPendingCompetitionIds": [
       "J-J100-BIH-2026-001",
       "J-J100-CAN-2026-002",
       "J-J100-ESP-2026-007",
       "J-J100-HKG-2026-001",
-      "J-J100-ITA-2026-001"
+      "J-J100-ITA-2026-001",
+      "J-J100-USA-2026-005"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-ARG-2026-003",
@@ -93,19 +94,141 @@
   },
   "audit": [
     {
-      "competitionId": "J-J100-TUR-2026-003",
-      "tournamentName": "J100 Istanbul (CANCELLED)",
-      "decision": "cancelled_no_draws",
+      "competitionId": "J-J100-USA-2026-005",
+      "tournamentName": "J100 San Antonio",
+      "decision": "pending",
       "playersFound": [],
-      "declaredSections": 0,
-      "acquiredSections": 0,
+      "declaredSections": 6,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 0,
-      "sections": [],
-      "families": [],
-      "eventFailure": null
+      "resolvedSections": 5,
+      "missingSections": 1,
+      "sections": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
+        }
+      ],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 27,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 18,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
+            }
+          ]
+        }
+      ],
+      "eventFailure": "GetDrawsheet_incapsula_challenge"
     }
   ]
 }
