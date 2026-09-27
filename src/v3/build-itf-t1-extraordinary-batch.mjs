@@ -30,10 +30,16 @@ J-J60-ALB-2026-002 J-J60-ARM-2026-009 J-J60-GHA-2026-002 J-J60-MRI-2026-001
 const state=await readJson('history/itf_draw_target_db.json',{tournaments:{}});
 const catalog=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]});
 const catalogById=new Map((catalog.tournaments||[]).map(t=>[String(t.competitionId||'').toUpperCase(),t]));
-const activeBacklog=BACKLOG
+const DYNAMIC_SAFETY_FROM='2026-09-27';
+const isTeamCompetition=t=>String(t?.category||'').toUpperCase()==='GC'||/\b(?:team finals|davis cup junior|billie jean king cup)\b/i.test(String(t?.tournamentName||''));
+const historicalBacklog=BACKLOG
  .filter(id=>!['complete','cancelled_no_draws'].includes(state.tournaments?.[id]?.decision))
  .map(id=>catalogById.get(id)||state.tournaments?.[id])
  .filter(Boolean);
+const futureSafetyBacklog=(catalog.tournaments||[])
+ .filter(t=>t?.competitionId&&t.endDate&&t.endDate>=DYNAMIC_SAFETY_FROM&&t.endDate<TODAY&&!isTeamCompetition(t))
+ .filter(t=>!['complete','cancelled_no_draws'].includes(state.tournaments?.[String(t.competitionId).toUpperCase()]?.decision));
+const activeBacklog=[...new Map([...historicalBacklog,...futureSafetyBacklog].map(t=>[String(t.competitionId).toUpperCase(),t])).values()];
 
 const concludedPending=Object.values(state.tournaments||{})
  .filter(t=>t?.decision==='pending'&&t.competitionId&&(!t.endDate||t.endDate<TODAY))
@@ -45,7 +51,7 @@ for(const tournament of [...activeBacklog,...concludedPending]){
  if(id&&!queueMap.has(id))queueMap.set(id,tournament);
 }
 const queue=[...queueMap.values()];
-const unseenIds=new Set(BACKLOG.filter(id=>!state.tournaments?.[id]));
+const unseenIds=new Set(activeBacklog.map(t=>String(t.competitionId).toUpperCase()).filter(id=>!state.tournaments?.[id]));
 queue.sort((a,b)=>
  Number(unseenIds.has(String(b.competitionId).toUpperCase()))-Number(unseenIds.has(String(a.competitionId).toUpperCase()))||
  String(a.checkedAt||'').localeCompare(String(b.checkedAt||''))||
