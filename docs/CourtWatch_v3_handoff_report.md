@@ -1425,3 +1425,12 @@ completa è in `docs/D1_NEW_FEATURE_POLICY.md`.
 - L'audit R2 identifica le generazioni non referenziate e le dichiara eliminabili solo quando ogni oggetto coincide con una copia referenziata.
 - I cicli D1 invariati aggiornano una sola riga tecnica di verifica e non riscrivono giocatori, tornei o match.
 - Il timestamp API rappresenta l'ultima verifica positiva della corrispondenza dell'import hash.
+
+## Archivio tabelloni ITF in R2 e D1 — 27 settembre 2026
+
+- Il backfill certificato run `36332685246` ha letto i 17 blocchi storici R2 e i documenti live: 4.352 task unici, 4.313 documenti completi e 39 retry conservati.
+- D1 contiene ora 88.077 match ITF e 88.077 risultati ITF, con parità esatta rispetto ai documenti completi acquisiti; zero documenti illeggibili e zero associazioni mancanti.
+- T−1 ordinario salva i documenti in R2; lo straordinario inoltra i tornei allo stesso motore. Il workflow `Court Watch ITF acquired draws D1 sync` importa automaticamente ogni nuova acquisizione completa.
+- Tornei, match e risultati ITF usano ID canonici stabili. Gli UPSERT aggiornano esclusivamente payload differenti; dati identici producono zero scritture e una sorgente incompleta non cancella dati validi.
+- Il rebuild D1 generale esclude l'archivio ITF dalle cancellazioni di riconciliazione, impedendo che una proiezione corrente incompleta elimini lo storico.
+- Il futuro motore risultati/OOP ITF deve usare lo stesso importatore canonico. Il controllo CI `Court Watch global D1 incremental policy` e il test `build-itf-draw-d1-seed.test.mjs` bloccano modifiche prive di ID stabili, UPSERT condizionali, protezione delle fonti incomplete o zero-write sui dati invariati.
