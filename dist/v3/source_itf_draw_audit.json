@@ -1,40 +1,41 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-27T19:31:18.890Z",
+  "generatedAt": "2026-09-27T19:35:38.969Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
+    "pendingTournaments": 0,
     "declaredSections": 6,
-    "requestedSections": 2,
-    "acquiredSections": 4,
+    "requestedSections": 6,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 4,
-    "missingSections": 2,
-    "newSectionsCached": 0,
+    "resolvedSections": 6,
+    "missingSections": 0,
+    "newSectionsCached": 6,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 2,
+    "retrySections": 0,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 2,
-    "confirmedInDraw": 1,
+    "notPublishedOrIncompleteSections": 0,
+    "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 55,
+    "globalCompleteTournaments": 56,
     "globalCancelledNoDraws": 2,
-    "globalPendingTotal": 55,
-    "globalPendingTechnical": 4,
+    "globalPendingTotal": 56,
+    "globalPendingTechnical": 5,
     "globalPendingPublication": 51,
     "technicalPendingCompetitionIds": [
       "J-J100-BIH-2026-001",
       "J-J100-CAN-2026-002",
       "J-J100-ESP-2026-007",
-      "J-J100-HKG-2026-001"
+      "J-J100-HKG-2026-001",
+      "J-J100-ITA-2026-001"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-ARG-2026-003",
@@ -92,18 +93,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-ITA-2026-001",
-      "tournamentName": "J60 Pescara",
-      "decision": "pending",
-      "playersFound": [
-        "martina-danesi"
-      ],
+      "competitionId": "J-J100-JPN-2026-001",
+      "tournamentName": "J100 Kawaguchi",
+      "decision": "complete",
+      "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 4,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 4,
-      "missingSections": 2,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -122,9 +121,9 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-M-KO",
@@ -143,9 +142,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -155,7 +154,7 @@
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 28,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -168,7 +167,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 32,
+              "players": 31,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -177,14 +176,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -194,7 +193,7 @@
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 28,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -216,14 +215,14 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
