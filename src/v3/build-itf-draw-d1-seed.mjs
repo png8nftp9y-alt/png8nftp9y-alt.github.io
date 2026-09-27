@@ -23,8 +23,8 @@ const payload=value=>esc(stable(value));
 const different=columns=>columns.map(column=>`${column} IS NOT excluded.${column}`).join(' OR ');
 const tournamentMap=new Map(),matchMap=new Map(),resultMap=new Map(),unmapped=[];
 for(const doc of complete){
- const competitionId=String(doc.competitionId||'').toUpperCase(),event=String(doc.event||'unknown'),source=catalogById.get(competitionId);
- if(!competitionId||!source){unmapped.push({competitionId,event});continue}
+ const competitionId=String(doc.competitionId||'').toUpperCase(),event=String(doc.event||'unknown'),source=catalogById.get(competitionId)||doc;
+ if(!competitionId){unmapped.push({competitionId,event});continue}
  const tournamentId='tournament_itf_'+crypto.createHash('sha256').update('itf|'+competitionId).digest('hex').slice(0,24);
  tournamentMap.set(tournamentId,{id:tournamentId,circuit:'itf',sourceTournamentId:competitionId,name:source.tournamentName||source.name||competitionId,location:source.location||'',surface:source.surface||'',environment:source.environment||source.indoorOutdoor||'',startDate:source.startDate||'',endDate:source.endDate||'',officialStartDate:source.officialStartDate||source.startDate||'',status:'archived',source:{circuit:'itf',sourceId:competitionId,sourceUrl:source.sourceUrl||doc.sourceUrl||''}});
  for(const raw of doc.matches||[]){
