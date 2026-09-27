@@ -19,7 +19,23 @@ const pending=new Set(Object.values(state.tournaments||{}).filter(row=>row?.deci
 const complete=new Set([...archiveComplete,...liveComplete]);
 const ids=new Set((catalog.tournaments||[]).map(row=>String(row.competitionId||'').toUpperCase()).filter(Boolean));
 const today=new Date().toISOString().slice(0,10);
+const windowEnd=String(queueStatus.windowEnd||new Date(Date.parse(today+'T00:00:00Z')+3*864e5).toISOString().slice(0,10));
 const catalogById=new Map((catalog.tournaments||[]).map(row=>[String(row.competitionId||'').toUpperCase(),row]).filter(([id])=>id));
+const catalogOnly=set=>new Set([...set].filter(id=>ids.has(id)));
+const queueIds=key=>catalogOnly(new Set((queueStatus[key]?.tournaments||[]).map(row=>String(row.competitionId||'').toUpperCase()).filter(Boolean)));
+const isTeamCompetition=t=>String(t?.category||'').toUpperCase()==='GC'||/\b(?:team finals|davis cup junior|billie jean king cup)\b/i.test(String(t?.tournamentName||t?.name||''));
+const paritySets={
+ complete:catalogOnly(complete),
+ cancelled_no_draws:catalogOnly(new Set(Object.values(state.tournaments||{}).filter(row=>row?.decision==='cancelled_no_draws').map(row=>String(row.competitionId||'').toUpperCase()).filter(Boolean))),
+ team_excluded:new Set([...ids].filter(id=>isTeamCompetition(catalogById.get(id)))),
+ ordinary:queueIds('ordinary'),
+ extraordinary:queueIds('extraordinary'),
+ future_beyond_d3:new Set([...ids].filter(id=>String(catalogById.get(id)?.startDate||'')>windowEnd))
+};
+const memberships=new Map([...ids].map(id=>[id,Object.entries(paritySets).filter(([,set])=>set.has(id)).map(([name])=>name)]));
+const parityOverlaps=[...memberships].filter(([,groups])=>groups.length>1).map(([competitionId,groups])=>({competitionId,groups})).sort((a,b)=>a.competitionId.localeCompare(b.competitionId));
+const parityUnclassified=[...memberships].filter(([,groups])=>groups.length===0).map(([competitionId])=>competitionId).sort();
+const parity={catalogTournaments:ids.size,windowEnd,categoryCounts:Object.fromEntries(Object.entries(paritySets).map(([name,set])=>[name,set.size])),classifiedExactlyOnce:[...memberships.values()].filter(groups=>groups.length===1).length,unclassifiedCount:parityUnclassified.length,overlapCount:parityOverlaps.length,unclassified:parityUnclassified,overlaps:parityOverlaps,status:parityUnclassified.length||parityOverlaps.length?'red':'green'};
 const classifications={future_not_due:[],active_not_certified:[],concluded_no_archive:[],concluded_archive_incomplete:[],state_not_complete:[]};
 for(const id of ids){
  if(complete.has(id)||pending.has(id))continue;
@@ -39,8 +55,8 @@ const participantsByTournament=new Map();
 for(const row of participantCache.participants||[]){const id=String(row.competitionId||'').toUpperCase();if(id&&ids.has(id))participantsByTournament.set(id,(participantsByTournament.get(id)||0)+1)}
 const entryListTournaments=[...ids].sort().map(id=>{const tournament=catalogById.get(id)||{},participantCount=participantsByTournament.get(id)||0;return{competitionId:id,tournamentName:tournament.tournamentName||tournament.name||'',startDate:tournament.startDate||null,endDate:tournament.endDate||null,participantCount,status:participantCount?'stored_snapshot_present_not_completeness_certified':'no_stored_snapshot',completenessCertified:false}});
 const entryListCounts={catalogTournaments:ids.size,withStoredParticipantSnapshot:entryListTournaments.filter(row=>row.participantCount>0).length,withoutStoredParticipantSnapshot:entryListTournaments.filter(row=>!row.participantCount).length,storedParticipants:[...participantsByTournament.values()].reduce((a,b)=>a+b,0),currentScanTournamentsChecked:Number(acceptance.tournamentsChecked||0),currentScanParticipantsFound:Number(acceptance.participantsFound||0),fullyCertifiedCompleteEntryLists:0,certificationLimitation:'The cache records participants but not an expected official row total or per-tournament successful-empty scan evidence; full entry-list completeness cannot be certified from current data.'};
-const report={version:3,generatedAt:new Date().toISOString(),coverageFrom:'2025-12-18',today,catalogTournaments:ids.size,drawQueues:{ordinary:queueStatus.ordinary||{total:0,missingDraws:0,tournaments:[]},extraordinary:queueStatus.extraordinary||{total:0,missingDraws:0,tournaments:[]},distinctQueuedTournaments:new Set([...(queueStatus.ordinary?.tournaments||[]).map(row=>row.competitionId),...(queueStatus.extraordinary?.tournaments||[]).map(row=>row.competitionId)]).size},entryLists:{counts:entryListCounts,tournaments:entryListTournaments},archiveTaskFiles:files.length,archiveTournamentIds:archive.size,archiveCompleteTournaments:archiveComplete.size,liveCompleteTournaments:liveComplete.size,completeTournamentUnion:[...complete].filter(id=>ids.has(id)).length,pendingTournaments:[...pending].filter(id=>ids.has(id)).length,notCertifiedTournaments:[...ids].filter(id=>!complete.has(id)&&!pending.has(id)).length,classificationCounts:Object.fromEntries(Object.entries(classifications).map(([key,rows])=>[key,rows.length])),recoverableConcludedTournaments:recoverable.length,recoveryBatchCount:recoveryBatches.length,classifications,recoveryBatches,archiveIdsOutsideCatalog:[...archiveComplete].filter(id=>!ids.has(id)).sort(),invalidFiles:invalid.length};
+const report={version:4,generatedAt:new Date().toISOString(),coverageFrom:'2025-12-18',today,catalogTournaments:ids.size,parity,drawQueues:{ordinary:queueStatus.ordinary||{total:0,missingDraws:0,tournaments:[]},extraordinary:queueStatus.extraordinary||{total:0,missingDraws:0,tournaments:[]},distinctQueuedTournaments:new Set([...(queueStatus.ordinary?.tournaments||[]).map(row=>row.competitionId),...(queueStatus.extraordinary?.tournaments||[]).map(row=>row.competitionId)]).size},entryLists:{counts:entryListCounts,tournaments:entryListTournaments},archiveTaskFiles:files.length,archiveTournamentIds:archive.size,archiveCompleteTournaments:archiveComplete.size,liveCompleteTournaments:liveComplete.size,completeTournamentUnion:[...complete].filter(id=>ids.has(id)).length,pendingTournaments:[...pending].filter(id=>ids.has(id)).length,notCertifiedTournaments:[...ids].filter(id=>!complete.has(id)&&!pending.has(id)).length,classificationCounts:Object.fromEntries(Object.entries(classifications).map(([key,rows])=>[key,rows.length])),recoverableConcludedTournaments:recoverable.length,recoveryBatchCount:recoveryBatches.length,classifications,recoveryBatches,archiveIdsOutsideCatalog:[...archiveComplete].filter(id=>!ids.has(id)).sort(),invalidFiles:invalid.length};
 await fs.mkdir('dist/v3/audits',{recursive:true});
 await fs.writeFile('dist/v3/audits/itf-complete-tournaments.json',JSON.stringify(report,null,2)+'\n');
 console.log('ITF_COMPLETE_TOURNAMENT_AUDIT='+JSON.stringify(report));
-if(invalid.length)process.exitCode=2;
+if(invalid.length||parity.status==='red')process.exitCode=2;
