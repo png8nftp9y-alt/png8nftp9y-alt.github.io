@@ -69,16 +69,18 @@ jobs:
           const currentTargets=JSON.parse(fs.readFileSync('history/itf_draw_target_db.json','utf8'));
           const retainedTargets=JSON.parse(fs.readFileSync('/tmp/itf-draw-targets-retained.json','utf8'));
           const targetId='1100203396';
-          const findTargetArray=value=>{if(Array.isArray(value)&&value.some(row=>row&&typeof row==='object'&&String(row.tournamentId)===targetId))return value;if(value&&typeof value==='object')for(const child of Object.values(value)){const found=findTargetArray(child);if(found)return found}return null};
-          const findWritableArray=value=>{if(Array.isArray(value)&&value.some(row=>row&&typeof row==='object'&&row.tournamentId!=null))return value;if(value&&typeof value==='object')for(const child of Object.values(value)){const found=findWritableArray(child);if(found)return found}return null};
-          const retainedArray=findTargetArray(retainedTargets),currentArray=findTargetArray(currentTargets)||findWritableArray(currentTargets);
-          if(!retainedArray||!currentArray)throw new Error('ITF draw-target collection not found');
-          const recoveredTargets=retainedArray.filter(row=>String(row.tournamentId)===targetId);
-          if(recoveredTargets.length<3)throw new Error('J30 Adelaide draw targets unexpectedly incomplete');
+          const isRecord=value=>value&&typeof value==='object'&&!Array.isArray(value)&&value.tournamentId!=null;
+          const collect=(value,out=[])=>{if(Array.isArray(value)){value.forEach((row,key)=>{if(isRecord(row)&&String(row.tournamentId)===targetId)out.push({key,row});else collect(row,out)});return out}if(value&&typeof value==='object')for(const[key,row]of Object.entries(value)){if(isRecord(row)&&String(row.tournamentId)===targetId)out.push({key,row});else collect(row,out)}return out};
+          const findContainer=value=>{if(Array.isArray(value)&&value.some(isRecord))return value;if(value&&typeof value==='object'){if(Object.values(value).some(isRecord))return value;for(const child of Object.values(value)){const found=findContainer(child);if(found)return found}}return null};
+          const recoveredEntries=collect(retainedTargets),currentContainer=findContainer(currentTargets);
+          if(recoveredEntries.length<3||!currentContainer)throw new Error('ITF draw-target records or destination not found');
           const signature=row=>['tournamentId','tourType','circuitCode','playerTypeCode','matchTypeCode','eventClassificationCode','drawsheetStructureCode'].map(key=>String(row[key]??'')).join('|');
-          const signatures=new Set(currentArray.map(signature));
-          const addedTargets=recoveredTargets.filter(row=>!signatures.has(signature(row)));
-          currentArray.push(...addedTargets);
+          const currentRows=Array.isArray(currentContainer)?currentContainer:Object.values(currentContainer).filter(isRecord);
+          const signatures=new Set(currentRows.map(signature));
+          const addedEntries=recoveredEntries.filter(({row})=>!signatures.has(signature(row)));
+          if(Array.isArray(currentContainer))currentContainer.push(...addedEntries.map(({row})=>row));
+          else for(const{key,row}of addedEntries){let destination=key,n=1;while(Object.hasOwn(currentContainer,destination))destination=`${key}:recovered-${n++}`;currentContainer[destination]=row}
+          const addedTargets=addedEntries.map(({row})=>row);
           currentTargets.generatedAt=new Date().toISOString();
           fs.writeFileSync('history/itf_draw_target_db.json',JSON.stringify(currentTargets,null,2)+'\n');
           console.log(JSON.stringify({currentParticipants:current.participants.length,recoveredParticipants:added.length,totalParticipants:current.participants.length+added.length,recoveredTournamentId:'1100203396',recoveredDrawTargets:addedTargets.length}));
