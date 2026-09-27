@@ -1,0 +1,50 @@
+name: Court Watch ITF T-1 extraordinary concluded recovery
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '7,37 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/build-itf-t1-extraordinary-batch.mjs'
+      - '.github/workflows/courtwatch-itf-t1-extraordinary.yml'
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: courtwatch-itf-t1-extraordinary-dispatch
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - id: select
+        name: Select two concluded pending tournaments
+        run: node src/v3/build-itf-t1-extraordinary-batch.mjs
+      - name: Dispatch isolated T-1 recovery
+        if: steps.select.outputs.selected != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IDS: ${{ steps.select.outputs.competition_ids }}
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/courtwatch-v3-itf-t-minus-one.yml/dispatches" \
+            -d "$(jq -n --arg ref main --arg ids "$IDS" '{ref:$ref,inputs:{competition_id:$ids}}')"
+          echo "Dispatched extraordinary ITF T-1 recovery for $IDS"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-t1-extraordinary-selection
+          path: dist/v3/itf_t1_extraordinary_batch.json
+          retention-days: 14
