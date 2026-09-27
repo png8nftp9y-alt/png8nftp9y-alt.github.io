@@ -2,6 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
+// D1_WRITE_POLICY: incremental
+// buildIncrementalSyncPlan contract: stable IDs, conditional UPSERTs, no archive DELETE.
 
 const roots=process.argv.slice(2);
 if(!roots.length)throw new Error('Pass at least one directory containing ITF draw documents');
