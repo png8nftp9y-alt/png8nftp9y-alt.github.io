@@ -5,7 +5,7 @@ readonly CORE_FILES=(itf_participant_cache.json.gz itf_players_database.json.gz 
 readonly STATE_FILES=(itf_draw_target_db.json itf_player_tournament_db.json itf_database_audit.json)
 readonly FILES=("${CORE_FILES[@]}" "${STATE_FILES[@]}")
 aws_r2(){ aws --endpoint-url "$ENDPOINT" "$@"; }
-prune(){ node src/v3/prune-r2-generations.mjs "$PREFIX" cb8dcf33c760fb7864fce61f0038dfd6cf4c598298ad1aaa63cec66285c35edf; }
+prune(){ node src/v3/prune-r2-generations.mjs "$PREFIX"; }
 empty_file(){ case "$1" in itf_participant_cache.json.gz) printf '%s' '{"version":4,"generatedAt":null,"participants":[]}'|gzip -n > "$DIR/$1";; itf_players_database.json.gz) printf '%s' '{"version":1,"generatedAt":null,"status":"complete","players":[]}'|gzip -n > "$DIR/$1";; itf_results_database.json.gz) printf '%s' '{"version":1,"generatedAt":null,"status":"complete","matches":[]}'|gzip -n > "$DIR/$1";; esac; }
 validate(){ local f;for f in "${CORE_FILES[@]}";do gzip -t "$DIR/$f";done;for f in "${STATE_FILES[@]}";do jq -e 'type=="object"' "$DIR/$f" >/dev/null;done; }
 restore(){
