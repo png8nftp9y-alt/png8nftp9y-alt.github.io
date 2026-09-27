@@ -19,6 +19,11 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: python -m pip install --quiet awscli
+      - name: Restore current ITF database and rebuild live queues
+        run: |
+          bash src/v3/itf-r2-cache.sh restore
+          node src/v3/build-itf-t1-extraordinary-batch.mjs
+          node src/v3/build-itf-t1-admin-status.mjs
       - name: Download certified ITF history blocks
         run: |
           set -euo pipefail
@@ -31,10 +36,10 @@ jobs:
           node -e "const m=require('/tmp/itf-manifest.json');if(m.status!=='itf_history_draw_archive_complete'||m.complete!==4291||m.missing||m.retry||m.unreadable)process.exit(2)"
           aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/$prefix/generations/$generation/" /tmp/itf-blocks --recursive --exclude "*" --include "blocks/*.tar.gz" --only-show-errors
           find /tmp/itf-blocks -name '*.tar.gz' -print0 | while IFS= read -r -d '' file; do tar -xzf "$file" -C /tmp/itf-complete-audit; done
-      - name: Classify complete, pending and recoverable tournaments
+      - name: Audit draws, ordinary and extraordinary queues, and entry lists
         run: node src/v3/audit-itf-complete-tournaments.mjs /tmp/itf-complete-audit
       - uses: actions/upload-artifact@v4
         with:
-          name: itf-complete-tournaments-audit-v2
+          name: itf-complete-tournaments-audit-v3
           path: dist/v3/audits/itf-complete-tournaments.json
           retention-days: 30
