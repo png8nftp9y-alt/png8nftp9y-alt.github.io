@@ -1,0 +1,81 @@
+name: Court Watch ITF T-1 artifact persistence recovery
+on:
+  workflow_dispatch:
+    inputs:
+      run_ids:
+        description: Comma-separated T-1 run IDs to recover
+        required: true
+        default: '36328514674,36330308145'
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: courtwatch-itf-t1-persistence-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Download T-1 draw artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_IDS: ${{ inputs.run_ids }}
+        run: |
+          set -euo pipefail
+          mkdir -p recovered
+          IFS=',' read -ra ids <<< "$RUN_IDS"
+          for raw in "${ids[@]}"; do
+            id="$(echo "$raw" | tr -d '[:space:]')"
+            test -n "$id"
+            mkdir -p "recovered/$id"
+            gh run download "$id" --repo "$GITHUB_REPOSITORY" --pattern 'itf-t1-draw-[0-9]*' --dir "recovered/$id"
+          done
+          find recovered -name '*.json.gz' -type f | grep -q .
+      - name: Configure R2
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_ACCESS_KEY_ID" && test -n "$R2_SECRET_ACCESS_KEY" && test -n "$R2_BUCKET"
+          echo "R2_ACCOUNT_ID=$R2_ACCOUNT_ID" >> "$GITHUB_ENV"
+          echo "R2_BUCKET=$R2_BUCKET" >> "$GITHUB_ENV"
+          echo "AWS_ACCESS_KEY_ID=$R2_ACCESS_KEY_ID" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$R2_SECRET_ACCESS_KEY" >> "$GITHUB_ENV"
+          echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
+          python -m pip install --quiet awscli
+      - name: Persist recovered draws and build incremental D1 projection
+        run: |
+          set -euo pipefail
+          node src/v3/persist-itf-t1-draws.mjs recovered
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          aws --endpoint-url "$endpoint" s3 sync dist/v3/itf-t1-r2-stage "s3://$R2_BUCKET/itf/live-draws" --size-only --only-show-errors
+      - name: Commit incremental match projection
+        run: |
+          set -euo pipefail
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git add dist/v3/universal/matches.json dist/v3/universal/results.json
+          if git diff --cached --quiet; then
+            echo "No new or changed D1 match rows"
+            exit 0
+          fi
+          git commit -m "Persist recovered ITF T-1 matches"
+          git pull --rebase origin main
+          git push origin main
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-t1-persistence-recovery-audit
+          path: dist/v3/audits/itf-t1-persistence.json
+          retention-days: 30
