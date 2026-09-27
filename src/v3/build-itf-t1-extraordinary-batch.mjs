@@ -30,11 +30,12 @@ J-J60-ALB-2026-002 J-J60-ARM-2026-009 J-J60-GHA-2026-002 J-J60-MRI-2026-001
 const state=await readJson('history/itf_draw_target_db.json',{tournaments:{}});
 const catalog=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]});
 const catalogById=new Map((catalog.tournaments||[]).map(t=>[String(t.competitionId||'').toUpperCase(),t]));
+const cancelledPending=BACKLOG.filter(id=>state.tournaments?.[id]?.decision==='pending'&&Number(state.tournaments[id].declaredSections||0)===0&&/\bcancel(?:led|ed)\b/i.test(String(catalogById.get(id)?.tournamentName||''))).map(id=>catalogById.get(id)).filter(Boolean);
 const unseen=BACKLOG.filter(id=>!state.tournaments?.[id]).map(id=>catalogById.get(id)).filter(Boolean);
 const concludedPending=Object.values(state.tournaments||{}).filter(t=>t?.decision==='pending'&&t.competitionId&&t.endDate&&t.endDate<TODAY).sort((a,b)=>String(a.checkedAt||'').localeCompare(String(b.checkedAt||''))||String(a.competitionId).localeCompare(String(b.competitionId)));
-const mode=unseen.length?'unarchived_concluded':'pending_concluded';
-const selected=(unseen.length?unseen:concludedPending).slice(0,2);
+const mode=cancelledPending.length?'cancelled_no_draws_recheck':unseen.length?'unarchived_concluded':'pending_concluded';
+const selected=(cancelledPending.length?cancelledPending:unseen.length?unseen:concludedPending).slice(0,2);
 const competitionIds=selected.map(t=>String(t.competitionId).toUpperCase());
-await writeJson('dist/v3/itf_t1_extraordinary_batch.json',{version:2,generatedAt:new Date().toISOString(),today:TODAY,mode,backlogTotal:BACKLOG.length,backlogUnseen:unseen.length,pendingConcluded:concludedPending.length,selected:selected.map(t=>({competitionId:t.competitionId,tournamentName:t.tournamentName||'',endDate:t.endDate||'',checkedAt:t.checkedAt||null}))});
+await writeJson('dist/v3/itf_t1_extraordinary_batch.json',{version:3,generatedAt:new Date().toISOString(),today:TODAY,mode,backlogTotal:BACKLOG.length,cancelledPendingToClose:cancelledPending.length,backlogUnseen:unseen.length,pendingConcluded:concludedPending.length,selected:selected.map(t=>({competitionId:t.competitionId,tournamentName:t.tournamentName||'',endDate:t.endDate||'',checkedAt:t.checkedAt||null}))});
 if(process.env.GITHUB_OUTPUT)await fs.appendFile(process.env.GITHUB_OUTPUT,`competition_ids=${competitionIds.join(',')}\nselected=${competitionIds.length}\n`);
-console.log(JSON.stringify({today:TODAY,mode,backlogTotal:BACKLOG.length,backlogUnseen:unseen.length,pendingConcluded:concludedPending.length,selected:competitionIds},null,2));
+console.log(JSON.stringify({today:TODAY,mode,backlogTotal:BACKLOG.length,cancelledPendingToClose:cancelledPending.length,backlogUnseen:unseen.length,pendingConcluded:concludedPending.length,selected:competitionIds},null,2));
