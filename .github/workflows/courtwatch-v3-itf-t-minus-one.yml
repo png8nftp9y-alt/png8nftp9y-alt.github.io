@@ -8,6 +8,11 @@ on:
         required: false
         type: string
   # Dispatched every 15 minutes by the Cloudflare watchdog ITF cron.
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/build-itf-t1-tournament-matrix.mjs'
+      - '.github/workflows/courtwatch-v3-itf-t-minus-one.yml'
 
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: false}
