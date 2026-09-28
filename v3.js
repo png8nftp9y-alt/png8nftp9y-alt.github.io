@@ -1957,6 +1957,12 @@ function renderCalendar() {
   if ($("calendarMonthLabel"))
     $("calendarMonthLabel").textContent =
       monthLabel.charAt(0).toLocaleUpperCase("it-IT") + monthLabel.slice(1);
+  if ($("calendarGoToday")) {
+    const today = new Date();
+    $("calendarGoToday").hidden =
+      state.month.getFullYear() === today.getFullYear() &&
+      state.month.getMonth() === today.getMonth();
+  }
   let html =
     '<div class="weekdays">' +
     ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"]
@@ -2630,12 +2636,9 @@ function renderProfile(id) {
             })
           : "",
         summerCenter = fitpSummerCenterPlace(t),
-        venue = summerCenter
-          ? ""
-          : readableText(t.venueName || t.clubName || t.club || ""),
-        place = summerCenter || cityCountry(t.location),
+        place = summerCenter || agendaVenueLocation(t),
         courtConditions = tournamentSurfaceLabel(t);
-      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${venue ? esc(venue) + " · " : ""}${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(displayDate(t.startDate))} – ${esc(displayDate(t.endDate))}${t.calendarListLabel ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(t.calendarListLabel)}` : ""}</p></div><div class="profileTournamentMatches">${
+      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(displayDate(t.startDate))} – ${esc(displayDate(t.endDate))}${t.calendarListLabel ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(t.calendarListLabel)}` : ""}</p></div><div class="profileTournamentMatches">${
         matches.length
           ? matchHistorySectionsHtml(matches)
           : '<div class="empty">Nessuna partita pubblicata.</div>'
@@ -3392,6 +3395,11 @@ function wire() {
     state.month = new Date(state.month.getFullYear(), state.month.getMonth() + 1, 1, 12);
     saveUiState();
     renderCalendar();
+  };
+  $("calendarGoToday").onclick = () => {
+    state.agenda = new Date();
+    syncMonthFromAgenda();
+    renderSynchronizedDates();
   };
   $("calendarSex").onchange = () => {
     state.sexFilter = $("calendarSex").value;
