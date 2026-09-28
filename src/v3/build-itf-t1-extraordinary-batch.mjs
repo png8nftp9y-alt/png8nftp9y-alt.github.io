@@ -29,6 +29,7 @@ J-J60-ALB-2026-002 J-J60-ARM-2026-009 J-J60-GHA-2026-002 J-J60-MRI-2026-001
 
 const state=await readJson('history/itf_draw_target_db.json',{tournaments:{}});
 const catalog=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]});
+const strictAudit=process.env.ITF_AUDIT_STATE_FILE?await readJson(process.env.ITF_AUDIT_STATE_FILE,{tournaments:[]}):{tournaments:[]};
 const catalogById=new Map((catalog.tournaments||[]).map(t=>[String(t.competitionId||'').toUpperCase(),t]));
 const DYNAMIC_SAFETY_FROM='2026-09-27';
 const isTeamCompetition=t=>String(t?.category||'').toUpperCase()==='GC'||/\b(?:team finals|davis cup junior|billie jean king cup)\b/i.test(String(t?.tournamentName||''));
@@ -44,22 +45,24 @@ const activeBacklog=[...new Map([...historicalBacklog,...futureSafetyBacklog].ma
 const concludedPending=Object.values(state.tournaments||{})
  .filter(t=>t?.decision==='pending'&&t.competitionId&&(!t.endDate||t.endDate<TODAY))
  .sort((a,b)=>String(a.checkedAt||'').localeCompare(String(b.checkedAt||''))||String(a.competitionId).localeCompare(String(b.competitionId)));
+const strictConcludedMissing=(strictAudit.tournaments||[]).filter(t=>t.classification==='missing_draws'&&t.competitionId&&t.endDate<TODAY).map(t=>{const id=String(t.competitionId).toUpperCase(),cache=state.tournaments?.[id]?.eventCache||{},missingEvents=(t.missingEvents||[]).filter(item=>!cache[item.event]?.populated);return{...t,competitionId:id,auditMissingEvents:missingEvents,auditMissingDraws:missingEvents.length}}).filter(t=>t.auditMissingDraws>0);
 
 const queueMap=new Map();
-for(const tournament of [...activeBacklog,...concludedPending]){
+for(const tournament of [...strictConcludedMissing,...activeBacklog,...concludedPending]){
  const id=String(tournament.competitionId||'').toUpperCase();
  if(id&&!queueMap.has(id))queueMap.set(id,tournament);
 }
 const queue=[...queueMap.values()];
-const unseenIds=new Set(activeBacklog.map(t=>String(t.competitionId).toUpperCase()).filter(id=>!state.tournaments?.[id]));
+const strictIds=new Set(strictConcludedMissing.map(t=>String(t.competitionId).toUpperCase())),unseenIds=new Set(activeBacklog.map(t=>String(t.competitionId).toUpperCase()).filter(id=>!state.tournaments?.[id]));
 queue.sort((a,b)=>
+ Number(strictIds.has(String(b.competitionId).toUpperCase()))-Number(strictIds.has(String(a.competitionId).toUpperCase()))||
  Number(unseenIds.has(String(b.competitionId).toUpperCase()))-Number(unseenIds.has(String(a.competitionId).toUpperCase()))||
  String(a.checkedAt||'').localeCompare(String(b.checkedAt||''))||
  String(a.competitionId).localeCompare(String(b.competitionId))
 );
 const selected=queue.slice(0,2);
 const competitionIds=selected.map(t=>String(t.competitionId).toUpperCase());
-const queueStatus=queue.map(t=>{const id=String(t.competitionId||'').toUpperCase(),row=state.tournaments?.[id]||t,inventory=row.eventInventory||[],cache=row.eventCache||{},missingDraws=inventory.filter(item=>{const saved=cache[item.event]||{};return !saved.populated&&!saved.terminalAlternative&&saved.resolution!=='declared_but_unused'}).length;return{competitionId:id,tournamentName:t.tournamentName||row.tournamentName||'',startDate:t.startDate||row.startDate||'',endDate:t.endDate||row.endDate||'',status:row.decision||'unprocessed',knownDraws:inventory.length,missingDraws:inventory.length?missingDraws:null,checkedAt:row.checkedAt||null}});
-await writeJson('dist/v3/itf_t1_extraordinary_batch.json',{version:5,generatedAt:new Date().toISOString(),today:TODAY,extraordinaryTotal:queue.length,extraordinaryMissingDraws:queueStatus.reduce((sum,row)=>sum+Number(row.missingDraws||0),0),activeBacklog:activeBacklog.length,pendingConcluded:concludedPending.length,selected:selected.map(t=>({competitionId:t.competitionId,tournamentName:t.tournamentName||'',endDate:t.endDate||'',checkedAt:t.checkedAt||null})),queue:queueStatus});
+const queueStatus=queue.map(t=>{const id=String(t.competitionId||'').toUpperCase(),row=state.tournaments?.[id]||t,inventory=row.eventInventory||[],cache=row.eventCache||{},missingDraws=t.auditMissingDraws??inventory.filter(item=>{const saved=cache[item.event]||{};return !saved.populated&&!saved.terminalAlternative&&saved.resolution!=='declared_but_unused'}).length;return{competitionId:id,tournamentName:t.tournamentName||row.tournamentName||'',startDate:t.startDate||row.startDate||'',endDate:t.endDate||row.endDate||'',status:t.auditMissingDraws!=null?'strict_missing_draws':row.decision||'unprocessed',knownDraws:t.events?.length||inventory.length,missingDraws:(t.auditMissingDraws!=null||inventory.length)?missingDraws:null,checkedAt:row.checkedAt||null}});
+await writeJson('dist/v3/itf_t1_extraordinary_batch.json',{version:6,generatedAt:new Date().toISOString(),today:TODAY,extraordinaryTotal:queue.length,extraordinaryMissingDraws:queueStatus.reduce((sum,row)=>sum+Number(row.missingDraws||0),0),strictConcludedMissing:strictConcludedMissing.length,activeBacklog:activeBacklog.length,pendingConcluded:concludedPending.length,selected:selected.map(t=>({competitionId:t.competitionId,tournamentName:t.tournamentName||'',endDate:t.endDate||'',checkedAt:t.checkedAt||null})),queue:queueStatus});
 if(process.env.GITHUB_OUTPUT)await fs.appendFile(process.env.GITHUB_OUTPUT,`competition_ids=${competitionIds.join(',')}\nselected=${competitionIds.length}\n`);
 console.log(JSON.stringify({today:TODAY,extraordinaryTotal:queue.length,activeBacklog:activeBacklog.length,pendingConcluded:concludedPending.length,selected:competitionIds},null,2));

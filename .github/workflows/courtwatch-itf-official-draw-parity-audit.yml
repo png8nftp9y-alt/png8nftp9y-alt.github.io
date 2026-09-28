@@ -80,7 +80,7 @@ jobs:
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
     outputs:
-      unverifiable: ${{ steps.result.outputs.unverifiable }}
+      actionable_unverifiable: ${{ steps.result.outputs.actionable_unverifiable }}
     steps:
       - uses: actions/checkout@v4
         with: {ref: main}
@@ -110,7 +110,7 @@ jobs:
           set -euo pipefail
           endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
           aws --endpoint-url "$endpoint" s3 cp dist/v3/audits/itf-official-draw-parity.json "s3://$R2_BUCKET/itf/audits/official-draw-parity/strict-v2-current.json" --only-show-errors
-          echo "unverifiable=$(node -p "require('./dist/v3/audits/itf-official-draw-parity.json').summary.unverifiable")" >> "$GITHUB_OUTPUT"
+          echo "actionable_unverifiable=$(node -p "require('./dist/v3/audits/itf-official-draw-parity.json').summary.actionableUnverifiable")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -119,7 +119,7 @@ jobs:
           retention-days: 30
   continue-audit:
     needs: compare
-    if: ${{ needs.compare.outputs.unverifiable != '0' && fromJSON(inputs.remaining || '20') > 0 }}
+    if: ${{ needs.compare.outputs.actionable_unverifiable != '0' && fromJSON(inputs.remaining || '20') > 0 }}
     runs-on: ubuntu-latest
     steps:
       - name: Dispatch next incremental audit cycle
