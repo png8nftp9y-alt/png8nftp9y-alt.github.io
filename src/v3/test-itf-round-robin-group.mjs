@@ -13,9 +13,9 @@ for(const competitionId of ids){
   for(const combo of combos){
    const event=[combo.playerTypeCode,combo.matchTypeCode,combo.eventClassificationCode,combo.drawsheetStructureCode].join('-');
    try{
-    const json=await drawsheet(combo),group=(json.rrGroups||[])[groupIndex]||null;
+    const json=await drawsheet(combo),declaredGroups=(json.rrGroups||[]).length,group=(json.rrGroups||[])[groupIndex]||null;
     const matches=group?drawMatchNodes({rrGroups:[group]}):[];
-    outcomes.push({competitionId,event,group:groupIndex+1,present:Boolean(group),matches:matches.length,data:group});
+    outcomes.push({competitionId,event,group:groupIndex+1,declaredGroups,present:Boolean(group),matches:matches.length,data:group});
    }catch(error){outcomes.push({competitionId,event,group:groupIndex+1,error:error.message})}
   }
  }catch(error){outcomes.push({competitionId,group:groupIndex+1,error:error.message})}
