@@ -34,7 +34,7 @@ const DYNAMIC_SAFETY_FROM='2026-09-27';
 const isTeamCompetition=t=>String(t?.category||'').toUpperCase()==='GC'||/\b(?:team finals|davis cup junior|billie jean king cup)\b/i.test(String(t?.tournamentName||''));
 const historicalBacklog=BACKLOG
  .filter(id=>!['complete','cancelled_no_draws'].includes(state.tournaments?.[id]?.decision))
- .map(id=>catalogById.get(id)||state.tournaments?.[id])
+ .map(id=>({...catalogById.get(id),...state.tournaments?.[id],competitionId:id}))
  .filter(Boolean);
 const futureSafetyBacklog=(catalog.tournaments||[])
  .filter(t=>t?.competitionId&&t.endDate&&t.endDate>=DYNAMIC_SAFETY_FROM&&t.endDate<TODAY&&!isTeamCompetition(t))
