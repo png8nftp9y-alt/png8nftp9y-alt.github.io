@@ -1,6 +1,10 @@
 name: Court Watch ITF official draw parity audit
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-itf-official-draw-parity-audit.yml'
 permissions:
   contents: read
 jobs:
