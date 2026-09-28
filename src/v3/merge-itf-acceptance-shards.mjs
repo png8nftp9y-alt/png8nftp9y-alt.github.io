@@ -117,10 +117,12 @@ if (scanMode === "known_targets_fast")
   }
 for (const e of current) {
   const key = `${e.playerId}|${e.competitionId}`,
-    old = targets[key] || {};
+    old = targets[key] || {},
+    preferred =
+      old.drawDecision === "confirmed" && old.drawEntry ? old.drawEntry : e;
   targets[key] = {
     ...old,
-    ...e,
+    ...preferred,
     acceptanceEntry: e,
     drawDecision: old.drawDecision === "confirmed" ? "confirmed" : "pending",
     firstSeenInAcceptanceAt: old.firstSeenInAcceptanceAt || e.lastSeen || NOW,
@@ -143,7 +145,16 @@ const visible = new Map(
     (e) => [`${e.playerId}|${e.competitionId}`, e],
   ),
 );
-for (const e of current) visible.set(`${e.playerId}|${e.competitionId}`, e);
+for (const e of current) {
+  const key = `${e.playerId}|${e.competitionId}`,
+    target = targets[key];
+  visible.set(
+    key,
+    target?.drawDecision === "confirmed" && target.drawEntry
+      ? target.drawEntry
+      : e,
+  );
+}
 for (const key of withdrawnByKey.keys()) visible.delete(key);
 for (const [key, target] of Object.entries(targets)) {
   if (
