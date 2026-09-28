@@ -38,7 +38,7 @@ jobs:
           set -euo pipefail
           python -m pip install --quiet awscli
           endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
-          if aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/current.json" /tmp/itf-audit-state.json --only-show-errors; then
+          if aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/strict-v2-current.json" /tmp/itf-audit-state.json --only-show-errors; then
             echo "ITF_AUDIT_STATE_FILE=/tmp/itf-audit-state.json" >> "$GITHUB_ENV"
           fi
       - id: matrix
@@ -101,7 +101,7 @@ jobs:
           generation="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/itf-pointer.json')).generation")"
           aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/generations/$generation/" /tmp/itf-blocks --recursive --exclude "*" --include "blocks/*.tar.gz" --only-show-errors
           find /tmp/itf-blocks -name '*.tar.gz' -print0 | while IFS= read -r -d '' file; do tar -xzf "$file" -C /tmp/itf-complete-audit; done
-          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/current.json" /tmp/itf-audit-state.json --only-show-errors || true
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/strict-v2-current.json" /tmp/itf-audit-state.json --only-show-errors || true
       - name: Compare official inventory with acquired draws
         run: node src/v3/merge-itf-full-inventory-audit.mjs /tmp/itf-official-inventory-shards /tmp/itf-complete-audit /tmp/itf-audit-state.json
       - id: result
@@ -109,7 +109,7 @@ jobs:
         run: |
           set -euo pipefail
           endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
-          aws --endpoint-url "$endpoint" s3 cp dist/v3/audits/itf-official-draw-parity.json "s3://$R2_BUCKET/itf/audits/official-draw-parity/current.json" --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp dist/v3/audits/itf-official-draw-parity.json "s3://$R2_BUCKET/itf/audits/official-draw-parity/strict-v2-current.json" --only-show-errors
           echo "unverifiable=$(node -p "require('./dist/v3/audits/itf-official-draw-parity.json').summary.unverifiable")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
