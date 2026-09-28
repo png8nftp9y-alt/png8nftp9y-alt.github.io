@@ -1,4 +1,4 @@
-import {NOW,TODAY,readJson,writeJson,tournamentEvents,drawsheet,playerFromApi,norm,aliases} from './itf-common.mjs';
+import {NOW,TODAY,readJson,writeJson,tournamentEvents,drawsheet,playersFromDrawsheet,norm,aliases} from './itf-common.mjs';
 import {readTournamentDrawsInBrowser} from './read-itf-draws-browser.mjs';
 
 const sourceFile='dist/v3/source_itf_entries.json',source=await readJson(sourceFile,{entries:[]}),map=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]}),former=new Set(((await readJson('former-players.json',{players:[]})).players||[]).map(player=>player.id));
@@ -8,7 +8,7 @@ const tomorrow=new Date(Date.parse(TODAY+'T00:00:00Z')+864e5).toISOString().slic
 const batchLimit=Math.max(1,Number(process.env.ITF_T1_MAX_TOURNAMENTS||2)),shardIndex=Math.max(0,Number(process.env.ITF_T1_SHARD_INDEX||0)),sectionSlotRaw=process.env.ITF_T1_SECTION_SLOT,requestedEvent=String(process.env.ITF_T1_EVENT_KEY||''),requestedCompetitionId=String(process.env.ITF_T1_COMPETITION_ID||'').toUpperCase(),inventoryB64=String(process.env.ITF_T1_INVENTORY_B64||''),explicitInventory=inventoryB64?JSON.parse(Buffer.from(inventoryB64,'base64').toString('utf8')):null,sectionMode=Boolean(requestedEvent)||sectionSlotRaw!==undefined,sectionSlot=Math.max(0,Number(sectionSlotRaw||0)),sortedDue=allDue.sort((a,b)=>String(tournamentStates[a.competitionId]?.checkedAt||'').localeCompare(String(tournamentStates[b.competitionId]?.checkedAt||''))||String(a.startDate).localeCompare(String(b.startDate))),due=requestedCompetitionId?sortedDue.filter(tournament=>String(tournament.competitionId).toUpperCase()===requestedCompetitionId).slice(0,1):sortedDue.slice(shardIndex*batchLimit,(shardIndex+1)*batchLimit);
 let tournamentsChecked=0,completeTournaments=0,pendingTournaments=0,confirmed=0,removed=0,drawRequests=0,challengeTournaments=0,browserFallbacks=0,browserRecoveries=0,cachedSectionsUsed=0,newSectionsCached=0;
 const eventKey=c=>[c.playerTypeCode,c.matchTypeCode,c.eventClassificationCode,c.drawsheetStructureCode].join('-'),familyKey=c=>[c.playerTypeCode,c.matchTypeCode,c.eventClassificationCode].join('-');
-function names(json){const out=[];for(const group of[...(json.koGroups||[]),...(json.rrGroups||[])])for(const round of group.rounds||group.matchesByRound||[])for(const match of round.matches||[])for(const team of match.teams||[])for(const raw of team.players||[]){const player=playerFromApi(raw);if(player.name)out.push({id:player.id,name:player.name})}return out}
+function names(json){return playersFromDrawsheet(json).map(player=>({id:player.id,name:player.name}))}
 for(const tournament of due){
  const previousState=tournamentStates[tournament.competitionId]||{},eventCache={...(previousState.eventCache||{})};
  tournamentsChecked++;

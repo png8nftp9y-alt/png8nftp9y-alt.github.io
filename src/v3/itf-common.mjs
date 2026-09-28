@@ -72,3 +72,28 @@ export function playerFromApi(raw={}){const p=raw||{},given=String(p.givenName||
 export function eventCombinations(json){const out=[];function walk(v,ctx={}){if(Array.isArray(v)){for(const x of v)walk(x,ctx);return}if(!v||typeof v!=='object')return;const next={...ctx};for(const k of['tournamentId','tourType','circuitCode','weekNumber','playerTypeCode','matchTypeCode','eventClassificationCode','drawsheetStructureCode'])if(v[k]!==undefined&&v[k]!==null&&v[k]!=='')next[k]=v[k];if(v.dataName&&v.valueCode!==undefined)next[v.dataName]=v.valueCode;if(next.tournamentId&&next.playerTypeCode&&next.matchTypeCode&&next.eventClassificationCode&&next.drawsheetStructureCode)out.push(next);for(const x of Object.values(v))if(x&&typeof x==='object')walk(x,next)}walk(json);return[...new Map(out.map(x=>[[x.tournamentId,x.weekNumber||0,x.playerTypeCode,x.matchTypeCode,x.eventClassificationCode,x.drawsheetStructureCode].join('|'),x])).values()]}
 export async function tournamentEvents(t){for(let attempt=0;attempt<3;attempt++){await bootstrapTournamentSession(t);const r=await request(`${API}/GetEventFilters?tournamentKey=${encodeURIComponent(t.competitionId.toLowerCase())}`);if(r.incapsula){if(attempt<2){await new Promise(x=>setTimeout(x,1200*(attempt+1)));continue}throw new Error('GetEventFilters_incapsula_challenge')}if(!r.ok||!r.json)throw new Error(`GetEventFilters_${r.status||r.responseKind||'non_json'}`);return eventCombinations(r.json).map(c=>({...c,sourceUrl:t.sourceUrl||t.drawsResultsUrl||''}))}throw new Error('GetEventFilters_session_exhausted')}
 export async function drawsheet(c){const q=new URLSearchParams({tournamentId:String(c.tournamentId),tourType:String(c.tourType||'N'),weekNumber:String(c.weekNumber||0),playerTypeCode:String(c.playerTypeCode),matchTypeCode:String(c.matchTypeCode),eventClassificationCode:String(c.eventClassificationCode),drawsheetStructureCode:String(c.drawsheetStructureCode)});if(c.sourceUrl&&!c.sessionReady)await bootstrapTournamentSession({sourceUrl:c.sourceUrl});for(let attempt=0;attempt<4;attempt++){if(attempt)await new Promise(x=>setTimeout(x,2500*attempt+Math.random()*1200));const r=await request(`${API}/GetDrawsheet?${q}`);if(r.incapsula){if(attempt<3&&c.sourceUrl){await bootstrapTournamentSession({sourceUrl:c.sourceUrl});continue}throw new Error('GetDrawsheet_incapsula_challenge')}if(!r.ok||!r.json)throw new Error(`GetDrawsheet_${r.status||r.responseKind||'non_json'}`);return r.json}throw new Error('GetDrawsheet_session_exhausted')}
+
+export function drawMatchNodes(json){
+ const rows=[],seen=new Set();
+ function walk(value,context={}){
+  if(Array.isArray(value)){value.forEach((item,index)=>walk(item,{...context,arrayIndex:index}));return}
+  if(!value||typeof value!=='object')return;
+  const group=value.groupName??value.groupDesc??value.poolName??value.groupNumber??value.groupId??context.group??null;
+  const round=value.roundDesc??value.roundName??context.round??'';
+  const roundNumber=value.roundNumber??context.roundNumber??null;
+  if(Array.isArray(value.teams)){
+   const key=String(value.matchId||'')||JSON.stringify([group,round,roundNumber,value.teams]);
+   if(!seen.has(key)){seen.add(key);rows.push({match:value,group,round,roundNumber})}
+   return;
+  }
+  for(const child of Object.values(value))if(child&&typeof child==='object')walk(child,{...context,group,round,roundNumber});
+ }
+ walk(json);
+ return rows;
+}
+
+export function playersFromDrawsheet(json){
+ const players=[];
+ for(const {match} of drawMatchNodes(json))for(const team of match.teams||[])for(const raw of team.players||[]){const player=playerFromApi(raw);if(player.name)players.push(player)}
+ return players;
+}
