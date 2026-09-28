@@ -20,4 +20,5 @@ jobs:
         with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - run: npm ci --ignore-scripts
       - run: node src/v3/test-itf-round-robin-live.mjs
