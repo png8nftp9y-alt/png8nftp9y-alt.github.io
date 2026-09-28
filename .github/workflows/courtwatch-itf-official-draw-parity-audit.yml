@@ -1,0 +1,79 @@
+name: Court Watch ITF official draw parity audit
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - id: matrix
+        run: node src/v3/build-itf-full-inventory-matrix.mjs
+  inventory:
+    needs: prepare
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Read official ITF inventory
+        env:
+          ITF_INVENTORY_SHARD: ${{ matrix.shard }}
+          ITF_COMPETITION_IDS: ${{ matrix.competitionIds }}
+        run: node src/v3/audit-itf-official-inventory-shard.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-official-inventory-${{ matrix.shard }}
+          path: dist/v3/audits/itf-official-inventory-shards/*.json
+          retention-days: 7
+  compare:
+    needs: inventory
+    if: always() && needs.inventory.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: python -m pip install --quiet awscli
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: itf-official-inventory-*
+          path: /tmp/itf-official-inventory-shards
+          merge-multiple: true
+      - name: Restore ITF draw archives
+        run: |
+          set -euo pipefail
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          mkdir -p /tmp/itf-complete-audit
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/pointers/current.json" /tmp/itf-pointer.json --only-show-errors
+          generation="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/itf-pointer.json')).generation")"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/generations/$generation/" /tmp/itf-blocks --recursive --exclude "*" --include "blocks/*.tar.gz" --only-show-errors
+          find /tmp/itf-blocks -name '*.tar.gz' -print0 | while IFS= read -r -d '' file; do tar -xzf "$file" -C /tmp/itf-complete-audit; done
+      - name: Compare official inventory with acquired draws
+        run: node src/v3/merge-itf-full-inventory-audit.mjs /tmp/itf-official-inventory-shards /tmp/itf-complete-audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-official-draw-parity-audit
+          path: dist/v3/audits/itf-official-draw-parity.json
+          retention-days: 30
