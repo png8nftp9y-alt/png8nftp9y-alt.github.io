@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-30T21:39:35.364Z",
+  "generatedAt": "2026-09-30T21:52:18.290Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,14 +8,14 @@
     "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 0,
-    "declaredSections": 7,
-    "requestedSections": 3,
-    "acquiredSections": 5,
+    "declaredSections": 8,
+    "requestedSections": 0,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 2,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 7,
+    "resolvedSections": 8,
     "missingSections": 0,
-    "newSectionsCached": 3,
+    "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
@@ -125,15 +125,15 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-DOM-2026-001",
-      "tournamentName": "J30 Punta Cana",
+      "competitionId": "J-J60-GBR-2026-002",
+      "tournamentName": "J60 Loughborough",
       "decision": "complete",
       "playersFound": [],
-      "declaredSections": 7,
-      "acquiredSections": 5,
+      "declaredSections": 8,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 2,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 7,
+      "resolvedSections": 8,
       "missingSections": 0,
       "sections": [
         {
@@ -179,6 +179,13 @@
           "status": "acquired"
         },
         {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "acquired": true,
@@ -213,7 +220,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 30,
+              "players": 16,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -226,7 +233,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 32,
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -246,7 +253,20 @@
             },
             {
               "event": "G-S-M-RR",
-              "players": 26,
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 16,
               "error": null,
               "failureType": null,
               "resolved": true
