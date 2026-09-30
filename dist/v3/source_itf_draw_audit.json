@@ -1,34 +1,34 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-30T20:40:42.491Z",
+  "generatedAt": "2026-09-30T20:47:54.783Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 1,
+    "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 0,
+    "pendingTournaments": 1,
     "declaredSections": 8,
     "requestedSections": 6,
-    "acquiredSections": 6,
+    "acquiredSections": 5,
     "unusedAlternativeSections": 2,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 8,
-    "missingSections": 0,
-    "newSectionsCached": 6,
+    "resolvedSections": 7,
+    "missingSections": 1,
+    "newSectionsCached": 5,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 2,
-    "retrySections": 0,
-    "technicalErrorSections": 0,
+    "retrySections": 1,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 113,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 89,
-    "globalPendingTechnical": 55,
+    "globalPendingTotal": 91,
+    "globalPendingTechnical": 57,
     "globalPendingPublication": 34,
     "technicalPendingCompetitionIds": [
       "J-J30-COL-2026-005",
@@ -85,7 +85,9 @@
       "J-J30-CHI-2026-002",
       "J-J30-CHI-2026-003",
       "J-J30-CHN-2026-003",
-      "J-J30-CHN-2026-004"
+      "J-J30-CHN-2026-004",
+      "J-J30-CHN-2026-006",
+      "J-J30-CHN-2026-007"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-DEN-2026-004",
@@ -126,16 +128,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-CHN-2026-005",
-      "tournamentName": "J30 Luan",
-      "decision": "complete",
+      "competitionId": "J-J30-CHN-2026-007",
+      "tournamentName": "J30 Dalian",
+      "decision": "pending",
       "playersFound": [],
       "declaredSections": 8,
-      "acquiredSections": 6,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 2,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 8,
-      "missingSections": 0,
+      "resolvedSections": 7,
+      "missingSections": 1,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -189,9 +191,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         }
       ],
       "families": [
@@ -267,7 +269,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 32,
+              "players": 30,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -276,19 +278,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge"
     }
   ]
 }
