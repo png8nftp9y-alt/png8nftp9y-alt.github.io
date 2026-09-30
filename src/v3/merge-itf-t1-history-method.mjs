@@ -16,7 +16,7 @@ const sourceFile='dist/v3/source_itf_entries.json',targetFile='history/itf_draw_
 const source=await readJson(sourceFile,{entries:[]}),targetDoc=await readJson(targetFile,{targets:{},tournaments:{}}),former=new Set(((await readJson('former-players.json',{players:[]})).players||[]).map(p=>p.id));
 const watched=((await readJson('players.json',{players:[]})).players||[]).filter(p=>!former.has(p.id)&&(p.circuits||[]).some(c=>norm(c)==='ITF'));
 const targets={...(targetDoc.targets||{})},tournaments={...(targetDoc.tournaments||{})},entries=new Map((source.entries||[]).map(e=>[e.playerId+'|'+e.competitionId,e]));
-const previous=tournaments[id]||{},eventCache={...(previous.eventCache||{})},tournamentDocs=docs.filter(d=>d.competitionId===id),byEvent=new Map(tournamentDocs.map(d=>[d.event,d]));
+const previous=tournaments[id]||{},eventCache={...(previous.eventCache||{})};for(const [event,value] of Object.entries(eventCache))if(value?.resolution==='unused_alternative_structure')delete eventCache[event];const tournamentDocs=docs.filter(d=>d.competitionId===id),byEvent=new Map(tournamentDocs.map(d=>[d.event,d]));
 let newSectionsCached=0;
 for(const section of inventory.sections||[]){const doc=byEvent.get(section.event);if(doc?.status==='complete'){
  eventCache[section.event]={family:section.event.split('-').slice(0,3).join('-'),populated:true,terminalAlternative:false,players:doc.players||[],storedAt:NOW};newSectionsCached++;
@@ -31,13 +31,7 @@ for(const section of eventInventory)if(isKnownUnusedDraw(id,section.event)&&!eve
  newDeclaredButUnused++;
 }
 const populatedFamilies=new Set(eventInventory.filter(section=>eventCache[section.event]?.populated).map(section=>section.family));
-let newTerminalAlternatives=0;
-for(const section of eventInventory){
- const doc=byEvent.get(section.event),cached=eventCache[section.event];
- if(cached?.populated||cached?.terminalAlternative||doc?.status!=='retry'||doc?.failureType==='technical_error'||!populatedFamilies.has(section.family))continue;
- eventCache[section.event]={family:section.family,populated:false,terminalAlternative:true,players:[],observedAt:NOW,storedAt:NOW,resolution:'unused_alternative_structure'};
- newTerminalAlternatives++;
-}
+const newTerminalAlternatives=0;
 const families=new Map();
 for(const section of eventInventory){
  const doc=byEvent.get(section.event),cached=eventCache[section.event],family=families.get(section.family)||{populated:false,events:[]};

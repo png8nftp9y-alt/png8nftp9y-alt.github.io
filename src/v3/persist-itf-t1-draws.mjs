@@ -22,7 +22,7 @@ const results=new Map((resultsDoc.results||[]).map(row=>[row.id,row]));
 const stage='dist/v3/itf-t1-r2-stage',runId=process.env.GITHUB_RUN_ID||'manual-'+Date.now();
 await fs.rm(stage,{recursive:true,force:true});
 
-let completeDocuments=0,retryDocuments=0,newTournaments=0,newMatches=0,changedMatches=0,newResults=0,changedResults=0,unmappedDocuments=0;
+let completeDocuments=0,retryDocuments=0,technicalPendingDocuments=0,publicationPendingDocuments=0,newTournaments=0,newMatches=0,changedMatches=0,newResults=0,changedResults=0,unmappedDocuments=0;
 const manifest=[];
 const stable=value=>JSON.stringify(value,(key,item)=>['generatedAt','observedAt'].includes(key)?undefined:item);
 for(const file of files){
@@ -32,7 +32,7 @@ for(const file of files){
  const key=`tournaments/${competitionId}/${event}/${sha}.json.gz`,target=path.join(stage,key);
  await fs.mkdir(path.dirname(target),{recursive:true});await fs.copyFile(file,target);
  manifest.push({competitionId,event,status,sha256:sha,key,matches:(doc.matches||[]).length,players:(doc.players||[]).length});
- if(status!=='complete'){retryDocuments++;continue}
+ if(status!=='complete'){retryDocuments++;if(doc.outcome==='pending_technical'||doc.failureType==='technical_error')technicalPendingDocuments++;else publicationPendingDocuments++;continue}
  completeDocuments++;
  let tournament=tournamentBySource.get(competitionId);
  if(!tournament){const source=catalogById.get(competitionId);if(!source){unmappedDocuments++;continue}const id='tournament_itf_'+crypto.createHash('sha256').update('itf|'+competitionId).digest('hex').slice(0,24);tournament={id,circuit:'itf',sourceTournamentId:competitionId,name:source.tournamentName||competitionId,location:source.location||'',surface:source.surface||'',environment:source.environment||source.indoorOutdoor||'',startDate:source.startDate||'',endDate:source.endDate||'',officialStartDate:source.officialStartDate||source.startDate||'',status:'detected',source:{circuit:'itf',sourceId:competitionId,sourceUrl:source.sourceUrl||doc.sourceUrl||'',observedAt:doc.generatedAt||new Date().toISOString()}};tournamentRows.push(tournament);tournamentBySource.set(competitionId,tournament);newTournaments++}
@@ -55,7 +55,7 @@ if(changed){
 await fs.mkdir(path.join(stage,'runs'),{recursive:true});
 await fs.writeFile(path.join(stage,'runs',runId+'.json'),JSON.stringify({version:1,runId,generatedAt:now,documents:manifest},null,2)+'\n');
 await fs.mkdir('dist/v3/audits',{recursive:true});
-const audit={version:1,generatedAt:now,runId,documents:manifest.length,completeDocuments,retryDocuments,unmappedDocuments,newTournaments,newMatches,changedMatches,newResults,changedResults,totalTournaments:tournamentRows.length,totalMatches:matches.size,totalResults:results.size};
+const audit={version:1,generatedAt:now,runId,documents:manifest.length,completeDocuments,retryDocuments,technicalPendingDocuments,publicationPendingDocuments,unmappedDocuments,newTournaments,newMatches,changedMatches,newResults,changedResults,totalTournaments:tournamentRows.length,totalMatches:matches.size,totalResults:results.size};
 await fs.writeFile('dist/v3/audits/itf-t1-persistence.json',JSON.stringify(audit,null,2)+'\n');
 console.log('ITF_T1_PERSISTENCE='+JSON.stringify(audit));
 if(unmappedDocuments)throw new Error(`${unmappedDocuments} complete draw documents have no canonical ITF tournament mapping`);

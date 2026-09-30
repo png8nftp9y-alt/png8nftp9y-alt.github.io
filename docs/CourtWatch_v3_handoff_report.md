@@ -1441,3 +1441,11 @@ completa è in `docs/D1_NEW_FEATURE_POLICY.md`.
 - Un test automatico verifica esplicitamente i tre casi `Q-KO`, `M-KO` e `M-RR`.
 - Lo straordinario ruota l'intera coda prima di riprovare tornei ancora bloccati: due fallimenti non possono più fermare gli altri recuperi.
 - La sincronizzazione D1 termina correttamente con zero scritture quando il run non contiene record nuovi o modificati.
+
+### ITF T-1: tre catene concorrenti
+
+L'acquisizione usa una catena ordinaria e due catene straordinarie A/B.
+Le corsie straordinarie sono partizionate stabilmente e non si sovrappongono.
+I tabelloni `pending_publication` restano irrisolti ma vengono spostati in fondo
+al ciclo; `pending_technical` resta distinto. La pubblicazione R2/D1 rimane
+serializzata e incrementale.

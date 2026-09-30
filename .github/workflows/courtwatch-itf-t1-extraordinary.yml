@@ -1,7 +1,13 @@
 name: Court Watch ITF T-1 extraordinary concluded recovery
+run-name: ITF extraordinary lane ${{ inputs.lane }}
 on:
   workflow_dispatch:
     inputs:
+      lane:
+        description: Extraordinary lane a or b
+        required: false
+        type: string
+        default: a
       remaining:
         description: Maximum remaining automatic batches
         required: false
@@ -18,7 +24,7 @@ permissions:
   actions: write
 
 concurrency:
-  group: courtwatch-itf-t1-extraordinary-dispatch
+  group: courtwatch-itf-t1-extraordinary-dispatch-${{ inputs.lane }}
   cancel-in-progress: false
 
 jobs:
@@ -45,6 +51,7 @@ jobs:
         name: Select two concluded pending tournaments
         env:
           ITF_EXCLUDE_IDS: ${{ inputs.previous_ids }}
+          ITF_EXTRAORDINARY_LANE: ${{ inputs.lane }}
         run: node src/v3/build-itf-t1-extraordinary-batch.mjs
       - name: Publish live T-1 queue counters
         run: |
@@ -73,6 +80,7 @@ jobs:
           IDS: ${{ steps.select.outputs.competition_ids }}
           REMAINING: ${{ inputs.remaining }}
           NEXT_PREVIOUS_IDS: ${{ steps.select.outputs.next_previous_ids }}
+          LANE: ${{ inputs.lane }}
         run: |
           set -euo pipefail
           if [ "${REMAINING:-0}" -le 0 ]; then echo "Extraordinary chain safety limit reached"; exit 0; fi
@@ -82,7 +90,7 @@ jobs:
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/courtwatch-v3-itf-t-minus-one.yml/dispatches" \
-            -d "$(jq -n --arg ref main --arg ids "$IDS" --arg remaining "$NEXT_REMAINING" --arg previous "$NEXT_PREVIOUS_IDS" '{ref:$ref,inputs:{competition_id:$ids,extraordinary_chain:true,extraordinary_remaining:$remaining,extraordinary_previous_ids:$previous}}')"
+            -d "$(jq -n --arg ref main --arg ids "$IDS" --arg lane "$LANE" --arg remaining "$NEXT_REMAINING" --arg previous "$NEXT_PREVIOUS_IDS" '{ref:$ref,inputs:{competition_id:$ids,chain_lane:("extraordinary-"+$lane),extraordinary_chain:true,extraordinary_remaining:$remaining,extraordinary_previous_ids:$previous}}')"
           echo "Dispatched extraordinary ITF T-1 recovery for $IDS; remaining guard $NEXT_REMAINING"
       - uses: actions/upload-artifact@v4
         with:

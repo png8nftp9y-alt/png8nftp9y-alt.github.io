@@ -1,8 +1,19 @@
 # Manual verification trigger: recover final persisted technical pending
 name: Court Watch v3 ITF T-1 complete draws
+run-name: ITF T-1 ${{ inputs.chain_lane || 'ordinary' }}
 on:
   workflow_dispatch:
     inputs:
+      chain_lane:
+        description: ordinary, extraordinary-a or extraordinary-b
+        required: false
+        type: string
+        default: ordinary
+      ordinary_previous_ids:
+        description: Ordinary tournament IDs already attempted in this cycle
+        required: false
+        type: string
+        default: ''
       competition_id:
         description: Optional comma-separated pending competition IDs
         required: false
@@ -30,7 +41,7 @@ on:
       - '.github/workflows/courtwatch-v3-itf-t-minus-one.yml'
 
 permissions: {contents: write, actions: write}
-concurrency: {group: courtwatch-v3-itf-t-minus-one,cancel-in-progress: false}
+concurrency: {group: courtwatch-v3-itf-t-minus-one-${{ inputs.chain_lane || 'ordinary' }},cancel-in-progress: false}
 jobs:
   select:
     runs-on: ubuntu-latest
@@ -38,6 +49,7 @@ jobs:
     outputs:
       matrix: ${{ steps.select.outputs.matrix }}
       selected: ${{ steps.select.outputs.selected }}
+      next_previous_ids: ${{ steps.select.outputs.next_previous_ids }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -47,6 +59,7 @@ jobs:
         env:
           ITF_T1_TOURNAMENT_BATCH: 8
           ITF_T1_COMPETITION_IDS: ${{ inputs.competition_id || '' }}
+          ITF_EXCLUDE_IDS: ${{ (inputs.chain_lane == 'ordinary' || inputs.chain_lane == '') && inputs.ordinary_previous_ids || '' }}
         run: node src/v3/build-itf-t1-tournament-matrix.mjs
       - uses: actions/upload-artifact@v4
         with:
@@ -239,6 +252,27 @@ jobs:
             dist/v3/audits/itf-t1-persistence.json
           retention-days: 14
 
+
+  continue-ordinary:
+    needs: [select, review]
+    if: ${{ success() && needs.select.outputs.selected != '0' && inputs.extraordinary_chain != true && (inputs.chain_lane == 'ordinary' || inputs.chain_lane == '') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch next ordinary batch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIOUS_IDS: ${{ needs.select.outputs.next_previous_ids }}
+        run: |
+          set -euo pipefail
+          curl --fail-with-body --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/courtwatch-v3-itf-t-minus-one.yml/dispatches" \
+            -d "$(jq -n --arg ref main --arg previous "$PREVIOUS_IDS" '{ref:$ref,inputs:{chain_lane:"ordinary",ordinary_previous_ids:$previous}}')"
+          echo "Next ordinary ITF T-1 batch dispatched"
+
   continue-extraordinary:
     needs: review
     if: ${{ success() && inputs.extraordinary_chain == true && fromJSON(inputs.extraordinary_remaining) > 0 }}
@@ -250,6 +284,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REMAINING: ${{ inputs.extraordinary_remaining }}
           PREVIOUS_IDS: ${{ inputs.extraordinary_previous_ids }}
+          LANE: ${{ inputs.chain_lane }}
         run: |
           set -euo pipefail
           curl --fail-with-body --silent --show-error \
@@ -257,5 +292,5 @@ jobs:
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/courtwatch-itf-t1-extraordinary.yml/dispatches" \
-            -d "$(jq -n --arg ref main --arg remaining "$REMAINING" --arg previous "$PREVIOUS_IDS" '{ref:$ref,inputs:{remaining:$remaining,previous_ids:$previous}}')"
+            -d "$(jq -n --arg ref main --arg lane "$LANE" --arg remaining "$REMAINING" --arg previous "$PREVIOUS_IDS" '{ref:$ref,inputs:{lane:$lane,remaining:$remaining,previous_ids:$previous}}')"
           echo "Next extraordinary selector dispatched with remaining=$REMAINING"
