@@ -1449,3 +1449,9 @@ Le corsie straordinarie sono partizionate stabilmente e non si sovrappongono.
 I tabelloni `pending_publication` restano irrisolti ma vengono spostati in fondo
 al ciclo; `pending_technical` resta distinto. La pubblicazione R2/D1 rimane
 serializzata e incrementale.
+
+### Correzione selettore ordinario ITF
+
+Il selettore ordinario include ora anche i tornei attivi classificati
+`strict_missing_draws` dalla coda diagnostica. Un run senza artefatti non causa
+più un falso fallimento del workflow D1.
