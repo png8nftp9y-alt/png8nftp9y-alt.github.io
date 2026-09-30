@@ -41,7 +41,9 @@ on:
       - '.github/workflows/courtwatch-v3-itf-t-minus-one.yml'
 
 permissions: {contents: write, actions: write}
-concurrency: {group: courtwatch-v3-itf-t-minus-one-${{ inputs.chain_lane || 'ordinary' }},cancel-in-progress: false}
+concurrency:
+  group: courtwatch-v3-itf-t-minus-one-${{ inputs.chain_lane || 'ordinary' }}
+  cancel-in-progress: false
 jobs:
   select:
     runs-on: ubuntu-latest
@@ -284,7 +286,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REMAINING: ${{ inputs.extraordinary_remaining }}
           PREVIOUS_IDS: ${{ inputs.extraordinary_previous_ids }}
-          LANE: ${{ inputs.chain_lane }}
+          LANE: ${{ inputs.chain_lane == 'extraordinary-b' && 'b' || 'a' }}
         run: |
           set -euo pipefail
           curl --fail-with-body --silent --show-error \
