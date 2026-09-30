@@ -1,36 +1,37 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-30T07:54:39.008Z",
+  "generatedAt": "2026-09-30T08:00:07.443Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 1,
+    "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 0,
+    "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 1,
-    "acquiredSections": 6,
+    "requestedSections": 6,
+    "acquiredSections": 5,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 6,
-    "missingSections": 0,
-    "newSectionsCached": 1,
+    "resolvedSections": 5,
+    "missingSections": 1,
+    "newSectionsCached": 5,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 0,
-    "technicalErrorSections": 0,
+    "retrySections": 1,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 84,
+    "globalCompleteTournaments": 83,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 89,
-    "globalPendingTechnical": 32,
+    "globalPendingTotal": 90,
+    "globalPendingTechnical": 33,
     "globalPendingPublication": 57,
     "technicalPendingCompetitionIds": [
+      "J-J100-KGZ-2026-001",
       "J-J30-COL-2026-005",
       "J-J30-CRO-2026-001",
       "J-J30-CZE-2026-005",
@@ -126,16 +127,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J100-FRA-2026-001",
-      "tournamentName": "J100 Clermont-Ferrand",
-      "decision": "complete",
+      "competitionId": "J-J100-KGZ-2026-001",
+      "tournamentName": "J100 Cholpon-Ata",
+      "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 6,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 6,
-      "missingSections": 0,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -175,9 +176,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         }
       ],
       "families": [
@@ -200,7 +201,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 23,
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -213,7 +214,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 30,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -239,7 +240,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 18,
+              "players": 12,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -248,19 +249,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 28,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge"
     }
   ]
 }
