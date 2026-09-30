@@ -1,31 +1,31 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-30T20:53:24.288Z",
+  "generatedAt": "2026-09-30T20:57:32.276Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
-    "declaredSections": 8,
-    "requestedSections": 6,
+    "pendingTournaments": 0,
+    "declaredSections": 6,
+    "requestedSections": 5,
     "acquiredSections": 5,
-    "unusedAlternativeSections": 2,
+    "unusedAlternativeSections": 1,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 7,
-    "missingSections": 1,
+    "resolvedSections": 6,
+    "missingSections": 0,
     "newSectionsCached": 5,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 2,
-    "retrySections": 1,
-    "technicalErrorSections": 1,
+    "newPolicyResolutions": 1,
+    "retrySections": 0,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 113,
+    "globalCompleteTournaments": 115,
     "globalCancelledNoDraws": 13,
     "globalPendingTotal": 93,
     "globalPendingTechnical": 59,
@@ -130,16 +130,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-CHN-2026-009",
-      "tournamentName": "J30 Maanshan",
-      "decision": "pending",
+      "competitionId": "J-J30-CMR-2026-002",
+      "tournamentName": "J30 Douala",
+      "decision": "complete",
       "playersFound": [],
-      "declaredSections": 8,
+      "declaredSections": 6,
       "acquiredSections": 5,
-      "unusedAlternativeSections": 2,
+      "unusedAlternativeSections": 1,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 7,
-      "missingSections": 1,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -172,20 +172,6 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": false,
-          "resolved": true,
-          "status": "unused_alternative_structure"
-        },
-        {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -193,9 +179,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -225,7 +211,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 32,
+              "players": 9,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -251,27 +237,7 @@
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
-              "resolved": true
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 32,
+              "players": 14,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -280,19 +246,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 12,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
