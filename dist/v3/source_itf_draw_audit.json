@@ -1,38 +1,37 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-30T22:50:58.639Z",
+  "generatedAt": "2026-09-30T22:55:26.184Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
+    "pendingTournaments": 0,
     "declaredSections": 8,
-    "requestedSections": 6,
-    "acquiredSections": 5,
-    "unusedAlternativeSections": 2,
+    "requestedSections": 5,
+    "acquiredSections": 8,
+    "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 7,
-    "missingSections": 1,
+    "resolvedSections": 8,
+    "missingSections": 0,
     "newSectionsCached": 5,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 2,
-    "retrySections": 1,
-    "technicalErrorSections": 1,
+    "newPolicyResolutions": 0,
+    "retrySections": 0,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 128,
+    "globalCompleteTournaments": 129,
     "globalCancelledNoDraws": 13,
     "globalPendingTotal": 97,
     "globalPendingTechnical": 66,
     "globalPendingPublication": 31,
     "technicalPendingCompetitionIds": [
       "J-J30-ECU-2026-003",
-      "J-J30-GEO-2026-004",
       "J-J30-GEO-2026-005",
       "J-J30-IND-2026-005",
       "J-J30-KAZ-2026-004",
@@ -96,7 +95,8 @@
       "J-J30-FIN-2026-004",
       "J-J30-FRA-2026-002",
       "J-J30-FRA-2026-004",
-      "J-J30-GBR-2026-006"
+      "J-J30-GBR-2026-006",
+      "J-J30-GEO-2026-002"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-ECU-2026-005",
@@ -134,23 +134,23 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-GBR-2026-006",
-      "tournamentName": "J30 Bradfield",
-      "decision": "pending",
+      "competitionId": "J-J30-GEO-2026-004",
+      "tournamentName": "J30 Telavi",
+      "decision": "complete",
       "playersFound": [],
       "declaredSections": 8,
-      "acquiredSections": 5,
-      "unusedAlternativeSections": 2,
+      "acquiredSections": 8,
+      "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 7,
-      "missingSections": 1,
+      "resolvedSections": 8,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
-          "acquired": false,
+          "acquired": true,
           "resolved": true,
-          "status": "unused_alternative_structure"
+          "status": "acquired"
         },
         {
           "event": "B-S-M-RR",
@@ -176,9 +176,9 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": false,
+          "acquired": true,
           "resolved": true,
-          "status": "unused_alternative_structure"
+          "status": "acquired"
         },
         {
           "event": "G-S-M-RR",
@@ -197,9 +197,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -209,9 +209,9 @@
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
+              "players": 8,
+              "error": null,
+              "failureType": null,
               "resolved": true
             },
             {
@@ -229,7 +229,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 20,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -242,7 +242,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 22,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -255,9 +255,9 @@
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
+              "players": 8,
+              "error": null,
+              "failureType": null,
               "resolved": true
             },
             {
@@ -275,7 +275,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 16,
+              "players": 15,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -284,19 +284,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 30,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
