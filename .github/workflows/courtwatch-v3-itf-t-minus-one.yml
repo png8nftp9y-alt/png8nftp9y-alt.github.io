@@ -112,7 +112,20 @@ jobs:
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
         with: {pattern: 'itf-t1-inventory-*', path: dist/v3/shards/itf/inventory, merge-multiple: true}
+      - name: Restore strict missing-draw audit
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          command -v aws >/dev/null || python -m pip install --quiet awscli
+          aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/strict-v2-current.json" /tmp/itf-audit-state.json --only-show-errors
       - id: queue
+        env:
+          ITF_AUDIT_STATE_FILE: /tmp/itf-audit-state.json
         run: node src/v3/build-itf-t1-draw-batch.mjs
       - uses: actions/upload-artifact@v4
         with:
