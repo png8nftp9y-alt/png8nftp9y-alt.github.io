@@ -1,35 +1,35 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-30T19:24:30.894Z",
+  "generatedAt": "2026-09-30T19:29:48.724Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
+    "pendingTournaments": 0,
     "declaredSections": 8,
-    "requestedSections": 6,
-    "acquiredSections": 5,
+    "requestedSections": 2,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 2,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 7,
-    "missingSections": 1,
-    "newSectionsCached": 5,
+    "resolvedSections": 8,
+    "missingSections": 0,
+    "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 2,
-    "retrySections": 1,
-    "technicalErrorSections": 1,
+    "newPolicyResolutions": 0,
+    "retrySections": 0,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 108,
+    "globalCompleteTournaments": 109,
     "globalCancelledNoDraws": 13,
     "globalPendingTotal": 73,
-    "globalPendingTechnical": 37,
-    "globalPendingPublication": 36,
+    "globalPendingTechnical": 38,
+    "globalPendingPublication": 35,
     "technicalPendingCompetitionIds": [
       "J-J30-COL-2026-005",
       "J-J30-CRO-2026-001",
@@ -67,7 +67,8 @@
       "J-J30-ARU-2026-001",
       "J-J30-ARU-2026-002",
       "J-J30-AUS-2026-001",
-      "J-J30-AUS-2026-002"
+      "J-J30-AUS-2026-002",
+      "J-J30-AUS-2026-003"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-DEN-2026-004",
@@ -85,7 +86,6 @@
       "J-J60-COL-2026-001",
       "J-J60-FRA-2026-006",
       "J-J60-LAT-2026-004",
-      "J-J30-AUS-2026-004",
       "J-J30-SVK-2026-004",
       "J-J30-LAT-2026-004",
       "J-J30-NCA-2026-002",
@@ -110,16 +110,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-AUS-2026-002",
-      "tournamentName": "J30 Melbourne",
-      "decision": "pending",
+      "competitionId": "J-J30-AUS-2026-004",
+      "tournamentName": "J30 Adelaide",
+      "decision": "complete",
       "playersFound": [],
       "declaredSections": 8,
-      "acquiredSections": 5,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 2,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 7,
-      "missingSections": 1,
+      "resolvedSections": 8,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -173,9 +173,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -205,7 +205,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 32,
+              "players": 48,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -251,7 +251,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 30,
+              "players": 45,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -260,19 +260,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
