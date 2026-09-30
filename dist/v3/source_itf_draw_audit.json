@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-30T10:36:19.921Z",
+  "generatedAt": "2026-09-30T10:50:34.064Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -10,8 +10,8 @@
     "pendingTournaments": 1,
     "declaredSections": 8,
     "requestedSections": 2,
-    "acquiredSections": 4,
-    "unusedAlternativeSections": 2,
+    "acquiredSections": 3,
+    "unusedAlternativeSections": 3,
     "declaredButUnusedSections": 0,
     "resolvedSections": 6,
     "missingSections": 2,
@@ -25,11 +25,11 @@
     "notPublishedOrIncompleteSections": 2,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 80,
+    "globalCompleteTournaments": 81,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 95,
+    "globalPendingTotal": 94,
     "globalPendingTechnical": 39,
-    "globalPendingPublication": 56,
+    "globalPendingPublication": 55,
     "technicalPendingCompetitionIds": [
       "J-J100-KGZ-2026-001",
       "J-J100-RSA-2026-004",
@@ -96,7 +96,6 @@
       "J-J30-NZL-2026-001",
       "J-J30-VIE-2026-007",
       "J-J30-ALG-2026-004",
-      "J-J30-AUT-2026-003",
       "J-J30-DOM-2026-002",
       "J-J30-INA-2026-004",
       "J-J30-MNE-2026-001",
@@ -132,13 +131,13 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-GBR-2026-002",
-      "tournamentName": "J60 Loughborough",
+      "competitionId": "J-J60-MEX-2026-011",
+      "tournamentName": "J60 Leon",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 8,
-      "acquiredSections": 4,
-      "unusedAlternativeSections": 2,
+      "acquiredSections": 3,
+      "unusedAlternativeSections": 3,
       "declaredButUnusedSections": 0,
       "resolvedSections": 6,
       "missingSections": 2,
@@ -188,9 +187,9 @@
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": true,
+          "acquired": false,
           "resolved": true,
-          "status": "acquired"
+          "status": "unused_alternative_structure"
         },
         {
           "event": "G-D-M-KO",
@@ -260,7 +259,7 @@
             },
             {
               "event": "G-S-M-RR",
-              "players": 32,
+              "players": 31,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -269,13 +268,13 @@
         },
         {
           "family": "G-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 16,
-              "error": null,
-              "failureType": null,
+              "players": 0,
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
               "resolved": true
             }
           ]
