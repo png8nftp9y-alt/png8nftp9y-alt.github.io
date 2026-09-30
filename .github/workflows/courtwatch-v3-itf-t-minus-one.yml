@@ -72,6 +72,8 @@ jobs:
           ITF_COMPETITION_ID: ${{ matrix.competitionId }}
           ITF_REQUEST_TIMEOUT_MS: 30000
           ITF_REQUEST_DELAY_MS: 1800
+          ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
         run: node src/v3/inventory-itf-history-tournament.mjs
       - uses: actions/upload-artifact@v4
         if: always() && matrix.skip != true
@@ -124,7 +126,10 @@ jobs:
         env:
           ITF_DRAW_TASK_B64: ${{ matrix.task }}
           ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUEST_DELAY_MS: 1800
           ITF_REQUIRE_POPULATED_DRAW: 1
+          ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
         run: |
           export ITF_TOURNAMENT_TASKS_JSON="$(printf '%s' "$ITF_DRAW_TASK_B64" | base64 --decode)"
           node src/v3/acquire-itf-history-tournament-tasks.mjs

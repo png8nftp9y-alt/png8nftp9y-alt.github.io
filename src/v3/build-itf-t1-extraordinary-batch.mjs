@@ -53,6 +53,7 @@ for(const tournament of [...strictConcludedMissing,...activeBacklog,...concluded
  if(id&&!queueMap.has(id))queueMap.set(id,tournament);
 }
 const queue=[...queueMap.values()];
+const excludedIds=new Set(String(process.env.ITF_EXCLUDE_IDS||'').split(',').map(id=>id.trim().toUpperCase()).filter(Boolean));
 const strictIds=new Set(strictConcludedMissing.map(t=>String(t.competitionId).toUpperCase())),unseenIds=new Set(activeBacklog.map(t=>String(t.competitionId).toUpperCase()).filter(id=>!state.tournaments?.[id]));
 queue.sort((a,b)=>
  Number(strictIds.has(String(b.competitionId).toUpperCase()))-Number(strictIds.has(String(a.competitionId).toUpperCase()))||
@@ -60,9 +61,12 @@ queue.sort((a,b)=>
  String(a.checkedAt||'').localeCompare(String(b.checkedAt||''))||
  String(a.competitionId).localeCompare(String(b.competitionId))
 );
-const selected=queue.slice(0,2);
+const available=queue.filter(t=>!excludedIds.has(String(t.competitionId||'').toUpperCase()));
+const cycleReset=queue.length>0&&available.length===0;
+const selected=(cycleReset?queue:available).slice(0,2);
 const competitionIds=selected.map(t=>String(t.competitionId).toUpperCase());
+const nextPreviousIds=[...(cycleReset?new Set():excludedIds),...competitionIds].join(',');
 const queueStatus=queue.map(t=>{const id=String(t.competitionId||'').toUpperCase(),row=state.tournaments?.[id]||t,inventory=row.eventInventory||[],cache=row.eventCache||{},missingDraws=t.auditMissingDraws??inventory.filter(item=>{const saved=cache[item.event]||{};return !saved.populated&&!saved.terminalAlternative&&saved.resolution!=='declared_but_unused'}).length;return{competitionId:id,tournamentName:t.tournamentName||row.tournamentName||'',startDate:t.startDate||row.startDate||'',endDate:t.endDate||row.endDate||'',status:t.auditMissingDraws!=null?'strict_missing_draws':row.decision||'unprocessed',knownDraws:t.events?.length||inventory.length,missingDraws:(t.auditMissingDraws!=null||inventory.length)?missingDraws:null,checkedAt:row.checkedAt||null}});
-await writeJson('dist/v3/itf_t1_extraordinary_batch.json',{version:6,generatedAt:new Date().toISOString(),today:TODAY,extraordinaryTotal:queue.length,extraordinaryMissingDraws:queueStatus.reduce((sum,row)=>sum+Number(row.missingDraws||0),0),strictConcludedMissing:strictConcludedMissing.length,activeBacklog:activeBacklog.length,pendingConcluded:concludedPending.length,selected:selected.map(t=>({competitionId:t.competitionId,tournamentName:t.tournamentName||'',endDate:t.endDate||'',checkedAt:t.checkedAt||null})),queue:queueStatus});
-if(process.env.GITHUB_OUTPUT)await fs.appendFile(process.env.GITHUB_OUTPUT,`competition_ids=${competitionIds.join(',')}\nselected=${competitionIds.length}\n`);
-console.log(JSON.stringify({today:TODAY,extraordinaryTotal:queue.length,activeBacklog:activeBacklog.length,pendingConcluded:concludedPending.length,selected:competitionIds},null,2));
+await writeJson('dist/v3/itf_t1_extraordinary_batch.json',{version:7,generatedAt:new Date().toISOString(),today:TODAY,extraordinaryTotal:queue.length,extraordinaryMissingDraws:queueStatus.reduce((sum,row)=>sum+Number(row.missingDraws||0),0),strictConcludedMissing:strictConcludedMissing.length,activeBacklog:activeBacklog.length,pendingConcluded:concludedPending.length,selectionCycleReset:cycleReset,attemptedInCycle:nextPreviousIds?nextPreviousIds.split(',').length:0,selected:selected.map(t=>({competitionId:t.competitionId,tournamentName:t.tournamentName||'',endDate:t.endDate||'',checkedAt:t.checkedAt||null})),queue:queueStatus});
+if(process.env.GITHUB_OUTPUT)await fs.appendFile(process.env.GITHUB_OUTPUT,`competition_ids=${competitionIds.join(',')}\nselected=${competitionIds.length}\nnext_previous_ids=${nextPreviousIds}\n`);
+console.log(JSON.stringify({today:TODAY,extraordinaryTotal:queue.length,activeBacklog:activeBacklog.length,pendingConcluded:concludedPending.length,cycleReset,selected:competitionIds},null,2));

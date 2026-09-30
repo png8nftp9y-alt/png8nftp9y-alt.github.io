@@ -1434,3 +1434,10 @@ completa è in `docs/D1_NEW_FEATURE_POLICY.md`.
 - Tornei, match e risultati ITF usano ID canonici stabili. Gli UPSERT aggiornano esclusivamente payload differenti; dati identici producono zero scritture e una sorgente incompleta non cancella dati validi.
 - Il rebuild D1 generale esclude l'archivio ITF dalle cancellazioni di riconciliazione, impedendo che una proiezione corrente incompleta elimini lo storico.
 - Il futuro motore risultati/OOP ITF deve usare lo stesso importatore canonico. Il controllo CI `Court Watch global D1 incremental policy` e il test `build-itf-draw-d1-seed.test.mjs` bloccano modifiche prive di ID stabili, UPSERT condizionali, protezione delle fonti incomplete o zero-write sui dati invariati.
+
+## Copertura Incapsula ITF — 30 settembre 2026
+
+- Inventario e acquisizione T−1 usano il fallback autorizzato per qualificazioni, knockout e Round Robin quando l'API diretta restituisce Incapsula, HTTP 401/403 o una risposta protetta non JSON.
+- Un test automatico verifica esplicitamente i tre casi `Q-KO`, `M-KO` e `M-RR`.
+- Lo straordinario ruota l'intera coda prima di riprovare tornei ancora bloccati: due fallimenti non possono più fermare gli altri recuperi.
+- La sincronizzazione D1 termina correttamente con zero scritture quando il run non contiene record nuovi o modificati.

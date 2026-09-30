@@ -49,9 +49,15 @@ jobs:
         working-directory: cloudflare/app-api
         run: |
           set -euo pipefail
+          shopt -s nullglob
           npm install
           node scripts/configure-d1.mjs
-          for sql_file in ../../seed-itf-draws/*.sql; do
+          sql_files=(../../seed-itf-draws/*.sql)
+          if [ "${#sql_files[@]}" -eq 0 ]; then
+            echo "No new or changed ITF draw rows; D1 is already synchronized"
+            exit 0
+          fi
+          for sql_file in "${sql_files[@]}"; do
             imported=0
             for attempt in 1 2 3 4; do
               if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"; then imported=1; break; fi

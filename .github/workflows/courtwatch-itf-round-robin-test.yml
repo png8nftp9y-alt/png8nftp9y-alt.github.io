@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'src/v3/itf-common.mjs'
+      - 'src/v3/itf-incapsula-fallback.test.mjs'
       - 'src/v3/acquire-itf-history-tournament-tasks.mjs'
       - 'src/v3/verify-itf-t-minus-one-all-players.mjs'
       - 'src/v3/test-itf-round-robin-live.mjs'
@@ -29,9 +30,14 @@ jobs:
         with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - run: node --test src/v3/itf-incapsula-fallback.test.mjs
       - run: node src/v3/test-itf-round-robin-group.mjs
         env:
           ITF_RR_GROUP_INDEX: ${{ matrix.group }}
+          ITF_REQUEST_DELAY_MS: 1800
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
