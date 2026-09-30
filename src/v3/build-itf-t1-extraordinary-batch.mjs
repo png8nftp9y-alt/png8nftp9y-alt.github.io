@@ -45,7 +45,7 @@ const activeBacklog=[...new Map([...historicalBacklog,...futureSafetyBacklog].ma
 const concludedPending=Object.values(state.tournaments||{})
  .filter(t=>t?.decision==='pending'&&t.competitionId&&(!t.endDate||t.endDate<TODAY))
  .sort((a,b)=>String(a.checkedAt||'').localeCompare(String(b.checkedAt||''))||String(a.competitionId).localeCompare(String(b.competitionId)));
-const strictConcludedMissing=(strictAudit.tournaments||[]).filter(t=>t.classification==='missing_draws'&&t.competitionId&&t.endDate<TODAY).map(t=>{const id=String(t.competitionId).toUpperCase(),cache=state.tournaments?.[id]?.eventCache||{},missingEvents=(t.missingEvents||[]).filter(item=>!cache[item.event]?.populated);return{...t,competitionId:id,auditMissingEvents:missingEvents,auditMissingDraws:missingEvents.length}}).filter(t=>t.auditMissingDraws>0);
+const strictConcludedMissing=(strictAudit.tournaments||[]).filter(t=>t.classification==='missing_draws'&&t.competitionId&&t.endDate<TODAY).map(t=>{const id=String(t.competitionId).toUpperCase(),cache=state.tournaments?.[id]?.eventCache||{},missingEvents=(t.missingEvents||[]).filter(item=>!cache[item.event]?.populated&&!cache[item.event]?.terminalAlternative);return{...t,competitionId:id,auditMissingEvents:missingEvents,auditMissingDraws:missingEvents.length}}).filter(t=>t.auditMissingDraws>0);
 
 const queueMap=new Map();
 for(const tournament of [...strictConcludedMissing,...activeBacklog,...concludedPending]){
