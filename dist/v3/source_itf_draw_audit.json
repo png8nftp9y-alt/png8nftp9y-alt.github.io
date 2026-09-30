@@ -1,35 +1,35 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-30T19:04:54.788Z",
+  "generatedAt": "2026-09-30T19:09:27.991Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
-    "declaredSections": 8,
+    "pendingTournaments": 0,
+    "declaredSections": 7,
     "requestedSections": 2,
-    "acquiredSections": 3,
-    "unusedAlternativeSections": 3,
+    "acquiredSections": 5,
+    "unusedAlternativeSections": 2,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 6,
-    "missingSections": 2,
-    "newSectionsCached": 0,
+    "resolvedSections": 7,
+    "missingSections": 0,
+    "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 2,
+    "retrySections": 0,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 2,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 107,
+    "globalCompleteTournaments": 108,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 70,
+    "globalPendingTotal": 69,
     "globalPendingTechnical": 33,
-    "globalPendingPublication": 37,
+    "globalPendingPublication": 36,
     "technicalPendingCompetitionIds": [
       "J-J30-COL-2026-005",
       "J-J30-CRO-2026-001",
@@ -66,7 +66,6 @@
       "J-J30-ALB-2026-003"
     ],
     "publicationPendingCompetitionIds": [
-      "J-J30-ARG-2026-003",
       "J-J30-DEN-2026-004",
       "J-J30-ECU-2026-005",
       "J-J30-GER-2026-005",
@@ -107,16 +106,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-MEX-2026-011",
-      "tournamentName": "J60 Leon",
-      "decision": "pending",
+      "competitionId": "J-J30-ARG-2026-003",
+      "tournamentName": "J30 San Miguel de Tucumán",
+      "decision": "complete",
       "playersFound": [],
-      "declaredSections": 8,
-      "acquiredSections": 3,
-      "unusedAlternativeSections": 3,
+      "declaredSections": 7,
+      "acquiredSections": 5,
+      "unusedAlternativeSections": 2,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 6,
-      "missingSections": 2,
+      "resolvedSections": 7,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -142,9 +141,9 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-M-KO",
@@ -161,18 +160,11 @@
           "status": "acquired"
         },
         {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "acquired": false,
-          "resolved": true,
-          "status": "unused_alternative_structure"
-        },
-        {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -202,7 +194,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 44,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -211,14 +203,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -235,7 +227,7 @@
             },
             {
               "event": "G-S-M-RR",
-              "players": 31,
+              "players": 28,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -243,28 +235,15 @@
           ]
         },
         {
-          "family": "G-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
-              "resolved": true
-            }
-          ]
-        },
-        {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
