@@ -1,34 +1,34 @@
 {
   "version": 16,
-  "generatedAt": "2026-09-30T19:09:27.991Z",
+  "generatedAt": "2026-09-30T19:14:28.555Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 1,
+    "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 0,
-    "declaredSections": 7,
-    "requestedSections": 2,
+    "pendingTournaments": 1,
+    "declaredSections": 8,
+    "requestedSections": 6,
     "acquiredSections": 5,
     "unusedAlternativeSections": 2,
     "declaredButUnusedSections": 0,
     "resolvedSections": 7,
-    "missingSections": 0,
-    "newSectionsCached": 2,
+    "missingSections": 1,
+    "newSectionsCached": 5,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 0,
-    "retrySections": 0,
-    "technicalErrorSections": 0,
+    "newPolicyResolutions": 2,
+    "retrySections": 1,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 108,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 69,
-    "globalPendingTechnical": 33,
+    "globalPendingTotal": 71,
+    "globalPendingTechnical": 35,
     "globalPendingPublication": 36,
     "technicalPendingCompetitionIds": [
       "J-J30-COL-2026-005",
@@ -63,7 +63,9 @@
       "J-J60-SRI-2026-002",
       "J-J60-USA-2026-005",
       "J-JGS-USA-2026-001",
-      "J-J30-ALB-2026-003"
+      "J-J30-ALB-2026-003",
+      "J-J30-ARU-2026-001",
+      "J-J30-ARU-2026-002"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-DEN-2026-004",
@@ -106,16 +108,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-ARG-2026-003",
-      "tournamentName": "J30 San Miguel de Tucumán",
-      "decision": "complete",
+      "competitionId": "J-J30-ARU-2026-002",
+      "tournamentName": "J30 Oranjestad",
+      "decision": "pending",
       "playersFound": [],
-      "declaredSections": 7,
+      "declaredSections": 8,
       "acquiredSections": 5,
       "unusedAlternativeSections": 2,
       "declaredButUnusedSections": 0,
       "resolvedSections": 7,
-      "missingSections": 0,
+      "missingSections": 1,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -160,11 +162,18 @@
           "status": "acquired"
         },
         {
-          "event": "G-D-M-KO",
-          "family": "G-D-M",
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         }
       ],
       "families": [
@@ -194,7 +203,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 44,
+              "players": 12,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -207,7 +216,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 32,
+              "players": 30,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -227,7 +236,20 @@
             },
             {
               "event": "G-S-M-RR",
-              "players": 28,
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 9,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -236,19 +258,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge"
     }
   ]
 }
