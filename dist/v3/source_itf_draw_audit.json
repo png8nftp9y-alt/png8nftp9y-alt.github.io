@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-01T11:59:10.469Z",
+  "generatedAt": "2026-10-01T12:05:11.910Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -10,26 +10,26 @@
     "pendingTournaments": 1,
     "declaredSections": 6,
     "requestedSections": 6,
-    "acquiredSections": 0,
-    "unusedAlternativeSections": 0,
+    "acquiredSections": 3,
+    "unusedAlternativeSections": 2,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 0,
-    "missingSections": 6,
-    "newSectionsCached": 0,
+    "resolvedSections": 5,
+    "missingSections": 1,
+    "newSectionsCached": 3,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 0,
-    "retrySections": 6,
+    "newPolicyResolutions": 2,
+    "retrySections": 1,
     "technicalErrorSections": 1,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 5,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 129,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 134,
-    "globalPendingTechnical": 94,
-    "globalPendingPublication": 40,
+    "globalPendingTotal": 136,
+    "globalPendingTechnical": 95,
+    "globalPendingPublication": 41,
     "technicalPendingCompetitionIds": [
       "J-J30-ECU-2026-003",
       "J-J30-GEO-2026-005",
@@ -124,7 +124,8 @@
       "J-J100-POL-2026-002",
       "J-J100-POL-2026-004",
       "J-J100-POR-2026-002",
-      "J-J100-ROU-2026-001"
+      "J-J100-ROU-2026-001",
+      "J-J100-RSA-2026-003"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-ECU-2026-005",
@@ -166,56 +167,57 @@
       "J-J100-DOM-2026-001",
       "J-J100-DOM-2026-003",
       "J-J100-GUA-2026-002",
-      "J-J100-MEX-2026-001"
+      "J-J100-MEX-2026-001",
+      "J-J100-RSA-2026-001"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J100-ROU-2026-001",
-      "tournamentName": "J100 Bucharest",
+      "competitionId": "J-J100-RSA-2026-003",
+      "tournamentName": "J100 Potchefstroom",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 0,
-      "unusedAlternativeSections": 0,
+      "acquiredSections": 3,
+      "unusedAlternativeSections": 2,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 6,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "resolved": true,
+          "status": "unused_alternative_structure"
         },
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "resolved": true,
+          "status": "unused_alternative_structure"
         },
         {
           "event": "G-D-M-KO",
@@ -228,14 +230,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_rows_incomplete:48/64;empty=16",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -246,35 +248,35 @@
             {
               "event": "B-S-Q-KO",
               "players": 0,
-              "error": "draw_rows_incomplete:45/48;empty=3",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             }
           ]
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_rows_incomplete:24/32;empty=8",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "draw_rows_incomplete:48/64;empty=16",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -285,9 +287,9 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "draw_rows_incomplete:42/48;empty=6",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             }
           ]
         },
