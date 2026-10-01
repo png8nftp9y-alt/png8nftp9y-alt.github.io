@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-01T23:29:05.238Z",
+  "generatedAt": "2026-10-01T23:32:16.793Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,14 +8,14 @@
     "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 0,
-    "declaredSections": 5,
-    "requestedSections": 2,
-    "acquiredSections": 5,
+    "declaredSections": 6,
+    "requestedSections": 1,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 5,
+    "resolvedSections": 6,
     "missingSections": 0,
-    "newSectionsCached": 2,
+    "newSectionsCached": 1,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
@@ -25,16 +25,12 @@
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 127,
+    "globalCompleteTournaments": 132,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 169,
-    "globalPendingTechnical": 103,
-    "globalPendingPublication": 66,
+    "globalPendingTotal": 164,
+    "globalPendingTechnical": 99,
+    "globalPendingPublication": 65,
     "technicalPendingCompetitionIds": [
-      "J-J200-HKG-2026-001",
-      "J-J200-KOR-2026-001",
-      "J-J30-LAT-2026-005",
-      "J-J30-NZL-2026-002",
       "J-J30-ECU-2026-003",
       "J-J30-GEO-2026-005",
       "J-J30-IND-2026-005",
@@ -156,7 +152,6 @@
       "J-J30-NED-2026-004",
       "J-J30-NZL-2026-001",
       "J-J30-VIE-2026-007",
-      "J-J30-MAD-2026-002",
       "J-J30-GHA-2026-006",
       "J-J30-MRI-2026-002",
       "J-J30-TPE-2026-001",
@@ -206,15 +201,15 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-NEP-2026-002",
-      "tournamentName": "J60 Kathmandu",
+      "competitionId": "J-J30-NZL-2026-002",
+      "tournamentName": "J30 Auckland",
       "decision": "complete",
       "playersFound": [],
-      "declaredSections": 5,
-      "acquiredSections": 5,
+      "declaredSections": 6,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 5,
+      "resolvedSections": 6,
       "missingSections": 0,
       "sections": [
         {
@@ -241,6 +236,13 @@
         {
           "event": "G-S-M-RR",
           "family": "G-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -273,7 +275,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 0,
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -286,7 +288,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
+              "players": 48,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -299,7 +301,20 @@
           "events": [
             {
               "event": "G-S-M-RR",
-              "players": 31,
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -312,7 +327,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
+              "players": 44,
               "error": null,
               "failureType": null,
               "resolved": true
