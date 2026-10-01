@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {gunzipSync} from 'node:zlib';
+import {reconcileCoverageAudit} from './reconcile-itf-coverage-audit.mjs';
+import {isCoverageAudit} from './itf-t1-acquisition-state.mjs';
 import {strictDrawStatus} from './itf-strict-draw-status.mjs';
 
 async function files(root){
@@ -47,8 +49,12 @@ if(import.meta.url===`file://${process.argv[1]}`){
  const input=process.argv[2]||process.env.ITF_AUDIT_STATE_FILE,root=process.argv[3]||process.env.ITF_T1_TASK_ROOT||'draw-tasks',output=process.argv[4]||input;
  if(!input||!output)throw new Error('Usage: reconcile-itf-t1-strict-audit.mjs AUDIT_FILE [TASK_ROOT] [OUTPUT_FILE]');
  const audit=JSON.parse(await fs.readFile(input,'utf8')),documents=[];
- for(const file of await files(root))try{documents.push(JSON.parse(gunzipSync(await fs.readFile(file))))}catch(error){console.warn(`Ignored invalid T-1 document ${file}: ${error.message}`)}
- const result=reconcileStrictAudit(audit,documents);
+ for(const file of await files(root))try{documents.push(JSON.parse(gunzipSync(await fs.readFile(file))))}catch(error){throw new Error(`Unreadable T-1 document ${file}: ${error.message}`)}
+ const inventories=[];
+ const inventoryRoot=process.argv[5]||'dist/v3/shards/itf/t1-inventory';
+ for(const item of await fs.readdir(inventoryRoot,{withFileTypes:true}).catch(()=>[]))if(item.isFile()&&item.name.endsWith('.json'))inventories.push(JSON.parse(await fs.readFile(path.join(inventoryRoot,item.name),'utf8')));
+ const baseline=isCoverageAudit(audit)?JSON.parse(await fs.readFile('src/v3/itf-audit-baseline-20261001.json','utf8')):null;
+ const result=isCoverageAudit(audit)?reconcileCoverageAudit(audit,documents,{inventories,baseline}):reconcileStrictAudit(audit,documents);
  await fs.writeFile(output,JSON.stringify(result.audit,null,2)+'\n');
  console.log(`ITF_T1_STRICT_AUDIT_RECONCILED=${JSON.stringify({documents:documents.length,newlyAcquired:result.newlyAcquired,acquiredDraws:result.audit.summary?.acquiredDraws,missingDraws:result.audit.summary?.missingDraws})}`);
 }

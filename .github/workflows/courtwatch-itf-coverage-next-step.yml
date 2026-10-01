@@ -1,0 +1,66 @@
+name: Court Watch ITF prepare queues and export Compiegne
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: courtwatch-v3-itf-publish
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: python -m pip install --quiet awscli
+      - name: Read the coverage snapshot and only historical block 06
+        run: |
+          set -euo pipefail
+          test -n "$R2_ACCOUNT_ID" && test -n "$R2_BUCKET"
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-coverage.json --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/pointers/current.json" /tmp/itf-pointer.json --only-show-errors
+          generation="$(jq -er '.generation|select(type=="string" and length>0)' /tmp/itf-pointer.json)"
+          [[ "$generation" =~ ^[a-f0-9]{64}$ ]]
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/generations/$generation/manifest.json" /tmp/itf-manifest.json --only-show-errors
+          sha="$(jq -er '.blocks[]|select(.block=="06")|.sha256' /tmp/itf-manifest.json)"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/generations/$generation/blocks/block-06.tar.gz" /tmp/block-06.tar.gz --only-show-errors
+          echo "$sha  /tmp/block-06.tar.gz" | sha256sum --check --status
+          mkdir -p /tmp/itf-block-06
+          tar -xzf /tmp/block-06.tar.gz -C /tmp/itf-block-06
+          echo "ITF_HISTORY_GENERATION=$generation" >> "$GITHUB_ENV"
+      - name: Prepare the ordinary and A/B queues without activating motors
+        run: node src/v3/prepare-itf-coverage-queues.mjs /tmp/itf-coverage.json
+      - name: Show preparation readiness
+        run: |
+          jq -r '"Prontezza preparatoria: \(.readyForT1)\n\nFotografia audit: \(.auditGeneratedAt)\n\nFinestra fino al: \(.windowEnd)\n\nOrdinario: \(.summary.ordinary.total) tornei / \(.summary.ordinary.missingDraws) tabelloni\n\nStraordinario A: \(.summary.extraordinaryA.total) / \(.summary.extraordinaryA.missingDraws)\n\nStraordinario B: \(.summary.extraordinaryB.total) / \(.summary.extraordinaryB.missingDraws)\n\nFuturi in attesa: \(.summary.waiting.total)\n\nMotori non avviati."' dist/v3/audits/itf-t1-preparation/itf-t1-prepared-queues.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Export the six original archived documents
+        run: node src/v3/export-itf-compiegne-archive.mjs /tmp/itf-block-06 dist/v3/audits/itf-t1-preparation/compiegne "$ITF_HISTORY_GENERATION"
+      - name: Publish the corrected diagnostic counters only
+        run: |
+          set -euo pipefail
+          cp dist/v3/audits/itf-t1-preparation/itf_t1_queue_status.json /tmp/itf-queue-preview.json
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          git pull --ff-only origin main
+          cp /tmp/itf-queue-preview.json dist/v3/itf_t1_queue_status.json
+          git add dist/v3/itf_t1_queue_status.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish ITF coverage diagnostic counters"
+            git push origin HEAD:main
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-prepared-queues-and-compiegne-draws
+          path: dist/v3/audits/itf-t1-preparation/
+          retention-days: 30
+          if-no-files-found: error

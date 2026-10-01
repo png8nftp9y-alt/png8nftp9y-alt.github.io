@@ -22,15 +22,19 @@ async function api(page,url){
   throw new Error(last);
 }
 
-export async function readTournamentDrawsInBrowser(tournament){
+export async function readTournamentDrawsInBrowser(tournament,{tasks=null}={}){
   const browser=await chromium.launch({channel:'chrome',headless:true});
   try{
     const context=await browser.newContext({locale:'en-GB',timezoneId:'Europe/Rome'});
     const page=await context.newPage();
     await page.goto(tournament.sourceUrl,{waitUntil:'domcontentloaded',timeout:60000});
     await pause(3000);
+    let combos;
+    if(tasks?.length)combos=tasks.map(combo=>({...combo,sourceUrl:tournament.sourceUrl||combo.sourceUrl||''}));
+    else{
     const filters=await api(page,`${API}/GetEventFilters?tournamentKey=${encodeURIComponent(tournament.competitionId.toLowerCase())}`);
-    const combos=eventCombinations(filters).map(combo=>({...combo,sourceUrl:tournament.sourceUrl||''}));
+    combos=eventCombinations(filters).map(combo=>({...combo,sourceUrl:tournament.sourceUrl||''}));
+    }
     if(!combos.length)throw new Error('browser_event_filters_empty');
     const outcomes=[];
     for(const combo of combos){

@@ -1,0 +1,10 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {buildCoverageQueuePlan,coverageDiagnostic} from './itf-coverage-queue-plan.mjs';
+const [input,output='dist/v3/audits/itf-t1-preparation',today]=process.argv.slice(2);
+if(!input)throw new Error('Usage: node prepare-itf-coverage-queues.mjs AUDIT_JSON [OUTPUT_DIRECTORY] [TODAY]');
+const audit=JSON.parse(await fs.readFile(input,'utf8')),baseline=JSON.parse(await fs.readFile('src/v3/itf-audit-baseline-20261001.json','utf8')),plan=buildCoverageQueuePlan(audit,baseline,today);
+await fs.mkdir(output,{recursive:true});
+await fs.writeFile(path.join(output,'itf-t1-prepared-queues.json'),JSON.stringify(plan,null,2)+'\n');
+await fs.writeFile(path.join(output,'itf_t1_queue_status.json'),JSON.stringify(coverageDiagnostic(plan),null,2)+'\n');
+console.log(JSON.stringify({readyForT1:plan.readyForT1,...plan.summary},null,2));

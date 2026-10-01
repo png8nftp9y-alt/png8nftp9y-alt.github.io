@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import {acquiredDrawStatus} from './itf-audit-acquisition-policy.mjs';
 import crypto from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 
@@ -32,7 +33,7 @@ for(const file of files){
  const key=`tournaments/${competitionId}/${event}/${sha}.json.gz`,target=path.join(stage,key);
  await fs.mkdir(path.dirname(target),{recursive:true});await fs.copyFile(file,target);
  manifest.push({competitionId,event,status,sha256:sha,key,matches:(doc.matches||[]).length,players:(doc.players||[]).length});
- if(status!=='complete'){retryDocuments++;if(doc.outcome==='pending_technical'||doc.failureType==='technical_error')technicalPendingDocuments++;else publicationPendingDocuments++;continue}
+ if(status!=='complete'||!acquiredDrawStatus({competitionId,event,structure:event.split('-').at(-1),artifact:doc}).complete){retryDocuments++;if(doc.outcome==='pending_technical'||doc.failureType==='technical_error')technicalPendingDocuments++;else publicationPendingDocuments++;continue}
  completeDocuments++;
  let tournament=tournamentBySource.get(competitionId);
  if(!tournament){const source=catalogById.get(competitionId);if(!source){unmappedDocuments++;continue}const id='tournament_itf_'+crypto.createHash('sha256').update('itf|'+competitionId).digest('hex').slice(0,24);tournament={id,circuit:'itf',sourceTournamentId:competitionId,name:source.tournamentName||competitionId,location:source.location||'',surface:source.surface||'',environment:source.environment||source.indoorOutdoor||'',startDate:source.startDate||'',endDate:source.endDate||'',officialStartDate:source.officialStartDate||source.startDate||'',status:'detected',source:{circuit:'itf',sourceId:competitionId,sourceUrl:source.sourceUrl||doc.sourceUrl||'',observedAt:doc.generatedAt||new Date().toISOString()}};tournamentRows.push(tournament);tournamentBySource.set(competitionId,tournament);newTournaments++}
