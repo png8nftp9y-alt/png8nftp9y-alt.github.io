@@ -12,7 +12,7 @@ on:
     paths:
       - '.github/workflows/courtwatch-itf-official-draw-parity-audit.yml'
 permissions:
-  contents: read
+  contents: write
   actions: write
 concurrency:
   group: courtwatch-itf-official-draw-parity-audit
@@ -105,7 +105,9 @@ jobs:
           find /tmp/itf-blocks -name '*.tar.gz' -print0 | while IFS= read -r -d '' file; do tar -xzf "$file" -C /tmp/itf-complete-audit; done
           aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/strict-v2-current.json" /tmp/itf-audit-state.json --only-show-errors || true
       - name: Compare official inventory with acquired draws
-        run: node src/v3/merge-itf-full-inventory-audit.mjs /tmp/itf-official-inventory-shards /tmp/itf-complete-audit /tmp/itf-audit-state.json
+        run: |
+          node src/v3/merge-itf-full-inventory-audit.mjs /tmp/itf-official-inventory-shards /tmp/itf-complete-audit /tmp/itf-audit-state.json
+          ITF_AUDIT_STATE_FILE=dist/v3/audits/itf-official-draw-parity.json node src/v3/build-itf-t1-admin-status.mjs
       - id: result
         name: Persist converged audit state
         run: |
@@ -119,6 +121,23 @@ jobs:
           name: itf-official-draw-parity-audit
           path: dist/v3/audits/itf-official-draw-parity.json
           retention-days: 30
+      - name: Publish strict binary diagnostics
+        run: |
+          set -euo pipefail
+          cp dist/v3/itf_t1_queue_status.json /tmp/itf_t1_queue_status.json
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/itf_t1_queue_status.json dist/v3/itf_t1_queue_status.json
+            git add dist/v3/itf_t1_queue_status.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m "Publish strict ITF draw completeness diagnostics"
+            if git push origin HEAD:main; then exit 0; fi
+            sleep $((attempt * 2))
+          done
+          exit 1
   continue-audit:
     needs: compare
     if: ${{ needs.compare.outputs.actionable_unverifiable != '0' && fromJSON(inputs.remaining || '20') > 0 }}

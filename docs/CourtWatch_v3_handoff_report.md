@@ -1455,3 +1455,12 @@ serializzata e incrementale.
 Il selettore ordinario include ora anche i tornei attivi classificati
 `strict_missing_draws` dalla coda diagnostica. Un run senza artefatti non causa
 più un falso fallimento del workflow D1.
+
+## Certificazione binaria dei tabelloni ITF — 1 ottobre 2026
+
+- La diagnostica non usa più `populated=true` come sinonimo di tabellone completo: un tabellone è preso soltanto quando l'artefatto ufficiale completo è archiviato.
+- Un Round Robin è preso soltanto quando tutti i gironi dichiarati risultano acquisiti e certificati; un solo girone mancante mantiene nero l'intero tabellone.
+- Qualsiasi altro esito resta mancante e ritentabile. La diagnostica espone per ogni tabellone uno dei motivi: mai processato, incompleto, vuoto/non pubblicato, blocco Incapsula, errore tecnico o gironi Round Robin incompleti.
+- Le correzioni manuali già confermate rimangono valide e sono marcate internamente come `manual_override`.
+- L'audit pubblica `dist/v3/itf_t1_queue_status.json` anche con T−1 sospeso, così l'Admin mostra numeri e motivazioni prodotti dalla stessa fotografia certificata.
+- Validazione: test unitari della regola binaria, controllo sintattico Node, verifica workflow e test UI dell'Admin.
