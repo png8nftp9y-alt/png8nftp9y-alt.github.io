@@ -38,6 +38,7 @@ permissions: {contents: write, actions: write}
 concurrency:
   group: courtwatch-v3-itf-t-minus-one-${{ inputs.chain_lane || 'ordinary' }}
   cancel-in-progress: false
+  queue: max
 jobs:
   select:
     if: ${{ vars.ITF_T1_COVERAGE_ENABLED == 'true' }}
@@ -198,7 +199,7 @@ jobs:
   review:
     needs: [queue, acquire]
     if: always() && needs.queue.result == 'success' && needs.queue.outputs.tournaments != '0'
-    concurrency: {group: courtwatch-v3-itf-publish,cancel-in-progress: false}
+    concurrency: {group: courtwatch-v3-itf-publish,cancel-in-progress: false,queue: max}
     runs-on: ubuntu-latest
     timeout-minutes: 13
     steps:

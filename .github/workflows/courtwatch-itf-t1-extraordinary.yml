@@ -26,6 +26,7 @@ permissions:
 concurrency:
   group: courtwatch-itf-t1-extraordinary-dispatch-${{ inputs.lane }}
   cancel-in-progress: false
+  queue: max
 
 jobs:
   dispatch:
