@@ -1,4 +1,4 @@
-import {AUDIT_CRITERION,acquiredDrawStatus,requiredAuditEvents} from './itf-audit-acquisition-policy.mjs';
+import {AUDIT_CRITERION,acquiredDrawStatus,requiredAuditEvents,emptySinglesQualificationResolutions} from './itf-audit-acquisition-policy.mjs';
 import {normalizedEvent} from './itf-t1-acquisition-state.mjs';
 import {buildCoverageQueuePlan} from './itf-coverage-queue-plan.mjs';
 export function reconcileCoverageAudit(audit,documents,{inventories=[],baseline,now=new Date().toISOString()}={}){
@@ -11,17 +11,24 @@ export function reconcileCoverageAudit(audit,documents,{inventories=[],baseline,
  let newlyAcquired=0;
  const tournaments=audit.tournaments.map(row=>{
   if(['complete','cancelled_no_draws'].includes(row.classification))return row;
-  const inventory=byInventory.get(row.competitionId),known=row.classification==='missing_draws',events=known?row.events:inventory&&!inventory.inventoryError?(inventory.sourceEvents||inventory.sections?.map(s=>s.combo)||[]):[];
+  const attempted=[...incoming.values()].map(r=>r.document).filter(d=>d.competitionId===row.competitionId);
+  const inventory=byInventory.get(row.competitionId);
+  if(!attempted.length&&(!inventory||inventory.inventorySource==='coverage_audit'||inventory.inventorySource==='persisted_parameters')&&row.classification==='missing_draws')return row;
+  const known=row.classification==='missing_draws',events=known?row.events:inventory&&!inventory.inventoryError?(inventory.sourceEvents||inventory.sections?.map(s=>s.combo)||[]):[];
   if(!events.length)return row;
   const normalized=events.map(normalizedEvent),required=requiredAuditEvents(normalized),old=new Map((row.checks||[]).map(c=>[c.event,c]));
-  const checks=required.map(event=>{
+  let checks=required.map(event=>{
    const previous=old.get(event.event),result=incoming.get(row.competitionId+'|'+event.event);
    if(previous?.acquired===true)return previous;
    if(result?.status.complete)newlyAcquired++;
    const status=result?.status||{complete:false,reasonCode:previous?.reasonCode||'never_processed',detail:previous?.detail||'mai processato'};
-   return{event:event.event,family:event.family,structure:event.structure,acquired:status.complete,reasonCode:status.reasonCode,detail:status.detail,rowParity:null,sources:result?.status.complete?[...new Set([...(previous?.sources||[]),'t1_acquisition'])]:previous?.sources||[]};
-  }),missingEvents=checks.filter(c=>!c.acquired);
-  return{...row,status:'inventoried',error:null,events:normalized,excludedEvents:normalized.filter(e=>!required.includes(e)),checks,declaredDraws:checks.length,acquiredDraws:checks.length-missingEvents.length,missingDraws:missingEvents.length,missingEvents,classification:missingEvents.length?'missing_draws':'complete',reconciledAt:now};
+   return{event:event.event,family:event.family,structure:event.structure,acquired:status.complete,reasonCode:status.reasonCode,detail:status.detail,lastError:result?.document.error||(!result?previous?.lastError:'')||'',lastAttemptAt:result?.document.generatedAt||previous?.lastAttemptAt||null,rowParity:null,sources:result?.status.complete?[...new Set([...(previous?.sources||[]),'t1_acquisition'])]:previous?.sources||[]};
+  });
+  const resolutions=emptySinglesQualificationResolutions(normalized,checks,[...incoming.values()].map(r=>r.document).filter(d=>d.competitionId===row.competitionId));
+  for(const resolution of resolutions)Object.assign(normalized.find(e=>e.event===resolution.event),resolution);
+  const finalRequired=requiredAuditEvents(normalized),names=new Set(finalRequired.map(e=>e.event));checks=checks.filter(c=>names.has(c.event));
+  const missingEvents=checks.filter(c=>!c.acquired),resolvedEvents=normalized.filter(e=>e.resolution==='empty_singles_qualification').map(({event,resolution,mainEvents,detail})=>({event,resolution,mainEvents,detail}));
+  return{...row,status:'inventoried',error:null,events:normalized,excludedEvents:normalized.filter(e=>!finalRequired.includes(e)),resolvedEvents,checks,declaredDraws:checks.length,acquiredDraws:checks.length-missingEvents.length,missingDraws:missingEvents.length,missingEvents,classification:missingEvents.length?'missing_draws':'complete',lastAttemptAt:attempted.map(d=>d.generatedAt).filter(t=>Number.isFinite(Date.parse(t))).sort().at(-1)||(attempted.length?now:inventory?.generatedAt||row.lastAttemptAt||row.reconciledAt||audit.generatedAt),reconciledAt:attempted.length?now:(row.reconciledAt||now)};
  });
  const sum=key=>tournaments.reduce((n,t)=>n+Number(t[key]||0),0),complete=tournaments.filter(t=>t.classification==='complete').length,cancelledNoDraws=tournaments.filter(t=>t.classification==='cancelled_no_draws').length;
  const summary={...audit.summary,catalogChecked:tournaments.length,complete,cancelledNoDraws,resolved:complete+cancelledNoDraws,missingDrawsTournaments:tournaments.filter(t=>t.classification==='missing_draws').length,unverifiable:tournaments.filter(t=>t.classification==='unverifiable').length,declaredDraws:sum('declaredDraws'),acquiredDraws:sum('acquiredDraws'),missingDraws:sum('missingDraws'),missingByReason:tournaments.flatMap(t=>t.missingEvents||[]).reduce((out,e)=>(out[e.reasonCode]=(out[e.reasonCode]||0)+1,out),{})};

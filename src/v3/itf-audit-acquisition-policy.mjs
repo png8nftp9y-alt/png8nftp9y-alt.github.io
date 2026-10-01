@@ -6,7 +6,19 @@ export const AUDIT_CRITERION='Artefatto acquisito e non vuoto, senza controllo r
 // The exclusion is per sex and event family, never for qualifying or doubles.
 export function requiredAuditEvents(events=[]){
  const rrFamilies=new Set(events.filter(item=>item.structure==='RR'&&/^[BG]-S-M$/.test(item.family)).map(item=>item.family));
- return events.filter(item=>!(item.structure==='KO'&&rrFamilies.has(item.family)));
+ return events.filter(item=>!(item.structure==='KO'&&rrFamilies.has(item.family))&&!(/^[BG]-S-Q-(KO|RR)$/.test(item.event)&&item.resolution==='empty_singles_qualification'));
+}
+
+export function emptySinglesQualificationResolutions(events=[],checks=[],documents=[]){
+ const acquired=new Set(checks.filter(c=>c.acquired===true).map(c=>c.event)),result=[];
+ for(const item of events){
+  if(!/^[BG]-S-Q-(KO|RR)$/.test(item.event))continue;
+  const doc=documents.find(d=>d.event===item.event),empty=doc&&acquiredDrawStatus({competitionId:doc.competitionId,event:doc.event,artifact:doc}).reasonCode==='draw_without_players';
+  if(!empty)continue;
+  const family=item.event[0]+'-S-M',main=events.filter(e=>e.family===family),required=main.some(e=>e.structure==='RR')?main.filter(e=>e.structure==='RR'):main.filter(e=>e.structure==='KO');
+  if(required.length&&required.every(e=>acquired.has(e.event)))result.push({event:item.event,resolution:'empty_singles_qualification',mainEvents:required.map(e=>e.event),detail:'qualificazione singolare senza giocatori risolta: main draw dello stesso sesso acquisito'});
+ }
+ return result;
 }
 
 export function acquiredDrawStatus({competitionId,event,structure,artifact=null,live=null}={}){
@@ -26,6 +38,7 @@ export function acquiredDrawStatus({competitionId,event,structure,artifact=null,
  }
  if(usable)return{complete:true,reasonCode:'complete',detail:'artefatto acquisito e non vuoto; controllo BYE escluso'};
  const evidence=[artifact?.error,artifact?.failureType,live?.error,live?.failureType,live?.resolution].filter(Boolean).join(' ').toLowerCase();
+ if(artifact&&matches.length>0&&!populated&&!/incapsula|captcha|security check|technical|timeout|http|non_json|protected/.test(evidence))return{complete:false,reasonCode:'draw_without_players',detail:'tabellone restituito senza giocatori; acquisizione non completata'};
  const reasonCode=/incapsula|captcha|security check/.test(evidence)?'incapsula_blocked':/technical|timeout|http|non_json|protected/.test(evidence)?'technical_error':/not.published|publication|empty|unused|alternative/.test(evidence)?'empty_or_not_published':artifact||live?'incomplete_draw':'never_processed';
  return{complete:false,reasonCode,detail:{incapsula_blocked:'richiesta bloccata da Incapsula',technical_error:'errore tecnico',empty_or_not_published:'vuoto, non pubblicato o non utilizzato da verificare',incomplete_draw:'acquisizione completa non documentata',never_processed:'mai processato'}[reasonCode]};
 }

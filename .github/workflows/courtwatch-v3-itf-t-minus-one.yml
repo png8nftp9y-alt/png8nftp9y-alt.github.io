@@ -153,6 +153,7 @@ jobs:
           retention-days: 14
   acquire:
     needs: queue
+    if: always() && needs.queue.result == 'success' && needs.queue.outputs.tasks != '0'
     strategy:
       fail-fast: false
       max-parallel: 2

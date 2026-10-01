@@ -1,4 +1,17 @@
 import {AUDIT_CRITERION,acquiredDrawStatus,requiredAuditEvents} from './itf-audit-acquisition-policy.mjs';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
+// Original acquisition tasks retain official URLs for tournaments no longer in the catalog.
+export async function historicalTournamentSource(competitionId,root='src/v3'){
+ const names=await fs.readdir(root).catch(()=>[]);
+ for(const name of names.filter(name=>/^itf-history-draw-batch-\d+\.json$/.test(name)).sort()){
+  const document=JSON.parse(await fs.readFile(path.join(root,name),'utf8'));
+  const task=(document.tasks||[]).find(task=>task.competitionId===competitionId&&task.sourceUrl);
+  if(task){const url=new URL(task.sourceUrl);if(url.hostname==='www.itftennis.com'&&url.pathname.toLowerCase().endsWith('/'+competitionId.toLowerCase()+'/'))return task.sourceUrl;}
+ }
+ return '';
+}
 
 export const isCoverageAudit=audit=>audit?.criterion===AUDIT_CRITERION;
 export function normalizedEvent(item){
@@ -18,5 +31,5 @@ export function eventAcquired({auditRow,previous={},event,document}){
  return proof?.criterion===AUDIT_CRITERION&&proof.complete===true;
 }
 export function coverageSections(doc,auditRow,previous={}){
- return requiredAuditEvents((doc.events||[]).map(normalizedEvent)).map((event,index)=>({index,event:event.event,acquired:eventAcquired({auditRow,previous,event:event.event}),resolved:eventAcquired({auditRow,previous,event:event.event}),status:eventAcquired({auditRow,previous,event:event.event})?'acquired':'pending',proofCriterion:AUDIT_CRITERION,combo:event}));
+ return requiredAuditEvents((doc.events||[]).map(normalizedEvent)).map((event,index)=>{const acquired=eventAcquired({auditRow,previous,event:event.event}),proof=previous.eventCache?.[event.event]?.resolutionProof,resolvedEmpty=previous.eventCache?.[event.event]?.resolution==='empty_singles_qualification'&&proof?.criterion===AUDIT_CRITERION&&proof.complete===true;return{index,event:event.event,acquired,resolved:acquired||resolvedEmpty,status:acquired?'acquired':resolvedEmpty?'empty_singles_qualification':'pending',proofCriterion:AUDIT_CRITERION,combo:event}});
 }
