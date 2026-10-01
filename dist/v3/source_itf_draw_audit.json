@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-01T03:51:15.494Z",
+  "generatedAt": "2026-10-01T03:55:42.752Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,12 +8,12 @@
     "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 0,
-    "declaredSections": 6,
-    "requestedSections": 0,
-    "acquiredSections": 6,
-    "unusedAlternativeSections": 0,
+    "declaredSections": 8,
+    "requestedSections": 1,
+    "acquiredSections": 7,
+    "unusedAlternativeSections": 1,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 6,
+    "resolvedSections": 8,
     "missingSections": 0,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
@@ -23,7 +23,7 @@
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
     "notPublishedOrIncompleteSections": 0,
-    "confirmedInDraw": 1,
+    "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 129,
     "globalCancelledNoDraws": 13,
@@ -138,21 +138,26 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-ITA-2026-001",
-      "tournamentName": "J60 Pescara",
+      "competitionId": "J-J60-MEX-2026-011",
+      "tournamentName": "J60 Leon",
       "decision": "complete",
-      "playersFound": [
-        "martina-danesi"
-      ],
-      "declaredSections": 6,
-      "acquiredSections": 6,
-      "unusedAlternativeSections": 0,
+      "playersFound": [],
+      "declaredSections": 8,
+      "acquiredSections": 7,
+      "unusedAlternativeSections": 1,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 6,
+      "resolvedSections": 8,
       "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "B-S-M-RR",
           "family": "B-S-M",
           "acquired": true,
           "resolved": true,
@@ -180,11 +185,18 @@
           "status": "acquired"
         },
         {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "acquired": false,
+          "resolved": true,
+          "status": "unused_alternative_structure"
         },
         {
           "event": "G-D-M-KO",
@@ -201,7 +213,14 @@
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 28,
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            },
+            {
+              "event": "B-S-M-RR",
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -214,7 +233,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 32,
+              "players": 16,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -227,7 +246,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 32,
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -240,7 +259,14 @@
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 28,
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 31,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -249,13 +275,13 @@
         },
         {
           "family": "G-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 32,
-              "error": null,
-              "failureType": null,
+              "players": 0,
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
               "resolved": true
             }
           ]
@@ -266,7 +292,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 32,
+              "players": 26,
               "error": null,
               "failureType": null,
               "resolved": true
