@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-01T12:12:35.755Z",
+  "generatedAt": "2026-10-01T12:21:35.995Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -10,25 +10,25 @@
     "pendingTournaments": 1,
     "declaredSections": 6,
     "requestedSections": 6,
-    "acquiredSections": 2,
-    "unusedAlternativeSections": 2,
+    "acquiredSections": 0,
+    "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 4,
-    "missingSections": 2,
-    "newSectionsCached": 2,
+    "resolvedSections": 0,
+    "missingSections": 6,
+    "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 2,
-    "retrySections": 2,
-    "technicalErrorSections": 0,
+    "newPolicyResolutions": 0,
+    "retrySections": 6,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 2,
+    "notPublishedOrIncompleteSections": 5,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 129,
+    "globalCompleteTournaments": 130,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 138,
-    "globalPendingTechnical": 96,
+    "globalPendingTotal": 139,
+    "globalPendingTechnical": 97,
     "globalPendingPublication": 42,
     "technicalPendingCompetitionIds": [
       "J-J30-ECU-2026-003",
@@ -126,7 +126,8 @@
       "J-J100-POR-2026-002",
       "J-J100-ROU-2026-001",
       "J-J100-RSA-2026-003",
-      "J-J100-SVK-2026-001"
+      "J-J100-SVK-2026-001",
+      "J-J100-TUR-2026-006"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-ECU-2026-005",
@@ -175,30 +176,30 @@
   },
   "audit": [
     {
-      "competitionId": "J-J100-SWE-2026-002",
-      "tournamentName": "J100 Varnamo",
+      "competitionId": "J-J100-TUR-2026-006",
+      "tournamentName": "J100 Istanbul",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 2,
-      "unusedAlternativeSections": 2,
+      "acquiredSections": 0,
+      "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 4,
-      "missingSections": 2,
+      "resolvedSections": 0,
+      "missingSections": 6,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "acquired": false,
-          "resolved": true,
-          "status": "unused_alternative_structure"
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "B-D-M-KO",
@@ -210,16 +211,16 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "acquired": false,
-          "resolved": true,
-          "status": "unused_alternative_structure"
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "G-D-M-KO",
@@ -232,14 +233,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_rows_incomplete:48/64;empty=16",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -250,9 +251,9 @@
             {
               "event": "B-S-Q-KO",
               "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
-              "resolved": true
+              "error": "draw_rows_incomplete:28/32;empty=4",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -263,7 +264,7 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_rows_incomplete:15/16;empty=1",
+              "error": "draw_rows_incomplete:24/32;empty=8",
               "failureType": "not_published_or_incomplete",
               "resolved": false
             }
@@ -271,14 +272,14 @@
         },
         {
           "family": "G-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_rows_incomplete:48/64;empty=16",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -289,9 +290,9 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
-              "resolved": true
+              "error": "draw_rows_incomplete:15/16;empty=1",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -302,14 +303,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_rows_incomplete:15/16;empty=1",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge"
     }
   ]
 }
