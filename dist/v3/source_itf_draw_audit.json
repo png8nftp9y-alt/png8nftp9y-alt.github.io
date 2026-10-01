@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-01T14:31:42.072Z",
+  "generatedAt": "2026-10-01T14:37:50.802Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,12 +8,12 @@
     "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 0,
-    "declaredSections": 8,
-    "requestedSections": 1,
-    "acquiredSections": 7,
-    "unusedAlternativeSections": 1,
+    "declaredSections": 6,
+    "requestedSections": 0,
+    "acquiredSections": 6,
+    "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 8,
+    "resolvedSections": 6,
     "missingSections": 0,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
@@ -178,26 +178,19 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-MEX-2026-011",
-      "tournamentName": "J60 Leon",
+      "competitionId": "J-J60-UKR-2026-003",
+      "tournamentName": "J60 Vyshkovo (CLOSED)",
       "decision": "complete",
       "playersFound": [],
-      "declaredSections": 8,
-      "acquiredSections": 7,
-      "unusedAlternativeSections": 1,
+      "declaredSections": 6,
+      "acquiredSections": 6,
+      "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 8,
+      "resolvedSections": 6,
       "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
-          "family": "B-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
-        },
-        {
-          "event": "B-S-M-RR",
           "family": "B-S-M",
           "acquired": true,
           "resolved": true,
@@ -225,18 +218,11 @@
           "status": "acquired"
         },
         {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "acquired": false,
-          "resolved": true,
-          "status": "unused_alternative_structure"
         },
         {
           "event": "G-D-M-KO",
@@ -253,13 +239,6 @@
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 8,
-              "error": null,
-              "failureType": null,
-              "resolved": true
-            },
-            {
-              "event": "B-S-M-RR",
               "players": 32,
               "error": null,
               "failureType": null,
@@ -273,7 +252,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 12,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -286,7 +265,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 24,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -299,14 +278,7 @@
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 8,
-              "error": null,
-              "failureType": null,
-              "resolved": true
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 31,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -315,13 +287,13 @@
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
+              "players": 14,
+              "error": null,
+              "failureType": null,
               "resolved": true
             }
           ]
@@ -332,7 +304,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 26,
+              "players": 30,
               "error": null,
               "failureType": null,
               "resolved": true
