@@ -50,7 +50,7 @@ jobs:
           aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-audit-state.json --only-show-errors
           echo "ITF_AUDIT_STATE_FILE=/tmp/itf-audit-state.json" >> "$GITHUB_ENV"
       - id: select
-        name: Select two concluded pending tournaments
+        name: Select up to eight concluded pending tournaments
         env:
           ITF_EXCLUDE_IDS: ${{ inputs.previous_ids }}
           ITF_EXTRAORDINARY_LANE: ${{ inputs.lane }}
