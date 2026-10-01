@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-01T23:41:45.587Z",
+  "generatedAt": "2026-10-01T23:47:27.120Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,12 +8,12 @@
     "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 0,
-    "declaredSections": 5,
+    "declaredSections": 6,
     "requestedSections": 2,
-    "acquiredSections": 5,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 5,
+    "resolvedSections": 6,
     "missingSections": 0,
     "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
@@ -25,10 +25,10 @@
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 136,
+    "globalCompleteTournaments": 144,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 164,
-    "globalPendingTechnical": 99,
+    "globalPendingTotal": 163,
+    "globalPendingTechnical": 98,
     "globalPendingPublication": 65,
     "technicalPendingCompetitionIds": [
       "J-J30-ECU-2026-003",
@@ -93,7 +93,6 @@
       "J-J30-ESP-2026-010",
       "J-J30-FIN-2026-002",
       "J-J30-FIN-2026-004",
-      "J-J30-FRA-2026-002",
       "J-J30-FRA-2026-004",
       "J-J30-GBR-2026-006",
       "J-J30-GEO-2026-002",
@@ -201,15 +200,15 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-RSA-2026-002",
-      "tournamentName": "J60 Durban",
+      "competitionId": "J-J60-TUN-2026-001",
+      "tournamentName": "J60 Sfax",
       "decision": "complete",
       "playersFound": [],
-      "declaredSections": 5,
-      "acquiredSections": 5,
+      "declaredSections": 6,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 5,
+      "resolvedSections": 6,
       "missingSections": 0,
       "sections": [
         {
@@ -236,6 +235,13 @@
         {
           "event": "G-S-M-RR",
           "family": "G-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -294,7 +300,20 @@
           "events": [
             {
               "event": "G-S-M-RR",
-              "players": 29,
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
               "error": null,
               "failureType": null,
               "resolved": true
