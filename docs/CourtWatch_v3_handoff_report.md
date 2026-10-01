@@ -1483,3 +1483,11 @@ più un falso fallimento del workflow D1.
 - Conservate le verifiche manuali: i doppi maschile e femminile di J60 Pescara restano certificati 16/16, oltre alle eccezioni già registrate e ai 13 tornei cancellati senza tabelloni.
 - L'audit ora fallisce invece di diventare verde quando i totali non quadrano, quando produce zero acquisiti a fronte di tabelloni dichiarati, quando osserva più righe di quelle possibili o quando regrediscono i casi sentinella Punta Cana/Pescara.
 - I workflow T−1 restano sospesi. Prima della riattivazione devono passare i test unitari, i casi campione e un nuovo audit totale coerente.
+
+## Aggiornamento immediato diagnostica T−1 — 1 ottobre 2026
+
+- Individuata la causa dei contatori non aggiornati dopo un'acquisizione: il `review` rigenerava `itf_t1_queue_status.json` usando la fotografia dell'audit R2 scaricata prima del recupero dei tabelloni.
+- Il `review` ora riconcilia nello stesso run soltanto gli artefatti T−1 con `status=complete` e parità righe certificata; artefatti incompleti, vuoti, bloccati da Incapsula o con errore tecnico restano mancanti.
+- Dopo la riconciliazione viene aggiornato l'audit stretto su R2 e solo successivamente vengono rigenerati i contatori ordinario/straordinario. I cicli successivi non possono quindi ripubblicare la vecchia fotografia.
+- Sicurezza: nessun `populated=true` legacy viene promosso automaticamente; sono accettati esclusivamente i documenti prodotti nel run corrente e ricontrollati con `strictDrawStatus`.
+- Verifica locale: tre test verdi — riduzione immediata di un tabellone, nessuna riduzione per un artefatto incompleto, uscita del torneo dalla coda soltanto quando tutti i tabelloni sono certificati.
