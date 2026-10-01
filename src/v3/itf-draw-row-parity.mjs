@@ -30,13 +30,21 @@ function teamState(team,event){
 
 function groupKey(match){return String(match.group??'__default__')}
 
+function roundKey(match){
+ const number=Number(match.roundNumber);
+ if(Number.isFinite(number))return`number:${number}`;
+ const label=upper(match.round);
+ return label?`label:${label}`:'unknown';
+}
+
 function koParity(matches,event){
  const groups=Map.groupBy(matches,groupKey),details=[];
  for(const [group,groupMatches] of groups){
-  const numbered=groupMatches.filter(match=>Number.isFinite(Number(match.roundNumber))&&Number(match.roundNumber)>0);
-  if(!numbered.length){details.push({group,declaredRows:0,observedRows:0,filledRows:0,byeRows:0,emptyRows:0,certified:false,error:'round_numbers_missing'});continue}
-  const firstRound=Math.min(...numbered.map(match=>Number(match.roundNumber))),lastRound=Math.max(...numbered.map(match=>Number(match.roundNumber))),entryMatches=numbered.filter(match=>Number(match.roundNumber)===firstRound),rows=entryMatches.flatMap(match=>match.teams||[]),declaredRows=2**lastRound,states=rows.map(team=>teamState(team,event)),filledRows=states.filter(state=>state.full&&!state.bye).length,byeRows=states.filter(state=>state.bye).length,emptyRows=Math.max(0,declaredRows-filledRows-byeRows);
-  details.push({group,firstRound,lastRound,declaredRows,observedRows:rows.length,filledRows,byeRows,emptyRows,certified:rows.length===declaredRows&&emptyRows===0});
+  const rounds=[...Map.groupBy(groupMatches,roundKey)].map(([key,roundMatches])=>({key,matches:roundMatches})).sort((a,b)=>b.matches.length-a.matches.length);
+  const entry=rounds[0];
+  if(!entry?.matches.length){details.push({group,declaredRows:0,observedRows:0,filledRows:0,byeRows:0,emptyRows:0,certified:false,error:'entry_round_missing'});continue}
+  const rows=entry.matches.flatMap(match=>match.teams||[]),declaredRows=entry.matches.length*2,states=rows.map(team=>teamState(team,event)),filledRows=states.filter(state=>state.full&&!state.bye).length,byeRows=states.filter(state=>state.bye).length,emptyRows=Math.max(0,declaredRows-filledRows-byeRows),structuralOverflow=rows.length>declaredRows;
+  details.push({group,entryRound:entry.key,entryMatches:entry.matches.length,declaredRows,observedRows:rows.length,filledRows,byeRows,emptyRows,certified:!structuralOverflow&&rows.length===declaredRows&&emptyRows===0,error:structuralOverflow?'entry_round_overflow':null});
  }
  const declaredRows=details.reduce((sum,row)=>sum+row.declaredRows,0),observedRows=details.reduce((sum,row)=>sum+row.observedRows,0),filledRows=details.reduce((sum,row)=>sum+row.filledRows,0),byeRows=details.reduce((sum,row)=>sum+row.byeRows,0),emptyRows=details.reduce((sum,row)=>sum+row.emptyRows,0);
  return{structure:'KO',groups:details.length,declaredRows,observedRows,filledRows,byeRows,emptyRows,certified:details.length>0&&details.every(row=>row.certified)};
@@ -50,10 +58,10 @@ function teamSignature(team={}){
 function rrParity(matches,event){
  const groups=Map.groupBy(matches,groupKey),details=[];
  for(const [group,groupMatches] of groups){
-  const allRows=groupMatches.flatMap(match=>match.teams||[]),unique=new Map();let anonymousEmpty=0;
-  for(const team of allRows){const signature=teamSignature(team);if(signature)unique.set(signature,team);else anonymousEmpty++}
-  const rows=[...unique.values()],states=rows.map(team=>teamState(team,event)),filledRows=states.filter(state=>state.full&&!state.bye).length,byeRows=states.filter(state=>state.bye).length,declaredRows=rows.length+anonymousEmpty,emptyRows=anonymousEmpty+states.filter(state=>!state.full).length;
-  details.push({group,declaredRows,observedRows:declaredRows,filledRows,byeRows,emptyRows,certified:declaredRows>0&&emptyRows===0});
+  const allRows=groupMatches.flatMap(match=>match.teams||[]),unique=new Map();
+  for(const team of allRows){const signature=teamSignature(team);if(signature)unique.set(signature,team)}
+  const discriminant=1+8*groupMatches.length,root=Math.sqrt(discriminant),declaredRows=Number.isInteger(root)?(1+root)/2:0,rows=[...unique.values()],states=rows.map(team=>teamState(team,event)),filledRows=states.filter(state=>state.full&&!state.bye).length,byeRows=states.filter(state=>state.bye).length,emptyRows=declaredRows?Math.max(0,declaredRows-filledRows-byeRows):0,structuralOverflow=declaredRows>0&&rows.length>declaredRows;
+  details.push({group,matches:groupMatches.length,declaredRows,observedRows:rows.length,filledRows,byeRows,emptyRows,certified:declaredRows>1&&!structuralOverflow&&emptyRows===0,error:declaredRows?'':`round_robin_non_triangular:${groupMatches.length}`});
  }
  const declaredRows=details.reduce((sum,row)=>sum+row.declaredRows,0),observedRows=details.reduce((sum,row)=>sum+row.observedRows,0),filledRows=details.reduce((sum,row)=>sum+row.filledRows,0),byeRows=details.reduce((sum,row)=>sum+row.byeRows,0),emptyRows=details.reduce((sum,row)=>sum+row.emptyRows,0);
  return{structure:'RR',groups:details.length,declaredRows,observedRows,filledRows,byeRows,emptyRows,certified:details.length>0&&details.every(row=>row.certified)};

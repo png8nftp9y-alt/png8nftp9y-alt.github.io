@@ -1,4 +1,4 @@
-import {isKnownMatchOnlyDraw} from './itf-known-match-only-draws.mjs';
+import {isKnownMatchOnlyDraw,knownCertifiedDrawDetail} from './itf-known-match-only-draws.mjs';
 import {isKnownUnusedDraw} from './itf-known-unused-draws.mjs';
 import {drawRowParity} from './itf-draw-row-parity.mjs';
 
@@ -16,6 +16,8 @@ export function missingReason({artifact,live,structure}={}){
 }
 
 export function strictDrawStatus({competitionId,event,structure,artifact=null,live=null}={}){
+ const certifiedDetail=knownCertifiedDrawDetail(competitionId,event);
+ if(certifiedDetail)return{complete:true,reasonCode:'manual_override',detail:certifiedDetail};
  if(isKnownMatchOnlyDraw(competitionId,event)||isKnownUnusedDraw(competitionId,event))return{complete:true,reasonCode:'manual_override',detail:'correzione manuale confermata'};
  const rr=String(structure||'').toUpperCase()==='RR';
  if(artifact?.status==='complete'){

@@ -1474,3 +1474,12 @@ più un falso fallimento del workflow D1.
 - Sicurezza: i workflow T-1 ordinario e straordinario restano disabilitati; audit e diagnostica non riattivano acquisizioni concatenate.
 - Validazione completata nello stesso commit: controlli sintattici Node, 10 test unitari per KO completo, BYE, riga vuota, 28/32 e RR, verifica UI Admin e confronto puntuale con Punta Cana e Pescara. Punta Cana `B-S-M-KO` risulta correttamente incompleto (2/8, sei righe vuote); Pescara `B-S-M-KO` e `G-S-M-KO` risultano incompleti (28/32, quattro righe non ancora provate come BYE), mentre i due doppi risultano completi (16/16).
 - Limite intenzionale: gli artefatti legacy senza prova esplicita dei BYE restano non certificati e dovranno essere riacquisiti; non vengono promossi a completi per inferenza.
+
+## Correzione certificazione righe ITF — 1 ottobre 2026
+
+- Corretto l'errore emerso nell'audit #57: `roundNumber` dell'API ITF non descrive sempre la profondità completa del tabellone e non può essere usato come esponente per ricavare la dimensione. Il KO usa ora il turno con il maggior numero di match e dichiara esattamente due posizioni d'ingresso per match.
+- Un tabellone KO è completo soltanto se tutte le posizioni risultano occupate da giocatore/coppia o BYE esplicito; una squadra mancante, parziale o una struttura con più di due squadre per match rimane incompleta.
+- Per i Round Robin la dimensione del girone viene ricavata soltanto da un numero triangolare valido di match; tutti i partecipanti/coppie del girone devono essere identificabili. La fase KO collegata continua a essere verificata separatamente.
+- Conservate le verifiche manuali: i doppi maschile e femminile di J60 Pescara restano certificati 16/16, oltre alle eccezioni già registrate e ai 13 tornei cancellati senza tabelloni.
+- L'audit ora fallisce invece di diventare verde quando i totali non quadrano, quando produce zero acquisiti a fronte di tabelloni dichiarati, quando osserva più righe di quelle possibili o quando regrediscono i casi sentinella Punta Cana/Pescara.
+- I workflow T−1 restano sospesi. Prima della riattivazione devono passare i test unitari, i casi campione e un nuovo audit totale coerente.
