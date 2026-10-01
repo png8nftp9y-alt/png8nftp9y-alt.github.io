@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-01T11:28:59.180Z",
+  "generatedAt": "2026-10-01T11:35:16.953Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,28 +8,28 @@
     "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
-    "declaredSections": 6,
-    "requestedSections": 6,
-    "acquiredSections": 0,
-    "unusedAlternativeSections": 0,
+    "declaredSections": 5,
+    "requestedSections": 5,
+    "acquiredSections": 1,
+    "unusedAlternativeSections": 1,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 0,
-    "missingSections": 6,
-    "newSectionsCached": 0,
+    "resolvedSections": 2,
+    "missingSections": 3,
+    "newSectionsCached": 1,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 0,
-    "retrySections": 6,
-    "technicalErrorSections": 1,
+    "newPolicyResolutions": 1,
+    "retrySections": 3,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 5,
+    "notPublishedOrIncompleteSections": 3,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 129,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 124,
-    "globalPendingTechnical": 86,
-    "globalPendingPublication": 38,
+    "globalPendingTotal": 126,
+    "globalPendingTechnical": 87,
+    "globalPendingPublication": 39,
     "technicalPendingCompetitionIds": [
       "J-J30-ECU-2026-003",
       "J-J30-GEO-2026-005",
@@ -116,7 +116,8 @@
       "J-J100-EST-2026-001",
       "J-J100-GBR-2026-002",
       "J-J100-GBR-2026-004",
-      "J-J100-GER-2026-003"
+      "J-J100-GER-2026-003",
+      "J-J100-GER-2026-005"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-ECU-2026-005",
@@ -156,35 +157,36 @@
       "J-J100-AUS-2026-002",
       "J-J100-CRC-2026-001",
       "J-J100-DOM-2026-001",
-      "J-J100-DOM-2026-003"
+      "J-J100-DOM-2026-003",
+      "J-J100-GUA-2026-002"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J100-GER-2026-003",
-      "tournamentName": "J100 Hamburg",
+      "competitionId": "J-J100-GUA-2026-002",
+      "tournamentName": "J100 Guatemala",
       "decision": "pending",
       "playersFound": [],
-      "declaredSections": 6,
-      "acquiredSections": 0,
-      "unusedAlternativeSections": 0,
+      "declaredSections": 5,
+      "acquiredSections": 1,
+      "unusedAlternativeSections": 1,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 6,
+      "resolvedSections": 2,
+      "missingSections": 3,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "resolved": true,
+          "status": "unused_alternative_structure"
         },
         {
           "event": "B-D-M-KO",
@@ -201,13 +203,6 @@
           "status": "pending"
         },
         {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
-        },
-        {
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "acquired": false,
@@ -218,14 +213,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_rows_incomplete:48/64;empty=16",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -236,9 +231,9 @@
             {
               "event": "B-S-Q-KO",
               "players": 0,
-              "error": "draw_rows_incomplete:36/48;empty=12",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             }
           ]
         },
@@ -249,7 +244,7 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_rows_incomplete:24/32;empty=8",
+              "error": "draw_rows_incomplete:15/16;empty=1",
               "failureType": "not_published_or_incomplete",
               "resolved": false
             }
@@ -262,20 +257,7 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_rows_incomplete:48/64;empty=16",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "draw_rows_incomplete:28/48;empty=20",
+              "error": "draw_rows_incomplete:27/32;empty=5",
               "failureType": "not_published_or_incomplete",
               "resolved": false
             }
@@ -288,14 +270,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_rows_incomplete:12/16;empty=4",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
