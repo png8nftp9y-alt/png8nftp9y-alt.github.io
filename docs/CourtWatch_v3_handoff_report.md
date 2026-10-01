@@ -1464,3 +1464,13 @@ più un falso fallimento del workflow D1.
 - Le correzioni manuali già confermate rimangono valide e sono marcate internamente come `manual_override`.
 - L'audit pubblica `dist/v3/itf_t1_queue_status.json` anche con T−1 sospeso, così l'Admin mostra numeri e motivazioni prodotti dalla stessa fotografia certificata.
 - Validazione: test unitari della regola binaria, controllo sintattico Node, verifica workflow e test UI dell'Admin.
+
+## Certificazione ITF riga per riga — 1 ottobre 2026
+
+- Motivo: il precedente audit considerava completo un KO con qualunque risposta popolata (`players > 0`), quindi poteva certificare artefatti parziali come il main draw maschile di Punta Cana.
+- Regola definitiva: ogni riga d'ingresso dichiarata deve contenere il giocatore/la coppia richiesta oppure un `BYE` esplicito; una sola riga vuota rende il tabellone incompleto. I turni successivi non ancora disputati non sono righe d'ingresso mancanti.
+- Componenti: l'acquisizione ITF conserva il marcatore BYE e distingue nodi KO/RR; l'audit R2 calcola la parità delle righe anche sugli artefatti storici; la diagnostica mostra mai processato, Incapsula, vuoto/non pubblicato, incompleto con conteggio delle righe ed errore tecnico.
+- Round Robin: devono essere presenti e completi tutti i gironi dichiarati e l'eventuale fase Knockout collegata.
+- Sicurezza: i workflow T-1 ordinario e straordinario restano disabilitati; audit e diagnostica non riattivano acquisizioni concatenate.
+- Validazione completata nello stesso commit: controlli sintattici Node, 10 test unitari per KO completo, BYE, riga vuota, 28/32 e RR, verifica UI Admin e confronto puntuale con Punta Cana e Pescara. Punta Cana `B-S-M-KO` risulta correttamente incompleto (2/8, sei righe vuote); Pescara `B-S-M-KO` e `G-S-M-KO` risultano incompleti (28/32, quattro righe non ancora provate come BYE), mentre i due doppi risultano completi (16/16).
+- Limite intenzionale: gli artefatti legacy senza prova esplicita dei BYE restano non certificati e dovranno essere riacquisiti; non vengono promossi a completi per inferenza.

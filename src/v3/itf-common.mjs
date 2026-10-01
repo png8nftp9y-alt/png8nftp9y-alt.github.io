@@ -107,10 +107,10 @@ export function drawMatchNodes(json){
   const isMatch=Array.isArray(value.teams)&&(value.matchId!=null||value.playStatusCode!=null||value.playStatusDesc!=null||value.resultStatusCode!=null||value.resultStatusDesc!=null);
   if(isMatch){
    const key=String(value.matchId||'')||JSON.stringify([group,round,roundNumber,value.teams]);
-   if(!seen.has(key)){seen.add(key);rows.push({match:value,group,round,roundNumber})}
+   if(!seen.has(key)){seen.add(key);rows.push({match:value,group,round,roundNumber,structure:context.structure||''})}
    return;
   }
-  for(const child of Object.values(value))if(child&&typeof child==='object')walk(child,{...context,group,round,roundNumber});
+  for(const [childKey,child] of Object.entries(value))if(child&&typeof child==='object')walk(child,{...context,group,round,roundNumber,structure:/^rrGroups$/i.test(childKey)?'RR':/^koGroups$/i.test(childKey)?'KO':context.structure});
  }
  walk(json);
  return rows;
