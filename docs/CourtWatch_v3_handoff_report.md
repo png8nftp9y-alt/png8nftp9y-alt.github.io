@@ -1601,3 +1601,10 @@ più un falso fallimento del workflow D1.
 - Beneficio atteso: meno avvii/review per lo stesso numero di tornei, non otto download simultanei né garanzia di velocità quattro volte maggiore.
 - Spiegazione empty_inventory verificata: Ghana, Grecia e Messico iniziano il 5 ottobre e terminano il 10; alla lettura del 2 ottobre erano in D+3 e GetEventFilters non aveva fornito combinazioni di eventi. La mancata pubblicazione è compatibile con tornei futuri, non dimostrata automaticamente dalla sola lista vuota. Restano da ritentare con freschezza individuale.
 - Test CLI: otto selezionati per A, otto per B, nessuna sovrapposizione di corsia, batch seguente evita gli ID già tentati. Nessun run remoto o chiamata ITF live durante la preparazione. Installer idempotente con backup, report append; nessuna cancellazione dei run in corso.
+
+
+## Ordinario ITF ogni quindici minuti — 2 ottobre 2026
+
+- Richiesta esplicita utente: avvio ordinario automatico ogni 15 minuti. Aggiunto schedule cron */15 * * * * al workflow courtwatch-v3-itf-t-minus-one.yml; conservato workflow_dispatch. Il cron usa UTC ma la selezione mantiene Europe/Rome e D+3. Gli input assenti sul trigger schedule usano la corsia ordinary; gate ITF_T1_COVERAGE_ENABLED, inventari riusati e soli tabelloni mancanti invariati.
+- Concurrency per corsia e review condiviso con queue=max preservati; nessuna acquisizione parallela supplementare o polling aggiunto. I batch già avviati proseguono. GitHub schedule richiede il workflow su default branch main e puo subire ritardi di piattaforma: non e garanzia di esecuzione al secondo.
+- Validazione YAML del cron e conservazione input manuali, queue/gate; installer idempotente con backup e append report. Nessun run remoto avviato o scrittura R2/D1 nella preparazione.

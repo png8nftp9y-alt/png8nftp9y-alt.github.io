@@ -2,6 +2,8 @@
 name: Court Watch v3 ITF T-1 complete draws
 run-name: ITF T-1 ${{ inputs.chain_lane || 'ordinary' }}
 on:
+  schedule:
+    - cron: '*/15 * * * *'
   workflow_dispatch:
     inputs:
       chain_lane:
