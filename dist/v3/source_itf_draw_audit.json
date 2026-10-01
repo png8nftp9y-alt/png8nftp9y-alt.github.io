@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-01T11:41:25.176Z",
+  "generatedAt": "2026-10-01T11:47:04.326Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -10,26 +10,26 @@
     "pendingTournaments": 1,
     "declaredSections": 6,
     "requestedSections": 6,
-    "acquiredSections": 0,
-    "unusedAlternativeSections": 0,
+    "acquiredSections": 3,
+    "unusedAlternativeSections": 2,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 0,
-    "missingSections": 6,
-    "newSectionsCached": 0,
+    "resolvedSections": 5,
+    "missingSections": 1,
+    "newSectionsCached": 3,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 0,
-    "retrySections": 6,
-    "technicalErrorSections": 1,
+    "newPolicyResolutions": 2,
+    "retrySections": 1,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 5,
+    "notPublishedOrIncompleteSections": 1,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 129,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 128,
-    "globalPendingTechnical": 89,
-    "globalPendingPublication": 39,
+    "globalPendingTotal": 130,
+    "globalPendingTechnical": 90,
+    "globalPendingPublication": 40,
     "technicalPendingCompetitionIds": [
       "J-J30-ECU-2026-003",
       "J-J30-GEO-2026-005",
@@ -119,7 +119,8 @@
       "J-J100-GER-2026-003",
       "J-J100-GER-2026-005",
       "J-J100-KAZ-2026-001",
-      "J-J100-KAZ-2026-003"
+      "J-J100-KAZ-2026-003",
+      "J-J100-MAR-2026-001"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-ECU-2026-005",
@@ -160,56 +161,57 @@
       "J-J100-CRC-2026-001",
       "J-J100-DOM-2026-001",
       "J-J100-DOM-2026-003",
-      "J-J100-GUA-2026-002"
+      "J-J100-GUA-2026-002",
+      "J-J100-MEX-2026-001"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J100-KAZ-2026-003",
-      "tournamentName": "J100 Almaty",
+      "competitionId": "J-J100-MEX-2026-001",
+      "tournamentName": "J100 Boca del Rio",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 0,
-      "unusedAlternativeSections": 0,
+      "acquiredSections": 3,
+      "unusedAlternativeSections": 2,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 6,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "resolved": true,
+          "status": "unused_alternative_structure"
         },
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "resolved": true,
+          "status": "unused_alternative_structure"
         },
         {
           "event": "G-D-M-KO",
@@ -222,14 +224,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_rows_incomplete:48/64;empty=16",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -240,35 +242,35 @@
             {
               "event": "B-S-Q-KO",
               "players": 0,
-              "error": "draw_rows_incomplete:23/24;empty=1",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             }
           ]
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_rows_incomplete:24/32;empty=8",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "draw_rows_incomplete:48/64;empty=16",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -279,9 +281,9 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "draw_rows_incomplete:20/24;empty=4",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "error": "unused_alternative_structure",
+              "failureType": "unused_alternative_structure",
+              "resolved": true
             }
           ]
         },
@@ -292,14 +294,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_rows_incomplete:14/16;empty=2",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
