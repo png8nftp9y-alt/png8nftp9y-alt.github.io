@@ -13,11 +13,12 @@ if(!files.length)throw new Error('No ITF draw documents found');
 
 const tournamentsDoc=await readJson('dist/v3/universal/tournaments.json',{version:'courtwatch-universal-v1',tournaments:[]});
 const catalogDoc=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]});
+const baselineDoc=await readJson('src/v3/itf-audit-baseline-20261001.json',{tournaments:[]});
 const matchesDoc=await readJson('dist/v3/universal/matches.json',{version:'courtwatch-universal-v1',matches:[]});
 const resultsDoc=await readJson('dist/v3/universal/results.json',{version:'courtwatch-universal-v1',results:[]});
 const tournamentRows=[...(tournamentsDoc.tournaments||[])];
 const tournamentBySource=new Map(tournamentRows.filter(t=>t.circuit==='itf').map(t=>[String(t.sourceTournamentId||'').toUpperCase(),t]));
-const catalogById=new Map((catalogDoc.tournaments||[]).map(t=>[String(t.competitionId||'').toUpperCase(),t]));
+const catalogById=new Map([...(baselineDoc.tournaments||[]),...(catalogDoc.tournaments||[])].map(t=>[String(t.competitionId||'').toUpperCase(),t]));
 const matches=new Map((matchesDoc.matches||[]).map(row=>[row.id,row]));
 const results=new Map((resultsDoc.results||[]).map(row=>[row.id,row]));
 const stage='dist/v3/itf-t1-r2-stage',runId=process.env.GITHUB_RUN_ID||'manual-'+Date.now();

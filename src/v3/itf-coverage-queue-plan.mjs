@@ -26,7 +26,7 @@ export function buildCoverageQueuePlan(audit,baseline,today=new Intl.DateTimeFor
   }
   if(classification==='complete'){resolved.push(row);continue}
   (classification==='missing_draws'?missing:unknown).push(row);
-  const item={competitionId:id,tournamentName:row.tournamentName,startDate:row.startDate,endDate:row.endDate,status:classification==='unverifiable'?'inventory_required':'missing',knownDraws:row.declaredDraws,acquiredDraws:row.acquiredDraws,missingDraws:row.missingDraws,missingEvents:row.missingEvents||[],resolvedEvents:row.resolvedEvents||[],needsInventory:classification==='unverifiable',checkedAt:row.lastAttemptAt||row.reconciledAt||audit.generatedAt};
+  const item={competitionId:id,tournamentName:row.tournamentName,startDate:row.startDate,endDate:row.endDate,status:classification==='unverifiable'?(row.error==='empty_inventory'?'inventory_empty':'inventory_required'):'missing',inventoryError:classification==='unverifiable'?(row.error||null):null,knownDraws:row.declaredDraws,acquiredDraws:row.acquiredDraws,missingDraws:row.missingDraws,missingEvents:row.missingEvents||[],resolvedEvents:row.resolvedEvents||[],needsInventory:classification==='unverifiable',checkedAt:row.lastAttemptAt||row.reconciledAt||audit.generatedAt};
   if(!validDate(row.startDate)||!validDate(row.endDate)||row.endDate<row.startDate){queues.blocked.push({...item,blockingReason:'invalid_tournament_dates'});continue}
   item.eligibleFrom=new Date(Date.parse(row.startDate+'T00:00:00Z')-864e5).toISOString().slice(0,10);
   if(row.startDate>windowEnd)queues.waiting.push(item);
