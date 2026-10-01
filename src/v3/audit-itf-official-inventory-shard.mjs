@@ -3,7 +3,8 @@ import {readJson,tournamentEvents} from './itf-common.mjs';
 
 const ids=String(process.env.ITF_COMPETITION_IDS||'').split(',').map(value=>value.trim().toUpperCase()).filter(Boolean);
 const catalog=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]});
-const byId=new Map((catalog.tournaments||[]).map(row=>[String(row.competitionId||'').toUpperCase(),row]));
+const baseline=await readJson('src/v3/itf-audit-baseline-20261001.json',{tournaments:[]});
+const byId=new Map([...baseline.tournaments,...(catalog.tournaments||[])].map(row=>[String(row.competitionId||'').toUpperCase(),row]));
 const tournaments=[];
 for(const competitionId of ids){
  const tournament=byId.get(competitionId);

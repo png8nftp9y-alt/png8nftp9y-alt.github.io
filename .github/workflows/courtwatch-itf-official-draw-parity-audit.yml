@@ -1,19 +1,8 @@
 name: Court Watch ITF official draw parity audit
 on:
   workflow_dispatch:
-    inputs:
-      remaining:
-        description: Maximum remaining convergence cycles
-        required: false
-        type: number
-        default: 20
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/courtwatch-itf-official-draw-parity-audit.yml'
 permissions:
-  contents: write
-  actions: write
+  contents: read
 concurrency:
   group: courtwatch-itf-official-draw-parity-audit
   cancel-in-progress: true
@@ -38,13 +27,19 @@ jobs:
           set -euo pipefail
           python -m pip install --quiet awscli
           endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
-          if aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/strict-v2-current.json" /tmp/itf-audit-state.json --only-show-errors; then
-            echo "ITF_AUDIT_STATE_FILE=/tmp/itf-audit-state.json" >> "$GITHUB_ENV"
+          if ! aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-audit-state.json --only-show-errors; then
+            aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/strict-v2-current.json" /tmp/itf-audit-state.json --only-show-errors
           fi
+          echo "ITF_AUDIT_STATE_FILE=/tmp/itf-audit-state.json" >> "$GITHUB_ENV"
       - id: matrix
         env:
           ITF_INVENTORY_BATCH_SIZE: 5
         run: node src/v3/build-itf-full-inventory-matrix.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-coverage-input-state
+          path: /tmp/itf-audit-state.json
+          retention-days: 7
   inventory:
     needs: prepare
     strategy:
@@ -62,6 +57,8 @@ jobs:
         with: {node-version: '22'}
       - name: Read official ITF inventory
         env:
+          ITF_ACQUISITION_URL: ${{ vars.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
           ITF_INVENTORY_SHARD: ${{ matrix.shard }}
           ITF_COMPETITION_IDS: ${{ matrix.competitionIds }}
         run: node src/v3/audit-itf-official-inventory-shard.mjs
@@ -81,8 +78,6 @@ jobs:
       AWS_DEFAULT_REGION: auto
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
-    outputs:
-      actionable_unverifiable: ${{ steps.result.outputs.actionable_unverifiable }}
     steps:
       - uses: actions/checkout@v4
         with: {ref: main}
@@ -94,6 +89,10 @@ jobs:
           pattern: itf-official-inventory-*
           path: /tmp/itf-official-inventory-shards
           merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: itf-coverage-input-state
+          path: /tmp
       - name: Restore ITF draw archives
         run: |
           set -euo pipefail
@@ -103,17 +102,17 @@ jobs:
           generation="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/itf-pointer.json')).generation")"
           aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/generations/$generation/" /tmp/itf-blocks --recursive --exclude "*" --include "blocks/*.tar.gz" --only-show-errors
           find /tmp/itf-blocks -name '*.tar.gz' -print0 | while IFS= read -r -d '' file; do tar -xzf "$file" -C /tmp/itf-complete-audit; done
-          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/strict-v2-current.json" /tmp/itf-audit-state.json --only-show-errors || true
+      - name: Validate audit policy
+        run: node --test src/v3/itf-audit-acquisition-policy.test.mjs
       - name: Compare official inventory with acquired draws
         run: |
           node src/v3/merge-itf-full-inventory-audit.mjs /tmp/itf-official-inventory-shards /tmp/itf-complete-audit /tmp/itf-audit-state.json
-          ITF_AUDIT_STATE_FILE=dist/v3/audits/itf-official-draw-parity.json node src/v3/build-itf-t1-admin-status.mjs
       - id: result
         name: Persist converged audit state
         run: |
           set -euo pipefail
           endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
-          aws --endpoint-url "$endpoint" s3 cp dist/v3/audits/itf-official-draw-parity.json "s3://$R2_BUCKET/itf/audits/official-draw-parity/strict-v2-current.json" --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp dist/v3/audits/itf-official-draw-parity.json "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" --only-show-errors
           echo "actionable_unverifiable=$(node -p "require('./dist/v3/audits/itf-official-draw-parity.json').summary.actionableUnverifiable")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
@@ -121,38 +120,3 @@ jobs:
           name: itf-official-draw-parity-audit
           path: dist/v3/audits/itf-official-draw-parity.json
           retention-days: 30
-      - name: Publish strict binary diagnostics
-        run: |
-          set -euo pipefail
-          cp dist/v3/itf_t1_queue_status.json /tmp/itf_t1_queue_status.json
-          git config user.name courtwatch-bot
-          git config user.email courtwatch-bot@users.noreply.github.com
-          for attempt in 1 2 3 4 5; do
-            git fetch origin main
-            git reset --hard origin/main
-            cp /tmp/itf_t1_queue_status.json dist/v3/itf_t1_queue_status.json
-            git add dist/v3/itf_t1_queue_status.json
-            if git diff --cached --quiet; then exit 0; fi
-            git commit -m "Publish strict ITF draw completeness diagnostics"
-            if git push origin HEAD:main; then exit 0; fi
-            sleep $((attempt * 2))
-          done
-          exit 1
-  continue-audit:
-    needs: compare
-    if: ${{ needs.compare.outputs.actionable_unverifiable != '0' && fromJSON(inputs.remaining || '20') > 0 }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dispatch next incremental audit cycle
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REMAINING: ${{ inputs.remaining || '20' }}
-        run: |
-          set -euo pipefail
-          next=$((REMAINING - 1))
-          curl --fail-with-body --silent --show-error \
-            -X POST \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/courtwatch-itf-official-draw-parity-audit.yml/dispatches" \
-            -d "{\"ref\":\"main\",\"inputs\":{\"remaining\":\"$next\"}}"
