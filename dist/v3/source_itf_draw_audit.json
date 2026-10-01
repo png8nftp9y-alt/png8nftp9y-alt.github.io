@@ -1,28 +1,28 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-01T11:08:03.414Z",
+  "generatedAt": "2026-10-01T11:11:48.776Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
-    "declaredSections": 6,
-    "requestedSections": 6,
-    "acquiredSections": 2,
-    "unusedAlternativeSections": 2,
+    "pendingTournaments": 0,
+    "declaredSections": 8,
+    "requestedSections": 1,
+    "acquiredSections": 7,
+    "unusedAlternativeSections": 1,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 4,
-    "missingSections": 2,
-    "newSectionsCached": 2,
+    "resolvedSections": 8,
+    "missingSections": 0,
+    "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
-    "newPolicyResolutions": 2,
-    "retrySections": 2,
-    "technicalErrorSections": 1,
+    "newPolicyResolutions": 0,
+    "retrySections": 0,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 1,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 129,
@@ -156,16 +156,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J100-EGY-2026-002",
-      "tournamentName": "J100 Cairo",
-      "decision": "pending",
+      "competitionId": "J-J60-MEX-2026-011",
+      "tournamentName": "J60 Leon",
+      "decision": "complete",
       "playersFound": [],
-      "declaredSections": 6,
-      "acquiredSections": 2,
-      "unusedAlternativeSections": 2,
+      "declaredSections": 8,
+      "acquiredSections": 7,
+      "unusedAlternativeSections": 1,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 4,
-      "missingSections": 2,
+      "resolvedSections": 8,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -175,21 +175,35 @@
           "status": "acquired"
         },
         {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
-          "acquired": false,
+          "acquired": true,
           "resolved": true,
-          "status": "unused_alternative_structure"
+          "status": "acquired"
         },
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-S-M-RR",
           "family": "G-S-M",
           "acquired": true,
           "resolved": true,
@@ -205,9 +219,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -217,6 +231,13 @@
           "events": [
             {
               "event": "B-S-M-KO",
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            },
+            {
+              "event": "B-S-M-RR",
               "players": 32,
               "error": null,
               "failureType": null,
@@ -226,27 +247,27 @@
         },
         {
           "family": "B-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
+              "players": 16,
+              "error": null,
+              "failureType": null,
               "resolved": true
             }
           ]
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_rows_incomplete:13/16;empty=3",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 24,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -256,7 +277,14 @@
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 32,
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            },
+            {
+              "event": "G-S-M-RR",
+              "players": 31,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -278,19 +306,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 26,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge;browser:browser_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
