@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-10-02T14:48:49.349Z",
+  "generatedAt": "2026-10-02T14:58:43.435Z",
   "today": "2026-10-02",
   "windowEnd": "2026-10-05",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -11,17 +11,17 @@
     "complete": 782,
     "cancelledNoDraws": 13,
     "resolved": 795,
-    "missingDrawsTournaments": 2,
-    "unverifiable": 234,
-    "declaredDraws": 4520,
-    "acquiredDraws": 4515,
-    "missingDraws": 5,
-    "actionableUnverifiable": 22,
+    "missingDrawsTournaments": 3,
+    "unverifiable": 233,
+    "declaredDraws": 4526,
+    "acquiredDraws": 4517,
+    "missingDraws": 9,
+    "actionableUnverifiable": 21,
     "futureUnverifiable": 212,
     "ordinary": {
       "total": 23,
-      "missingDraws": 4,
-      "inventoryRequired": 22
+      "missingDraws": 8,
+      "inventoryRequired": 21
     },
     "extraordinaryA": {
       "total": 1,
@@ -236,7 +236,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T23:33:44.077Z",
+        "checkedAt": "2026-10-02T14:45:51.999Z",
         "eligibleFrom": "2026-10-04"
       },
       {
@@ -252,7 +252,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T23:34:11.928Z",
+        "checkedAt": "2026-10-02T14:45:44.811Z",
         "eligibleFrom": "2026-10-04"
       },
       {
@@ -268,7 +268,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T23:33:39.585Z",
+        "checkedAt": "2026-10-02T14:45:45.403Z",
         "eligibleFrom": "2026-10-04"
       },
       {
@@ -276,15 +276,15 @@
         "tournamentName": "J30 Le Chambon-sur-Lignon",
         "startDate": "2026-10-05",
         "endDate": "2026-10-10",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-10-02T14:45:43.031Z",
         "eligibleFrom": "2026-10-04"
       },
       {
@@ -292,15 +292,15 @@
         "tournamentName": "J30 Jelgava",
         "startDate": "2026-10-05",
         "endDate": "2026-10-09",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-10-02T14:45:47.947Z",
         "eligibleFrom": "2026-10-04"
       },
       {
@@ -308,15 +308,15 @@
         "tournamentName": "J30 Vilamoura",
         "startDate": "2026-10-05",
         "endDate": "2026-10-11",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-10-02T14:45:48.384Z",
         "eligibleFrom": "2026-10-04"
       },
       {
@@ -324,15 +324,15 @@
         "tournamentName": "J30 Bursa",
         "startDate": "2026-10-05",
         "endDate": "2026-10-11",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-10-02T14:45:49.120Z",
         "eligibleFrom": "2026-10-04"
       },
       {
@@ -340,15 +340,64 @@
         "tournamentName": "J300 Wanju (Closed Asia Regional Championships)",
         "startDate": "2026-10-05",
         "endDate": "2026-10-11",
-        "status": "inventory_required",
+        "status": "missing",
         "inventoryError": null,
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "knownDraws": 6,
+        "acquiredDraws": 2,
+        "missingDraws": 4,
+        "missingEvents": [
+          {
+            "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-10-02T14:46:33.476Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-10-02T14:46:33.476Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-10-02T14:46:33.476Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T14:46:33.476Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "needsInventory": false,
+        "checkedAt": "2026-10-02T14:46:33.476Z",
         "eligibleFrom": "2026-10-04"
       },
       {
@@ -465,16 +514,16 @@
       }
     ],
     "total": 23,
-    "missingDraws": 4,
-    "acquiredDraws": 2,
+    "missingDraws": 8,
+    "acquiredDraws": 4,
     "missingByReason": {
-      "draw_without_players": 3,
-      "incapsula_blocked": 1
+      "draw_without_players": 6,
+      "incapsula_blocked": 2
     },
     "byStatus": {
-      "inventory_empty": 10,
-      "missing": 1,
-      "inventory_required": 12
+      "inventory_empty": 14,
+      "missing": 2,
+      "inventory_required": 7
     }
   },
   "extraordinary": {
@@ -3923,9 +3972,9 @@
     }
   },
   "audit": {
-    "urgentUnverifiable": 22,
+    "urgentUnverifiable": 21,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 22,
+    "actionableUnverifiable": 21,
     "futureUnverifiable": 212,
     "blocked": 0
   }

@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-02T14:47:38.126Z",
+  "generatedAt": "2026-10-02T14:58:37.050Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,27 +9,27 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 1,
-    "acquiredSections": 5,
+    "requestedSections": 6,
+    "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 5,
-    "missingSections": 1,
-    "newSectionsCached": 0,
+    "resolvedSections": 2,
+    "missingSections": 4,
+    "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 1,
-    "technicalErrorSections": 0,
+    "retrySections": 4,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 1,
+    "notPublishedOrIncompleteSections": 3,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 395,
     "globalCancelledNoDraws": 13,
     "globalPendingTotal": 68,
-    "globalPendingTechnical": 34,
-    "globalPendingPublication": 34,
+    "globalPendingTechnical": 35,
+    "globalPendingPublication": 33,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -64,7 +64,8 @@
       "J-J100-TUR-2026-006",
       "J-J100-USA-2026-002",
       "J-J100-USA-2026-004",
-      "J-J100-UZB-2026-003"
+      "J-J100-UZB-2026-003",
+      "J-J300-KOR-2026-001"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-DOM-2026-001",
@@ -96,7 +97,6 @@
       "J-J60-DOM-2026-003",
       "J-J30-POR-2026-004",
       "J-J30-TUR-2026-006",
-      "J-J300-KOR-2026-001",
       "J-J60-CRO-2026-002",
       "J-J60-GBR-2026-003",
       "J-J60-MAR-2026-001",
@@ -105,23 +105,23 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-DOM-2026-001",
-      "tournamentName": "J30 Punta Cana",
+      "competitionId": "J-J300-KOR-2026-001",
+      "tournamentName": "J300 Wanju (Closed Asia Regional Championships)",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 5,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 5,
-      "missingSections": 1,
+      "resolvedSections": 2,
+      "missingSections": 4,
       "sections": [
         {
-          "event": "B-S-M-RR",
+          "event": "B-S-M-KO",
           "family": "B-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "B-S-Q-KO",
@@ -133,43 +133,43 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
-        },
-        {
-          "event": "G-S-M-RR",
-          "family": "G-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
           "acquired": false,
           "resolved": false,
           "status": "pending"
         },
         {
-          "event": "G-D-M-KO",
-          "family": "G-D-M",
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         }
       ],
       "families": [
         {
           "family": "B-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
-              "event": "B-S-M-RR",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -179,7 +179,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 30,
+              "players": 54,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -188,36 +188,10 @@
         },
         {
           "family": "B-D-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "B-D-M-KO",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
-            }
-          ]
-        },
-        {
-          "family": "G-S-M",
-          "populated": true,
-          "events": [
-            {
-              "event": "G-S-M-RR",
-              "players": 26,
-              "error": null,
-              "failureType": null,
-              "resolved": true
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
           "populated": false,
           "events": [
             {
-              "event": "G-S-Q-KO",
+              "event": "B-D-M-KO",
               "players": 0,
               "error": "draw_not_published_or_incomplete",
               "failureType": "not_published_or_incomplete",
@@ -226,20 +200,46 @@
           ]
         },
         {
-          "family": "G-D-M",
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
           "populated": true,
           "events": [
             {
-              "event": "G-D-M-KO",
-              "players": 22,
+              "event": "G-S-Q-KO",
+              "players": 35,
               "error": null,
               "failureType": null,
               "resolved": true
             }
           ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
+            }
+          ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge"
     }
   ]
 }
