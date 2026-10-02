@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-02T01:58:13.140Z",
+  "generatedAt": "2026-10-02T02:05:14.819Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,12 +8,12 @@
     "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 0,
-    "declaredSections": 5,
+    "declaredSections": 6,
     "requestedSections": 2,
-    "acquiredSections": 5,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 5,
+    "resolvedSections": 6,
     "missingSections": 0,
     "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
@@ -25,10 +25,10 @@
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 319,
+    "globalCompleteTournaments": 327,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 124,
-    "globalPendingTechnical": 60,
+    "globalPendingTotal": 123,
+    "globalPendingTechnical": 59,
     "globalPendingPublication": 64,
     "technicalPendingCompetitionIds": [
       "J-J30-ECU-2026-003",
@@ -54,7 +54,6 @@
       "J-J60-SRI-2026-002",
       "J-J60-USA-2026-005",
       "J-JGS-USA-2026-001",
-      "J-J30-BOT-2026-002",
       "J-J30-BOT-2026-003",
       "J-J30-CHN-2026-009",
       "J-J100-AUT-2026-002",
@@ -161,15 +160,15 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-ZIM-2026-001",
-      "tournamentName": "J60 Harare",
+      "competitionId": "J-J30-TUR-2026-008",
+      "tournamentName": "J30 Istanbul",
       "decision": "complete",
       "playersFound": [],
-      "declaredSections": 5,
-      "acquiredSections": 5,
+      "declaredSections": 6,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 5,
+      "resolvedSections": 6,
       "missingSections": 0,
       "sections": [
         {
@@ -196,6 +195,13 @@
         {
           "event": "G-S-M-RR",
           "family": "G-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -254,7 +260,20 @@
           "events": [
             {
               "event": "G-S-M-RR",
-              "players": 26,
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
               "error": null,
               "failureType": null,
               "resolved": true
