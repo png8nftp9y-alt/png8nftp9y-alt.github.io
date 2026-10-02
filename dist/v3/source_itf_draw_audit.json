@@ -1,57 +1,49 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-02T09:10:30.930Z",
+  "generatedAt": "2026-10-02T09:13:49.053Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
+    "pendingTournaments": 0,
     "declaredSections": 6,
     "requestedSections": 1,
-    "acquiredSections": 5,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 5,
-    "missingSections": 1,
-    "newSectionsCached": 0,
+    "resolvedSections": 6,
+    "missingSections": 0,
+    "newSectionsCached": 1,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 1,
+    "retrySections": 0,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 1,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 370,
+    "globalCompleteTournaments": 378,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 93,
-    "globalPendingTechnical": 54,
+    "globalPendingTotal": 85,
+    "globalPendingTechnical": 46,
     "globalPendingPublication": 39,
     "technicalPendingCompetitionIds": [
-      "J-J100-BIH-2026-001",
       "J-J100-CAN-2026-002",
-      "J-J100-USA-2026-005",
       "J-J200-CAN-2026-001",
       "J-J200-JPN-2026-001",
       "J-J200-RSA-2026-001",
       "J-J30-BEL-2026-007",
-      "J-J30-DEN-2026-003",
       "J-J30-ECU-2026-003",
       "J-J30-GEO-2026-005",
       "J-J30-KAZ-2026-004",
       "J-J30-MEX-2026-008",
       "J-J30-NED-2026-003",
-      "J-J30-POL-2026-005",
-      "J-J30-TPE-2026-003",
       "J-J300-CHN-2026-001",
       "J-J60-ALB-2026-002",
       "J-J60-ARM-2026-009",
-      "J-J60-AUS-2026-004",
-      "J-J60-EGY-2026-006",
-      "J-J60-SRI-2026-001",
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
       "J-J100-ARG-2026-001",
@@ -130,16 +122,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-DOM-2026-001",
-      "tournamentName": "J30 Punta Cana",
-      "decision": "pending",
+      "competitionId": "J-J60-SRI-2026-001",
+      "tournamentName": "J60 Colombo",
+      "decision": "complete",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 5,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 5,
-      "missingSections": 1,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-RR",
@@ -172,9 +164,9 @@
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-D-M-KO",
@@ -204,7 +196,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 30,
+              "players": 16,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -230,7 +222,7 @@
           "events": [
             {
               "event": "G-S-M-RR",
-              "players": 26,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -239,14 +231,14 @@
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 11,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -256,7 +248,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 22,
+              "players": 28,
               "error": null,
               "failureType": null,
               "resolved": true
