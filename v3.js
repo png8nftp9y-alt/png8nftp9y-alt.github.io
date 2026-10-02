@@ -749,7 +749,6 @@ async function fetchProjection(url, timeoutMs) {
     const data = await response.json();
     if (
       !Array.isArray(data.players) ||
-      !data.players.length ||
       !Array.isArray(data.tournaments) ||
       !Array.isArray(data.matches)
     )
@@ -764,7 +763,7 @@ async function apiProjection() {
     return await fetchProjection(APP_API, 8000);
   } catch (privateError) {
     console.warn("Snapshot privato lento: recupero snapshot D1 rapido", privateError);
-    return fetchProjection(location.origin + "/v1/app-snapshot", 15000);
+    return fetchProjection(APP_API, 15000);
   }
 }
 function cachedData() {
@@ -772,7 +771,6 @@ function cachedData() {
     const saved = JSON.parse(localStorage.getItem(LAST_GOOD_CACHE) || "null");
     return saved &&
       Array.isArray(saved.players) &&
-      saved.players.length &&
       Array.isArray(saved.tournaments)
       ? saved
       : null;
@@ -2073,6 +2071,67 @@ function wirePlayersColumnHeight() {
   addEventListener("resize", syncPlayersColumnHeight);
   requestAnimationFrame(syncPlayersColumnHeight);
 }
+let playerRemovalMode = false;
+const removedCourtWatchPlayers = new Set();
+function removePlayerFromLocalView(playerId) {
+  removedCourtWatchPlayers.add(playerId);
+  state.data.players = (state.data.players || []).filter((p) => p.id !== playerId);
+  for (const key of ['tournaments', 'matches', 'agenda', 'results', 'tournamentEntries'])
+    if (Array.isArray(state.data[key])) state.data[key] = state.data[key].filter((item) => item.playerId !== playerId);
+  state.selected.delete(playerId);
+  saveUiState();
+  saveCachedData(state.data);
+  playerRemovalMode = false;
+  const control = $('removePlayer');
+  control.setAttribute('aria-pressed', 'false');
+  control.title = 'Rimuovi giocatore';
+  location.hash = 'players';
+  renderHome();
+}
+function requestPlayerRemoval(playerId) {
+  const player = (state.data?.players || []).find((p) => p.id === playerId);
+  if (!player || document.getElementById('playerRemovalDialog')) return;
+  const trigger = document.activeElement;
+  const dialog = document.createElement('dialog');
+  dialog.id = 'playerRemovalDialog';
+  dialog.className = 'playerRemovalDialog';
+  dialog.setAttribute('aria-labelledby', 'playerRemovalQuestion');
+  dialog.innerHTML = `<div class="playerRemovalIcon" aria-hidden="true">⚠️</div><h2 id="playerRemovalQuestion">Sei davvero sicuro di voler rimuovere ${esc(player.name)} dall’elenco Courtwatch.</h2><p class="playerRemovalError" role="alert" hidden></p><div class="playerRemovalActions"><button type="button" class="btn" data-removal-no autofocus>No</button><button type="button" class="btn" data-removal-yes>Sì</button></div>`;
+  document.body.append(dialog);
+  const yes = dialog.querySelector('[data-removal-yes]');
+  const no = dialog.querySelector('[data-removal-no]');
+  const error = dialog.querySelector('.playerRemovalError');
+  let pending = false;
+  const close = () => { if (pending) return; dialog.close(); dialog.remove(); if (trigger?.isConnected) trigger.focus(); };
+  no.onclick = close;
+  dialog.oncancel = (event) => { event.preventDefault(); close(); };
+  yes.onclick = async () => {
+    if (pending) return;
+    pending = true; yes.disabled = no.disabled = true; error.hidden = true;
+    yes.textContent = 'Rimozione…';
+    try {
+      const response = await fetch(`${PRIVATE_API}/courtwatch-player?playerId=${encodeURIComponent(playerId)}`,
+        privateApiOptions({method: 'DELETE', credentials: 'same-origin', cache: 'no-store'}));
+      if (!response.ok) throw new Error('remove_player_http_' + response.status);
+      const result = await response.json();
+      if (result.removed !== true || result.playerId !== playerId) throw new Error('remove_player_not_confirmed');
+      pending = false; close(); removePlayerFromLocalView(playerId);
+    } catch (failure) {
+      pending = false; yes.disabled = no.disabled = false; yes.textContent = 'Sì';
+      error.textContent = 'Rimozione non riuscita. Riprova.'; error.hidden = false;
+    }
+  };
+  dialog.showModal();
+  no.focus();
+}
+function togglePlayerRemovalMode() {
+  playerRemovalMode = !playerRemovalMode;
+  const control = $('removePlayer');
+  control.setAttribute('aria-pressed', String(playerRemovalMode));
+  control.title = playerRemovalMode ? 'Annulla rimozione' : 'Rimuovi giocatore';
+  renderPlayers();
+}
+
 function renderPlayers() {
   const ps = state.data.players || [];
   $("playerTotal").textContent = ps.length;
@@ -2083,7 +2142,7 @@ function renderPlayers() {
         ).length,
         club = p.club || "Tesseramento da completare",
         card = p.membershipCard ? ` · tessera ${p.membershipCard}` : "";
-      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(p.name)}</strong><small>${esc(club)}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div><i>›</i></div>`;
+      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(p.name)}</strong><small>${esc(club)}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(p.name)}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
     .join("");
   document.querySelectorAll("[data-profile]").forEach(
@@ -2094,7 +2153,8 @@ function renderPlayers() {
       x.addEventListener("touchstart", preloadRanking, { once: true, passive: true });
       (x.onclick = () => {
         if (String(getSelection() || "").trim()) return;
-        openProfile(x.dataset.profile);
+        if (playerRemovalMode) requestPlayerRemoval(x.dataset.profile);
+        else openProfile(x.dataset.profile);
       });
     },
   );
@@ -2562,6 +2622,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
     flag = nationalityHtml(initialNationality || prepared?.profile?.nationality),
     follow = $("removeProfilePlayer");
   follow.hidden = false;
+  follow.onclick = null;
   follow.textContent = "Segui giocatore";
   follow.title = "Segui giocatore";
   follow.setAttribute("aria-label", "Segui giocatore");
@@ -2980,6 +3041,7 @@ let openProfileTournamentKeys = new Set(
 renderProfile = function (id) {
   const remove = $("removeProfilePlayer");
   remove.hidden = false;
+  remove.onclick = () => requestPlayerRemoval(id);
   remove.textContent = "Rimuovi giocatore";
   remove.title = "Rimuovi giocatore";
   remove.setAttribute("aria-label", "Rimuovi giocatore");
@@ -3327,6 +3389,8 @@ function toggleDatePopover() {
 }
 function wire() {
   wirePlayersColumnHeight();
+  $("removePlayer").onclick = togglePlayerRemovalMode;
+  $("removePlayer").setAttribute("aria-pressed", "false");
   const playerSearchForm = $("playerSearchForm"),
     playerSearchInput = $("playerSearchInput"),
     playerSearchSuggestions = $("playerSearchSuggestions");
@@ -3588,7 +3652,8 @@ async function load() {
       ),
       previousPlayers = new Map((previous.players || []).map((p) => [p.id, p]));
     const visiblePlayers = docs.players.players
-      .filter((p) => !FORMER_PLAYERS.has(p.id))
+      .filter((p) => !FORMER_PLAYERS.has(p.id) && !removedCourtWatchPlayers.has(p.id) &&
+        (projection ? projectedPlayers.has(p.id) : Array.isArray(previous.players) ? previousPlayers.has(p.id) : true))
       .map((player) => {
         const projected = projectedPlayers.get(player.id),
           retained =

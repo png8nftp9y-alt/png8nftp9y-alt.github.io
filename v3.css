@@ -468,3 +468,6 @@ button.brand:focus-visible{outline:2px solid var(--blue);outline-offset:4px;bord
 .matchTypeHeading{margin:0;padding:7px 14px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#f4f3f0;color:#494641;font-size:11px;font-weight:850;text-transform:none;letter-spacing:.02em}
 .matchTypeSection:first-child>.matchTypeHeading{border-top:0}
 .opponentHistoryMatches>.matchTypeSection{min-width:0}
+
+/* Confirmation before removing a player from the account list. */
+.playerRemovalDialog{box-sizing:border-box;width:min(440px,calc(100vw - 32px));border:1px solid var(--line);border-radius:16px;padding:24px;text-align:center;color:var(--ink);background:var(--card);box-shadow:0 20px 65px #0003}.playerRemovalDialog::backdrop{background:#0006}.playerRemovalIcon{font-size:30px;margin-bottom:12px}.playerRemovalDialog h2{font-size:18px;line-height:1.4;margin:0}.playerRemovalActions{display:flex;justify-content:center;gap:12px;margin-top:22px}.playerRemovalActions .btn{min-width:88px;padding:9px 16px}.playerRemovalActions [data-removal-yes]{background:var(--red);border-color:var(--red);color:#fff}.playerRemovalError{color:var(--red)}.playerRowRemove{color:var(--red)}#removePlayer[aria-pressed="true"]{color:var(--red);border-color:var(--red)}
