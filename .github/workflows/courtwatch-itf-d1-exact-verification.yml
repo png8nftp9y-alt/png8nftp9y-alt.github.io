@@ -1,0 +1,78 @@
+name: Court Watch ITF exact D1 verification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-itf-d1-exact-verification
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Read acquired archive and current coverage (no ITF requests)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet awscli
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          mkdir -p /tmp/itf-exact-archive /tmp/itf-exact-live /tmp/itf-exact-blocks
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-exact-coverage.json --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/pointers/current.json" /tmp/itf-exact-pointer.json --only-show-errors
+          generation="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/itf-exact-pointer.json')).generation")"
+          test -n "$generation"; test "$generation" != undefined
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/generations/$generation/blocks/" /tmp/itf-exact-blocks --recursive --exclude "*" --include "*.tar.gz" --only-show-errors
+          test "$(find /tmp/itf-exact-blocks -name '*.tar.gz' | wc -l)" -gt 0
+          find /tmp/itf-exact-blocks -name '*.tar.gz' -print0 | while IFS= read -r -d '' file; do tar -xzf "$file" -C /tmp/itf-exact-archive; done
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/live-draws/" /tmp/itf-exact-live --recursive --only-show-errors
+      - name: Select proof-backed draws and construct expected rows locally
+        run: |
+          node src/v3/prepare-itf-d1-exact-audit.mjs /tmp/itf-exact-coverage.json /tmp/itf-exact-selected /tmp/itf-exact-archive /tmp/itf-exact-live
+          node src/v3/build-itf-draw-d1-seed.mjs /tmp/itf-exact-selected
+      - name: Locate existing D1 database (GET only; no creation or imports)
+        working-directory: cloudflare/app-api
+        run: |
+          npm install
+          node --input-type=module <<'JS'
+          import fs from 'node:fs/promises';
+          const response=await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/d1/database?name=courtwatch-app&per_page=100`,{headers:{Authorization:`Bearer ${process.env.CLOUDFLARE_API_TOKEN}`}});
+          const body=await response.json();if(!response.ok||body.success!==true)throw new Error('Cannot locate D1');
+          const db=(body.result||[]).find(d=>d.name==='courtwatch-app');if(!db)throw new Error('Existing D1 database not found');
+          await fs.writeFile('wrangler.generated.jsonc',JSON.stringify({name:'courtwatch-app-api',main:'src/index.js',compatibility_date:'2026-08-29',d1_databases:[{binding:'DB',database_name:'courtwatch-app',database_id:db.uuid||db.id}]}));
+          JS
+      - name: Compare each acquired match and result with D1 (SELECT only)
+        run: python3 src/v3/verify-itf-d1-exact.py
+      - name: Publish verification summary
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('dist/v3/audits/itf-d1-exact-verification.json')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
+            if not p.exists():out.write('Audit non completato: consultare lo step fallito. Nessuna certificazione D1.\n')
+            else:
+              d=json.loads(p.read_text());out.write('Parità D1 della coorte: '+d['databaseParity']+'\n\n')
+              out.write(d['limitation']+'\n\n');out.write('```json\n'+json.dumps(d['counts'],indent=2)+'\n```\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-d1-exact-verification
+          path: |
+            dist/v3/audits/itf-d1-exact-scope.json
+            dist/v3/audits/itf-d1-exact-verification.json
+          retention-days: 30
