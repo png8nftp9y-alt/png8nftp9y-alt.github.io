@@ -1,44 +1,36 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-02T09:57:37.684Z",
+  "generatedAt": "2026-10-02T10:00:32.163Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
+    "pendingTournaments": 0,
     "declaredSections": 6,
     "requestedSections": 1,
-    "acquiredSections": 5,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 5,
-    "missingSections": 1,
-    "newSectionsCached": 0,
+    "resolvedSections": 6,
+    "missingSections": 0,
+    "newSectionsCached": 1,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 1,
+    "retrySections": 0,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 1,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 387,
+    "globalCompleteTournaments": 395,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 76,
-    "globalPendingTechnical": 41,
+    "globalPendingTotal": 68,
+    "globalPendingTechnical": 33,
     "globalPendingPublication": 35,
     "technicalPendingCompetitionIds": [
-      "J-J30-SWE-2026-003",
-      "J-J300-ESP-2026-002",
-      "J-J200-URU-2026-001",
-      "J-J30-CZE-2026-006",
-      "J-J30-MEX-2026-008",
-      "J-J30-TPE-2026-001",
-      "J-J30-UKR-2026-002",
-      "J-J60-ALB-2026-002",
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
       "J-J100-ARG-2026-001",
@@ -113,19 +105,19 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-DOM-2026-001",
-      "tournamentName": "J30 Punta Cana",
-      "decision": "pending",
+      "competitionId": "J-J60-ALB-2026-002",
+      "tournamentName": "J60 Tirana",
+      "decision": "complete",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 5,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 5,
-      "missingSections": 1,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "sections": [
         {
-          "event": "B-S-M-RR",
+          "event": "B-S-M-KO",
           "family": "B-S-M",
           "acquired": true,
           "resolved": true,
@@ -146,7 +138,7 @@
           "status": "acquired"
         },
         {
-          "event": "G-S-M-RR",
+          "event": "G-S-M-KO",
           "family": "G-S-M",
           "acquired": true,
           "resolved": true,
@@ -155,9 +147,9 @@
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-D-M-KO",
@@ -173,7 +165,7 @@
           "populated": true,
           "events": [
             {
-              "event": "B-S-M-RR",
+              "event": "B-S-M-KO",
               "players": 32,
               "error": null,
               "failureType": null,
@@ -187,7 +179,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 30,
+              "players": 16,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -200,7 +192,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 32,
+              "players": 28,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -212,8 +204,8 @@
           "populated": true,
           "events": [
             {
-              "event": "G-S-M-RR",
-              "players": 26,
+              "event": "G-S-M-KO",
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -222,14 +214,14 @@
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 6,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -239,7 +231,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 22,
+              "players": 26,
               "error": null,
               "failureType": null,
               "resolved": true
