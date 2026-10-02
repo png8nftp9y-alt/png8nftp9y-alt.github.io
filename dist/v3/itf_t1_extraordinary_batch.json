@@ -1,18 +1,18 @@
 {
   "version": 9,
   "batchLimit": 8,
-  "generatedAt": "2026-10-02T09:24:56.323Z",
+  "generatedAt": "2026-10-02T09:26:00.428Z",
   "today": "2026-10-02",
-  "lane": "a",
-  "laneTotal": 1,
+  "lane": "b",
+  "laneTotal": 13,
   "extraordinaryTotal": 14,
   "extraordinaryMissingDraws": 71,
   "selectionCycleReset": false,
-  "attemptedInCycle": 1,
+  "attemptedInCycle": 24,
   "selected": [
     {
-      "competitionId": "J-J30-DOM-2026-001",
-      "tournamentName": "J30 Punta Cana",
+      "competitionId": "J-J100-CAN-2026-002",
+      "tournamentName": "J100 Quebec City",
       "startDate": "2026-09-21",
       "endDate": "2026-09-26",
       "status": "missing",
@@ -22,21 +22,612 @@
       "missingDraws": 1,
       "missingEvents": [
         {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incapsula_blocked",
+          "detail": "richiesta bloccata da Incapsula",
+          "lastError": "GetDrawsheet_incapsula_challenge",
+          "lastAttemptAt": "2026-10-02T04:45:27.992Z",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        }
+      ],
+      "resolvedEvents": [],
+      "needsInventory": false,
+      "checkedAt": "2026-10-02T04:45:27.992Z",
+      "eligibleFrom": "2026-09-20"
+    },
+    {
+      "competitionId": "J-J200-URU-2026-001",
+      "tournamentName": "J200 Montevideo",
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-26",
+      "status": "missing",
+      "inventoryError": null,
+      "knownDraws": 6,
+      "acquiredDraws": 0,
+      "missingDraws": 6,
+      "missingEvents": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "structure": "KO",
           "acquired": false,
-          "reasonCode": "empty_or_not_published",
-          "detail": "vuoto, non pubblicato o non utilizzato da verificare",
-          "lastError": "draw_not_published_or_incomplete",
-          "lastAttemptAt": "2026-10-02T09:13:04.115Z",
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        }
+      ],
+      "resolvedEvents": [],
+      "needsInventory": false,
+      "checkedAt": "2026-10-01T23:06:54.671Z",
+      "eligibleFrom": "2026-09-20"
+    },
+    {
+      "competitionId": "J-J30-CZE-2026-006",
+      "tournamentName": "J30 Frydek Mistek",
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-26",
+      "status": "missing",
+      "inventoryError": null,
+      "knownDraws": 6,
+      "acquiredDraws": 0,
+      "missingDraws": 6,
+      "missingEvents": [
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        }
+      ],
+      "resolvedEvents": [],
+      "needsInventory": false,
+      "checkedAt": "2026-10-01T23:06:54.671Z",
+      "eligibleFrom": "2026-09-20"
+    },
+    {
+      "competitionId": "J-J30-KAZ-2026-004",
+      "tournamentName": "J30 Almaty",
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-26",
+      "status": "missing",
+      "inventoryError": null,
+      "knownDraws": 6,
+      "acquiredDraws": 0,
+      "missingDraws": 6,
+      "missingEvents": [
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
+          "rowParity": null,
+          "sources": []
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
+          "rowParity": null,
+          "sources": []
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
           "rowParity": null,
           "sources": []
         }
       ],
       "resolvedEvents": [],
       "needsInventory": false,
-      "checkedAt": "2026-10-02T09:13:04.115Z",
+      "checkedAt": "2026-10-01T23:06:54.671Z",
+      "eligibleFrom": "2026-09-20"
+    },
+    {
+      "competitionId": "J-J30-MEX-2026-008",
+      "tournamentName": "J30 Leon",
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-26",
+      "status": "missing",
+      "inventoryError": null,
+      "knownDraws": 6,
+      "acquiredDraws": 0,
+      "missingDraws": 6,
+      "missingEvents": [
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
+          "rowParity": null,
+          "sources": []
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
+          "rowParity": null,
+          "sources": []
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
+          "rowParity": null,
+          "sources": []
+        }
+      ],
+      "resolvedEvents": [],
+      "needsInventory": false,
+      "checkedAt": "2026-10-01T23:06:54.671Z",
+      "eligibleFrom": "2026-09-20"
+    },
+    {
+      "competitionId": "J-J30-NCA-2026-002",
+      "tournamentName": "J30 Managua",
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-27",
+      "status": "missing",
+      "inventoryError": null,
+      "knownDraws": 5,
+      "acquiredDraws": 0,
+      "missingDraws": 5,
+      "missingEvents": [
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
+          "rowParity": null,
+          "sources": []
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        }
+      ],
+      "resolvedEvents": [],
+      "needsInventory": false,
+      "checkedAt": "2026-10-01T23:06:54.671Z",
+      "eligibleFrom": "2026-09-20"
+    },
+    {
+      "competitionId": "J-J30-TPE-2026-001",
+      "tournamentName": "J30 Miaoli",
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-26",
+      "status": "missing",
+      "inventoryError": null,
+      "knownDraws": 6,
+      "acquiredDraws": 0,
+      "missingDraws": 6,
+      "missingEvents": [
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
+          "rowParity": null,
+          "sources": []
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
+          "rowParity": null,
+          "sources": []
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        }
+      ],
+      "resolvedEvents": [],
+      "needsInventory": false,
+      "checkedAt": "2026-10-01T23:06:54.671Z",
+      "eligibleFrom": "2026-09-20"
+    },
+    {
+      "competitionId": "J-J30-UKR-2026-002",
+      "tournamentName": "J30 Vyshkovo (CLOSED)",
+      "startDate": "2026-09-21",
+      "endDate": "2026-09-26",
+      "status": "missing",
+      "inventoryError": null,
+      "knownDraws": 6,
+      "acquiredDraws": 0,
+      "missingDraws": 6,
+      "missingEvents": [
+        {
+          "event": "B-S-M-RR",
+          "family": "B-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
+          "rowParity": null,
+          "sources": []
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-S-M-RR",
+          "family": "G-S-M",
+          "structure": "RR",
+          "acquired": false,
+          "reasonCode": "never_processed",
+          "detail": "mai processato",
+          "rowParity": null,
+          "sources": []
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "structure": "KO",
+          "acquired": false,
+          "reasonCode": "incomplete_draw",
+          "detail": "acquisizione completa non documentata",
+          "rowParity": null,
+          "sources": [
+            "live_state"
+          ]
+        }
+      ],
+      "resolvedEvents": [],
+      "needsInventory": false,
+      "checkedAt": "2026-10-01T23:06:54.671Z",
       "eligibleFrom": "2026-09-20"
     }
   ],
