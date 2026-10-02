@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-10-02T02:31:23.925Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-10-02T02:34:47.737Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 8,
   "targets": {
@@ -683,8 +683,8 @@
   "tournaments": {
     "J-J100-FRA-2026-001": {
       "competitionId": "J-J100-FRA-2026-001",
-      "decision": "complete",
-      "checkedAt": "2026-09-30T07:54:39.008Z",
+      "decision": "pending",
+      "checkedAt": "2026-10-02T02:34:45.295Z",
       "playersFound": 0,
       "families": [
         {
@@ -754,34 +754,35 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
               "players": 28,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
       "tournamentName": "J100 Clermont-Ferrand",
       "startDate": "2026-08-24",
       "endDate": "2026-08-29",
       "declaredSections": 6,
-      "acquiredSections": 6,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 6,
-      "missingSections": 0,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
           "combo": {
-            "competitionId": "J-J100-FRA-2026-001",
             "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
             "tournamentId": 1100202959,
             "tourType": "N",
             "weekNumber": 0,
@@ -789,6 +790,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-FRA-2026-001",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-clermont-ferrand/fra/2026/j-j100-fra-2026-001/"
           }
         },
@@ -796,8 +798,9 @@
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "combo": {
-            "competitionId": "J-J100-FRA-2026-001",
             "event": "B-S-Q-KO",
+            "family": "B-S-Q",
+            "structure": "KO",
             "tournamentId": 1100202959,
             "tourType": "N",
             "weekNumber": 0,
@@ -805,6 +808,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-FRA-2026-001",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-clermont-ferrand/fra/2026/j-j100-fra-2026-001/"
           }
         },
@@ -812,8 +816,9 @@
           "event": "B-D-M-KO",
           "family": "B-D-M",
           "combo": {
-            "competitionId": "J-J100-FRA-2026-001",
             "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
             "tournamentId": 1100202959,
             "tourType": "N",
             "weekNumber": 0,
@@ -821,6 +826,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-FRA-2026-001",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-clermont-ferrand/fra/2026/j-j100-fra-2026-001/"
           }
         },
@@ -828,8 +834,9 @@
           "event": "G-S-M-KO",
           "family": "G-S-M",
           "combo": {
-            "competitionId": "J-J100-FRA-2026-001",
             "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
             "tournamentId": 1100202959,
             "tourType": "N",
             "weekNumber": 0,
@@ -837,6 +844,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-FRA-2026-001",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-clermont-ferrand/fra/2026/j-j100-fra-2026-001/"
           }
         },
@@ -844,8 +852,9 @@
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "combo": {
-            "competitionId": "J-J100-FRA-2026-001",
             "event": "G-S-Q-KO",
+            "family": "G-S-Q",
+            "structure": "KO",
             "tournamentId": 1100202959,
             "tourType": "N",
             "weekNumber": 0,
@@ -853,6 +862,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-FRA-2026-001",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-clermont-ferrand/fra/2026/j-j100-fra-2026-001/"
           }
         },
@@ -860,8 +870,9 @@
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "combo": {
-            "competitionId": "J-J100-FRA-2026-001",
             "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
             "tournamentId": 1100202959,
             "tourType": "N",
             "weekNumber": 0,
@@ -869,6 +880,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-FRA-2026-001",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-clermont-ferrand/fra/2026/j-j100-fra-2026-001/"
           }
         }
@@ -1200,7 +1212,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-28T21:15:08.659Z"
+          "storedAt": "2026-10-02T02:34:45.295Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J100-FRA-2026-001__B-S-M-KO",
+            "storedAt": "2026-10-02T02:34:45.295Z"
+          }
         },
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1438,7 +1456,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-28T21:15:08.659Z"
+          "storedAt": "2026-10-02T02:34:45.295Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J100-FRA-2026-001__B-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:45.295Z"
+          }
         },
         "B-D-M-KO": {
           "family": "B-D-M",
@@ -1746,7 +1770,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-28T21:15:08.659Z"
+          "storedAt": "2026-10-02T02:34:45.295Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J100-FRA-2026-001__B-D-M-KO",
+            "storedAt": "2026-10-02T02:34:45.295Z"
+          }
         },
         "G-S-M-KO": {
           "family": "G-S-M",
@@ -2074,7 +2104,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-28T21:15:08.659Z"
+          "storedAt": "2026-10-02T02:34:45.295Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J100-FRA-2026-001__G-S-M-KO",
+            "storedAt": "2026-10-02T02:34:45.295Z"
+          }
         },
         "G-S-Q-KO": {
           "family": "G-S-Q",
@@ -2262,7 +2298,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-28T21:15:08.659Z"
+          "storedAt": "2026-10-02T02:34:45.295Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J100-FRA-2026-001__G-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:45.295Z"
+          }
         },
         "G-D-M-KO": {
           "family": "G-D-M",
@@ -4487,8 +4529,8 @@
     },
     "J-J100-RSA-2026-004": {
       "competitionId": "J-J100-RSA-2026-004",
-      "decision": "complete",
-      "checkedAt": "2026-09-30T11:41:38.722Z",
+      "decision": "pending",
+      "checkedAt": "2026-10-02T02:34:45.938Z",
       "playersFound": 0,
       "families": [
         {
@@ -4558,34 +4600,35 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
               "players": 28,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
       "tournamentName": "J100 Johannesburg",
       "startDate": "2026-08-24",
       "endDate": "2026-08-29",
       "declaredSections": 6,
-      "acquiredSections": 6,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 6,
-      "missingSections": 0,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
           "combo": {
-            "competitionId": "J-J100-RSA-2026-004",
             "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
             "tournamentId": 1100204101,
             "tourType": "N",
             "weekNumber": 0,
@@ -4593,6 +4636,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-RSA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-johannesburg/rsa/2026/j-j100-rsa-2026-004/"
           }
         },
@@ -4600,8 +4644,9 @@
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "combo": {
-            "competitionId": "J-J100-RSA-2026-004",
             "event": "B-S-Q-KO",
+            "family": "B-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204101,
             "tourType": "N",
             "weekNumber": 0,
@@ -4609,6 +4654,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-RSA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-johannesburg/rsa/2026/j-j100-rsa-2026-004/"
           }
         },
@@ -4616,8 +4662,9 @@
           "event": "B-D-M-KO",
           "family": "B-D-M",
           "combo": {
-            "competitionId": "J-J100-RSA-2026-004",
             "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
             "tournamentId": 1100204101,
             "tourType": "N",
             "weekNumber": 0,
@@ -4625,6 +4672,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-RSA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-johannesburg/rsa/2026/j-j100-rsa-2026-004/"
           }
         },
@@ -4632,8 +4680,9 @@
           "event": "G-S-M-KO",
           "family": "G-S-M",
           "combo": {
-            "competitionId": "J-J100-RSA-2026-004",
             "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
             "tournamentId": 1100204101,
             "tourType": "N",
             "weekNumber": 0,
@@ -4641,6 +4690,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-RSA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-johannesburg/rsa/2026/j-j100-rsa-2026-004/"
           }
         },
@@ -4648,8 +4698,9 @@
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "combo": {
-            "competitionId": "J-J100-RSA-2026-004",
             "event": "G-S-Q-KO",
+            "family": "G-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204101,
             "tourType": "N",
             "weekNumber": 0,
@@ -4657,6 +4708,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-RSA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-johannesburg/rsa/2026/j-j100-rsa-2026-004/"
           }
         },
@@ -4664,8 +4716,9 @@
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "combo": {
-            "competitionId": "J-J100-RSA-2026-004",
             "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
             "tournamentId": 1100204101,
             "tourType": "N",
             "weekNumber": 0,
@@ -4673,6 +4726,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J100-RSA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j100-johannesburg/rsa/2026/j-j100-rsa-2026-004/"
           }
         }
@@ -5004,7 +5058,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-30T08:08:45.272Z"
+          "storedAt": "2026-10-02T02:34:45.938Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J100-RSA-2026-004__B-S-M-KO",
+            "storedAt": "2026-10-02T02:34:45.938Z"
+          }
         },
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -5142,7 +5202,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-30T08:08:45.272Z"
+          "storedAt": "2026-10-02T02:34:45.938Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J100-RSA-2026-004__B-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:45.938Z"
+          }
         },
         "B-D-M-KO": {
           "family": "B-D-M",
@@ -5470,7 +5536,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-30T08:08:45.272Z"
+          "storedAt": "2026-10-02T02:34:45.938Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J100-RSA-2026-004__B-D-M-KO",
+            "storedAt": "2026-10-02T02:34:45.938Z"
+          }
         },
         "G-S-M-KO": {
           "family": "G-S-M",
@@ -5798,7 +5870,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-30T08:08:45.272Z"
+          "storedAt": "2026-10-02T02:34:45.938Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J100-RSA-2026-004__G-S-M-KO",
+            "storedAt": "2026-10-02T02:34:45.938Z"
+          }
         },
         "G-S-Q-KO": {
           "family": "G-S-Q",
@@ -5876,7 +5954,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-30T08:08:45.272Z"
+          "storedAt": "2026-10-02T02:34:45.938Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J100-RSA-2026-004__G-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:45.938Z"
+          }
         },
         "G-D-M-KO": {
           "family": "G-D-M",
@@ -13826,7 +13910,7 @@
     "J-J30-MEX-2026-011": {
       "competitionId": "J-J30-MEX-2026-011",
       "decision": "complete",
-      "checkedAt": "2026-09-01T06:54:00.494Z",
+      "checkedAt": "2026-10-02T02:34:46.233Z",
       "playersFound": 0,
       "families": [
         {
@@ -13834,17 +13918,10 @@
           "populated": true,
           "events": [
             {
-              "event": "B-S-M-KO",
-              "players": 8,
+              "event": "B-S-M-RR",
+              "players": 32,
               "error": null,
               "failureType": null,
-              "resolved": true
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
               "resolved": true
             }
           ]
@@ -13880,17 +13957,10 @@
           "populated": true,
           "events": [
             {
-              "event": "G-S-M-KO",
-              "players": 8,
+              "event": "G-S-M-RR",
+              "players": 32,
               "error": null,
               "failureType": null,
-              "resolved": true
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
               "resolved": true
             }
           ]
@@ -13923,34 +13993,19 @@
         }
       ],
       "eventFailure": null,
-      "declaredSections": 8,
+      "declaredSections": 6,
       "acquiredSections": 6,
-      "unusedAlternativeSections": 2,
-      "resolvedSections": 8,
+      "unusedAlternativeSections": 0,
+      "resolvedSections": 6,
       "missingSections": 0,
       "eventInventory": [
-        {
-          "event": "B-S-M-KO",
-          "family": "B-S-M",
-          "combo": {
-            "competitionId": "J-J30-MEX-2026-011",
-            "event": "B-S-M-KO",
-            "tournamentId": 1100204877,
-            "tourType": "N",
-            "weekNumber": 0,
-            "playerTypeCode": "B",
-            "matchTypeCode": "S",
-            "eventClassificationCode": "M",
-            "drawsheetStructureCode": "KO",
-            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-nuevo-leon/mex/2026/j-j30-mex-2026-011/"
-          }
-        },
         {
           "event": "B-S-M-RR",
           "family": "B-S-M",
           "combo": {
-            "competitionId": "J-J30-MEX-2026-011",
             "event": "B-S-M-RR",
+            "family": "B-S-M",
+            "structure": "RR",
             "tournamentId": 1100204877,
             "tourType": "N",
             "weekNumber": 0,
@@ -13958,6 +14013,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "RR",
+            "competitionId": "J-J30-MEX-2026-011",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-nuevo-leon/mex/2026/j-j30-mex-2026-011/"
           }
         },
@@ -13965,8 +14021,9 @@
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "combo": {
-            "competitionId": "J-J30-MEX-2026-011",
             "event": "B-S-Q-KO",
+            "family": "B-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204877,
             "tourType": "N",
             "weekNumber": 0,
@@ -13974,6 +14031,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J30-MEX-2026-011",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-nuevo-leon/mex/2026/j-j30-mex-2026-011/"
           }
         },
@@ -13981,8 +14039,9 @@
           "event": "B-D-M-KO",
           "family": "B-D-M",
           "combo": {
-            "competitionId": "J-J30-MEX-2026-011",
             "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
             "tournamentId": 1100204877,
             "tourType": "N",
             "weekNumber": 0,
@@ -13990,22 +14049,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
-            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-nuevo-leon/mex/2026/j-j30-mex-2026-011/"
-          }
-        },
-        {
-          "event": "G-S-M-KO",
-          "family": "G-S-M",
-          "combo": {
             "competitionId": "J-J30-MEX-2026-011",
-            "event": "G-S-M-KO",
-            "tournamentId": 1100204877,
-            "tourType": "N",
-            "weekNumber": 0,
-            "playerTypeCode": "G",
-            "matchTypeCode": "S",
-            "eventClassificationCode": "M",
-            "drawsheetStructureCode": "KO",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-nuevo-leon/mex/2026/j-j30-mex-2026-011/"
           }
         },
@@ -14013,8 +14057,9 @@
           "event": "G-S-M-RR",
           "family": "G-S-M",
           "combo": {
-            "competitionId": "J-J30-MEX-2026-011",
             "event": "G-S-M-RR",
+            "family": "G-S-M",
+            "structure": "RR",
             "tournamentId": 1100204877,
             "tourType": "N",
             "weekNumber": 0,
@@ -14022,6 +14067,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "RR",
+            "competitionId": "J-J30-MEX-2026-011",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-nuevo-leon/mex/2026/j-j30-mex-2026-011/"
           }
         },
@@ -14029,8 +14075,9 @@
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "combo": {
-            "competitionId": "J-J30-MEX-2026-011",
             "event": "G-S-Q-KO",
+            "family": "G-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204877,
             "tourType": "N",
             "weekNumber": 0,
@@ -14038,6 +14085,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J30-MEX-2026-011",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-nuevo-leon/mex/2026/j-j30-mex-2026-011/"
           }
         },
@@ -14045,8 +14093,9 @@
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "combo": {
-            "competitionId": "J-J30-MEX-2026-011",
             "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
             "tournamentId": 1100204877,
             "tourType": "N",
             "weekNumber": 0,
@@ -14054,6 +14103,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J30-MEX-2026-011",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-nuevo-leon/mex/2026/j-j30-mex-2026-011/"
           }
         }
@@ -14313,7 +14363,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T06:54:00.494Z"
+          "storedAt": "2026-10-02T02:34:46.233Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-MEX-2026-011__B-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:46.233Z"
+          }
         },
         "B-D-M-KO": {
           "family": "B-D-M",
@@ -14621,7 +14677,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T06:54:00.494Z"
+          "storedAt": "2026-10-02T02:34:46.233Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-MEX-2026-011__B-D-M-KO",
+            "storedAt": "2026-10-02T02:34:46.233Z"
+          }
         },
         "G-S-M-KO": {
           "family": "G-S-M",
@@ -14877,7 +14939,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T06:54:00.494Z"
+          "storedAt": "2026-10-02T02:34:46.233Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-MEX-2026-011__G-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:46.233Z"
+          }
         },
         "G-D-M-KO": {
           "family": "G-D-M",
@@ -15185,27 +15253,686 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T06:54:00.494Z"
+          "storedAt": "2026-10-02T02:34:46.233Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-MEX-2026-011__G-D-M-KO",
+            "storedAt": "2026-10-02T02:34:46.233Z"
+          }
         },
         "B-S-M-RR": {
           "family": "B-S-M",
-          "populated": false,
-          "terminalAlternative": true,
-          "players": [],
-          "observedAt": "2026-09-01T06:54:00.494Z",
-          "storedAt": "2026-09-01T06:54:00.494Z",
-          "resolution": "unused_alternative_structure"
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800718989",
+              "name": "Niccolo Magagnin",
+              "givenName": "Niccolo",
+              "familyName": "Magagnin",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/niccolo-magagnin/800718989/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800694930",
+              "name": "Juan Pablo Gomez",
+              "givenName": "Juan Pablo",
+              "familyName": "Gomez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/juan-pablo-gomez/800694930/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800695223",
+              "name": "Luciano Hernandez Ramirez",
+              "givenName": "Luciano",
+              "familyName": "Hernandez Ramirez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/luciano-hernandez-ramirez/800695223/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800712545",
+              "name": "MATIAS FINCK",
+              "givenName": "MATIAS",
+              "familyName": "FINCK",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/matias-finck/800712545/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800659883",
+              "name": "Nicolas Dagda Mireles",
+              "givenName": "Nicolas",
+              "familyName": "Dagda Mireles",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/nicolas-dagda-mireles/800659883/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781115",
+              "name": "Rodrigo Leyva",
+              "givenName": "Rodrigo",
+              "familyName": "Leyva",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/rodrigo-leyva/800781115/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800819792",
+              "name": "Franco Baeza Martinez",
+              "givenName": "Franco",
+              "familyName": "Baeza Martinez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/franco-baeza-martinez/800819792/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800835022",
+              "name": "Matias Garza",
+              "givenName": "Matias",
+              "familyName": "Garza",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/matias-garza/800835022/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800724361",
+              "name": "Valentino Arjona",
+              "givenName": "Valentino",
+              "familyName": "Arjona",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/valentino-arjona/800724361/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800705773",
+              "name": "Kamran Sadikov",
+              "givenName": "Kamran",
+              "familyName": "Sadikov",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/kamran-sadikov/800705773/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800813878",
+              "name": "Matteo Limones Munoz",
+              "givenName": "Matteo",
+              "familyName": "Limones Munoz",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/matteo-limones-munoz/800813878/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800765217",
+              "name": "Elias Cano Morales",
+              "givenName": "Elias",
+              "familyName": "Cano Morales",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/elias-cano-morales/800765217/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800773934",
+              "name": "Leonardo Calles Salinas",
+              "givenName": "Leonardo",
+              "familyName": "Calles Salinas",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/leonardo-calles-salinas/800773934/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800739109",
+              "name": "Santiago Brocker Ordaz",
+              "givenName": "Santiago",
+              "familyName": "Brocker Ordaz",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/santiago-brocker-ordaz/800739109/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777437",
+              "name": "Alejandro Calles",
+              "givenName": "Alejandro",
+              "familyName": "Calles",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/alejandro-calles/800777437/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800737004",
+              "name": "Patricio Fuentes Valencia",
+              "givenName": "Patricio",
+              "familyName": "Fuentes Valencia",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/patricio-fuentes-valencia/800737004/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766374",
+              "name": "Andres Guerra Dabaghi",
+              "givenName": "Andres",
+              "familyName": "Guerra Dabaghi",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/andres-guerra-dabaghi/800766374/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800854646",
+              "name": "Maximo Franco",
+              "givenName": "Maximo",
+              "familyName": "Franco",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/maximo-franco/800854646/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800836042",
+              "name": "Agustin Burroni",
+              "givenName": "Agustin",
+              "familyName": "Burroni",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/agustin-burroni/800836042/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800804224",
+              "name": "Victor Aleksander Gonzalez",
+              "givenName": "Victor Aleksander",
+              "familyName": "Gonzalez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/victor-aleksander-gonzalez/800804224/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800862999",
+              "name": "Guillermo Maximo Venegas Ruiz",
+              "givenName": "Guillermo Maximo",
+              "familyName": "Venegas Ruiz",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/guillermo-maximo-venegas-ruiz/800862999/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800782609",
+              "name": "Santiago Garcia Puente",
+              "givenName": "Santiago",
+              "familyName": "Garcia Puente",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/santiago-garcia-puente/800782609/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800855872",
+              "name": "Andres Romero Malagrino",
+              "givenName": "Andres",
+              "familyName": "Romero Malagrino",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/andres-romero-malagrino/800855872/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800711622",
+              "name": "Xavier Alonso Rozada",
+              "givenName": "Xavier",
+              "familyName": "Alonso Rozada",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/xavier-alonso-rozada/800711622/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800697521",
+              "name": "Antonio jimenez",
+              "givenName": "Antonio",
+              "familyName": "jimenez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/antonio-jimenez/800697521/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800773841",
+              "name": "Mauricio Cantu Hernandez",
+              "givenName": "Mauricio",
+              "familyName": "Cantu Hernandez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/mauricio-cantu-hernandez/800773841/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800705665",
+              "name": "Bekzod Jalilov",
+              "givenName": "Bekzod",
+              "familyName": "Jalilov",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/bekzod-jalilov/800705665/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800782408",
+              "name": "Emmanuel Martinez Reza",
+              "givenName": "Emmanuel",
+              "familyName": "Martinez Reza",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/emmanuel-martinez-reza/800782408/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800697780",
+              "name": "Carlos Patricio Meneses",
+              "givenName": "Carlos Patricio",
+              "familyName": "Meneses",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/carlos-patricio-meneses/800697780/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800805390",
+              "name": "Maxim Frumin",
+              "givenName": "Maxim",
+              "familyName": "Frumin",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/maxim-frumin/800805390/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800839429",
+              "name": "Andres Daniel De La Cruz Gonzalez",
+              "givenName": "Andres Daniel",
+              "familyName": "De La Cruz Gonzalez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/andres-daniel-de-la-cruz-gonzalez/800839429/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777433",
+              "name": "Andres Guillermo Narcio Vazquez",
+              "givenName": "Andres Guillermo",
+              "familyName": "Narcio Vazquez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/andres-guillermo-narcio-vazquez/800777433/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-02T02:34:46.233Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-MEX-2026-011__B-S-M-RR",
+            "storedAt": "2026-10-02T02:34:46.233Z"
+          }
         },
         "G-S-M-RR": {
           "family": "G-S-M",
-          "populated": false,
-          "terminalAlternative": true,
-          "players": [],
-          "observedAt": "2026-09-01T06:54:00.494Z",
-          "storedAt": "2026-09-01T06:54:00.494Z",
-          "resolution": "unused_alternative_structure"
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800724934",
+              "name": "Galia Garcia Anzures",
+              "givenName": "Galia",
+              "familyName": "Garcia Anzures",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/galia-garcia-anzures/800724934/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800854655",
+              "name": "Valentina Matienzo Mercado",
+              "givenName": "Valentina",
+              "familyName": "Matienzo Mercado",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/valentina-matienzo-mercado/800854655/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800776647",
+              "name": "Eva Ramos",
+              "givenName": "Eva",
+              "familyName": "Ramos",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/eva-ramos/800776647/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800705701",
+              "name": "Kamila Yusupova",
+              "givenName": "Kamila",
+              "familyName": "Yusupova",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/kamila-yusupova/800705701/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800773613",
+              "name": "Luciana Ramirez Rosales",
+              "givenName": "Luciana",
+              "familyName": "Ramirez Rosales",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/luciana-ramirez-rosales/800773613/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800846122",
+              "name": "Lucero Hernandez",
+              "givenName": "Lucero",
+              "familyName": "Hernandez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/lucero-hernandez/800846122/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800815923",
+              "name": "Paula Campuzano Del Castillo",
+              "givenName": "Paula",
+              "familyName": "Campuzano Del Castillo",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/paula-campuzano-del-castillo/800815923/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800776397",
+              "name": "Andrea Sanchez Cravioto",
+              "givenName": "Andrea",
+              "familyName": "Sanchez Cravioto",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/andrea-sanchez-cravioto/800776397/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800755347",
+              "name": "Valeria Eugenia Hernandez Salazar",
+              "givenName": "Valeria Eugenia",
+              "familyName": "Hernandez Salazar",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/valeria-eugenia-hernandez-salazar/800755347/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800801250",
+              "name": "Abigail Kim",
+              "givenName": "Abigail",
+              "familyName": "Kim",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/abigail-kim/800801250/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800790169",
+              "name": "Anneliese Lezama Roesch",
+              "givenName": "Anneliese",
+              "familyName": "Lezama Roesch",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/anneliese-lezama-roesch/800790169/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777943",
+              "name": "Carlota Garibay Romero",
+              "givenName": "Carlota",
+              "familyName": "Garibay Romero",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/carlota-garibay-romero/800777943/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800762962",
+              "name": "Paulina Guerrero",
+              "givenName": "Paulina",
+              "familyName": "Guerrero",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/paulina-guerrero/800762962/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800740399",
+              "name": "Natalia Tena",
+              "givenName": "Natalia",
+              "familyName": "Tena",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/natalia-tena/800740399/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800824479",
+              "name": "Chiara Arangio",
+              "givenName": "Chiara",
+              "familyName": "Arangio",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/chiara-arangio/800824479/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800722232",
+              "name": "Africa Guzman Garcia",
+              "givenName": "Africa",
+              "familyName": "Guzman Garcia",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/africa-guzman-garcia/800722232/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800803786",
+              "name": "Miranda Renee Fernandez Figueroa",
+              "givenName": "Miranda Renee",
+              "familyName": "Fernandez Figueroa",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/miranda-renee-fernandez-figueroa/800803786/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800656493",
+              "name": "Gina Cecilia Arteaga De La Cruz",
+              "givenName": "Gina Cecilia",
+              "familyName": "Arteaga De La Cruz",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/gina-cecilia-arteaga-de-la-cruz/800656493/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800856285",
+              "name": "Alicia Salces",
+              "givenName": "Alicia",
+              "familyName": "Salces",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/alicia-salces/800856285/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800809063",
+              "name": "Cristina Lucrecia Hagelsieb Parra",
+              "givenName": "Cristina Lucrecia",
+              "familyName": "Hagelsieb Parra",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/cristina-lucrecia-hagelsieb-parra/800809063/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800850626",
+              "name": "Regina Romero Flores",
+              "givenName": "Regina",
+              "familyName": "Romero Flores",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/regina-romero-flores/800850626/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800665732",
+              "name": "Fernanda Temprana",
+              "givenName": "Fernanda",
+              "familyName": "Temprana",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/fernanda-temprana/800665732/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800728522",
+              "name": "Vitoria De Mello Schneider",
+              "givenName": "Vitoria De Mello",
+              "familyName": "Schneider",
+              "nationalityCode": "POR",
+              "profileLink": "/en/players/vitoria-de-mello-schneider/800728522/por/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800762446",
+              "name": "Valentina Serrano Garibay",
+              "givenName": "Valentina",
+              "familyName": "Serrano Garibay",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/valentina-serrano-garibay/800762446/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791572",
+              "name": "Elsa Lauren Pina Boiko",
+              "givenName": "Elsa Lauren",
+              "familyName": "Pina Boiko",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/elsa-lauren-pina-boiko/800791572/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800733015",
+              "name": "Sara Lillian Chavez",
+              "givenName": "Sara Lillian",
+              "familyName": "Chavez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/sara-lillian-chavez/800733015/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800871568",
+              "name": "Ana Paula Sanchez Garcia Sanchez Garcia",
+              "givenName": "Ana Paula Sanchez Garcia",
+              "familyName": "Sanchez Garcia",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/ana-paula-sanchez-garcia-sanchez-garcia/800871568/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800778384",
+              "name": "DANIELA DURAN ARCE",
+              "givenName": "DANIELA",
+              "familyName": "DURAN ARCE",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/daniela-duran-arce/800778384/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800688961",
+              "name": "Dallas King-Ehau",
+              "givenName": "Dallas",
+              "familyName": "King-Ehau",
+              "nationalityCode": "NZL",
+              "profileLink": "/en/players/dallas-king-ehau/800688961/nzl/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800878066",
+              "name": "Natalia Cano Morales",
+              "givenName": "Natalia",
+              "familyName": "Cano Morales",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/natalia-cano-morales/800878066/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800842728",
+              "name": "Samantha Nicole Marin Gonzalez",
+              "givenName": "Samantha Nicole",
+              "familyName": "Marin Gonzalez",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/samantha-nicole-marin-gonzalez/800842728/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800779721",
+              "name": "Valentina Perera Ayala",
+              "givenName": "Valentina",
+              "familyName": "Perera Ayala",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/valentina-perera-ayala/800779721/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-02T02:34:46.233Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-MEX-2026-011__G-S-M-RR",
+            "storedAt": "2026-10-02T02:34:46.233Z"
+          }
         }
-      }
+      },
+      "tournamentName": "J30 Nuevo Leon",
+      "startDate": "2026-08-24",
+      "endDate": "2026-08-29"
     },
     "J-J30-MKD-2026-003": {
       "competitionId": "J-J30-MKD-2026-003",
@@ -23246,7 +23973,7 @@
     "J-J30-TJK-2026-005": {
       "competitionId": "J-J30-TJK-2026-005",
       "decision": "complete",
-      "checkedAt": "2026-09-01T16:44:01.938Z",
+      "checkedAt": "2026-10-02T02:34:46.536Z",
       "playersFound": 0,
       "families": [
         {
@@ -23254,17 +23981,10 @@
           "populated": true,
           "events": [
             {
-              "event": "B-S-M-KO",
-              "players": 8,
+              "event": "B-S-M-RR",
+              "players": 32,
               "error": null,
               "failureType": null,
-              "resolved": true
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
               "resolved": true
             }
           ]
@@ -23300,30 +24020,10 @@
           "populated": true,
           "events": [
             {
-              "event": "G-S-M-KO",
-              "players": 8,
+              "event": "G-S-M-RR",
+              "players": 32,
               "error": null,
               "failureType": null,
-              "resolved": true
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
-              "resolved": true
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "declared_but_unused",
-              "failureType": "declared_but_unused",
               "resolved": true
             }
           ]
@@ -23343,34 +24043,19 @@
         }
       ],
       "eventFailure": null,
-      "declaredSections": 8,
+      "declaredSections": 5,
       "acquiredSections": 5,
-      "unusedAlternativeSections": 2,
-      "resolvedSections": 8,
+      "unusedAlternativeSections": 0,
+      "resolvedSections": 5,
       "missingSections": 0,
       "eventInventory": [
-        {
-          "event": "B-S-M-KO",
-          "family": "B-S-M",
-          "combo": {
-            "competitionId": "J-J30-TJK-2026-005",
-            "event": "B-S-M-KO",
-            "tournamentId": 1100203116,
-            "tourType": "N",
-            "weekNumber": 0,
-            "playerTypeCode": "B",
-            "matchTypeCode": "S",
-            "eventClassificationCode": "M",
-            "drawsheetStructureCode": "KO",
-            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-dushanbe/tjk/2026/j-j30-tjk-2026-005/"
-          }
-        },
         {
           "event": "B-S-M-RR",
           "family": "B-S-M",
           "combo": {
-            "competitionId": "J-J30-TJK-2026-005",
             "event": "B-S-M-RR",
+            "family": "B-S-M",
+            "structure": "RR",
             "tournamentId": 1100203116,
             "tourType": "N",
             "weekNumber": 0,
@@ -23378,6 +24063,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "RR",
+            "competitionId": "J-J30-TJK-2026-005",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-dushanbe/tjk/2026/j-j30-tjk-2026-005/"
           }
         },
@@ -23385,8 +24071,9 @@
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "combo": {
-            "competitionId": "J-J30-TJK-2026-005",
             "event": "B-S-Q-KO",
+            "family": "B-S-Q",
+            "structure": "KO",
             "tournamentId": 1100203116,
             "tourType": "N",
             "weekNumber": 0,
@@ -23394,6 +24081,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J30-TJK-2026-005",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-dushanbe/tjk/2026/j-j30-tjk-2026-005/"
           }
         },
@@ -23401,8 +24089,9 @@
           "event": "B-D-M-KO",
           "family": "B-D-M",
           "combo": {
-            "competitionId": "J-J30-TJK-2026-005",
             "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
             "tournamentId": 1100203116,
             "tourType": "N",
             "weekNumber": 0,
@@ -23410,22 +24099,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
-            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-dushanbe/tjk/2026/j-j30-tjk-2026-005/"
-          }
-        },
-        {
-          "event": "G-S-M-KO",
-          "family": "G-S-M",
-          "combo": {
             "competitionId": "J-J30-TJK-2026-005",
-            "event": "G-S-M-KO",
-            "tournamentId": 1100203116,
-            "tourType": "N",
-            "weekNumber": 0,
-            "playerTypeCode": "G",
-            "matchTypeCode": "S",
-            "eventClassificationCode": "M",
-            "drawsheetStructureCode": "KO",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-dushanbe/tjk/2026/j-j30-tjk-2026-005/"
           }
         },
@@ -23433,8 +24107,9 @@
           "event": "G-S-M-RR",
           "family": "G-S-M",
           "combo": {
-            "competitionId": "J-J30-TJK-2026-005",
             "event": "G-S-M-RR",
+            "family": "G-S-M",
+            "structure": "RR",
             "tournamentId": 1100203116,
             "tourType": "N",
             "weekNumber": 0,
@@ -23442,22 +24117,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "RR",
-            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-dushanbe/tjk/2026/j-j30-tjk-2026-005/"
-          }
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "combo": {
             "competitionId": "J-J30-TJK-2026-005",
-            "event": "G-S-Q-KO",
-            "tournamentId": 1100203116,
-            "tourType": "N",
-            "weekNumber": 0,
-            "playerTypeCode": "G",
-            "matchTypeCode": "S",
-            "eventClassificationCode": "Q",
-            "drawsheetStructureCode": "KO",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-dushanbe/tjk/2026/j-j30-tjk-2026-005/"
           }
         },
@@ -23465,8 +24125,9 @@
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "combo": {
-            "competitionId": "J-J30-TJK-2026-005",
             "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
             "tournamentId": 1100203116,
             "tourType": "N",
             "weekNumber": 0,
@@ -23474,6 +24135,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J30-TJK-2026-005",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j30-dushanbe/tjk/2026/j-j30-tjk-2026-005/"
           }
         }
@@ -23753,7 +24415,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.052Z"
+          "storedAt": "2026-10-02T02:34:46.536Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-TJK-2026-005__B-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:46.536Z"
+          }
         },
         "B-D-M-KO": {
           "family": "B-D-M",
@@ -24061,7 +24729,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.052Z"
+          "storedAt": "2026-10-02T02:34:46.536Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-TJK-2026-005__B-D-M-KO",
+            "storedAt": "2026-10-02T02:34:46.536Z"
+          }
         },
         "G-S-M-KO": {
           "family": "G-S-M",
@@ -24308,11 +24982,11 @@
             },
             {
               "id": "800828932",
-              "name": "Karina Shayakhmetova",
+              "name": "Karina Shaiakhmetova",
               "givenName": "Karina",
-              "familyName": "Shayakhmetova",
+              "familyName": "Shaiakhmetova",
               "nationalityCode": "RUS",
-              "profileLink": "/en/players/karina-shayakhmetova/800828932/rus/jt/d/",
+              "profileLink": "/en/players/karina-shaiakhmetova/800828932/rus/jt/d/",
               "singlesRank": null,
               "doublesRank": null
             },
@@ -24437,25 +25111,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.052Z"
-        },
-        "B-S-M-RR": {
-          "family": "B-S-M",
-          "populated": false,
-          "terminalAlternative": true,
-          "players": [],
-          "observedAt": "2026-09-01T07:42:41.052Z",
-          "storedAt": "2026-09-01T07:42:41.052Z",
-          "resolution": "unused_alternative_structure"
-        },
-        "G-S-M-RR": {
-          "family": "G-S-M",
-          "populated": false,
-          "terminalAlternative": true,
-          "players": [],
-          "observedAt": "2026-09-01T07:42:41.052Z",
-          "storedAt": "2026-09-01T07:42:41.052Z",
-          "resolution": "unused_alternative_structure"
+          "storedAt": "2026-10-02T02:34:46.536Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-TJK-2026-005__G-D-M-KO",
+            "storedAt": "2026-10-02T02:34:46.536Z"
+          }
         },
         "G-S-Q-KO": {
           "family": "G-S-Q",
@@ -24465,13 +25127,684 @@
           "observedAt": "2026-09-01T16:44:01.938Z",
           "storedAt": "2026-09-01T16:44:01.938Z",
           "resolution": "declared_but_unused"
+        },
+        "B-S-M-RR": {
+          "family": "B-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800576306",
+              "name": "Somon Amonov",
+              "givenName": "Somon",
+              "familyName": "Amonov",
+              "nationalityCode": "TJK",
+              "profileLink": "/en/players/somon-amonov/800576306/tjk/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800664363",
+              "name": "Damir Niyazov",
+              "givenName": "Damir",
+              "familyName": "Niyazov",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/damir-niyazov/800664363/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800829080",
+              "name": "Sidhant Choudhary",
+              "givenName": "Sidhant",
+              "familyName": "Choudhary",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/sidhant-choudhary/800829080/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800739402",
+              "name": "Djamal Khakimov",
+              "givenName": "Djamal",
+              "familyName": "Khakimov",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/djamal-khakimov/800739402/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800704421",
+              "name": "Khaknazar Zhetkerbay",
+              "givenName": "Khaknazar",
+              "familyName": "Zhetkerbay",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/khaknazar-zhetkerbay/800704421/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800853884",
+              "name": "Semen Shvarts",
+              "givenName": "Semen",
+              "familyName": "Shvarts",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/semen-shvarts/800853884/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800803895",
+              "name": "Weilun Tong",
+              "givenName": "Weilun",
+              "familyName": "Tong",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/weilun-tong/800803895/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800765098",
+              "name": "Ojas Malhotra",
+              "givenName": "Ojas",
+              "familyName": "Malhotra",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/ojas-malhotra/800765098/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800632711",
+              "name": "Semen Kolykhmatov",
+              "givenName": "Semen",
+              "familyName": "Kolykhmatov",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/semen-kolykhmatov/800632711/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800748198",
+              "name": "Saidaslam Farkxodov",
+              "givenName": "Saidaslam",
+              "familyName": "Farkxodov",
+              "nationalityCode": "UZB",
+              "profileLink": "/en/players/saidaslam-farkxodov/800748198/uzb/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743240",
+              "name": "Rungu Tian",
+              "givenName": "Rungu",
+              "familyName": "Tian",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/rungu-tian/800743240/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800735031",
+              "name": "Runqi Yang",
+              "givenName": "Runqi",
+              "familyName": "Yang",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/runqi-yang/800735031/hkg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800708841",
+              "name": "Rastin Akbari",
+              "givenName": "Rastin",
+              "familyName": "Akbari",
+              "nationalityCode": "IRI",
+              "profileLink": "/en/players/rastin-akbari/800708841/iri/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800779245",
+              "name": "Andrey Kostin",
+              "givenName": "Andrey",
+              "familyName": "Kostin",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/andrey-kostin/800779245/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800858811",
+              "name": "Ji Shen Li",
+              "givenName": "Ji Shen",
+              "familyName": "Li",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/ji-shen-li/800858811/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800644926",
+              "name": "Akmal Arabdjanov",
+              "givenName": "Akmal",
+              "familyName": "Arabdjanov",
+              "nationalityCode": "UZB",
+              "profileLink": "/en/players/akmal-arabdjanov/800644926/uzb/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800779236",
+              "name": "Enze Wu",
+              "givenName": "Enze",
+              "familyName": "Wu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/enze-wu/800779236/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800829721",
+              "name": "Yaroslav Konoplyanko",
+              "givenName": "Yaroslav",
+              "familyName": "Konoplyanko",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/yaroslav-konoplyanko/800829721/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800752453",
+              "name": "Arslon Aliev",
+              "givenName": "Arslon",
+              "familyName": "Aliev",
+              "nationalityCode": "UZB",
+              "profileLink": "/en/players/arslon-aliev/800752453/uzb/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800726772",
+              "name": "Amirhossein Barbod",
+              "givenName": "Amirhossein",
+              "familyName": "Barbod",
+              "nationalityCode": "IRI",
+              "profileLink": "/en/players/amirhossein-barbod/800726772/iri/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800704486",
+              "name": "Raphael Kalyuzhnov",
+              "givenName": "Raphael",
+              "familyName": "Kalyuzhnov",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/raphael-kalyuzhnov/800704486/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800679785",
+              "name": "Ibratjon Ganiev",
+              "givenName": "Ibratjon",
+              "familyName": "Ganiev",
+              "nationalityCode": "UZB",
+              "profileLink": "/en/players/ibratjon-ganiev/800679785/uzb/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800807168",
+              "name": "Harsh Marwaha",
+              "givenName": "Harsh",
+              "familyName": "Marwaha",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/harsh-marwaha/800807168/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800654506",
+              "name": "Matsvei Zharyn",
+              "givenName": "Matsvei",
+              "familyName": "Zharyn",
+              "nationalityCode": "BLR",
+              "profileLink": "/en/players/matsvei-zharyn/800654506/blr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800721383",
+              "name": "Myeongdo Jang",
+              "givenName": "Myeongdo",
+              "familyName": "Jang",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/myeongdo-jang/800721383/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800688063",
+              "name": "Alshinhan Mukhamedkali",
+              "givenName": "Alshinhan",
+              "familyName": "Mukhamedkali",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/alshinhan-mukhamedkali/800688063/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800755286",
+              "name": "Rishi Boyat",
+              "givenName": "Rishi",
+              "familyName": "Boyat",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/rishi-boyat/800755286/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800873587",
+              "name": "Farozmand Zikriyoev",
+              "givenName": "Farozmand",
+              "familyName": "Zikriyoev",
+              "nationalityCode": "TJK",
+              "profileLink": "/en/players/farozmand-zikriyoev/800873587/tjk/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800759720",
+              "name": "Rakshan Bajaj",
+              "givenName": "Rakshan",
+              "familyName": "Bajaj",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/rakshan-bajaj/800759720/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800721563",
+              "name": "Artem Shalygin",
+              "givenName": "Artem",
+              "familyName": "Shalygin",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/artem-shalygin/800721563/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781818",
+              "name": "Nasriddin Muhiddinov",
+              "givenName": "Nasriddin",
+              "familyName": "Muhiddinov",
+              "nationalityCode": "TJK",
+              "profileLink": "/en/players/nasriddin-muhiddinov/800781818/tjk/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800767515",
+              "name": "Doyul JANG",
+              "givenName": "Doyul",
+              "familyName": "JANG",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/doyul-jang/800767515/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-02T02:34:46.536Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-TJK-2026-005__B-S-M-RR",
+            "storedAt": "2026-10-02T02:34:46.536Z"
+          }
+        },
+        "G-S-M-RR": {
+          "family": "G-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800819235",
+              "name": "Polina Konopleva",
+              "givenName": "Polina",
+              "familyName": "Konopleva",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/polina-konopleva/800819235/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800865829",
+              "name": "Yinuo Bai",
+              "givenName": "Yinuo",
+              "familyName": "Bai",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yinuo-bai/800865829/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800670605",
+              "name": "Salima Fakhrutdinova",
+              "givenName": "Salima",
+              "familyName": "Fakhrutdinova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/salima-fakhrutdinova/800670605/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800643701",
+              "name": "saiyora rajabalieva",
+              "givenName": "saiyora",
+              "familyName": "rajabalieva",
+              "nationalityCode": "TJK",
+              "profileLink": "/en/players/saiyora-rajabalieva/800643701/tjk/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800835801",
+              "name": "Sirui Liu",
+              "givenName": "Sirui",
+              "familyName": "Liu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/sirui-liu/800835801/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800685059",
+              "name": "Sofia Shcherbatskaia",
+              "givenName": "Sofia",
+              "familyName": "Shcherbatskaia",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/sofia-shcherbatskaia/800685059/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800752103",
+              "name": "Glafira Romanova",
+              "givenName": "Glafira",
+              "familyName": "Romanova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/glafira-romanova/800752103/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800739227",
+              "name": "Rukiia Amonova",
+              "givenName": "Rukiia",
+              "familyName": "Amonova",
+              "nationalityCode": "TJK",
+              "profileLink": "/en/players/rukiia-amonova/800739227/tjk/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777476",
+              "name": "Amina Subkhangulova",
+              "givenName": "Amina",
+              "familyName": "Subkhangulova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/amina-subkhangulova/800777476/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800867273",
+              "name": "Ksenya Krokhina",
+              "givenName": "Ksenya",
+              "familyName": "Krokhina",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/ksenya-krokhina/800867273/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800872274",
+              "name": "Yulan Lin",
+              "givenName": "Yulan",
+              "familyName": "Lin",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yulan-lin/800872274/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800821004",
+              "name": "Benazir Nazarshoeva",
+              "givenName": "Benazir",
+              "familyName": "Nazarshoeva",
+              "nationalityCode": "TJK",
+              "profileLink": "/en/players/benazir-nazarshoeva/800821004/tjk/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800689562",
+              "name": "Vlada Kuzmenko",
+              "givenName": "Vlada",
+              "familyName": "Kuzmenko",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/vlada-kuzmenko/800689562/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800875191",
+              "name": "Ruojia Sun",
+              "givenName": "Ruojia",
+              "familyName": "Sun",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/ruojia-sun/800875191/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800643004",
+              "name": "Kira Afanasyeva",
+              "givenName": "Kira",
+              "familyName": "Afanasyeva",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/kira-afanasyeva/800643004/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800711143",
+              "name": "Evelina Dzepa",
+              "givenName": "Evelina",
+              "familyName": "Dzepa",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/evelina-dzepa/800711143/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800718455",
+              "name": "Kseniia Buinova",
+              "givenName": "Kseniia",
+              "familyName": "Buinova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/kseniia-buinova/800718455/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800697861",
+              "name": "anastasiia tashlintseva",
+              "givenName": "anastasiia",
+              "familyName": "tashlintseva",
+              "nationalityCode": "TJK",
+              "profileLink": "/en/players/anastasiia-tashlintseva/800697861/tjk/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800694045",
+              "name": "Varvara Soviak",
+              "givenName": "Varvara",
+              "familyName": "Soviak",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/varvara-soviak/800694045/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800783609",
+              "name": "Siyu Liu",
+              "givenName": "Siyu",
+              "familyName": "Liu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/siyu-liu/800783609/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800692201",
+              "name": "Kira Ugolnikova",
+              "givenName": "Kira",
+              "familyName": "Ugolnikova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/kira-ugolnikova/800692201/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800803271",
+              "name": "Nozanin Odinaeva",
+              "givenName": "Nozanin",
+              "familyName": "Odinaeva",
+              "nationalityCode": "TJK",
+              "profileLink": "/en/players/nozanin-odinaeva/800803271/tjk/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800739756",
+              "name": "Aiyari Kuanshaliyeva",
+              "givenName": "Aiyari",
+              "familyName": "Kuanshaliyeva",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/aiyari-kuanshaliyeva/800739756/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800872331",
+              "name": "Irina Borzenkova",
+              "givenName": "Irina",
+              "familyName": "Borzenkova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/irina-borzenkova/800872331/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800711262",
+              "name": "Ayazhan Sailaubekova",
+              "givenName": "Ayazhan",
+              "familyName": "Sailaubekova",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/ayazhan-sailaubekova/800711262/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800661289",
+              "name": "Elizaveta Bobrova",
+              "givenName": "Elizaveta",
+              "familyName": "Bobrova",
+              "nationalityCode": "UZB",
+              "profileLink": "/en/players/elizaveta-bobrova/800661289/uzb/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800660379",
+              "name": "Sofiya Afanasyeva",
+              "givenName": "Sofiya",
+              "familyName": "Afanasyeva",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/sofiya-afanasyeva/800660379/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781390",
+              "name": "Liya Lily Yan",
+              "givenName": "Liya Lily",
+              "familyName": "Yan",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/liya-lily-yan/800781390/hkg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800786091",
+              "name": "Mumtozbegim Akramova",
+              "givenName": "Mumtozbegim",
+              "familyName": "Akramova",
+              "nationalityCode": "UZB",
+              "profileLink": "/en/players/mumtozbegim-akramova/800786091/uzb/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800847474",
+              "name": "Alisa Shperuk",
+              "givenName": "Alisa",
+              "familyName": "Shperuk",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/alisa-shperuk/800847474/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800711756",
+              "name": "Polina Sushkova",
+              "givenName": "Polina",
+              "familyName": "Sushkova",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/polina-sushkova/800711756/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800828932",
+              "name": "Karina Shaiakhmetova",
+              "givenName": "Karina",
+              "familyName": "Shaiakhmetova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/karina-shaiakhmetova/800828932/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-02T02:34:46.536Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-TJK-2026-005__G-S-M-RR",
+            "storedAt": "2026-10-02T02:34:46.536Z"
+          }
         }
-      }
+      },
+      "tournamentName": "J30 Dushanbe",
+      "startDate": "2026-08-24",
+      "endDate": "2026-08-29"
     },
     "J-J300-USA-2026-003": {
       "competitionId": "J-J300-USA-2026-003",
-      "decision": "complete",
-      "checkedAt": "2026-09-01T07:42:41.286Z",
+      "decision": "pending",
+      "checkedAt": "2026-10-02T02:34:46.834Z",
       "playersFound": 0,
       "families": [
         {
@@ -24541,31 +25874,32 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
               "players": 48,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
       "declaredSections": 6,
-      "acquiredSections": 6,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 6,
-      "missingSections": 0,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
           "combo": {
-            "competitionId": "J-J300-USA-2026-003",
             "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
             "tournamentId": 1100204477,
             "tourType": "N",
             "weekNumber": 0,
@@ -24573,6 +25907,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J300-USA-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j300-college-park/usa/2026/j-j300-usa-2026-003/"
           }
         },
@@ -24580,8 +25915,9 @@
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "combo": {
-            "competitionId": "J-J300-USA-2026-003",
             "event": "B-S-Q-KO",
+            "family": "B-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204477,
             "tourType": "N",
             "weekNumber": 0,
@@ -24589,6 +25925,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J300-USA-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j300-college-park/usa/2026/j-j300-usa-2026-003/"
           }
         },
@@ -24596,8 +25933,9 @@
           "event": "B-D-M-KO",
           "family": "B-D-M",
           "combo": {
-            "competitionId": "J-J300-USA-2026-003",
             "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
             "tournamentId": 1100204477,
             "tourType": "N",
             "weekNumber": 0,
@@ -24605,6 +25943,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J300-USA-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j300-college-park/usa/2026/j-j300-usa-2026-003/"
           }
         },
@@ -24612,8 +25951,9 @@
           "event": "G-S-M-KO",
           "family": "G-S-M",
           "combo": {
-            "competitionId": "J-J300-USA-2026-003",
             "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
             "tournamentId": 1100204477,
             "tourType": "N",
             "weekNumber": 0,
@@ -24621,6 +25961,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J300-USA-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j300-college-park/usa/2026/j-j300-usa-2026-003/"
           }
         },
@@ -24628,8 +25969,9 @@
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "combo": {
-            "competitionId": "J-J300-USA-2026-003",
             "event": "G-S-Q-KO",
+            "family": "G-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204477,
             "tourType": "N",
             "weekNumber": 0,
@@ -24637,6 +25979,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J300-USA-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j300-college-park/usa/2026/j-j300-usa-2026-003/"
           }
         },
@@ -24644,8 +25987,9 @@
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "combo": {
-            "competitionId": "J-J300-USA-2026-003",
             "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
             "tournamentId": 1100204477,
             "tourType": "N",
             "weekNumber": 0,
@@ -24653,6 +25997,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J300-USA-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j300-college-park/usa/2026/j-j300-usa-2026-003/"
           }
         }
@@ -25144,7 +26489,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.286Z"
+          "storedAt": "2026-10-02T02:34:46.834Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J300-USA-2026-003__B-S-M-KO",
+            "storedAt": "2026-10-02T02:34:46.834Z"
+          }
         },
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -25632,7 +26983,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.286Z"
+          "storedAt": "2026-10-02T02:34:46.834Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J300-USA-2026-003__B-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:46.834Z"
+          }
         },
         "B-D-M-KO": {
           "family": "B-D-M",
@@ -26120,7 +27477,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.286Z"
+          "storedAt": "2026-10-02T02:34:46.834Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J300-USA-2026-003__B-D-M-KO",
+            "storedAt": "2026-10-02T02:34:46.834Z"
+          }
         },
         "G-S-M-KO": {
           "family": "G-S-M",
@@ -26608,7 +27971,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.286Z"
+          "storedAt": "2026-10-02T02:34:46.834Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J300-USA-2026-003__G-S-M-KO",
+            "storedAt": "2026-10-02T02:34:46.834Z"
+          }
         },
         "G-S-Q-KO": {
           "family": "G-S-Q",
@@ -27076,7 +28445,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.286Z"
+          "storedAt": "2026-10-02T02:34:46.834Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J300-USA-2026-003__G-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:46.834Z"
+          }
         },
         "G-D-M-KO": {
           "family": "G-D-M",
@@ -27566,12 +28941,15 @@
           ],
           "storedAt": "2026-09-01T07:42:41.286Z"
         }
-      }
+      },
+      "tournamentName": "J300 College Park",
+      "startDate": "2026-08-24",
+      "endDate": "2026-08-29"
     },
     "J-J60-BRA-2026-004": {
       "competitionId": "J-J60-BRA-2026-004",
-      "decision": "complete",
-      "checkedAt": "2026-09-01T07:42:41.411Z",
+      "decision": "pending",
+      "checkedAt": "2026-10-02T02:34:47.137Z",
       "playersFound": 0,
       "families": [
         {
@@ -27641,31 +29019,32 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
               "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
       "declaredSections": 6,
-      "acquiredSections": 6,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 6,
-      "missingSections": 0,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
           "combo": {
-            "competitionId": "J-J60-BRA-2026-004",
             "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
             "tournamentId": 1100204497,
             "tourType": "N",
             "weekNumber": 0,
@@ -27673,6 +29052,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-BRA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-sao-paulo/bra/2026/j-j60-bra-2026-004/"
           }
         },
@@ -27680,8 +29060,9 @@
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "combo": {
-            "competitionId": "J-J60-BRA-2026-004",
             "event": "B-S-Q-KO",
+            "family": "B-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204497,
             "tourType": "N",
             "weekNumber": 0,
@@ -27689,6 +29070,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-BRA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-sao-paulo/bra/2026/j-j60-bra-2026-004/"
           }
         },
@@ -27696,8 +29078,9 @@
           "event": "B-D-M-KO",
           "family": "B-D-M",
           "combo": {
-            "competitionId": "J-J60-BRA-2026-004",
             "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
             "tournamentId": 1100204497,
             "tourType": "N",
             "weekNumber": 0,
@@ -27705,6 +29088,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-BRA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-sao-paulo/bra/2026/j-j60-bra-2026-004/"
           }
         },
@@ -27712,8 +29096,9 @@
           "event": "G-S-M-KO",
           "family": "G-S-M",
           "combo": {
-            "competitionId": "J-J60-BRA-2026-004",
             "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
             "tournamentId": 1100204497,
             "tourType": "N",
             "weekNumber": 0,
@@ -27721,6 +29106,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-BRA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-sao-paulo/bra/2026/j-j60-bra-2026-004/"
           }
         },
@@ -27728,8 +29114,9 @@
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "combo": {
-            "competitionId": "J-J60-BRA-2026-004",
             "event": "G-S-Q-KO",
+            "family": "G-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204497,
             "tourType": "N",
             "weekNumber": 0,
@@ -27737,6 +29124,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-BRA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-sao-paulo/bra/2026/j-j60-bra-2026-004/"
           }
         },
@@ -27744,8 +29132,9 @@
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "combo": {
-            "competitionId": "J-J60-BRA-2026-004",
             "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
             "tournamentId": 1100204497,
             "tourType": "N",
             "weekNumber": 0,
@@ -27753,6 +29142,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-BRA-2026-004",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-sao-paulo/bra/2026/j-j60-bra-2026-004/"
           }
         }
@@ -28084,7 +29474,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.411Z"
+          "storedAt": "2026-10-02T02:34:47.137Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-BRA-2026-004__B-S-M-KO",
+            "storedAt": "2026-10-02T02:34:47.137Z"
+          }
         },
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -28412,7 +29808,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.411Z"
+          "storedAt": "2026-10-02T02:34:47.137Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-BRA-2026-004__B-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:47.137Z"
+          }
         },
         "B-D-M-KO": {
           "family": "B-D-M",
@@ -28740,7 +30142,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.411Z"
+          "storedAt": "2026-10-02T02:34:47.137Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-BRA-2026-004__B-D-M-KO",
+            "storedAt": "2026-10-02T02:34:47.137Z"
+          }
         },
         "G-S-M-KO": {
           "family": "G-S-M",
@@ -29068,7 +30476,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.411Z"
+          "storedAt": "2026-10-02T02:34:47.137Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-BRA-2026-004__G-S-M-KO",
+            "storedAt": "2026-10-02T02:34:47.137Z"
+          }
         },
         "G-S-Q-KO": {
           "family": "G-S-Q",
@@ -29386,7 +30800,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.411Z"
+          "storedAt": "2026-10-02T02:34:47.137Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-BRA-2026-004__G-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:47.137Z"
+          }
         },
         "G-D-M-KO": {
           "family": "G-D-M",
@@ -29716,12 +31136,15 @@
           ],
           "storedAt": "2026-09-01T07:42:41.411Z"
         }
-      }
+      },
+      "tournamentName": "J60 São Paulo",
+      "startDate": "2026-08-24",
+      "endDate": "2026-08-29"
     },
     "J-J60-CHI-2026-003": {
       "competitionId": "J-J60-CHI-2026-003",
-      "decision": "complete",
-      "checkedAt": "2026-09-01T07:42:41.523Z",
+      "decision": "pending",
+      "checkedAt": "2026-10-02T02:34:47.435Z",
       "playersFound": 0,
       "families": [
         {
@@ -29791,31 +31214,32 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
               "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
       "declaredSections": 6,
-      "acquiredSections": 6,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 6,
-      "missingSections": 0,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
           "combo": {
-            "competitionId": "J-J60-CHI-2026-003",
             "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
             "tournamentId": 1100204739,
             "tourType": "N",
             "weekNumber": 0,
@@ -29823,6 +31247,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-CHI-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-vina-del-mar/chi/2026/j-j60-chi-2026-003/"
           }
         },
@@ -29830,8 +31255,9 @@
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "combo": {
-            "competitionId": "J-J60-CHI-2026-003",
             "event": "B-S-Q-KO",
+            "family": "B-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204739,
             "tourType": "N",
             "weekNumber": 0,
@@ -29839,6 +31265,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-CHI-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-vina-del-mar/chi/2026/j-j60-chi-2026-003/"
           }
         },
@@ -29846,8 +31273,9 @@
           "event": "B-D-M-KO",
           "family": "B-D-M",
           "combo": {
-            "competitionId": "J-J60-CHI-2026-003",
             "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
             "tournamentId": 1100204739,
             "tourType": "N",
             "weekNumber": 0,
@@ -29855,6 +31283,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-CHI-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-vina-del-mar/chi/2026/j-j60-chi-2026-003/"
           }
         },
@@ -29862,8 +31291,9 @@
           "event": "G-S-M-KO",
           "family": "G-S-M",
           "combo": {
-            "competitionId": "J-J60-CHI-2026-003",
             "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
             "tournamentId": 1100204739,
             "tourType": "N",
             "weekNumber": 0,
@@ -29871,6 +31301,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-CHI-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-vina-del-mar/chi/2026/j-j60-chi-2026-003/"
           }
         },
@@ -29878,8 +31309,9 @@
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "combo": {
-            "competitionId": "J-J60-CHI-2026-003",
             "event": "G-S-Q-KO",
+            "family": "G-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204739,
             "tourType": "N",
             "weekNumber": 0,
@@ -29887,6 +31319,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-CHI-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-vina-del-mar/chi/2026/j-j60-chi-2026-003/"
           }
         },
@@ -29894,8 +31327,9 @@
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "combo": {
-            "competitionId": "J-J60-CHI-2026-003",
             "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
             "tournamentId": 1100204739,
             "tourType": "N",
             "weekNumber": 0,
@@ -29903,6 +31337,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-CHI-2026-003",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-vina-del-mar/chi/2026/j-j60-chi-2026-003/"
           }
         }
@@ -30234,7 +31669,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.523Z"
+          "storedAt": "2026-10-02T02:34:47.435Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CHI-2026-003__B-S-M-KO",
+            "storedAt": "2026-10-02T02:34:47.435Z"
+          }
         },
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -30532,7 +31973,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.523Z"
+          "storedAt": "2026-10-02T02:34:47.435Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CHI-2026-003__B-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:47.435Z"
+          }
         },
         "B-D-M-KO": {
           "family": "B-D-M",
@@ -30860,7 +32307,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.523Z"
+          "storedAt": "2026-10-02T02:34:47.435Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CHI-2026-003__B-D-M-KO",
+            "storedAt": "2026-10-02T02:34:47.435Z"
+          }
         },
         "G-S-M-KO": {
           "family": "G-S-M",
@@ -31188,7 +32641,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.523Z"
+          "storedAt": "2026-10-02T02:34:47.435Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CHI-2026-003__G-S-M-KO",
+            "storedAt": "2026-10-02T02:34:47.435Z"
+          }
         },
         "G-S-Q-KO": {
           "family": "G-S-Q",
@@ -31316,7 +32775,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.523Z"
+          "storedAt": "2026-10-02T02:34:47.435Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CHI-2026-003__G-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:47.435Z"
+          }
         },
         "G-D-M-KO": {
           "family": "G-D-M",
@@ -31646,12 +33111,15 @@
           ],
           "storedAt": "2026-09-01T07:42:41.523Z"
         }
-      }
+      },
+      "tournamentName": "J60 Vina del Mar",
+      "startDate": "2026-08-24",
+      "endDate": "2026-08-29"
     },
     "J-J60-CHN-2026-011": {
       "competitionId": "J-J60-CHN-2026-011",
-      "decision": "complete",
-      "checkedAt": "2026-09-01T07:42:41.634Z",
+      "decision": "pending",
+      "checkedAt": "2026-10-02T02:34:47.737Z",
       "playersFound": 0,
       "families": [
         {
@@ -31659,17 +33127,10 @@
           "populated": true,
           "events": [
             {
-              "event": "B-S-M-KO",
-              "players": 8,
+              "event": "B-S-M-RR",
+              "players": 32,
               "error": null,
               "failureType": null,
-              "resolved": true
-            },
-            {
-              "event": "B-S-M-RR",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
               "resolved": true
             }
           ]
@@ -31705,17 +33166,10 @@
           "populated": true,
           "events": [
             {
-              "event": "G-S-M-KO",
-              "players": 8,
+              "event": "G-S-M-RR",
+              "players": 32,
               "error": null,
               "failureType": null,
-              "resolved": true
-            },
-            {
-              "event": "G-S-M-RR",
-              "players": 0,
-              "error": "unused_alternative_structure",
-              "failureType": "unused_alternative_structure",
               "resolved": true
             }
           ]
@@ -31735,47 +33189,32 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
               "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
-      "declaredSections": 8,
-      "acquiredSections": 6,
-      "unusedAlternativeSections": 2,
-      "resolvedSections": 8,
-      "missingSections": 0,
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
+      "declaredSections": 6,
+      "acquiredSections": 5,
+      "unusedAlternativeSections": 0,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "eventInventory": [
-        {
-          "event": "B-S-M-KO",
-          "family": "B-S-M",
-          "combo": {
-            "competitionId": "J-J60-CHN-2026-011",
-            "event": "B-S-M-KO",
-            "tournamentId": 1100204642,
-            "tourType": "N",
-            "weekNumber": 0,
-            "playerTypeCode": "B",
-            "matchTypeCode": "S",
-            "eventClassificationCode": "M",
-            "drawsheetStructureCode": "KO",
-            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-shenzhen/chn/2026/j-j60-chn-2026-011/"
-          }
-        },
         {
           "event": "B-S-M-RR",
           "family": "B-S-M",
           "combo": {
-            "competitionId": "J-J60-CHN-2026-011",
             "event": "B-S-M-RR",
+            "family": "B-S-M",
+            "structure": "RR",
             "tournamentId": 1100204642,
             "tourType": "N",
             "weekNumber": 0,
@@ -31783,6 +33222,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "RR",
+            "competitionId": "J-J60-CHN-2026-011",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-shenzhen/chn/2026/j-j60-chn-2026-011/"
           }
         },
@@ -31790,8 +33230,9 @@
           "event": "B-S-Q-KO",
           "family": "B-S-Q",
           "combo": {
-            "competitionId": "J-J60-CHN-2026-011",
             "event": "B-S-Q-KO",
+            "family": "B-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204642,
             "tourType": "N",
             "weekNumber": 0,
@@ -31799,6 +33240,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-CHN-2026-011",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-shenzhen/chn/2026/j-j60-chn-2026-011/"
           }
         },
@@ -31806,8 +33248,9 @@
           "event": "B-D-M-KO",
           "family": "B-D-M",
           "combo": {
-            "competitionId": "J-J60-CHN-2026-011",
             "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
             "tournamentId": 1100204642,
             "tourType": "N",
             "weekNumber": 0,
@@ -31815,22 +33258,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
-            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-shenzhen/chn/2026/j-j60-chn-2026-011/"
-          }
-        },
-        {
-          "event": "G-S-M-KO",
-          "family": "G-S-M",
-          "combo": {
             "competitionId": "J-J60-CHN-2026-011",
-            "event": "G-S-M-KO",
-            "tournamentId": 1100204642,
-            "tourType": "N",
-            "weekNumber": 0,
-            "playerTypeCode": "G",
-            "matchTypeCode": "S",
-            "eventClassificationCode": "M",
-            "drawsheetStructureCode": "KO",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-shenzhen/chn/2026/j-j60-chn-2026-011/"
           }
         },
@@ -31838,8 +33266,9 @@
           "event": "G-S-M-RR",
           "family": "G-S-M",
           "combo": {
-            "competitionId": "J-J60-CHN-2026-011",
             "event": "G-S-M-RR",
+            "family": "G-S-M",
+            "structure": "RR",
             "tournamentId": 1100204642,
             "tourType": "N",
             "weekNumber": 0,
@@ -31847,6 +33276,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "RR",
+            "competitionId": "J-J60-CHN-2026-011",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-shenzhen/chn/2026/j-j60-chn-2026-011/"
           }
         },
@@ -31854,8 +33284,9 @@
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
           "combo": {
-            "competitionId": "J-J60-CHN-2026-011",
             "event": "G-S-Q-KO",
+            "family": "G-S-Q",
+            "structure": "KO",
             "tournamentId": 1100204642,
             "tourType": "N",
             "weekNumber": 0,
@@ -31863,6 +33294,7 @@
             "matchTypeCode": "S",
             "eventClassificationCode": "Q",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-CHN-2026-011",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-shenzhen/chn/2026/j-j60-chn-2026-011/"
           }
         },
@@ -31870,8 +33302,9 @@
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "combo": {
-            "competitionId": "J-J60-CHN-2026-011",
             "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
             "tournamentId": 1100204642,
             "tourType": "N",
             "weekNumber": 0,
@@ -31879,6 +33312,7 @@
             "matchTypeCode": "D",
             "eventClassificationCode": "M",
             "drawsheetStructureCode": "KO",
+            "competitionId": "J-J60-CHN-2026-011",
             "sourceUrl": "https://www.itftennis.com/en/tournament/j60-shenzhen/chn/2026/j-j60-chn-2026-011/"
           }
         }
@@ -32288,7 +33722,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.634Z"
+          "storedAt": "2026-10-02T02:34:47.737Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CHN-2026-011__B-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:47.737Z"
+          }
         },
         "B-D-M-KO": {
           "family": "B-D-M",
@@ -32616,7 +34056,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.634Z"
+          "storedAt": "2026-10-02T02:34:47.737Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CHN-2026-011__B-D-M-KO",
+            "storedAt": "2026-10-02T02:34:47.737Z"
+          }
         },
         "G-S-M-KO": {
           "family": "G-S-M",
@@ -33032,7 +34478,13 @@
               "doublesRank": null
             }
           ],
-          "storedAt": "2026-09-01T07:42:41.634Z"
+          "storedAt": "2026-10-02T02:34:47.737Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CHN-2026-011__G-S-Q-KO",
+            "storedAt": "2026-10-02T02:34:47.737Z"
+          }
         },
         "G-D-M-KO": {
           "family": "G-D-M",
@@ -33364,23 +34816,676 @@
         },
         "B-S-M-RR": {
           "family": "B-S-M",
-          "populated": false,
-          "terminalAlternative": true,
-          "players": [],
-          "observedAt": "2026-09-01T07:42:41.634Z",
-          "storedAt": "2026-09-01T07:42:41.634Z",
-          "resolution": "unused_alternative_structure"
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800749167",
+              "name": "Yiyuan Su",
+              "givenName": "Yiyuan",
+              "familyName": "Su",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yiyuan-su/800749167/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800792054",
+              "name": "Jiajun Zhang",
+              "givenName": "Jiajun",
+              "familyName": "Zhang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/jiajun-zhang/800792054/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800776054",
+              "name": "MinHui Zhang",
+              "givenName": "MinHui",
+              "familyName": "Zhang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/minhui-zhang/800776054/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800857549",
+              "name": "Guorui Wang",
+              "givenName": "Guorui",
+              "familyName": "Wang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/guorui-wang/800857549/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800732116",
+              "name": "Mingrui Shi",
+              "givenName": "Mingrui",
+              "familyName": "Shi",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/mingrui-shi/800732116/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800768080",
+              "name": "Hongyi Ding",
+              "givenName": "Hongyi",
+              "familyName": "Ding",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/hongyi-ding/800768080/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800816556",
+              "name": "Jialiang Guo",
+              "givenName": "Jialiang",
+              "familyName": "Guo",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/jialiang-guo/800816556/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800798022",
+              "name": "Zichen Li",
+              "givenName": "Zichen",
+              "familyName": "Li",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zichen-li/800798022/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800765674",
+              "name": "LIANGXUAN LIU",
+              "givenName": "LIANGXUAN",
+              "familyName": "LIU",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/liangxuan-liu/800765674/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800734503",
+              "name": "Callum Sharkey",
+              "givenName": "Callum",
+              "familyName": "Sharkey",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/callum-sharkey/800734503/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800780314",
+              "name": "Kaihong Dong",
+              "givenName": "Kaihong",
+              "familyName": "Dong",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/kaihong-dong/800780314/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800821149",
+              "name": "Zifan Liu",
+              "givenName": "Zifan",
+              "familyName": "Liu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zifan-liu/800821149/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800767737",
+              "name": "Chuan Ding",
+              "givenName": "Chuan",
+              "familyName": "Ding",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/chuan-ding/800767737/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800716682",
+              "name": "Jay Lin Gibson",
+              "givenName": "Jay Lin",
+              "familyName": "Gibson",
+              "nationalityCode": "CAN",
+              "profileLink": "/en/players/jay-lin-gibson/800716682/can/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800752166",
+              "name": "Yan Zhou",
+              "givenName": "Yan",
+              "familyName": "Zhou",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yan-zhou/800752166/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800773222",
+              "name": "zijing yang",
+              "givenName": "zijing",
+              "familyName": "yang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zijing-yang/800773222/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800769678",
+              "name": "Yitian Lou",
+              "givenName": "Yitian",
+              "familyName": "Lou",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yitian-lou/800769678/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743623",
+              "name": "boyin Zhang",
+              "givenName": "boyin",
+              "familyName": "Zhang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/boyin-zhang/800743623/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766023",
+              "name": "Andy Wang",
+              "givenName": "Andy",
+              "familyName": "Wang",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/andy-wang/800766023/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800749006",
+              "name": "Jinxi Che",
+              "givenName": "Jinxi",
+              "familyName": "Che",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/jinxi-che/800749006/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800739148",
+              "name": "Zhiming Fang",
+              "givenName": "Zhiming",
+              "familyName": "Fang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zhiming-fang/800739148/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800816374",
+              "name": "Shuoze Sun",
+              "givenName": "Shuoze",
+              "familyName": "Sun",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/shuoze-sun/800816374/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800792882",
+              "name": "Zhixin Jin",
+              "givenName": "Zhixin",
+              "familyName": "Jin",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zhixin-jin/800792882/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743540",
+              "name": "Shunhua He",
+              "givenName": "Shunhua",
+              "familyName": "He",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/shunhua-he/800743540/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800738027",
+              "name": "Jason FU",
+              "givenName": "Jason",
+              "familyName": "FU",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/jason-fu/800738027/hkg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800817230",
+              "name": "Zhiyu Li",
+              "givenName": "Zhiyu",
+              "familyName": "Li",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zhiyu-li/800817230/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800759305",
+              "name": "Zihao Liu",
+              "givenName": "Zihao",
+              "familyName": "Liu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zihao-liu/800759305/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800755865",
+              "name": "Tingshuo Wang",
+              "givenName": "Tingshuo",
+              "familyName": "Wang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/tingshuo-wang/800755865/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800802946",
+              "name": "Xiande He",
+              "givenName": "Xiande",
+              "familyName": "He",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/xiande-he/800802946/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800794057",
+              "name": "Yichen Liu",
+              "givenName": "Yichen",
+              "familyName": "Liu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yichen-liu/800794057/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751765",
+              "name": "Zirui Zhu",
+              "givenName": "Zirui",
+              "familyName": "Zhu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zirui-zhu/800751765/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800789594",
+              "name": "Cheng-Yu Lin",
+              "givenName": "Cheng-Yu",
+              "familyName": "Lin",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/cheng-yu-lin/800789594/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-02T02:34:47.737Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CHN-2026-011__B-S-M-RR",
+            "storedAt": "2026-10-02T02:34:47.737Z"
+          }
         },
         "G-S-M-RR": {
           "family": "G-S-M",
-          "populated": false,
-          "terminalAlternative": true,
-          "players": [],
-          "observedAt": "2026-09-01T07:42:41.634Z",
-          "storedAt": "2026-09-01T07:42:41.634Z",
-          "resolution": "unused_alternative_structure"
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800773164",
+              "name": "Jinling Shi",
+              "givenName": "Jinling",
+              "familyName": "Shi",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/jinling-shi/800773164/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800854784",
+              "name": "Yichen Yue",
+              "givenName": "Yichen",
+              "familyName": "Yue",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yichen-yue/800854784/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800856634",
+              "name": "Zhenrong Jin",
+              "givenName": "Zhenrong",
+              "familyName": "Jin",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zhenrong-jin/800856634/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800796937",
+              "name": "Ying Xue",
+              "givenName": "Ying",
+              "familyName": "Xue",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/ying-xue/800796937/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800786447",
+              "name": "Xiaofen Liu",
+              "givenName": "Xiaofen",
+              "familyName": "Liu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/xiaofen-liu/800786447/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800796289",
+              "name": "Shishuo Geng",
+              "givenName": "Shishuo",
+              "familyName": "Geng",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/shishuo-geng/800796289/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800823831",
+              "name": "Zijun Miao",
+              "givenName": "Zijun",
+              "familyName": "Miao",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zijun-miao/800823831/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800750465",
+              "name": "Mingxi Qu",
+              "givenName": "Mingxi",
+              "familyName": "Qu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/mingxi-qu/800750465/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800694576",
+              "name": "Jasmine Li",
+              "givenName": "Jasmine",
+              "familyName": "Li",
+              "nationalityCode": "CAN",
+              "profileLink": "/en/players/jasmine-li/800694576/can/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791984",
+              "name": "Shaoya Zhao",
+              "givenName": "Shaoya",
+              "familyName": "Zhao",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/shaoya-zhao/800791984/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800793916",
+              "name": "Zi Qi Shang",
+              "givenName": "Zi Qi",
+              "familyName": "Shang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zi-qi-shang/800793916/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800855652",
+              "name": "Chenhan Xiang",
+              "givenName": "Chenhan",
+              "familyName": "Xiang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/chenhan-xiang/800855652/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800802755",
+              "name": "Jingyue Zhang",
+              "givenName": "Jingyue",
+              "familyName": "Zhang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/jingyue-zhang/800802755/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800872376",
+              "name": "Xiaoyuchen Pei",
+              "givenName": "Xiaoyuchen",
+              "familyName": "Pei",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/xiaoyuchen-pei/800872376/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800855952",
+              "name": "Yuxi He",
+              "givenName": "Yuxi",
+              "familyName": "He",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yuxi-he/800855952/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800726992",
+              "name": "Ma RuoXi",
+              "givenName": "Ma",
+              "familyName": "RuoXi",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/ma-ruoxi/800726992/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777750",
+              "name": "YILIN DOU",
+              "givenName": "YILIN",
+              "familyName": "DOU",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yilin-dou/800777750/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791798",
+              "name": "Qige Yi",
+              "givenName": "Qige",
+              "familyName": "Yi",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/qige-yi/800791798/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800775743",
+              "name": "Xier Ai",
+              "givenName": "Xier",
+              "familyName": "Ai",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/xier-ai/800775743/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800778825",
+              "name": "Yuting Zhang",
+              "givenName": "Yuting",
+              "familyName": "Zhang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yuting-zhang/800778825/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800652030",
+              "name": "Mia Noetzig",
+              "givenName": "Mia",
+              "familyName": "Noetzig",
+              "nationalityCode": "GER",
+              "profileLink": "/en/players/mia-noetzig/800652030/ger/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800632075",
+              "name": "Qianyu Dong",
+              "givenName": "Qianyu",
+              "familyName": "Dong",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/qianyu-dong/800632075/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800861697",
+              "name": "Mingyi Zhao",
+              "givenName": "Mingyi",
+              "familyName": "Zhao",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/mingyi-zhao/800861697/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800765814",
+              "name": "Zheng Ye",
+              "givenName": "Zheng",
+              "familyName": "Ye",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zheng-ye/800765814/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800829261",
+              "name": "Liwen Liu",
+              "givenName": "Liwen",
+              "familyName": "Liu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/liwen-liu/800829261/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800792838",
+              "name": "Qingan Chen",
+              "givenName": "Qingan",
+              "familyName": "Chen",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/qingan-chen/800792838/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800775742",
+              "name": "Zihao Han",
+              "givenName": "Zihao",
+              "familyName": "Han",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/zihao-han/800775742/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800824858",
+              "name": "Wanyi Luo",
+              "givenName": "Wanyi",
+              "familyName": "Luo",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/wanyi-luo/800824858/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800792191",
+              "name": "Jiayi Lu",
+              "givenName": "Jiayi",
+              "familyName": "Lu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/jiayi-lu/800792191/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800776411",
+              "name": "Yelei Zhang",
+              "givenName": "Yelei",
+              "familyName": "Zhang",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/yelei-zhang/800776411/hkg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800790408",
+              "name": "Maner Li",
+              "givenName": "Maner",
+              "familyName": "Li",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/maner-li/800790408/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800753810",
+              "name": "Ye Xin TANG",
+              "givenName": "Ye Xin",
+              "familyName": "TANG",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/ye-xin-tang/800753810/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-02T02:34:47.737Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CHN-2026-011__G-S-M-RR",
+            "storedAt": "2026-10-02T02:34:47.737Z"
+          }
         }
-      }
+      },
+      "tournamentName": "J60 Shenzhen",
+      "startDate": "2026-08-24",
+      "endDate": "2026-08-29"
     },
     "J-J60-IND-2026-007": {
       "competitionId": "J-J60-IND-2026-007",
