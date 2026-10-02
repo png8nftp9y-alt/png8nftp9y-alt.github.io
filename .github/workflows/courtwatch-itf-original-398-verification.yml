@@ -1,0 +1,42 @@
+name: Court Watch ITF original 398 verification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-itf-original-398-verification
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: python -m pip install --quiet awscli
+      - name: Read archived ITF documents (no writes and no ITF requests)
+        shell: bash
+        run: |
+          set -euo pipefail
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/pointers/current.json" /tmp/itf-pointer.json --only-show-errors
+          generation="$(node -p "JSON.parse(require('fs').readFileSync('/tmp/itf-pointer.json')).generation")"
+          test -n "$generation"
+          test "$generation" != undefined
+          mkdir -p /tmp/itf-original-398-docs
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/history-draws/generations/$generation/" /tmp/itf-original-398-blocks --recursive --exclude "*" --include "blocks/*.tar.gz" --only-show-errors
+          find /tmp/itf-original-398-blocks -name '*.tar.gz' -print0 | while IFS= read -r -d '' file; do tar -xzf "$file" -C /tmp/itf-original-398-docs; done
+      - name: Verify the frozen 398 tournament cohort
+        run: node src/v3/verify-itf-original-398.mjs /tmp/itf-original-398-docs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-original-398-verification
+          path: dist/v3/audits/itf-original-398-verification.json
+          retention-days: 30
