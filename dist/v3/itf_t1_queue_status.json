@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-10-02T05:01:19.324Z",
+  "generatedAt": "2026-10-02T05:11:22.158Z",
   "today": "2026-10-02",
   "windowEnd": "2026-10-05",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -8,14 +8,14 @@
   "activation": "prepared_only",
   "coverage": {
     "catalogChecked": 1031,
-    "complete": 725,
+    "complete": 729,
     "cancelledNoDraws": 13,
-    "resolved": 738,
-    "missingDrawsTournaments": 58,
+    "resolved": 742,
+    "missingDrawsTournaments": 54,
     "unverifiable": 235,
     "declaredDraws": 4514,
-    "acquiredDraws": 4332,
-    "missingDraws": 182,
+    "acquiredDraws": 4372,
+    "missingDraws": 142,
     "actionableUnverifiable": 23,
     "futureUnverifiable": 212,
     "ordinary": {
@@ -24,8 +24,8 @@
       "inventoryRequired": 23
     },
     "extraordinaryA": {
-      "total": 29,
-      "missingDraws": 96,
+      "total": 25,
+      "missingDraws": 56,
       "inventoryRequired": 0
     },
     "extraordinaryB": {
@@ -885,79 +885,25 @@
         "status": "missing",
         "inventoryError": null,
         "knownDraws": 6,
-        "acquiredDraws": 0,
-        "missingDraws": 6,
+        "acquiredDraws": 5,
+        "missingDraws": 1,
         "missingEvents": [
-          {
-            "event": "B-S-M-RR",
-            "family": "B-S-M",
-            "structure": "RR",
-            "acquired": false,
-            "reasonCode": "never_processed",
-            "detail": "mai processato",
-            "rowParity": null,
-            "sources": []
-          },
-          {
-            "event": "B-S-Q-KO",
-            "family": "B-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-D-M-KO",
-            "family": "B-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-M-RR",
-            "family": "G-S-M",
-            "structure": "RR",
-            "acquired": false,
-            "reasonCode": "never_processed",
-            "detail": "mai processato",
-            "rowParity": null,
-            "sources": []
-          },
-          {
-            "event": "G-S-Q-KO",
-            "family": "G-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
           {
             "event": "G-D-M-KO",
             "family": "G-D-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "never_processed",
-            "detail": "mai processato",
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T05:05:35.651Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-10-01T23:06:54.671Z",
+        "checkedAt": "2026-10-02T05:05:35.651Z",
         "eligibleFrom": "2026-09-14"
       },
       {
@@ -968,76 +914,18 @@
         "status": "missing",
         "inventoryError": null,
         "knownDraws": 6,
-        "acquiredDraws": 0,
-        "missingDraws": 6,
+        "acquiredDraws": 5,
+        "missingDraws": 1,
         "missingEvents": [
-          {
-            "event": "B-S-M-KO",
-            "family": "B-S-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-S-Q-KO",
-            "family": "B-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-D-M-KO",
-            "family": "B-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-M-KO",
-            "family": "G-S-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-Q-KO",
-            "family": "G-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
           {
             "event": "G-D-M-KO",
             "family": "G-D-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T05:03:13.870Z",
             "rowParity": null,
             "sources": [
               "live_state"
@@ -1046,173 +934,7 @@
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-10-01T23:06:54.671Z",
-        "eligibleFrom": "2026-09-20"
-      },
-      {
-        "competitionId": "J-J30-ALG-2026-003",
-        "tournamentName": "J30 Algiers",
-        "startDate": "2026-09-21",
-        "endDate": "2026-09-26",
-        "status": "missing",
-        "inventoryError": null,
-        "knownDraws": 5,
-        "acquiredDraws": 0,
-        "missingDraws": 5,
-        "missingEvents": [
-          {
-            "event": "B-S-M-RR",
-            "family": "B-S-M",
-            "structure": "RR",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-S-Q-KO",
-            "family": "B-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-D-M-KO",
-            "family": "B-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-M-KO",
-            "family": "G-S-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-D-M-KO",
-            "family": "G-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          }
-        ],
-        "resolvedEvents": [],
-        "needsInventory": false,
-        "checkedAt": "2026-10-01T23:06:54.671Z",
-        "eligibleFrom": "2026-09-20"
-      },
-      {
-        "competitionId": "J-J30-CRO-2026-005",
-        "tournamentName": "J30 Rijeka",
-        "startDate": "2026-09-21",
-        "endDate": "2026-09-27",
-        "status": "missing",
-        "inventoryError": null,
-        "knownDraws": 6,
-        "acquiredDraws": 0,
-        "missingDraws": 6,
-        "missingEvents": [
-          {
-            "event": "B-S-M-KO",
-            "family": "B-S-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-S-Q-KO",
-            "family": "B-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-D-M-KO",
-            "family": "B-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-M-KO",
-            "family": "G-S-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-Q-KO",
-            "family": "G-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-D-M-KO",
-            "family": "G-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          }
-        ],
-        "resolvedEvents": [],
-        "needsInventory": false,
-        "checkedAt": "2026-10-01T23:06:54.671Z",
+        "checkedAt": "2026-10-02T05:03:13.870Z",
         "eligibleFrom": "2026-09-20"
       },
       {
@@ -1223,64 +945,18 @@
         "status": "missing",
         "inventoryError": null,
         "knownDraws": 6,
-        "acquiredDraws": 0,
-        "missingDraws": 6,
+        "acquiredDraws": 4,
+        "missingDraws": 2,
         "missingEvents": [
-          {
-            "event": "B-S-M-RR",
-            "family": "B-S-M",
-            "structure": "RR",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-S-Q-KO",
-            "family": "B-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-D-M-KO",
-            "family": "B-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-M-RR",
-            "family": "G-S-M",
-            "structure": "RR",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
           {
             "event": "G-S-Q-KO",
             "family": "G-S-Q",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "never_processed",
-            "detail": "mai processato",
+            "reasonCode": "empty_or_not_published",
+            "detail": "vuoto, non pubblicato o non utilizzato da verificare",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-10-02T05:04:21.187Z",
             "rowParity": null,
             "sources": []
           },
@@ -1289,8 +965,10 @@
             "family": "G-D-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T05:04:21.187Z",
             "rowParity": null,
             "sources": [
               "live_state"
@@ -1299,7 +977,7 @@
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-10-01T23:06:54.671Z",
+        "checkedAt": "2026-10-02T05:04:21.187Z",
         "eligibleFrom": "2026-09-20"
       },
       {
@@ -1310,76 +988,18 @@
         "status": "missing",
         "inventoryError": null,
         "knownDraws": 6,
-        "acquiredDraws": 0,
-        "missingDraws": 6,
+        "acquiredDraws": 5,
+        "missingDraws": 1,
         "missingEvents": [
-          {
-            "event": "B-S-M-KO",
-            "family": "B-S-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-S-Q-KO",
-            "family": "B-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-D-M-KO",
-            "family": "B-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-M-KO",
-            "family": "G-S-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-Q-KO",
-            "family": "G-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
           {
             "event": "G-D-M-KO",
             "family": "G-D-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T05:04:42.160Z",
             "rowParity": null,
             "sources": [
               "live_state"
@@ -1388,158 +1008,8 @@
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-10-01T23:06:54.671Z",
+        "checkedAt": "2026-10-02T05:04:42.160Z",
         "eligibleFrom": "2026-09-20"
-      },
-      {
-        "competitionId": "J-J60-GHA-2026-002",
-        "tournamentName": "J60 Accra",
-        "startDate": "2026-09-21",
-        "endDate": "2026-09-26",
-        "status": "missing",
-        "inventoryError": null,
-        "knownDraws": 4,
-        "acquiredDraws": 0,
-        "missingDraws": 4,
-        "missingEvents": [
-          {
-            "event": "B-S-M-RR",
-            "family": "B-S-M",
-            "structure": "RR",
-            "acquired": false,
-            "reasonCode": "never_processed",
-            "detail": "mai processato",
-            "rowParity": null,
-            "sources": []
-          },
-          {
-            "event": "B-D-M-KO",
-            "family": "B-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-M-RR",
-            "family": "G-S-M",
-            "structure": "RR",
-            "acquired": false,
-            "reasonCode": "never_processed",
-            "detail": "mai processato",
-            "rowParity": null,
-            "sources": []
-          },
-          {
-            "event": "G-D-M-KO",
-            "family": "G-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          }
-        ],
-        "resolvedEvents": [],
-        "needsInventory": false,
-        "checkedAt": "2026-10-01T23:06:54.671Z",
-        "eligibleFrom": "2026-09-20"
-      },
-      {
-        "competitionId": "J-J100-AUT-2026-001",
-        "tournamentName": "J100 Maria-Lanzendorf",
-        "startDate": "2026-09-22",
-        "endDate": "2026-09-27",
-        "status": "missing",
-        "inventoryError": null,
-        "knownDraws": 6,
-        "acquiredDraws": 0,
-        "missingDraws": 6,
-        "missingEvents": [
-          {
-            "event": "B-S-M-KO",
-            "family": "B-S-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-S-Q-KO",
-            "family": "B-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "B-D-M-KO",
-            "family": "B-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-M-KO",
-            "family": "G-S-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-S-Q-KO",
-            "family": "G-S-Q",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          },
-          {
-            "event": "G-D-M-KO",
-            "family": "G-D-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "incomplete_draw",
-            "detail": "acquisizione completa non documentata",
-            "rowParity": null,
-            "sources": [
-              "live_state"
-            ]
-          }
-        ],
-        "resolvedEvents": [],
-        "needsInventory": false,
-        "checkedAt": "2026-10-01T23:06:54.671Z",
-        "eligibleFrom": "2026-09-21"
       },
       {
         "competitionId": "J-J100-HKG-2026-001",
@@ -3577,16 +3047,17 @@
         "eligibleFrom": "2026-09-22"
       }
     ],
-    "total": 58,
-    "missingDraws": 182,
-    "acquiredDraws": 160,
+    "total": 54,
+    "missingDraws": 142,
+    "acquiredDraws": 179,
     "missingByReason": {
-      "incapsula_blocked": 32,
-      "never_processed": 28,
-      "incomplete_draw": 122
+      "incapsula_blocked": 36,
+      "empty_or_not_published": 1,
+      "incomplete_draw": 83,
+      "never_processed": 22
     },
     "byStatus": {
-      "missing": 58
+      "missing": 54
     }
   },
   "waiting": {
