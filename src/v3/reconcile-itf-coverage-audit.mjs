@@ -1,8 +1,10 @@
+import {applyUserQualificationResolutions} from './itf-user-resolved-qualifications.mjs';
 import {AUDIT_CRITERION,acquiredDrawStatus,requiredAuditEvents,emptySinglesQualificationResolutions} from './itf-audit-acquisition-policy.mjs';
 import {normalizedEvent} from './itf-t1-acquisition-state.mjs';
 import {buildCoverageQueuePlan} from './itf-coverage-queue-plan.mjs';
 export function reconcileCoverageAudit(audit,documents,{inventories=[],baseline,now=new Date().toISOString()}={}){
  if(audit.criterion!==AUDIT_CRITERION)throw new Error('ITF_new_coverage_audit_required');
+ audit=applyUserQualificationResolutions(audit);
  const incoming=new Map(),byInventory=new Map(inventories.map(doc=>[doc.competitionId,doc]));
  for(const document of documents){
   const key=document.competitionId+'|'+document.event,status=acquiredDrawStatus({competitionId:document.competitionId,event:document.event,structure:document.event?.split('-').at(-1),artifact:document});

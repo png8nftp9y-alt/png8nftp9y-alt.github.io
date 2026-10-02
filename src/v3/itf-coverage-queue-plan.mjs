@@ -1,3 +1,4 @@
+import {applyUserQualificationResolutions} from './itf-user-resolved-qualifications.mjs';
 import {AUDIT_CRITERION,requiredAuditEvents} from './itf-audit-acquisition-policy.mjs';
 
 const datePattern=/^\d{4}-\d{2}-\d{2}$/;
@@ -6,6 +7,7 @@ export const extraordinaryLane=id=>[...id].reduce((sum,char)=>sum+char.charCodeA
 export function buildCoverageQueuePlan(audit,baseline,today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())){
  if(!validDate(today))throw new Error('ITF_invalid_today');
  if(audit?.criterion!==AUDIT_CRITERION)throw new Error('ITF_wrong_coverage_policy');
+ audit=applyUserQualificationResolutions(audit);
  const ids=new Set((baseline?.tournaments||[]).map(t=>t.competitionId));
  if(baseline.tournaments?.length!==1031||ids.size!==1031||audit.tournaments?.length!==1031||new Set(audit.tournaments.map(t=>t.competitionId)).size!==1031||audit.tournaments.some(t=>!ids.has(t.competitionId)))throw new Error('ITF_coverage_scope_changed');
  const windowEnd=new Date(Date.parse(today+'T00:00:00Z')+3*864e5).toISOString().slice(0,10);
