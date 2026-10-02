@@ -1,28 +1,28 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-02T05:51:16.000Z",
+  "generatedAt": "2026-10-02T05:56:25.870Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 1,
+    "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 0,
+    "pendingTournaments": 1,
     "declaredSections": 6,
     "requestedSections": 1,
-    "acquiredSections": 6,
+    "acquiredSections": 5,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 6,
-    "missingSections": 0,
-    "newSectionsCached": 1,
+    "resolvedSections": 5,
+    "missingSections": 1,
+    "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 0,
+    "retrySections": 1,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 0,
+    "notPublishedOrIncompleteSections": 1,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 370,
@@ -130,19 +130,19 @@
   },
   "audit": [
     {
-      "competitionId": "J-J500-JPN-2026-001",
-      "tournamentName": "J500 Osaka",
-      "decision": "complete",
+      "competitionId": "J-J30-DOM-2026-001",
+      "tournamentName": "J30 Punta Cana",
+      "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 6,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 6,
-      "missingSections": 0,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "sections": [
         {
-          "event": "B-S-M-KO",
+          "event": "B-S-M-RR",
           "family": "B-S-M",
           "acquired": true,
           "resolved": true,
@@ -163,7 +163,7 @@
           "status": "acquired"
         },
         {
-          "event": "G-S-M-KO",
+          "event": "G-S-M-RR",
           "family": "G-S-M",
           "acquired": true,
           "resolved": true,
@@ -172,9 +172,9 @@
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "G-D-M-KO",
@@ -190,8 +190,8 @@
           "populated": true,
           "events": [
             {
-              "event": "B-S-M-KO",
-              "players": 48,
+              "event": "B-S-M-RR",
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -204,7 +204,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 40,
+              "players": 30,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -217,7 +217,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 48,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -229,8 +229,8 @@
           "populated": true,
           "events": [
             {
-              "event": "G-S-M-KO",
-              "players": 48,
+              "event": "G-S-M-RR",
+              "players": 26,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -239,14 +239,14 @@
         },
         {
           "family": "G-S-Q",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 39,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -256,7 +256,7 @@
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 48,
+              "players": 22,
               "error": null,
               "failureType": null,
               "resolved": true
