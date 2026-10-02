@@ -122,7 +122,11 @@ async function checkTarget(target, env, now) {
 }
 
 async function checkLiveSchedule(target, env, scheduledTime) {
-  const runs = await latestRuns(target, env);
+  const allRuns = await latestRuns(target, env);
+  // Extraordinary runs share this workflow but must not block ordinary dispatch.
+  const runs = target.id === "itf-t-minus-one"
+    ? allRuns.filter((run) => !/^ITF T-1 extraordinary-[ab]$/.test(String(run.display_title || "")))
+    : allRuns;
   const slotStart = Math.floor(scheduledTime / 900000) * 900000;
   const active = runs.find(
     (run) =>

@@ -28,6 +28,11 @@ export function mergeCoverageCatalog(audit,catalog,{now=new Date().toISOString()
 }
 export async function withCurrentCoverageCatalog(audit){
  if(audit?.criterion!==AUDIT_CRITERION)return audit;
- let catalog;try{catalog=JSON.parse(await fs.readFile('dist/v3/source_itf_tournaments.json','utf8'));}catch{return applyUserQualificationResolutions(audit);}
- return mergeCoverageCatalog(audit,catalog);
+ audit=applyUserQualificationResolutions(audit);
+ // The permanent historical catalog is independent of the rolling discovery window.
+ for(const file of ['dist/v3/source_itf_history_tournaments.json','dist/v3/source_itf_tournaments.json']){
+  let catalog;try{catalog=JSON.parse(await fs.readFile(file,'utf8'));}catch{continue;}
+  audit=mergeCoverageCatalog(audit,catalog);
+ }
+ return audit;
 }
