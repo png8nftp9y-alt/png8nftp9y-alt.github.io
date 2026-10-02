@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-10-02T22:17:35.513Z",
+  "generatedAt": "2026-10-02T22:20:46.884Z",
   "today": "2026-10-03",
   "windowEnd": "2026-10-06",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -8,14 +8,14 @@
   "activation": "prepared_only",
   "coverage": {
     "catalogChecked": 1031,
-    "complete": 783,
+    "complete": 782,
     "cancelledNoDraws": 13,
-    "resolved": 796,
-    "missingDrawsTournaments": 11,
+    "resolved": 795,
+    "missingDrawsTournaments": 12,
     "unverifiable": 224,
-    "declaredDraws": 4579,
+    "declaredDraws": 4580,
     "acquiredDraws": 4533,
-    "missingDraws": 46,
+    "missingDraws": 47,
     "actionableUnverifiable": 17,
     "futureUnverifiable": 207,
     "ordinary": {
@@ -24,8 +24,8 @@
       "inventoryRequired": 17
     },
     "extraordinaryA": {
-      "total": 0,
-      "missingDraws": 0,
+      "total": 1,
+      "missingDraws": 1,
       "inventoryRequired": 0
     },
     "extraordinaryB": {
@@ -998,15 +998,15 @@
         "tournamentName": "J30 Antananarivo",
         "startDate": "2026-10-06",
         "endDate": "2026-10-10",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-10-02T22:14:54.611Z",
         "eligibleFrom": "2026-10-05"
       },
       {
@@ -1014,15 +1014,15 @@
         "tournamentName": "J30 Megrine",
         "startDate": "2026-10-06",
         "endDate": "2026-10-11",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-10-02T22:14:58.642Z",
         "eligibleFrom": "2026-10-05"
       },
       {
@@ -1030,15 +1030,15 @@
         "tournamentName": "J60 Lautoka",
         "startDate": "2026-10-06",
         "endDate": "2026-10-11",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-10-02T22:14:56.788Z",
         "eligibleFrom": "2026-10-05"
       },
       {
@@ -1046,15 +1046,15 @@
         "tournamentName": "J60 Albany",
         "startDate": "2026-10-06",
         "endDate": "2026-10-11",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-10-02T22:14:56.886Z",
         "eligibleFrom": "2026-10-05"
       }
     ],
@@ -1065,18 +1065,51 @@
       "draw_without_players": 46
     },
     "byStatus": {
-      "inventory_empty": 13,
-      "missing": 11,
-      "inventory_required": 4
+      "inventory_empty": 17,
+      "missing": 11
     }
   },
   "extraordinary": {
-    "tournaments": [],
-    "total": 0,
-    "missingDraws": 0,
-    "acquiredDraws": 0,
-    "missingByReason": {},
-    "byStatus": {}
+    "tournaments": [
+      {
+        "competitionId": "J-J30-DOM-2026-001",
+        "tournamentName": "J30 Punta Cana",
+        "startDate": "2026-09-21",
+        "endDate": "2026-09-26",
+        "status": "missing",
+        "inventoryError": null,
+        "knownDraws": 6,
+        "acquiredDraws": 5,
+        "missingDraws": 1,
+        "missingEvents": [
+          {
+            "event": "G-S-Q-KO",
+            "family": "G-S-Q",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "empty_or_not_published",
+            "detail": "vuoto, non pubblicato o non utilizzato da verificare",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-10-02T22:06:11.375Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
+        "resolvedEvents": [],
+        "needsInventory": false,
+        "checkedAt": "2026-10-02T22:06:11.375Z",
+        "eligibleFrom": "2026-09-20"
+      }
+    ],
+    "total": 1,
+    "missingDraws": 1,
+    "acquiredDraws": 5,
+    "missingByReason": {
+      "empty_or_not_published": 1
+    },
+    "byStatus": {
+      "missing": 1
+    }
   },
   "waiting": {
     "tournaments": [
