@@ -1,34 +1,34 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-02T05:25:41.315Z",
+  "generatedAt": "2026-10-02T05:37:55.657Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
+    "pendingTournaments": 0,
     "declaredSections": 6,
-    "requestedSections": 6,
-    "acquiredSections": 5,
+    "requestedSections": 1,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 5,
-    "missingSections": 1,
-    "newSectionsCached": 5,
+    "resolvedSections": 6,
+    "missingSections": 0,
+    "newSectionsCached": 1,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 1,
-    "technicalErrorSections": 1,
+    "retrySections": 0,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 347,
+    "globalCompleteTournaments": 355,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 116,
-    "globalPendingTechnical": 78,
+    "globalPendingTotal": 108,
+    "globalPendingTechnical": 70,
     "globalPendingPublication": 38,
     "technicalPendingCompetitionIds": [
       "J-J200-RSA-2026-002",
@@ -40,14 +40,11 @@
       "J-J100-BIH-2026-001",
       "J-J100-CAN-2026-002",
       "J-J100-HKG-2026-001",
-      "J-J100-JPN-2026-001",
       "J-J100-USA-2026-005",
       "J-J200-CAN-2026-001",
-      "J-J200-CHN-2026-001",
       "J-J200-JPN-2026-001",
       "J-J200-RSA-2026-001",
       "J-J30-BEL-2026-007",
-      "J-J30-COL-2026-005",
       "J-J30-CRO-2026-001",
       "J-J30-CZE-2026-005",
       "J-J30-DEN-2026-002",
@@ -59,7 +56,6 @@
       "J-J30-MEX-2026-008",
       "J-J30-NED-2026-003",
       "J-J30-POL-2026-005",
-      "J-J30-SRB-2026-004",
       "J-J30-TPE-2026-003",
       "J-J30-TPE-2026-004",
       "J-J300-CHN-2026-001",
@@ -67,15 +63,11 @@
       "J-J60-ARM-2026-009",
       "J-J60-AUS-2026-004",
       "J-J60-AZE-2026-002",
-      "J-J60-BUL-2026-003",
-      "J-J60-CHI-2026-002",
       "J-J60-EGY-2026-005",
       "J-J60-EGY-2026-006",
       "J-J60-ESP-2026-008",
-      "J-J60-GER-2026-008",
       "J-J60-SRI-2026-001",
       "J-J60-SRI-2026-002",
-      "J-J60-USA-2026-005",
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
       "J-J100-ARG-2026-001",
@@ -153,16 +145,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-VIE-2026-007",
-      "tournamentName": "J30 Phan Thiet",
-      "decision": "pending",
+      "competitionId": "J-J60-USA-2026-005",
+      "tournamentName": "J60 Dallas",
+      "decision": "complete",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 5,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 5,
-      "missingSections": 1,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "sections": [
         {
           "event": "B-S-M-RR",
@@ -202,9 +194,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -227,7 +219,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 23,
+              "players": 16,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -240,7 +232,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 32,
+              "players": 28,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -266,7 +258,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 12,
+              "players": 13,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -275,19 +267,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 32,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 24,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
