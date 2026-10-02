@@ -1,35 +1,35 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-02T02:46:06.707Z",
+  "generatedAt": "2026-10-02T02:59:17.673Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 1,
+    "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 0,
-    "declaredSections": 5,
-    "requestedSections": 5,
+    "pendingTournaments": 1,
+    "declaredSections": 6,
+    "requestedSections": 6,
     "acquiredSections": 5,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
     "resolvedSections": 5,
-    "missingSections": 0,
+    "missingSections": 1,
     "newSectionsCached": 5,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 0,
-    "technicalErrorSections": 0,
+    "retrySections": 1,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 319,
+    "globalCompleteTournaments": 316,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 144,
-    "globalPendingTechnical": 84,
-    "globalPendingPublication": 60,
+    "globalPendingTotal": 147,
+    "globalPendingTechnical": 96,
+    "globalPendingPublication": 51,
     "technicalPendingCompetitionIds": [
       "J-J100-FRA-2026-001",
       "J-J100-RSA-2026-004",
@@ -57,7 +57,19 @@
       "J-J30-DEN-2026-004",
       "J-J30-GER-2026-005",
       "J-J30-IND-2026-006",
+      "J-J30-ROU-2026-004",
       "J-J30-SLO-2026-003",
+      "J-J30-SRB-2026-003",
+      "J-J30-TJK-2026-006",
+      "J-J30-TPE-2026-002",
+      "J-J30-USA-2026-006",
+      "J-J60-BUL-2026-002",
+      "J-J60-CHI-2026-001",
+      "J-J60-FRA-2026-006",
+      "J-J30-AUS-2026-004",
+      "J-J30-POL-2026-004",
+      "J-J100-ESP-2026-007",
+      "J-J100-ITA-2026-001",
       "J-J30-ECU-2026-003",
       "J-J30-GEO-2026-005",
       "J-J30-IND-2026-005",
@@ -117,15 +129,6 @@
       "J-J100-NOR-2026-001"
     ],
     "publicationPendingCompetitionIds": [
-      "J-J30-ROU-2026-004",
-      "J-J30-TJK-2026-006",
-      "J-J30-TPE-2026-002",
-      "J-J30-USA-2026-005",
-      "J-J30-USA-2026-006",
-      "J-J60-BUL-2026-002",
-      "J-J60-CHI-2026-001",
-      "J-J60-COL-2026-001",
-      "J-J60-FRA-2026-006",
       "J-J60-LAT-2026-004",
       "J-J30-SVK-2026-004",
       "J-J30-LAT-2026-004",
@@ -181,16 +184,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-TTO-2026-002",
-      "tournamentName": "J60 Tacarigua",
-      "decision": "complete",
+      "competitionId": "J-J60-FRA-2026-006",
+      "tournamentName": "J60 Dijon",
+      "decision": "pending",
       "playersFound": [],
-      "declaredSections": 5,
+      "declaredSections": 6,
       "acquiredSections": 5,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
       "resolvedSections": 5,
-      "missingSections": 0,
+      "missingSections": 1,
       "sections": [
         {
           "event": "B-S-M-RR",
@@ -214,8 +217,15 @@
           "status": "acquired"
         },
         {
-          "event": "G-S-M-KO",
+          "event": "G-S-M-RR",
           "family": "G-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -223,9 +233,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         }
       ],
       "families": [
@@ -248,7 +258,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 10,
+              "players": 19,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -261,7 +271,7 @@
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 28,
+              "players": 20,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -273,8 +283,21 @@
           "populated": true,
           "events": [
             {
-              "event": "G-S-M-KO",
-              "players": 20,
+              "event": "G-S-M-RR",
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 14,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -283,19 +306,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 20,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 18,
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge"
     }
   ]
 }
