@@ -52,7 +52,10 @@ jobs:
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
           git pull --ff-only origin main
-          cp /tmp/itf-queue-preview.json dist/v3/itf_t1_queue_status.json
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-coverage.json --only-show-errors
+          node src/v3/synchronize-itf-coverage-catalog.mjs /tmp/itf-coverage.json
+          ITF_AUDIT_STATE_FILE=/tmp/itf-coverage.json node src/v3/build-itf-t1-admin-status.mjs
           git add dist/v3/itf_t1_queue_status.json
           if ! git diff --cached --quiet; then
             git commit -m "Publish ITF coverage diagnostic counters"

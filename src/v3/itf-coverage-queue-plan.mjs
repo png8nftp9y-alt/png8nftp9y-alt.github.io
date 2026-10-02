@@ -9,7 +9,8 @@ export function buildCoverageQueuePlan(audit,baseline,today=new Intl.DateTimeFor
  if(audit?.criterion!==AUDIT_CRITERION)throw new Error('ITF_wrong_coverage_policy');
  audit=applyUserQualificationResolutions(audit);
  const ids=new Set((baseline?.tournaments||[]).map(t=>t.competitionId));
- if(baseline.tournaments?.length!==1031||ids.size!==1031||audit.tournaments?.length!==1031||new Set(audit.tournaments.map(t=>t.competitionId)).size!==1031||audit.tournaments.some(t=>!ids.has(t.competitionId)))throw new Error('ITF_coverage_scope_changed');
+ const auditIds=new Set(audit.tournaments.map(t=>t.competitionId)),additions=new Set(audit.incrementalCatalogIds||[]);
+ if(baseline.tournaments?.length!==1031||ids.size!==1031||auditIds.size!==audit.tournaments.length||[...ids].some(id=>!auditIds.has(id))||audit.tournaments.some(t=>!ids.has(t.competitionId)&&!additions.has(t.competitionId))||[...additions].some(id=>ids.has(id)||!auditIds.has(id)))throw new Error('ITF_coverage_scope_changed');
  const windowEnd=new Date(Date.parse(today+'T00:00:00Z')+3*864e5).toISOString().slice(0,10);
  const queues={ordinary:[],extraordinaryA:[],extraordinaryB:[],waiting:[],blocked:[]},resolved=[],missing=[],unknown=[];
  const sum=(rows,key)=>rows.reduce((n,t)=>n+Number(t[key]||0),0);
@@ -48,7 +49,7 @@ export function buildCoverageQueuePlan(audit,baseline,today=new Intl.DateTimeFor
  }));
  if(new Set(tasks.map(t=>t.taskId)).size!==tasks.length)throw new Error('ITF_duplicate_prepared_tasks');
  const summarize=rows=>({total:rows.length,missingDraws:sum(rows,'missingDraws'),inventoryRequired:rows.filter(t=>t.needsInventory).length});
- return{version:1,generatedAt:new Date().toISOString(),auditGeneratedAt:audit.generatedAt,today,windowEnd,windowDays:3,criterion:AUDIT_CRITERION,readyForT1,activation:'prepared_only',summary:{catalogChecked:1031,complete:resolved.length-13,cancelledNoDraws:13,resolved:resolved.length,missingDrawsTournaments:missing.length,unverifiable:unknown.length,declaredDraws:requiredDraws,acquiredDraws,missingDraws,actionableUnverifiable:dueUnknown.length,futureUnverifiable:queues.waiting.filter(t=>t.needsInventory).length,ordinary:summarize(queues.ordinary),extraordinaryA:summarize(queues.extraordinaryA),extraordinaryB:summarize(queues.extraordinaryB),waiting:summarize(queues.waiting),blocked:summarize(queues.blocked)},queues,tasks};
+ return{version:1,generatedAt:new Date().toISOString(),auditGeneratedAt:audit.generatedAt,today,windowEnd,windowDays:3,criterion:AUDIT_CRITERION,readyForT1,activation:'prepared_only',summary:{catalogChecked:audit.tournaments.length,complete:resolved.length-13,cancelledNoDraws:13,resolved:resolved.length,missingDrawsTournaments:missing.length,unverifiable:unknown.length,declaredDraws:requiredDraws,acquiredDraws,missingDraws,actionableUnverifiable:dueUnknown.length,futureUnverifiable:queues.waiting.filter(t=>t.needsInventory).length,ordinary:summarize(queues.ordinary),extraordinaryA:summarize(queues.extraordinaryA),extraordinaryB:summarize(queues.extraordinaryB),waiting:summarize(queues.waiting),blocked:summarize(queues.blocked)},queues,tasks};
 }
 
 export function coverageDiagnostic(plan){

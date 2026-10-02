@@ -1,8 +1,9 @@
+import {withCurrentCoverageCatalog} from './itf-incremental-coverage.mjs';
 import fs from 'node:fs/promises';
 import {TODAY,readJson,writeJson} from './itf-common.mjs';
 import {AUDIT_CRITERION} from './itf-audit-acquisition-policy.mjs';
 import {buildCoverageQueuePlan} from './itf-coverage-queue-plan.mjs';
-const audit=await readJson(process.env.ITF_AUDIT_STATE_FILE||'',null);
+const audit=await withCurrentCoverageCatalog(await readJson(process.env.ITF_AUDIT_STATE_FILE||'',null));
 if(audit?.criterion!==AUDIT_CRITERION)throw new Error('ITF_new_coverage_audit_required');
 const baseline=await readJson('src/v3/itf-audit-baseline-20261001.json',null),plan=buildCoverageQueuePlan(audit,baseline,TODAY),lane=process.env.ITF_EXTRAORDINARY_LANE==='b'?'b':'a',laneQueue=plan.queues[lane==='a'?'extraordinaryA':'extraordinaryB'],excluded=new Set(String(process.env.ITF_EXCLUDE_IDS||'').split(',').filter(Boolean)),available=laneQueue.filter(t=>!excluded.has(t.competitionId)),cycleReset=laneQueue.length>0&&available.length===0,selected=(cycleReset?laneQueue:available).slice(0,8),ids=selected.map(t=>t.competitionId),next=[...(cycleReset?[]:excluded),...ids].join(','),queue=[...plan.queues.extraordinaryA,...plan.queues.extraordinaryB];
 await writeJson('dist/v3/itf_t1_extraordinary_batch.json',{version:9,batchLimit:8,generatedAt:new Date().toISOString(),today:TODAY,lane,laneTotal:laneQueue.length,extraordinaryTotal:queue.length,extraordinaryMissingDraws:plan.summary.extraordinaryA.missingDraws+plan.summary.extraordinaryB.missingDraws,selectionCycleReset:cycleReset,attemptedInCycle:next?next.split(',').length:0,selected,queue});

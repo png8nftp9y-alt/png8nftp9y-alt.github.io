@@ -52,6 +52,7 @@ jobs:
       next_previous_ids: ${{ steps.select.outputs.next_previous_ids }}
     steps:
       - uses: actions/checkout@v4
+        with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Restore the authoritative coverage audit
@@ -65,6 +66,7 @@ jobs:
           set -euo pipefail
           python -m pip install --quiet awscli
           aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-audit-state.json --only-show-errors
+          node src/v3/synchronize-itf-coverage-catalog.mjs /tmp/itf-audit-state.json
           echo "ITF_AUDIT_STATE_FILE=/tmp/itf-audit-state.json" >> "$GITHUB_ENV"
       - uses: actions/upload-artifact@v4
         with:
@@ -93,6 +95,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
@@ -127,6 +130,7 @@ jobs:
       tournaments: ${{ steps.queue.outputs.tournaments }}
     steps:
       - uses: actions/checkout@v4
+        with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
@@ -142,6 +146,7 @@ jobs:
           set -euo pipefail
           command -v aws >/dev/null || python -m pip install --quiet awscli
           aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-audit-state.json --only-show-errors
+          node src/v3/synchronize-itf-coverage-catalog.mjs /tmp/itf-audit-state.json
       - id: queue
         env:
           ITF_AUDIT_STATE_FILE: /tmp/itf-audit-state.json
@@ -165,6 +170,7 @@ jobs:
     timeout-minutes: 11
     steps:
       - uses: actions/checkout@v4
+        with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22', cache: npm}
       - run: npm ci --ignore-scripts
@@ -206,7 +212,7 @@ jobs:
     timeout-minutes: 13
     steps:
       - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
+        with: {ref: main, fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
@@ -229,6 +235,7 @@ jobs:
           python -m pip install --quiet awscli
           bash src/v3/itf-r2-cache.sh restore
           aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-audit-state.json --only-show-errors
+          node src/v3/synchronize-itf-coverage-catalog.mjs /tmp/itf-audit-state.json
           echo "ITF_AUDIT_STATE_FILE=/tmp/itf-audit-state.json" >> "$GITHUB_ENV"
       - name: Persist complete draw documents to R2 and project incremental D1 rows
         if: needs.queue.outputs.tasks != '0'
@@ -273,6 +280,11 @@ jobs:
             cp -R "$snapshot"/* ./
             node src/v3/merge-itf-draw-target-ownership.mjs t-minus-one /tmp/itf-current-state.json /tmp/itf-incoming-state.json history/itf_draw_target_db.json
             node src/v3/entries-engine.mjs
+            aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-audit-state.json --only-show-errors
+            node src/v3/synchronize-itf-coverage-catalog.mjs /tmp/itf-audit-state.json
+            aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3 cp /tmp/itf-audit-state.json "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" --only-show-errors
+            node src/v3/build-itf-t1-extraordinary-batch.mjs
+            node src/v3/build-itf-t1-admin-status.mjs
             git add dist/v3/source_itf_entries.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json dist/v3/universal/tournaments.json dist/v3/universal/matches.json dist/v3/universal/results.json dist/v3/itf_t1_queue_status.json dist/v3/itf_t1_extraordinary_batch.json
             if git diff --cached --quiet; then echo "No validated ITF T-1 changes"; exit 0; fi
             git commit -m "Publish validated ITF T-1 decisions"
@@ -332,3 +344,9 @@ jobs:
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/courtwatch-itf-t1-extraordinary.yml/dispatches" \
             -d "$(jq -n --arg ref main --arg lane "$LANE" --arg remaining "$REMAINING" --arg previous "$PREVIOUS_IDS" '{ref:$ref,inputs:{lane:$lane,remaining:$remaining,previous_ids:$previous}}')"
           echo "Next extraordinary selector dispatched with remaining=$REMAINING"
+
+  refresh-diagnostics:
+    needs: [select, review]
+    if: ${{ always() && needs.select.result == 'success' }}
+    uses: ./.github/workflows/courtwatch-itf-incremental-status.yml
+    secrets: inherit

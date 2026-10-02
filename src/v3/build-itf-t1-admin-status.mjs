@@ -1,3 +1,4 @@
+import {withCurrentCoverageCatalog} from './itf-incremental-coverage.mjs';
 import {TODAY,readJson,writeJson} from './itf-common.mjs';
 import {t1Candidates} from './itf-t1-candidates.mjs';
 import {AUDIT_CRITERION} from './itf-audit-acquisition-policy.mjs';
@@ -5,7 +6,7 @@ import {buildCoverageQueuePlan,coverageDiagnostic} from './itf-coverage-queue-pl
 
 const catalog=await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]});
 const state=await readJson('history/itf_draw_target_db.json',{tournaments:{}});
-const strictAudit=process.env.ITF_AUDIT_STATE_FILE?await readJson(process.env.ITF_AUDIT_STATE_FILE,{tournaments:[]}):{tournaments:[]};
+const strictAudit=await withCurrentCoverageCatalog(process.env.ITF_AUDIT_STATE_FILE?await readJson(process.env.ITF_AUDIT_STATE_FILE,{tournaments:[]}):{tournaments:[]});
 if(strictAudit.criterion===AUDIT_CRITERION){
  const baseline=await readJson('src/v3/itf-audit-baseline-20261001.json',null);
  const plan=buildCoverageQueuePlan(strictAudit,baseline,TODAY);

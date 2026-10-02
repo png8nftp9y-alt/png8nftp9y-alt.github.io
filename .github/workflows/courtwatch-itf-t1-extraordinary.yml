@@ -30,6 +30,7 @@ concurrency:
 
 jobs:
   dispatch:
+    concurrency: {group: courtwatch-v3-itf-publish, cancel-in-progress: false, queue: max}
     if: ${{ vars.ITF_T1_COVERAGE_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -56,6 +57,12 @@ jobs:
           ITF_EXTRAORDINARY_LANE: ${{ inputs.lane }}
         run: node src/v3/build-itf-t1-extraordinary-batch.mjs
       - name: Publish live T-1 queue counters
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
         run: |
           set -euo pipefail
           node src/v3/build-itf-t1-admin-status.mjs
@@ -69,6 +76,10 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             cp "$snapshot/dist/v3/"*.json dist/v3/
+            aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-audit-state.json --only-show-errors
+            node src/v3/synchronize-itf-coverage-catalog.mjs /tmp/itf-audit-state.json
+            node src/v3/build-itf-t1-extraordinary-batch.mjs
+            node src/v3/build-itf-t1-admin-status.mjs
             git add dist/v3/itf_t1_extraordinary_batch.json dist/v3/itf_t1_queue_status.json
             if git diff --cached --quiet; then exit 0; fi
             git commit -m "Publish live ITF T-1 queue counters"

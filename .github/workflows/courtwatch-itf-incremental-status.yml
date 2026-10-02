@@ -1,0 +1,58 @@
+name: Court Watch ITF incremental catalog and diagnostics
+on:
+  workflow_dispatch:
+  workflow_call:
+  workflow_run:
+    workflows: [Court Watch v3 ITF global tournament map]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  refresh:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    concurrency: {group: courtwatch-v3-itf-publish, cancel-in-progress: false, queue: max}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      ITF_AUDIT_STATE_FILE: /tmp/itf-current-coverage.json
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: python -m pip install --quiet awscli
+      - name: Reconcile current catalog and publish current counters under the shared lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" "$ITF_AUDIT_STATE_FILE" --only-show-errors
+            node src/v3/synchronize-itf-coverage-catalog.mjs "$ITF_AUDIT_STATE_FILE"
+            node src/v3/build-itf-t1-extraordinary-batch.mjs
+            node src/v3/build-itf-t1-admin-status.mjs
+            aws --endpoint-url "$endpoint" s3 cp "$ITF_AUDIT_STATE_FILE" "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" --only-show-errors
+            git add dist/v3/itf_t1_extraordinary_batch.json dist/v3/itf_t1_queue_status.json
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m "Refresh incremental ITF coverage and diagnostic counters"
+            git push origin HEAD:main && exit 0
+          done
+          exit 1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-incremental-catalog-diagnostics
+          path: |
+            /tmp/itf-current-coverage.json
+            dist/v3/itf_t1_queue_status.json
+          retention-days: 7

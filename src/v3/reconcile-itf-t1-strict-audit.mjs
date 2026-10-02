@@ -1,3 +1,4 @@
+import {withCurrentCoverageCatalog} from './itf-incremental-coverage.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {gunzipSync} from 'node:zlib';
@@ -48,7 +49,7 @@ export function reconcileStrictAudit(audit,documents,{now=new Date().toISOString
 if(import.meta.url===`file://${process.argv[1]}`){
  const input=process.argv[2]||process.env.ITF_AUDIT_STATE_FILE,root=process.argv[3]||process.env.ITF_T1_TASK_ROOT||'draw-tasks',output=process.argv[4]||input;
  if(!input||!output)throw new Error('Usage: reconcile-itf-t1-strict-audit.mjs AUDIT_FILE [TASK_ROOT] [OUTPUT_FILE]');
- const audit=JSON.parse(await fs.readFile(input,'utf8')),documents=[];
+ const audit=await withCurrentCoverageCatalog(JSON.parse(await fs.readFile(input,'utf8'))),documents=[];
  for(const file of await files(root))try{documents.push(JSON.parse(gunzipSync(await fs.readFile(file))))}catch(error){throw new Error(`Unreadable T-1 document ${file}: ${error.message}`)}
  const inventories=[];
  const inventoryRoot=process.argv[5]||'dist/v3/shards/itf/t1-inventory';
