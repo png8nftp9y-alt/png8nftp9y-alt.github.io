@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-03T23:24:44.762Z",
+  "generatedAt": "2026-10-03T23:28:49.059Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,26 +9,26 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 5,
-    "acquiredSections": 1,
+    "requestedSections": 4,
+    "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 1,
-    "missingSections": 5,
+    "resolvedSections": 2,
+    "missingSections": 4,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 5,
+    "retrySections": 4,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 5,
+    "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 420,
+    "globalCompleteTournaments": 428,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 83,
-    "globalPendingTechnical": 44,
+    "globalPendingTotal": 75,
+    "globalPendingTechnical": 36,
     "globalPendingPublication": 39,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
@@ -65,14 +65,6 @@
       "J-J100-USA-2026-002",
       "J-J100-USA-2026-004",
       "J-J60-DOM-2026-003",
-      "J-J100-UAE-2026-003",
-      "J-J30-BEL-2026-003",
-      "J-J300-AUS-2026-001",
-      "J-J60-GER-2026-005",
-      "J-J30-EGY-2026-003",
-      "J-J30-MEX-2026-002",
-      "J-J30-SGP-2026-002",
-      "J-J30-SLO-2026-002",
       "J-J30-TUR-2026-001",
       "J-J60-CHN-2026-002"
     ],
@@ -120,16 +112,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-BAN-2026-002",
-      "tournamentName": "J30 Rajshahi",
+      "competitionId": "J-J300-KOR-2026-001",
+      "tournamentName": "J300 Wanju (Closed Asia Regional Championships)",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 1,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 1,
-      "missingSections": 5,
+      "resolvedSections": 2,
+      "missingSections": 4,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -162,9 +154,9 @@
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-D-M-KO",
@@ -194,7 +186,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 21,
+              "players": 54,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -229,14 +221,14 @@
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 35,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
