@@ -1706,3 +1706,13 @@ Richiesta: verificare la completezza dei 398 tornei, separandoli dai 13 cancella
 - Preparazione verificata: YAML, dipendenze job e 18 test.
 - I vecchi run mantengono la vecchia definizione; modifica attiva
   nei nuovi run dopo push. Esito operativo ancora da verificare.
+
+
+## Ricerca giocatori rimossi — 4 ottobre 2026
+
+- Corretto il ritorno alla Home dalla ricerca di giocatori rimossi.
+- Il clic verifica la lista attuale dei seguiti: gli altri risultati
+  aprono la pagina avversario con identità e nome.
+- Regola generale, valida anche dopo future rimozioni.
+- Sei scenari di navigazione e sintassi verificati.
+- Verifica nell'app da completare dopo push e Pages verde.

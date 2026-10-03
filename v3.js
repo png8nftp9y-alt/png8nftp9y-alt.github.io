@@ -2184,8 +2184,11 @@ async function searchPlayers(query) {
   return (await response.json()).results || [];
 }
 function openPlayerSearchResult(result) {
-  if (result.courtwatchId) openProfile(result.courtwatchId);
-  else openCurrentOpponent(result.identity, result.name, "");
+  const followed = result.courtwatchId && (state.data?.players || []).some(
+    (player) => player.id === result.courtwatchId && player.active !== false,
+  );
+  if (followed) openProfile(result.courtwatchId);
+  else openCurrentOpponent(result.identity || result.courtwatchId, result.name, "");
 }
 function playerSearchResultHtml(result, className) {
   const sourceLabels = (result.sources || [])
