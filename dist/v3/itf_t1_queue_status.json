@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-10-03T21:27:37.013Z",
+  "generatedAt": "2026-10-03T21:32:21.872Z",
   "today": "2026-10-03",
   "windowEnd": "2026-10-06",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -8,15 +8,15 @@
   "activation": "prepared_only",
   "coverage": {
     "catalogChecked": 1079,
-    "complete": 783,
+    "complete": 785,
     "cancelledNoDraws": 13,
-    "resolved": 796,
-    "missingDrawsTournaments": 19,
-    "unverifiable": 264,
-    "declaredDraws": 4625,
-    "acquiredDraws": 4546,
-    "missingDraws": 79,
-    "actionableUnverifiable": 54,
+    "resolved": 798,
+    "missingDrawsTournaments": 25,
+    "unverifiable": 256,
+    "declaredDraws": 4672,
+    "acquiredDraws": 4587,
+    "missingDraws": 85,
+    "actionableUnverifiable": 46,
     "futureUnverifiable": 210,
     "ordinary": {
       "total": 28,
@@ -24,9 +24,9 @@
       "inventoryRequired": 9
     },
     "extraordinaryA": {
-      "total": 20,
-      "missingDraws": 0,
-      "inventoryRequired": 20
+      "total": 18,
+      "missingDraws": 6,
+      "inventoryRequired": 12
     },
     "extraordinaryB": {
       "total": 25,
@@ -1480,15 +1480,28 @@
         "tournamentName": "J30 Agno",
         "startDate": "2025-12-29",
         "endDate": "2026-01-03",
-        "status": "inventory_required",
+        "status": "missing",
         "inventoryError": null,
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "knownDraws": 6,
+        "acquiredDraws": 5,
+        "missingDraws": 1,
+        "missingEvents": [
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T23:15:50.047Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "needsInventory": false,
+        "checkedAt": "2026-10-02T23:15:50.047Z",
         "eligibleFrom": "2025-12-28"
       },
       {
@@ -1496,47 +1509,57 @@
         "tournamentName": "J60 Arlon",
         "startDate": "2025-12-30",
         "endDate": "2026-01-04",
-        "status": "inventory_required",
+        "status": "missing",
         "inventoryError": null,
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "knownDraws": 6,
+        "acquiredDraws": 5,
+        "missingDraws": 1,
+        "missingEvents": [
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T23:16:01.668Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "needsInventory": false,
+        "checkedAt": "2026-10-02T23:16:01.668Z",
         "eligibleFrom": "2025-12-29"
-      },
-      {
-        "competitionId": "J-J60-CRC-2026-002",
-        "tournamentName": "J60 San Jose",
-        "startDate": "2026-01-05",
-        "endDate": "2026-01-10",
-        "status": "inventory_required",
-        "inventoryError": null,
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
-        "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
-        "eligibleFrom": "2026-01-04"
       },
       {
         "competitionId": "J-J60-SWE-2026-001",
         "tournamentName": "J60 Malmo",
         "startDate": "2026-01-05",
         "endDate": "2026-01-10",
-        "status": "inventory_required",
+        "status": "missing",
         "inventoryError": null,
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "knownDraws": 6,
+        "acquiredDraws": 5,
+        "missingDraws": 1,
+        "missingEvents": [
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T23:17:32.398Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "needsInventory": false,
+        "checkedAt": "2026-10-02T23:17:32.398Z",
         "eligibleFrom": "2026-01-04"
       },
       {
@@ -1544,15 +1567,28 @@
         "tournamentName": "J60 Frankfurt",
         "startDate": "2026-01-06",
         "endDate": "2026-01-11",
-        "status": "inventory_required",
+        "status": "missing",
         "inventoryError": null,
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "knownDraws": 6,
+        "acquiredDraws": 5,
+        "missingDraws": 1,
+        "missingEvents": [
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T23:17:05.047Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "needsInventory": false,
+        "checkedAt": "2026-10-02T23:17:05.047Z",
         "eligibleFrom": "2026-01-05"
       },
       {
@@ -1560,15 +1596,28 @@
         "tournamentName": "J100 Dubai",
         "startDate": "2026-01-12",
         "endDate": "2026-01-17",
-        "status": "inventory_required",
+        "status": "missing",
         "inventoryError": null,
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "knownDraws": 6,
+        "acquiredDraws": 5,
+        "missingDraws": 1,
+        "missingEvents": [
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T23:14:37.866Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "needsInventory": false,
+        "checkedAt": "2026-10-02T23:14:37.866Z",
         "eligibleFrom": "2026-01-11"
       },
       {
@@ -1576,31 +1625,28 @@
         "tournamentName": "J200 Gurugram",
         "startDate": "2026-01-12",
         "endDate": "2026-01-17",
-        "status": "inventory_required",
+        "status": "missing",
         "inventoryError": null,
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "knownDraws": 6,
+        "acquiredDraws": 5,
+        "missingDraws": 1,
+        "missingEvents": [
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-02T23:14:35.382Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
-        "eligibleFrom": "2026-01-11"
-      },
-      {
-        "competitionId": "J-J30-EGY-2026-002",
-        "tournamentName": "J30 Ismailia",
-        "startDate": "2026-01-12",
-        "endDate": "2026-01-18",
-        "status": "inventory_required",
-        "inventoryError": null,
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
-        "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "needsInventory": false,
+        "checkedAt": "2026-10-02T23:14:35.382Z",
         "eligibleFrom": "2026-01-11"
       },
       {
@@ -2196,12 +2242,15 @@
         "eligibleFrom": "2026-01-19"
       }
     ],
-    "total": 45,
-    "missingDraws": 0,
-    "acquiredDraws": 0,
-    "missingByReason": {},
+    "total": 43,
+    "missingDraws": 6,
+    "acquiredDraws": 30,
+    "missingByReason": {
+      "incapsula_blocked": 6
+    },
     "byStatus": {
-      "inventory_required": 45
+      "missing": 6,
+      "inventory_required": 37
     }
   },
   "waiting": {
@@ -5577,8 +5626,8 @@
   },
   "audit": {
     "urgentUnverifiable": 9,
-    "concludedUnverifiable": 45,
-    "actionableUnverifiable": 54,
+    "concludedUnverifiable": 37,
+    "actionableUnverifiable": 46,
     "futureUnverifiable": 210,
     "blocked": 0
   }
