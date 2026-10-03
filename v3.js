@@ -616,7 +616,21 @@ function tournamentLocationLabel(t, fallback = "") {
     fitpSummerCenterPlace(t) || cityCountry(t?.location || t?.city || fallback)
   );
 }
+function tennisEuropeVenueLocation(t, fallback = "") {
+  const location = tournamentLocationLabel(t || {}, fallback),
+    city = location.split(",")[0].trim();
+  let venue = readableText(t?.venueName || t?.clubName || t?.club || "")
+    .split("|")[0].replace(/[,·\s]+$/, "").trim();
+  // Search results sometimes append the city to the club field itself.
+  const suffix = ", " + city;
+  if (city && venue.toLocaleLowerCase("it-IT").endsWith(suffix.toLocaleLowerCase("it-IT")))
+    venue = venue.slice(0, -suffix.length).trim();
+  if (!venue || venue.toLocaleLowerCase("it-IT") === city.toLocaleLowerCase("it-IT"))
+    return location;
+  return `${venue} · ${location}`;
+}
 function tournamentPlace(t) {
+  if (circuit(t) === "tennis-europe") return tennisEuropeVenueLocation(t);
   const compact = (value) => {
       const seen = new Set();
       return readableText(value)
@@ -679,6 +693,8 @@ function agendaOrderOfPlayUrl(match) {
   return "";
 }
 function agendaVenueLocation(t, fallback = "") {
+  if (circuit(t || {}) === "tennis-europe")
+    return tennisEuropeVenueLocation(t || {}, fallback);
   const item = t || {},
     venue =
       circuit(item) === "fitp"

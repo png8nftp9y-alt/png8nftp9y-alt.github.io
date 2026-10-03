@@ -98,7 +98,7 @@ jobs:
           set -euo pipefail
           if [ "${REMAINING:-0}" -le 0 ]; then echo "Extraordinary chain safety limit reached"; exit 0; fi
           NEXT_REMAINING=$((REMAINING - 1))
-          curl --fail-with-body --silent --show-error \
+          curl --connect-timeout 10 --max-time 30 --fail-with-body --silent --show-error \
             -X POST \
             -H "Authorization: Bearer $GH_TOKEN" \
             -H "Accept: application/vnd.github+json" \
