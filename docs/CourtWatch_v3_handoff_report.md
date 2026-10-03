@@ -1694,3 +1694,15 @@ Richiesta: verificare la completezza dei 398 tornei, separandoli dai 13 cancella
 - Controllo statico euristico: non certifica modifiche indirette.
   Nessuna modifica a dati, interfaccia o acquisizione ITF.
   Deploy da confermare attraverso i nuovi run dopo push.
+
+
+## Riduzione coda T-1 — 4 ottobre 2026
+
+- A e B pubblicavano gia i contatori nel review, poi attendevano
+  un secondo refresh sotto lo stesso blocco di pubblicazione.
+- Saltato il refresh dopo review riuscito; mantenuto negli altri casi.
+- Checkout e fetch profondita 1 nei job review e refresh.
+- Conservati serializzazione, D+3 Europe/Rome, missing-only e duplicati.
+- Preparazione verificata: YAML, dipendenze job e 18 test.
+- I vecchi run mantengono la vecchia definizione; modifica attiva
+  nei nuovi run dopo push. Esito operativo ancora da verificare.
