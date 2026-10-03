@@ -69,40 +69,36 @@ const diffs = [
 ].filter(Boolean);
 
 const affected = new Set();
-const changedSources = new Set();
 
+// Check changed code on both sides, including multiline SQL.
 for (const diff of diffs) {
-  let file = "";
-
+  let file = "", eligible = false, side = "";
+  let changed = [];
+  const flush = () => {
+    if (eligible && mutationPattern.test(changed.join("\n"))) affected.add(file);
+    changed = [];
+    side = "";
+  };
   for (const line of diff.split("\n")) {
-    if (line.startsWith("+++ b/")) {
+    if (line.startsWith("diff --git ")) {
+      flush();
+      file = "";
+      eligible = false;
+    } else if (line.startsWith("+++ b/")) {
+      flush();
       file = line.slice(6);
-      if (
-        file &&
-        !ignored(file) &&
-        sourceExtensions.has(extname(file).toLowerCase())
-      ) {
-        changedSources.add(file);
-      }
-      continue;
-    }
-
-    if (
-      file &&
-      changedSources.has(file) &&
-      line.startsWith("+") &&
-      !line.startsWith("+++") &&
-      mutationPattern.test(line)
-    ) {
-      affected.add(file);
+      eligible = !ignored(file) && sourceExtensions.has(extname(file).toLowerCase());
+    } else if (line.startsWith("@@")) {
+      flush();
+    } else if (eligible && /^[+-]/.test(line) && !/^([+]{3}|[-]{3})/.test(line)) {
+      if (side && side !== line[0]) flush();
+      side = line[0];
+      changed.push(line.slice(1));
+    } else {
+      flush();
     }
   }
-}
-
-for (const file of changedSources) {
-  if (existsSync(file) && mutationPattern.test(readFileSync(file, "utf8"))) {
-    affected.add(file);
-  }
+  flush();
 }
 
 const failures = [];

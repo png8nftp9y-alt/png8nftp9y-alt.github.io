@@ -1681,3 +1681,16 @@ Richiesta: verificare la completezza dei 398 tornei, separandoli dai 13 cancella
 - Prosecuzione A: selector 37155540645 è rimasto bloccato nella curl dispatch dalle 21:51:42Z fino a cancellazione 21:56:34Z, trattenendo gruppo courtwatch-v3-itf-publish. Nessun child extraordinary-a trovato nell’intervallo; job selector 111298063574 rilanciato tramite GitHub. Aggiunti --connect-timeout 10 e --max-time 30 alle dispatch A/B e continuazioni ordinary/extraordinary. Nessun retry automatico del POST per evitare duplicati; serializzazione, D+3 Europe/Rome e acquisizione missing-only invariati.
 - Validazione locale: 9 test Node (record reale Sanxenxo, altri circoli Europe, preservazione FITP, fonte CI/fallback/errori/cache/coda fresca), sintassi JS/MJS, parsing YAML delle due definizioni workflow e verifica installer con backup/rollback.
 - Limiti: installer locale; nessun push/deploy effettuato. Dopo push attendere Pages, diagnostica operativa e Worker API verdi; verificare pagina autenticata e prosecuzione delle lane. Le definizioni shell di un vecchio rerun non includono i nuovi timeout: valgono per nuovi run dopo push. Nessuna certificazione D1 basata sul solo review verde. Installer v2: corretti gli hash delle due definizioni workflow, la cui copia di preparazione aveva una riga vuota finale aggiuntiva; verificata la base fa8e8781f1.
+
+
+## Correzione controllo D1 diagnostica — 4 ottobre 2026
+
+- Eliminato il falso positivo sulle letture diagnostiche in index.js:
+  il controllo verificava anche SQL preesistente non modificato.
+- Ora verifica righe aggiunte e rimosse, aggregando SQL multilinea.
+  Conservati requisiti incrementali e test per le mutazioni rilevate.
+- Sette scenari di regressione verificati durante la preparazione;
+  test planner, controllo e sintassi eseguiti prima del commit.
+- Controllo statico euristico: non certifica modifiche indirette.
+  Nessuna modifica a dati, interfaccia o acquisizione ITF.
+  Deploy da confermare attraverso i nuovi run dopo push.
