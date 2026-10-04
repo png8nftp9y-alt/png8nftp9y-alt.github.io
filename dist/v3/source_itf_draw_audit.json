@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-04T01:36:30.915Z",
+  "generatedAt": "2026-10-04T01:40:14.152Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,20 +9,20 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 5,
-    "acquiredSections": 1,
+    "requestedSections": 4,
+    "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 1,
-    "missingSections": 5,
+    "resolvedSections": 2,
+    "missingSections": 4,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 5,
+    "retrySections": 4,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 5,
+    "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 428,
@@ -112,16 +112,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-BAN-2026-002",
-      "tournamentName": "J30 Rajshahi",
+      "competitionId": "J-J300-KOR-2026-001",
+      "tournamentName": "J300 Wanju (Closed Asia Regional Championships)",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 1,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 1,
-      "missingSections": 5,
+      "resolvedSections": 2,
+      "missingSections": 4,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -154,9 +154,9 @@
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-D-M-KO",
@@ -186,7 +186,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 21,
+              "players": 54,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -221,14 +221,14 @@
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 35,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
