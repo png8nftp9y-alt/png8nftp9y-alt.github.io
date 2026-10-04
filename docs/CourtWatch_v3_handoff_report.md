@@ -1716,3 +1716,12 @@ Richiesta: verificare la completezza dei 398 tornei, separandoli dai 13 cancella
 - Regola generale, valida anche dopo future rimozioni.
 - Sei scenari di navigazione e sintassi verificati.
 - Verifica nell'app da completare dopo push e Pages verde.
+
+
+## ITF T-1: pubblicazione JSON sotto il limite GitHub — 5 ottobre 2026
+
+- Causa verificata: run extraordinary-b 37242673360, job review 111554530442, 5 ottobre 01:11 Europe/Rome. I due documenti completi Adana/Guangzhou, 46 nuovi incontri e risultati, audit straordinario zero e generazione R2 erano riusciti. Push rifiutato per dist/v3/universal/results.json da 100,08 MB (GH001); matches.json da 98,61 MB generava un avviso.
+- Correzione: helper compact-universal-git-files.mjs riserializza i tre archivi universali senza indentazione conservando ogni record, campo e timestamp. Preflight di tutti i file e limite prudenziale 95 MiB dopo compattazione, nessun taglio di dati; file invalidi/mancanti sono errori. Persistenza ITF lo esegue anche su importazioni ripetute senza nuovi record; publisher T-1 lo esegue prima dello snapshot Git anche senza task di acquisizione. R2 e letture D1/JSON restano compatibili. Recupero artifact ora condivide courtwatch-v3-itf-publish con le pubblicazioni ITF, queue max, senza cancellazioni.
+- Componenti: helper e test nuovi, persist-itf-t1-draws.mjs, workflow T-1 e persistence-recovery. Nessuna modifica a D+3 Europe/Rome, soli mancanti, chiavi/deduplica, cron e lane.
+- Validazione: 7 test Node passati (equivalenza JSON inclusi UTF-8, timestamp e campi null/zero/false; idempotenza; oversize prima di ogni scrittura; file invalidi; recupero storico, mappe incomplete, precedenze e fallback). Copia reale locale: 41.527 incontri e 41.527 risultati invariati; matches 92.386.053→54.188.072 byte, results 93.766.419→55.568.438 byte. Sintassi JS, YAML e ordine prima snapshot verificati; installer verificato con backup/rollback, applicazione e riapplicazione.
+- Limiti: misure su copia locale, non sugli esatti byte del job fallito. Nessun push/deploy remoto eseguito. Compattazione risolve l'ingombro di formattazione; il controllo interrompe la pubblicazione qualora in futuro il contenuto compatto raggiunga 95 MiB e richieda migrazione di storage. Dopo push avviare un nuovo persistence-recovery da main con run_ids=37242673360 per riproiettare i documenti salvati senza riacquisire ITF, attendere push e deploy app-api verdi prima di dichiarare distribuito.

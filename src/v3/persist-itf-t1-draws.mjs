@@ -1,3 +1,4 @@
+import {compactUniversalGitFiles} from './compact-universal-git-files.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {acquiredDrawStatus} from './itf-audit-acquisition-policy.mjs';
@@ -63,3 +64,5 @@ const audit={version:1,generatedAt:now,runId,documents:manifest.length,completeD
 await fs.writeFile('dist/v3/audits/itf-t1-persistence.json',JSON.stringify(audit,null,2)+'\n');
 console.log('ITF_T1_PERSISTENCE='+JSON.stringify(audit));
 if(unmappedDocuments)throw new Error(`${unmappedDocuments} complete draw documents have no canonical ITF tournament mapping`);
+
+await compactUniversalGitFiles();

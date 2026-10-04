@@ -13,8 +13,9 @@ permissions:
   actions: read
 
 concurrency:
-  group: courtwatch-itf-t1-persistence-recovery
+  group: courtwatch-v3-itf-publish
   cancel-in-progress: false
+  queue: max
 
 jobs:
   recover:
