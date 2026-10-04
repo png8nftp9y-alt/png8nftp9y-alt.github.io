@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-04T05:46:46.569Z",
+  "generatedAt": "2026-10-04T05:52:26.077Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,27 +9,27 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 4,
+    "requestedSections": 6,
     "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
     "resolvedSections": 2,
     "missingSections": 4,
-    "newSectionsCached": 0,
+    "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
     "retrySections": 4,
-    "technicalErrorSections": 0,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 4,
+    "notPublishedOrIncompleteSections": 3,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 428,
     "globalCancelledNoDraws": 13,
     "globalPendingTotal": 75,
-    "globalPendingTechnical": 35,
-    "globalPendingPublication": 40,
+    "globalPendingTechnical": 36,
+    "globalPendingPublication": 39,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -64,6 +64,7 @@
       "J-J100-TUR-2026-006",
       "J-J100-USA-2026-002",
       "J-J100-USA-2026-004",
+      "J-J60-NZL-2026-002",
       "J-J30-TUR-2026-001",
       "J-J60-CHN-2026-002"
     ],
@@ -106,14 +107,13 @@
       "J-J30-INA-2026-005",
       "J-J30-MAD-2026-003",
       "J-J30-TUN-2026-006",
-      "J-J60-FIJ-2026-005",
-      "J-J60-NZL-2026-002"
+      "J-J60-FIJ-2026-005"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J60-TJK-2026-002",
-      "tournamentName": "J60 Dushanbe",
+      "competitionId": "J-J60-NZL-2026-002",
+      "tournamentName": "J60 Albany",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
@@ -225,7 +225,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 9,
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -239,14 +239,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge"
     }
   ]
 }
