@@ -1748,3 +1748,7 @@ Priorità utente: tutti i tabelloni ITF già acquisiti devono risiedere in D1; o
 Validazione locale: cinque test Node verdi (Unicode/documenti grandi, esclusioni e RR, corruzione/chunk mancanti, SQLite replay/vista ultima versione, builder/import SQL end-to-end); sintassi Node/Python e parsing YAML verificati. Installer con controlli preventivi dei file originali, backup, report aggiornato e test locali; nessun commit/push automatico.
 
 Limiti: patch preparata e verificata localmente, NON distribuita. Certificazione D1 solo dopo push, backfill verde e audit remoto verified_acquired_documents con expectedDocuments=verifiedDocuments e missingOrCorrupt vuoto. Questo certifica i documenti acquisiti, non tutti i tabelloni ufficiali ancora non acquisiti, non gli esiti finali aggiornati e non tutte le pagine frontend. D+3 Europe/Rome, missing-only e selettori T−1 restano invariati. Versioni precedenti conservate senza garbage collection. Add-player rimandato.
+
+
+## 2026-10-05 — Correzione coda D1
+Allineati deploy API e agenda Europe a queue:max nella coda condivisa courtwatch-d1-writes, mantenendo scritture serializzate e cancel-in-progress:false. Il backfill ITF riparte al push di questa correzione. Run precedente cancellato prima di qualsiasi job; importazione e certificazione remota ancora da completare.

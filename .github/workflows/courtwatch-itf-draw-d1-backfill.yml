@@ -8,6 +8,8 @@ on:
   push:
     branches: [main]
     paths:
+      - '.github/workflows/courtwatch-cloudflare-app-api.yml'
+      - '.github/workflows/courtwatch-tennis-europe-agenda.yml'
       - '.github/workflows/courtwatch-itf-draw-d1-backfill.yml'
       - 'src/v3/itf-draw-document-d1.mjs'
       - 'src/v3/build-itf-draw-d1-seed.mjs'

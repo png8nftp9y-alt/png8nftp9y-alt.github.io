@@ -28,6 +28,7 @@ permissions:
 concurrency:
   group: courtwatch-d1-writes
   cancel-in-progress: false
+  queue: max
 
 jobs:
   import-verify-deploy:
