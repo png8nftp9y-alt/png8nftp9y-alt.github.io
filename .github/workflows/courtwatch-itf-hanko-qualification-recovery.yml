@@ -1,0 +1,79 @@
+name: Court Watch ITF Hanko qualification recovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-itf-hanko-qualification-recovery.yml'
+      - 'src/v3/recover-itf-hanko-qualification.mjs'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: courtwatch-itf-hanko-qualification-recovery
+  cancel-in-progress: false
+  queue: max
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci --ignore-scripts
+      - name: Recover ONLY Hanko girls singles qualification using saved official parameters
+        env:
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUEST_DELAY_MS: 1800
+          ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
+        run: node src/v3/recover-itf-hanko-qualification.mjs
+      - name: Verify actual populated acquisition (empty reply is not success)
+        run: node src/v3/recover-itf-hanko-qualification.mjs verify
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-d1-draw-documents
+          path: dist/v3/shards/itf/draw-tasks/*.json.gz
+          if-no-files-found: warn
+          retention-days: 30
+  persist:
+    needs: acquire
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: courtwatch-v3-itf-publish
+      cancel-in-progress: false
+      queue: max
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with: {name: itf-d1-draw-documents, path: dist/v3/shards/itf/draw-tasks}
+      - run: node src/v3/recover-itf-hanko-qualification.mjs verify
+      - name: Persist recovered document and reconcile authoritative coverage
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet awscli
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          node src/v3/persist-itf-t1-draws.mjs dist/v3/shards/itf/draw-tasks
+          aws --endpoint-url "$endpoint" s3 sync dist/v3/itf-t1-r2-stage "s3://$R2_BUCKET/itf/live-draws" --size-only --only-show-errors
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-audit-state.json --only-show-errors
+          node src/v3/reconcile-itf-t1-strict-audit.mjs /tmp/itf-audit-state.json dist/v3/shards/itf/draw-tasks /tmp/itf-audit-state.json
+          aws --endpoint-url "$endpoint" s3 cp /tmp/itf-audit-state.json "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" --only-show-errors
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-hanko-recovery-persistence-audit
+          path: dist/v3/audits/itf-t1-persistence.json
+          retention-days: 30

@@ -18,9 +18,9 @@ if(!files.length)throw new Error('No ITF draw documents found');
 
 const tasks=new Map(),unreadable=[],seen=new Set(),archiveTasks=new Set();
 const archiveRoot=process.env.ITF_D1_REQUIRED_ARCHIVE_ROOT?path.resolve(process.env.ITF_D1_REQUIRED_ARCHIVE_ROOT)+path.sep:null;
-for(const file of files)try{const doc=JSON.parse(gunzipSync(await fs.readFile(file)));const task=String(doc.competitionId||'').toUpperCase()+'|'+String(doc.event||'');seen.add(task);if(archiveRoot&&path.resolve(file).startsWith(archiveRoot))archiveTasks.add(task);const row=documentRecord(doc);if(!row)continue;const old=tasks.get(task);if(!old||row.observedAt>old.row.observedAt||(row.observedAt===old.row.observedAt&&row.sha256>old.row.sha256))tasks.set(task,{doc,row})}catch(error){unreadable.push({file,error:error.message})}
-const complete=[...tasks.values()].map(x=>x.doc);
-const retry=[...seen].filter(key=>!tasks.has(key));
+for(const file of files)try{const doc=JSON.parse(gunzipSync(await fs.readFile(file)));const task=String(doc.competitionId||'').toUpperCase()+'|'+String(doc.event||'');seen.add(task);const archived=Boolean(archiveRoot&&path.resolve(file).startsWith(archiveRoot));if(archived)archiveTasks.add(task);const row=documentRecord(doc,{archiveEvidence:archived});if(!row)continue;const old=tasks.get(task);const rank=r=>r.acquisitionState==='complete'?1:0;if(!old||rank(row)>rank(old.row)||(rank(row)===rank(old.row)&&(row.observedAt>old.row.observedAt||(row.observedAt===old.row.observedAt&&row.sha256>old.row.sha256))))tasks.set(task,{doc,row})}catch(error){unreadable.push({file,error:error.message})}
+const complete=[...tasks.values()].filter(x=>x.row.acquisitionState==='complete').map(x=>x.doc);
+const retry=[...seen].filter(key=>tasks.get(key)?.row.acquisitionState!=='complete');
 const stable=value=>JSON.stringify(value,(key,item)=>['generatedAt','observedAt','sourceObservedAt'].includes(key)?undefined:item);
 const esc=value=>`'${String(value??'').replaceAll("'","''")}'`;
 const payload=value=>esc(stable(value));
@@ -54,7 +54,8 @@ const flush=async()=>{if(!batch.length)return;await fs.writeFile(path.join(out,`
 for(const statement of statements.slice(1)){const size=Buffer.byteLength(statement);if(size>99000)throw new Error('SQL statement exceeds safe D1 query size');if(batch.length>=400||bytes+size>750000)await flush();batch.push(statement);bytes+=size}await flush();
 const documents=[...tasks.values()].map(({row:{chunks,...row}})=>row).sort((a,b)=>a.drawKey.localeCompare(b.drawKey));
 const archiveMissing=[...archiveTasks].filter(key=>!tasks.has(key));
-const audit={version:2,generatedAt:new Date().toISOString(),scope:'acquired-documents-only; excludes ordinary pending',status:complete.length?'awaiting_remote_content_verification':'no_complete_documents',sourceFiles:files.length,uniqueTasks:seen.size,completeDocuments:complete.length,retryDocuments:retry.length,pendingTasks:retry,requiredArchiveTasks:archiveTasks.size,archiveMissing,tournaments:tournamentMap.size,matches:matchMap.size,results:resultMap.size,sqlFiles,unreadable:unreadable.length,unmapped:unmapped.length,documents};
+const archivedUnverified=documents.filter(row=>row.acquisitionState==='archived_unverified').map(row=>row.drawKey);
+const audit={version:3,generatedAt:new Date().toISOString(),scope:'saved acquired documents and checksum-verified archive; ordinary pending excluded',status:documents.length?'awaiting_remote_content_verification':'no_complete_documents',sourceFiles:files.length,uniqueTasks:seen.size,storedDocuments:documents.length,completeDocuments:complete.length,archivedUnverified,retryDocuments:retry.length,pendingTasks:retry,requiredArchiveTasks:archiveTasks.size,archiveMissing,tournaments:tournamentMap.size,matches:matchMap.size,results:resultMap.size,sqlFiles,unreadable:unreadable.length,unmapped:unmapped.length,documents};
 await fs.mkdir('dist/v3/audits',{recursive:true});await fs.writeFile('dist/v3/audits/itf-draw-d1-sync.json',JSON.stringify(audit,null,2)+'\n');
 console.log('ITF_DRAW_D1_SEED='+JSON.stringify(audit));
-if(archiveMissing.length)throw new Error('Previously certified archive contains documents without valid content evidence: '+archiveMissing.join(','));
+if(archiveMissing.length)throw new Error('Archive contains documents that cannot be preserved: '+archiveMissing.join(','));

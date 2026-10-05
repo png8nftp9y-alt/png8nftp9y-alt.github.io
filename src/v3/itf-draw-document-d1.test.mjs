@@ -28,3 +28,23 @@ test('builder chooses newest complete document, ignores later retries, and SQL i
   const result=spawnSync('python3',['-c',`import sys,json,sqlite3\np=json.load(sys.stdin)\nc=sqlite3.connect(':memory:')\nc.executescript(p['schema'])\nc.executescript(p['sql'])\nn=c.total_changes\nc.executescript(p['sql'])\nassert c.total_changes==n\nassert c.execute('select count(*) from matches').fetchone()[0]==1\nassert c.execute('select count(*) from itf_draw_documents').fetchone()[0]==1\nprint('builder import/replay OK')`],{encoding:'utf8',input:JSON.stringify({schema,sql})});assert.equal(result.status,0,result.stderr);
  }finally{fs.rmSync(temp,{recursive:true,force:true})}
 });
+test('empty Finland archived qualification is stored without certifying players or matches',()=>{
+ const empty={competitionId:'J-J30-FIN-2026-004',event:'G-S-Q-KO',status:'complete',players:[],matches:[]};
+ assert.equal(documentRecord(empty),null);
+ const row=documentRecord(empty,{archiveEvidence:true});assert.equal(row.acquisitionState,'archived_unverified');assert.equal(row.matchCount,0);
+ assert.equal(verifyDocument(row,remote(row),row.chunks.map((content,chunk_index)=>({content,chunk_index}))),true);
+ const schema=fs.readFileSync('cloudflare/app-api/migrations/0025_itf_draw_documents.sql','utf8')+fs.readFileSync('cloudflare/app-api/migrations/0026_itf_unverified_draw_archive.sql','utf8');
+ const result=spawnSync('python3',['-c',`import sys,json,sqlite3\np=json.load(sys.stdin)\nc=sqlite3.connect(':memory:')\nc.executescript(p['schema'])\nc.executescript(p['sql'])\nn=c.total_changes\nc.executescript(p['sql'])\nassert c.total_changes==n\nassert c.execute('select count(*) from itf_draw_documents').fetchone()[0]==0\nassert c.execute('select match_count from itf_draw_unverified_documents').fetchone()[0]==0`],{encoding:'utf8',input:JSON.stringify({schema,sql:documentSQL(row).join('\n')})});assert.equal(result.status,0,result.stderr);
+});
+test('archive builder transfers unknown document instead of blocking valid acquired draws',()=>{
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'courtwatch-itf-archive-'));
+ try{
+  const archive=path.join(temp,'archive');fs.mkdirSync(archive);
+  const empty={competitionId:'J-J30-FIN-2026-004',event:'G-S-Q-KO',status:'complete',players:[],matches:[]};
+  fs.writeFileSync(path.join(archive,'finland.json.gz'),gzipSync(JSON.stringify(empty)));
+  fs.writeFileSync(path.join(archive,'complete.json.gz'),gzipSync(JSON.stringify(doc)));
+  const run=spawnSync(process.execPath,[path.resolve('src/v3/build-itf-draw-d1-seed.mjs'),archive],{cwd:temp,encoding:'utf8',env:{...process.env,ITF_D1_REQUIRED_ARCHIVE_ROOT:archive}});assert.equal(run.status,0,run.stderr);
+  const audit=JSON.parse(fs.readFileSync(path.join(temp,'dist/v3/audits/itf-draw-d1-sync.json'),'utf8'));
+  assert.equal(audit.storedDocuments,2);assert.equal(audit.completeDocuments,1);assert.deepEqual(audit.archiveMissing,[]);assert.deepEqual(audit.archivedUnverified,['J-J30-FIN-2026-004|G-S-Q-KO']);assert.equal(audit.matches,1);
+ }finally{fs.rmSync(temp,{recursive:true,force:true})}
+});
