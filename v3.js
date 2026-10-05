@@ -2089,7 +2089,9 @@ function wirePlayersColumnHeight() {
 }
 let playerRemovalMode = false;
 const removedCourtWatchPlayers = new Set();
+const confirmedCourtWatchPlayers = new Map();
 function removePlayerFromLocalView(playerId) {
+  confirmedCourtWatchPlayers.delete(playerId);
   removedCourtWatchPlayers.add(playerId);
   state.data.players = (state.data.players || []).filter((p) => p.id !== playerId);
   for (const key of ['tournaments', 'matches', 'agenda', 'results', 'tournamentEntries'])
@@ -2183,6 +2185,79 @@ async function searchPlayers(query) {
   if (!response.ok) throw Error("player search");
   return (await response.json()).results || [];
 }
+const playerAdditionsInFlight = new Map();
+async function addCourtWatchPlayerFromUi(result, button) {
+  const key = result.sourceKey || result.courtwatchId || result.identity;
+  if (!key || playerAdditionsInFlight.has(key)) return;
+  const original = button.textContent, routeHash = location.hash;
+  const root = button.closest('dialog') || button.parentElement || $('profileContent');
+  root.querySelector('[data-player-add-error]')?.remove();
+  button.disabled = true;
+  button.textContent = 'Aggiunta…';
+  const operation = (async () => {
+    const response = await fetch(`${PRIVATE_API}/courtwatch-player`, privateApiOptions({
+      method:'POST',credentials:'same-origin',cache:'no-store',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify(result),
+    }));
+    const data = await response.json();
+    if (!response.ok || data.added !== true || !data.player?.id || data.playerId !== data.player.id)
+      throw Error(data.error || 'player_addition_not_confirmed');
+    if (!state.data) throw Error('player_view_unavailable');
+    removedCourtWatchPlayers.delete(data.playerId);
+    confirmedCourtWatchPlayers.set(data.playerId,data.player);
+    state.data.players = [...(state.data.players || []).filter(p => p.id !== data.playerId),data.player];
+    state.selected.add(data.playerId);
+    saveUiState();saveCachedData(state.data);
+    playerRemovalMode = false;
+    const dialog = document.getElementById('addPlayerDialog');
+    if (dialog && dialog === root) { dialog.close();dialog.remove(); }
+    renderHome();
+    if (location.hash === routeHash) openProfile(data.playerId);
+    // The same load path preserves personal players and refreshes stored entries.
+    load();
+  })();
+  playerAdditionsInFlight.set(key,operation);
+  try { await operation; }
+  catch (error) {
+    if (button.isConnected) {
+      const message = document.createElement('p');message.dataset.playerAddError='';message.setAttribute('role','alert');
+      message.textContent = error.message === 'player_identity_ambiguous'
+        ? 'Identità non univoca. Usa + e seleziona il profilo del circuito corretto.'
+        : 'Aggiunta non riuscita. Riprova.';
+      root.append(message);
+    }
+  } finally {
+    playerAdditionsInFlight.delete(key);
+    if (button.isConnected) {button.disabled=false;button.textContent=original;}
+  }
+}
+function openAddPlayerDialog() {
+  if (document.getElementById('addPlayerDialog')) return;
+  const dialog=document.createElement('dialog');dialog.id='addPlayerDialog';dialog.className='card';
+  dialog.setAttribute('aria-labelledby','addPlayerTitle');
+  dialog.innerHTML='<h2 id="addPlayerTitle">Aggiungi giocatore</h2><form data-add-player-search role="search"><label for="addPlayerQuery">Nome del giocatore</label><input id="addPlayerQuery" type="search" minlength="2" autocomplete="off" required><button type="submit" class="btn">Cerca</button></form><div data-add-player-results aria-live="polite"></div><button type="button" class="btn" data-close-add-player>Chiudi</button>';
+  document.body.append(dialog);
+  let sequence=0,timer;
+  const input=dialog.querySelector('input'),results=dialog.querySelector('[data-add-player-results]');
+  const close=()=>{clearTimeout(timer);sequence++;dialog.close();dialog.remove();$('addPlayer')?.focus()};
+  dialog.querySelector('[data-close-add-player]').onclick=close;
+  dialog.oncancel=event=>{event.preventDefault();close()};
+  const search=async()=>{
+    clearTimeout(timer);const query=input.value.trim(),request=++sequence;
+    dialog.querySelector('[data-player-add-error]')?.remove();
+    if(query.length<2){results.textContent='';return}
+    results.textContent='Ricerca in corso…';
+    try{
+      const found=await searchPlayers(query);
+      if(request!==sequence||!dialog.isConnected)return;
+      results.innerHTML=found.length?found.map(result=>playerSearchResultHtml(result,'playerSearchResult')).join(''):'Nessun giocatore trovato.';
+      bindPlayerSearchResults(results,found,true);
+    }catch{if(request===sequence&&dialog.isConnected)results.textContent='Ricerca temporaneamente non disponibile. Riprova.'}
+  };
+  input.oninput=()=>{clearTimeout(timer);sequence++;timer=setTimeout(search,220)};
+  dialog.querySelector('form').onsubmit=event=>{event.preventDefault();search()};
+  dialog.showModal();input.focus();
+}
 function openPlayerSearchResult(result) {
   const followed = result.courtwatchId && (state.data?.players || []).some(
     (player) => player.id === result.courtwatchId && player.active !== false,
@@ -2196,18 +2271,21 @@ function playerSearchResultHtml(result, className) {
     detail = [result.courtwatchId ? "Court Watch" : "", ...sourceLabels]
       .filter(Boolean)
       .join(" · ") || readableText(result.circuit || "Giocatore");
-  return `<button type="button" class="${className}" data-search-player="${esc(result.identity || result.courtwatchId)}" data-search-name="${esc(result.name)}" data-search-courtwatch="${esc(result.courtwatchId || "")}"><span><b>${esc(readablePerson(result.name))}</b>${result.nationality ? nationalityHtml(result.nationality) : ""}${result.club ? `<small>${esc(result.club)}</small>` : ""}</span><small>${esc(detail)}</small></button>`;
+  return `<button type="button" class="${className}" data-search-player="${esc(result.sourceKey || result.identity || result.courtwatchId)}" data-search-name="${esc(result.name)}" data-search-courtwatch="${esc(result.courtwatchId || "")}"><span><b>${esc(readablePerson(result.name))}</b>${result.nationality ? nationalityHtml(result.nationality) : ""}${result.club ? `<small>${esc(result.club)}</small>` : ""}</span><small>${esc(detail)}</small></button>`;
 }
-function bindPlayerSearchResults(root, results) {
+function bindPlayerSearchResults(root, results, adding = false) {
   root.querySelectorAll("[data-search-player]").forEach((button) => {
     button.onclick = () => {
       const result = results.find(
         (item) =>
-          String(item.identity || item.courtwatchId) ===
+          String(item.sourceKey || item.identity || item.courtwatchId) ===
             button.dataset.searchPlayer &&
           readablePerson(item.name) === readablePerson(button.dataset.searchName),
       );
-      if (result) openPlayerSearchResult(result);
+      if (result) {
+        if (adding) addCourtWatchPlayerFromUi(result, button);
+        else openPlayerSearchResult(result);
+      }
     };
   });
 }
@@ -2633,6 +2711,9 @@ function renderOpponentFromMatch(identity, matchId, index, role = "opponent") {
   renderOpponentProfile(identity, name, event, nationality);
 }
 function renderOpponentProfile(identity, name, event = "", initialNationality = "") {
+  const monitored = (state.data?.players || []).find(player =>
+    [player.id,player.sourceKey,player.sourcePlayerId,player.worldTennisId,player.membershipCard,player.profileSync?.tennisEurope?.profileId].filter(Boolean).map(String).includes(String(identity)));
+  if (monitored) { openProfile(monitored.id); return; }
   const routeKey = [identity, readablePerson(name), event].join("|");
   if (activeOpponentRouteKey === routeKey && $("profileView").classList.contains("active") && $("opponentTournamentHistory")) return;
   activeOpponentRouteKey = routeKey;
@@ -2641,18 +2722,18 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
     flag = nationalityHtml(initialNationality || prepared?.profile?.nationality),
     follow = $("removeProfilePlayer");
   follow.hidden = false;
-  follow.onclick = null;
-  follow.textContent = "Segui giocatore";
-  follow.title = "Segui giocatore";
-  follow.setAttribute("aria-label", "Segui giocatore");
+  follow.disabled = false;
+  follow.onclick = () => addCourtWatchPlayerFromUi({identity,name}, follow);
+  follow.textContent = "Aggiungi giocatore";
+  follow.title = "Aggiungi giocatore";
+  follow.setAttribute("aria-label", "Aggiungi giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3></div><div id="opponentTournamentHistory"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Per vedere tutti i tornei segui giocatore</button></p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3></div><div id="opponentTournamentHistory"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Aggiungi giocatore</button></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
   $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", (event) => {
     event.preventDefault();
-    follow.scrollIntoView({ behavior: "smooth", block: "center" });
-    follow.focus({ preventScroll: true });
+    addCourtWatchPlayerFromUi({identity,name}, event.currentTarget);
   });
   if (prepared) {
     opponentHistoryCache.set(requestKey, prepared);
@@ -3408,6 +3489,8 @@ function toggleDatePopover() {
 }
 function wire() {
   wirePlayersColumnHeight();
+  $("addPlayer").onclick = openAddPlayerDialog;
+  $("addPlayerLabel").onclick = openAddPlayerDialog;
   $("removePlayer").onclick = togglePlayerRemovalMode;
   $("removePlayer").setAttribute("aria-pressed", "false");
   const playerSearchForm = $("playerSearchForm"),
@@ -3666,13 +3749,17 @@ async function load() {
       console.warn(
         "Indice universale D1 in sincronizzazione: uso temporaneo dei JSON per giocatori e tornei; i match di circuito restano dalla API",
       );
+    for (const player of projection?.players || []) confirmedCourtWatchPlayers.delete(player.id);
     const projectedPlayers = new Map(
         (projection?.players || []).map((p) => [p.id, p]),
       ),
       previousPlayers = new Map((previous.players || []).map((p) => [p.id, p]));
-    const visiblePlayers = docs.players.players
-      .filter((p) => !FORMER_PLAYERS.has(p.id) && !removedCourtWatchPlayers.has(p.id) &&
-        (projection ? projectedPlayers.has(p.id) : Array.isArray(previous.players) ? previousPlayers.has(p.id) : true))
+    const playerCandidates = projection
+      ? [...new Map([...docs.players.players, ...(projection.players || []),...confirmedCourtWatchPlayers.values()].map(p => [p.id,p])).values()]
+      : [...new Map([...docs.players.players, ...(previous.players || [])].map(p => [p.id,p])).values()];
+    const visiblePlayers = playerCandidates
+      .filter((p) => (!FORMER_PLAYERS.has(p.id) || p.userAdded) && !removedCourtWatchPlayers.has(p.id) &&
+        (projection ? (projectedPlayers.has(p.id) || confirmedCourtWatchPlayers.has(p.id)) : Array.isArray(previous.players) ? previousPlayers.has(p.id) : true))
       .map((player) => {
         const projected = projectedPlayers.get(player.id),
           retained =
@@ -3738,10 +3825,10 @@ async function load() {
 
     state.data = {
       players: visiblePlayers,
-      tournaments: (
-        (universalProjectionFresh && projection?.tournaments) ||
-        docs.tournaments.tournaments
-      ).filter((x) => visibleIds.has(x.playerId)),
+      tournaments: [
+        ...((universalProjectionFresh && projection?.tournaments) || docs.tournaments.tournaments),
+        ...(!universalProjectionFresh ? (projection?.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : []),
+      ].filter((x) => visibleIds.has(x.playerId)),
       matches: matches.filter((x) => visibleIds.has(x.playerId)),
       agenda: mergeAgenda(agenda, matches).filter((x) =>
         visibleIds.has(x.playerId),

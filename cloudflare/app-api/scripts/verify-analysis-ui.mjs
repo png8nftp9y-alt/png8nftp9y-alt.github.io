@@ -39,14 +39,14 @@ assert.ok(hasSource('tennisEuropeRanking:retained.tennisEuropeRanking||retained.
 assert.ok(hasApiSource('player.tennisEuropeRanking=labels.join'), 'API must expose Tennis Europe ranking separately');
 assert.ok(hasApiSource("apiPath==='/player-ranking'") && hasApiSource('currentTennisEuropePlayerRanking') && hasSource('loadCurrentPlayerRanking(p)'), 'player page must read the current Tennis Europe ranking directly from D1');
 assert.ok(hasSource('PLAYER_RANKING_CACHE') && hasSource('playerRankingCache.set(key,data)') && !hasSource('(ranking del ${displayDate(row.ranking_date)})'), 'player ranking must render immediately from its last live value without a parenthesized date');
-assert.ok(hasApiSource("apiPath==='/player-search'") && hasApiSource('searchPlayers(env,query)') && hasSource('renderPlayerSearchPage(') && hasSource('playerSearchSuggestions'), 'players environment must provide global D1 search with suggestions and a results page');
+assert.ok(hasApiSource("apiPath==='/player-search'") && hasApiSource('searchPlayers(env,query,user.id)') && hasSource('renderPlayerSearchPage(') && hasSource('playerSearchSuggestions'), 'players environment must provide global D1 search with suggestions and a results page');
 assert.ok(hasApiSource('tennisEuropeNameKey(row.display_name)') && hasApiSource("row.circuit==='tennis-europe'") && hasApiSource('sources:[row.circuit]'), 'global player search must merge unambiguous FITP and Tennis Europe identities while preserving ambiguous names');
 assert.ok(hasSource('result.sources || []') && hasSource('Court Watch" : "", ...sourceLabels'), 'player search must render all merged profile sources');
 assert.ok(hasApiSource('player.tennisEuropeRankingDates') && hasApiSource("if(player.tennisEuropeRankingDates[key]&&player.tennisEuropeRankingDates[key]>date)return"), 'API must retain the newest Tennis Europe ranking by date');
 assert.ok(hasApiSource('applyPreparedTennisEuropeRankings') && hasApiSource('tennis_europe_current_player_rankings') && hasApiSource("prepared_tennis_europe_projection_failed"), 'private snapshot must read prepared Tennis Europe projections and remain available if optional ranking enrichment fails');
 assert.ok(hasApiSource('tennisEuropeNameKey') && hasApiSource('h.normalized_name LIKE ?') && hasApiSource('playersByName.get(tennisEuropeNameKey(row.normalized_name))'), 'current player rankings must resolve reversed Tennis Europe names');
 assert.ok(hasSource('function renderOpponentProfile(') && hasSource('profile.ranking_date'), 'opponent page must expose the current ranking date');
-assert.ok(hasSource('profile.category') && hasSource('Segui giocatore'), 'opponent header must expose current age category and follow action');
+assert.ok(hasSource('profile.category') && hasSource('follow.onclick = () => addCourtWatchPlayerFromUi({identity,name}, follow)'), 'opponent header must expose current age category and follow action');
 assert.ok(hasSource('(ranking del ${displayDate(profile.ranking_date)})'), 'opponent ranking date must be parenthesized');
 assert.ok(hasSource('function partnerHtml(') && hasSource('data-open-current-opponent'), 'partners must use current opponent-profile navigation');
 assert.ok(hasSource('doublesPartnerLink'), 'doubles partners must remain bold');
@@ -62,7 +62,7 @@ assert.ok(hasApiSource('tennisEuropeNameVariants') && hasApiSource('self.normali
 assert.ok(hasSource('const asOf = iso(new Date())') && !hasSource('&excludeMatchId='), 'opponent profile must always load through today without excluding the clicked match');
 assert.ok(hasApiSource('tennisEuropePerspectiveScore(rawScore,self?.team_index)') && hasSource('opponentHistoryRoundLabel'), 'opponent study rows must orient scores to the viewed player and show full rounds');
 assert.ok(!hasApiSource('tennisEuropePerspectiveScore(rawScore,winnerTeam)') && !source.includes('Aggiornato al'), 'opponent scores must never be forced into the winner perspective and profile must not show an updated-at label');
-assert.ok(hasSource('Per vedere tutti i tornei segui giocatore') && hasSource('opponentTournamentDateLabel'), 'opponent history must show follow prompt and tournament dates');
+assert.ok(hasSource('data-follow-opponent>Aggiungi giocatore') && hasSource('opponentTournamentDateLabel'), 'opponent history must show follow prompt and tournament dates');
 assert.ok(hasApiSource('tennis_europe_match_ranking_snapshots WHERE match_id IN') && hasApiSource('snapshotFor(player,row.match_id)'), 'opponent-of-opponent rankings must use frozen match snapshots');
 assert.ok(hasSource('opponentHistoryPersonLink') && hasSource('openCurrentOpponent(') && hasSource('#opponent-profile'), 'every non-CourtWatch participant must support recursive profile navigation');
 assert.ok(hasSource('preloadOpponentHistory(') && hasSource('opponentHistoryRequests = new Map()') && hasSource('pointerenter') && !hasSource('requestIdleCallback'), 'clickable opponent profiles must use targeted prefetch and share in-flight requests without a request storm');
