@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-05T09:12:54.173Z",
+  "generatedAt": "2026-10-05T09:18:25.925Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,20 +9,20 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 2,
-    "acquiredSections": 4,
+    "requestedSections": 4,
+    "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 4,
-    "missingSections": 2,
+    "resolvedSections": 2,
+    "missingSections": 4,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 2,
+    "retrySections": 4,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 2,
+    "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 432,
@@ -108,23 +108,23 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-CRO-2026-002",
-      "tournamentName": "J60 Porec",
+      "competitionId": "J-J60-TJK-2026-002",
+      "tournamentName": "J60 Dushanbe",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 4,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 4,
-      "missingSections": 2,
+      "resolvedSections": 2,
+      "missingSections": 4,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "B-S-Q-KO",
@@ -143,9 +143,9 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "G-S-Q-KO",
@@ -165,14 +165,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 64,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -182,7 +182,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 57,
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -204,14 +204,14 @@
         },
         {
           "family": "G-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 64,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -221,7 +221,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 37,
+              "players": 9,
               "error": null,
               "failureType": null,
               "resolved": true
