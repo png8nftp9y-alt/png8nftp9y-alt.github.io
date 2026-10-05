@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {gzipSync} from 'node:zlib';
+import {documentRecord,documentSQL,verifyDocument} from './itf-draw-document-d1.mjs';
+const doc={competitionId:'J-J30-MAD-2026-002',event:'B-S-M-KO',status:'complete',generatedAt:'2026-10-04T20:00:00Z',players:[{name:"O'Connor 🎾"}],matches:[{matchId:1,teams:[{players:[{name:"O'Connor 🎾"}]}]}]};
+function remote(row){return{chunk_count:row.chunkCount,content_bytes:row.bytes,player_count:row.playerCount,match_count:row.matchCount}}
+test('full Unicode content survives chunking and exact hash verification',()=>{const row=documentRecord({...doc,raw:'🎾é'.repeat(50000)});assert.ok(row.chunkCount>1);assert.equal(verifyDocument(row,remote(row),row.chunks.map((content,chunk_index)=>({content,chunk_index}))),true);assert.ok(documentSQL(row).every(x=>Buffer.byteLength(x)<99000))});
+test('empty, retry and incomplete RR are not certified',()=>{assert.equal(documentRecord({...doc,players:[],matches:[]}),null);assert.equal(documentRecord({...doc,status:'retry'}),null);assert.equal(documentRecord({...doc,event:'B-S-M-RR'}),null);assert.ok(documentRecord({...doc,event:'B-S-M-RR',roundRobin:{declaredGroups:2,completeGroups:2,missingGroups:[]}}))});
+test('missing or corrupted remote content fails',()=>{const row=documentRecord(doc);assert.throws(()=>verifyDocument(row,undefined,[]));assert.throws(()=>verifyDocument(row,remote(row),[]));assert.throws(()=>verifyDocument(row,remote(row),[{chunk_index:0,content:'{}'}]))});
+test('D1 SQLite replay writes zero; old recovery cannot replace newest document',()=>{
+ const old=documentRecord({...doc,generatedAt:'2026-10-01T00:00:00Z'}),current=documentRecord(doc);
+ const python=`import json,sqlite3,sys\np=json.load(sys.stdin)\nc=sqlite3.connect(':memory:')\nc.executescript(p['schema'])\nc.executescript(p['current'])\nn=c.total_changes\nc.executescript(p['current'])\nassert c.total_changes==n\nc.executescript(p['old'])\nassert c.execute('select content_sha256 from itf_current_draw_documents').fetchone()[0]==p['sha']\nassert c.execute('select count(*) from itf_draw_documents').fetchone()[0]==2\nprint('sqlite replay/current-view OK')\n`;
+ const result=spawnSync('python3',['-c',python],{encoding:'utf8',input:JSON.stringify({schema:fs.readFileSync('cloudflare/app-api/migrations/0025_itf_draw_documents.sql','utf8'),current:documentSQL(current).join('\n'),old:documentSQL(old).join('\n'),sha:current.sha256})});assert.equal(result.status,0,result.stderr);
+});
+test('builder chooses newest complete document, ignores later retries, and SQL imports idempotently',()=>{
+ const temp=fs.mkdtempSync(path.join(os.tmpdir(),'courtwatch-itf-d1-test-'));
+ try{
+  const draws=path.join(temp,'draws');fs.mkdirSync(draws);
+  for(const [name,value] of [['old',{...doc,generatedAt:'2026-10-01T00:00:00Z'}],['new',doc],['retry',{...doc,generatedAt:'2026-10-05T00:00:00Z',status:'retry',matches:[]}]])fs.writeFileSync(path.join(draws,name+'.json.gz'),gzipSync(JSON.stringify(value)));
+  const run=spawnSync(process.execPath,[path.resolve('src/v3/build-itf-draw-d1-seed.mjs'),draws],{cwd:temp,encoding:'utf8'});assert.equal(run.status,0,run.stderr);
+  const audit=JSON.parse(fs.readFileSync(path.join(temp,'dist/v3/audits/itf-draw-d1-sync.json'),'utf8'));assert.equal(audit.completeDocuments,1);assert.equal(audit.documents[0].sha256,documentRecord(doc).sha256);
+  const directory=path.join(temp,'seed-itf-draws'),sql=fs.readdirSync(directory).sort().map(p=>fs.readFileSync(path.join(directory,p),'utf8')).join('\n');
+  const schema=fs.readFileSync('cloudflare/app-api/migrations/0025_itf_draw_documents.sql','utf8')+`\nCREATE TABLE tournaments(id TEXT PRIMARY KEY,circuit TEXT,source_tournament_id TEXT,start_date TEXT,end_date TEXT,payload TEXT);CREATE TABLE matches(id TEXT PRIMARY KEY,tournament_id TEXT,circuit TEXT,played_date TEXT,payload TEXT);CREATE TABLE results(id TEXT PRIMARY KEY,tournament_id TEXT,match_id TEXT,circuit TEXT,played_date TEXT,payload TEXT);`;
+  const result=spawnSync('python3',['-c',`import sys,json,sqlite3\np=json.load(sys.stdin)\nc=sqlite3.connect(':memory:')\nc.executescript(p['schema'])\nc.executescript(p['sql'])\nn=c.total_changes\nc.executescript(p['sql'])\nassert c.total_changes==n\nassert c.execute('select count(*) from matches').fetchone()[0]==1\nassert c.execute('select count(*) from itf_draw_documents').fetchone()[0]==1\nprint('builder import/replay OK')`],{encoding:'utf8',input:JSON.stringify({schema,sql})});assert.equal(result.status,0,result.stderr);
+ }finally{fs.rmSync(temp,{recursive:true,force:true})}
+});

@@ -41,6 +41,13 @@ jobs:
             gh run download "$id" --repo "$GITHUB_REPOSITORY" --pattern 'itf-t1-draw-[0-9]*' --dir "recovered/$id"
           done
           find recovered -name '*.json.gz' -type f | grep -q .
+      - name: Retain recovered documents for automatic D1 ingestion
+        uses: actions/upload-artifact@v4
+        with:
+          name: itf-d1-draw-documents
+          path: recovered/**/*.json.gz
+          if-no-files-found: error
+          retention-days: 30
       - name: Configure R2
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}

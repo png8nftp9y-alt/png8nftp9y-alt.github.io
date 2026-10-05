@@ -3,28 +3,26 @@ on:
   workflow_run:
     workflows:
       - Court Watch v3 ITF T-1 complete draws
+      - Court Watch ITF T-1 artifact persistence recovery
     types: [completed]
     branches: [main]
   workflow_dispatch:
     inputs:
       run_id:
-        description: Optional completed T-1 run ID
+        description: Optional completed T-1 or recovery run ID (blank = latest T-1)
         required: false
         type: string
-
 permissions:
   contents: read
   actions: read
-
 concurrency:
   group: courtwatch-d1-writes
   cancel-in-progress: false
-
+  queue: max
 jobs:
   sync:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -34,25 +32,33 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - id: download
-        name: Download every draw document acquired by the T-1 run
+        name: Download acquired artifacts even if a later publication step failed
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_RUN_ID: ${{ inputs.run_id || github.event.workflow_run.id }}
         run: |
           set -euo pipefail
+          if [ -z "$SOURCE_RUN_ID" ]; then
+            SOURCE_RUN_ID="$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/courtwatch-v3-itf-t-minus-one.yml/runs?status=completed&per_page=1" --jq '.workflow_runs[0].id // empty')"
+          fi
           test -n "$SOURCE_RUN_ID"
           mkdir -p /tmp/itf-run-draws
-          if gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern 'itf-t1-draw-*' --dir /tmp/itf-run-draws 2>/dev/null &&
-             find /tmp/itf-run-draws -name '*.json.gz' -type f | grep -q .; then
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID/artifacts?per_page=100" --jq '.artifacts[] | select((.name | test("^itf-t1-draw-([0-9]+|retry-[0-9]+)$|^itf-d1-draw-documents$"))) | [.name,.expired] | @tsv' > /tmp/itf-artifacts.tsv
+          while IFS=$'\t' read -r name expired; do
+            [ -n "$name" ] || continue
+            test "$expired" = false
+            gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name "$name" --dir "/tmp/itf-run-draws/$name"
+          done < /tmp/itf-artifacts.tsv
+          if find /tmp/itf-run-draws -name '*.json.gz' -type f | grep -q .; then
             echo "has_draws=true" >> "$GITHUB_OUTPUT"
           else
             echo "has_draws=false" >> "$GITHUB_OUTPUT"
-            echo "No acquired draw artifacts: nothing to synchronize"
+            echo "NO_DRAW_ARTIFACTS: no D1 coverage claim; inspect source run $SOURCE_RUN_ID if acquisition was expected."
           fi
-      - name: Build idempotent ITF-only D1 delta
+      - name: Build acquired documents and incremental match projection
         if: steps.download.outputs.has_draws == 'true'
         run: node src/v3/build-itf-draw-d1-seed.mjs /tmp/itf-run-draws
-      - name: Configure and import D1 delta
+      - name: Configure, migrate and import D1
         if: steps.download.outputs.has_draws == 'true'
         working-directory: cloudflare/app-api
         run: |
@@ -60,10 +66,10 @@ jobs:
           shopt -s nullglob
           npm install
           node scripts/configure-d1.mjs
+          npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
           sql_files=(../../seed-itf-draws/*.sql)
           if [ "${#sql_files[@]}" -eq 0 ]; then
-            echo "No new or changed ITF draw rows; D1 is already synchronized"
-            exit 0
+            echo "NO_COMPLETE_DOCUMENTS: pending artifacts only; no D1 parity claim."
           fi
           for sql_file in "${sql_files[@]}"; do
             imported=0
@@ -73,9 +79,14 @@ jobs:
             done
             test "$imported" -eq 1
           done
-      - uses: actions/upload-artifact@v4
+      - name: Verify every imported document by reading its full content from D1
         if: steps.download.outputs.has_draws == 'true'
+        run: node src/v3/verify-itf-draw-documents-d1.mjs
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.download.outputs.has_draws == 'true'
         with:
           name: itf-acquired-draws-d1-sync-audit
-          path: dist/v3/audits/itf-draw-d1-sync.json
+          path: |
+            dist/v3/audits/itf-draw-d1-sync.json
+            dist/v3/audits/itf-draw-d1-content-verification.json
           retention-days: 30
