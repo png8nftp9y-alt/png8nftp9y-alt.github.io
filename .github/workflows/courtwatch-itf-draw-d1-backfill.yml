@@ -1,5 +1,9 @@
 name: Court Watch ITF complete draw archive D1 backfill
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-itf-draw-d1-backfill.yml'
   workflow_dispatch:
   workflow_run:
     workflows: [Court Watch v3 archive 4291 ITF historical draws to R2, Court Watch ITF Hanko qualification recovery]
@@ -32,22 +36,6 @@ jobs:
         with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Require recovered populated Hanko qualification BEFORE any archive import
-        run: |
-          set -euo pipefail
-          python3 -m pip install --quiet awscli
-          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
-          mkdir -p /tmp/itf-hanko-proof
-          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/live-draws/tournaments/J-J30-FIN-2026-004/G-S-Q-KO/" /tmp/itf-hanko-proof --recursive --only-show-errors
-          node --input-type=module - <<'NODE'
-          import fs from 'node:fs';
-          import {gunzipSync} from 'node:zlib';
-          import {requireRecoveredDraw} from './src/v3/recover-itf-hanko-qualification.mjs';
-          let recovered=false;
-          for(const name of fs.readdirSync('/tmp/itf-hanko-proof').filter(x=>x.endsWith('.json.gz'))){const doc=JSON.parse(gunzipSync(fs.readFileSync('/tmp/itf-hanko-proof/'+name)));try{requireRecoveredDraw(doc);recovered=true}catch{}}
-          if(!recovered)throw new Error('Archive import paused: Hanko qualification has not been recovered with populated content.');
-          console.log('HANKO_RECOVERY_GATE=verified');
-          NODE
       - name: Download and checksum-verify the current archive and live draws
         run: |
           set -euo pipefail

@@ -8,19 +8,22 @@ export function documentRecord(doc,{archiveEvidence=false}={}){
  const named=p=>Boolean(String(p?.name||p?.id||'').trim());
  const populated=(doc.players||[]).some(named)||(doc.matches||[]).some(m=>(m.teams||[]).some(t=>(t.players||[]).some(named)));
  const complete=Boolean(populated&&(doc.matches||[]).length&&acquiredDrawStatus({competitionId,event,artifact:doc}).complete);
+ // Explicit user resolution after independent source inspection (2026-10-05).
+ // Only this empty qualification is resolved; technical failures remain pending.
+ const resolvedEmpty=competitionId==='J-J30-FIN-2026-004'&&event==='G-S-Q-KO'&&!populated&&Array.isArray(doc.players)&&Array.isArray(doc.matches)&&((doc.status==='complete'&&!doc.error)||(doc.status==='retry'&&doc.error==='draw_not_published_or_incomplete'));
  // A checksum-verified archived document must be preserved even when its
  // acquisition proof is insufficient. Storage never upgrades that proof.
- if(!competitionId||!event||(!complete&&!archiveEvidence))return null;
+ if(!competitionId||!event||(!complete&&!resolvedEmpty&&!archiveEvidence))return null;
  const text=JSON.stringify(doc),points=Array.from(text),chunks=[];
  for(let offset=0;offset<points.length;offset+=12000)chunks.push(points.slice(offset,offset+12000).join(''));
  const stamp=[doc.generatedAt,doc.observedAt,doc.sourceObservedAt].map(x=>Date.parse(x)).filter(Number.isFinite);
- return {drawKey:competitionId+'|'+event,competitionId,event,sha256:digest(text),bytes:Buffer.byteLength(text),chunkCount:chunks.length,playerCount:(doc.players||[]).length,matchCount:(doc.matches||[]).length,observedAt:stamp.length?new Date(Math.max(...stamp)).toISOString():'',acquisitionState:complete?'complete':'archived_unverified',chunks};
+ return {drawKey:competitionId+'|'+event,competitionId,event,sha256:digest(text),bytes:Buffer.byteLength(text),chunkCount:chunks.length,playerCount:(doc.players||[]).length,matchCount:(doc.matches||[]).length,observedAt:stamp.length?new Date(Math.max(...stamp)).toISOString():'',acquisitionState:complete?'complete':resolvedEmpty?'resolved_empty_qualification':'archived_unverified',chunks};
 }
 export function documentSQL(row){
  const q=sqlString,values=[];
  // Immutable versions: interrupted uploads cannot expose a partial document.
  row.chunks.forEach((text,index)=>values.push(`INSERT INTO itf_draw_document_chunks(draw_key,content_sha256,chunk_index,content) VALUES(${q(row.drawKey)},${q(row.sha256)},${index},${q(text)}) ON CONFLICT(draw_key,content_sha256,chunk_index) DO NOTHING;`));
- const table=row.acquisitionState==='archived_unverified'?'itf_draw_unverified_documents':'itf_draw_documents';
+ const table=row.acquisitionState==='complete'?'itf_draw_documents':'itf_draw_unverified_documents';
  values.push(`INSERT INTO ${table}(draw_key,content_sha256,competition_id,event,observed_at,content_bytes,chunk_count,player_count,match_count) VALUES(${q(row.drawKey)},${q(row.sha256)},${q(row.competitionId)},${q(row.event)},${q(row.observedAt)},${row.bytes},${row.chunkCount},${row.playerCount},${row.matchCount}) ON CONFLICT(draw_key,content_sha256) DO NOTHING;`);
  return values;
 }
@@ -31,7 +34,7 @@ export function verifyDocument(row,remote,chunks){
  const content=ordered.map(x=>x.content).join('');
  if(digest(content)!==row.sha256||Buffer.byteLength(content)!==row.bytes)throw new Error('D1 content hash/size mismatch: '+row.drawKey);
  for(const [column,key] of [['chunk_count','chunkCount'],['content_bytes','bytes'],['player_count','playerCount'],['match_count','matchCount']])if(Number(remote[column])!==row[key])throw new Error('D1 metadata mismatch: '+row.drawKey+' '+column);
- const doc=JSON.parse(content),check=documentRecord(doc,{archiveEvidence:row.acquisitionState==='archived_unverified'});
+ const doc=JSON.parse(content),check=documentRecord(doc,{archiveEvidence:row.acquisitionState!=='complete'});
  if(!check||check.drawKey!==row.drawKey||check.sha256!==row.sha256)throw new Error('D1 document invalid: '+row.drawKey);
  return true;
 }

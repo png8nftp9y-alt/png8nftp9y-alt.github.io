@@ -15,16 +15,16 @@ async function query(sql){
   await new Promise(resolve=>setTimeout(resolve,(attempt+1)*2000));
  }
 }
-const report={version:2,verifiedAt:new Date().toISOString(),scope:expected.scope,expectedDocuments:expected.documents.length,verifiedDocuments:0,missingOrCorrupt:[],archivedUnverified:expected.archivedUnverified||[],fullPeriodCertified:false};
+const report={version:3,verifiedAt:new Date().toISOString(),scope:expected.scope,expectedDocuments:expected.documents.length,verifiedDocuments:0,missingOrCorrupt:[],archivedUnverified:expected.archivedUnverified||[],resolvedEmptyQualifications:expected.resolvedEmptyQualifications||[],fullPeriodCertified:false};
 try{
  for(let offset=0;offset<expected.documents.length;offset+=10){
   const batch=expected.documents.slice(offset,offset+10);
-  const predicate=batch.map(x=>`(d.draw_key=${sqlString(x.drawKey)} AND d.content_sha256=${sqlString(x.sha256)} AND d.acquisition_state=${sqlString(x.acquisitionState||'complete')})`).join(' OR ');
-  const rows=await query(`SELECT d.*,c.chunk_index,c.content FROM (SELECT *, 'complete' AS acquisition_state FROM itf_draw_documents UNION ALL SELECT *, 'archived_unverified' AS acquisition_state FROM itf_draw_unverified_documents) d LEFT JOIN itf_draw_document_chunks c ON c.draw_key=d.draw_key AND c.content_sha256=d.content_sha256 WHERE ${predicate} ORDER BY d.draw_key,c.chunk_index`);
+  const predicate=batch.map(x=>`(d.draw_key=${sqlString(x.drawKey)} AND d.content_sha256=${sqlString(x.sha256)} AND d.acquisition_state=${sqlString((x.acquisitionState||'complete')==='complete'?'complete':'saved_non_complete')})`).join(' OR ');
+  const rows=await query(`SELECT d.*,c.chunk_index,c.content FROM (SELECT *, 'complete' AS acquisition_state FROM itf_draw_documents UNION ALL SELECT *, 'saved_non_complete' AS acquisition_state FROM itf_draw_unverified_documents) d LEFT JOIN itf_draw_document_chunks c ON c.draw_key=d.draw_key AND c.content_sha256=d.content_sha256 WHERE ${predicate} ORDER BY d.draw_key,c.chunk_index`);
   for(const expectedRow of batch){const chunks=rows.filter(x=>x.draw_key===expectedRow.drawKey&&x.content_sha256===expectedRow.sha256);try{verifyDocument(expectedRow,chunks[0],chunks.filter(x=>x.chunk_index!==null));report.verifiedDocuments++}catch(e){report.missingOrCorrupt.push({drawKey:expectedRow.drawKey,error:e.message})}}
   if(offset%200===0)console.log(`ITF_D1_CONTENT_VERIFIED=${report.verifiedDocuments}/${expected.documents.length}`);
  }
- report.status=report.missingOrCorrupt.length?'failed':report.expectedDocuments?(report.archivedUnverified.length?'verified_saved_documents_with_unverified_acquisition':'verified_acquired_documents'):'no_complete_documents';
+ report.status=report.missingOrCorrupt.length?'failed':report.expectedDocuments?(report.archivedUnverified.length?'verified_saved_documents_with_unverified_acquisition':report.resolvedEmptyQualifications.length?'verified_saved_documents':'verified_acquired_documents'):'no_complete_documents';
 }catch(e){report.status='failed';report.error=e.message}
 await fs.writeFile(path.join(root,'dist/v3/audits/itf-draw-d1-content-verification.json'),JSON.stringify(report,null,2)+'\n');
 console.log('ITF_D1_CONTENT_VERIFICATION='+JSON.stringify(report));
