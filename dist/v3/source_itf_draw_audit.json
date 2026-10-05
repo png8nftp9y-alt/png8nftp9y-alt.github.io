@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-05T14:06:26.172Z",
+  "generatedAt": "2026-10-05T14:11:22.784Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,20 +9,20 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 5,
-    "acquiredSections": 1,
+    "requestedSections": 4,
+    "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 1,
-    "missingSections": 5,
+    "resolvedSections": 2,
+    "missingSections": 4,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 5,
+    "retrySections": 4,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 5,
+    "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 442,
@@ -98,16 +98,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-DOM-2026-003",
-      "tournamentName": "J60 Santo Domingo",
+      "competitionId": "J-J60-TJK-2026-002",
+      "tournamentName": "J60 Dushanbe",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 1,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 1,
-      "missingSections": 5,
+      "resolvedSections": 2,
+      "missingSections": 4,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -140,9 +140,9 @@
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-D-M-KO",
@@ -172,7 +172,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 28,
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -207,14 +207,14 @@
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 9,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
