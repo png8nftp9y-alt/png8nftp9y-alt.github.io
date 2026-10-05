@@ -1,0 +1,47 @@
+name: Court Watch ITF Hanko raw recovery diagnosis
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-itf-hanko-raw-diagnosis.yml'
+      - 'src/v3/diagnose-itf-hanko-qualification.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: courtwatch-itf-hanko-raw-diagnosis
+  cancel-in-progress: false
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Stop premature archive transfer as requested
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          id=37275394277
+          status="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id" --jq .status)"
+          if [ "$status" != completed ]; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$id/cancel" || test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id" --jq .status)" = completed
+          fi
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci --ignore-scripts
+      - name: Read fresh official parameters and the target draw via independent paths
+        env:
+          ITF_REQUEST_TIMEOUT_MS: 30000
+          ITF_REQUEST_DELAY_MS: 1800
+          ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
+        run: node src/v3/diagnose-itf-hanko-qualification.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-hanko-raw-recovery-diagnostics
+          path: dist/v3/audits/hanko-qualification/*
+          retention-days: 30
