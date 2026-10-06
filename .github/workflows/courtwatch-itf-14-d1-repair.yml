@@ -1,0 +1,66 @@
+name: Court Watch ITF 10 qualifications and 4 doubles D1 repair
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-itf-14-d1-repair.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Validate source classification and existing D1 safeguards
+        run: node --test src/v3/itf-14-repair.test.mjs src/v3/itf-draw-document-d1.test.mjs
+      - name: Download only target versions and same-sex main evidence
+        run: |
+          python3 -m pip install --quiet boto3
+          python3 src/v3/download-itf-14-repair.py
+      - name: Select complete or evidence-resolved documents
+        env:
+          ITF_D1_REQUIRED_ARCHIVE_ROOT: /tmp/itf-14-selected/resolved
+        run: |
+          node src/v3/prepare-itf-14-repair.mjs prepare /tmp/itf-14-coverage.json /tmp/itf-14-source /tmp/itf-14-selected
+          node src/v3/build-itf-draw-d1-seed.mjs /tmp/itf-14-selected
+          node src/v3/prepare-itf-14-repair.mjs finalize
+      - name: Import incremental documents; identical rows are not rewritten
+        working-directory: cloudflare/app-api
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install
+          node scripts/configure-d1.mjs
+          npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+          for file in ../../seed-itf-draws/*.sql; do
+            npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$file"
+          done
+      - name: Read every selected document back from D1 and check all 14 targets
+        run: |
+          node src/v3/verify-itf-draw-documents-d1.mjs
+          node src/v3/prepare-itf-14-repair.mjs check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-14-d1-repair-audit
+          path: |
+            dist/v3/audits/itf-14-repair-scope.json
+            dist/v3/audits/itf-draw-d1-sync.json
+            dist/v3/audits/itf-draw-d1-content-verification.json
+          retention-days: 30

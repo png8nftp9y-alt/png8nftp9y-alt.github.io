@@ -3490,7 +3490,6 @@ function toggleDatePopover() {
 function wire() {
   wirePlayersColumnHeight();
   $("addPlayer").onclick = openAddPlayerDialog;
-  $("addPlayerLabel").onclick = openAddPlayerDialog;
   $("removePlayer").onclick = togglePlayerRemovalMode;
   $("removePlayer").setAttribute("aria-pressed", "false");
   const playerSearchForm = $("playerSearchForm"),
