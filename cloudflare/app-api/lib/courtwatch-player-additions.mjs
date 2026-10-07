@@ -25,7 +25,7 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
   const row=candidates[0],payload=parse(row.payload),hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(row.source_key));
   const id='cw-'+Array.from(new Uint8Array(hash)).map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,32);
   player={id,name:row.display_name,circuits:[row.circuit],nationality:payload.nationality||'',club:payload.club||'',sourceCircuit:row.circuit,sourceKey:row.source_key,sourcePlayerId:row.official_id||'',userAdded:true};
-  if(row.circuit==='fitp')player.membershipCard=row.official_id||'';
+  if(row.circuit==='fitp'){player.membershipCard=row.official_id||'';player.ranking=payload.ranking||'';}
   if(row.circuit==='itf')player.worldTennisId=row.official_id||'';
   if(row.circuit==='tennis-europe')player.profileSync={tennisEurope:{profileId:row.official_id||''}};
   // Reuse a configured player only with a matching official circuit identity.

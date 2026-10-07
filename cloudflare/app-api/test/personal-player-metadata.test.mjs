@@ -32,3 +32,11 @@ test('Lecco club alias applies to stored selections and freshly recovered offici
  assert.equal(await officialFitpClub('1234',async()=>({ok:true,json:async()=>({player:{tennis_club_name:raw}})})),'Tennis Club Lecco');
  assert.equal(personalPlayerMetadata({name:'Player',club:'Altro circolo'}).club,'Altro circolo');
 });
+
+test('FITP ranking is restored for old personal selections from their exact source metadata',()=>{
+ const player={id:'cw-riccardo',name:'Riccardo Galbiati',membershipCard:'123',club:'Tennis Club Lecco'};
+ assert.equal(personalPlayerMetadata(player,{ranking:'4.2'}).ranking,'4.2');
+ assert.equal(personalPlayerMetadata({...player,ranking:'4.3'},{ranking:'4.1'}).ranking,'4.1');
+ assert.equal(personalPlayerMetadata(player,{ranking:'4NC'}).ranking,'4.NC');
+ assert.equal(personalPlayerMetadata({name:'ITF Player',sourceCircuit:'itf'},{ranking:'123'}).ranking,undefined);
+});

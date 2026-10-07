@@ -1877,3 +1877,17 @@ The full last-good snapshot includes historical matches, opponents and entry dat
 Save a lightweight calendar snapshot before attempting the full history cache. It contains all visible players and tournaments, recent/future matches and agenda, with no opponent/history/entry bulk. If the old full snapshot blocks the calendar write, remove only that replaceable snapshot and retry the calendar write. Prefer the newer calendar over stale full history and tolerate corrupt full-cache JSON. Retain cached tournaments of still-visible personal players when refreshing from static JSON without a working API; removed players remain excluded. Restore remains before the initial route. Increment frontend JS asset version.
 
 Validation: 16 startup, storage-quota, fallback and player-addition UI tests passed, including executing actual load() with an unavailable API, and JavaScript syntax validation passed. Installer validates expected source versions and restores originals if checks fail. No D1 writes or remote deployment performed. A successful full personal snapshot must be loaded once after deployment to replace a preexisting stale cache. First visit without any cache, unavailable browser storage, and newly acquired remote events still require network data. Other history details omitted from the lightweight fallback are reloaded from the API.
+
+## 2026-10-07 — FITP ranking for personal CourtWatch players
+
+The personal player constructor copied FITP membership card but discarded the source ranking. Personal metadata readback also omitted ranking fallback from the exact observed_source_key join, leaving older additions without FITP classification despite the index containing it.
+
+Copy payload.ranking for new FITP selections. When returning stored personal players, populate FITP ranking from exact-source observed metadata with saved ranking as fallback, including 4NC → 4.NC normalization. Restrict this fallback to FITP identities so ITF/Europe positions do not become FITP classifications. Old selections need no removal/re-add or D1 rewrite; the existing frontend ranking display consumes the returned ranking.
+
+Validation: 16 tests pass, including actual SQLite new FITP ranking propagation and old-row recovery with zero writes, updated source ranking, NC formatting and cross-circuit isolation. Existing addition, official club preparation, replay and identity tests remain green. Source values are not guessed; a genuinely absent FITP source ranking remains absent. Production behavior requires local push and green Worker deployment.
+
+## 2026-10-07 — Calendar startup guard compatibility for app API deployment
+
+The app API check failed before migrations/deployment because verify-analysis-ui required wire();wireAccount();route();load(); to be contiguous. Restoring the calendar cache and sync status between these calls kept their order but invalidated the literal marker. Replace the contiguous-call assertion with an ordered startup check requiring cache restoration, event wiring, route and then remote load. Preserve the opponent retry, timeout and recursive navigation assertions.
+
+Validation: the complete analysis UI verification passes on the current frontend, and 16 FITP metadata/addition tests pass. No database writes or deployment were performed by this patch. FITP classification availability remains dependent on the exact-source acquired index. Local commit/push and a green app API deploy are required.

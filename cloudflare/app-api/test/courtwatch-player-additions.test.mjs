@@ -114,3 +114,16 @@ test('unavailable FITP club does not save an incomplete new selection',async()=>
   assert.equal(db.writes(),0);
  }finally{db.close()}
 });
+
+test('FITP selection carries ranking and old saved selections recover it by exact source identity',async()=>{
+ const db=database();try{
+  db.execute('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',['fitp|id:999','fitp','999','RICCARDO GALBIATI','RICCARDO GALBIATI',JSON.stringify({ranking:'4.2',club:'Tennis Club Lecco'})]);
+  const result=await addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:999'});
+  assert.equal(result.player.ranking,'4.2');
+  assert.equal((await personalPlayerAdditions(db.env,user.id))[0].ranking,'4.2');
+  const old={...result.player};delete old.ranking;
+  db.execute('UPDATE user_app_player_additions SET payload=? WHERE courtwatch_id=?',[JSON.stringify(old),result.playerId]);
+  const before=db.writes();const restored=await personalPlayerAdditions(db.env,user.id);
+  assert.equal(restored[0].ranking,'4.2');assert.equal(db.writes(),before);
+ }finally{db.close()}
+});

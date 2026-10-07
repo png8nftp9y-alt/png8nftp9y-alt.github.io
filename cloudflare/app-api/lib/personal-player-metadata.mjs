@@ -9,7 +9,12 @@ export function displayPlayerName(value) {
   ? name.toLocaleLowerCase('it-IT').replace(/(^|[\s'’-])\p{L}/gu,letter=>letter.toLocaleUpperCase('it-IT')) : name;
 }
 export function personalPlayerMetadata(player,observed={}) {
- return {...player,name:displayPlayerName(player.name),club:displayPlayerClub(player.club||observed.club||'')};
+ const result={...player,name:displayPlayerName(player.name),club:displayPlayerClub(player.club||observed.club||'')};
+ if(player.membershipCard||player.sourceCircuit==='fitp'){
+  const value=observed.ranking||player.ranking||'';
+  result.ranking=String(value).replace(/\s+/g,'').replace(/^([1-4])NC$/i,'$1.NC').toUpperCase();
+ }
+ return result;
 }
 export async function officialFitpClub(card,fetcher=fetch) {
  if(!/^\d+$/.test(String(card||'')))return '';
