@@ -1,3 +1,6 @@
+import {mergePersonalLiveTournaments} from '../lib/personal-live-entry.mjs';
+import {personalTennisEuropeHistory} from '../lib/personal-tennis-europe-history.mjs';
+import {personalPlayerMetadata} from '../lib/personal-player-metadata.mjs';
 import {addCourtWatchPlayer,personalPlayerAdditions} from '../lib/courtwatch-player-additions.mjs';
 import { loadAdminRemote } from '../lib/admin-remote.mjs';
 const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Methods':'GET,PUT,DELETE,OPTIONS','Access-Control-Allow-Headers':'Content-Type,Authorization'};
@@ -126,8 +129,18 @@ async function protectedApp(request,env,path,url){
     const playerMap=new Map(players.map(player=>[player.id,player]));for(const player of added)playerMap.set(player.id,{...playerMap.get(player.id),...player});players.splice(0,players.length,...playerMap.values());
     for(const player of added.filter(player=>player.sourceKey)){
       const entries=await opponentEntryTournaments(env,{profileId:player.sourcePlayerId,name:player.name,includePast:true,sourceCircuit:player.sourceCircuit||''});
-      const keys=new Set(tournaments.filter(t=>t.playerId===player.id).map(t=>`${t.circuit}|${t.competitionId}`));
-      for(const tournament of entries){const key=`${tournament.circuit}|${tournament.competitionId}`;if(!keys.has(key)){tournaments.push({...tournament,playerId:player.id,playerName:player.name});keys.add(key)}}
+      const live=mergePersonalLiveTournaments(tournaments,entries.map(t=>({...t,playerName:player.name})),player.id);
+      tournaments.splice(0,tournaments.length,...live);
+    }
+    for(const player of added.filter(p=>p.sourceCircuit==='tennis-europe')){
+      const history=await personalTennisEuropeHistory(env.DB,player);
+      const position=players.findIndex(p=>p.id===player.id);if(position>=0)players[position]=personalPlayerMetadata(history.player);
+      const tournamentMap=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
+      for(const t of history.tournaments){const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;tournamentMap.set(key,{...t,...tournamentMap.get(key)});}
+      tournaments.splice(0,tournaments.length,...tournamentMap.values());
+      const matchMap=new Map(matches.map(m=>[`${m.playerId}|${m.matchId||m.id}`,m]));
+      for(const m of history.matches)matchMap.set(`${m.playerId}|${m.matchId||m.id}`,{...matchMap.get(`${m.playerId}|${m.matchId||m.id}`),...m});
+      matches.splice(0,matches.length,...matchMap.values());
     }
     try{await applyPreparedTennisEuropeRankings(env,players,matches,[...new Set(players.map(p=>p.id))])}catch(error){console.error('prepared_tennis_europe_projection_failed',error)}return privateJson({generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players:applyOverrides(players,overrides,'player'),tournaments:applyOverrides(tournaments,overrides,'tournament'),matches})}
   if(apiPath==='/match-analysis-status'&&request.method==='GET'){const rows=await optionalRows(env.DB.prepare('SELECT match_key,updated_at FROM user_match_analyses WHERE user_id=? ORDER BY updated_at DESC').bind(user.id));return privateJson({matches:rows.map(row=>({matchKey:row.match_key,updatedAt:row.updated_at}))})}

@@ -9,7 +9,7 @@ function context(response){
  const root={querySelector:()=>null,append(){this.error=true}},button={textContent:'Aggiungi giocatore',disabled:false,isConnected:true,closest:()=>root};
  const state={data:{players:[],tournaments:[]},selected:new Set()},opened=[],calls=[];
  const context=vm.createContext({console,Headers,Map,Set,Promise,Date,setTimeout,clearTimeout,state,PRIVATE_API:'/app/api',removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),playerRemovalMode:false,
-  privateApiOptions:x=>x,location:{hash:'#opponent-profile/101/Test'},document:{getElementById:()=>null,createElement:()=>({dataset:{},setAttribute(){}})},$:()=>root,
+  privateApiOptions:x=>x,history:{state:{},replaceState(_s,_t,hash){context.location.hash=hash}},route(){opened.push(decodeURIComponent(context.location.hash.slice('#player/'.length)))},location:{hash:'#opponent-profile/101/Test'},document:{getElementById:()=>null,createElement:()=>({dataset:{},setAttribute(){}})},$:()=>root,
   apiProjection:async()=>({players:[{id:'cw-test',name:'Test Player',userAdded:true}],tournaments:[{playerId:'cw-test',competitionId:'cantu',name:'Cantù'}],matches:[]}),
   fetch:async(url,options)=>{calls.push({url,options});return response},saveUiState(){},saveCachedData(){},renderHome(){},openProfile:id=>opened.push(id),load(){},
  });vm.runInContext(addition,context);

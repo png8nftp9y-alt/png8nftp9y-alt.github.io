@@ -35,6 +35,14 @@ export function personalPlayerMetadata(player,observed={}) {
   const value=observed.ranking||player.ranking||'';
   result.ranking=String(value).replace(/\s+/g,'').replace(/^([1-4])NC$/i,'$1.NC').toUpperCase();
  }
+ // Verified academy source, read 2026-10-08. Guard name, country and source circuit;
+ // do not overwrite an existing acquired or user-confirmed year.
+ if(!result.birthYear&&!result.birthDate&&player.sourceCircuit==='tennis-europe'&&
+    result.name.normalize('NFKD').toLowerCase().split(/\s+/).sort().join(' ')==='milana shein'&&
+    ['SUI','CH','SWITZERLAND'].includes(String(result.nationality||'').toUpperCase())){
+  result.birthYear=2012;
+  result.birthYearSource='https://www.roshardt-tennisacademy.ch/spieler/tennis-academy/zuerich';
+ }
  return result;
 }
 export async function officialFitpClub(card,fetcher=fetch) {
