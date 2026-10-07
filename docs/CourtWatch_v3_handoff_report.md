@@ -1837,3 +1837,9 @@ Changes: readable all-uppercase names, case-insensitive Italian alphabetical pla
 Validation: 11 Node tests pass (including actual SQLite personal addition persistence, zero-write replay, remove/re-add, ambiguity, account isolation and protected POST plus names/club source tests). Isolated execution of real frontend handlers verified alphabetical ordering and the Cantù tournament name fallback. Syntax checks pass. Installer is transactional and idempotent and checks scoped whitespace.
 
 Remaining limitation: actual club values for Camilla Frigerio and Paolo Brambilla require successful official source responses during the first deployed workflow run; no club is guessed. Frontend and API deployment are certified only after push and green runs.
+
+## 2026-10-07 — Incremental policy guard for personal FITP clubs
+
+The first club recovery change failed the global D1 policy because it lacked the mandatory buildIncrementalSyncPlan helper and the stem-associated test suite. The script now computes an incremental plan before producing the conditional SQL update. It retains optimistic payload matching, membership/removal protection, no writes for populated clubs, and refusal of incomplete official data. No policy bypass was added.
+
+Validation: four actual SQLite cases pass: first club enrichment, zero-write replay, changes restricted to the selected player including concurrent payload edits, and missing-source/removal protection. The global policy verifier passes in a Git fixture. Final production recovery requires local push and green D1/API run.
