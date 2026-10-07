@@ -2259,6 +2259,19 @@ function openAddPlayerDialog() {
   dialog.showModal();input.focus();
 }
 function openPlayerSearchResult(result) {
+  // Start the next search empty and discard suggestions still in flight.
+  clearTimeout(playerSearchTimer);
+  ++playerSearchSequence;
+  const searchInput = $("playerSearchInput"),
+    searchSuggestions = $("playerSearchSuggestions");
+  if (searchInput) {
+    searchInput.value = "";
+    searchInput.setAttribute("aria-expanded", "false");
+  }
+  if (searchSuggestions) {
+    searchSuggestions.hidden = true;
+    searchSuggestions.innerHTML = "";
+  }
   const followed = result.courtwatchId && (state.data?.players || []).some(
     (player) => player.id === result.courtwatchId && player.active !== false,
   );

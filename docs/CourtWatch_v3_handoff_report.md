@@ -1821,3 +1821,9 @@ Changed verify-d1.mjs to check missing generated-player links, active links that
 Validation: five Node tests execute the actual policy SQL against SQLite, covering the failed aggregate with two personal additions, growth to 2,000 players, mismatched IDs despite equal counts, personal removals and missing diagnostics. Added this suite to npm run check. Installer checks syntax, executes the suite and checks scoped Git whitespace; replay is idempotent.
 
 Limitation: live D1 parity and final Worker/API validation require the user to push and a successful Court Watch Cloudflare D1 and app API run. Local verification does not certify deployment.
+
+## 2026-10-07 — Clear player search after selection
+
+Selecting a result from player search now clears the main search input, hides and removes old suggestions, cancels its debounce timer and invalidates in-flight responses. This applies to both observed players and opponent profiles, including selections from the results page. Returning to the search leaves the input ready for a new query. Player routing and the separate add-player dialog remain unchanged.
+
+Validation: JavaScript syntax and isolated execution of the real selection handler, covering observed and non-observed navigation, empty input, discarded suggestions, cancelled timer and invalidated request sequence. Updated frontend asset version. Deployment requires local push and successful Pages publication.
