@@ -24,3 +24,11 @@ test('missing club is not fabricated and HTTP failure stays visible',async()=>{
  await assert.rejects(officialFitpClub('1234',async()=>({ok:false,status:503})),/HTTP 503/);
  assert.equal(await officialFitpClub('not-a-card',()=>{throw Error('must not fetch')}),'');
 });
+
+test('Lecco club alias applies to stored selections and freshly recovered official clubs',async()=>{
+ const raw='ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO';
+ assert.equal(personalPlayerMetadata({name:'Player',club:raw}).club,'Tennis Club Lecco');
+ assert.equal(personalPlayerMetadata({name:'Player'},{club:raw}).club,'Tennis Club Lecco');
+ assert.equal(await officialFitpClub('1234',async()=>({ok:true,json:async()=>({player:{tennis_club_name:raw}})})),'Tennis Club Lecco');
+ assert.equal(personalPlayerMetadata({name:'Player',club:'Altro circolo'}).club,'Altro circolo');
+});

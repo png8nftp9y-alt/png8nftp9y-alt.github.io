@@ -1938,11 +1938,8 @@ function groups(selectedOnly = true) {
     map.set(key, g);
   }
   for (const g of map.values()) {
-    g.people.sort(
-      (a, b) =>
-        acceptanceRank(a) - acceptanceRank(b) ||
-        acceptanceNumber(a) - acceptanceNumber(b) ||
-        String(a.playerName).localeCompare(String(b.playerName)),
+    g.people.sort((a, b) =>
+      readablePerson(a.playerName).localeCompare(readablePerson(b.playerName), "it", {sensitivity: "base"}),
     );
     g.players = g.people.map((t) =>
       t.calendarListLabel

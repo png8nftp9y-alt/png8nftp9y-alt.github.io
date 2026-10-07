@@ -1843,3 +1843,11 @@ Remaining limitation: actual club values for Camilla Frigerio and Paolo Brambill
 The first club recovery change failed the global D1 policy because it lacked the mandatory buildIncrementalSyncPlan helper and the stem-associated test suite. The script now computes an incremental plan before producing the conditional SQL update. It retains optimistic payload matching, membership/removal protection, no writes for populated clubs, and refusal of incomplete official data. No policy bypass was added.
 
 Validation: four actual SQLite cases pass: first club enrichment, zero-write replay, changes restricted to the selected player including concurrent payload edits, and missing-source/removal protection. The global policy verifier passes in a Git fixture. Final production recovery requires local push and green D1/API run.
+
+## 2026-10-07 — Lecco club alias and alphabetical calendar players
+
+Restore the existing Tennis Club Lecco display alias for personal players: normalize verbose official affiliation strings containing Tennis Club Lecco when reading saved selections, observed fallback and newly recovered FITP club responses. Existing D1 rows need no rewriting or additional fetch for display normalization; other club names remain unchanged.
+
+Calendar tournament participants now sort by readable player name using Italian case-insensitive collation, independently of acceptance rank and position. Acceptance labels remain attached to the correct player. Updated JS asset version.
+
+Validation: five metadata tests pass, including stored/observed/new Lecco aliases and unrelated clubs. Execution of the actual frontend grouping function verifies alphabetical calendar participants with deliberately different MD/Q/ALT positions and preserved labels; syntax checked. Deployment requires local push and green Worker/Pages publication.
