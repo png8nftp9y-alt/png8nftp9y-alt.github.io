@@ -63,7 +63,7 @@ test('D1_TEST_INCOMPLETE_SOURCE_GUARD: missing or ambiguous identities cannot cr
   db.execute('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',['fitp|id:101','fitp','101','TEST PLAYER','Test Player','{}']);
   await assert.rejects(addCourtWatchPlayer(db.env,user,{identity:'101',name:'Test Player'}),/player_identity_ambiguous/);
   assert.equal(db.writes(),0);
-  const a=await addCourtWatchPlayer(db.env,user,{sourceKey:'itf|id:101'}),b=await addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:101'});
+  const a=await addCourtWatchPlayer(db.env,user,{sourceKey:'itf|id:101'}),b=await addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:101'},{fetchClub:async()=> 'Known Club'});
   assert.notEqual(a.playerId,b.playerId);
  }finally{db.close()}
 });
@@ -92,5 +92,25 @@ test('opponent without an official ID resolves only an exact unambiguous indexed
   assert.equal(added.player.worldTennisId,'101');
   db.execute('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',['itf|id:202','itf','202','TEST PLAYER','Test Player','{}']);
   await assert.rejects(addCourtWatchPlayer(db.env,user,{identity:'another-local-id',name:'Test Player'}),/player_identity_ambiguous/);
+ }finally{db.close()}
+});
+
+test('FITP addition waits for official club before persisting or confirming',async()=>{
+ const db=database();try{
+  db.execute('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',['fitp|id:777','fitp','777','RICCARDO GALBIATI','RICCARDO GALBIATI','{}']);
+  let release,started;const began=new Promise(resolve=>started=resolve);
+  const operation=addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:777'},{fetchClub:card=>{assert.equal(card,'777');started();return new Promise(resolve=>release=resolve)}});
+  await began;assert.equal(db.writes(),0);
+  release('ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO');
+  const result=await operation;assert.equal(result.player.club,'Tennis Club Lecco');assert.equal(result.player.name,'Riccardo Galbiati');
+  const before=db.writes();await addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:777'},{fetchClub:()=>{throw Error('must reuse stored club')}});
+  assert.equal(db.writes(),before);
+ }finally{db.close()}
+});
+test('unavailable FITP club does not save an incomplete new selection',async()=>{
+ const db=database();try{
+  db.execute('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',['fitp|id:888','fitp','888','NEW PLAYER','NEW PLAYER','{}']);
+  await assert.rejects(addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:888'},{fetchClub:async()=>''}),/player_club_unavailable/);
+  assert.equal(db.writes(),0);
  }finally{db.close()}
 });

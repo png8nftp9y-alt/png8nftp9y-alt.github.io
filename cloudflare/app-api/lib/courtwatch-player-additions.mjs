@@ -1,4 +1,4 @@
-import {personalPlayerMetadata} from './personal-player-metadata.mjs';
+import {personalPlayerMetadata,officialFitpClub} from './personal-player-metadata.mjs';
 // D1_WRITE_POLICY: incremental
 import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
 
@@ -6,7 +6,7 @@ const nameKey=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f
 const failure=(message,status=400)=>Object.assign(new Error(message),{status});
 const parse=value=>{try{return JSON.parse(value||'{}')}catch{return{}}};
 
-export async function addCourtWatchPlayer(env,user,body){
+export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpClub}={}){
  const sourceKey=String(body?.sourceKey||'').trim(),courtwatchId=String(body?.courtwatchId||'').trim(),identity=String(body?.identity||'').trim(),name=String(body?.name||'').trim();
  if((!sourceKey&&!courtwatchId&&!identity)||sourceKey.length>240||courtwatchId.length>160||identity.length>160||name.length>160)throw failure('invalid_player');
  let player,observedSourceKey;
@@ -45,6 +45,12 @@ export async function addCourtWatchPlayer(env,user,body){
   env.DB.prepare('SELECT courtwatch_id FROM user_app_player_removals WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first()
  ]);
  if(previous&&previous.courtwatch_id!==player.id)throw failure('player_identity_conflict',409);
+ if(!player.club&&previous)player.club=personalPlayerMetadata(parse(previous.payload)).club||'';
+ if(player.membershipCard&&!player.club){
+  try{player.club=await fetchClub(player.membershipCard)}catch{throw failure('player_club_unavailable',503)}
+  if(!player.club)throw failure('player_club_unavailable',503);
+ }
+ player=personalPlayerMetadata(player);
  const incoming={courtwatch_id:player.id,observed_source_key:observedSourceKey,payload:JSON.stringify(player)};
  const plan=buildIncrementalSyncPlan({current:previous?[previous]:[],incoming:[incoming],keyOf:row=>row.courtwatch_id,sourceComplete:Boolean(player.id&&player.name)});
  const now=new Date().toISOString(),statements=[];

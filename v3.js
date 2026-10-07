@@ -1923,7 +1923,7 @@ function groups(selectedOnly = true) {
   for (const t of state.data.tournaments || []) {
     if ((selectedOnly && !state.selected.has(t.playerId)) || !active(t))
       continue;
-    const entry = {...t, playerName: readablePerson(t.playerName || state.data.players?.find(p => p.id === t.playerId)?.name || "")};
+    const entry = {...t, playerName: readablePerson(state.data.players?.find(p => p.id === t.playerId)?.name || t.playerName || "")};
     const key = tournamentKey(t),
       g = map.get(key) || {
         ...t,
@@ -2206,6 +2206,12 @@ async function addCourtWatchPlayerFromUi(result, button) {
     if (!response.ok || data.added !== true || !data.player?.id || data.playerId !== data.player.id)
       throw Error(data.error || 'player_addition_not_confirmed');
     if (!state.data) throw Error('player_view_unavailable');
+    state.playerSelectionEpoch = (state.playerSelectionEpoch || 0) + 1;
+    const projection = await apiProjection();
+    const confirmedPlayer = projection.players.find(p => p.id === data.playerId);
+    if (!confirmedPlayer) throw Error('player_snapshot_not_ready');
+    state.data = {...state.data,players:projection.players,tournaments:projection.tournaments,matches:projection.matches,personalProjectionComplete:true};
+    data.player = confirmedPlayer;
     removedCourtWatchPlayers.delete(data.playerId);
     confirmedCourtWatchPlayers.set(data.playerId,data.player);
     state.data.players = [...(state.data.players || []).filter(p => p.id !== data.playerId),data.player];
@@ -2226,6 +2232,10 @@ async function addCourtWatchPlayerFromUi(result, button) {
       const message = document.createElement('p');message.dataset.playerAddError='';message.setAttribute('role','alert');
       message.textContent = error.message === 'player_identity_ambiguous'
         ? 'Identità non univoca. Usa + e seleziona il profilo del circuito corretto.'
+        : error.message === 'player_club_unavailable'
+          ? 'Scheda FITP temporaneamente non disponibile: riprova per aggiungere il giocatore con il suo circolo.'
+        : error.message === 'player_snapshot_not_ready'
+          ? 'Iscrizioni non ancora disponibili nella vista: riprova per completare l’apertura del giocatore.'
         : 'Aggiunta non riuscita. Riprova.';
       root.append(message);
     }
@@ -3689,8 +3699,9 @@ function wire() {
 }
 async function load() {
   if (loadRunning) return;
+  const selectionEpoch = state.playerSelectionEpoch || 0;
   const immediate = !state.data && cachedData();
-  if (immediate) {
+  if (immediate?.personalProjectionComplete === true) {
     state.data = immediate;
     if (!uiSelectionRestored) {
       state.data.players.forEach((p) => state.selected.add(p.id));
@@ -3838,7 +3849,9 @@ async function load() {
     const diagnostics = docs.diagnostics ||
       previous.diagnostics || { overall: "yellow", items: [] };
 
+    if (selectionEpoch !== (state.playerSelectionEpoch || 0)) return;
     state.data = {
+      personalProjectionComplete: Boolean(projection),
       players: visiblePlayers,
       tournaments: [
         ...((universalProjectionFresh && projection?.tournaments) || docs.tournaments.tournaments),
@@ -3881,6 +3894,7 @@ async function load() {
     syncLabel(state.data, optionalFailures > 0);
     renderIfDataChanged();
   } catch (e) {
+    if (selectionEpoch !== (state.playerSelectionEpoch || 0)) return;
     const fallback = state.data || cachedData();
     if (fallback) {
       state.data = fallback;

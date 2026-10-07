@@ -1851,3 +1851,13 @@ Restore the existing Tennis Club Lecco display alias for personal players: norma
 Calendar tournament participants now sort by readable player name using Italian case-insensitive collation, independently of acceptance rank and position. Acceptance labels remain attached to the correct player. Updated JS asset version.
 
 Validation: five metadata tests pass, including stored/observed/new Lecco aliases and unrelated clubs. Execution of the actual frontend grouping function verifies alphabetical calendar participants with deliberately different MD/Q/ALT positions and preserved labels; syntax checked. Deployment requires local push and green Worker/Pages publication.
+
+## 2026-10-07 — Atomic personal player addition and complete calendar loading
+
+Cause: the add-player response confirmed an FITP player before club enrichment; the UI cached only the new player and fetched their tournaments later. On reload it rendered a partial old local cache before awaiting the API. Calendar entries could also carry surname-first names instead of the canonical player name.
+
+Changes: FITP addition uses the exact-card official profile club lookup before persistence/confirmation when no known club is available. Replays reuse the saved club and retain zero-write behavior. Official unavailable/empty responses return an explicit retryable error before saving an incomplete new selection. Lecco normalization remains applied. After successful POST, UI awaits the complete authenticated snapshot before rendering/saving the new selection. Mark complete personal projections and do not render unmarked old caches on startup. Selection epochs prevent a request started before an addition from overwriting the completed new snapshot. Calendar alphabetical ordering uses canonical selected-player names before source entry names. Updated frontend JS asset version.
+
+Validation: 16 Node tests passed, including SQLite persistence/zero-write replay, FITP club wait before writes, failed profile lookup without new writes, snapshot wait before UI promotion, cold reload with no partial-cache first render, and canonical alphabetical calendar names despite surname-first source entry names. Installer verifies JavaScript syntax, both suites and scoped whitespace and supports idempotent replay. No run polling.
+
+Limits: official FITP lookup may take up to its 8-second timeout; + remains pending during preparation. A source failure gives a retryable error rather than confirming a club-less new FITP player. Existing selected players remain retained; previous background club recovery remains available for older selections. No private browser session was inspected. Live behavior requires local push and successful Worker and Pages publication.
