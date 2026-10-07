@@ -150,6 +150,8 @@ jobs:
           fi
       - name: Recover missing clubs for personal FITP players
         run: node scripts/sync-personal-fitp-clubs.mjs
+      - name: Apply user-confirmed personal birth years
+        run: node scripts/sync-confirmed-personal-birth-years.mjs
       - name: Build read-only Europe parity manifests
         run: |
           npm run seed:te-oop

@@ -526,6 +526,10 @@ const displayDate = (value) => {
   const m = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
   return m ? `${m[3]}-${m[2]}-${m[1]}` : String(value || "");
 };
+function personalNationalityHtml(player) {
+ const country=String(player?.nationality||'').trim().toUpperCase();
+ return !country||['IT','ITA','ITALIA','ITALY'].includes(country)?'':nationalityHtml(country);
+}
 function playerBirthLabel(player) {
   const raw = String(player?.birthDate || player?.dateOfBirth || "").slice(
     0,
@@ -2881,7 +2885,7 @@ function renderProfile(id) {
     })
     .join("");
   $("profileContent").innerHTML =
-    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><h2>${esc(p.name)}</h2><p>${esc(p.club || "Tesseramento da completare")}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
+    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><h2>${esc(p.name)}</h2>${personalNationalityHtml(p)}<p>${esc(p.club || "Tesseramento da completare")}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
   loadCurrentPlayerRanking(p);
   $("profileContent")
     .querySelectorAll("[data-open-tournament]")

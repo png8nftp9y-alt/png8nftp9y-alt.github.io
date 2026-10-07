@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import {gunzipSync} from 'node:zlib';
 import crypto from 'node:crypto';
+import {playerSourceMetadata} from '../lib/personal-player-metadata.mjs';
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
 const readGz=async file=>JSON.parse(gunzipSync(await fs.readFile(file)));
 const norm=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
@@ -13,15 +14,15 @@ function add(circuit,officialId,name,observations=1,extra={}){
   const displayName=clean(name),normalizedName=norm(displayName);if(!normalizedName)return;
   const official=clean(officialId),sourceKey=circuit+'|'+(official?'id:'+official:'name:'+normalizedName),old=rows.get(sourceKey);
   const monitored=(official&&(monitoredIds.has(official)||monitoredCards.has(official)))||monitoredNames.has(normalizedName);
-  if(old){old.observations+=Math.max(1,Number(observations)||1);old.monitored=old.monitored||monitored;return}
+  if(old){old.observations+=Math.max(1,Number(observations)||1);old.monitored=old.monitored||monitored;for(const [key,value] of Object.entries(extra))if(value!==''&&value!=null&&(!old[key]||Date.parse(extra.lastObservedAt||'')>=Date.parse(old.lastObservedAt||'')))old[key]=value;return}
   rows.set(sourceKey,{sourceKey,id:'observed_'+hash(sourceKey),circuit,officialId:official,normalizedName,displayName,monitored:Boolean(monitored),observations:Math.max(1,Number(observations)||1),firstObservedAt:extra.firstObservedAt||'',lastObservedAt:extra.lastObservedAt||now,...extra});
 }
 const fitp=await readGz('tmp/observed/fitp_participant_cache.json.gz');
-for(const snapshot of Object.values(fitp.tournaments||{}))for(const p of snapshot.participants||[])add('fitp',p.membershipCard,p.full1||p.full2,1,{ranking:p.ranking||'',lastObservedAt:snapshot.fetchedAt||fitp.generatedAt||now});
+for(const snapshot of Object.values(fitp.tournaments||{}))for(const p of snapshot.participants||[])add('fitp',p.membershipCard,p.full1||p.full2,1,{...playerSourceMetadata(p),ranking:p.ranking||'',lastObservedAt:snapshot.fetchedAt||fitp.generatedAt||now});
 const te=await readGz('tmp/observed/tennis_europe_participant_index.json.gz');
-for(const [name,refs] of Object.entries(te.byName||{})){const first=(refs||[])[0]||{};add('tennis-europe',first.participantId,first.playerName||name,(refs||[]).length,{lastObservedAt:te.generatedAt||now})}
+for(const [name,refs] of Object.entries(te.byName||{})){const first=(refs||[])[0]||{};add('tennis-europe',first.participantId,first.playerName||name,(refs||[]).length,{...playerSourceMetadata(first),lastObservedAt:te.generatedAt||now})}
 const itf=await readGz('tmp/observed/itf_participant_cache.json.gz'),itfSourceSlot=(await fs.readFile('tmp/observed/itf-source-slot.txt','utf8')).trim();
-for(const p of itf.participants||[]){const name=p.name||p.playerName||[p.firstName,p.lastName].filter(Boolean).join(' '),id=p.worldTennisId||p.id||p.playerId||p.worldTennisNumber||'';add('itf',id,name,1,{nationality:p.nationality||p.country||'',lastObservedAt:p.observedAt||itf.generatedAt||now})}
+for(const p of itf.participants||[]){const name=p.name||p.playerName||[p.firstName,p.lastName].filter(Boolean).join(' '),id=p.worldTennisId||p.id||p.playerId||p.worldTennisNumber||'';add('itf',id,name,1,{...playerSourceMetadata(p),lastObservedAt:p.observedAt||itf.generatedAt||now})}
 if(!(itf.participants||[]).length)throw new Error('Selected ITF participant cache is empty');
 const players=[...rows.values()].sort((a,b)=>a.circuit.localeCompare(b.circuit)||a.displayName.localeCompare(b.displayName));
 const counts=Object.fromEntries(['fitp','tennis-europe','itf'].map(c=>[c,players.filter(p=>p.circuit===c).length]));

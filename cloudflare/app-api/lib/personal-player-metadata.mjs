@@ -8,8 +8,29 @@ export function displayPlayerName(value) {
  return name && name===name.toLocaleUpperCase('it-IT')
   ? name.toLocaleLowerCase('it-IT').replace(/(^|[\s'’-])\p{L}/gu,letter=>letter.toLocaleUpperCase('it-IT')) : name;
 }
+export function playerSourceMetadata(source={}) {
+ const result={};
+ const raw=source.raw&&typeof source.raw==='object'?source.raw:{};
+ const date=String(source.birthDate||source.dateOfBirth||raw.BirthDate||raw.DateOfBirth||'').slice(0,10);
+ const parsed=/^\d{4}-\d{2}-\d{2}$/.test(date)?new Date(date+'T00:00:00Z'):null;
+ const validDate=parsed&&Number.isFinite(+parsed)&&parsed.toISOString().slice(0,10)===date;
+ const year=Number(validDate?date.slice(0,4):source.birthYear||raw.BirthYear);
+ if(Number.isInteger(year)&&year>=1900&&year<=new Date().getUTCFullYear()){
+  result.birthYear=year;
+  if(validDate)result.birthDate=date;
+ }
+ const sex=String(source.sex||source.gender||raw.Sex||raw.Gender||'').toUpperCase();
+ if(['M','F'].includes(sex))result.sex=sex;
+ const nationality=source.nationality||source.country;
+ if(typeof nationality==='string'&&nationality.trim())result.nationality=nationality.trim();
+ const club=source.club||raw.tennis_club_name;
+ if(typeof club==='string'&&club.trim())result.club=displayPlayerClub(club);
+ return result;
+}
 export function personalPlayerMetadata(player,observed={}) {
- const result={...player,name:displayPlayerName(player.name),club:displayPlayerClub(player.club||observed.club||'')};
+ const source=playerSourceMetadata(observed),own=playerSourceMetadata(player);
+ const result={...player,...source,...own,name:displayPlayerName(player.name),club:displayPlayerClub(player.club||source.club||'')};
+ if(own.birthYear&&source.birthDate&&!own.birthDate&&own.birthYear!==source.birthYear)delete result.birthDate;
  if(player.membershipCard||player.sourceCircuit==='fitp'){
   const value=observed.ranking||player.ranking||'';
   result.ranking=String(value).replace(/\s+/g,'').replace(/^([1-4])NC$/i,'$1.NC').toUpperCase();

@@ -127,3 +127,15 @@ test('FITP selection carries ranking and old saved selections recover it by exac
   assert.equal(restored[0].ranking,'4.2');assert.equal(db.writes(),before);
  }finally{db.close()}
 });
+
+test('new and existing personal selections carry complete indexed demographics without readback writes',async()=>{
+ const db=database();
+ try{
+  db.execute("INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)",['fitp|id:000123','fitp','000123','TEST PLAYER','Test Player',JSON.stringify({club:'Tennis Club Lecco',ranking:'4.2',birthYear:2010,sex:'F',nationality:'ITA'})]);
+  const result=await addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:000123',name:'Test Player'});
+  assert.equal(result.player.birthYear,2010);assert.equal(result.player.sex,'F');assert.equal(result.player.nationality,'ITA');
+  db.execute("UPDATE user_app_player_additions SET payload=json_remove(payload,'$.birthYear','$.sex','$.nationality')");
+  const before=db.writes(),rows=await personalPlayerAdditions(db.env,user.id);
+  assert.equal(rows[0].birthYear,2010);assert.equal(rows[0].sex,'F');assert.equal(rows[0].nationality,'ITA');assert.equal(db.writes(),before);
+ }finally{db.close()}
+});

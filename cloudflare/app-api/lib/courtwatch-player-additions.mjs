@@ -36,6 +36,7 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
    if(existing.length>1)throw failure('player_identity_ambiguous',409);
    if(existing.length===1)player={...parse(existing[0].payload),id:existing[0].id,userAdded:true,sourceCircuit:row.circuit,sourceKey:row.source_key,sourcePlayerId:row.official_id};
   }
+  player=personalPlayerMetadata(player,payload);
   observedSourceKey=row.source_key;
  }
  player=personalPlayerMetadata(player);
