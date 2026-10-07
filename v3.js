@@ -7,6 +7,7 @@ const V3 = "https://png8nftp9y-alt.github.io/dist/v3/";
 const PRIVATE_API = location.origin + "/app/api";
 const APP_API = PRIVATE_API + "/app-snapshot";
 const LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1";
+const CALENDAR_CACHE = "courtwatch-v3-calendar-v1";
 const UI_STATE_CACHE = "courtwatch-v3-ui-state-v1";
 const DEVICE_ID_CACHE = "courtwatch-device-id-v1";
 const PLAYER_RANKING_CACHE = "courtwatch-player-rankings-v1";
@@ -787,14 +788,16 @@ async function apiProjection() {
 }
 function cachedData() {
   try {
-    const saved = JSON.parse(localStorage.getItem(LAST_GOOD_CACHE) || "null");
-    return saved &&
-      Array.isArray(saved.players) &&
-      Array.isArray(saved.tournaments)
-      ? saved
-      : null;
+    const full = JSON.parse(localStorage.getItem(LAST_GOOD_CACHE) || "null");
+    const calendar = JSON.parse(localStorage.getItem(CALENDAR_CACHE) || "null");
+    const valid = data => data && Array.isArray(data.players) && Array.isArray(data.tournaments);
+    if (valid(calendar) && (!valid(full) || calendar.cachedAt > (full.cachedAt || 0))) return calendar;
+    return valid(full) ? full : valid(calendar) ? calendar : null;
   } catch {
-    return null;
+    try {
+      const calendar = JSON.parse(localStorage.getItem(CALENDAR_CACHE) || "null");
+      return calendar && Array.isArray(calendar.players) && Array.isArray(calendar.tournaments) ? calendar : null;
+    } catch { return null; }
   }
 }
 function restoreCachedProjectionBeforeFirstRender() {
@@ -810,12 +813,42 @@ function restoreCachedProjectionBeforeFirstRender() {
   }
   return true;
 }
+function calendarCacheSnapshot(data, cachedAt) {
+  const current = iso(add(new Date(), -14));
+  return {
+    players: data.players,
+    tournaments: data.tournaments,
+    matches: (data.matches || []).filter(match => String(match.date || "").slice(0, 10) >= current),
+    agenda: data.agenda || [],
+    results: [], opponents: [], tournamentEntries: [],
+    generatedAt: data.generatedAt,
+    personalProjectionComplete: data.personalProjectionComplete,
+    cachedAt,
+  };
+}
 function saveCachedData(data) {
+  const cachedAt = Date.now();
+  const calendar = JSON.stringify(calendarCacheSnapshot(data, cachedAt));
   try {
-    localStorage.setItem(LAST_GOOD_CACHE, JSON.stringify(data));
-  } catch (e) {
-    console.warn("Cache locale Court Watch non disponibile", e);
+    localStorage.setItem(CALENDAR_CACHE, calendar);
+  } catch (error) {
+    // The old full history may occupy the quota needed by the current calendar.
+    try {
+      localStorage.removeItem(LAST_GOOD_CACHE);
+      localStorage.setItem(CALENDAR_CACHE, calendar);
+    } catch (retryError) {
+      console.warn("Cache calendario Court Watch non disponibile", retryError);
+    }
   }
+  try {
+    localStorage.setItem(LAST_GOOD_CACHE, JSON.stringify({...data, cachedAt}));
+  } catch (error) {
+    console.warn("Storico locale non salvato; calendario conservato separatamente", error);
+  }
+}
+function cachedPersonalTournaments(previous, visiblePlayers) {
+  const personalIds = new Set(visiblePlayers.filter(player => player.userAdded).map(player => player.id));
+  return (previous.tournaments || []).filter(tournament => personalIds.has(tournament.playerId));
 }
 function syncLabel(data, fallback = false) {
   const status = $("syncStatus"),
@@ -3870,7 +3903,7 @@ async function load() {
       players: visiblePlayers,
       tournaments: [
         ...((universalProjectionFresh && projection?.tournaments) || docs.tournaments.tournaments),
-        ...(!universalProjectionFresh ? (projection?.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : []),
+        ...(!universalProjectionFresh ? (projection ? (projection.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : cachedPersonalTournaments(previous, visiblePlayers)) : []),
       ].filter((x) => visibleIds.has(x.playerId)),
       matches: matches.filter((x) => visibleIds.has(x.playerId)),
       agenda: mergeAgenda(agenda, matches).filter((x) =>

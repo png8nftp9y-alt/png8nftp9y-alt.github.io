@@ -42,3 +42,51 @@ test('select-deselect calendar chips are alphabetical and keep the chosen IDs',(
  assert.deepEqual(Array.from(state.selected),['p','c']);
  assert.deepEqual(players.map(p=>p.id),['r','p','c','a']);
 });
+
+const cacheSource=source.slice(source.indexOf('function cachedData()'),source.indexOf('function syncLabel('));
+function cacheContext(initial={},quota=Infinity) {
+ const values=new Map(Object.entries(initial));
+ const ctx={LAST_GOOD_CACHE:'full',CALENDAR_CACHE:'calendar',console:{warn(){}},Date,
+ iso:date=>date.toISOString().slice(0,10),add:(date,days)=>new Date(date.getTime()+days*86400000),
+ state:{data:null,selected:new Set()},uiSelectionRestored:false,
+ localStorage:{getItem:key=>values.get(key)||null,removeItem:key=>values.delete(key),
+ setItem(key,value){const total=[...values].filter(([k])=>k!==key).reduce((n,[,v])=>n+v.length,0)+value.length;if(total>quota)throw Error('QuotaExceededError');values.set(key,value);}}};
+ vm.createContext(ctx);vm.runInContext(cacheSource,ctx);return {ctx,values};
+}
+test('large history exceeding storage quota still restores all personal tournaments before first route',()=>{
+ const stale={players:[{id:'base'}],tournaments:[],padding:'x'.repeat(3000)};
+ const {ctx,values}=cacheContext({full:JSON.stringify(stale)},4000);
+ const data={players:[{id:'base'},{id:'new',userAdded:true}],tournaments:[{playerId:'new',name:'Cantù'}],matches:[],opponents:[{raw:'x'.repeat(10000)}],personalProjectionComplete:true};
+ ctx.saveCachedData(data);
+ assert.ok(values.has('calendar'));
+ ctx.restoreCachedProjectionBeforeFirstRender();
+ assert.equal(ctx.state.data.tournaments[0].playerId,'new');
+ assert.ok(ctx.state.selected.has('new'));
+});
+test('new lightweight calendar takes precedence over stale full snapshot',()=>{
+ const {ctx}=cacheContext({full:JSON.stringify({players:[],tournaments:[],cachedAt:1}),calendar:JSON.stringify({players:[{id:'r'}],tournaments:[{playerId:'r'}],cachedAt:2})});
+ assert.equal(ctx.cachedData().tournaments[0].playerId,'r');
+});
+test('corrupt full snapshot does not hide valid calendar cache',()=>{
+ const {ctx}=cacheContext({full:'invalid JSON',calendar:JSON.stringify({players:[{id:'r'}],tournaments:[{playerId:'r'}],cachedAt:2})});
+ assert.equal(ctx.cachedData().players[0].id,'r');
+});
+test('API failure fallback retains personal tournaments and omits removed players',()=>{
+ const {ctx}=cacheContext();
+ const previous={tournaments:[{playerId:'base'},{playerId:'new'},{playerId:'removed'}]};
+ const result=ctx.cachedPersonalTournaments(previous,[{id:'base'},{id:'new',userAdded:true}]);
+ assert.deepEqual(Array.from(result,t=>t.playerId),['new']);
+ assert.ok(source.includes('cachedPersonalTournaments(previous, visiblePlayers)'));
+});
+
+test('actual load with unavailable API keeps cached personal calendar after JSON refresh',async()=>{
+ const {ctx}=cacheContext();
+ Object.assign(ctx,{loadRunning:false,uiSelectionRestored:true,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),saveUiState(){},syncLabel(){},renderIfDataChanged(){},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,
+ apiProjection:async()=>{throw Error('offline')},
+ v3json:async name=>name==='players.json'?{players:[{id:'base'}]}:name==='tournaments.json'?{tournaments:[{playerId:'base',name:'Base'}]}:{}});
+ ctx.state.data={players:[{id:'base'},{id:'new',userAdded:true}],tournaments:[{playerId:'new',name:'Cantù'}],matches:[]};
+ const loader=source.slice(source.indexOf('async function load()'),source.indexOf('document.addEventListener("click", (event) => {',source.indexOf('async function load()')));
+ vm.runInContext(loader,ctx);await ctx.load();
+ assert.deepEqual(Array.from(ctx.state.data.tournaments,t=>t.name),['Base','Cantù']);
+ assert.equal(ctx.cachedData().tournaments.some(t=>t.playerId==='new'),true);
+});
