@@ -147,7 +147,7 @@ let calendarHeightObserver = null,
   activeRouteScrollKey = location.hash || "#home",
   routeScrollMemory = new Map(),
   uiSelectionRestored =
-    Array.isArray(restoredUi.selected) && restoredUi.selected.length > 0,
+    Array.isArray(restoredUi.selected),
   uiScrollRestored = false,
   calendarPlayerHoldTimer = null,
   suppressTournamentOpenUntil = 0,
@@ -797,6 +797,19 @@ function cachedData() {
     return null;
   }
 }
+function restoreCachedProjectionBeforeFirstRender() {
+  const saved = cachedData();
+  if (!saved) return false;
+  state.data = saved;
+  if (!uiSelectionRestored) {
+    saved.players.forEach(player => state.selected.add(player.id));
+    uiSelectionRestored = true;
+  } else {
+    const ids = new Set(saved.players.map(player => player.id));
+    state.selected = new Set([...state.selected].filter(id => ids.has(id)));
+  }
+  return true;
+}
 function saveCachedData(data) {
   try {
     localStorage.setItem(LAST_GOOD_CACHE, JSON.stringify(data));
@@ -1444,7 +1457,9 @@ function applyDemographicSelection() {
   );
 }
 function renderFilters() {
-  const all = state.data.players || [],
+  const all = [...(state.data.players || [])].sort((a, b) =>
+      readablePerson(a.name).localeCompare(readablePerson(b.name), "it", {sensitivity: "base"}),
+    ),
     eligibleIds = new Set(calendarEligiblePlayers().map((player) => player.id));
   $("calendarSex").value = state.sexFilter;
   $("categoryFilterLabel").textContent = state.categoryFilters.size
@@ -1458,7 +1473,7 @@ function renderFilters() {
   $("playerFilters").innerHTML = all
     .map(
       (p) =>
-        `<button class="chip ${state.selected.has(p.id) ? "selected" : eligibleIds.has(p.id) ? "" : "filteredOut"}" data-filter="${esc(p.id)}">${esc(p.name)}</button>`,
+        `<button class="chip ${state.selected.has(p.id) ? "selected" : eligibleIds.has(p.id) ? "" : "filteredOut"}" data-filter="${esc(p.id)}">${esc(readablePerson(p.name))}</button>`,
     )
     .join("");
   $("toggleAll").textContent =
@@ -4194,9 +4209,15 @@ renderProfile = function (id) {
     };
   applyTournamentStatus();
 };
+restoreCachedProjectionBeforeFirstRender();
 wire();
 wireAccount();
 route();
+if (state.data) {
+  renderedDataSignature = renderDataSignature(state.data);
+  syncLabel(state.data, true);
+  restoreUiScroll();
+}
 load();
 loadAccount();
 refreshMatchAnalysisStatus();
