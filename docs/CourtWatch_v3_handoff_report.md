@@ -1811,3 +1811,13 @@ Su richiesta utente, rimosso il pulsante testuale Aggiungi giocatore dalla pagin
 ## ITF 14 installer v3: conservazione UI locale — 2026-10-06
 
 Rimosso il guard completo sul frontend: si modifica esclusivamente il pulsante addPlayerLabel, relativo handler e versione asset, preservando il resto del contenuto locale. + mantenuto. Verificato con differenze locali di HTML/JS e TMPDIR simbolico, 18 test verdi e replay senza ulteriori cambiamenti. Nessun push/deploy anticipato.
+
+## 2026-10-07 — D1 player ownership verification by identity
+
+Reason: the aggregate equality between user links, removals and regenerated app_players rejected durable personal additions (24 active links + 1 removal against 23 generated rows). The generated projection is not the complete personal player list.
+
+Changed verify-d1.mjs to check missing generated-player links, active links that resolve to neither app_players nor the same user's durable additions, and missing active personal-addition links. Removals remain respected. There is no fixed player count or cap; counts are diagnostics only. The policy performs read-only checks and does not rewrite selections, removals or draw documents. Account and analysis checks remain in place.
+
+Validation: five Node tests execute the actual policy SQL against SQLite, covering the failed aggregate with two personal additions, growth to 2,000 players, mismatched IDs despite equal counts, personal removals and missing diagnostics. Added this suite to npm run check. Installer checks syntax, executes the suite and checks scoped Git whitespace; replay is idempotent.
+
+Limitation: live D1 parity and final Worker/API validation require the user to push and a successful Court Watch Cloudflare D1 and app API run. Local verification does not certify deployment.

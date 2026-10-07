@@ -1,3 +1,4 @@
+import {ownershipSelect, ownershipErrors} from './player-ownership-policy.mjs';
 import fs from 'node:fs/promises';import {spawnSync} from 'node:child_process';
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
 const [manifest,oop,candidates,tournaments,schedules,matches,results]=await Promise.all([
@@ -36,6 +37,7 @@ const query=`SELECT
 (SELECT COUNT(*) FROM user_app_players u WHERE user_id='user-federico-181099' AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=u.user_id AND r.courtwatch_id=u.courtwatch_id)) ownerPlayerLinks,
 (SELECT COUNT(*) FROM app_players a WHERE EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id='user-federico-181099' AND r.courtwatch_id=a.id)) ownerRemovedPlayers,
 (SELECT COUNT(*) FROM app_players) appPlayerRows,
+${ownershipSelect},
 (SELECT COUNT(*) FROM user_match_analyses WHERE user_id='user-federico-181099') ownerAnalyses,
 (SELECT COUNT(*) FROM match_analyses) legacyAnalyses`;
 const run=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',query,'--json'],{encoding:'utf8'});if(run.status!==0)throw new Error(run.stderr||run.stdout);
@@ -48,7 +50,7 @@ for(const [key,value] of Object.entries(expected))if(!tennisEuropeOwned.has(key)
 const observed={total:Number(row.observedPlayers),fitp:Number(row.observedFitp),tennisEurope:Number(row.observedTe),itf:Number(row.observedItf)};
 if(observed.total<=Number(manifest.counts.players)||observed.fitp<50000||observed.tennisEurope<5000||observed.itf<5000)errors.push('observed player index incomplete: '+JSON.stringify(observed));
 if(Number(row.ownerUsers)!==1)errors.push('Federico account missing or inactive');
-if(Number(row.ownerPlayerLinks)+Number(row.ownerRemovedPlayers)!==Number(row.appPlayerRows))errors.push(`Federico player ownership incomplete: links=${row.ownerPlayerLinks} removed=${row.ownerRemovedPlayers} app_players=${row.appPlayerRows}`);
+errors.push(...ownershipErrors(row));
 if(Number(row.ownerAnalyses)!==Number(row.legacyAnalyses))errors.push(`Federico analysis migration incomplete: owned=${row.ownerAnalyses} legacy=${row.legacyAnalyses}`);
 if(errors.length)throw new Error('D1 parity failed: '+errors.join('; '));
 // Reserved probe row: every run removes it before and after the CRUD assertions.
