@@ -254,7 +254,10 @@ const readablePerson = (value) => {
       .localeCompare(words.at(-2), undefined, { sensitivity: "base" }) === 0
   )
     words.pop();
-  return words.join(" ");
+  const name = words.join(" ");
+  return name && name === name.toLocaleUpperCase("it-IT")
+    ? name.toLocaleLowerCase("it-IT").replace(/(^|[\s'’-])\p{L}/gu, letter => letter.toLocaleUpperCase("it-IT"))
+    : name;
 };
 const IOC_REGION = {
   AUT: "AT",
@@ -1920,6 +1923,7 @@ function groups(selectedOnly = true) {
   for (const t of state.data.tournaments || []) {
     if ((selectedOnly && !state.selected.has(t.playerId)) || !active(t))
       continue;
+    const entry = {...t, playerName: readablePerson(t.playerName || state.data.players?.find(p => p.id === t.playerId)?.name || "")};
     const key = tournamentKey(t),
       g = map.get(key) || {
         ...t,
@@ -1928,7 +1932,7 @@ function groups(selectedOnly = true) {
         playerIds: [],
         labels: [],
       };
-    if (!g.people.some((p) => p.playerId === t.playerId)) g.people.push(t);
+    if (!g.people.some((p) => p.playerId === t.playerId)) g.people.push(entry);
     if (t.calendarListLabel && !g.labels.includes(t.calendarListLabel))
       g.labels.push(t.calendarListLabel);
     map.set(key, g);
@@ -2151,7 +2155,9 @@ function togglePlayerRemovalMode() {
 }
 
 function renderPlayers() {
-  const ps = state.data.players || [];
+  const ps = [...(state.data.players || [])].sort((a, b) =>
+    readablePerson(a.name).localeCompare(readablePerson(b.name), "it", {sensitivity: "base"}),
+  );
   $("playerTotal").textContent = ps.length;
   $("playersList").innerHTML = ps
     .map((p) => {
@@ -2160,7 +2166,7 @@ function renderPlayers() {
         ).length,
         club = p.club || "Tesseramento da completare",
         card = p.membershipCard ? ` · tessera ${p.membershipCard}` : "";
-      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(p.name)}</strong><small>${esc(club)}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(p.name)}">Rimuovi</button>` : "<i>›</i>"}</div>`;
+      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${esc(club)}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
     .join("");
   document.querySelectorAll("[data-profile]").forEach(

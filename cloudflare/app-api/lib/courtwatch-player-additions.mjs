@@ -1,3 +1,4 @@
+import {personalPlayerMetadata} from './personal-player-metadata.mjs';
 // D1_WRITE_POLICY: incremental
 import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
 
@@ -37,6 +38,7 @@ export async function addCourtWatchPlayer(env,user,body){
   }
   observedSourceKey=row.source_key;
  }
+ player=personalPlayerMetadata(player);
  const [previous,linked,removed]=await Promise.all([
   env.DB.prepare('SELECT courtwatch_id,observed_source_key,payload FROM user_app_player_additions WHERE user_id=? AND observed_source_key=?').bind(user.id,observedSourceKey).first(),
   env.DB.prepare('SELECT courtwatch_id FROM user_app_players WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first(),
@@ -54,6 +56,6 @@ export async function addCourtWatchPlayer(env,user,body){
 }
 
 export async function personalPlayerAdditions(env,userId){
- const rows=(await env.DB.prepare('SELECT a.payload FROM user_app_player_additions a JOIN user_app_players u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id WHERE a.user_id=? AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=a.user_id AND r.courtwatch_id=a.courtwatch_id) ORDER BY a.created_at,a.courtwatch_id').bind(userId).all()).results||[];
- return rows.map(row=>parse(row.payload)).filter(player=>player.id&&player.name);
+ const rows=(await env.DB.prepare('SELECT a.payload,o.payload AS observed_payload FROM user_app_player_additions a JOIN user_app_players u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id LEFT JOIN observed_players o ON o.source_key=a.observed_source_key WHERE a.user_id=? AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=a.user_id AND r.courtwatch_id=a.courtwatch_id) ORDER BY a.created_at,a.courtwatch_id').bind(userId).all()).results||[];
+ return rows.map(row=>personalPlayerMetadata(parse(row.payload),parse(row.observed_payload))).filter(player=>player.id&&player.name);
 }

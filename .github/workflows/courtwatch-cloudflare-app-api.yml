@@ -148,6 +148,8 @@ jobs:
               npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"
             done
           fi
+      - name: Recover missing clubs for personal FITP players
+        run: node scripts/sync-personal-fitp-clubs.mjs
       - name: Build read-only Europe parity manifests
         run: |
           npm run seed:te-oop

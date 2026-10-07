@@ -1827,3 +1827,13 @@ Limitation: live D1 parity and final Worker/API validation require the user to p
 Selecting a result from player search now clears the main search input, hides and removes old suggestions, cancels its debounce timer and invalidates in-flight responses. This applies to both observed players and opponent profiles, including selections from the results page. Returning to the search leaves the input ready for a new query. Player routing and the separate add-player dialog remain unchanged.
 
 Validation: JavaScript syntax and isolated execution of the real selection handler, covering observed and non-observed navigation, empty input, discarded suggestions, cancelled timer and invalidated request sequence. Updated frontend asset version. Deployment requires local push and successful Pages publication.
+
+## 2026-10-07 — Personal player names, ordering, clubs and calendar ownership
+
+Cause: uppercase observed-source names were rendered verbatim and personal players were appended after the generated alphabetical list. Personal opponent-entry projection supplied playerId without playerName. FITP observed index did not retain club metadata.
+
+Changes: readable all-uppercase names, case-insensitive Italian alphabetical player list, exact-ID player-name fallback for calendar entries, and explicit playerName in the personal tournament API projection. Durable personal metadata retains source identity and known clubs. Added a prepared FITP club recovery step in the serialized D1 workflow: only linked, nonremoved personal selections with an exact membership card and missing club are queried via the existing official FITP player sheet endpoint; only an actually returned club is stored. Conditional payload updates prevent overwriting concurrent edits. Up to 100 missing clubs are processed per run; this is batch size, not a cap on observed players. No requests are made for already populated clubs or during page rendering. Failed/empty official responses remain unavailable and are logged for later retry.
+
+Validation: 11 Node tests pass (including actual SQLite personal addition persistence, zero-write replay, remove/re-add, ambiguity, account isolation and protected POST plus names/club source tests). Isolated execution of real frontend handlers verified alphabetical ordering and the Cantù tournament name fallback. Syntax checks pass. Installer is transactional and idempotent and checks scoped whitespace.
+
+Remaining limitation: actual club values for Camilla Frigerio and Paolo Brambilla require successful official source responses during the first deployed workflow run; no club is guessed. Frontend and API deployment are certified only after push and green runs.
