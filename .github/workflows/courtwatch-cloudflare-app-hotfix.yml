@@ -25,14 +25,20 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
         with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: npm install
-      - run: npm run check
+      - run: npm run check && node --test test/app-worker-r2-binding.test.mjs
+      - name: Require archive binding before configuring Worker
+        run: test -n "$R2_BUCKET"
       - run: npm run configure
+      - name: Verify generated archive binding before deploy
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; const c=JSON.parse(fs.readFileSync('wrangler.generated.jsonc','utf8')); if(!c.r2_buckets?.some(b=>b.binding==='ARCHIVE' && b.bucket_name===process.env.R2_BUCKET)) throw Error('Missing ARCHIVE binding; deploy blocked');"
       - name: Deploy Worker only
         run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
       - name: Verify protected app no Worker exception

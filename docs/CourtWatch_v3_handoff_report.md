@@ -1967,3 +1967,13 @@ Validazione locale: npm run check verde con 77 test, 18 invarianti dei costi D1,
 Stato: modifica preparata e verificata localmente; non ancora distribuita. Occorrono push e verde dei workflow API, Pages e acquired-player-search. Non certifica la ricerca dell'intero universo dei tesserati esterno ai dati acquisiti e non garantisce il link a un profilo il cui identificativo manca. La prima indicizzazione D1 è un passaggio distinto dal deploy della UI.
 
 Chiusura evidenza precedente: run https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/37704345737 verde il 2026-10-08 alle 01:52:48 Europe/Rome: 4892/4892 versioni del perimetro congelato verificate D1/R2, 141 versioni esatte ripristinate dall'archivio senza richieste ITF live. Questa evidenza non certifica il catalogo ufficiale oltre quel perimetro.
+
+## 2026-10-08 — Ripristino binding R2 nei deploy hotfix
+
+Causa verificata nei log del run 37708158757, job 113087406936: deploy del 2026-10-08 02:31:25 Europe/Rome con sola binding DB e senza ARCHIVE. La configurazione aggiunge ARCHIVE soltanto se R2_BUCKET è presente, ma il workflow hotfix non passava quella variabile. Il pannello Consumi Cloudflare legge monitoring/cloudflare-usage/current.json tramite ARCHIVE; senza binding non può leggere lo snapshot.
+
+Modifica: passaggio del secret R2_BUCKET esistente al workflow hotfix; preflight che blocca un secret assente; verifica della binding ARCHIVE e del bucket nel file generato prima del deploy. Nessuna modifica a oggetti R2, tabelloni, tabelle D1 o indicizzazione in corso. Il deploy resta nella lane hotfix indipendente dalle scritture D1.
+
+Verifica locale: due test verdi, incluso il vero configure-d1.mjs eseguito con API simulata per verificare che D1 e ARCHIVE compaiano entrambi. YAML valido e diff senza errori di whitespace. Installer con preflight, rollback e staging dei soli due file più questo report.
+
+Stato: correzione pronta, da pushare. Non dichiarato ripristino live; occorre hotfix verde con ARCHIVE presente e pannello admin nuovamente in grado di leggere lo snapshot. Evidenza: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/37708158757/job/113087406936 .
