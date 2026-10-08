@@ -1,0 +1,57 @@
+name: Court Watch acquired player search index
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Court Watch Cloudflare D1 and app API
+      - Court Watch ITF acquired draws D1 sync
+      - Court Watch ITF complete draw archive D1 backfill
+      - Court Watch ITF 10 qualifications and 4 doubles D1 repair
+      - Court Watch ITF repair 141 versions and verify 4892
+    types: [completed]
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-acquired-player-search.yml'
+      - 'cloudflare/app-api/lib/acquired-player-index.mjs'
+      - 'cloudflare/app-api/scripts/sync-acquired-player-search.mjs'
+      - 'cloudflare/app-api/migrations/0028_acquired_player_search.sql'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  index:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      # D1_WRITE_POLICY: incremental
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test incremental source and replay guards
+        working-directory: cloudflare/app-api
+        run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs
+      - name: Configure database and apply additive migrations
+        working-directory: cloudflare/app-api
+        run: |
+          npm install
+          node scripts/configure-d1.mjs
+          npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+      - name: Index only unprocessed complete documents and changed matches
+        working-directory: cloudflare/app-api
+        run: node scripts/sync-acquired-player-search.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: acquired-player-search-sync
+          path: cloudflare/app-api/tmp/acquired-search-sync.json
+          retention-days: 30

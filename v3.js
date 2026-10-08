@@ -2240,13 +2240,17 @@ function renderPlayers() {
     },
   );
 }
-async function searchPlayers(query) {
-  const response = await fetch(
-    `${PRIVATE_API}/player-search?q=${encodeURIComponent(query)}`,
-    privateApiOptions({ cache: "no-store" }),
-  );
-  if (!response.ok) throw Error("player search");
-  return (await response.json()).results || [];
+async function searchPlayerPage(query,cursor='') {
+  const response=await fetch(`${PRIVATE_API}/player-search?q=${encodeURIComponent(query)}${cursor?'&cursor='+encodeURIComponent(cursor):''}`,privateApiOptions({cache:'no-store'}));
+  if(!response.ok)throw Error('player search');return response.json();
+}
+async function searchPlayers(query){return(await searchPlayerPage(query)).results||[]}
+function playerCircuitLinksHtml(profiles=[]) {
+  const labels={'fitp':'FITP','tennis-europe':'Tennis Europe','itf':'ITF'};
+  return profiles.filter(p=>labels[p.circuit]).map(p=>{
+    let valid=false;try{const u=new URL(p.url);valid=u.protocol==='https:'&&!u.username&&!u.password&&(['fitp.it','www.fitp.it','te.tournamentsoftware.com','itftennis.com','www.itftennis.com'].includes(u.hostname))}catch{}
+    return valid?`<a class="playerCircuitBadge ${esc(p.circuit)}" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="Profilo ${esc(labels[p.circuit])}">${esc(labels[p.circuit])}</a>`:`<span class="playerCircuitBadge unavailable ${esc(p.circuit)}" title="Profilo ufficiale non ancora identificato">${esc(labels[p.circuit])}</span>`;
+  }).join('');
 }
 const playerAdditionsInFlight = new Map();
 async function addCourtWatchPlayerFromUi(result, button) {
@@ -2382,26 +2386,17 @@ function bindPlayerSearchResults(root, results, adding = false) {
   });
 }
 async function renderPlayerSearchPage(query) {
-  activeOpponentRouteKey = "";
-  $("removeProfilePlayer").hidden = true;
-  $("profileContent").innerHTML =
-    `<section class="card playerSearchResults"><div class="cardHead"><div><h2>Risultati giocatori</h2><p>Ricerca: ${esc(query)}</p></div></div><div id="playerSearchPageContent"><div class="empty">Ricerca in corso…</div></div></section>`;
-  $("profileView").classList.add("active");
-  const routeHash = location.hash;
-  try {
-    const results = await searchPlayers(query);
-    if (location.hash !== routeHash) return;
-    const body = $("playerSearchPageContent");
-    body.innerHTML = results.length
-      ? results.map((result) => playerSearchResultHtml(result, "playerSearchResult")).join("")
-      : '<div class="empty">Nessun giocatore trovato.</div>';
-    bindPlayerSearchResults(body, results);
-  } catch {
-    if (location.hash === routeHash)
-      $("playerSearchPageContent").innerHTML =
-        '<div class="empty">Ricerca temporaneamente non disponibile.</div>';
+  activeOpponentRouteKey='';$('removeProfilePlayer').hidden=true;
+  $('profileContent').innerHTML=`<section class="card playerSearchResults"><div class="cardHead"><div><h2>Risultati giocatori</h2><p>Ricerca: ${esc(query)}</p></div></div><div id="playerSearchPageContent"></div><button type="button" id="playerSearchMore">Caricamento…</button><p id="playerSearchError" role="status"></p></section>`;
+  $('profileView').classList.add('active');const routeHash=location.hash,results=[];let cursor='',busy=false;
+  async function loadPage(){if(busy||location.hash!==routeHash)return;busy=true;const button=$('playerSearchMore');button.disabled=true;button.textContent='Caricamento…';$('playerSearchError').textContent='';
+    try{const page=await searchPlayerPage(query,cursor);if(location.hash!==routeHash)return;results.push(...(page.results||[]));cursor=page.nextCursor||'';const body=$('playerSearchPageContent');body.innerHTML=results.length?results.map(r=>playerSearchResultHtml(r,'playerSearchResult')).join(''):'<div class="empty">Nessun giocatore trovato.</div>';bindPlayerSearchResults(body,results);button.hidden=!cursor;button.textContent='Mostra altri';}
+    catch{if(location.hash===routeHash){$('playerSearchError').textContent='Ricerca temporaneamente non disponibile. Riprova.';button.textContent='Riprova';}}
+    finally{busy=false;if(location.hash===routeHash)button.disabled=false;}
   }
+  $('playerSearchMore').onclick=loadPage;await loadPage();
 }
+
 function statusEmoji(s) {
   return s === "green" ? "🟢" : s === "red" ? "🔴" : "🟡";
 }
@@ -2638,6 +2633,7 @@ function opponentHistoryMatchSectionsHtml(matches) {
   );
 }
 function renderOpponentHistory(data) {
+  const badges=$("opponentCircuitProfiles");if(badges)badges.innerHTML=playerCircuitLinksHtml(data.circuitProfiles||[]);
   const tournaments = data.tournaments || [],
     body = $("opponentTournamentHistory");
   const profileRanking = $("opponentProfileRanking"),
@@ -2676,7 +2672,7 @@ function renderOpponentHistory(data) {
             const entryLabel = !(tournament.matches || []).length && tournament.entryStatus
               ? `<p class="opponentTournamentEntry">${esc(source === "itf" && tournament.acceptanceCode ? `Iscritto · ${tournament.acceptanceCode}` : "Iscritto")}</p>`
               : "";
-            return `<section class="opponentHistoryTournament"><header class="opponentHistoryTournamentHead"><h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header>${entryLabel}<div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [])}</div></section>`;
+            return `<section class="opponentHistoryTournament"><p class="opponentHistoryKind">${tournament.historyKind === "upcoming" ? "Prossimo torneo programmato" : "Torneo passato"}</p><header class="opponentHistoryTournamentHead"><h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header>${entryLabel}<div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [])}</div></section>`;
           },
         )
         .join("")
@@ -2820,7 +2816,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   follow.title = "Aggiungi giocatore";
   follow.setAttribute("aria-label", "Aggiungi giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Ultimi 5 tornei</h3></div><div id="opponentTournamentHistory"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Aggiungi giocatore</button></p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentCircuitProfiles" class="playerCircuitProfiles"></span><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Tre tornei passati e prossimo programmato</h3></div><div id="opponentTournamentHistory"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Aggiungi giocatore</button></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
   $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", (event) => {
@@ -2899,7 +2895,7 @@ function renderProfile(id) {
     })
     .join("");
   $("profileContent").innerHTML =
-    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><h2>${esc(p.name)}</h2>${personalNationalityHtml(p)}<p>${personalPlayerAffiliationHtml(p)}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
+    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><div class="playerNameWithCircuits"><h2>${esc(p.name)}</h2><span class="playerCircuitProfiles">${playerCircuitLinksHtml(p.circuitProfiles||[])}</span></div>${personalNationalityHtml(p)}<p>${personalPlayerAffiliationHtml(p)}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
   loadCurrentPlayerRanking(p);
   $("profileContent")
     .querySelectorAll("[data-open-tournament]")

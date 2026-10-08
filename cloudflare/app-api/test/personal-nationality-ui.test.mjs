@@ -8,5 +8,5 @@ test('personal header shows only foreign nationality and never adds a sex label'
  vm.runInContext(source.slice(source.indexOf('function foreignPlayerCountry('),source.indexOf('function playerBirthLabel(')),context);
  for(const nationality of ['', 'ITA','IT','Italia','Italy'])assert.equal(context.personalNationalityHtml({nationality}),'');
  assert.equal(context.personalNationalityHtml({nationality:'fra'}),'flag:FRA');
- assert.ok(source.includes('</h2>${personalNationalityHtml(p)}<p>'));
+ assert.ok(source.includes('</span></div>${personalNationalityHtml(p)}<p>'));
 });

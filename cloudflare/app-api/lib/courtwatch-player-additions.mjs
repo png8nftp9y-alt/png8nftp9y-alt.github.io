@@ -15,7 +15,9 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
   if(!row)throw failure('player_not_found',404);
   player={...parse(row.payload),id:row.id,userAdded:true};observedSourceKey='courtwatch|'+row.id;
  }else{
-  let rows=(await env.DB.prepare('SELECT source_key,circuit,official_id,display_name,payload FROM observed_players WHERE source_key=? OR official_id=? LIMIT 20').bind(sourceKey||identity,sourceKey?'':identity).all()).results||[];
+  const sourceTable=(sourceKey||identity).startsWith('acquired|')?'search_acquired_players':'observed_players';
+  let rows=(await env.DB.prepare(`SELECT source_key,circuit,official_id,display_name,payload FROM ${sourceTable} WHERE source_key=? OR official_id=? LIMIT 20`).bind(sourceKey||identity,sourceKey?'':identity).all()).results||[];
+  if(!rows.length&&!sourceKey&&identity){try{rows=(await env.DB.prepare('SELECT source_key,circuit,official_id,display_name,payload FROM search_acquired_players WHERE source_key=? OR official_id=? LIMIT 20').bind(identity,identity).all()).results||[]}catch(error){if(!/no such table/i.test(error.message))throw error}}
   if(!rows.length&&!sourceKey&&name){
    const normalized=name.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,' ').trim(),reverse=normalized.split(' ').reverse().join(' '),variants=[...new Set([normalized.toUpperCase(),reverse.toUpperCase(),normalized.toLowerCase(),reverse.toLowerCase()])];
    rows=(await env.DB.prepare(`SELECT source_key,circuit,official_id,display_name,payload FROM observed_players WHERE normalized_name IN (${variants.map(()=>'?').join(',')}) LIMIT 20`).bind(...variants).all()).results||[];
@@ -24,7 +26,7 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
   if(candidates.length!==1)throw failure(candidates.length?'player_identity_ambiguous':'player_not_found',candidates.length?409:404);
   const row=candidates[0],payload=parse(row.payload),hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(row.source_key));
   const id='cw-'+Array.from(new Uint8Array(hash)).map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,32);
-  player={id,name:row.display_name,circuits:[row.circuit],nationality:payload.nationality||'',club:payload.club||'',sourceCircuit:row.circuit,sourceKey:row.source_key,sourcePlayerId:row.official_id||'',userAdded:true};
+  player={id,name:row.display_name,circuits:[row.circuit],nationality:payload.nationality||'',club:payload.club||'',sourceCircuit:row.circuit,sourceKey:row.source_key,sourcePlayerId:row.official_id||'',userAdded:true,profileUrl:payload.profileUrl||''};
   if(row.circuit==='fitp'){player.membershipCard=row.official_id||'';player.ranking=payload.ranking||'';}
   if(row.circuit==='itf')player.worldTennisId=row.official_id||'';
   if(row.circuit==='tennis-europe')player.profileSync={tennisEurope:{profileId:row.official_id||''}};
@@ -64,5 +66,6 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
 
 export async function personalPlayerAdditions(env,userId){
  const rows=(await env.DB.prepare('SELECT a.payload,o.payload AS observed_payload FROM user_app_player_additions a JOIN user_app_players u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id LEFT JOIN observed_players o ON o.source_key=a.observed_source_key WHERE a.user_id=? AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=a.user_id AND r.courtwatch_id=a.courtwatch_id) ORDER BY a.created_at,a.courtwatch_id').bind(userId).all()).results||[];
- return rows.map(row=>personalPlayerMetadata(parse(row.payload),parse(row.observed_payload))).filter(player=>player.id&&player.name);
+ const acquired=rows.filter(row=>String(parse(row.payload).sourceKey||'').startsWith('acquired|')),metadata=new Map();for(let i=0;i<acquired.length;i+=40){const keys=acquired.slice(i,i+40).map(row=>parse(row.payload).sourceKey);try{for(const row of (await env.DB.prepare(`SELECT source_key,payload FROM search_acquired_players WHERE source_key IN (${keys.map(()=>'?').join(',')})`).bind(...keys).all()).results||[])metadata.set(row.source_key,parse(row.payload))}catch(error){if(!/no such table/i.test(error.message))throw error}}
+ return rows.map(row=>{const p=parse(row.payload);return personalPlayerMetadata(p,metadata.get(p.sourceKey)||parse(row.observed_payload))}).filter(player=>player.id&&player.name);
 }

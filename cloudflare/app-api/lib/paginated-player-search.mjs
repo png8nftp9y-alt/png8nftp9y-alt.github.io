@@ -1,0 +1,14 @@
+import {normalizePlayerName} from './player-circuit-profiles.mjs';
+export const SEARCH_PAGE_SIZE=60;
+function cursor(value){if(!value)return null;try{const row=JSON.parse(decodeURIComponent(escape(atob(value))));if(typeof row.n!=='string'||typeof row.k!=='string'||row.n.length>240||row.k.length>400)throw Error();return row}catch{throw Object.assign(Error('invalid_search_cursor'),{status:400})}}
+const encode=row=>btoa(unescape(encodeURIComponent(JSON.stringify({n:row.normalized_name,k:row.cursor_key}))));
+export async function paginatedPlayerSearch(db,query,userId,after=''){
+ const tokens=normalizePlayerName(query).split(' ').filter(Boolean).slice(0,5);if(!tokens.length)return{results:[],nextCursor:null};
+ const seek=cursor(after),where=tokens.map(()=>'normalized_name LIKE ?').join(' AND ')+(seek?' AND (normalized_name>? OR (normalized_name=? AND cursor_key>?))':''),binds=[...tokens.map(t=>'%'+t+'%'),...(seek?[seek.n,seek.n,seek.k]:[])];
+ const rows=[];
+ for(const [table,prefix]of [['observed_players','o:'],['search_acquired_players','s:']])try{rows.push(...((await db.prepare(`SELECT * FROM (SELECT source_key,circuit,official_id,display_name,normalized_name,payload,'${prefix}'||source_key AS cursor_key FROM ${table}${table==='search_acquired_players'?" a WHERE NOT EXISTS(SELECT 1 FROM observed_players o WHERE o.circuit=a.circuit AND o.official_id<>'' AND o.official_id=a.official_id)":''}) WHERE ${where} ORDER BY normalized_name,cursor_key LIMIT 61`).bind(...binds).all()).results||[]))}catch(e){if(!/no such table/i.test(e.message))throw e}
+ rows.push(...((await db.prepare(`SELECT * FROM (SELECT id AS source_key,'courtwatch' AS circuit,id AS official_id,json_extract(payload,'$.name') AS display_name,UPPER(json_extract(payload,'$.name')) AS normalized_name,payload,'c:'||id AS cursor_key FROM app_players) WHERE ${where} ORDER BY normalized_name,cursor_key LIMIT 61`).bind(...binds).all()).results||[]));
+ rows.sort((a,b)=>a.normalized_name<b.normalized_name?-1:a.normalized_name>b.normalized_name?1:a.cursor_key<b.cursor_key?-1:a.cursor_key>b.cursor_key?1:0);
+ const page=rows.slice(0,SEARCH_PAGE_SIZE),personal=userId?((await db.prepare('SELECT a.courtwatch_id,a.observed_source_key FROM user_app_player_additions a JOIN user_app_players u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id WHERE a.user_id=?').bind(userId).all()).results||[]):[],linked=new Map(personal.map(p=>[p.observed_source_key,p.courtwatch_id]));
+ return{results:page.map(r=>{let p={};try{p=JSON.parse(r.payload||'{}')}catch{}return{courtwatchId:r.circuit==='courtwatch'?r.official_id:linked.get(r.source_key)||'',sourceKey:r.circuit==='courtwatch'?'':r.source_key,identity:r.official_id||r.source_key,name:r.display_name,circuit:r.circuit,nationality:p.nationality||'',club:p.club||'',birthYear:p.birthYear||null,sources:[r.circuit]}}),nextCursor:rows.length>SEARCH_PAGE_SIZE?encode(page.at(-1)):null};
+}
