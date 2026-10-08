@@ -63,8 +63,16 @@ test('cold reload discards a partial old cache and first renders all personal to
 });
 test('calendar order uses canonical player names even when entry names use surname first',()=>{
  const readable=source.slice(source.indexOf('const readablePerson ='),source.indexOf('const IOC_REGION ='));
- const group=source.slice(source.indexOf('function groups('),source.indexOf('function renderCalendar('));
+ const group=source.slice(source.indexOf('function effectiveAcceptanceLabel('),source.indexOf('function renderCalendar('));
  const ctx={state:{data:{players:[{id:'c',name:'Camilla Frigerio'},{id:'p',name:'Paolo Brambilla'},{id:'r',name:'Riccardo Galbiati'}],tournaments:[{playerId:'r',playerName:'GALBIATI RICCARDO',competitionId:'cantu'},{playerId:'p',playerName:'BRAMBILLA PAOLO',competitionId:'cantu'},{playerId:'c',playerName:'FRIGERIO CAMILLA',competitionId:'cantu'}]},selected:new Set(['c','p','r'])},readableText:x=>String(x||''),active:()=>true,tournamentKey:t=>t.competitionId,circuitRank:()=>0};
  vm.createContext(ctx);vm.runInContext(readable+group,ctx);
  assert.deepEqual(Array.from(ctx.groups()[0].players),['Camilla Frigerio','Paolo Brambilla','Riccardo Galbiati']);
+});
+
+test('calendar hides acceptance only for confirmed participant, leaving another player live',()=>{
+ const helper=source.slice(source.indexOf('function effectiveAcceptanceLabel('),source.indexOf('function groups('));
+ const ctx={};vm.createContext(ctx);vm.runInContext(helper,ctx);
+ assert.equal(ctx.effectiveAcceptanceLabel({calendarListLabel:'MD-3',calendarState:'draw_confirmed'}),'');
+ assert.equal(ctx.effectiveAcceptanceLabel({calendarListLabel:'Q-4',entryStatus:'official_draw'}),'');
+ assert.equal(ctx.effectiveAcceptanceLabel({calendarListLabel:'MD-3',drawUrl:'https://example.org/draw'}),'MD-3');
 });

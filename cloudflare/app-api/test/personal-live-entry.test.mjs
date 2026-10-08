@@ -23,5 +23,12 @@ test('withdrawals remain withdrawn and unknown positions are never fabricated as
 test('protected personal snapshot merges current labels and history cannot replace acceptance fields',()=>{
  const source=readFileSync(new URL('../src/index.js',import.meta.url),'utf8');
  assert.ok(source.includes('mergePersonalLiveTournaments(tournaments,entries.map('));
- assert.ok(source.includes('tournamentMap.set(key,{...t,...tournamentMap.get(key)})'));
+ assert.ok(source.includes("tournamentMap.set(key,{...t,...tournamentMap.get(key),calendarState:t.calendarState,entryStatus:t.entryStatus,calendarListLabel:''})"));
+});
+test('certified draw presence survives acceptance refresh, scoped to player circuit and tournament',()=>{
+ const old={playerId:'one',competitionId:'T',circuit:'tennis-europe',calendarState:'draw_confirmed',entryStatus:'official_draw',calendarListLabel:''};
+ const entries=[{competitionId:'T',circuit:'tennis-europe',acceptanceCode:'MD',acceptancePosition:2},{competitionId:'future',circuit:'tennis-europe',acceptanceCode:'Q',acceptancePosition:4},{competitionId:'T',circuit:'itf',acceptanceCode:'A',acceptancePosition:3}];
+ const merged=mergePersonalLiveTournaments([old],entries,'one');assert.equal(merged[0].calendarListLabel,'');assert.equal(merged[0].calendarState,'draw_confirmed');assert.equal(merged[1].calendarListLabel,'Q-4');assert.equal(merged[2].calendarListLabel,'A-3');
+ assert.equal(mergePersonalLiveTournaments([old],[entries[0]],'two')[1].calendarListLabel,'MD-2');
+ assert.equal(personalLiveEntry({...entries[0],drawUrl:'https://example.org/draw'}).calendarListLabel,'MD-2');
 });

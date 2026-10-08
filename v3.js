@@ -1978,12 +1978,15 @@ function tournamentKey(t) {
       .replace(/[^A-Z0-9]+/g, "-");
   return `${identity}|${cityCountry(t.location)}|${circuit(t)}`;
 }
+function effectiveAcceptanceLabel(entry) {
+  return /(?:draw_confirmed|official_draw)/i.test(`${entry?.calendarState || ""} ${entry?.entryStatus || ""}`) ? "" : entry?.calendarListLabel || "";
+}
 function groups(selectedOnly = true) {
   const map = new Map();
   for (const t of state.data.tournaments || []) {
     if ((selectedOnly && !state.selected.has(t.playerId)) || !active(t))
       continue;
-    const entry = {...t, playerName: readablePerson(state.data.players?.find(p => p.id === t.playerId)?.name || t.playerName || "")};
+    const entry = {...t, calendarListLabel: effectiveAcceptanceLabel(t), playerName: readablePerson(state.data.players?.find(p => p.id === t.playerId)?.name || t.playerName || "")};
     const key = tournamentKey(t),
       g = map.get(key) || {
         ...t,
@@ -1993,8 +1996,8 @@ function groups(selectedOnly = true) {
         labels: [],
       };
     if (!g.people.some((p) => p.playerId === t.playerId)) g.people.push(entry);
-    if (t.calendarListLabel && !g.labels.includes(t.calendarListLabel))
-      g.labels.push(t.calendarListLabel);
+    if (entry.calendarListLabel && !g.labels.includes(entry.calendarListLabel))
+      g.labels.push(entry.calendarListLabel);
     map.set(key, g);
   }
   for (const g of map.values()) {
@@ -2887,7 +2890,7 @@ function renderProfile(id) {
         summerCenter = fitpSummerCenterPlace(t),
         place = summerCenter || agendaVenueLocation(t),
         courtConditions = tournamentSurfaceLabel(t);
-      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(displayDate(t.startDate))} – ${esc(displayDate(t.endDate))}${t.calendarListLabel ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(t.calendarListLabel)}` : ""}</p></div><div class="profileTournamentMatches">${
+      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(displayDate(t.startDate))} – ${esc(displayDate(t.endDate))}${effectiveAcceptanceLabel(t) ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(effectiveAcceptanceLabel(t))}` : ""}</p></div><div class="profileTournamentMatches">${
         matches.length
           ? matchHistorySectionsHtml(matches)
           : '<div class="empty">Nessuna partita pubblicata.</div>'
@@ -2895,7 +2898,7 @@ function renderProfile(id) {
     })
     .join("");
   $("profileContent").innerHTML =
-    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><div class="playerNameWithCircuits"><h2>${esc(p.name)}</h2><span class="playerCircuitProfiles">${playerCircuitLinksHtml(p.circuitProfiles||[])}</span></div>${personalNationalityHtml(p)}<p>${personalPlayerAffiliationHtml(p)}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
+    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><div class="playerNameWithCircuits"><h2>${esc(p.name)}</h2><span class="playerCircuitProfiles">${playerCircuitLinksHtml(p.circuitProfiles||[])}</span></div><p>${personalPlayerAffiliationHtml(p)}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
   loadCurrentPlayerRanking(p);
   $("profileContent")
     .querySelectorAll("[data-open-tournament]")

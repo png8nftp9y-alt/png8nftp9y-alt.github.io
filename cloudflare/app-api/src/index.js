@@ -138,7 +138,7 @@ async function protectedApp(request,env,path,url){
       const history=await personalTennisEuropeHistory(env.DB,player);
       const position=players.findIndex(p=>p.id===player.id);if(position>=0)players[position]=personalPlayerMetadata(history.player);
       const tournamentMap=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
-      for(const t of history.tournaments){const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;tournamentMap.set(key,{...t,...tournamentMap.get(key)});}
+      for(const t of history.tournaments){const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;tournamentMap.set(key,{...t,...tournamentMap.get(key),calendarState:t.calendarState,entryStatus:t.entryStatus,calendarListLabel:''});}
       tournaments.splice(0,tournaments.length,...tournamentMap.values());
       const matchMap=new Map(matches.map(m=>[`${m.playerId}|${m.matchId||m.id}`,m]));
       for(const m of history.matches)matchMap.set(`${m.playerId}|${m.matchId||m.id}`,{...matchMap.get(`${m.playerId}|${m.matchId||m.id}`),...m});

@@ -1991,3 +1991,17 @@ Componenti: player-circuit-profiles.mjs e relativi test; trigger hotfix esteso a
 Validazione: sette test del resolver verdi, inclusi circuito dichiarato senza profilo, ID locali, id ITF scambiato per FITP, comparsa futura TE, omonimi, dati discordanti e navigazione dei badge nelle due pagine. npm run check completo verde con 80 test e guard/invarianti D1; YAML valido, report aggiornato e installer con staging selettivo e rollback.
 
 Stato: patch preparata e verificata, non distribuita prima del push e dell'hotfix verde. Il riconoscimento automatico rimane subordinato a evidenze d'identità sufficienti: non certifica la presenza su un circuito esterno non ancora acquisito e non unisce omonimi incerti.
+
+## 2026-10-08 — Acceptance dopo tabellone, ricerca unificata e schede giocatori
+
+Problemi: l'acceptance live poteva sovrascrivere la presenza certificata nel tabellone; lo storico personale Tennis Europe non marcava la conferma. Nazionalità straniera ripetuta, schede/avatar disallineati, colori circuiti scambiati e risultati ricerca separati per circuito.
+
+Correzioni: merge acceptance conserva draw_confirmed/official_draw della stessa combinazione giocatore-circuito-torneo. I tornei dello storico TE con partecipante effettivamente presente in match_participants espongono tale conferma e cancellano la sola etichetta di quel torneo. Il calendario e la pagina giocatore filtrano inoltre etichette obsolete quando lo stato è confermato; un URL tabellone generico non basta. La nazionalità rimane una volta come affiliazione per stranieri. Grid con righe di uguale altezza e avatar fissi in alto; badge FITP blu, Europe arancio, ITF verde; versione asset aggiornata.
+
+Ricerca: aggrega nomi completi normalizzati in ordine normale/inverso su sorgenti acquisite, con un risultato e tutti i circuiti quando la sorgente è univoca per circuito e anno/nazionalità non discordanti. Non accorpa identità multiple dello stesso circuito o metadati discordanti. L'espansione delle varianti usa query esatte a blocchi di 30 e un primo elemento stabile per evitare duplicati tra pagine. Questa aggregazione di presentazione non modifica identità D1 e non rende il solo nome una prova per badge ufficiali. Include la precedente regola circuiti comprovati: circuits[] da solo non basta e un futuro circuito acquisito viene collegato con evidenza sufficiente (nome, anno e nazionalità compatibili, profilo ufficiale univoco). Nessun polling aggiunto.
+
+Componenti: UI v3, helper acceptance/storico personale/ricerca/profili ufficiali e test. Trigger hotfix esteso a lib e test; preservate verifica ARCHIVE/R2 e impostazioni D1. Nessuna scrittura D1, nuovo indice o backfill.
+
+Validazione: npm run check completo verde, 80 test e guard/invarianti D1, inclusi 137 risultati paginati, omonimi, Darko Sartori FITP+Europe su fixture, nome invertito oltre il confine di pagina, acceptance dopo conferma e isolamento giocatore/circuito/torneo. CSS controllato a livello sorgente; rendering browser locale non eseguito perché manca il binario Chromium. Installer con controllo preventivo versioni, rollback esatto, staging selettivo e git diff --check.
+
+Stato: preparato e verificato, non distribuito. Il caso reale D1 Darko/Milana e l'aspetto nel browser restano da confermare dopo push, Worker hotfix e pubblicazione Pages verdi; la fixture non è un audit dei dati privati di produzione.

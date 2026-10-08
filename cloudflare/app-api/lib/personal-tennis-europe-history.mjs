@@ -27,7 +27,7 @@ export async function personalTennisEuropeHistory(db,player){
   if(self.length!==1)throw Error('personal_history_identity_ambiguous');
   const own=self[0],partners=people.filter(p=>p.team_index===own.team_index&&p!==own),opponents=people.filter(p=>p.team_index!==own.team_index);
   const competitionId=raw.competitionId||t.competitionId||source.source_tournament_id||source.tournament_id;
-  const tournament={...t,id:source.tournament_id,competitionId,name:t.name||t.tournamentName||raw.tournamentName||competitionId,circuit:'tennis-europe',playerId:player.id,playerName:player.name,startDate:t.startDate||t.officialStartDate||source.played_date,endDate:t.endDate||source.played_date};
+  const tournament={...t,id:source.tournament_id,competitionId,name:t.name||t.tournamentName||raw.tournamentName||competitionId,circuit:'tennis-europe',playerId:player.id,playerName:player.name,calendarState:'draw_confirmed',entryStatus:'official_draw',calendarListLabel:'',startDate:t.startDate||t.officialStartDate||source.played_date,endDate:t.endDate||source.played_date};
   tournaments.set(source.tournament_id,tournament);
   const event=raw.event||raw.draw||'',double=partners.length>0||/^GD|^BD|DOUBLE/i.test(event);
   const score=own.team_index===1?reverseScore(raw.score||raw.result):String(raw.score||raw.result||'');
