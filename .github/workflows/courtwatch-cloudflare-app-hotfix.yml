@@ -6,6 +6,8 @@ on:
     branches: [main]
     paths:
       - 'cloudflare/app-api/src/index.js'
+      - 'cloudflare/app-api/lib/player-circuit-profiles.mjs'
+      - 'cloudflare/app-api/test/player-circuit-profiles.test.mjs'
       - '.github/workflows/courtwatch-cloudflare-app-hotfix.yml'
 
 permissions:

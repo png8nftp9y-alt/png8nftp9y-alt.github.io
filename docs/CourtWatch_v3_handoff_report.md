@@ -1977,3 +1977,17 @@ Modifica: passaggio del secret R2_BUCKET esistente al workflow hotfix; preflight
 Verifica locale: due test verdi, incluso il vero configure-d1.mjs eseguito con API simulata per verificare che D1 e ARCHIVE compaiano entrambi. YAML valido e diff senza errori di whitespace. Installer con preflight, rollback e staging dei soli due file più questo report.
 
 Stato: correzione pronta, da pushare. Non dichiarato ripristino live; occorre hotfix verde con ARCHIVE presente e pannello admin nuovamente in grado di leggere lo snapshot. Evidenza: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/37708158757/job/113087406936 .
+
+## 2026-10-08 — Etichette circuiti basate su presenza comprovata e adattamento futuro
+
+Richiesta: non mostrare etichette di circuiti nei quali il giocatore non risulta presente; adattare giocatore e avversario quando vengono acquisiti dati di un suo nuovo circuito.
+
+Correzione: circuits[] dichiarato non costituisce più una prova sufficiente per un badge. Il resolver parte da tessera/profilo ufficiale valido, URL personale ufficiale o identità selezionata da una sorgente acquisita tramite sourceKey. Un ID generico ITF non viene interpretato come tessera FITP. ID locali TE/ITF non vengono promossi a profili ufficiali. Il profilo corrente non viene collegato a un diverso ID dello stesso circuito soltanto per somiglianza del nome.
+
+Adattamento futuro: l'API consulta l'indice D1 a ogni snapshot del giocatore e richiesta dello storico avversario. Quando il nuovo profilo di circuito è acquisito e indicizzato, nome compatibile, anno di nascita coincidente, nazionalità non discordante e un singolo link ufficiale identificabile consentono di aggiungere il circuito e il link. Non occorre cambiare manualmente circuits[]. Il solo nome o un profilo ambiguo non autorizzano l'associazione. Un profilo appena creato all'esterno non viene scoperto prima che entri nei dati acquisiti/sincronizzati. Una sessione già aperta mostra i dati al successivo caricamento; nessun polling o refresh periodico aggiunto.
+
+Componenti: player-circuit-profiles.mjs e relativi test; trigger hotfix esteso al resolver e ai test, preservando ARCHIVE/R2. Nessuna modifica a tabelloni, indice o scritture D1.
+
+Validazione: sette test del resolver verdi, inclusi circuito dichiarato senza profilo, ID locali, id ITF scambiato per FITP, comparsa futura TE, omonimi, dati discordanti e navigazione dei badge nelle due pagine. npm run check completo verde con 80 test e guard/invarianti D1; YAML valido, report aggiornato e installer con staging selettivo e rollback.
+
+Stato: patch preparata e verificata, non distribuita prima del push e dell'hotfix verde. Il riconoscimento automatico rimane subordinato a evidenze d'identità sufficienti: non certifica la presenza su un circuito esterno non ancora acquisito e non unisce omonimi incerti.

@@ -17,20 +17,29 @@ export function officialPlayerUrl(circuit,player={}){
  if(c==='itf'){const id=String(player.worldTennisId||player.officialId||''),nation=country(player.nationality||player.country),slug=normalizePlayerName(player.name||player.displayName).toLowerCase().replaceAll(' ','-');if(/^800\d{6}$/.test(id)&&/^[A-Z]{3}$/.test(nation)&&slug)return `https://www.itftennis.com/en/players/${slug}/${id}/${nation.toLowerCase()}/jt/s/overview/`;}
  return '';
 }
+const identityFor=(c,p)=>String(c==='fitp'?p.membershipCard||'':c==='tennis-europe'?p.profileSync?.tennisEurope?.profileId||'':p.worldTennisId||'');
+const officialIdentity=(c,id)=>c==='fitp'?/^\d{6,12}$/.test(id):c==='tennis-europe'?guid.test(id):/^800\d{6}$/.test(id);
 export function circuitProfiles(player,rows=[]){
- const known=new Set((player.circuits||[]).map(profileCircuit).filter(Boolean));if(profileCircuit(player.sourceCircuit))known.add(profileCircuit(player.sourceCircuit));
- if(player.membershipCard)known.add('fitp');if(player.profileSync?.tennisEurope?.profileId)known.add('tennis-europe');if(player.worldTennisId)known.add('itf');
- const result=new Map();for(const c of known){result.set(c,{circuit:c,url:officialPlayerUrl(c,player)})}
+ const source=profileCircuit(player.sourceCircuit||player.circuit),known=new Set(),result=new Map();
+ // A configured circuits array is eligibility, not evidence of a profile or participation.
+ for(const c of ['fitp','tennis-europe','itf']){
+  const own={...player,officialId:source===c?player.officialId||player.sourcePlayerId||'':''},url=officialPlayerUrl(c,own);
+  if(url||officialIdentity(c,identityFor(c,player))||(c===source&&player.sourceKey)){
+   known.add(c);result.set(c,{circuit:c,url});
+  }
+ }
  const grouped=new Map();for(const row of rows){let payload={};try{payload=JSON.parse(row.payload||'{}')}catch{}const c=profileCircuit(row.circuit);if(!c||playerNameKey(row.display_name)!==playerNameKey(player.name))continue;
   const candidate={...payload,name:row.display_name,officialId:row.official_id||payload.officialId||''};
   if(country(player.nationality)&&country(candidate.nationality)&&country(player.nationality)!==country(candidate.nationality))continue;
   if(birth(player)&&birth(candidate)&&birth(player)!==birth(candidate))continue;
+  const expected=identityFor(c,player)||(c===source?String(player.sourcePlayerId||player.officialId||''):'');
+  if(officialIdentity(c,expected)&&officialIdentity(c,candidate.officialId)&&expected!==candidate.officialId)continue;
   const list=grouped.get(c)||[];list.push(candidate);grouped.set(c,list);
  }
  for(const [c,list] of grouped){
   const urls=[...new Set(list.map(p=>officialPlayerUrl(c,p)).filter(Boolean))];
-  // Cross-circuit affiliation requires a declared circuit or matching birth year;
-  // a name alone never silently joins two people.
+  // A new circuit needs a compatible birth year and an unambiguous official profile.
+  // Names, reversed names and static circuit declarations alone cannot join people.
   const safe=known.has(c)||list.some(p=>birth(player)&&birth(p)===birth(player));
   if(safe&&urls.length===1&&!result.get(c)?.url)result.set(c,{circuit:c,url:urls[0]});
  }
