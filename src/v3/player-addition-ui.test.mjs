@@ -76,3 +76,10 @@ test('calendar hides acceptance only for confirmed participant, leaving another 
  assert.equal(ctx.effectiveAcceptanceLabel({calendarListLabel:'Q-4',entryStatus:'official_draw'}),'');
  assert.equal(ctx.effectiveAcceptanceLabel({calendarListLabel:'MD-3',drawUrl:'https://example.org/draw'}),'MD-3');
 });
+
+test('confirmed durable addition remains successful when snapshot refresh fails',async()=>{
+ const player={id:'cw-test',name:'Test Player'},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})});
+ c.context.apiProjection=async()=>{throw Error('snapshot unavailable')};
+ await c.context.addCourtWatchPlayerFromUi({identity:'101',name:'Test Player'},c.button);
+ assert.equal(c.state.data.players[0].id,player.id);assert.equal(c.state.selected.has(player.id),true);assert.equal(c.state.data.personalProjectionComplete,false);assert.deepEqual(c.opened,[player.id]);assert.equal(c.button.disabled,false);
+});
