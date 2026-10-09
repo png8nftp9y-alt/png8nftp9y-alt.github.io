@@ -1,5 +1,5 @@
 const optional=async(db,sql,values=[])=>{try{return(await db.prepare(sql).bind(...values).all()).results||[]}catch(e){if(/no such table/i.test(e.message))return[];throw e}};
-export async function identityMapReady(db){const rows=await optional(db,"SELECT status FROM player_identity_sync WHERE id='current' AND status='ready' AND NOT EXISTS(SELECT 1 FROM player_identity_pending_sources LIMIT 1)");return rows.length===1;}
+export async function identityMapReady(db){const rows=await optional(db,"SELECT status FROM player_identity_sync WHERE id='current' AND status IN ('ready','pending') AND EXISTS(SELECT 1 FROM player_identity_people LIMIT 1)");return rows.length===1;}
 export async function storedIdentity(db,identity){
  if(!identity)return null;
  const rows=await optional(db,'SELECT p.payload FROM player_identity_people p WHERE p.canonical_id IN (SELECT canonical_id FROM player_identity_people WHERE canonical_id=? UNION SELECT canonical_id FROM player_circuit_identities WHERE source_key=? UNION SELECT canonical_id FROM player_identity_aliases WHERE alias_id=?) AND EXISTS(SELECT 1 FROM player_circuit_identities live WHERE live.canonical_id=p.canonical_id) LIMIT 2',[identity,identity,identity]);
