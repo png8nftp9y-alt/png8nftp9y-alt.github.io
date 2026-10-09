@@ -66,7 +66,7 @@ assert.ok(hasSource('data-follow-opponent>Aggiungi giocatore') && hasSource('opp
 assert.ok(hasApiSource('tennis_europe_match_ranking_snapshots WHERE match_id IN') && hasApiSource('snapshotFor(player,row.match_id)'), 'opponent-of-opponent rankings must use frozen match snapshots');
 assert.ok(hasSource('opponentHistoryPersonLink') && hasSource('openCurrentOpponent(') && hasSource('#opponent-profile'), 'every non-CourtWatch participant must support recursive profile navigation');
 assert.ok(hasSource('preloadOpponentHistory(') && hasSource('opponentHistoryRequests = new Map()') && hasSource('pointerenter') && !hasSource('requestIdleCallback'), 'clickable opponent profiles must use targeted prefetch and share in-flight requests without a request storm');
-assert.ok(hasSource('opponentPrefetchActive<6') && hasSource('savedEntries(OPPONENT_HISTORY_CACHE)') && hasSource('queueOpponentPreload('), 'opponent pages must be warmed through a bounded queue and persistent cache');
+assert.ok(hasSource('opponentPrefetchActive<2') && hasSource('savedEntries(OPPONENT_HISTORY_CACHE)') && hasSource('queueOpponentPreload('), 'opponent pages must use at most two intent-triggered background requests and persistent cache');
 const startup = canonical(source.slice(source.lastIndexOf('restoreCachedProjectionBeforeFirstRender();')));
 const startupSteps = ['restoreCachedProjectionBeforeFirstRender();', 'wire();', 'wireAccount();', 'route();', 'load();'].map(step => startup.indexOf(step));
 assert.ok(startupSteps.every((position, index) => position >= 0 && (!index || position > startupSteps[index - 1])), 'startup must restore cache, wire events and route before loading remote data');

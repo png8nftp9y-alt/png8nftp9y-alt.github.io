@@ -2500,7 +2500,7 @@ function bindParticipantNavigation(root) {
   opponentLinks.forEach(
     (element) => {
       const preload = () =>
-        preloadOpponentHistory(
+        queueOpponentPreload(
           element.dataset.opponentName,
           element.dataset.opponentEvent || "",
           element.dataset.openCurrentOpponent || "",
@@ -2508,11 +2508,6 @@ function bindParticipantNavigation(root) {
       element.addEventListener("pointerenter", preload, { once: true });
       element.addEventListener("focus", preload, { once: true });
       element.addEventListener("touchstart", preload, { once: true, passive: true });
-      queueOpponentPreload(
-        element.dataset.opponentName,
-        element.dataset.opponentEvent || "",
-        element.dataset.openCurrentOpponent || "",
-      );
       (element.onclick = (event) => {
         event.stopPropagation();
         openCurrentOpponent(
@@ -2748,7 +2743,7 @@ function preloadOpponentHistory(name, event = "", profileId = "") {
   fetchOpponentHistory(name, event, profileId).catch(() => {});
 }
 function runOpponentPrefetchQueue() {
-  while (opponentPrefetchActive < 6 && opponentPrefetchQueue.length) {
+  while (opponentPrefetchActive < 2 && opponentPrefetchQueue.length) {
     const item = opponentPrefetchQueue.shift(),
       { requestKey } = opponentHistoryKey(item.name, item.event, item.profileId);
     opponentPrefetchQueued.delete(requestKey);
