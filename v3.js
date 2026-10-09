@@ -2269,7 +2269,9 @@ async function addCourtWatchPlayerFromUi(result, button) {
       method:'POST',credentials:'same-origin',cache:'no-store',
       headers:{'Content-Type':'application/json'},body:JSON.stringify(result),
     }));
-    const data = await response.json();
+    if (response.status === 401 || response.status === 403) throw Error('player_access_required');
+    let data;
+    try { data = await response.json(); } catch { throw Error('player_response_invalid'); }
     if (!response.ok || data.added !== true || !data.player?.id || data.playerId !== data.player.id)
       throw Error(data.error || 'player_addition_not_confirmed');
     if (!state.data) throw Error('player_view_unavailable');
@@ -2309,7 +2311,13 @@ async function addCourtWatchPlayerFromUi(result, button) {
           ? 'Scheda FITP temporaneamente non disponibile: riprova per aggiungere il giocatore con il suo circolo.'
         : error.message === 'player_snapshot_not_ready'
           ? 'Iscrizioni non ancora disponibili nella vista: riprova per completare l’apertura del giocatore.'
-        : 'Aggiunta non riuscita. Riprova.';
+        : error.message === 'player_not_found'
+          ? 'Profilo non trovato nella sorgente selezionata. Cerca nuovamente il giocatore.'
+        : error.message === 'player_access_required'
+          ? 'Accesso scaduto o non autorizzato. Accedi nuovamente a Court Watch.'
+        : error.message === 'player_response_invalid'
+          ? 'Il server non ha restituito la conferma di aggiunta. Riprova.'
+        : `Aggiunta non riuscita (${error.message || 'errore di connessione'}). Riprova.`;
       root.append(message);
     }
   } finally {
