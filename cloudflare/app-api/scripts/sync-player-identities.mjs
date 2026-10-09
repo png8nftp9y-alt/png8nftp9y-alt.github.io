@@ -33,7 +33,7 @@ export async function profileRecoveryAudit(query){
  return{byCircuit,unresolved:residual.length,residual};
 }
 
-export async function syncPlayerIdentities(query){
+export async function syncPlayerIdentities(query,{allowBulk=false,maxChanges=5000}={}){
  const pending=[];for(const [table]of sources){let after='';while(true){const batch=await query(`SELECT * FROM player_identity_pending_sources WHERE source_table=${sqlString(table)} AND source_key>${sqlString(after)} ORDER BY source_key LIMIT 1000`);pending.push(...batch);if(batch.length<1000)break;after=batch.at(-1).source_key;}}
  if(!pending.length){const counts=await query('SELECT (SELECT COUNT(*) FROM player_identity_people) AS people,(SELECT COUNT(*) FROM player_circuit_identities) AS links');return{status:'unchanged',writes:0,pending:0,...counts[0]};}
  const full=pending.length>500,rows=[];
@@ -52,17 +52,28 @@ export async function syncPlayerIdentities(query){
  const loaded=new Set(rows.map(r=>r.source_key));
  // Preserve retained acquired evidence, including sources no longer in current indexes.
  for(const r of currentLinks)if(!loaded.has(r.source_key))rows.push({...r,payload:JSON.stringify({birthYear:r.birth_year,nationality:r.nationality,profileUrl:r.profile_url})});
- const plan=buildIdentityMapping(rows,{currentLinks,currentPeople,currentAliases,sourceComplete:true}),statements=identityMappingSql(plan);await write(query,statements);
+ const plan=buildIdentityMapping(rows,{currentLinks,currentPeople,currentAliases,sourceComplete:true}),statements=identityMappingSql(plan);const changedRecords=Object.values(plan.plans).reduce((n,p)=>n+p.inserts.length+p.updates.length,0);if(!allowBulk&&changedRecords>maxChanges)throw Error('identity_bulk_write_blocked:'+changedRecords+'; explicit allow_bulk_identity_writes required');await write(query,statements);
  // Revision predicate retains a source changed while this snapshot was processed.
  const clears=[];for(let i=0;i<pending.length;i+=100)clears.push(`DELETE FROM player_identity_pending_sources WHERE (source_table,source_key,revision) IN (${pending.slice(i,i+100).map(p=>'('+sqlString(p.source_table)+','+sqlString(p.source_key)+','+Number(p.revision)+')').join(',')});`);await write(query,clears);
  const remaining=Number((await query('SELECT COUNT(*) AS total FROM player_identity_pending_sources'))[0].total);
  const status=remaining?'pending':'ready';await query(`INSERT INTO player_identity_sync(id,status) VALUES('current',${sqlString(status)}) ON CONFLICT(id) DO UPDATE SET status=excluded.status WHERE status IS NOT excluded.status;`);
  const audit=(await query(`SELECT (SELECT COUNT(*) FROM player_identity_people p WHERE EXISTS(SELECT 1 FROM player_circuit_identities l WHERE l.canonical_id=p.canonical_id)) AS people,(SELECT COUNT(*) FROM player_circuit_identities) AS links,(SELECT COUNT(*) FROM player_circuit_identities WHERE circuit IN ('fitp','tennis-europe','itf') AND profile_url='') AS sources_without_official_profile,(SELECT COUNT(*) FROM observed_players o WHERE NOT EXISTS(SELECT 1 FROM player_circuit_identities l WHERE l.source_key=o.source_key)) AS missing_observed,(SELECT COUNT(*) FROM search_acquired_players s WHERE NOT EXISTS(SELECT 1 FROM player_circuit_identities l WHERE l.source_key=s.source_key)) AS missing_acquired`))[0];
  if(audit.missing_observed||audit.missing_acquired){await query("UPDATE player_identity_sync SET status='pending' WHERE id='current' AND status<>'pending'");throw Error('identity_mapping_coverage_failed');}
- return{status,writes:statements.length,pending:remaining,...audit};
+ return{status,writes:statements.length,sqlStatements:statements.length,changedRecords,pending:remaining,...audit};
 }
+export function addD1Metrics(target,result){for(const r of result.result||[]){target.rowsWritten+=Number(r.meta?.rows_written||0);target.rowsRead+=Number(r.meta?.rows_read||0);}}
 async function main(){const config=JSON.parse(await fs.readFile('wrangler.generated.jsonc','utf8')),db=config.d1_databases.find(d=>d.binding==='DB').database_id;
- async function query(sql){for(let attempt=0;attempt<3;attempt++)try{const response=await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/d1/database/${db}/query`,{method:'POST',headers:{Authorization:`Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)}),result=await response.json();if(!response.ok||result.success!==true||!result.result?.every(r=>r.success))throw Error('identity_D1_query_failed_HTTP_'+response.status);return result.result[0].results||[]}catch(error){if(attempt===2)throw error}}
- const recovery=await recoverMissingProfiles(query);const audit=await syncPlayerIdentities(query);const profiles=await profileRecoveryAudit(query);audit.profileRecovery={...recovery,unresolved:profiles.unresolved,byCircuit:profiles.byCircuit};await fs.mkdir('tmp',{recursive:true});await fs.writeFile('tmp/player-profile-unresolved.json',JSON.stringify(profiles)+'\n');await fs.mkdir('tmp',{recursive:true});await fs.writeFile('tmp/player-identity-sync.json',JSON.stringify(audit)+'\n');console.log(JSON.stringify(audit));if(audit.status==='pending')throw Error('identity_mapping_pending_sources');
+ const metrics={recovery:{rowsWritten:0,rowsRead:0},mapping:{rowsWritten:0,rowsRead:0},audit:{rowsWritten:0,rowsRead:0}};let phase='mapping';
+ async function query(sql){for(let attempt=0;attempt<3;attempt++)try{const response=await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/d1/database/${db}/query`,{method:'POST',headers:{Authorization:`Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)}),result=await response.json();if(!response.ok||result.success!==true||!result.result?.every(r=>r.success))throw Error('identity_D1_query_failed_HTTP_'+response.status);addD1Metrics(metrics[phase],result);return result.result[0].results||[]}catch(error){if(attempt===2)throw error}}
+ await fs.mkdir('tmp',{recursive:true});
+ try{
+ const repair=process.env.REPAIR_MISSING_PROFILES==='true',allowBulk=process.env.ALLOW_BULK_IDENTITY_WRITES==='true';
+ if(repair&&!allowBulk)throw Error('profile_repair_requires_explicit_bulk_authorization');
+ phase='recovery';const recovery=repair?await recoverMissingProfiles(query):{status:'skipped',examined:0,repaired:0};
+ phase='mapping';const audit=await syncPlayerIdentities(query,{allowBulk});
+ if(repair){phase='audit';const profiles=await profileRecoveryAudit(query);audit.profileRecovery={...recovery,unresolved:profiles.unresolved,byCircuit:profiles.byCircuit};await fs.writeFile('tmp/player-profile-unresolved.json',JSON.stringify(profiles)+'\n');}else audit.profileRecovery=recovery;
+ audit.d1Metrics=metrics;await fs.writeFile('tmp/player-identity-sync.json',JSON.stringify(audit)+'\n');console.log(JSON.stringify(audit));if(audit.status==='pending')throw Error('identity_mapping_pending_sources');
+ }finally{await fs.writeFile('tmp/player-identity-d1-metrics.json',JSON.stringify(metrics)+'\n');console.log('IDENTITY_D1_METRICS='+JSON.stringify(metrics));}
+
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
