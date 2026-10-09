@@ -2226,7 +2226,7 @@ function renderPlayers() {
         ).length,
         club = foreignPlayerCountry(p) || p.club || "Tesseramento da completare",
         card = p.membershipCard ? ` · tessera ${p.membershipCard}` : "";
-      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${foreignPlayerCountry(p) ? nationalityHtml(foreignPlayerCountry(p)) : esc(club)}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
+      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${esc(club)}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
     .join("");
   document.querySelectorAll("[data-profile]").forEach(
@@ -2274,13 +2274,20 @@ async function addCourtWatchPlayerFromUi(result, button) {
     try { data = await response.json(); } catch { throw Error('player_response_invalid'); }
     if (!response.ok || data.added !== true || !data.player?.id || data.playerId !== data.player.id)
       throw Error(data.error || 'player_addition_not_confirmed');
-    if (!state.data) throw Error('player_view_unavailable');
+    if (!state.data) state.data = {players:[],tournaments:[],matches:[]};
     state.playerSelectionEpoch = (state.playerSelectionEpoch || 0) + 1;
-    const projection = await apiProjection();
-    const confirmedPlayer = projection.players.find(p => p.id === data.playerId);
-    if (!confirmedPlayer) throw Error('player_snapshot_not_ready');
-    state.data = {...state.data,players:projection.players,tournaments:projection.tournaments,matches:projection.matches,personalProjectionComplete:true};
-    data.player = confirmedPlayer;
+    let projection, projectionReady = true;
+    try {
+      projection = await apiProjection();
+      const confirmedPlayer = projection.players.find(p => p.id === data.playerId);
+      if (!confirmedPlayer) throw Error('player_snapshot_not_ready');
+      data.player = confirmedPlayer;
+    } catch (error) {
+      // POST already confirmed durable membership; a view refresh cannot undo it.
+      projectionReady = false;
+      projection = {players:[...(state.data.players || []).filter(p => p.id !== data.playerId),data.player],tournaments:state.data.tournaments || [],matches:state.data.matches || []};
+    }
+    state.data = {...state.data,players:projection.players,tournaments:projection.tournaments,matches:projection.matches,personalProjectionComplete:projectionReady};
     removedCourtWatchPlayers.delete(data.playerId);
     confirmedCourtWatchPlayers.set(data.playerId,data.player);
     state.data.players = [...(state.data.players || []).filter(p => p.id !== data.playerId),data.player];
@@ -2296,6 +2303,11 @@ async function addCourtWatchPlayerFromUi(result, button) {
         history.replaceState(history.state,'',target);
         activeRouteScrollKey=target;route();saveUiState();
       } else openProfile(data.playerId);
+    }
+    if (!projectionReady && location.hash === '#player/'+encodeURIComponent(data.playerId)) {
+      const notice = document.createElement('p');notice.setAttribute('role','status');
+      notice.textContent = 'Giocatore aggiunto. Tornei e dati della pagina in aggiornamento.';
+      $('profileContent').append(notice);
     }
     // The same load path preserves personal players and refreshes stored entries.
     load();

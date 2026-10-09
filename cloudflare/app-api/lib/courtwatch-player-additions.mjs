@@ -56,8 +56,7 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
  if(previous&&previous.courtwatch_id!==player.id)throw failure('player_identity_conflict',409);
  if(!player.club&&previous)player.club=personalPlayerMetadata(parse(previous.payload)).club||'';
  if(player.membershipCard&&!player.club){
-  try{player.club=await fetchClub(player.membershipCard)}catch{throw failure('player_club_unavailable',503)}
-  if(!player.club)throw failure('player_club_unavailable',503);
+  try{player.club=await fetchClub(player.membershipCard)||''}catch{player.club=''}
  }
  player=personalPlayerMetadata(player);
  const incoming={courtwatch_id:player.id,observed_source_key:observedSourceKey,payload:JSON.stringify(player)};

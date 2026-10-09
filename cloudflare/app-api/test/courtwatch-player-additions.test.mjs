@@ -107,11 +107,12 @@ test('FITP addition waits for official club before persisting or confirming',asy
   assert.equal(db.writes(),before);
  }finally{db.close()}
 });
-test('unavailable FITP club does not save an incomplete new selection',async()=>{
+test('unavailable FITP club does not block durable addition or fabricate metadata',async()=>{
  const db=database();try{
   db.execute('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',['fitp|id:888','fitp','888','NEW PLAYER','NEW PLAYER','{}']);
-  await assert.rejects(addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:888'},{fetchClub:async()=>''}),/player_club_unavailable/);
-  assert.equal(db.writes(),0);
+  const result=await addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:888'},{fetchClub:async()=>''});
+  assert.equal(result.added,true);assert.equal(result.player.club,'');assert.ok(db.writes()>0);
+  const before=db.writes(),again=await addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:888'},{fetchClub:async()=>{throw Error('unavailable')}});assert.equal(again.added,true);assert.equal(db.writes(),before);
  }finally{db.close()}
 });
 
