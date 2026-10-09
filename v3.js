@@ -11,8 +11,8 @@ const CALENDAR_CACHE = "courtwatch-v3-calendar-v1";
 const UI_STATE_CACHE = "courtwatch-v3-ui-state-v1";
 const DEVICE_ID_CACHE = "courtwatch-device-id-v1";
 const PLAYER_RANKING_CACHE = "courtwatch-player-rankings-v1";
-const OPPONENT_HISTORY_CACHE = "courtwatch-opponent-history-v2";
-const ACTIVE_OPPONENT_CACHE = "courtwatch-active-opponent-v2";
+const OPPONENT_HISTORY_CACHE = "courtwatch-opponent-history-v3";
+const ACTIVE_OPPONENT_CACHE = "courtwatch-active-opponent-v3";
 function courtWatchDeviceId() {
   try {
     let id = localStorage.getItem(DEVICE_ID_CACHE) || "";
@@ -536,7 +536,7 @@ function personalNationalityHtml(player) {
 }
 function personalPlayerAffiliationHtml(player) {
  const country=foreignPlayerCountry(player);
- return country ? esc(country) : esc(player.club || 'Tesseramento da completare');
+ return country ? nationalityHtml(country) : esc(player.club || 'Tesseramento da completare');
 }
 function playerBirthLabel(player) {
   const raw = String(player?.birthDate || player?.dateOfBirth || "").slice(
@@ -2226,7 +2226,7 @@ function renderPlayers() {
         ).length,
         club = foreignPlayerCountry(p) || p.club || "Tesseramento da completare",
         card = p.membershipCard ? ` · tessera ${p.membershipCard}` : "";
-      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${esc(club)}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
+      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${foreignPlayerCountry(p) ? nationalityHtml(foreignPlayerCountry(p)) : esc(club)}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
     .join("");
   document.querySelectorAll("[data-profile]").forEach(
@@ -2362,7 +2362,7 @@ function openPlayerSearchResult(result) {
     (player) => player.id === result.courtwatchId && player.active !== false,
   );
   if (followed) openProfile(result.courtwatchId);
-  else openCurrentOpponent(result.identity || result.courtwatchId, result.name, "");
+  else openCurrentOpponent(result.sourceKey || result.identity || result.courtwatchId, result.name, "");
 }
 function playerSearchResultHtml(result, className) {
   const sourceLabels = (result.sources || [])
