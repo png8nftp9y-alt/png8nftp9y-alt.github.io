@@ -2300,7 +2300,7 @@ async function addCourtWatchPlayerFromUi(result, button) {
     if (location.hash === routeHash) {
       const target='#player/'+encodeURIComponent(data.playerId);
       if (/^#(?:opponent(?:-profile)?|player-search)\//.test(routeHash)) {
-        history.replaceState(history.state,'',target);
+        history.replaceState(history.state,'',(location.href||'').split('#')[0]+target);
         activeRouteScrollKey=target;route();saveUiState();
       } else openProfile(data.playerId);
     }
@@ -2824,7 +2824,7 @@ function renderOpponentFromMatch(identity, matchId, index, role = "opponent") {
 function renderOpponentProfile(identity, name, event = "", initialNationality = "") {
   const monitored = (state.data?.players || []).find(player =>
     [player.id,player.sourceKey,player.sourcePlayerId,player.worldTennisId,player.membershipCard,player.profileSync?.tennisEurope?.profileId].filter(Boolean).map(String).includes(String(identity)));
-  if (monitored) { history.replaceState(history.state,'','#player/'+encodeURIComponent(monitored.id));route();return; }
+  if (monitored) { history.replaceState(history.state,'',(location.href||'').split('#')[0]+'#player/'+encodeURIComponent(monitored.id));route();return; }
   const routeKey = [identity, readablePerson(name), event].join("|");
   if (activeOpponentRouteKey === routeKey && $("profileView").classList.contains("active") && $("opponentTournamentHistory")) return;
   activeOpponentRouteKey = routeKey;
