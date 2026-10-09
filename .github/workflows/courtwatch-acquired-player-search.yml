@@ -1,6 +1,15 @@
 name: Court Watch acquired player search index
 on:
   workflow_dispatch:
+    inputs:
+      repair_missing_profiles:
+        description: 'Run the one-time missing official profile recovery'
+        type: boolean
+        default: false
+      allow_bulk_identity_writes:
+        description: 'Authorize more than 5000 identity record changes in this run'
+        type: boolean
+        default: false
   workflow_run:
     workflows:
       - Court Watch Cloudflare D1 and app API
@@ -10,18 +19,6 @@ on:
       - Court Watch ITF repair 141 versions and verify 4892
     types: [completed]
     branches: [main]
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/courtwatch-acquired-player-search.yml'
-      - 'cloudflare/app-api/lib/acquired-player-index.mjs'
-      - 'cloudflare/app-api/scripts/sync-acquired-player-search.mjs'
-      - 'cloudflare/app-api/migrations/0028_acquired_player_search.sql'
-      - 'cloudflare/app-api/migrations/0029_player_circuit_identities.sql'
-      - 'cloudflare/app-api/migrations/0030_player_profile_recovery.sql'
-      - 'cloudflare/app-api/lib/player-identity-*.mjs'
-      - 'cloudflare/app-api/lib/player-profile-evidence.mjs'
-      - 'cloudflare/app-api/scripts/sync-player-identities.mjs'
 permissions:
   contents: read
 concurrency:
@@ -34,6 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
+      REPAIR_MISSING_PROFILES: ${{ github.event_name == 'workflow_dispatch' && inputs.repair_missing_profiles || false }}
+      ALLOW_BULK_IDENTITY_WRITES: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_bulk_identity_writes || false }}
       # D1_WRITE_POLICY: incremental
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -44,7 +43,7 @@ jobs:
         with: {node-version: '22'}
       - name: Test incremental source and replay guards
         working-directory: cloudflare/app-api
-        run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs test/player-profile-evidence.test.mjs
+        run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs test/player-profile-evidence.test.mjs test/player-identity-write-budget.test.mjs
       - name: Configure database and apply additive migrations
         working-directory: cloudflare/app-api
         run: |
@@ -64,5 +63,6 @@ jobs:
           path: |
             cloudflare/app-api/tmp/acquired-search-sync.json
             cloudflare/app-api/tmp/player-identity-sync.json
+            cloudflare/app-api/tmp/player-identity-d1-metrics.json
             cloudflare/app-api/tmp/player-profile-unresolved.json
           retention-days: 30

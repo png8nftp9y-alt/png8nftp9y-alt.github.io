@@ -42,9 +42,9 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
 export function identityMappingSql(plan){
  const tables={people:['player_identity_people','canonical_id'],links:['player_circuit_identities','source_key'],aliases:['player_identity_aliases','alias_id']},statements=[];
  for(const type of ['people','links','aliases']){
-  const [table,key]=tables[type],delta=[...plan.plans[type].inserts,...plan.plans[type].updates.map(u=>u.after)];if(!delta.length)continue;
-  const fields=Object.keys(delta[0]),updates=fields.filter(f=>f!==key),head=`INSERT INTO ${table}(${fields.join(',')}) VALUES `,tail=` ON CONFLICT(${key}) DO UPDATE SET ${updates.map(f=>f+'=excluded.'+f).join(',')} WHERE ${updates.map(f=>table+'.'+f+' IS NOT excluded.'+f).join(' OR ')};`;
+  const [table,key]=tables[type],groups=new Map();const change=plan.plans[type];for(const r of change.inserts){const fields=Object.keys(r).filter(f=>f!==key);const k=fields.join(',');if(!groups.has(k))groups.set(k,{updates:fields,delta:[]});groups.get(k).delta.push(r);}for(const {before,after} of change.updates){const fields=Object.keys(after).filter(f=>f!==key&&before[f]!==after[f]);if(!fields.length)continue;const k=fields.join(',');if(!groups.has(k))groups.set(k,{updates:fields,delta:[]});groups.get(k).delta.push(after);}for(const {updates,delta} of groups.values()){
+  const fields=Object.keys(delta[0]),head=`INSERT INTO ${table}(${fields.join(',')}) VALUES `,tail=` ON CONFLICT(${key}) DO UPDATE SET ${updates.map(f=>f+'=excluded.'+f).join(',')} WHERE ${updates.map(f=>table+'.'+f+' IS NOT excluded.'+f).join(' OR ')};`;
   let values=[],bytes=Buffer.byteLength(head+tail);for(const r of delta){const value='('+fields.map(f=>r[f]===null?'NULL':typeof r[f]==='number'?r[f]:sqlString(r[f])).join(',')+')',size=Buffer.byteLength(value)+1;if(values.length&&bytes+size>75000){statements.push(head+values.join(',')+tail);values=[];bytes=Buffer.byteLength(head+tail);}if(size>70000)throw Error('identity_source_incomplete');values.push(value);bytes+=size;}if(values.length)statements.push(head+values.join(',')+tail);
- }
+ }}
  return statements;
 }
