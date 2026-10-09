@@ -7,7 +7,7 @@ const country=value=>({ITALY:'ITA',ITALIA:'ITA',IT:'ITA',SWITZERLAND:'SUI',CH:'S
 const birth=p=>Number(p.birthYear||String(p.birthDate||p.dateOfBirth||'').slice(0,4))||null;
 export function officialPlayerUrl(circuit,player={}){
  const c=profileCircuit(circuit),sync=player.profileSync?.[c==='tennis-europe'?'tennisEurope':c]||{};
- const candidates=[sync.url,player.profileUrl,player.playerProfileUrl,player.url,...(player.officialUrls?.[c==='tennis-europe'?'tennisEurope':c]||[])].filter(x=>typeof x==='string');
+ const candidates=[sync.url,player.profileUrl,player.playerProfileUrl,player.profileLink,player.href,player.url,...(player.officialUrls?.[c==='tennis-europe'?'tennisEurope':c]||[])].filter(x=>typeof x==='string');
  for(const value of candidates)try{const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password)continue;
   if(c==='fitp'&&['fitp.it','www.fitp.it'].includes(u.hostname)&&/^\/Pagina-Giocatore\/?$/i.test(u.pathname)&&u.searchParams.get('cardNumber'))return u.href;
   if(c==='tennis-europe'&&u.hostname==='te.tournamentsoftware.com'&&/^\/player-profile\/[a-f0-9-]{36}\/?$/i.test(u.pathname))return u.href;
@@ -15,7 +15,7 @@ export function officialPlayerUrl(circuit,player={}){
  }catch{}
  if(c==='fitp'){const card=String(player.membershipCard||player.officialId||'');if(/^\d{6,12}$/.test(card))return 'https://www.fitp.it/Pagina-Giocatore/?cardNumber='+encodeURIComponent(btoa(card));}
  if(c==='tennis-europe'){const id=String(sync.profileId||player.officialId||'');if(guid.test(id))return 'https://te.tournamentsoftware.com/player-profile/'+id;}
- if(c==='itf'){const id=String(player.worldTennisId||player.officialId||''),nation=country(player.nationality||player.country),slug=normalizePlayerName(player.name||player.displayName).toLowerCase().replaceAll(' ','-');if(/^800\d{6}$/.test(id)&&/^[A-Z]{3}$/.test(nation)&&slug)return `https://www.itftennis.com/en/players/${slug}/${id}/${nation.toLowerCase()}/jt/s/overview/`;}
+ if(c==='itf'){const id=String(player.worldTennisId||player.officialId||''),nation=country(player.nationality||player.nationalityCode||player.countryCode||player.country),slug=normalizePlayerName(player.name||player.displayName).toLowerCase().replaceAll(' ','-');if(/^800\d{6}$/.test(id)&&/^[A-Z]{3}$/.test(nation)&&slug)return `https://www.itftennis.com/en/players/${slug}/${id}/${nation.toLowerCase()}/jt/s/overview/`;}
  return '';
 }
 const identityFor=(c,p)=>String(c==='fitp'?p.membershipCard||'':c==='tennis-europe'?p.profileSync?.tennisEurope?.profileId||'':p.worldTennisId||'');
