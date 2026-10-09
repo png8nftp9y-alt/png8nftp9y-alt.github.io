@@ -1,3 +1,4 @@
+import {mappedPlayerSearch,storedIdentity} from './player-identity-lookup.mjs';
 import {normalizePlayerName,officialPlayerUrl} from './player-circuit-profiles.mjs';
 export const SEARCH_PAGE_SIZE=60;
 function cursor(value){if(!value)return null;try{const row=JSON.parse(decodeURIComponent(escape(atob(value))));if(typeof row.n!=='string'||typeof row.k!=='string'||row.n.length>240||row.k.length>400)throw Error();return row}catch{throw Object.assign(Error('invalid_search_cursor'),{status:400})}}
@@ -31,6 +32,7 @@ function unify(members,linked){
  return [first];
 }
 export async function searchIdentityProfile(db,name,identity){
+ const stored=await storedIdentity(db,identity);if(stored&&nameKey(stored.name)===nameKey(name))return{...stored,sourceCircuit:stored.circuit,sourcePlayerId:stored.sourcePlayerId||''};
  const n=normalizePlayerName(name),names=[...new Set([n,n.toLowerCase(),n.split(' ').reverse().join(' '),n.split(' ').reverse().join(' ').toLowerCase()])];
  const members=await select(db,`normalized_name IN (${names.map(()=>'?').join(',')})`,names);
  const selected=members.find(r=>r.source_key===identity||r.official_id===identity);if(!selected)return null;
@@ -40,6 +42,7 @@ export async function searchIdentityProfile(db,name,identity){
 export async function paginatedPlayerSearch(db,query,userId,after=''){
  const tokens=normalizePlayerName(query).split(' ').filter(Boolean).slice(0,5);if(!tokens.length)return{results:[],nextCursor:null};
  const seek=cursor(after),where=tokens.map(()=>'normalized_name LIKE ?').join(' AND ')+(seek?' AND (normalized_name>? OR (normalized_name=? AND cursor_key>?))':''),binds=[...tokens.map(t=>'%'+t+'%'),...(seek?[seek.n,seek.n,seek.k]:[])];
+ const mapped=await mappedPlayerSearch(db,{tokens,seek,pageSize:SEARCH_PAGE_SIZE,encode,userId});if(mapped)return mapped;
  const rows=await select(db,where,binds,'LIMIT 61'),page=rows.slice(0,SEARCH_PAGE_SIZE);
  // Expand exact normal/reversed names before grouping. Every group has a stable
  // first source-row anchor, so aliases encountered on later pages are not repeated.
@@ -52,3 +55,5 @@ export async function paginatedPlayerSearch(db,query,userId,after=''){
  for(const group of groups.values()){const members=[...group.values()].sort(compare);if(seek&&compare(members[0],{normalized_name:seek.n,cursor_key:seek.k})<=0)continue;results.push(...unify(members,linked));}
  return{results,nextCursor:rows.length>SEARCH_PAGE_SIZE?encode(page.at(-1)):null};
 }
+
+export {unify as mergeSearchIdentities};
