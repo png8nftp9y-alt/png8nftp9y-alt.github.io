@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-09T18:26:56.761Z",
+  "generatedAt": "2026-10-09T18:52:11.001Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,20 +9,20 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 4,
+    "requestedSections": 6,
     "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
     "resolvedSections": 2,
     "missingSections": 4,
-    "newSectionsCached": 0,
+    "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
     "retrySections": 4,
-    "technicalErrorSections": 0,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 4,
+    "notPublishedOrIncompleteSections": 3,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 458,
@@ -64,7 +64,7 @@
       "J-J100-TUR-2026-006",
       "J-J100-USA-2026-002",
       "J-J100-USA-2026-004",
-      "J-J100-CRO-2026-002"
+      "J-J30-FRA-2026-007"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-DOM-2026-001",
@@ -79,13 +79,13 @@
       "J-J100-MEX-2026-001",
       "J-J100-RSA-2026-001",
       "J-J100-SWE-2026-002",
+      "J-J100-CRO-2026-002",
       "J-J100-EGY-2026-004",
       "J-J100-MEX-2026-004",
       "J-J200-BOL-2026-001",
       "J-J200-UZB-2026-001",
       "J-J30-BUL-2026-003",
       "J-J30-CYP-2026-002",
-      "J-J30-FRA-2026-007",
       "J-J30-TUR-2026-009",
       "J-J60-DEN-2026-003",
       "J-J60-DOM-2026-004",
@@ -96,8 +96,8 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-TJK-2026-003",
-      "tournamentName": "J60 Dushanbe",
+      "competitionId": "J-J30-FRA-2026-007",
+      "tournamentName": "J30 Ponts de Ce",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
@@ -170,7 +170,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 20,
+              "players": 26,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -209,7 +209,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 8,
+              "players": 19,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -223,14 +223,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge"
     }
   ]
 }
