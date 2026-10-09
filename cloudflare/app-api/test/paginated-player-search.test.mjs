@@ -13,3 +13,9 @@ test('reversed-name alias across page boundary is emitted only once and keeps bo
  let after='',found=[];do{const p=await paginatedPlayerSearch(d.db,'Test',null,after);found.push(...p.results);after=p.nextCursor}while(after);
  assert.equal(found.length,66);const person=found.filter(r=>r.sources.includes('fitp'));assert.equal(person.length,1);assert.ok(person[0].sources.includes('tennis-europe'));
 }finally{d.close()}});
+test('repeated same-circuit observations collapse and selected source keeps all official profile links',async()=>{const d=database();try{
+ const guid='12345678-1234-1234-1234-123456789abc';
+ for(const [key,circuit,id]of [['f','fitp','123456'],['e','tennis-europe',guid],['retry','tennis-europe','']])d.execute('INSERT INTO search_acquired_players VALUES(?,?,?,?,?,?)',[key,circuit,id,'DARKO SARTORI','Darko Sartori','{"birthYear":2010,"nationality":"ITA"}']);
+ const page=await paginatedPlayerSearch(d.db,'Darko Sartori',null);assert.equal(page.results.length,1);assert.equal(page.results[0].circuitProfiles.length,2);
+ const {searchIdentityProfile}=await import('../lib/paginated-player-search.mjs');const person=await searchIdentityProfile(d.db,'Darko Sartori','retry');assert.equal(person.sourceCircuit,'tennis-europe');assert.equal(person.circuitProfiles.length,2);assert.ok(person.circuitProfiles.some(p=>p.url.endsWith(guid)));
+}finally{d.close()}});
