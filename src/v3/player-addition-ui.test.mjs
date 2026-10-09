@@ -83,3 +83,11 @@ test('confirmed durable addition remains successful when snapshot refresh fails'
  await c.context.addCourtWatchPlayerFromUi({identity:'101',name:'Test Player'},c.button);
  assert.equal(c.state.data.players[0].id,player.id);assert.equal(c.state.selected.has(player.id),true);assert.equal(c.state.data.personalProjectionComplete,false);assert.deepEqual(c.opened,[player.id]);assert.equal(c.button.disabled,false);
 });
+
+test('protected app with external base navigates after addition on its own origin',async()=>{
+ const player={id:'cw-test',name:'Test Player'},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})});
+ c.context.location.href='https://courtwatch-app-api.ckrk9ggvrb.workers.dev/app#opponent-profile/fitp%7Cid%3A5754459584/Test/-';
+ const urls=[];c.context.history.replaceState=(_state,_title,value)=>{const url=new URL(value,'https://png8nftp9y-alt.github.io/');assert.equal(url.origin,'https://courtwatch-app-api.ckrk9ggvrb.workers.dev');urls.push(url.href);c.context.location.hash=url.hash;};
+ await c.context.addCourtWatchPlayerFromUi({identity:'fitp|id:5754459584',name:player.name},c.button);
+ assert.deepEqual(urls,['https://courtwatch-app-api.ckrk9ggvrb.workers.dev/app#player/cw-test']);assert.deepEqual(c.opened,[player.id]);assert.equal(c.state.selected.has(player.id),true);assert.equal(c.root.error,undefined);
+});
