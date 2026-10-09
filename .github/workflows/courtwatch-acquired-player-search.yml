@@ -43,7 +43,7 @@ jobs:
         with: {node-version: '22'}
       - name: Test incremental source and replay guards
         working-directory: cloudflare/app-api
-        run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs test/player-profile-evidence.test.mjs test/player-identity-write-budget.test.mjs
+        run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs test/player-profile-evidence.test.mjs test/player-identity-write-budget.test.mjs test/player-native-profile-recovery.test.mjs
       - name: Configure database and apply additive migrations
         working-directory: cloudflare/app-api
         run: |

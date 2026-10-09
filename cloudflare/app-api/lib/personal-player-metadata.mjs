@@ -21,7 +21,7 @@ export function playerSourceMetadata(source={}) {
  }
  const sex=String(source.sex||source.gender||raw.Sex||raw.Gender||'').toUpperCase();
  if(['M','F'].includes(sex))result.sex=sex;
- const nationality=source.nationality||source.country;
+ const nationality=source.nationality||source.nationalityCode||source.countryCode||source.country||raw.NationalityCode||raw.CountryCode;
  if(typeof nationality==='string'&&nationality.trim())result.nationality=nationality.trim();
  const club=source.club||raw.tennis_club_name;
  if(typeof club==='string'&&club.trim())result.club=displayPlayerClub(club);
