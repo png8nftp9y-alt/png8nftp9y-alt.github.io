@@ -17,6 +17,9 @@ on:
       - 'cloudflare/app-api/lib/acquired-player-index.mjs'
       - 'cloudflare/app-api/scripts/sync-acquired-player-search.mjs'
       - 'cloudflare/app-api/migrations/0028_acquired_player_search.sql'
+      - 'cloudflare/app-api/migrations/0029_player_circuit_identities.sql'
+      - 'cloudflare/app-api/lib/player-identity-*.mjs'
+      - 'cloudflare/app-api/scripts/sync-player-identities.mjs'
 permissions:
   contents: read
 concurrency:
@@ -39,7 +42,7 @@ jobs:
         with: {node-version: '22'}
       - name: Test incremental source and replay guards
         working-directory: cloudflare/app-api
-        run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs
+        run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs
       - name: Configure database and apply additive migrations
         working-directory: cloudflare/app-api
         run: |
@@ -49,9 +52,14 @@ jobs:
       - name: Index only unprocessed complete documents and changed matches
         working-directory: cloudflare/app-api
         run: node scripts/sync-acquired-player-search.mjs
+      - name: Link acquired players to persistent circuit identities
+        working-directory: cloudflare/app-api
+        run: node scripts/sync-player-identities.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: acquired-player-search-sync
-          path: cloudflare/app-api/tmp/acquired-search-sync.json
+          path: |
+            cloudflare/app-api/tmp/acquired-search-sync.json
+            cloudflare/app-api/tmp/player-identity-sync.json
           retention-days: 30

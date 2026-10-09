@@ -1,3 +1,4 @@
+import {mappedProfiles} from './player-identity-lookup.mjs';
 export const normalizePlayerName=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,' ').trim().toUpperCase();
 export const playerNameKey=value=>normalizePlayerName(value).split(' ').sort().join(' ');
 export const profileCircuit=value=>{const s=String(value||'').toLowerCase();return /europe/.test(s)?'tennis-europe':/itf/.test(s)?'itf':/fitp/.test(s)?'fitp':''};
@@ -46,10 +47,10 @@ export function circuitProfiles(player,rows=[]){
  return ['fitp','tennis-europe','itf'].filter(c=>result.has(c)).map(c=>result.get(c));
 }
 export async function resolveCircuitProfiles(db,players){
- const results=new Map();
- for(let offset=0;offset<players.length;offset+=20){const batch=players.slice(offset,offset+20),names=[...new Set(batch.flatMap(p=>{const n=normalizePlayerName(p.name),reverse=n.split(' ').reverse().join(' ');return[n,n.toLowerCase(),reverse,reverse.toLowerCase()]}).filter(Boolean))],rows=[];
+ const stored=await mappedProfiles(db,players),results=new Map(stored),pending=players.filter(p=>!stored.has(p));
+ for(let offset=0;offset<pending.length;offset+=20){const batch=pending.slice(offset,offset+20),names=[...new Set(batch.flatMap(p=>{const n=normalizePlayerName(p.name),reverse=n.split(' ').reverse().join(' ');return[n,n.toLowerCase(),reverse,reverse.toLowerCase()]}).filter(Boolean))],rows=[];
   if(names.length)for(const table of ['observed_players','search_acquired_players'])try{rows.push(...((await db.prepare(`SELECT circuit,official_id,display_name,payload FROM ${table} WHERE normalized_name IN (${names.map(()=>'?').join(',')})`).bind(...names).all()).results||[]))}catch(e){if(!/no such table/i.test(e.message))throw e}
-  for(const p of batch)results.set(p,circuitProfiles(p,rows));
+  for(const p of batch)results.set(p,stored.get(p)||circuitProfiles(p,rows));
  }
  return results;
 }

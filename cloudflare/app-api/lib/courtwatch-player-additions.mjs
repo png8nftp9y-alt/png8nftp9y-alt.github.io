@@ -1,3 +1,4 @@
+import {mappedPlayerId} from './player-identity-lookup.mjs';
 import {personalPlayerMetadata,officialFitpClub} from './personal-player-metadata.mjs';
 // D1_WRITE_POLICY: incremental
 import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
@@ -47,13 +48,14 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
   player=personalPlayerMetadata(player,payload);
   observedSourceKey=row.source_key;
  }
+ const mapped=await mappedPlayerId(env.DB,observedSourceKey,user.id);if(mapped){player.id=mapped.playerId;player.canonicalId=mapped.canonicalId;}
  player=personalPlayerMetadata(player);
- const [previous,linked,removed]=await Promise.all([
+ let [previous,linked,removed]=await Promise.all([
   env.DB.prepare('SELECT courtwatch_id,observed_source_key,payload FROM user_app_player_additions WHERE user_id=? AND observed_source_key=?').bind(user.id,observedSourceKey).first(),
   env.DB.prepare('SELECT courtwatch_id FROM user_app_players WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first(),
   env.DB.prepare('SELECT courtwatch_id FROM user_app_player_removals WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first()
  ]);
- if(previous&&previous.courtwatch_id!==player.id)throw failure('player_identity_conflict',409);
+ if(previous&&previous.courtwatch_id!==player.id){if(mapped){player.id=previous.courtwatch_id;[linked,removed]=await Promise.all([env.DB.prepare('SELECT courtwatch_id FROM user_app_players WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first(),env.DB.prepare('SELECT courtwatch_id FROM user_app_player_removals WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first()]);}else throw failure('player_identity_conflict',409);}
  if(!player.club&&previous)player.club=personalPlayerMetadata(parse(previous.payload)).club||'';
  if(player.membershipCard&&!player.club){
   try{player.club=await fetchClub(player.membershipCard)||''}catch{player.club=''}
