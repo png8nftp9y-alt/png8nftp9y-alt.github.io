@@ -140,3 +140,12 @@ test('new and existing personal selections carry complete indexed demographics w
  }finally{db.close()}
 });
 test('acquired search selection can be promoted from its exact source key or opponent identity',async()=>{const d=database();try{d.execute(readFileSync(new URL('../migrations/0028_acquired_player_search.sql',import.meta.url),'utf8').split(';')[0]);d.execute('INSERT INTO search_acquired_players VALUES(?,?,?,?,?,?)',['acquired|itf|id:800671267','itf','800671267','SEARCH PLAYER','Search Player','{"nationality":"NED","birthYear":2009}']);const r=await addCourtWatchPlayer(d.env,user,{identity:'800671267',name:'Search Player'});assert.equal(r.player.birthYear,2009);assert.equal(r.player.nationality,'NED');assert.equal(r.player.sourceKey,'acquired|itf|id:800671267');assert.equal((await personalPlayerAdditions(d.env,user.id))[0].id,r.playerId)}finally{d.close()}});
+
+test('opponent identity of configured player adds exact app player and replay writes zero',async()=>{
+ const db=database();try{
+  db.execute('INSERT INTO app_players(id,payload,seq) VALUES(?,?,?)',['configured-new',JSON.stringify({id:'configured-new',name:'Configured New',circuits:[],nationality:'SUI'}),1]);
+  const first=await addCourtWatchPlayer(db.env,user,{identity:'configured-new',name:'Configured New'});assert.equal(first.playerId,'configured-new');
+  const before=db.writes(),again=await addCourtWatchPlayer(db.env,user,{identity:'configured-new',name:'Configured New'});assert.equal(again.changed,false);assert.equal(db.writes(),before);
+  await assert.rejects(addCourtWatchPlayer(db.env,user,{identity:'configured-new',name:'Another Person'}),/player_identity_ambiguous/);
+ }finally{db.close()}
+});

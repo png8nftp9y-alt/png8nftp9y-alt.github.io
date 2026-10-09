@@ -7,8 +7,14 @@ const failure=(message,status=400)=>Object.assign(new Error(message),{status});
 const parse=value=>{try{return JSON.parse(value||'{}')}catch{return{}}};
 
 export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpClub}={}){
- const sourceKey=String(body?.sourceKey||'').trim(),courtwatchId=String(body?.courtwatchId||'').trim(),identity=String(body?.identity||'').trim(),name=String(body?.name||'').trim();
+ let sourceKey=String(body?.sourceKey||'').trim(),courtwatchId=String(body?.courtwatchId||'').trim(),identity=String(body?.identity||'').trim(),name=String(body?.name||'').trim();
  if((!sourceKey&&!courtwatchId&&!identity)||sourceKey.length>240||courtwatchId.length>160||identity.length>160||name.length>160)throw failure('invalid_player');
+ // The opponent page submits identity even for a configured app player.
+ // Resolve that exact app identity before looking in circuit source tables.
+ if(!sourceKey&&!courtwatchId&&identity){
+  const configured=await env.DB.prepare('SELECT id,payload FROM app_players WHERE id=?').bind(identity).first();
+  if(configured){if(name&&nameKey(parse(configured.payload).name)!==nameKey(name))throw failure('player_identity_ambiguous',409);courtwatchId=configured.id;}
+ }
  let player,observedSourceKey;
  if(courtwatchId&&!sourceKey){
   const row=await env.DB.prepare('SELECT id,payload FROM app_players WHERE id=?').bind(courtwatchId).first();

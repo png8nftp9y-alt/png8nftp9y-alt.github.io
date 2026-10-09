@@ -2015,3 +2015,11 @@ Aprendo il risultato viene conservato sourceKey. L'API risolve l'identità selez
 Validazione: npm run check completo verde (81 test, guard e invarianti D1); test finali mirati verdi dopo l'ultimo affinamento degli ID. Caso duplicato osservazione Europe con profilo valido più FITP produce un solo risultato e due link ufficiali; omonimi con profili diversi rimangono distinti; paginazione e varianti nome invertito conservate. node --check e git diff --check verdi. Nessuna migrazione, backfill o modifica dei documenti D1.
 
 Limite: Cloudflare Access richiede autenticazione nel browser disponibile, quindi i dati privati reali e la navigazione dei link di Milana/Darko non sono stati verificati in quella sessione. Non dichiarare quei casi certificati soltanto sulla base dei test. Commit e deploy da verificare dopo la pubblicazione; il report registra questa limitazione esplicitamente.
+
+## 2026-10-09 — Aggiunta da identità configurata e causa errore visibile
+
+Segnalazione: “Aggiunta non riuscita” per nuovo giocatore; nome e risposta privata non disponibili, quindi la causa del singolo tentativo non è stata certificata. Riprodotto un difetto reale: la pagina avversario invia identity anche per app_players, ma l'aggiunta cercava tale ID soltanto nelle sorgenti osservate/acquisite. Ora l'ID esatto viene risolto in app_players prima di interrogare le sorgenti; viene controllato anche il nome per evitare di aggiungere un'altra persona. L'aggiunta riusa l'ID configurato e il replay è a zero scritture.
+
+UI distingue profilo non trovato, accesso non autorizzato/scaduto e risposta non JSON; gli altri fallimenti mostrano il codice restituito, invece di nascondere ogni causa con lo stesso testo. Versione asset aggiornata. Non cambia il percorso di scrittura incrementale, l'isolamento account o la certificazione del salvataggio; nessun dato di giocatore inventato.
+
+Validazione: npm run check completo verde (82 test, guard/invarianti D1); test SQLite aggiunta configurata tramite identity, replay zero scritture, rifiuto nome discordante; git diff --check verde. Correzione applicata direttamente su autorizzazione utente. Resta da identificare il giocatore del tentativo reale e verificare la risposta privata; l'accesso Cloudflare disponibile nel browser richiede login.
