@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-10-09T14:56:34.077Z",
+  "generatedAt": "2026-10-09T15:11:44.643Z",
   "today": "2026-10-09",
   "summary": {
-    "appliedAt": "2026-10-09T14:56:34.077Z",
+    "appliedAt": "2026-10-09T15:11:44.643Z",
     "today": "2026-10-09",
     "mode": "live_t_minus_1",
     "auditOnly": false,
     "targetPlayerId": null,
     "rule": "From day -1 through tournament end inspect every official singles qualifying, main-draw and round-robin group phase. A player found in any compiled phase stays permanently without an acceptance label. Absence from qualifying alone never removes the player. Removal requires a compiled final singles phase (main draw or groups), no player occurrence in any compiled phase, and no relevant phase still empty, bye-only, missing or unreadable.",
-    "originalEntries": 115,
-    "entriesFound": 53,
+    "originalEntries": 114,
+    "entriesFound": 52,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 62,
     "inconclusiveKept": 4
@@ -393,16 +393,6 @@
       "code": "Q",
       "event": "BS14",
       "daysFromStart": 146,
-      "decision": "kept_existing_draw_confirmation"
-    },
-    {
-      "playerId": "virginia-cereghini",
-      "playerName": "Virginia Cereghini",
-      "competitionId": "1A40AC5D-E4AF-4588-9C73-DF950E32AE28",
-      "tournamentName": "Torneo U14 - Pescara",
-      "code": "MD",
-      "event": "GS14",
-      "daysFromStart": 139,
       "decision": "kept_existing_draw_confirmation"
     },
     {
@@ -7992,9 +7982,9 @@
       "decision": "kept_draw_unpublished_empty_or_inconclusive",
       "qualifying": {
         "found": false,
-        "reliable": false,
+        "reliable": true,
         "publishedEmpty": false,
-        "populatedDrawInventory": false,
+        "populatedDrawInventory": true,
         "tried": [
           {
             "url": "https://te.tournamentsoftware.com/sport/tournament?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8",
@@ -8023,6 +8013,81 @@
             "kind": "base",
             "found": false,
             "reliableEvidence": false
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=7",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/7",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/7/GetDrawContent?tabindex=1",
+            "label": "GS14 - Girls Singles 14 Qualifying",
+            "score": 18,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": true,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": true,
+              "populated": true,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 23,
+              "countryPlayers": 0,
+              "byes": 5,
+              "doubles": false,
+              "genderMismatch": false,
+              "ageMismatch": false,
+              "qualifying": true
+            }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=8",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/8",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/8/GetDrawContent?tabindex=1",
+            "label": "BS14 - Boys Singles 14 Qualifying",
+            "score": 14,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 65,
+              "countryPlayers": 0,
+              "byes": 13,
+              "doubles": false,
+              "genderMismatch": true,
+              "ageMismatch": false,
+              "qualifying": true
+            }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=3",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/3",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/3/GetDrawContent?tabindex=1",
+            "label": "GS14 - Girls Singles 14 Main Draw",
+            "score": 10,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 1,
+              "countryPlayers": 0,
+              "byes": 32,
+              "doubles": false,
+              "genderMismatch": false,
+              "ageMismatch": false,
+              "qualifying": false
+            }
           },
           {
             "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8",
@@ -8075,9 +8140,34 @@
             }
           },
           {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=1",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/1",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/1/GetDrawContent?tabindex=1",
+            "label": "BS14 - Boys Singles 14 Main Draw",
+            "score": 6,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 1,
+              "countryPlayers": 0,
+              "byes": 32,
+              "doubles": false,
+              "genderMismatch": true,
+              "ageMismatch": false,
+              "qualifying": false
+            }
+          },
+          {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/1",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/1",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/1/GetDrawContent?tabindex=1",
             "label": "direct draw 1",
             "score": 1,
             "status": 200,
@@ -8089,12 +8179,12 @@
               "relevant": false,
               "populated": false,
               "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "heading": "",
+              "profileLinks": 1,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 32,
               "doubles": false,
-              "genderMismatch": false,
+              "genderMismatch": true,
               "ageMismatch": false,
               "qualifying": false
             }
@@ -8127,7 +8217,7 @@
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/3",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/3",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/3/GetDrawContent?tabindex=1",
             "label": "direct draw 3",
             "score": 1,
             "status": 200,
@@ -8139,10 +8229,10 @@
               "relevant": false,
               "populated": false,
               "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "heading": "",
+              "profileLinks": 1,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 32,
               "doubles": false,
               "genderMismatch": false,
               "ageMismatch": false,
@@ -8177,7 +8267,7 @@
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/5",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/5",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/5/GetDrawContent?tabindex=1",
             "label": "direct draw 5",
             "score": 1,
             "status": 200,
@@ -8189,10 +8279,10 @@
               "relevant": false,
               "populated": false,
               "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "heading": "",
+              "profileLinks": 1,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 16,
               "doubles": false,
               "genderMismatch": false,
               "ageMismatch": false,
@@ -8202,7 +8292,7 @@
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/6",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/6",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/6/GetDrawContent?tabindex=1",
             "label": "direct draw 6",
             "score": 1,
             "status": 200,
@@ -8214,10 +8304,10 @@
               "relevant": false,
               "populated": false,
               "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "heading": "",
+              "profileLinks": 1,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 16,
               "doubles": false,
               "genderMismatch": false,
               "ageMismatch": false,
@@ -8227,32 +8317,32 @@
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/7",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/7",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/7/GetDrawContent?tabindex=1",
             "label": "direct draw 7",
             "score": 1,
             "status": 200,
             "kind": "numbered_draw_probe",
             "found": false,
-            "reliableEvidence": false,
+            "reliableEvidence": true,
             "publishedEmpty": false,
             "evidence": {
-              "relevant": false,
-              "populated": false,
+              "relevant": true,
+              "populated": true,
               "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "heading": "",
+              "profileLinks": 23,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 5,
               "doubles": false,
               "genderMismatch": false,
               "ageMismatch": false,
-              "qualifying": false
+              "qualifying": true
             }
           },
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/8",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/8",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/8/GetDrawContent?tabindex=1",
             "label": "direct draw 8",
             "score": 1,
             "status": 200,
@@ -8264,14 +8354,14 @@
               "relevant": false,
               "populated": false,
               "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "heading": "",
+              "profileLinks": 65,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 13,
               "doubles": false,
-              "genderMismatch": false,
+              "genderMismatch": true,
               "ageMismatch": false,
-              "qualifying": false
+              "qualifying": true
             }
           },
           {
@@ -8673,9 +8763,124 @@
               "ageMismatch": false,
               "qualifying": false
             }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/3",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/3",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/3/GetDrawContent?tabindex=1",
+            "label": "Girls Singles 14 Main Draw",
+            "score": 2,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 1,
+              "countryPlayers": 0,
+              "byes": 32,
+              "doubles": false,
+              "genderMismatch": false,
+              "ageMismatch": false,
+              "qualifying": false
+            }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/1",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/1",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/1/GetDrawContent?tabindex=1",
+            "label": "Boys Singles 14 Main Draw",
+            "score": 2,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 1,
+              "countryPlayers": 0,
+              "byes": 32,
+              "doubles": false,
+              "genderMismatch": true,
+              "ageMismatch": false,
+              "qualifying": false
+            }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/7",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/7",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/7/GetDrawContent?tabindex=1",
+            "label": "Girls Singles 14 Qualifying",
+            "score": 10,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": true,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": true,
+              "populated": true,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 23,
+              "countryPlayers": 0,
+              "byes": 5,
+              "doubles": false,
+              "genderMismatch": false,
+              "ageMismatch": false,
+              "qualifying": true
+            }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/8",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/8",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/8/GetDrawContent?tabindex=1",
+            "label": "Boys Singles 14 Qualifying",
+            "score": 10,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 65,
+              "countryPlayers": 0,
+              "byes": 13,
+              "doubles": false,
+              "genderMismatch": true,
+              "ageMismatch": false,
+              "qualifying": true
+            }
           }
         ],
         "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=7",
+            "text": "GS14 - Girls Singles 14 Qualifying",
+            "score": 18
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=8",
+            "text": "BS14 - Boys Singles 14 Qualifying",
+            "score": 14
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=3",
+            "text": "GS14 - Girls Singles 14 Main Draw",
+            "score": 10
+          },
           {
             "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8",
             "text": "Tennis Europe - TE U14 Herodotou Tennis Academy G2 - Draws",
@@ -8684,6 +8889,11 @@
           {
             "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=f7c54c7a-7a28-4f86-81bc-ef255ba407f8",
             "text": "Draws",
+            "score": 6
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=1",
+            "text": "BS14 - Boys Singles 14 Main Draw",
             "score": 6
           },
           {
@@ -8829,14 +9039,34 @@
             "text": "direct draw 24",
             "score": 1,
             "directProbe": true
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/3",
+            "text": "Girls Singles 14 Main Draw",
+            "score": 2
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/1",
+            "text": "Boys Singles 14 Main Draw",
+            "score": 2
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/7",
+            "text": "Girls Singles 14 Qualifying",
+            "score": 10
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/8",
+            "text": "Boys Singles 14 Qualifying",
+            "score": 10
           }
         ]
       },
       "main": {
         "found": false,
         "reliable": false,
-        "publishedEmpty": false,
-        "populatedDrawInventory": false,
+        "publishedEmpty": true,
+        "populatedDrawInventory": true,
         "tried": [
           {
             "url": "https://te.tournamentsoftware.com/sport/tournament?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8",
@@ -8867,6 +9097,56 @@
             "reliableEvidence": false
           },
           {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=3",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/3",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/3/GetDrawContent?tabindex=1",
+            "label": "GS14 - Girls Singles 14 Main Draw",
+            "score": 17,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": true,
+            "evidence": {
+              "relevant": true,
+              "populated": false,
+              "publishedEmpty": true,
+              "heading": "",
+              "profileLinks": 1,
+              "countryPlayers": 0,
+              "byes": 32,
+              "doubles": false,
+              "genderMismatch": false,
+              "ageMismatch": false,
+              "qualifying": false
+            }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=1",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/1",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/1/GetDrawContent?tabindex=1",
+            "label": "BS14 - Boys Singles 14 Main Draw",
+            "score": 13,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 1,
+              "countryPlayers": 0,
+              "byes": 32,
+              "doubles": false,
+              "genderMismatch": true,
+              "ageMismatch": false,
+              "qualifying": false
+            }
+          },
+          {
             "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8",
             "finalUrl": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8",
             "drawContentUrl": "",
@@ -8889,6 +9169,31 @@
               "genderMismatch": false,
               "ageMismatch": false,
               "qualifying": false
+            }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=7",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/7",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/7/GetDrawContent?tabindex=1",
+            "label": "GS14 - Girls Singles 14 Qualifying",
+            "score": 9,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 23,
+              "countryPlayers": 0,
+              "byes": 5,
+              "doubles": false,
+              "genderMismatch": false,
+              "ageMismatch": false,
+              "qualifying": true
             }
           },
           {
@@ -8917,9 +9222,34 @@
             }
           },
           {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=8",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/8",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/8/GetDrawContent?tabindex=1",
+            "label": "BS14 - Boys Singles 14 Qualifying",
+            "score": 5,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 65,
+              "countryPlayers": 0,
+              "byes": 13,
+              "doubles": false,
+              "genderMismatch": true,
+              "ageMismatch": false,
+              "qualifying": true
+            }
+          },
+          {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/1",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/1",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/1/GetDrawContent?tabindex=1",
             "label": "direct draw 1",
             "score": 1,
             "status": 200,
@@ -8931,12 +9261,12 @@
               "relevant": false,
               "populated": false,
               "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "heading": "",
+              "profileLinks": 1,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 32,
               "doubles": false,
-              "genderMismatch": false,
+              "genderMismatch": true,
               "ageMismatch": false,
               "qualifying": false
             }
@@ -8969,22 +9299,22 @@
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/3",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/3",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/3/GetDrawContent?tabindex=1",
             "label": "direct draw 3",
             "score": 1,
             "status": 200,
             "kind": "numbered_draw_probe",
             "found": false,
             "reliableEvidence": false,
-            "publishedEmpty": false,
+            "publishedEmpty": true,
             "evidence": {
-              "relevant": false,
+              "relevant": true,
               "populated": false,
-              "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "publishedEmpty": true,
+              "heading": "",
+              "profileLinks": 1,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 32,
               "doubles": false,
               "genderMismatch": false,
               "ageMismatch": false,
@@ -9019,22 +9349,22 @@
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/5",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/5",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/5/GetDrawContent?tabindex=1",
             "label": "direct draw 5",
             "score": 1,
             "status": 200,
             "kind": "numbered_draw_probe",
             "found": false,
             "reliableEvidence": false,
-            "publishedEmpty": false,
+            "publishedEmpty": true,
             "evidence": {
-              "relevant": false,
+              "relevant": true,
               "populated": false,
-              "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "publishedEmpty": true,
+              "heading": "",
+              "profileLinks": 1,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 16,
               "doubles": false,
               "genderMismatch": false,
               "ageMismatch": false,
@@ -9044,22 +9374,22 @@
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/6",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/6",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/6/GetDrawContent?tabindex=1",
             "label": "direct draw 6",
             "score": 1,
             "status": 200,
             "kind": "numbered_draw_probe",
             "found": false,
             "reliableEvidence": false,
-            "publishedEmpty": false,
+            "publishedEmpty": true,
             "evidence": {
-              "relevant": false,
+              "relevant": true,
               "populated": false,
-              "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "publishedEmpty": true,
+              "heading": "",
+              "profileLinks": 1,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 16,
               "doubles": false,
               "genderMismatch": false,
               "ageMismatch": false,
@@ -9069,7 +9399,7 @@
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/7",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/7",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/7/GetDrawContent?tabindex=1",
             "label": "direct draw 7",
             "score": 1,
             "status": 200,
@@ -9081,20 +9411,20 @@
               "relevant": false,
               "populated": false,
               "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "heading": "",
+              "profileLinks": 23,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 5,
               "doubles": false,
               "genderMismatch": false,
               "ageMismatch": false,
-              "qualifying": false
+              "qualifying": true
             }
           },
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/8",
             "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/8",
-            "drawContentUrl": "",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/8/GetDrawContent?tabindex=1",
             "label": "direct draw 8",
             "score": 1,
             "status": 200,
@@ -9106,14 +9436,14 @@
               "relevant": false,
               "populated": false,
               "publishedEmpty": false,
-              "heading": "Tennis Europe Tennis Europe 404 - Page not found Partners",
-              "profileLinks": 0,
+              "heading": "",
+              "profileLinks": 65,
               "countryPlayers": 0,
-              "byes": 0,
+              "byes": 13,
               "doubles": false,
-              "genderMismatch": false,
+              "genderMismatch": true,
               "ageMismatch": false,
-              "qualifying": false
+              "qualifying": true
             }
           },
           {
@@ -9515,18 +9845,138 @@
               "ageMismatch": false,
               "qualifying": false
             }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/7",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/7",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/7/GetDrawContent?tabindex=1",
+            "label": "Girls Singles 14 Qualifying",
+            "score": 1,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 23,
+              "countryPlayers": 0,
+              "byes": 5,
+              "doubles": false,
+              "genderMismatch": false,
+              "ageMismatch": false,
+              "qualifying": true
+            }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/8",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/8",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/8/GetDrawContent?tabindex=1",
+            "label": "Boys Singles 14 Qualifying",
+            "score": 1,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 65,
+              "countryPlayers": 0,
+              "byes": 13,
+              "doubles": false,
+              "genderMismatch": true,
+              "ageMismatch": false,
+              "qualifying": true
+            }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/3",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/3",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/3/GetDrawContent?tabindex=1",
+            "label": "Girls Singles 14 Main Draw",
+            "score": 9,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": true,
+            "evidence": {
+              "relevant": true,
+              "populated": false,
+              "publishedEmpty": true,
+              "heading": "",
+              "profileLinks": 1,
+              "countryPlayers": 0,
+              "byes": 32,
+              "doubles": false,
+              "genderMismatch": false,
+              "ageMismatch": false,
+              "qualifying": false
+            }
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/1",
+            "finalUrl": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/1",
+            "drawContentUrl": "https://te.tournamentsoftware.com/tournament/f7c54c7a-7a28-4f86-81bc-ef255ba407f8/Draw/1/GetDrawContent?tabindex=1",
+            "label": "Boys Singles 14 Main Draw",
+            "score": 9,
+            "status": 200,
+            "kind": "draw_link",
+            "found": false,
+            "reliableEvidence": false,
+            "publishedEmpty": false,
+            "evidence": {
+              "relevant": false,
+              "populated": false,
+              "publishedEmpty": false,
+              "heading": "",
+              "profileLinks": 1,
+              "countryPlayers": 0,
+              "byes": 32,
+              "doubles": false,
+              "genderMismatch": true,
+              "ageMismatch": false,
+              "qualifying": false
+            }
           }
         ],
         "drawLinks": [
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=3",
+            "text": "GS14 - Girls Singles 14 Main Draw",
+            "score": 17
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=1",
+            "text": "BS14 - Boys Singles 14 Main Draw",
+            "score": 13
+          },
           {
             "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8",
             "text": "Tennis Europe - TE U14 Herodotou Tennis Academy G2 - Draws",
             "score": 9
           },
           {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=7",
+            "text": "GS14 - Girls Singles 14 Qualifying",
+            "score": 9
+          },
+          {
             "url": "https://te.tournamentsoftware.com/sport/draws.aspx?id=f7c54c7a-7a28-4f86-81bc-ef255ba407f8",
             "text": "Draws",
             "score": 6
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/sport/draw.aspx?id=F7C54C7A-7A28-4F86-81BC-EF255BA407F8&draw=8",
+            "text": "BS14 - Boys Singles 14 Qualifying",
+            "score": 5
           },
           {
             "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/draw/1",
@@ -9671,6 +10121,26 @@
             "text": "direct draw 24",
             "score": 1,
             "directProbe": true
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/7",
+            "text": "Girls Singles 14 Qualifying",
+            "score": 1
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/8",
+            "text": "Boys Singles 14 Qualifying",
+            "score": 1
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/3",
+            "text": "Girls Singles 14 Main Draw",
+            "score": 9
+          },
+          {
+            "url": "https://te.tournamentsoftware.com/tournament/F7C54C7A-7A28-4F86-81BC-EF255BA407F8/Draw/1",
+            "text": "Boys Singles 14 Main Draw",
+            "score": 9
           }
         ]
       }
