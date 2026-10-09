@@ -1,15 +1,16 @@
 // D1_WRITE_POLICY: incremental
 import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
 import crypto from 'node:crypto';
+import {profileEvidence} from './player-profile-evidence.mjs';
 import {normalizePlayerName,playerNameKey,officialPlayerUrl} from './player-circuit-profiles.mjs';
 import {playerSourceMetadata} from './personal-player-metadata.mjs';
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex').slice(0,24);
 export function acquiredPlayer(circuit,source={}){
  const name=String(source.name||source.display_name||source.playerName||[source.firstName,source.lastName].filter(Boolean).join(' ')).trim();if(!normalizePlayerName(name))return null;
- const metadata=playerSourceMetadata(source),rawId=String(source.worldTennisId||source.membershipCard||source.profileId||source.source_player_id||source.id||''),officialId=circuit==='tennis-europe'&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(rawId)?rawId:circuit==='itf'&&/^800\d{6}$/.test(rawId)?rawId:circuit==='fitp'&&source.membershipCard?String(source.membershipCard):'';
+ const metadata=playerSourceMetadata(source),evidence=profileEvidence(circuit,{...source,...metadata,name}),officialId=evidence?.officialId||'';
  const identity=officialId?'id:'+officialId:'name:'+hash(playerNameKey(name)+'|'+String(metadata.nationality||'').toUpperCase()+'|'+(metadata.birthYear||''));
  const sourceKey='acquired|'+circuit+'|'+identity;
- const payload={...metadata,displayName:name,officialId,circuit,profileUrl:officialPlayerUrl(circuit,{...source,...metadata,name,officialId})};
+ const payload={...metadata,displayName:name,officialId,circuit,profileUrl:evidence?.profileUrl||''};
  return{sourceKey,circuit,officialId,normalizedName:normalizePlayerName(name),displayName:name,payload};
 }
 export function documentPlayers(doc){return[...(doc.players||[]),...(doc.matches||[]).flatMap(m=>(m.teams||[]).flatMap(t=>t.players||[]))]}
