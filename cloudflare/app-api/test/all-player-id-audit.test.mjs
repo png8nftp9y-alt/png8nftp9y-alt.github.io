@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
 import {database} from './search-sqlite-fixture.mjs';
 import {syncPlayerIdentities} from '../scripts/sync-player-identities.mjs';
 import {allPlayerIdAuditSql,allPlayerIdAuditResult,cloudflareAuditError} from '../lib/all-player-id-audit.mjs';
@@ -41,4 +42,13 @@ test('Cloudflare audit failures preserve actionable error codes and redact secre
  const error=cloudflareAuditError(400,{errors:[{code:7500,message:"no such table: missing_table; token secret_token; account secret_account; source 'Moez Ben-Amor'; 22cc93f0-672e-41ee-85f1-561829ed9315"}]},['secret_token','secret_account']);
  assert.match(error,/7500/);assert.match(error,/no such table: missing_table/);assert.doesNotMatch(error,/secret_token|secret_account|Moez|22cc93f0/);
  assert.match(cloudflareAuditError(400,{errors:[{code:7500,message:'Your account has exceeded daily row read limit.'}]}),/daily row read limit/);
+});
+
+
+test('complete six-source audit compiles with a compound SELECT limit of three',async()=>{
+ const d=fixture();try{
+  const schema=(await d.query("SELECT sql FROM sqlite_master WHERE type='table' AND sql IS NOT NULL")).map(row=>row.sql).join(';');
+  const code="import sqlite3,json,sys\np=json.load(sys.stdin);c=sqlite3.connect(':memory:');c.executescript(p['schema']);c.setlimit(sqlite3.SQLITE_LIMIT_COMPOUND_SELECT,3)\ntry:\n c.execute('SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6');raise Exception('original regression not reproduced')\nexcept sqlite3.OperationalError as e:\n assert 'too many terms' in str(e)\nc.execute(p['sql']).fetchall()\n";
+  const result=spawnSync('python3',['-c',code],{encoding:'utf8',input:JSON.stringify({schema,sql:allPlayerIdAuditSql})});assert.equal(result.status,0,result.stderr);
+ }finally{d.close()}
 });
