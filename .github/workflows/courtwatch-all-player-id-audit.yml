@@ -23,5 +23,5 @@ jobs:
         with: {node-version: '22'}
       - name: Test stored native profiles, application lookups and complete ID coverage
         run: node --test test/all-player-id-audit.test.mjs test/player-id-audit-scope.test.mjs
-      - name: Audit all players and categorize missing IDs and mappings anonymously
+      - name: Audit IDs and distinguish unresolved from ambiguous references anonymously
         run: node scripts/all-player-id-audit.mjs

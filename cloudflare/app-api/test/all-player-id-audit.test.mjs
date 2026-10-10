@@ -82,3 +82,17 @@ test('foreign native profiles and malformed encoded FITP cards cannot pass ID co
   }
  }finally{d.close()}
 });
+
+
+test('unresolved and ambiguous references are distinguished without exporting identities',async()=>{
+ const d=fixture();try{
+  add(d,'f','fitp','123456','Player One');add(d,'other','itf','800123456','Player Two');await syncPlayerIdentities(d.query);
+  d.execute("INSERT INTO user_app_players VALUES('owner','unknown-reference','today')");
+  let result=await audit(d);assert.deepEqual(JSON.parse(result.unmapped_mapping_breakdown),[{source:'membership',mapped_players:0,records:1}]);
+  const ids=await d.query("SELECT canonical_id FROM player_circuit_identities WHERE source_key IN ('f','other') ORDER BY source_key");
+  d.execute("INSERT INTO player_identity_aliases VALUES('f',?)",[ids[1].canonical_id]);
+  d.execute("INSERT INTO user_app_players VALUES('owner','f','today')");
+  result=await audit(d);assert.deepEqual(JSON.parse(result.unmapped_mapping_breakdown),[{source:'acquired',mapped_players:2,records:1},{source:'membership',mapped_players:0,records:1},{source:'membership',mapped_players:2,records:1}]);assert.equal(result.passed,false);
+  assert.equal(result.unresolved_refs_to_excluded_identity,0);
+ }finally{d.close()}
+});

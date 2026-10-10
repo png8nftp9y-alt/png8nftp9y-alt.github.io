@@ -98,6 +98,13 @@ SELECT (SELECT COUNT(*) FROM people) AS players,
   (SELECT l.circuit,COUNT(DISTINCT l.canonical_id) AS n FROM eligible_links l JOIN people p ON p.canonical_id=l.canonical_id WHERE p.circuits=0 GROUP BY l.circuit)) AS missing_by_link_circuit,
  (SELECT json_group_array(json_object('source',source,'records',n)) FROM
   (SELECT source,COUNT(*) AS n FROM source_coverage WHERE mapped<>1 GROUP BY source)) AS unmapped_by_source_class,
+ (SELECT json_group_array(json_object('source',source,'mapped_players',mapped,'records',n)) FROM
+  (SELECT source,mapped,COUNT(*) AS n FROM source_coverage WHERE mapped<>1 GROUP BY source,mapped)) AS unmapped_mapping_breakdown,
+ (SELECT COUNT(*) FROM source_coverage s WHERE s.mapped<>1 AND EXISTS
+  (SELECT 1 FROM player_circuit_identities excluded WHERE NOT (${includedPlayerIdSourceSql('excluded')} )
+   AND (excluded.source_key=s.source_key OR excluded.source_key=s.lookup_key OR excluded.canonical_id=s.lookup_key
+    OR EXISTS(SELECT 1 FROM player_identity_aliases a WHERE a.alias_id=s.lookup_key AND a.canonical_id=excluded.canonical_id)))) AS unresolved_refs_to_excluded_identity,
+
  (SELECT COUNT(*) FROM people p JOIN player_identity_people stored ON stored.canonical_id=p.canonical_id WHERE p.circuits=0 AND EXISTS
   (SELECT 1 FROM json_each(stored.payload,'$.circuitProfiles') profile WHERE json_extract(profile.value,'$.url')<>'')) AS missing_with_stored_profile_urls,
  (SELECT COUNT(*) FROM people p JOIN player_identity_people stored ON stored.canonical_id=p.canonical_id WHERE p.circuits=0
