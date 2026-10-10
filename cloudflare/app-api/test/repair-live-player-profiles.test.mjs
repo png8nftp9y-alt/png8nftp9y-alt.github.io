@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {itfSearchEvidence,teDirectoryEvidence,publicCookiePair} from '../lib/live-profile-evidence.mjs';
+import {itfSearchEvidence,teDirectoryEvidence,publicCookiePair,teSearchCandidates,teProfileEvidence,lookupTeDirectory} from '../lib/live-profile-evidence.mjs';
 import {evidenceCatalog} from '../lib/archived-profile-evidence.mjs';
 import {acquiredPlayer} from '../lib/acquired-player-index.mjs';
 // D1_TEST_INITIAL_IMPORT / D1_TEST_IDENTICAL_ZERO_WRITES
@@ -22,6 +22,27 @@ test('public consent cookies retain equals signs in their values',()=>{
  assert.deepEqual(publicCookiePair('st=l=2057&exp=46610&c=1&cp=1; path=/'),['st','l=2057&exp=46610&c=1&cp=1']);
  assert.deepEqual(publicCookiePair('token=abc==; Secure'),['token','abc==']);
  assert.equal(publicCookiePair('not-a-cookie'),null);
+});
+const teId='12345678-1234-1234-1234-123456789abc';
+const card=(id,name)=>'<h5 class="media__title"><a href="/player-profile/'+id+'"><span>'+name+'</span></a></h5>';
+const profile=(name,country)=>'<img class="profile-head__nat" src="//static.tournamentsoftware.com/content/images/flags/'+country+'.svg"><h2 class="media__title media__title--large"><span>'+name+'</span></h2><img src="//static.tournamentsoftware.com/content/images/flags/FRA.svg">';
+test('native search cards require named official profile anchors and main-header nationality',()=>{
+ const candidates=teSearchCandidates('<a href="/player-profile/'+teId+'">icon</a>'+card(teId,'Richie Kennedy')+'<h5><a href="https://example.com/player-profile/'+teId+'">Other Person</a></h5>');
+ assert.equal(candidates.length,1);assert.equal(teProfileEvidence(profile('Richie Kennedy','IRL'),candidates[0]).nationality,'IRL');
+ assert.equal(teProfileEvidence(profile('Other Person','IRL'),candidates[0]),null);
+ assert.equal(teProfileEvidence('<h2 class="media__title--large">Richie Kennedy</h2><img src="//static.tournamentsoftware.com/content/images/flags/IRL.svg">',candidates[0]),null);
+ assert.equal(teProfileEvidence(profile('Richie Kennedy','IRL'),candidates[0],'https://example.com/player-profile/'+teId),null);
+});
+test('directory paginates and retains conflicting exact-name GUIDs instead of choosing the first',async()=>{
+ const second='12345678-1234-1234-1234-123456789abd',calls=[];
+ const found=await lookupTeDirectory('Richie Kennedy',async(url,options)=>{calls.push(url);const u=new URL(url);return {url,text:u.searchParams.has('Page')?(u.searchParams.get('Page')==='1'?card(teId,'Richie Kennedy'):u.searchParams.get('Page')==='2'?card(second,'Richie Kennedy'):''):profile('Richie Kennedy','IRL')};});
+ assert.equal(found.length,2);assert.equal(calls.length,5);
+ const catalog=evidenceCatalog();catalog.add(found);assert.equal(catalog.resolve({circuit:'tennis-europe',official_id:'',display_name:'Richie Kennedy',nationality:'IRL',payload:'{}'}),null);
+ await assert.rejects(lookupTeDirectory('Richie Kennedy',async url=>({url,text:card(teId,'Richie Kennedy')})),/pagination_repeated/);
+});
+test('an unreadable second candidate fails the lookup rather than inventing a unique match',async()=>{
+ const second='12345678-1234-1234-1234-123456789abd';
+ await assert.rejects(lookupTeDirectory('Richie Kennedy',async url=>{const u=new URL(url);return {url,text:u.searchParams.has('Page')?(u.searchParams.get('Page')==='1'?card(teId,'Richie Kennedy')+card(second,'Richie Kennedy'):''):u.pathname.endsWith(second)?profile('Wrong Person','IRL'):profile('Richie Kennedy','IRL')};}),/profile_unverified/);
 });
 test('directory requires per-row country and rejects tournament IDs and foreign domains',()=>{
  const id='12345678-1234-1234-1234-123456789abc',p=teDirectoryEvidence('<table><tr><td>[IRL]</td><td><a href="/profile/default.aspx?id='+id+'">Richie KENNEDY</a></td></tr><tr><td>[IRL]</td><td><a href="/sport/player.aspx?id='+id+'&amp;player=1">Other Person</a></td></tr><tr><td><a href="/player-profile/'+id+'">No Country</a></td></tr></table>');

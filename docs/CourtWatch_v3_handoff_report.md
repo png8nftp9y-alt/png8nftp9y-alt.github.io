@@ -2289,3 +2289,12 @@ Cookie corretto: pagina finale /find/player, cookiewall false. Form ufficiale ac
 ### Europe ricerca confermata — run 38014293660 verde
 
 Endpoint ufficiale risponde: ricerca campione 1.518 byte, 0 righe tr, 2 li e 2 link al medesimo player-profile. Risultati in card li.list__item, nome in media__title/nav-link__value; nazionalità assente nel risultato. Si verifica il markup del profilo candidato per ottenere la nazionalità ufficiale prima di associare, con HTML a testi/GUID mascherati. Nessuna mutazione D1. Sintassi Node verificata; report completo preservato (hash 4460216bc88cd37026734b71dcce445f5edfb5ca).
+
+
+## 2026-10-10 — ricerca reale dei profili Tennis Europe mancanti
+
+Richiesta: risolvere i profili mancanti e mantenere i trigger FITP, Tennis Europe e ITF gia applicati. Il controllo ufficiale run https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38014775092 ha verificato la risposta AJAX `/find/player/DoSearch` e la nazione nel flag `profile-head__nat` del profilo, distinta dalle bandiere degli avversari. Il recupero precedente leggeva soltanto la pagina iniziale del directory, che non contiene risultati individuali.
+
+Il recupero ora cerca ciascun nome distinto, legge tutte le pagine fino alla pagina vuota, visita ogni candidato con nome esatto, verifica URL, GUID, intestazione del nome e nazione ufficiale. Paginazione ripetuta/incompleta o un candidato illeggibile impediscono un'associazione falsamente univoca. Gli omonimi rimangono soggetti ai controlli esistenti su nazione, anno e unicita del GUID. Quattro letture pubbliche in parallelo; applicazione delle sole differenze verificate ogni 100 nomi, con sorgenti conservate e readback. Limite di ricerca 40 minuti nel job da 60 minuti, con audit finale e residui espliciti: nessuna promessa di zero prima del controllo. Le differenze ITF gia verificate vengono salvate prima della ricerca Europe.
+
+Validazione: 29 test passati (inclusi formato reale delle schede, bandiera del solo profilo, omonimi, paginazione ripetuta e candidato illeggibile), sintassi Node corretta e D1 GLOBAL NEW FEATURE POLICY OK. Il clone shallow produce l'avviso preesistente HEAD^ nel controllo, che termina OK. La verifica pubblica senza scritture controlla anche la funzione di ricerca usata in produzione. Il run di recupero 38013993745 gia pending effettua checkout di main e utilizzera queste modifiche senza aggiungere un altro run di recupero. FITP 38011202300 ancora pending al controllo; zero non ancora verificato.

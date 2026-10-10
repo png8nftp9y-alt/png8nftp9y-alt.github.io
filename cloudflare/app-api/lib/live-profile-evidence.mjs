@@ -1,4 +1,5 @@
 import {validOfficialId,profileEvidence} from './player-profile-evidence.mjs';
+import {playerNameKey} from './player-circuit-profiles.mjs';
 const direct=(o,names)=>Object.entries(o||{}).find(([k])=>names.includes(k.toLowerCase()))?.[1];
 export function itfSearchEvidence(payload,expectedId){
  const out=[];
@@ -21,6 +22,41 @@ export function publicCookiePair(value){
 }
 const decode=s=>String(s||'').replace(/&amp;/g,'&').replace(/&#39;|&apos;/g,"'").replace(/&quot;/g,'"').replace(/&nbsp;/g,' ');
 const clean=s=>decode(s).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+export function teSearchCandidates(html){
+ const out=new Map();
+ // The official AJAX directory uses h5 cards; the icon anchor has no player name.
+ for(const h of String(html).matchAll(/<h5\b[^>]*>([\s\S]*?)<\/h5>/gi))for(const a of h[1].matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
+  const url=new URL(decode(a[1]),'https://te.tournamentsoftware.com'),id=url.pathname.match(/^\/player-profile\/([a-f0-9-]{36})\/?$/i)?.[1],name=clean(a[2]);
+  if(url.hostname==='te.tournamentsoftware.com'&&validOfficialId('tennis-europe',id)&&name)out.set(id.toLowerCase(),{officialId:id.toLowerCase(),name,profileUrl:url.href});
+ }return [...out.values()];
+}
+export function teProfileEvidence(html,candidate,finalUrl=candidate.profileUrl){
+ const url=new URL(finalUrl),id=url.pathname.match(/^\/player-profile\/([a-f0-9-]{36})\/?$/i)?.[1];
+ if(url.hostname!=='te.tournamentsoftware.com'||id?.toLowerCase()!==candidate.officialId.toLowerCase())return null;
+ const title=/<h2\b[^>]*class=["'][^"']*media__title--large[^"']*["'][^>]*>([\s\S]*?)<\/h2>/i.exec(String(html));
+ if(!title||playerNameKey(clean(title[1]))!==playerNameKey(candidate.name))return null;
+ // Only the main profile header flag: opponent and tournament flags are unrelated.
+ const header=String(html).slice(Math.max(0,title.index-1500),title.index);
+ const flag=[...header.matchAll(/<img\b[^>]*class=["'][^"']*profile-head__nat[^"']*["'][^>]*>/gi)].at(-1)?.[0];
+ const country=flag?.match(/src=["'](?:https?:)?\/\/static\.tournamentsoftware\.com\/content\/images\/flags\/([A-Z]{3})\.svg["']/i)?.[1]?.toUpperCase();
+ return country?{...candidate,circuit:'tennis-europe',nationality:country,profileUrl:'https://te.tournamentsoftware.com/player-profile/'+id.toLowerCase()}:null;
+}
+export async function lookupTeDirectory(name,publicPage){
+ const candidates=new Map(),seenPages=new Set();let complete=false;
+ for(let page=1;page<=10;page++){
+  const response=await publicPage('https://te.tournamentsoftware.com/find/player/DoSearch?'+new URLSearchParams({Query:name,Page:String(page),SportID:'0'}),{headers:{'X-Requested-With':'XMLHttpRequest'}});
+  if(new URL(response.url).pathname!=='/find/player/DoSearch')throw Error('te_search_redirected');
+  const found=teSearchCandidates(response.text);
+  if(!found.length){if(/\/player-profile\//i.test(response.text))throw Error('te_search_unparsed');complete=true;break;}
+  const signature=found.map(p=>p.officialId).sort().join('|');if(seenPages.has(signature))throw Error('te_search_pagination_repeated');seenPages.add(signature);
+  for(const p of found)if(playerNameKey(p.name)===playerNameKey(name))candidates.set(p.officialId,p);
+ }
+ if(!complete)throw Error('te_search_incomplete');
+ const evidence=[];
+ // Validate every exact-name candidate; a failed candidate must not create false uniqueness.
+ for(const p of candidates.values()){const page=await publicPage(p.profileUrl),e=teProfileEvidence(page.text,p,page.url);if(!e)throw Error('te_profile_unverified');evidence.push(e);}
+ return evidence;
+}
 export function teDirectoryEvidence(html){
  const out=[];
  // Associate metadata within one result row, never from a neighbouring person.

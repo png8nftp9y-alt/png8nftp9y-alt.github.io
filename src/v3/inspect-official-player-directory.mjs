@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises';
-import {publicCookiePair} from '../../cloudflare/app-api/lib/live-profile-evidence.mjs';
+import {publicCookiePair,lookupTeDirectory} from '../../cloudflare/app-api/lib/live-profile-evidence.mjs';
 const directory='tmp/official-player-directory';await fs.mkdir(directory,{recursive:true});
 const jars=new Map();
 async function page(url,{method='GET',body}={}){
@@ -37,3 +37,6 @@ if(guid){
  await fs.writeFile(directory+'/profile-structure.html',structure);
  console.log(JSON.stringify({profileBytes:profile.text.length,flagTags:[...profile.text.matchAll(/<[^>]*(?:flag|country|nationality)[^>]*>/gi)].map(m=>m[0]).slice(0,30)}));
 }
+const verified=await lookupTeDirectory('Richie Kennedy',page);
+console.log(JSON.stringify({verifiedLookupCandidates:verified.length,nations:verified.map(p=>p.nationality)}));
+if(verified.length!==1||verified[0].nationality!=='IRL')throw Error('verified_directory_lookup_failed');
