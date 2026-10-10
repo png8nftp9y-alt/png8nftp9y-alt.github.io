@@ -2205,3 +2205,14 @@ Prima 18250 link senza profilo ufficiale (ITF 5665, Europe 12585); riparati 6136
 Verificati 5425 documenti ITF, 774729 candidati evidence; metriche script rowsWritten37807, rowsRead6296139. Sono metriche di questo script, non dell'intero account/workflow. Obiettivo zero ufficiale NON raggiunto: nessun rilancio identico effettuato. Prima di ulteriori recuperi servono evidenze aggiuntive per i residui, non IDs inventati o eliminazione dei giocatori.
 
 Integrità report: hash Git dell'intero file sorgente (403066 byte) uguale al blob canonico bac3c826468249014376823c776419d9513ce75a. Il marcatore di truncation iniziale è preesistente nel blob; l'append conserva tutti i byte precedenti.
+
+
+## 2026-10-10 — Recupero mirato verso zero: nuove prove ufficiali e guardia GUID Europe
+
+Obiettivo richiesto: zero collegamenti senza profilo ufficiale. Ultimo audit verificato del run 38008293874: 12.114 residui (12 ITF e 12.102 Tennis Europe); zero NON ancora raggiunto.
+
+Nuovo recupero mirato `repair-live-player-profiles.mjs`: sei pagine ufficiali ITF con ID esatto verificate e registrate in `verified-profile-evidence-20261010.json`; ricerca nativa ITF per i casi restanti, accettata solo con corrispondenza dell'ID e nazione nello stesso oggetto. Nessuna ripetizione della scansione completa R2 già eseguita. Per Europe il runner legge il directory ufficiale e salva HTML, campi e script per determinare il protocollo di ricerca; questa prima verifica NON equivale al recupero dei 12.102 GUID. Evidenze per nome senza nazione o ID ambiguo vengono scartate. Mutazioni solo delta verificati, readback e conservazione delle sorgenti concorrenti; mapping e audit finale. Il workflow una tantum condivide il lock D1 e conserva artifact anche se residui restano. Non dichiara successo finché l'audit non certifica zero.
+
+Correzione per le nuove acceptance: `sport/player.aspx?id=...&player=...` contiene un UUID del torneo nel parametro `id`, non il GUID globale del giocatore. La guardia comune in `player-profile-evidence.mjs` impedisce di promuoverlo a ID giocatore. Questo non certifica retroattivamente tutti i vecchi GUID già memorizzati.
+
+Validazione: 21 test mirati superati; `npm run check` app-api completo superato, inclusi invarianti costi D1 e policy nuove scritture; YAML valido. Report completo preservato: blob originale 71c31a269a6e03856f574a7a97f0e8ca8c6c4130, verificato con git hash-object su 404.616 byte. La stringa iniziale preesistente “Warning: truncated output” fa parte di quel blob e non indica una lettura parziale. Risultato operativo del nuovo run ancora da verificare.

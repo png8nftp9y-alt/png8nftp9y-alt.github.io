@@ -3,6 +3,8 @@ export const validOfficialId=(c,id)=>c==='fitp'?/^\d{6,12}$/.test(String(id)):c=
 const nation=p=>String(p.nationality||p.nationalityCode||p.countryCode||p.country||'').toUpperCase();
 const year=p=>Number(p.birthYear||String(p.birthDate||p.dateOfBirth||'').slice(0,4))||0;
 export function profileEvidence(circuit,p={}){
+ // In sport/player.aspx the id parameter is a tournament UUID, not a global player GUID.
+ if(circuit==='tennis-europe'&&/\/sport\/player(?:\.aspx)?(?:[?/#]|$)/i.test(String(p.profileUrl||p.playerProfileUrl||p.profileLink||p.href||p.url||'')))return null;
  const sync=p.profileSync?.[circuit==='tennis-europe'?'tennisEurope':circuit]||{};
  const ids=[p.officialId,p.official_id,circuit==='fitp'?p.membershipCard:circuit==='itf'?p.worldTennisId:p.profileId,sync.profileId,sync.worldTennisId,p.source_player_id,p.sourcePlayerId,p.playerId,p.participantId,p.teProfileId,p.id].filter(v=>v!=null).map(String);
  let id=ids.find(id=>validOfficialId(circuit,id))||'';
