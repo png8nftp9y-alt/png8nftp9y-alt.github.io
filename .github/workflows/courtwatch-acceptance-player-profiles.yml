@@ -12,11 +12,17 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: courtwatch-d1-writes
+  # Coalesce notifications by circuit; each run reads the complete current cache.
+  group: courtwatch-acceptance-${{ contains(github.event.workflow_run.name, 'FITP') && 'fitp' || contains(github.event.workflow_run.name, 'Europe') && 'tennis-europe' || 'itf' }}
   cancel-in-progress: false
-  queue: max
+  queue: single
 jobs:
   profiles:
+    # Keep actual database writes serialized with every other D1 writer.
+    concurrency:
+      group: courtwatch-d1-writes
+      cancel-in-progress: false
+      queue: max
     # A verified R2 pointer can be published before a later Git step fails.
     # Reading current is safe on failed/no-op runs too; unchanged lists write nothing.
     runs-on: ubuntu-latest
