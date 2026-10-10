@@ -40,7 +40,7 @@ export async function syncPlayerIdentities(query,{allowBulk=false,maxChanges=500
  const pending=[];for(const [table]of sources){let after='';while(true){const batch=await query(`SELECT * FROM player_identity_pending_sources WHERE source_table=${sqlString(table)} AND source_key>${sqlString(after)} ORDER BY source_key LIMIT 1000`);pending.push(...batch);if(batch.length<1000)break;after=batch.at(-1).source_key;}}
  if(!pending.length){const counts=await query('SELECT (SELECT COUNT(*) FROM player_identity_people) AS people,(SELECT COUNT(*) FROM player_circuit_identities) AS links');return{status:'unchanged',writes:0,pending:0,...counts[0]};}
  const full=pending.length>500,rows=[];
- for(const [table,key]of sources){const keys=pending.filter(p=>p.source_table===table).map(p=>p.source_key);if(full)rows.push(...await allRows(query,table,key));else if(keys.length)rows.push(...await byKeys(query,table,key,keys));}
+ for(const [table,key]of sources){const keys=pending.filter(p=>p.source_table===table).map(p=>p.source_key);const selected=full?await allRows(query,table,key):keys.length?await byKeys(query,table,key,keys):[];for(const row of selected)rows.push(row);}
  let currentLinks=[],currentPeople=[],currentAliases=[];
  if(full){for(const [table,key,target]of [['player_circuit_identities','source_key',currentLinks],['player_identity_people','canonical_id',currentPeople],['player_identity_aliases','alias_id',currentAliases]]){let after='';while(true){const batch=await query(`SELECT * FROM ${table} WHERE ${key}>${sqlString(after)} ORDER BY ${key} LIMIT 1000`);target.push(...batch);if(batch.length<1000)break;after=batch.at(-1)[key];}}}
  else{
@@ -51,7 +51,7 @@ export async function syncPlayerIdentities(query,{allowBulk=false,maxChanges=500
  }
  currentLinks=[...new Map(currentLinks.map(r=>[r.source_key,r])).values()];
  // Reload original retained records so metadata is preserved during small delta updates.
- if(!full){const known=new Set(rows.map(r=>r.source_key));for(const [table,key]of sources){const keys=currentLinks.filter(r=>!known.has(r.source_key)&&(table==='app_players'||table==='user_app_player_additions'?r.source_key.startsWith('courtwatch|'):true)).map(r=>table==='app_players'||table==='user_app_player_additions'?r.source_key.slice(11):r.source_key);if(keys.length)rows.push(...await byKeys(query,table,key,keys));}}
+ if(!full){const known=new Set(rows.map(r=>r.source_key));for(const [table,key]of sources){const keys=currentLinks.filter(r=>!known.has(r.source_key)&&(table==='app_players'||table==='user_app_player_additions'?r.source_key.startsWith('courtwatch|'):true)).map(r=>table==='app_players'||table==='user_app_player_additions'?r.source_key.slice(11):r.source_key);if(keys.length)for(const row of await byKeys(query,table,key,keys))rows.push(row);}}
  const loaded=new Set(rows.map(r=>r.source_key));
  // Preserve retained acquired evidence, including sources no longer in current indexes.
  for(const r of currentLinks)if(!loaded.has(r.source_key))rows.push({...r,payload:JSON.stringify({birthYear:r.birth_year,nationality:r.nationality,profileUrl:r.profile_url})});
