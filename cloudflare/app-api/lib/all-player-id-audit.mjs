@@ -54,7 +54,21 @@ SELECT (SELECT COUNT(*) FROM people) AS players,
  (SELECT COUNT(*) FROM player_circuit_identities WHERE NOT (${includedPlayerIdSourceSql()})) AS excluded_records,
  (SELECT COUNT(DISTINCT official_id) FROM native WHERE circuit='fitp') AS fitp_ids,
  (SELECT COUNT(DISTINCT official_id) FROM native WHERE circuit='tennis-europe') AS tennis_europe_ids,
- (SELECT COUNT(DISTINCT official_id) FROM native WHERE circuit='itf') AS itf_ids`;
+ (SELECT COUNT(DISTINCT official_id) FROM native WHERE circuit='itf') AS itf_ids,
+ (SELECT json_group_array(json_object('circuit',circuit,'players',n)) FROM
+  (SELECT l.circuit,COUNT(DISTINCT l.canonical_id) AS n FROM eligible_links l JOIN people p ON p.canonical_id=l.canonical_id WHERE p.circuits=0 GROUP BY l.circuit)) AS missing_by_link_circuit,
+ (SELECT json_group_array(json_object('source',source,'records',n)) FROM
+  (SELECT source,COUNT(*) AS n FROM source_coverage WHERE mapped<>1 GROUP BY source)) AS unmapped_by_source_class,
+ (SELECT COUNT(*) FROM people p JOIN player_identity_people stored ON stored.canonical_id=p.canonical_id WHERE p.circuits=0 AND EXISTS
+  (SELECT 1 FROM json_each(stored.payload,'$.circuitProfiles') profile WHERE json_extract(profile.value,'$.url')<>'')) AS missing_with_stored_profile_urls,
+ (SELECT COUNT(*) FROM people p JOIN player_identity_people stored ON stored.canonical_id=p.canonical_id WHERE p.circuits=0
+  AND length(COALESCE(json_extract(stored.payload,'$.membershipCard'),'')) BETWEEN 6 AND 12
+  AND CAST(json_extract(stored.payload,'$.membershipCard') AS TEXT) NOT GLOB '*[^0-9]*') AS missing_with_native_fitp_field,
+ (SELECT COUNT(*) FROM people p JOIN player_identity_people stored ON stored.canonical_id=p.canonical_id WHERE p.circuits=0
+  AND length(COALESCE(json_extract(stored.payload,'$.worldTennisId'),''))=9
+  AND CAST(json_extract(stored.payload,'$.worldTennisId') AS TEXT) GLOB '800*'
+  AND CAST(json_extract(stored.payload,'$.worldTennisId') AS TEXT) NOT GLOB '*[^0-9]*') AS missing_with_native_itf_field`;
+
 
 export function allPlayerIdAuditResult(row) {
  if(!row)return {status:'unavailable',passed:false};

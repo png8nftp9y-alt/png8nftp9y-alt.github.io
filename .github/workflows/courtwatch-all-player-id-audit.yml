@@ -23,5 +23,5 @@ jobs:
         with: {node-version: '22'}
       - name: Test complete player coverage, exclusions and compound SELECT limits
         run: node --test test/all-player-id-audit.test.mjs test/player-id-audit-scope.test.mjs
-      - name: Audit all application players with anonymous counts and sanitized D1 errors
+      - name: Audit all players and categorize missing IDs and mappings anonymously
         run: node scripts/all-player-id-audit.mjs
