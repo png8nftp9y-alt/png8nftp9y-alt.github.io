@@ -30,24 +30,34 @@ jobs:
           printf '%s\n' '{"name":"courtwatch-readonly-diagnostic","compatibility_date":"2026-10-01"}' > tmp/fitp-row-diagnostic/wrangler.json
           npx wrangler r2 object get "$R2_BUCKET/fitp/cache/generations/26c98919b4f25c27810667a91f9fb967ce899ac30d444ae4acb438977650dc84/fitp_participant_cache.json.gz" --remote --config tmp/fitp-row-diagnostic/wrangler.json --file tmp/fitp-row-diagnostic/cache.json.gz
           gzip -t tmp/fitp-row-diagnostic/cache.json.gz
-      - name: Diagnose every participant without database queries or writes
+      - name: Diagnose every participant and check existing IDs with SELECT queries only
         run: |
           node --input-type=module <<'JS'
           import fs from 'node:fs/promises';
           import {gunzipSync} from 'node:zlib';
           import {acquiredPlayer} from './lib/acquired-player-index.mjs';
+          import {sqlString} from '../../src/v3/itf-draw-document-d1.mjs';
           const doc=JSON.parse(gunzipSync(await fs.readFile('tmp/fitp-row-diagnostic/cache.json.gz')));
-          const invalid=[],shapeErrors=[];let participants=0,tournaments=0;
+          const invalid=[],shapeErrors=[],checks=[];let participants=0,tournaments=0;
+          async function query(sql){
+            const url='https://api.cloudflare.com/client/v4/accounts/'+process.env.CLOUDFLARE_ACCOUNT_ID+'/d1/database/cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda/query';
+            const r=await fetch(url,{method:'POST',headers:{Authorization:'Bearer '+process.env.CLOUDFLARE_API_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)});
+            const j=await r.json();if(!r.ok||!j.success||!j.result?.every(x=>x.success))throw Error('read_only_identity_check_failed:'+r.status);
+            return j.result[0].results||[];
+          }
           for(const [key,t] of Object.entries(doc.tournaments||{})){
             tournaments++;
             if(!Array.isArray(t?.participants)){shapeErrors.push({competitionId:key,keys:Object.keys(t||{})});continue;}
             for(const [index,p] of t.participants.entries()){
               participants++;
               const name=p?.name||p?.playerName||p?.full1||p?.full2||[p?.firstName,p?.lastName].filter(Boolean).join(' ');
-              if(!p||typeof p!=='object'||!acquiredPlayer('fitp',{...p,name}))invalid.push({competitionId:key,tournamentName:t.tournamentName||'',sourceUrl:t.sourceUrl||'',index,fieldNames:Object.keys(p||{}),nameLengths:{name:String(p?.name||'').length,playerName:String(p?.playerName||'').length,full1:String(p?.full1||'').length,full2:String(p?.full2||'').length},hasMembershipCard:Boolean(p?.membershipCard),cardLength:String(p?.membershipCard||'').length});
+              if(!p||typeof p!=='object'||!acquiredPlayer('fitp',{...p,name})){invalid.push({competitionId:key,tournamentName:t.tournamentName||'',sourceUrl:t.sourceUrl||'',index,fieldNames:Object.keys(p||{}),nameLengths:{name:String(p?.name||'').length,playerName:String(p?.playerName||'').length,full1:String(p?.full1||'').length,full2:String(p?.full2||'').length},hasMembershipCard:Boolean(p?.membershipCard),cardLength:String(p?.membershipCard||'').length});
+              const card=String(p?.membershipCard||'').trim();
+              if(card){const q=sqlString(card),found=await query("SELECT 'observed' AS source, display_name FROM observed_players WHERE circuit='fitp' AND official_id="+q+" UNION ALL SELECT 'acquired' AS source, display_name FROM search_acquired_players WHERE circuit='fitp' AND official_id="+q),links=await query("SELECT COUNT(*) AS count FROM player_circuit_identities WHERE circuit='fitp' AND official_id="+q);checks.push({competitionId:key,index,observedRows:found.filter(x=>x.source==='observed').length,acquiredRows:found.filter(x=>x.source==='acquired').length,storedNameLengths:found.map(x=>String(x.display_name||'').length),appProfileLinks:Number(links[0]?.count||0)});}
+              }
             }
           }
-          const report={sourceRun:38011202300,generation:'26c98919b4f25c27810667a91f9fb967ce899ac30d444ae4acb438977650dc84',tournaments,participants,invalidCount:invalid.length,shapeErrorCount:shapeErrors.length,invalid,shapeErrors};
+          const report={sourceRun:38011202300,generation:'26c98919b4f25c27810667a91f9fb967ce899ac30d444ae4acb438977650dc84',tournaments,participants,invalidCount:invalid.length,shapeErrorCount:shapeErrors.length,invalid,shapeErrors,identityChecks:checks};
           await fs.writeFile('tmp/fitp-row-diagnostic/report.json',JSON.stringify(report,null,2));
           console.log(JSON.stringify({...report,invalid:invalid.slice(0,20)}));
           JS
