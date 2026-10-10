@@ -42,3 +42,15 @@ test('anonymous gate diagnostics identify rejected evidence without exposing nam
  const birth={};assert.equal(legacyAcceptanceCandidate({...source,birth_year:2010},[entry],doc,birth),null);assert.equal(birth.reason,'source_birth_not_proven');
  const encoded=JSON.stringify([noEntries,missingGuid,birth]);assert.equal(encoded.includes(source.display_name),false);assert.equal(encoded.includes(id),false);assert.equal(encoded.includes(t),false);
 });
+
+test('GUID-less cache copies cannot veto an independently retained native migration, but cannot establish one',async()=>{
+ const legacyCache={...doc,tournaments:{[t]:{competitionId:t,participants:[{playerName:source.display_name,participantId:'',birthYear:2012}]}}};
+ const entries=[entry,{...entry,source_player_id:id}];
+ assert.equal(legacyAcceptanceCandidate(source,entries,legacyCache).officialId,id);
+ assert.equal(legacyAcceptanceCandidate(source,[entry],legacyCache),null);
+ assert.equal(legacyAcceptanceCandidate(source,[{...entry,source_player_id:id}],legacyCache),null);
+ assert.equal(legacyAcceptanceCandidate({...source,birth_year:2010},entries,legacyCache),null);
+ const conflicting={...legacyCache,tournaments:{[t]:{competitionId:t,participants:[...legacyCache.tournaments[t].participants,{playerName:source.display_name,participantId:second,birthYear:2012}]}}};assert.equal(legacyAcceptanceCandidate(source,entries,conflicting),null);
+ const get=async url=>new URL(url).pathname==='/find/player/DoSearch'?{url,text:new URL(url).searchParams.get('Page')==='1'?'<h5><a href="/player-profile/'+id+'">Example Person</a></h5>':''}:{url,text:'<img class="profile-head__nat" src="https://static.tournamentsoftware.com/content/images/flags/TUN.svg"><h2 class="media__title--large">Example Person</h2>'};
+ const r=await legacyAcceptanceProfiles([source],async()=>entries,get,legacyCache);assert.equal(r.resolved.size,1);
+});
