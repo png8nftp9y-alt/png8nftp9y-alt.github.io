@@ -1,6 +1,7 @@
 // D1_WRITE_POLICY: incremental
 import fs from 'node:fs/promises';
 import {gunzipSync} from 'node:zlib';
+import {acceptanceSourceProfiles} from '../lib/acceptance-source-profile-provenance.mjs';
 import {legacyAcceptanceProfiles} from '../lib/legacy-acceptance-profile-migration.mjs';
 import {publicCookiePair} from '../lib/live-profile-evidence.mjs';
 import {unresolvedSources,applyArchiveEvidence} from './repair-archived-player-profiles.mjs';
@@ -13,6 +14,7 @@ async function publicPage(url,options={}){let method=options.method||'GET',body=
 const consent=await publicPage('https://te.tournamentsoftware.com/find/player');if(/CookiePurposes|SettingsOpen/.test(consent.text))await publicPage('https://te.tournamentsoftware.com/cookiewall/Save',{method:'POST',body:new URLSearchParams({ReturnUrl:'/find/player',SettingsOpen:'false',CookiePurposes:'1'}).toString()});
 const doc=JSON.parse(gunzipSync(await fs.readFile(process.env.TE_NATIVE_ACCEPTANCE_CACHE))),sources=(await unresolvedSources(query)).filter(r=>r.circuit==='tennis-europe');
 const te=await legacyAcceptanceProfiles(sources,query,publicPage,doc),teDelta=await applyArchiveEvidence(query,sources,{resolve:r=>te.resolved.get(r.source_table+'|'+r.source_key)});
+const original=await acceptanceSourceProfiles(sources.filter(r=>!te.resolved.has(r.source_table+'|'+r.source_key)),doc,publicPage),originalDelta=await applyArchiveEvidence(query,sources,{resolve:r=>original.resolved.get(r.source_table+'|'+r.source_key)});
 const mapping=await syncPlayerIdentities(query,{maxChanges:500}),after=await profileRecoveryAudit(query);
-console.log(JSON.stringify({status:after.unresolved?'native_profiles_unresolved':'all_native_profiles_resolved',before:{unresolved:before.unresolved,byCircuit:before.byCircuit},tennisEurope:{...te.report,repaired:teDelta.repaired},after:{unresolved:after.unresolved,byCircuit:after.byCircuit},mapping:{status:mapping.status,pending:mapping.pending,missingObserved:mapping.missing_observed??0,missingAcquired:mapping.missing_acquired??0},metrics}));
+console.log(JSON.stringify({status:after.unresolved?'native_profiles_unresolved':'all_native_profiles_resolved',before:{unresolved:before.unresolved,byCircuit:before.byCircuit},tennisEurope:{...te.report,repaired:teDelta.repaired},originalAcceptance:{...original.report,repaired:originalDelta.repaired},after:{unresolved:after.unresolved,byCircuit:after.byCircuit},mapping:{status:mapping.status,pending:mapping.pending,missingObserved:mapping.missing_observed??0,missingAcquired:mapping.missing_acquired??0},metrics}));
 if(mapping.status==='pending')throw Error('identity_mapping_pending');if(after.unresolved)throw Error('native_profiles_unresolved:'+after.unresolved);
