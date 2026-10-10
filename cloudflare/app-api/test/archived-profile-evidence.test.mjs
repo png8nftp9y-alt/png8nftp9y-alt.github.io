@@ -4,6 +4,16 @@ import {database} from './search-sqlite-fixture.mjs';
 import {syncPlayerIdentities} from '../scripts/sync-player-identities.mjs';
 import {unresolvedSources,applyArchiveEvidence} from '../scripts/repair-archived-player-profiles.mjs';
 const guid='12345678-1234-1234-1234-123456789abc';
+test('TE neutral federation affiliation matches native nationality only within TE and preserves ambiguity',()=>{
+ for(const [affiliation,nation]of [['RTF','RUS'],['BTF','BLR']]){
+  const catalog=evidenceCatalog();catalog.add([{circuit:'tennis-europe',name:'Example Player',officialId:guid,nationality:nation}]);
+  const row={circuit:'tennis-europe',display_name:'Example Player',official_id:'',nationality:affiliation,payload:'{}'};
+  const e=catalog.resolve(row);assert.equal(e.officialId,guid);assert.equal(e.nationality,undefined);assert.equal(row.nationality,affiliation);
+  assert.equal(catalog.resolve({...row,nationality:'KAZ'}),null);
+  catalog.add([{circuit:'tennis-europe',name:'Example Player',officialId:'22345678-1234-1234-1234-123456789abc',nationality:nation}]);assert.equal(catalog.resolve(row),null);
+  const itf=evidenceCatalog();itf.add([{circuit:'itf',name:'Example Player',officialId:'800123456',nationality:nation}]);assert.equal(itf.resolve({...row,circuit:'itf'}),null);
+ }
+});
 test('retained document native ID/country and relative profile recover ID-only ITF',()=>{const catalog=evidenceCatalog();catalog.add(archivedCandidates('itf',{matches:[{teams:[{players:[{id:'800543439',name:'Aruzhan Nuranbay',nationalityCode:'KAZ',profileLink:'/en/players/aruzhan-nuranbay/800543439/kaz/jt/s/overview/'}]}]}]}));const e=catalog.resolve({circuit:'itf',official_id:'800543439',display_name:'Aruzhan Nuranbay',payload:'{}'});assert.match(e.profileUrl,/\/kaz\//);assert.equal(e.officialId,'800543439');});
 test('retained full name order and equivalent nation codes resolve TE, conflicting GUIDs do not',()=>{const catalog=evidenceCatalog();catalog.add(archivedCandidates('tennis-europe',[{name:'SLANICEANU Sarah Ioana',participantId:guid,countryCode:'ROU'}]));const row={circuit:'tennis-europe',official_id:'',display_name:'Sarah Ioana SLANICEANU',nationality:'ROM',payload:'{}'};assert.equal(catalog.resolve(row).officialId,guid);catalog.add(archivedCandidates('tennis-europe',[{name:row.display_name,participantId:'22345678-1234-1234-1234-123456789abc',countryCode:'ROU'}]));assert.equal(catalog.resolve(row),null);});
 test('tournament UUID never becomes a player profile and metadata conflicts remain unresolved',()=>{assert.equal(archivedCandidates('tennis-europe',{playerName:'Test Player',participantId:guid,profileUrl:'/sport/player.aspx?id='+guid+'&player=42'}).length,0);const catalog=evidenceCatalog();catalog.add(archivedCandidates('itf',{id:'800543439',name:'Corrected Name',nationalityCode:'KAZ',birthYear:2010}));assert.equal(catalog.resolve({circuit:'itf',official_id:'800543439',display_name:'Original Name',nationality:'ITA',payload:'{}'}),null);assert.equal(catalog.resolve({circuit:'itf',official_id:'800543439',display_name:'Original Name',payload:'{"birthYear":2011}'}),null);assert.match(catalog.resolve({circuit:'itf',official_id:'800543439',display_name:'Original Name',payload:'{}'}).profileUrl,/800543439/);});

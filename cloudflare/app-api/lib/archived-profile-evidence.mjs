@@ -3,6 +3,12 @@ import {playerNameKey} from './player-circuit-profiles.mjs';
 
 // Equivalent federation codes, not inferred nationalities.
 export const canonicalNation=value=>({ROM:'ROU',MGO:'MNE'}[String(value||'').toUpperCase()]||String(value||'').toUpperCase());
+// Tennis Europe acceptance lists use federation codes for neutral entrants.
+// This is a comparison key only: never overwrite the source affiliation.
+export const matchingNation=(circuit,value)=>{
+ const nation=canonicalNation(value);
+ return circuit==='tennis-europe'?({RTF:'RUS',BTF:'BLR'}[nation]||nation):nation;
+};
 export function archivedCandidates(circuit,payload){
  const out=[];
  function walk(v,depth=0){
@@ -22,8 +28,8 @@ export function archivedCandidates(circuit,payload){
 }
 export function evidenceCatalog(){
  const byName=new Map(),byId=new Map();let entries=0;
- return {add(candidates){for(const candidate of candidates){const p={...candidate,nationality:canonicalNation(candidate.nationality)};const nk=p.circuit+'|'+playerNameKey(p.name),ik=p.circuit+'|'+String(p.officialId).toLowerCase();for(const [map,key]of [[byName,nk],[byId,ik]]){const values=map.get(key)||new Map();values.set(JSON.stringify([p.officialId,p.profileUrl,p.nationality,p.birthYear]),p);map.set(key,values);}entries++;}},get entries(){return entries;},resolve(row){
-  const payload=JSON.parse(row.payload||'{}'),source={...payload,name:row.display_name,officialId:row.official_id,birthYear:row.birth_year||payload.birthYear,nationality:canonicalNation(row.nationality||payload.nationality||payload.country)};
+ return {add(candidates){for(const candidate of candidates){const p={...candidate,nationality:matchingNation(candidate.circuit,candidate.nationality)};const nk=p.circuit+'|'+playerNameKey(p.name),ik=p.circuit+'|'+String(p.officialId).toLowerCase();for(const [map,key]of [[byName,nk],[byId,ik]]){const values=map.get(key)||new Map();values.set(JSON.stringify([p.officialId,p.profileUrl,p.nationality,p.birthYear]),p);map.set(key,values);}entries++;}},get entries(){return entries;},resolve(row){
+  const payload=JSON.parse(row.payload||'{}'),source={...payload,name:row.display_name,officialId:row.official_id,birthYear:row.birth_year||payload.birthYear,nationality:matchingNation(row.circuit,row.nationality||payload.nationality||payload.country)};
   const exact=validOfficialId(row.circuit,row.official_id)?[...(byId.get(row.circuit+'|'+row.official_id.toLowerCase())?.values()||[])]:[];
   const years=new Set(exact.map(p=>Number(p.birthYear||String(p.birthDate||p.dateOfBirth||'').slice(0,4))).filter(Boolean)),nations=new Set(exact.map(p=>canonicalNation(p.nationality)).filter(Boolean));
   if(exact.length&&(nations.size>1||years.size>1||source.nationality&&nations.size&&!nations.has(source.nationality)||source.birthYear&&years.size&&!years.has(Number(source.birthYear))))return null;
