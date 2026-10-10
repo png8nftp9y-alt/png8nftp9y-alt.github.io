@@ -18,7 +18,7 @@ jobs:
       run:
         working-directory: cloudflare/app-api
     env:
-      # D1_WRITE_POLICY: incremental; recover exact source-bound original acceptance references.
+      # D1_WRITE_POLICY: incremental; trace both acceptance hashes and legacy observed index references.
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
@@ -40,6 +40,10 @@ jobs:
           [[ "$generation" =~ ^[a-f0-9]{64}$ ]]
           npx wrangler r2 object get "$R2_BUCKET/tennis-europe/cache/generations/$generation/tennis_europe_participant_cache.json.gz" --remote --config wrangler.generated.jsonc --file tmp/native-acceptance/cache.json.gz
           test "$(sha256sum tmp/native-acceptance/cache.json.gz | cut -d' ' -f1)" = "$(jq -er .files.participantCache.sha256 tmp/native-acceptance/pointer.json)"
+          npx wrangler r2 object get "$R2_BUCKET/tennis-europe/cache/generations/$generation/tennis_europe_participant_index.json.gz" --remote --config wrangler.generated.jsonc --file tmp/native-acceptance/index.json.gz
+          test "$(sha256sum tmp/native-acceptance/index.json.gz | cut -d' ' -f1)" = "$(jq -er .files.participantIndex.sha256 tmp/native-acceptance/pointer.json)"
+          gzip -t tmp/native-acceptance/index.json.gz
+          echo "TE_NATIVE_PARTICIPANT_INDEX=tmp/native-acceptance/index.json.gz" >> "$GITHUB_ENV"
           gzip -t tmp/native-acceptance/cache.json.gz
           echo "TE_NATIVE_ACCEPTANCE_CACHE=tmp/native-acceptance/cache.json.gz" >> "$GITHUB_ENV"
       - name: Recover residual Tennis Europe IDs from retained original participation
