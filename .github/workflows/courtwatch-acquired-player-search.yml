@@ -10,15 +10,10 @@ on:
         description: 'Authorize more than 5000 identity record changes in this run'
         type: boolean
         default: false
-  workflow_run:
-    workflows:
-      - Court Watch Cloudflare D1 and app API
-      - Court Watch ITF acquired draws D1 sync
-      - Court Watch ITF complete draw archive D1 backfill
-      - Court Watch ITF 10 qualifications and 4 doubles D1 repair
-      - Court Watch ITF repair 141 versions and verify 4892
-    types: [completed]
-    branches: [main]
+  # Poll all durable unprocessed sources together, instead of one run per upstream completion.
+  # Existing queued runs are retained by the shared D1 write lock below.
+  schedule:
+    - cron: '17,47 * * * *'
 permissions:
   contents: read
 concurrency:
@@ -27,7 +22,6 @@ concurrency:
   queue: max
 jobs:
   index:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -41,6 +35,8 @@ jobs:
         with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - name: Test periodic trigger and preserved recovery guards
+        run: node --test test/courtwatch-acquired-player-search.test.mjs
       - name: Test incremental source and replay guards
         working-directory: cloudflare/app-api
         run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs test/player-profile-evidence.test.mjs test/player-identity-write-budget.test.mjs test/player-native-profile-recovery.test.mjs
