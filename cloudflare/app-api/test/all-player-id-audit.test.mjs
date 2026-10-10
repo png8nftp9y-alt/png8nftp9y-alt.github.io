@@ -106,10 +106,10 @@ test('explicit canonical alias redirects override retained canonical rows for ap
   const old=ids[0].canonical_id,target=ids[1].canonical_id;
   d.execute('UPDATE player_identity_aliases SET canonical_id=? WHERE alias_id=?',[target,old]);
   d.execute("INSERT INTO user_app_players VALUES('owner',?,'today')",[old]);
-  d.execute("INSERT INTO user_app_player_additions VALUES('owner',?,'other','{}','today')",[old]);
+  d.execute("INSERT INTO user_app_player_additions VALUES('owner',?,'f','{}','today')",[old]);
   const result=await audit(d);assert.equal(result.unmapped_or_ambiguous_sources,0);assert.equal(result.passed,true);
-  const person=await storedIdentity(d.db,old);assert.equal(person.canonicalId,target);
-  const players=[{id:old}];const profiles=await mappedProfiles(d.db,players);assert.deepEqual(profiles.get(players[0]),person.circuitProfiles);
+  const person=await storedIdentity(d.db,old);assert.equal(person.canonicalId,target);assert.equal((await storedIdentity(d.db,'f')).canonicalId,target);
+  const players=[{id:old,sourceKey:'f'}];const profiles=await mappedProfiles(d.db,players);assert.deepEqual(profiles.get(players[0]),person.circuitProfiles);
   assert.equal((await d.query('SELECT COUNT(*) AS n FROM player_identity_people'))[0].n,2);
  }finally{d.close()}
 });

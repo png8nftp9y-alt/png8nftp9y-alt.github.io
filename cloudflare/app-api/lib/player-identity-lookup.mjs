@@ -2,7 +2,7 @@ const optional=async(db,sql,values=[])=>{try{return(await db.prepare(sql).bind(.
 export async function identityMapReady(db){const rows=await optional(db,"SELECT status FROM player_identity_sync WHERE id='current' AND status IN ('ready','pending') AND EXISTS(SELECT 1 FROM player_identity_people LIMIT 1)");return rows.length===1;}
 export async function storedIdentity(db,identity){
  if(!identity)return null;
- const rows=await optional(db,'SELECT p.payload FROM player_identity_people p WHERE p.canonical_id IN (SELECT canonical_id FROM player_identity_people WHERE canonical_id=? AND NOT EXISTS(SELECT 1 FROM player_identity_aliases WHERE alias_id=player_identity_people.canonical_id) UNION SELECT canonical_id FROM player_circuit_identities WHERE source_key=? UNION SELECT canonical_id FROM player_identity_aliases WHERE alias_id=?) AND EXISTS(SELECT 1 FROM player_circuit_identities live WHERE live.canonical_id=p.canonical_id) LIMIT 2',[identity,identity,identity]);
+ const rows=await optional(db,'SELECT p.payload FROM player_identity_people p WHERE p.canonical_id IN (SELECT canonical_id FROM player_identity_people WHERE canonical_id=? AND NOT EXISTS(SELECT 1 FROM player_identity_aliases WHERE alias_id=player_identity_people.canonical_id) UNION SELECT COALESCE(a.canonical_id,l.canonical_id) FROM player_circuit_identities l LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE l.source_key=? UNION SELECT canonical_id FROM player_identity_aliases WHERE alias_id=?) AND EXISTS(SELECT 1 FROM player_circuit_identities live WHERE live.canonical_id=p.canonical_id) LIMIT 2',[identity,identity,identity]);
  if(rows.length!==1)return null;try{return JSON.parse(rows[0].payload)}catch{return null}
 }
 export async function mappedPlayerSearch(db,{tokens,seek,pageSize,encode,userId}){
@@ -18,7 +18,7 @@ export async function mappedProfiles(db,players){
  // Established source mappings remain usable while unrelated new evidence is queued.
  for(let offset=0;offset<players.length;offset+=100){const batch=players.slice(offset,offset+100),keys=[...new Set(batch.flatMap(p=>[p.id,p.sourceKey]).filter(Boolean))];if(!keys.length)continue;
   const rows=await optional(db,`WITH requested AS (SELECT value AS lookup_key FROM json_each(?)),resolved AS (
-   SELECT k.lookup_key,l.canonical_id FROM requested k JOIN player_circuit_identities l ON l.source_key=k.lookup_key
+   SELECT k.lookup_key,COALESCE(a.canonical_id,l.canonical_id) AS canonical_id FROM requested k JOIN player_circuit_identities l ON l.source_key=k.lookup_key LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id
    UNION SELECT k.lookup_key,a.canonical_id FROM requested k JOIN player_identity_aliases a ON a.alias_id=k.lookup_key
    UNION SELECT k.lookup_key,p.canonical_id FROM requested k JOIN player_identity_people p ON p.canonical_id=k.lookup_key WHERE NOT EXISTS(SELECT 1 FROM player_identity_aliases a WHERE a.alias_id=k.lookup_key)
   ) SELECT r.lookup_key,p.canonical_id,p.payload FROM resolved r JOIN player_identity_people p ON p.canonical_id=r.canonical_id

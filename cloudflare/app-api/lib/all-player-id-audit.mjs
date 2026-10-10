@@ -70,8 +70,8 @@ export const allPlayerIdAuditSql=`${playerNativeIdAuditCtes}, people AS (
 ), sources AS (
  SELECT DISTINCT source,source_key,lookup_key FROM source_refs s WHERE ${includedPlayerIdSourceSql('s')}
 ), resolved_links AS (
- SELECT s.source,s.source_key,s.lookup_key,l.canonical_id FROM sources s JOIN player_circuit_identities l ON l.source_key=s.source_key WHERE ${includedPlayerIdSourceSql('l')}
- UNION SELECT s.source,s.source_key,s.lookup_key,l.canonical_id FROM sources s JOIN player_circuit_identities l ON l.source_key=s.lookup_key WHERE ${includedPlayerIdSourceSql('l')}
+ SELECT s.source,s.source_key,s.lookup_key,COALESCE(a.canonical_id,l.canonical_id) AS canonical_id FROM sources s JOIN player_circuit_identities l ON l.source_key=s.source_key LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE ${includedPlayerIdSourceSql('l')}
+ UNION SELECT s.source,s.source_key,s.lookup_key,COALESCE(a.canonical_id,l.canonical_id) FROM sources s JOIN player_circuit_identities l ON l.source_key=s.lookup_key LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE ${includedPlayerIdSourceSql('l')}
 ), resolved AS (
  SELECT source,source_key,lookup_key,canonical_id FROM resolved_links
  UNION SELECT s.source,s.source_key,s.lookup_key,a.canonical_id FROM sources s JOIN player_identity_aliases a ON a.alias_id=s.lookup_key
