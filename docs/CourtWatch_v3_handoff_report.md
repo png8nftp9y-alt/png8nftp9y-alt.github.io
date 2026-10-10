@@ -2404,3 +2404,8 @@ Avviata una diagnosi mirata e in sola lettura delle sorgenti senza ID ancora pre
 ### 2026-10-10 — Verifica riferimenti nativi residui Europe autorizzata
 
 Diagnosi 38052535365: 79 collegamenti, 67 nomi, 59 gruppi con riferimenti originali nei match. Verifica estesa in sola lettura per aprire la coppia torneo/partecipante esatta e raccogliere i link globali player-profile. GUID di torneo mai usati come ID giocatore; redirect limitati al dominio ufficiale, cookie pubblico integro, timeout e quattro richieste simultanee. Guardia D1 contro mutazioni e statement multipli; quattro test passati, sintassi e YAML validi. Pubblicazione esplicitamente autorizzata dall’utente dopo il blocco automatico. Risultati e successivo delta/audit ancora da verificare; zero non dichiarato.
+
+
+### 2026-10-10 — Recupero da riferimenti nativi torneo/partecipante
+
+Verifica ufficiale 38053503754 riuscita: 150 URL originali aperti, 149 con un link globale; per 58 dei 67 gruppi nominali un unico GUID coerente fra tutte le pagine, nove gruppi senza quel riferimento. Implementato recupero nella lane mirata: legge i partecipanti originali con nome normalizzato e affiliazione compatibile, verifica coppia torneo/ID locale e URL finale, usa soltanto l’anchor player-profile nel titolo principale h4. Nessun GUID di torneo o profilo dell’avversario viene promosso. Ogni sorgente conserva chiave e affiliazione; link incompleti, discordanti o oltre il limite di lettura restano irrisolti. Deltas già protetti dal confronto ottimistico e readback; cache richieste evita duplicati. Nessun nuovo schedule e lock globale D1 preservato. 38 test passati, sintassi e whitespace validi; numero realmente riparato e residui da misurare nel nuovo audit, senza dedurli dalla sola diagnosi.

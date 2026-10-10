@@ -1,5 +1,5 @@
 name: Court Watch targeted official player profile recovery
-# Recover from the verified current acceptance cache, including blank native profile icons.
+# Recover exact native tournament/player global profile anchors, preserving historical source keys.
 on:
   push:
     branches: [main]
@@ -30,7 +30,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Verify native evidence and retained-source delta guards
-        run: node --test test/repair-live-player-profiles.test.mjs test/courtwatch-player-profile-live-repair.test.mjs test/native-acceptance-profile-evidence.test.mjs
+        run: node --test test/repair-live-player-profiles.test.mjs test/courtwatch-player-profile-live-repair.test.mjs test/native-acceptance-profile-evidence.test.mjs test/retained-tournament-profile-evidence.test.mjs
       - name: Configure database
         run: |
           npm install

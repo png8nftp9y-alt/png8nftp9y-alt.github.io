@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import {profileRecoveryDeltaWriter} from '../lib/profile-recovery-delta-writer.mjs';
 import {gunzipSync} from 'node:zlib';
 import {nativeAcceptanceEvidence} from '../lib/native-acceptance-profile-evidence.mjs';
+import {retainedTournamentProfiles} from '../lib/retained-tournament-profile-evidence.mjs';
 import {pathToFileURL} from 'node:url';
 import {evidenceCatalog} from '../lib/archived-profile-evidence.mjs';
 import {itfSearchEvidence,teDirectoryEvidence,publicCookiePair,lookupTeDirectory} from '../lib/live-profile-evidence.mjs';
@@ -35,7 +36,8 @@ async function main(){
   }
   // The official search route and main-profile country markup were verified on the runner.
   report.repaired=0;report.records=[];
-  const writeDelta=profileRecoveryDeltaWriter(query,catalog);
+  const sourceBound=new Map();
+  const writeDelta=profileRecoveryDeltaWriter(query,{resolve:row=>sourceBound.get(row.source_table+'|'+row.source_key)||catalog.resolve(row)});
   const saveDelta=async batch=>{const result=await writeDelta(batch);report.repaired+=result.repaired;report.records.push(...result.records);await fs.writeFile('tmp/live-profile-recovery/report.json',JSON.stringify(report));};
   await saveDelta(rows.filter(r=>r.circuit==='itf'));
   if(report.nativeAcceptance)await saveDelta(rows.filter(r=>r.circuit==='tennis-europe'));
@@ -45,6 +47,11 @@ async function main(){
     const fields=new URLSearchParams({ReturnUrl:'/find/player',SettingsOpen:'false'});fields.append('CookiePurposes','1');
     await publicPage('https://te.tournamentsoftware.com/cookiewall/Save',{method:'POST',body:fields.toString()});page=await publicPage('https://te.tournamentsoftware.com/find/player');
    }
+   const nativeRows=await unresolvedSources(query);
+   const native=await retainedTournamentProfiles(nativeRows,query,publicPage);
+   report.retainedTournament=native.report;
+   for(const [key,evidence]of native.resolved)sourceBound.set(key,evidence);
+   await saveDelta(nativeRows);
    await fs.writeFile('tmp/live-profile-recovery/te-directory.html',page.text);
    const fields=[...page.text.matchAll(/<input\b[^>]*name=["']([^"']+)["'][^>]*>/gi)].map(m=>({name:m[1],tag:m[0]}));
    report.directory={url:page.url,bytes:page.text.length,inputNames:fields.map(x=>x.name),forms:[...page.text.matchAll(/<form\b[\s\S]*?<\/form>/gi)].map(m=>m[0]),scripts:[...page.text.matchAll(/<script\b[^>]*src=["']([^"']+)["']/gi)].map(m=>new URL(m[1],page.url).href)};
