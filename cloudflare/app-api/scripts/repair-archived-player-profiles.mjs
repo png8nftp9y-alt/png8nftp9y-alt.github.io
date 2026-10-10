@@ -1,3 +1,4 @@
+import {includedPlayerIdSourceSql} from '../lib/player-id-audit-scope.mjs';
 // D1_WRITE_POLICY: incremental
 // buildIncrementalSyncPlan: only changed source metadata; source keys are retained.
 import fs from 'node:fs/promises';
@@ -11,7 +12,7 @@ import {sqlString,verifyDocument} from '../../../src/v3/itf-draw-document-d1.mjs
 export async function unresolvedSources(query){
  const rows=[];
  for(const table of ['observed_players','search_acquired_players']){let after='';while(true){
-  const batch=await query(`SELECT s.*,l.nationality,l.birth_year FROM ${table} s JOIN player_circuit_identities l ON l.source_key=s.source_key WHERE l.profile_url='' AND s.source_key>${sqlString(after)} AND s.circuit IN ('itf','tennis-europe') ORDER BY s.source_key LIMIT 1000`);
+  const batch=await query(`SELECT s.*,l.nationality,l.birth_year FROM ${table} s JOIN player_circuit_identities l ON l.source_key=s.source_key WHERE l.profile_url='' AND ${includedPlayerIdSourceSql('s')} AND s.source_key>${sqlString(after)} AND s.circuit IN ('itf','tennis-europe') ORDER BY s.source_key LIMIT 1000`);
   rows.push(...batch.map(r=>({...r,source_table:table})));if(batch.length<1000)break;after=batch.at(-1).source_key;
  }}return rows;
 }
