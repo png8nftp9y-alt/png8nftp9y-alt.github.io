@@ -2316,3 +2316,8 @@ Run https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/3801
 Rilancio FITP https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38011202300 verde, job 04:58:19–04:58:53 Europe/Rome: stessi 77417 record, recoveredExistingFitpNames 1, changed 0, identity writes 0, pending 0, unchanged true. Confermati sia il fix FITP sia replay invariato senza nuove scritture sui giocatori.
 
 Per proseguire la richiesta autorizzata di risolvere i mancanti, rilanciato il solo job fallito del recupero 38013993745. La nuova scansione legge solo le sorgenti ancora prive di profilo; non riapplica i 4465 recuperi gia verificati. Rimane necessario verificare audit e omonimi/letture fallite: zero non raggiunto e non certificato.
+
+
+## 2026-10-10 — diagnosi dei residui Europe dopo il primo recupero
+
+Richiesta confermata di risolvere gli ID Europe. Tentativo 2 del recupero 38013993745 pending; nessun recupero duplicato avviato. Esaminato artifact ufficiale del tentativo 1: 8 errori (3 te_profile_unverified e 5 timeout/fetch); tutti gli altri residui vanno distinti fra non ancora cercati, ricerca senza candidato e omonimi/confitti. Il controllo ufficiale senza D1 verifica ora 3 casi di markup rifiutato e 3 ricerche senza recupero, confrontando nome completo e cognome mantenendo il filtro di nome esatto. Artifact solo struttura anonimizzata, nessuna associazione effettuata dal controllo. Sintassi Node verificata. Scopo: correggere il parser o la ricerca solo sulla base di risposte ufficiali; non assegnare il primo candidato per ridurre artificialmente i mancanti.

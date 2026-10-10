@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
-import {publicCookiePair,lookupTeDirectory} from '../../cloudflare/app-api/lib/live-profile-evidence.mjs';
+import {publicCookiePair,lookupTeDirectory,teSearchCandidates,teProfileEvidence} from '../../cloudflare/app-api/lib/live-profile-evidence.mjs';
+import {playerNameKey} from '../../cloudflare/app-api/lib/player-circuit-profiles.mjs';
 const directory='tmp/official-player-directory';await fs.mkdir(directory,{recursive:true});
 const jars=new Map();
 async function page(url,{method='GET',body}={}){
@@ -40,3 +41,21 @@ if(guid){
 const verified=await lookupTeDirectory('Richie Kennedy',page);
 console.log(JSON.stringify({verifiedLookupCandidates:verified.length,nations:verified.map(p=>p.nationality)}));
 if(verified.length!==1||verified[0].nationality!=='IRL')throw Error('verified_directory_lookup_failed');
+const samples=['Maksim Mikhailov','Sofia Ivanova','Nikita Stepanov','ANDRADA MARIA SOFIAN','Ada Aydin','Sarah Ioana Slaniceanu'];
+for(const [index,name]of samples.entries()){
+ const diagnostics={index,queries:[]};
+ for(const query of [name,name.split(/\s+/).at(-1)]){
+  const p=await page('https://te.tournamentsoftware.com/find/player/DoSearch?'+new URLSearchParams({Query:query,Page:'1',SportID:'0'}));
+  const all=teSearchCandidates(p.text),exact=all.filter(c=>playerNameKey(c.name)===playerNameKey(name));
+  const entry={queryKind:query===name?'full':'surname',cards:all.length,exact:exact.length,profiles:[]};
+  for(const [n,c]of exact.slice(0,5).entries()){
+   const p=await page(c.profileUrl),e=teProfileEvidence(p.text,c,p.url);
+   const title=p.text.match(/<h2\b[^>]*class=["'][^"']*media__title--large[^"']*["'][^>]*>([\s\S]*?)<\/h2>/i);
+   entry.profiles.push({verified:!!e,nationality:e?.nationality,title:!!title,flagTags:[...p.text.matchAll(/<img\b[^>]*class=["'][^"']*profile-head__nat[^"']*["'][^>]*>/gi)].map(m=>m[0])});
+   const masked=p.text.replace(/>[\s\S]*?</g,m=>'>[text:'+m.slice(1,-1).trim().length+']<').replace(/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/gi,'PROFILE_ID');
+   await fs.writeFile(directory+'/residual-'+index+'-'+entry.queryKind+'-'+n+'.html',masked);
+  }
+  diagnostics.queries.push(entry);
+ }
+ console.log('TE_RESIDUAL_STRUCTURE='+JSON.stringify(diagnostics));
+}
