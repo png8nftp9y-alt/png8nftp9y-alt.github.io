@@ -61,7 +61,7 @@ export const allPlayerIdAuditSql=`${playerNativeIdAuditCtes}, people AS (
  UNION ALL SELECT 'personal',observed_source_key,courtwatch_id,
  CASE WHEN observed_source_key='tennis-europe|name:MOEZ BEN AMOR' THEN 'tennis-europe' ELSE 'courtwatch' END FROM user_app_player_additions
 ), member_source_refs AS (
- SELECT 'membership' AS source,'courtwatch|'||courtwatch_id AS source_key,courtwatch_id AS lookup_key,'courtwatch' AS circuit FROM user_app_players
+ SELECT 'membership' AS source,courtwatch_id AS source_key,courtwatch_id AS lookup_key,'courtwatch' AS circuit FROM user_app_players
  UNION ALL SELECT 'override','courtwatch|'||entity_id,entity_id,'courtwatch' FROM manual_overrides WHERE entity_type='player' AND action='upsert' AND active=1
 ), source_refs AS (
  SELECT * FROM observed_source_refs
@@ -75,7 +75,7 @@ export const allPlayerIdAuditSql=`${playerNativeIdAuditCtes}, people AS (
 ), resolved AS (
  SELECT source,source_key,lookup_key,canonical_id FROM resolved_links
  UNION SELECT s.source,s.source_key,s.lookup_key,a.canonical_id FROM sources s JOIN player_identity_aliases a ON a.alias_id=s.lookup_key
- UNION SELECT s.source,s.source_key,s.lookup_key,p.canonical_id FROM sources s JOIN player_identity_people p ON p.canonical_id=s.lookup_key
+ UNION SELECT s.source,s.source_key,s.lookup_key,p.canonical_id FROM sources s JOIN player_identity_people p ON p.canonical_id=s.lookup_key WHERE NOT EXISTS(SELECT 1 FROM player_identity_aliases a WHERE a.alias_id=s.lookup_key)
 ), source_coverage AS (
  SELECT s.source,s.source_key,s.lookup_key,COUNT(DISTINCT p.canonical_id) AS mapped FROM sources s
  LEFT JOIN resolved r ON r.source=s.source AND r.source_key=s.source_key AND r.lookup_key=s.lookup_key
