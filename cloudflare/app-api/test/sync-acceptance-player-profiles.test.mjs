@@ -32,6 +32,20 @@ test('D1_TEST_REAL_DELTAS_ONLY: a new name becomes a profile while retained meta
   assert.equal(JSON.parse(d.execute('SELECT payload FROM observed_players WHERE source_key=?',[r.source_key])[0].payload).clubName,'Retained club');
  }finally{d.close()}
 });
+test('a refreshed ID-less acceptance retains the official GUID recovered on the same source',async()=>{
+ const d=database({identityMapping:true});try{
+  const player={playerName:'Known Europe Person',nationality:'IRL'},doc={tournaments:{t:{participants:[player]}}};
+  await syncAcceptanceProfiles(d.query,'tennis-europe',doc);
+  const source=acceptancePlayers('tennis-europe',doc)[0],id='12345678-1234-1234-1234-123456789abc';
+  const row=d.execute('SELECT * FROM observed_players WHERE source_key=?',[source.source_key])[0];
+  const payload={...JSON.parse(row.payload),officialId:id,profileUrl:'https://te.tournamentsoftware.com/player-profile/'+id};
+  d.execute('UPDATE observed_players SET official_id=?,payload=? WHERE source_key=?',[id,JSON.stringify(payload),source.source_key]);
+  const result=await syncAcceptanceProfiles(d.query,'tennis-europe',{tournaments:{t:{participants:[player,{playerName:'New Europe Person',nationality:'ITA'}]}}});
+  const retained=d.execute('SELECT official_id,payload FROM observed_players WHERE source_key=?',[source.source_key])[0];
+  assert.equal(retained.official_id,id);assert.equal(JSON.parse(retained.payload).profileUrl,payload.profileUrl);assert.equal(result.changed,1);
+  const profile=await storedIdentity(d.db,source.source_key);assert.ok(profile.circuitProfiles.some(p=>p.url===payload.profileUrl));
+ }finally{d.close()}
+});
 test('D1_TEST_INCOMPLETE_SOURCE_GUARD: empty or malformed lists never mutate D1 or mark checkpoints',async()=>{
  const d=database({identityMapping:true});try{
   for(const doc of [{},{participants:[]},{participants:[{}]}])await assert.rejects(syncAcceptanceProfiles(d.query,'itf',doc),/incomplete/);

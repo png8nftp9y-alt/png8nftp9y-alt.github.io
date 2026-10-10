@@ -50,7 +50,7 @@ export async function syncAcceptanceProfiles(query,circuit,doc) {
   for(let i=0;i<rows.length;i+=40){
    const incoming=rows.slice(i,i+40),current=await query('SELECT source_key,circuit,official_id,normalized_name,display_name,payload FROM observed_players WHERE source_key IN ('+incoming.map(r=>sqlString(r.source_key)).join(',')+')');
    const parsed=current.map(r=>({...r,payload:JSON.parse(r.payload)})),prior=new Map(parsed.map(r=>[r.source_key,r]));
-   const merged=incoming.map(r=>({...r,payload:{...(prior.get(r.source_key)?.payload||{}),...Object.fromEntries(Object.entries(r.payload).filter(([,v])=>v!==''&&v!=null))}}));
+   const merged=incoming.map(r=>({...r,official_id:r.official_id||prior.get(r.source_key)?.official_id||'',payload:{...(prior.get(r.source_key)?.payload||{}),...Object.fromEntries(Object.entries(r.payload).filter(([,v])=>v!==''&&v!=null))}}));
    const plan=buildIncrementalSyncPlan({current:parsed,incoming:merged,keyOf:r=>r.source_key,sourceComplete:true});
    const delta=[...plan.inserts,...plan.updates.map(u=>u.after)];changed+=delta.length;
    for(let j=0;j<delta.length;j+=20)await query(delta.slice(j,j+20).map(r=>'INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES('+[r.source_key,r.circuit,r.official_id,r.normalized_name,r.display_name,JSON.stringify(r.payload)].map(sqlString).join(',')+') ON CONFLICT(source_key) DO UPDATE SET official_id=excluded.official_id,normalized_name=excluded.normalized_name,display_name=excluded.display_name,payload=excluded.payload WHERE official_id IS NOT excluded.official_id OR normalized_name IS NOT excluded.normalized_name OR display_name IS NOT excluded.display_name OR payload IS NOT excluded.payload;').join('\n'));
