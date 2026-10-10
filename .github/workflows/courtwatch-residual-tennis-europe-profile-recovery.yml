@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Verify source-bound Tennis Europe recovery and identity mapping
-        run: node --test test/acceptance-source-profile-provenance.test.mjs test/legacy-acceptance-profile-migration.test.mjs test/archived-profile-evidence.test.mjs test/player-identity-mapping.test.mjs test/player-circuit-profiles.test.mjs
+        run: node --test test/player-id-audit-scope.test.mjs test/acceptance-source-profile-provenance.test.mjs test/legacy-acceptance-profile-migration.test.mjs test/archived-profile-evidence.test.mjs test/player-identity-mapping.test.mjs test/player-circuit-profiles.test.mjs
       - run: npm install
       - run: node scripts/configure-d1.mjs
       - name: Load verified native Tennis Europe acceptance generation
