@@ -2,7 +2,7 @@ const optional=async(db,sql,values=[])=>{try{return(await db.prepare(sql).bind(.
 export async function identityMapReady(db){const rows=await optional(db,"SELECT status FROM player_identity_sync WHERE id='current' AND status IN ('ready','pending') AND EXISTS(SELECT 1 FROM player_identity_people LIMIT 1)");return rows.length===1;}
 export async function storedIdentity(db,identity){
  if(!identity)return null;
- const rows=await optional(db,'SELECT p.payload FROM player_identity_people p WHERE p.canonical_id IN (SELECT canonical_id FROM player_identity_people WHERE canonical_id=? UNION SELECT canonical_id FROM player_circuit_identities WHERE source_key=? UNION SELECT canonical_id FROM player_identity_aliases WHERE alias_id=?) AND EXISTS(SELECT 1 FROM player_circuit_identities live WHERE live.canonical_id=p.canonical_id) LIMIT 2',[identity,identity,identity]);
+ const rows=await optional(db,'SELECT p.payload FROM player_identity_people p WHERE p.canonical_id IN (SELECT canonical_id FROM player_identity_people WHERE canonical_id=? AND NOT EXISTS(SELECT 1 FROM player_identity_aliases WHERE alias_id=player_identity_people.canonical_id) UNION SELECT canonical_id FROM player_circuit_identities WHERE source_key=? UNION SELECT canonical_id FROM player_identity_aliases WHERE alias_id=?) AND EXISTS(SELECT 1 FROM player_circuit_identities live WHERE live.canonical_id=p.canonical_id) LIMIT 2',[identity,identity,identity]);
  if(rows.length!==1)return null;try{return JSON.parse(rows[0].payload)}catch{return null}
 }
 export async function mappedPlayerSearch(db,{tokens,seek,pageSize,encode,userId}){
@@ -20,7 +20,7 @@ export async function mappedProfiles(db,players){
   const rows=await optional(db,`WITH requested AS (SELECT value AS lookup_key FROM json_each(?)),resolved AS (
    SELECT k.lookup_key,l.canonical_id FROM requested k JOIN player_circuit_identities l ON l.source_key=k.lookup_key
    UNION SELECT k.lookup_key,a.canonical_id FROM requested k JOIN player_identity_aliases a ON a.alias_id=k.lookup_key
-   UNION SELECT k.lookup_key,p.canonical_id FROM requested k JOIN player_identity_people p ON p.canonical_id=k.lookup_key
+   UNION SELECT k.lookup_key,p.canonical_id FROM requested k JOIN player_identity_people p ON p.canonical_id=k.lookup_key WHERE NOT EXISTS(SELECT 1 FROM player_identity_aliases a WHERE a.alias_id=k.lookup_key)
   ) SELECT r.lookup_key,p.canonical_id,p.payload FROM resolved r JOIN player_identity_people p ON p.canonical_id=r.canonical_id
   WHERE EXISTS(SELECT 1 FROM player_circuit_identities live WHERE live.canonical_id=p.canonical_id)`,[JSON.stringify(keys)]);
   const byKey=new Map();for(const r of rows){let p;try{p=JSON.parse(r.payload)}catch{continue}const persons=byKey.get(r.lookup_key)||new Map();persons.set(r.canonical_id,p);byKey.set(r.lookup_key,persons);}

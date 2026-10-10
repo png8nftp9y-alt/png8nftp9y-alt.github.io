@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Test stored native profiles, application lookups and complete ID coverage
+      - name: Test native ID coverage and canonical alias redirects
         run: node --test test/all-player-id-audit.test.mjs test/player-id-audit-scope.test.mjs
       - name: Audit IDs and distinguish unresolved from ambiguous references anonymously
         run: node scripts/all-player-id-audit.mjs

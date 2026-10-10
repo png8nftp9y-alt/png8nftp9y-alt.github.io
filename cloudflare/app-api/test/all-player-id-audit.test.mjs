@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {storedIdentity,mappedProfiles} from '../lib/player-identity-lookup.mjs';
 import {loadPlayerIdDiagnostics} from '../lib/admin-player-id-diagnostics.mjs';
 import {spawnSync} from 'node:child_process';
 import {database} from './search-sqlite-fixture.mjs';
@@ -94,5 +95,21 @@ test('unresolved and ambiguous references are distinguished without exporting id
   d.execute("INSERT INTO user_app_players VALUES('owner','f','today')");
   result=await audit(d);assert.deepEqual(JSON.parse(result.unmapped_mapping_breakdown),[{source:'acquired',mapped_players:2,records:1},{source:'membership',mapped_players:0,records:1},{source:'membership',mapped_players:2,records:1}]);assert.equal(result.passed,false);
   assert.equal(result.unresolved_refs_to_excluded_identity,0);
+ }finally{d.close()}
+});
+
+
+test('explicit canonical alias redirects override retained canonical rows for app and audit',async()=>{
+ const d=fixture();try{
+  add(d,'f','fitp','123456','Player One');add(d,'other','itf','800123456','Player Two');await syncPlayerIdentities(d.query);
+  const ids=await d.query("SELECT canonical_id FROM player_circuit_identities WHERE source_key IN ('f','other') ORDER BY source_key");
+  const old=ids[0].canonical_id,target=ids[1].canonical_id;
+  d.execute('UPDATE player_identity_aliases SET canonical_id=? WHERE alias_id=?',[target,old]);
+  d.execute("INSERT INTO user_app_players VALUES('owner',?,'today')",[old]);
+  d.execute("INSERT INTO user_app_player_additions VALUES('owner',?,'other','{}','today')",[old]);
+  const result=await audit(d);assert.equal(result.unmapped_or_ambiguous_sources,0);assert.equal(result.passed,true);
+  const person=await storedIdentity(d.db,old);assert.equal(person.canonicalId,target);
+  const players=[{id:old}];const profiles=await mappedProfiles(d.db,players);assert.deepEqual(profiles.get(players[0]),person.circuitProfiles);
+  assert.equal((await d.query('SELECT COUNT(*) AS n FROM player_identity_people'))[0].n,2);
  }finally{d.close()}
 });
