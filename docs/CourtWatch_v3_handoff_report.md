@@ -2279,3 +2279,8 @@ Validazione: 19 test superati, inclusi replay FITP con nome recuperato a zero sc
 ### Directory Europe: verifica pubblica indipendente dal lock D1
 
 Per proseguire il recupero GUID senza aspettare la coda dei writer, aggiunta ispezione una tantum del directory ufficiale anonimo e degli script pubblici di ricerca. Nessun segreto, account autenticato, query o scrittura D1; conserva cookie pubblici di consenso per host e legge solo la pagina senza ricerca e i suoi script statici. Non viene programmata ricorrenza. Sintassi Node e YAML verificate. Lo scopo è identificare la form/API esatta prima di richiedere i profili mancanti, non dichiarare zero.
+
+
+### Europe directory accesso riuscito — run 38014159355 verde
+
+Cookie corretto: pagina finale /find/player, cookiewall false. Form ufficiale action /find/player/DoSearch, data-ajax-method GET, campi Query, Page=1 e SportID=0. Nessuna supposizione sul parametro q. Aggiunta verifica una tantum di una ricerca campione per determinare la struttura dei risultati; l'artifact contiene solo struttura HTML con testi e GUID mascherati, nessuna tessera/nome/record grezzo. Sintassi Node verificata. Necessario prima di costruire il recupero massivo dei soli profili mancanti. Non modifica D1 e non dichiara zero.

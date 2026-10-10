@@ -5,7 +5,7 @@ const jars=new Map();
 async function page(url,{method='GET',body}={}){
  for(let i=0;i<6;i++){
   const host=new URL(url).hostname,jar=jars.get(host)||new Map();jars.set(host,jar);
-  const r=await fetch(url,{method,body,redirect:'manual',signal:AbortSignal.timeout(20000),headers:{'User-Agent':'Mozilla/5.0','Content-Type':'application/x-www-form-urlencoded',Cookie:[...jar].map(([k,v])=>k+'='+v).join('; ')}});
+  const r=await fetch(url,{method,body,redirect:'manual',signal:AbortSignal.timeout(20000),headers:{'User-Agent':'Mozilla/5.0','X-Requested-With':'XMLHttpRequest','Content-Type':'application/x-www-form-urlencoded',Cookie:[...jar].map(([k,v])=>k+'='+v).join('; ')}});
   for(const c of r.headers.getSetCookie()){const pair=publicCookiePair(c);if(pair)jar.set(...pair);}
   const text=await r.text(),next=r.headers.get('location');
   if(next&&r.status>=300&&r.status<400){url=new URL(next,url).href;method='GET';body=undefined;continue;}
@@ -24,3 +24,9 @@ await fs.writeFile(directory+'/directory.html',p.text);await fs.writeFile(direct
 for(const [i,url]of scripts.entries()){const s=await page(url);await fs.writeFile(directory+'/script-'+i+'.js',s.text);}
 console.log(JSON.stringify(report));
 if(report.cookiewall)throw Error('directory_consent_not_applied');
+// Verified form action and parameter names from the official directory.
+const result=await page('https://te.tournamentsoftware.com/find/player/DoSearch?'+new URLSearchParams({Query:'Richie Kennedy',Page:'1',SportID:'0'}));
+// Publish structure only: no names, player identifiers, cookies or raw profile records.
+const masked=result.text.replace(/>[\s\S]*?</g,m=>'>[text:'+m.slice(1,-1).trim().length+']<').replace(/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/gi,'PROFILE_ID');
+await fs.writeFile(directory+'/search-structure.html',masked);
+console.log(JSON.stringify({searchBytes:result.text.length,resultRows:(result.text.match(/<tr\b/gi)||[]).length,resultItems:(result.text.match(/<li\b/gi)||[]).length,profileLinks:(result.text.match(/player-profile/gi)||[]).length}));
