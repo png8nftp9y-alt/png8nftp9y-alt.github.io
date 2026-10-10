@@ -1,26 +1,15 @@
 import {includedPlayerIdSourceSql} from './player-id-audit-scope.mjs';
-// Count native identities, not source aliases or configured circuit eligibility.
-export const playerIdDiagnosticsSql = `
-WITH native AS (
- SELECT canonical_id,circuit,lower(trim(official_id)) AS official_id,
- CASE
- WHEN circuit='fitp' AND length(trim(official_id)) BETWEEN 6 AND 12
-  AND trim(official_id) NOT GLOB '*[^0-9]*' THEN 1
- WHEN circuit='itf' AND length(trim(official_id))=9
-  AND trim(official_id) GLOB '800*' AND trim(official_id) NOT GLOB '*[^0-9]*' THEN 1
- WHEN circuit='tennis-europe' AND length(trim(official_id))=36
-  AND substr(trim(official_id),9,1)='-' AND substr(trim(official_id),14,1)='-'
-  AND substr(trim(official_id),19,1)='-' AND substr(trim(official_id),24,1)='-'
-  AND length(replace(trim(official_id),'-',''))=32
-  AND lower(replace(trim(official_id),'-','')) NOT GLOB '*[^0-9a-f]*' THEN 1
- ELSE 0 END AS has_id
- FROM player_circuit_identities
- WHERE circuit IN ('fitp','tennis-europe','itf') AND ${includedPlayerIdSourceSql()}
+import {playerNativeIdAuditCtes} from './all-player-id-audit.mjs';
+// Shared native evidence includes configured players' stored official profiles.
+export const playerIdDiagnosticsSql=`${playerNativeIdAuditCtes}, known AS (
+ SELECT canonical_id,circuit FROM eligible_links WHERE circuit IN ('fitp','tennis-europe','itf')
+ UNION SELECT canonical_id,circuit FROM native
 ), people AS (
- SELECT circuit,canonical_id,MAX(has_id) AS has_id FROM native GROUP BY circuit,canonical_id
+ SELECT k.circuit,k.canonical_id,MAX(n.canonical_id IS NOT NULL) AS has_id FROM known k
+ LEFT JOIN native n ON n.canonical_id=k.canonical_id AND n.circuit=k.circuit GROUP BY k.circuit,k.canonical_id
 ), circuits(circuit) AS (VALUES ('fitp'),('tennis-europe'),('itf'))
 SELECT c.circuit,
- (SELECT COUNT(DISTINCT official_id) FROM native n WHERE n.circuit=c.circuit AND n.has_id=1) AS ids,
+ (SELECT COUNT(DISTINCT official_id) FROM native n WHERE n.circuit=c.circuit) AS ids,
  (SELECT COUNT(*) FROM people p WHERE p.circuit=c.circuit) AS players,
  (SELECT COUNT(*) FROM people p WHERE p.circuit=c.circuit AND p.has_id=0) AS missing,
  (SELECT COUNT(*) FROM player_identity_pending_sources) AS pending,

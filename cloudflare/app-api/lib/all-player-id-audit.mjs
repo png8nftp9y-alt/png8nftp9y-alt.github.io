@@ -3,9 +3,9 @@
 import {includedPlayerIdSourceSql} from './player-id-audit-scope.mjs';
 
 // One aggregate SELECT gives a consistent D1 snapshot without exporting players.
-export const allPlayerIdAuditSql=`WITH eligible_links AS (
+export const playerNativeIdAuditCtes=`WITH RECURSIVE eligible_links AS (
  SELECT source_key,canonical_id,circuit,official_id FROM player_circuit_identities WHERE ${includedPlayerIdSourceSql()}
-), native AS (
+), link_native AS (
  SELECT canonical_id,circuit,lower(trim(official_id)) AS official_id FROM eligible_links
  WHERE (circuit='fitp' AND length(trim(official_id)) BETWEEN 6 AND 12 AND trim(official_id) NOT GLOB '*[^0-9]*')
  OR (circuit='itf' AND length(trim(official_id))=9 AND trim(official_id) GLOB '800*' AND trim(official_id) NOT GLOB '*[^0-9]*')
@@ -13,7 +13,43 @@ export const allPlayerIdAuditSql=`WITH eligible_links AS (
  AND substr(trim(official_id),9,1)='-' AND substr(trim(official_id),14,1)='-'
  AND substr(trim(official_id),19,1)='-' AND substr(trim(official_id),24,1)='-'
  AND length(replace(trim(official_id),'-',''))=32 AND lower(replace(trim(official_id),'-','')) NOT GLOB '*[^0-9a-f]*')
-), people AS (
+), canonical_profiles AS (
+ SELECT p.canonical_id,json_extract(profile.value,'$.circuit') AS circuit,json_extract(profile.value,'$.url') AS url
+ FROM player_identity_people p JOIN (SELECT DISTINCT canonical_id FROM eligible_links WHERE circuit='courtwatch') e ON e.canonical_id=p.canonical_id,
+ json_each(p.payload,'$.circuitProfiles') profile WHERE json_extract(profile.value,'$.url')<>''
+), profile_paths AS (
+ SELECT canonical_id,circuit,
+ CASE WHEN circuit='tennis-europe' AND lower(substr(url,1,49))='https://te.tournamentsoftware.com/player-profile/' THEN rtrim(substr(url,50),'/') ELSE '' END AS te_id,
+ CASE WHEN circuit='itf' AND lower(substr(url,1,37))='https://www.itftennis.com/en/players/' THEN substr(url,38)
+ WHEN circuit='itf' AND lower(substr(url,1,33))='https://itftennis.com/en/players/' THEN substr(url,34) ELSE '' END AS itf_path,
+ CASE WHEN circuit='fitp' AND lower(substr(url,1,49))='https://www.fitp.it/pagina-giocatore/?cardnumber=' THEN substr(url,50)
+ WHEN circuit='fitp' AND lower(substr(url,1,45))='https://fitp.it/pagina-giocatore/?cardnumber=' THEN substr(url,46) ELSE '' END AS fitp_query
+ FROM canonical_profiles
+), fitp_encoded AS (
+ SELECT canonical_id,replace(replace(CASE WHEN instr(fitp_query,'&')>0 THEN substr(fitp_query,1,instr(fitp_query,'&')-1) ELSE fitp_query END,'%3D','='),'%3d','=') AS encoded FROM profile_paths WHERE circuit='fitp'
+), fitp_decoded(canonical_id,encoded,pos,official_id) AS (
+ SELECT canonical_id,encoded,1,'' FROM fitp_encoded WHERE length(encoded) BETWEEN 8 AND 16 AND length(encoded)%4=0 AND encoded NOT GLOB '*[^A-Za-z0-9+/=]*'
+ UNION ALL SELECT canonical_id,encoded,pos+4,official_id||
+ CASE WHEN substr(encoded,pos+2,1)='=' THEN char((((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+0,1))-1)<<2)|((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+1,1))-1)>>4)))
+ WHEN substr(encoded,pos+3,1)='=' THEN char((((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+0,1))-1)<<2)|((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+1,1))-1)>>4)),((((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+1,1))-1)&15)<<4)|((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+2,1))-1)>>2))) ELSE char((((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+0,1))-1)<<2)|((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+1,1))-1)>>4)),((((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+1,1))-1)&15)<<4)|((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+2,1))-1)>>2)),((((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+2,1))-1)&3)<<6)|(instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+3,1))-1))) END
+ FROM fitp_decoded WHERE pos<=length(encoded) AND (((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+0,1))-1)<<2)|((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+1,1))-1)>>4)) BETWEEN 48 AND 57
+ AND (substr(encoded,pos+2,2)='==' AND pos+3=length(encoded)
+ OR substr(encoded,pos+2,1)<>'=' AND ((((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+1,1))-1)&15)<<4)|((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+2,1))-1)>>2)) BETWEEN 48 AND 57
+ AND (substr(encoded,pos+3,1)='=' AND pos+3=length(encoded) OR substr(encoded,pos+3,1)<>'=' AND ((((instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+2,1))-1)&3)<<6)|(instr('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',substr(encoded,pos+3,1))-1)) BETWEEN 48 AND 57))
+), profile_native AS (
+ SELECT canonical_id,'tennis-europe' AS circuit,lower(te_id) AS official_id FROM profile_paths
+ WHERE length(te_id)=36 AND substr(te_id,9,1)='-' AND substr(te_id,14,1)='-' AND substr(te_id,19,1)='-' AND substr(te_id,24,1)='-'
+ AND length(replace(te_id,'-',''))=32 AND lower(replace(te_id,'-','')) NOT GLOB '*[^0-9a-f]*'
+ UNION ALL SELECT canonical_id,'itf',substr(itf_path,instr(itf_path,'/')+1,9) FROM profile_paths WHERE circuit='itf' AND instr(itf_path,'/')>1
+ AND substr(itf_path,instr(itf_path,'/')+10,1)='/' AND substr(itf_path,instr(itf_path,'/')+1,9) GLOB '800*'
+ AND substr(itf_path,instr(itf_path,'/')+1,9) NOT GLOB '*[^0-9]*' AND length(substr(itf_path,instr(itf_path,'/')+1,9))=9
+ UNION ALL SELECT canonical_id,'fitp',official_id FROM fitp_decoded WHERE pos>length(encoded) AND length(official_id) BETWEEN 6 AND 12 AND official_id NOT GLOB '*[^0-9]*'
+), native AS (
+ SELECT canonical_id,circuit,official_id FROM link_native
+ UNION SELECT canonical_id,circuit,official_id FROM profile_native
+)`;
+
+export const allPlayerIdAuditSql=`${playerNativeIdAuditCtes}, people AS (
  SELECT p.canonical_id,COUNT(DISTINCT n.circuit) AS circuits FROM player_identity_people p
  JOIN (SELECT DISTINCT canonical_id FROM eligible_links) e ON e.canonical_id=p.canonical_id
  LEFT JOIN native n ON n.canonical_id=p.canonical_id GROUP BY p.canonical_id
@@ -33,8 +69,11 @@ export const allPlayerIdAuditSql=`WITH eligible_links AS (
  UNION ALL SELECT * FROM member_source_refs
 ), sources AS (
  SELECT DISTINCT source,source_key,lookup_key FROM source_refs s WHERE ${includedPlayerIdSourceSql('s')}
+), resolved_links AS (
+ SELECT s.source,s.source_key,s.lookup_key,l.canonical_id FROM sources s JOIN player_circuit_identities l ON l.source_key=s.source_key WHERE ${includedPlayerIdSourceSql('l')}
+ UNION SELECT s.source,s.source_key,s.lookup_key,l.canonical_id FROM sources s JOIN player_circuit_identities l ON l.source_key=s.lookup_key WHERE ${includedPlayerIdSourceSql('l')}
 ), resolved AS (
- SELECT s.source,s.source_key,s.lookup_key,l.canonical_id FROM sources s JOIN eligible_links l ON l.source_key=s.source_key
+ SELECT source,source_key,lookup_key,canonical_id FROM resolved_links
  UNION SELECT s.source,s.source_key,s.lookup_key,a.canonical_id FROM sources s JOIN player_identity_aliases a ON a.alias_id=s.lookup_key
  UNION SELECT s.source,s.source_key,s.lookup_key,p.canonical_id FROM sources s JOIN player_identity_people p ON p.canonical_id=s.lookup_key
 ), source_coverage AS (
