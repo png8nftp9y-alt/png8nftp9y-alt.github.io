@@ -26,6 +26,14 @@ test('public consent cookies retain equals signs in their values',()=>{
 const teId='12345678-1234-1234-1234-123456789abc';
 const card=(id,name)=>'<h5 class="media__title"><a href="/player-profile/'+id+'"><span>'+name+'</span></a></h5>';
 const profile=(name,country)=>'<img class="profile-head__nat" src="//static.tournamentsoftware.com/content/images/flags/'+country+'.svg"><h2 class="media__title media__title--large"><span>'+name+'</span></h2><img src="//static.tournamentsoftware.com/content/images/flags/FRA.svg">';
+test('numeric HTML entities preserve accented official names through search and profile verification',async()=>{
+ const encoded='Ella Bal&#225;&#x17e;ov&#225;',candidate=teSearchCandidates(card(teId,encoded))[0];
+ assert.equal(candidate.name,'Ella Balážová');
+ assert.equal(teProfileEvidence(profile(encoded,'SVK'),{...candidate,name:'Ella Balážová'}).nationality,'SVK');
+ const found=await lookupTeDirectory('Ella Balážová',async url=>({url,text:new URL(url).searchParams.has('Page')?(new URL(url).searchParams.get('Page')==='1'?card(teId,encoded):''):profile(encoded,'SVK')}));
+ assert.equal(found.length,1);assert.equal(found[0].officialId,teId);
+ assert.doesNotThrow(()=>teSearchCandidates(card(teId,'Bad &#x110000; Entity')));
+});
 test('native search cards require named official profile anchors and main-header nationality',()=>{
  const candidates=teSearchCandidates('<a href="/player-profile/'+teId+'">icon</a>'+card(teId,'Richie Kennedy')+'<h5><a href="https://example.com/player-profile/'+teId+'">Other Person</a></h5>');
  assert.equal(candidates.length,1);assert.equal(teProfileEvidence(profile('Richie Kennedy','IRL'),candidates[0]).nationality,'IRL');

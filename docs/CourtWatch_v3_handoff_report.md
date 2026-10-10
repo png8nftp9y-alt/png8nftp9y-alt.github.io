@@ -2362,3 +2362,8 @@ Nessun recupero successivo risulta nei dispatch piu recenti. La scansione automa
 ### 2026-10-10 — Diagnosi completa dei 611 collegamenti Tennis Europe residui
 
 Il recupero 38040666830 ha verificato tutti i 330 nomi, senza nuove associazioni: rimangono 611 collegamenti di 372 profili. Avviata una verifica pubblica in sola lettura della directory ufficiale per ogni nome residuo, con conteggio dei candidati, nazionalità ufficiali e profili privi di metadati. Fra i residui, 215 collegamenti riportano RTF: non si applicano equivalenze di nazionalità senza riscontro ufficiale. La diagnosi scarica l'artefatto di quel run e pubblica solo indici e metadati, senza nomi o identificativi personali; nessuna scrittura D1. Serve a correggere la causa del blocco prima di un ulteriore recupero.
+
+
+### 2026-10-10 — Correzione della decodifica nomi nella directory ufficiale
+
+La lettura dei profili e delle schede Tennis Europe decodificava solo apostrofi e poche entità HTML, lasciando numeri al posto delle lettere accentate nelle entità numeriche decimali/esadecimali. Corretto il parser per preservare i caratteri Unicode e confrontare lo stesso nome fra acceptance, ricerca e profilo. Mantenuti i controlli su GUID, paese, dominio, completezza della ricerca e omonimi. Verifica: 33 test del recupero mirato superati, incluso nome accentato codificato in ricerca e profilo, input Unicode fuori intervallo e guardie D1. Diagnosi completa in corso: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38050469869. Questa modifica non dimostra ancora zero residui; atteso audit dopo il recupero.

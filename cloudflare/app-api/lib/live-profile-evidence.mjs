@@ -20,8 +20,11 @@ export function publicCookiePair(value){
  const pair=String(value).split(';')[0],i=pair.indexOf('=');
  return i>0?[pair.slice(0,i),pair.slice(i+1)]:null;
 }
-const decode=s=>String(s||'').replace(/&amp;/g,'&').replace(/&#39;|&apos;/g,"'").replace(/&quot;/g,'"').replace(/&nbsp;/g,' ');
-const clean=s=>decode(s).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+const decode=s=>String(s||'').replace(/&#(x[0-9a-f]+|[0-9]+);/gi,(entity,value)=>{
+ const code=value[0].toLowerCase()==='x'?parseInt(value.slice(1),16):Number(value);
+ return code>0&&code<=0x10ffff&&!(code>=0xd800&&code<=0xdfff)?String.fromCodePoint(code):entity;
+}).replace(/&amp;/g,'&').replace(/&apos;/g,"'").replace(/&quot;/g,'"').replace(/&nbsp;/g,' ');
+const clean=s=>decode(String(s||'').replace(/<[^>]*>/g,' ')).replace(/\s+/g,' ').trim();
 export function teSearchCandidates(html){
  const out=new Map();
  // The official AJAX directory uses h5 cards; the icon anchor has no player name.
