@@ -41,21 +41,46 @@ if(guid){
 const verified=await lookupTeDirectory('Richie Kennedy',page);
 console.log(JSON.stringify({verifiedLookupCandidates:verified.length,nations:verified.map(p=>p.nationality)}));
 if(verified.length!==1||verified[0].nationality!=='IRL')throw Error('verified_directory_lookup_failed');
-const samples=['Maksim Mikhailov','Sofia Ivanova','Nikita Stepanov','ANDRADA MARIA SOFIAN','Ada Aydin','Sarah Ioana Slaniceanu'];
-for(const [index,name]of samples.entries()){
- const diagnostics={index,queries:[]};
- for(const query of [name,name.split(/\s+/).at(-1)]){
-  const p=await page('https://te.tournamentsoftware.com/find/player/DoSearch?'+new URLSearchParams({Query:query,Page:'1',SportID:'0'}));
-  const all=teSearchCandidates(p.text),exact=all.filter(c=>playerNameKey(c.name)===playerNameKey(name));
-  const entry={queryKind:query===name?'full':'surname',cards:all.length,exact:exact.length,profiles:[]};
-  for(const [n,c]of exact.slice(0,5).entries()){
-   const p=await page(c.profileUrl),e=teProfileEvidence(p.text,c,p.url);
-   const title=p.text.match(/<h2\b[^>]*class=["'][^"']*media__title--large[^"']*["'][^>]*>([\s\S]*?)<\/h2>/i);
-   entry.profiles.push({verified:!!e,nationality:e?.nationality,title:!!title,flagTags:[...p.text.matchAll(/<img\b[^>]*class=["'][^"']*profile-head__nat[^"']*["'][^>]*>/gi)].map(m=>m[0])});
-   const masked=p.text.replace(/>[\s\S]*?</g,m=>'>[text:'+m.slice(1,-1).trim().length+']<').replace(/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/gi,'PROFILE_ID');
-   await fs.writeFile(directory+'/residual-'+index+'-'+entry.queryKind+'-'+n+'.html',masked);
-  }
-  diagnostics.queries.push(entry);
- }
- console.log('TE_RESIDUAL_STRUCTURE='+JSON.stringify(diagnostics));
+
+const residual=JSON.parse(await fs.readFile('tmp/profile-residual/player-profile-unresolved.json','utf8'));
+const groups=new Map();
+for(const row of residual.residual){
+ const key=playerNameKey(row.display_name),group=groups.get(key)||{name:row.display_name,nations:new Set(),links:0};
+ group.nations.add(row.nationality||'');group.links++;groups.set(key,group);
 }
+const samples=[...groups.values()],diagnostics=[];
+let next=0;
+await Promise.all(Array.from({length:4},async()=>{
+ while(next<samples.length){
+  const index=next++,sample=samples[index];
+  const entry={index,sourceNations:[...sample.nations],links:sample.links,profiles:[]};
+  try{
+   const candidates=new Map();
+   for(let n=1;n<=10;n++){
+    const p=await page('https://te.tournamentsoftware.com/find/player/DoSearch?'+new URLSearchParams({Query:sample.name,Page:String(n),SportID:'0'}));
+    const all=teSearchCandidates(p.text);
+    if(!all.length)break;
+    for(const c of all)if(playerNameKey(c.name)===playerNameKey(sample.name))candidates.set(c.officialId,c);
+   }
+   entry.exact=candidates.size;
+   for(const c of candidates.values()){
+    const p=await page(c.profileUrl),e=teProfileEvidence(p.text,c,p.url);
+    const flags=[...p.text.matchAll(/content\/images\/flags\/([a-z]{3})\.svg/gi)].map(m=>m[1].toUpperCase());
+    const profile={verified:!!e,nationality:e?.nationality||null,flags:[...new Set(flags)]};
+    if(!e){
+     const links=[...p.text.matchAll(/href=["']([^"']+)["']/gi)].map(m=>m[1]).filter(u=>/biograph|profile.*detail/i.test(u));
+     profile.biographyLinks=links.map(u=>u.replace(/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/gi,'PROFILE_ID'));
+     for(const link of links.slice(0,1)){
+      const b=await page(new URL(link,p.url).href);
+      profile.biographyFlagCodes=[...new Set([...b.text.matchAll(/content\/images\/flags\/([a-z]{3})\.svg/gi)].map(m=>m[1].toUpperCase()))];
+     }
+    }
+    entry.profiles.push(profile);
+   }
+  }catch(e){entry.error=e.message;}
+  diagnostics.push(entry);
+  console.log('TE_RESIDUAL_DIAG='+JSON.stringify(entry));
+ }
+}));
+diagnostics.sort((a,b)=>a.index-b.index);
+await fs.writeFile(directory+'/residual-diagnostics.json',JSON.stringify({groups:samples.length,diagnostics}));

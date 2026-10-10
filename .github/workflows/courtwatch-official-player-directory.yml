@@ -1,5 +1,5 @@
 name: Court Watch official player directory inspection once
-# Inspect rejected profile markup and exact full-name versus surname search responses.
+# Classify all remaining official-profile matches and federation-code conflicts.
 # Verify complete pagination and the production profile parser against the official site.
 # Inspect the confirmed AJAX form response structure without publishing player records.
 # Inspect country markup on the candidate profile before trusting the directory GUID.
@@ -10,15 +10,22 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
   inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: targeted-player-profile-recovery
+          run-id: 38040666830
+          github-token: ${{ github.token }}
+          path: tmp/profile-residual
       - name: Inspect anonymous official directory and its public search code
         run: node src/v3/inspect-official-player-directory.mjs
       - uses: actions/upload-artifact@v4
