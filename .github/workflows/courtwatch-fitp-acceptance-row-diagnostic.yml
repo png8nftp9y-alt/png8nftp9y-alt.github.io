@@ -1,0 +1,59 @@
+name: Court Watch FITP acceptance row diagnostic once
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-fitp-acceptance-row-diagnostic.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Install read client
+        run: npm install
+      - name: Read the exact retained cache used by failed run 38011202300
+        run: |
+          mkdir -p tmp/fitp-row-diagnostic
+          printf '%s\n' '{"name":"courtwatch-readonly-diagnostic","compatibility_date":"2026-10-01"}' > tmp/fitp-row-diagnostic/wrangler.json
+          npx wrangler r2 object get "$R2_BUCKET/fitp/cache/generations/26c98919b4f25c27810667a91f9fb967ce899ac30d444ae4acb438977650dc84/fitp_participant_cache.json.gz" --remote --config tmp/fitp-row-diagnostic/wrangler.json --file tmp/fitp-row-diagnostic/cache.json.gz
+          gzip -t tmp/fitp-row-diagnostic/cache.json.gz
+      - name: Diagnose every participant without database queries or writes
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs/promises';
+          import {gunzipSync} from 'node:zlib';
+          import {acquiredPlayer} from './lib/acquired-player-index.mjs';
+          const doc=JSON.parse(gunzipSync(await fs.readFile('tmp/fitp-row-diagnostic/cache.json.gz')));
+          const invalid=[],shapeErrors=[];let participants=0,tournaments=0;
+          for(const [key,t] of Object.entries(doc.tournaments||{})){
+            tournaments++;
+            if(!Array.isArray(t?.participants)){shapeErrors.push({competitionId:key,keys:Object.keys(t||{})});continue;}
+            for(const [index,p] of t.participants.entries()){
+              participants++;
+              const name=p?.name||p?.playerName||p?.full1||p?.full2||[p?.firstName,p?.lastName].filter(Boolean).join(' ');
+              if(!p||typeof p!=='object'||!acquiredPlayer('fitp',{...p,name}))invalid.push({competitionId:key,tournamentName:t.tournamentName||'',sourceUrl:t.sourceUrl||'',index,fieldNames:Object.keys(p||{}),nameLengths:{name:String(p?.name||'').length,playerName:String(p?.playerName||'').length,full1:String(p?.full1||'').length,full2:String(p?.full2||'').length},hasMembershipCard:Boolean(p?.membershipCard),cardLength:String(p?.membershipCard||'').length});
+            }
+          }
+          const report={sourceRun:38011202300,generation:'26c98919b4f25c27810667a91f9fb967ce899ac30d444ae4acb438977650dc84',tournaments,participants,invalidCount:invalid.length,shapeErrorCount:shapeErrors.length,invalid,shapeErrors};
+          await fs.writeFile('tmp/fitp-row-diagnostic/report.json',JSON.stringify(report,null,2));
+          console.log(JSON.stringify({...report,invalid:invalid.slice(0,20)}));
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fitp-acceptance-row-diagnostic
+          path: cloudflare/app-api/tmp/fitp-row-diagnostic/report.json
+          retention-days: 30
