@@ -2157,3 +2157,19 @@ Modifica: courtwatch-acquired-player-search.yml passa dai cinque trigger workflo
 Validazione: 5 test superati (importazione completa, replay senza scritture, sole variazioni reali, rifiuto fonti incomplete, contratto trigger/lock/recupero); YAML valido e diff senza errori whitespace. Il nuovo test è eseguito nel workflow dell'indice e risiede in test/ per evitare un deploy D1/API causato solo da questo test.
 
 Limiti: questa modifica riduce i nuovi run dell'indice, non tutta la coda generale né le letture di un controllo senza variazioni. Il cron GitHub può subire ritardi e attende il lock D1. I vecchi run conservano il workflow con cui sono stati creati e possono ancora avviare le catene esistenti prima dello smaltimento. Il recupero ufficiale dei profili non è certificato a zero: ultimo audit verificato 18250 link residui, archive repair ancora pending alla fotografia.
+
+## 2026-10-10 — Associazione automatica dei giocatori dalle acceptance list
+
+Chiarimento dell'utente: ogni giocatore letto nelle liste FITP, Tennis Europe o ITF deve poter essere associato a un profilo giocatore app senza avvio manuale e senza attendere il controllo periodico dei tabelloni.
+
+Motivo: il workflow D1/API ordinario salta il rebuild observed; l'import delle iscrizioni non assicura da solo la registrazione di tutti i partecipanti nelle identità persistenti. Il precedente cambio a cron 30 minuti dell'indice tabelloni non copriva questo requisito.
+
+Aggiunto courtwatch-acceptance-player-profiles.yml, automatico sui completed di FITP player entries, Tennis Europe live entries e ITF acceptance discovery 42d/known labels fast/acceptance safety 120d. Nessun schedule o workflow_dispatch in questo nuovo percorso. Legge solo il puntatore R2 current del circuito interessato, senza scegliere backup più grandi e vecchi. Viene eseguito anche se una fase Git successiva ha fallito: un puntatore R2 già verificato può essere stato pubblicato; se non è cambiato, non scrive nulla.
+
+sync-acceptance-player-profiles.mjs registra i partecipanti native dei cache completi pubblicati in observed_players e chiama il mapper persistente nella stessa esecuzione, sotto il lock courtwatch-d1-writes condiviso. Riutilizza le chiavi observed basate su ID ufficiali, conserva metadati e giocatori storici, non cancella fonti. I partecipanti senza ID mantengono una chiave distinta per nome/nazione/anno e ricevono un'identità interna: non vengono inventati ID ufficiali. Hash per circuito dei soli dati identità; timestamp e lista immutata non richiedono scansioni observed né nuove scritture. Checkpoint solo dopo mapping completato; eventuale pending viene conservato e produce errore.
+
+La prima registrazione di ciascun circuito può integrare molti record storici ed è autorizzata dall'obiettivo espresso dall'utente. Le esecuzioni successive scrivono solo differenze reali e mantengono il limite bulk del mapper (5000 cambiamenti). Le modifiche di ranking/iscrizioni non entrano nell'hash identità.
+
+Verifica: 5 test comportamentali superati, inclusa lettura del profilo attraverso storedIdentity per tutti e tre i circuiti, replay zero scritture e senza scansione observed, sole aggiunte con conservazione dei metadati, fonti vuote/malformate bloccate prima di qualunque scrittura, trigger automatici e lock; YAML valido, diff pulito, policy D1 globale superata. Fonte report verificata mediante SHA Git prima dell'append.
+
+Limiti: automatico significa subito dopo la pubblicazione del cache e la conclusione del workflow di lettura, poi attesa del lock D1. La coda esistente impedisce una garanzia di disponibilità istantanea. La modifica è testata localmente; l'esecuzione reale e i dati visualizzati in produzione saranno certificabili al prossimo run automatico. L'audit storico ufficiale a zero resta separato e non viene dichiarato risolto da questa modifica. Il cron 30 minuti rimane per il recupero dell'indice tabelloni/match.
