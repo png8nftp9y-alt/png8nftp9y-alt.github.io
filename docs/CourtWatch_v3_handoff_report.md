@@ -2284,3 +2284,8 @@ Per proseguire il recupero GUID senza aspettare la coda dei writer, aggiunta isp
 ### Europe directory accesso riuscito — run 38014159355 verde
 
 Cookie corretto: pagina finale /find/player, cookiewall false. Form ufficiale action /find/player/DoSearch, data-ajax-method GET, campi Query, Page=1 e SportID=0. Nessuna supposizione sul parametro q. Aggiunta verifica una tantum di una ricerca campione per determinare la struttura dei risultati; l'artifact contiene solo struttura HTML con testi e GUID mascherati, nessuna tessera/nome/record grezzo. Sintassi Node verificata. Necessario prima di costruire il recupero massivo dei soli profili mancanti. Non modifica D1 e non dichiara zero.
+
+
+### Europe ricerca confermata — run 38014293660 verde
+
+Endpoint ufficiale risponde: ricerca campione 1.518 byte, 0 righe tr, 2 li e 2 link al medesimo player-profile. Risultati in card li.list__item, nome in media__title/nav-link__value; nazionalità assente nel risultato. Si verifica il markup del profilo candidato per ottenere la nazionalità ufficiale prima di associare, con HTML a testi/GUID mascherati. Nessuna mutazione D1. Sintassi Node verificata; report completo preservato (hash 4460216bc88cd37026734b71dcce445f5edfb5ca).

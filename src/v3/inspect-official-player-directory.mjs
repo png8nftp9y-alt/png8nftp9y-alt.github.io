@@ -30,3 +30,10 @@ const result=await page('https://te.tournamentsoftware.com/find/player/DoSearch?
 const masked=result.text.replace(/>[\s\S]*?</g,m=>'>[text:'+m.slice(1,-1).trim().length+']<').replace(/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/gi,'PROFILE_ID');
 await fs.writeFile(directory+'/search-structure.html',masked);
 console.log(JSON.stringify({searchBytes:result.text.length,resultRows:(result.text.match(/<tr\b/gi)||[]).length,resultItems:(result.text.match(/<li\b/gi)||[]).length,profileLinks:(result.text.match(/player-profile/gi)||[]).length}));
+const guid=result.text.match(/href=["']\/player-profile\/([a-f0-9-]{36})["']/i)?.[1];
+if(guid){
+ const profile=await page('https://te.tournamentsoftware.com/player-profile/'+guid);
+ const structure=profile.text.replace(/>[\s\S]*?</g,m=>'>[text:'+m.slice(1,-1).trim().length+']<').replace(/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/gi,'PROFILE_ID');
+ await fs.writeFile(directory+'/profile-structure.html',structure);
+ console.log(JSON.stringify({profileBytes:profile.text.length,flagTags:[...profile.text.matchAll(/<[^>]*(?:flag|country|nationality)[^>]*>/gi)].map(m=>m[0]).slice(0,30)}));
+}
