@@ -18,6 +18,8 @@ jobs:
         with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - name: Verify read-only query guard
+        run: node --test cloudflare/app-api/test/inspect-residual-player-lineage.test.mjs
       - name: Read retained native player references for residual source keys
         run: node src/v3/inspect-residual-player-lineage.mjs
       - uses: actions/upload-artifact@v4
