@@ -19,3 +19,10 @@ test('global directory homonyms do not permit choosing the active tournament ent
  const get=async url=>new URL(url).pathname==='/find/player/DoSearch'?{url,text:new URL(url).searchParams.get('Page')==='1'?'<h5><a href="/player-profile/'+id+'">Example Person</a></h5><h5><a href="/player-profile/'+second+'">Example Person</a></h5>':''}:{url,text:'<img class="profile-head__nat" src="https://static.tournamentsoftware.com/content/images/flags/TUN.svg"><h2 class="media__title--large">Example Person</h2>'};
  const r=await legacyAcceptanceProfiles([source],async()=>[entry],get,doc);assert.equal(r.resolved.size,0);
 });
+
+test('already migrated native entry references still bind the original competition; conflicting native IDs cannot bind',()=>{
+ assert.equal(legacyAcceptanceCandidate(source,[{...entry,source_player_id:id.toUpperCase()}],doc).officialId,id);
+ assert.equal(legacyAcceptanceCandidate(source,[{...entry,source_player_id:second}],doc),null);
+ assert.equal(legacyAcceptanceCandidate(source,[{...entry,source_player_id:id},{...entry,source_player_id:second}],doc),null);
+ assert.equal(legacyAcceptanceCandidate(source,[{...entry,source_player_id:'123'}],doc),null);
+});
