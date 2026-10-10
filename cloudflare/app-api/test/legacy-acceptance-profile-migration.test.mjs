@@ -35,3 +35,10 @@ test('retained legacy and native histories prove the same original participation
  assert.equal(legacyAcceptanceCandidate(source,[entry,{...native,payload:JSON.stringify({tournaments:[{competitionId:second}]})}],expired),null);
  assert.equal(legacyAcceptanceCandidate(source,[entry,native,{...native,source_player_id:second}],expired),null);
 });
+
+test('anonymous gate diagnostics identify rejected evidence without exposing names, IDs or payloads',()=>{
+ const noEntries={};assert.equal(legacyAcceptanceCandidate(source,[],doc,noEntries),null);assert.equal(noEntries.reason,'no_original_competitions');
+ const missingGuid={},badDoc={...doc,tournaments:{[t]:{competitionId:t,participants:[{playerName:source.display_name,participantId:''}]}}};assert.equal(legacyAcceptanceCandidate(source,[entry],badDoc,missingGuid),null);assert.equal(missingGuid.reason,'cache_exact_name_without_native_guid');
+ const birth={};assert.equal(legacyAcceptanceCandidate({...source,birth_year:2010},[entry],doc,birth),null);assert.equal(birth.reason,'source_birth_not_proven');
+ const encoded=JSON.stringify([noEntries,missingGuid,birth]);assert.equal(encoded.includes(source.display_name),false);assert.equal(encoded.includes(id),false);assert.equal(encoded.includes(t),false);
+});
