@@ -2183,3 +2183,9 @@ Commit 60c46959f27f289ef3c769e0fa5985a3f033ce85 aggiunge un percorso separato au
 ## 2026-10-10 02:42 Europe/Rome — Durata recupero archivi
 
 API jobs del run 38008293874 conferma avvio effettivo job alle 02:35:47; fase recupero iniziata alle 02:36:32 e ancora in_progress al controllo, circa 6 minuti di lavoro contro circa 20 minuti precedenti di attesa dalla creazione run (02:15:57). Timeout job configurato 120 minuti: limite circa 04:35:47, non stima di completamento. Il percorso può rileggere tutti i documenti ITF conservati e successivamente applicare evidence, mapping e audit; non è disponibile un contatore live affidabile per calcolare la durata restante. Nessuna promessa di tempo finale o zero residui. Non effettuato polling ripetuto.
+
+## 2026-10-10 — ID FITP nei partecipanti acquisiti
+
+Audit corrente dist/v3/source_fitp_entries_audit.json del 2026-10-10T00:41:39.760Z: 6603 tornei/snapshot in scope dal 18 dicembre 2025; 489746 occorrenze di partecipanti esaminate, tutte 489746 con membershipCard, senza tessera 0, errors 0. Sono occorrenze, non giocatori unici. Verificato discover-fitp.mjs: scanned conta tutti i partecipanti prima del matching con i monitorati; withCard conta solo quelli con tessera. Questo prova presenza della tessera/ID nei partecipanti FITP acquisiti dello snapshot, non copertura universale di ogni torneo esistente, freshness istantanea (53 snapshot aggiornati, 6550 riutilizzati), validità sintattica delle tessere o associazione completa in app, da auditare separatamente.
+
+Integrità report: hash Git calcolato su tutti i 400931 byte letti dal file sorgente uguale al blob canonico 31ca83f235e2d56a4058e2f58f3e7118fb214085. Il marcatore Warning: truncated output a posizione 0 è già nel blob canonico; questa append conserva integralmente tutti i byte del report, senza sostituzione con un estratto.
