@@ -4,12 +4,14 @@ import {lookupTeDirectory} from './live-profile-evidence.mjs';
 import {sqlString} from '../../../src/v3/itf-draw-document-d1.mjs';
 export function legacyAcceptanceCandidate(source,entries,doc){
  if(doc?.status!=='tennis_europe_participant_cache_complete'||!doc.tournaments||!Object.keys(doc.tournaments).length)throw Error('native_acceptance_source_incomplete');
- const name=playerNameKey(source.display_name),competitions=new Set(),retainedNativeIds=new Set();
- for(const row of entries){const retainedId=String(row.source_player_id||'');if(playerNameKey(row.display_name)!==name)continue;if(retainedId.startsWith('name:')){if(playerNameKey(retainedId.slice(5))!==name)continue}else if(validOfficialId('tennis-europe',retainedId)){retainedNativeIds.add(retainedId.toLowerCase())}else continue;let payload;try{payload=JSON.parse(row.payload)}catch{return null}for(const t of payload.tournaments||[])if(validOfficialId('tennis-europe',t.competitionId))competitions.add(t.competitionId.toLowerCase())}
+ const name=playerNameKey(source.display_name),competitions=new Set(),retainedNativeIds=new Set(),legacyCompetitions=new Set(),nativeCompetitions=new Set();
+ for(const row of entries){const retainedId=String(row.source_player_id||'');if(playerNameKey(row.display_name)!==name)continue;if(retainedId.startsWith('name:')){if(playerNameKey(retainedId.slice(5))!==name)continue}else if(validOfficialId('tennis-europe',retainedId)){retainedNativeIds.add(retainedId.toLowerCase())}else continue;let payload;try{payload=JSON.parse(row.payload)}catch{return null}for(const t of payload.tournaments||[])if(validOfficialId('tennis-europe',t.competitionId)){const key=t.competitionId.toLowerCase();competitions.add(key);(retainedId.startsWith('name:')?legacyCompetitions:nativeCompetitions).add(key)}}
  if(!competitions.size)return null;
  const matches=[],shared=new Set();for(const t of Object.values(doc.tournaments)){if(!Array.isArray(t.participants))throw Error('native_acceptance_source_incomplete');for(const p of t.participants){if(playerNameKey(p.playerName)!==name)continue;if(!validOfficialId('tennis-europe',p.participantId))return null;matches.push(p);if(competitions.has(String(t.competitionId).toLowerCase()))shared.add(String(t.competitionId).toLowerCase())}}
- const ids=new Set(matches.map(p=>p.participantId.toLowerCase())),years=new Set(matches.map(p=>p.birthYear).filter(Boolean));
- if(!shared.size||ids.size!==1||retainedNativeIds.size>1||retainedNativeIds.size===1&&!ids.has([...retainedNativeIds][0])||years.size>1||source.birth_year&&(years.size!==1||!years.has(source.birth_year)))return null;
+ // The current cache may omit a past tournament. Retained legacy and native entry histories must share an original competition before historical migration can bind.
+ for(const key of legacyCompetitions)if(nativeCompetitions.has(key))shared.add(key);
+ const ids=new Set([...matches.map(p=>p.participantId.toLowerCase()),...retainedNativeIds]),years=new Set(matches.map(p=>Number(p.birthYear)).filter(Boolean));
+ if(!shared.size||ids.size!==1||retainedNativeIds.size>1||retainedNativeIds.size===1&&!ids.has([...retainedNativeIds][0])||years.size>1||source.birth_year&&(years.size!==1||!years.has(Number(source.birth_year))))return null;
  return{officialId:[...ids][0],birthYear:years.size?[...years][0]:undefined,sharedTournaments:shared.size};
 }
 export async function legacyAcceptanceProfiles(rows,query,publicPage,doc){
