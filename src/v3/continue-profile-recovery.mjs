@@ -1,5 +1,4 @@
 import fs from 'node:fs/promises';
-import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 
 export function continuationDecision(report){
@@ -11,22 +10,20 @@ export function continuationDecision(report){
  if(!(report.repaired>0&&report.after.unresolved<report.before))return 'no_verified_progress';
  return 'continue';
 }
-async function main(){
- const event=JSON.parse(await fs.readFile(process.env.GITHUB_EVENT_PATH,'utf8')),run=event.workflow_run,repo=process.env.GITHUB_REPOSITORY;
- if(!run||run.name!=='Court Watch targeted official player profile recovery'||run.conclusion!=='failure'||run.head_branch!=='main'||run.head_repository.full_name!==repo)throw Error('unexpected_recovery_event');
- const base='https://api.github.com/repos/'+repo,headers={Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
- async function api(path,options={}){const r=await fetch(base+path,{...options,headers:{...headers,...options.headers},signal:AbortSignal.timeout(60000)});if(!r.ok)throw Error('recovery_continuation_github_'+r.status);return r;}
- const artifacts=await(await api('/actions/runs/'+run.id+'/artifacts?per_page=100')).json();
- const artifact=artifacts.artifacts.find(a=>a.name==='targeted-player-profile-recovery'&&!a.expired);if(!artifact)throw Error('recovery_audit_artifact_missing');
- const bytes=Buffer.from(await(await api('/actions/artifacts/'+artifact.id+'/zip')).arrayBuffer());if(bytes.length>20000000)throw Error('recovery_audit_artifact_oversize');
- const file='tmp-recovery-'+run.id+'.zip';await fs.writeFile(file,bytes);
- const report=JSON.parse(execFileSync('unzip',['-p',file,'report.json'],{maxBuffer:20000000,encoding:'utf8'}));
- const decision=continuationDecision(report);console.log(JSON.stringify({sourceRun:run.id,decision,repaired:report.repaired,residual:report.after?.unresolved,runNumber:report.recoveryRunNumber}));
- if(decision!=='continue')return;
+export async function continueRecovery({report,sourceRun,repo,token,request=fetch,log=console.log}){
+ const decision=continuationDecision(report);log(JSON.stringify({sourceRun,decision,repaired:report.repaired,residual:report.after?.unresolved,runNumber:report.recoveryRunNumber}));
+ if(decision!=='continue')return decision;
+ const base='https://api.github.com/repos/'+repo,headers={Authorization:'Bearer '+token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
+ async function api(path,options={}){const r=await request(base+path,{...options,headers:{...headers,...options.headers},signal:AbortSignal.timeout(60000)});if(!r.ok)throw Error('recovery_continuation_github_'+r.status);return r;}
  const runs=await(await api('/actions/workflows/courtwatch-player-profile-live-repair.yml/runs?branch=main&per_page=100')).json();
  // An already queued recovery will read current residuals; do not add another copy.
- if(runs.workflow_runs.some(r=>['queued','pending','in_progress','waiting','requested'].includes(r.status))){console.log('recovery_already_scheduled');return;}
+ if(runs.workflow_runs.some(r=>String(r.id)!==String(sourceRun)&&['queued','pending','in_progress','waiting','requested'].includes(r.status))){log('recovery_already_scheduled');return 'already_scheduled';}
  await api('/actions/workflows/courtwatch-player-profile-live-repair.yml/dispatches',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ref:'main'})});
- console.log('next_residual_recovery_dispatched');
+ log('next_residual_recovery_dispatched');return 'dispatched';
+}
+async function main(){
+ if(process.env.GITHUB_REF!=='refs/heads/main'||process.env.GITHUB_WORKFLOW!=='Court Watch targeted official player profile recovery')throw Error('unexpected_recovery_context');
+ let report;try{report=JSON.parse(await fs.readFile('tmp/live-profile-recovery/report.json','utf8'));}catch(error){if(error.code==='ENOENT'){console.log('recovery_audit_missing');return;}throw error;}
+ await continueRecovery({report,sourceRun:process.env.GITHUB_RUN_ID,repo:process.env.GITHUB_REPOSITORY,token:process.env.GH_TOKEN});
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();

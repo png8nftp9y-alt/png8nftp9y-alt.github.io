@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: write
 concurrency:
   group: courtwatch-d1-writes
   cancel-in-progress: false
@@ -41,3 +42,8 @@ jobs:
           name: targeted-player-profile-recovery
           path: cloudflare/app-api/tmp/live-profile-recovery/
           retention-days: 30
+      - name: Continue verified residual recovery from this job
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node ../../src/v3/continue-profile-recovery.mjs
