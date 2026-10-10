@@ -1,0 +1,27 @@
+name: Court Watch all players native ID audit once
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-all-player-id-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      # Read-only aggregate audit: no migrations, imports or player exports.
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test complete player coverage and exclusions
+        run: node --test test/all-player-id-audit.test.mjs test/player-id-audit-scope.test.mjs
+      - name: Audit all application players using anonymous counts only
+        run: node scripts/all-player-id-audit.mjs
