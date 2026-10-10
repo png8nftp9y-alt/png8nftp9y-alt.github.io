@@ -2534,3 +2534,11 @@ New one-shot guarded D1 recovery writes only verified deltas, preserves source k
 - Change: preserve bounded Cloudflare error codes and sanitized messages, redacting credentials, quoted SQL values and GUIDs. Filter existing-database discovery by name and accept uuid/id while rejecting absent IDs explicitly. Reduce the identity CTE to the four required fields instead of SELECT *, preserving coverage/gate semantics. Trigger one further audit via the workflow update; no polling, DB mutations or data exports.
 - Validation: five audit regression tests passed, including actionable-error/secret-redaction coverage; the global D1 new-feature policy passed for both affected modules, syntax and whitespace checks passed. Four existing files matched current main before publishing.
 - Limitation: the HTTP 400 root cause is not yet established or claimed fixed; the new run will expose the actual D1 rejection if it persists. Confirmation that all eligible app players have a native ID remains pending live audit output. Source names, IDs and payloads are not logged/exported.
+
+
+## Full ID audit: compound SELECT limit repaired (2026-10-11)
+
+- Evidence: run 38095046998/job114339124480 returned Cloudflare code 7500, `too many terms in compound SELECT: SQLITE_ERROR`, before any player coverage counts. This identifies a query structure error, not missing player IDs.
+- Change: replace the six-arm source-reference UNION with three two-arm CTEs combined by a three-arm UNION. Preserve all six source classes, canonical/native coverage, exact exclusion and failure gates. Every compound expression now has at most three terms; no D1 writes added.
+- Validation: all six audit tests passed. New regression uses SQLite SQLITE_LIMIT_COMPOUND_SELECT=3, reproduces the original six-arm rejection and executes the complete repaired audit under the strict limit. Global D1 feature policy, syntax and whitespace checks passed; three modified files matched latest main before publication.
+- Limitation: persisted native-ID format/coverage audit remains distinct from an external official-profile audit. Live coverage totals are still pending the new one-shot run; no claim of complete player coverage made without its output. No polling or exports added.

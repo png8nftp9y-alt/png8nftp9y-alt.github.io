@@ -17,14 +17,20 @@ export const allPlayerIdAuditSql=`WITH eligible_links AS (
  SELECT p.canonical_id,COUNT(DISTINCT n.circuit) AS circuits FROM player_identity_people p
  JOIN (SELECT DISTINCT canonical_id FROM eligible_links) e ON e.canonical_id=p.canonical_id
  LEFT JOIN native n ON n.canonical_id=p.canonical_id GROUP BY p.canonical_id
-), source_refs AS (
+), observed_source_refs AS (
  SELECT 'observed' AS source,source_key,source_key AS lookup_key,circuit FROM observed_players
  UNION ALL SELECT 'acquired',source_key,source_key,circuit FROM search_acquired_players
- UNION ALL SELECT 'configured','courtwatch|'||id,id,'courtwatch' FROM app_players
+), personal_source_refs AS (
+ SELECT 'configured' AS source,'courtwatch|'||id AS source_key,id AS lookup_key,'courtwatch' AS circuit FROM app_players
  UNION ALL SELECT 'personal',observed_source_key,courtwatch_id,
  CASE WHEN observed_source_key='tennis-europe|name:MOEZ BEN AMOR' THEN 'tennis-europe' ELSE 'courtwatch' END FROM user_app_player_additions
- UNION ALL SELECT 'membership','courtwatch|'||courtwatch_id,courtwatch_id,'courtwatch' FROM user_app_players
+), member_source_refs AS (
+ SELECT 'membership' AS source,'courtwatch|'||courtwatch_id AS source_key,courtwatch_id AS lookup_key,'courtwatch' AS circuit FROM user_app_players
  UNION ALL SELECT 'override','courtwatch|'||entity_id,entity_id,'courtwatch' FROM manual_overrides WHERE entity_type='player' AND action='upsert' AND active=1
+), source_refs AS (
+ SELECT * FROM observed_source_refs
+ UNION ALL SELECT * FROM personal_source_refs
+ UNION ALL SELECT * FROM member_source_refs
 ), sources AS (
  SELECT DISTINCT source,source_key,lookup_key FROM source_refs s WHERE ${includedPlayerIdSourceSql('s')}
 ), resolved AS (
