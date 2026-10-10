@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {itfSearchEvidence,teDirectoryEvidence} from '../lib/live-profile-evidence.mjs';
+import {itfSearchEvidence,teDirectoryEvidence,publicCookiePair} from '../lib/live-profile-evidence.mjs';
 import {evidenceCatalog} from '../lib/archived-profile-evidence.mjs';
 import {acquiredPlayer} from '../lib/acquired-player-index.mjs';
 // D1_TEST_INITIAL_IMPORT / D1_TEST_IDENTICAL_ZERO_WRITES
@@ -12,6 +12,16 @@ test('official search exact ID selects nationality from the same player object',
  assert.match(itfSearchEvidence(p,'800659492')[0].profileUrl,/800659492\/usa/);
  assert.equal(itfSearchEvidence(p,'800999999').length,0);
  assert.equal(itfSearchEvidence({playerId:'800659492',name:'Rohan Mishra'},'800659492').length,0);
+});
+test('native ITF search fields recover exact official ID, country and relative profile',()=>{
+ const p={players:[{playerId:800825359,givenName:'Takatoshi',familyName:'Sakai',playerNationalityCode:'THA',playerProfileLink:'/en/players/takatoshi-sakai/800825359/tha/'}]};
+ const hit=itfSearchEvidence(p,'800825359');assert.equal(hit.length,1);assert.equal(hit[0].nationality,'THA');assert.equal(hit[0].profileUrl,'https://www.itftennis.com/en/players/takatoshi-sakai/800825359/tha/');
+ assert.equal(itfSearchEvidence(p,'800814282').length,0);
+});
+test('public consent cookies retain equals signs in their values',()=>{
+ assert.deepEqual(publicCookiePair('st=l=2057&exp=46610&c=1&cp=1; path=/'),['st','l=2057&exp=46610&c=1&cp=1']);
+ assert.deepEqual(publicCookiePair('token=abc==; Secure'),['token','abc==']);
+ assert.equal(publicCookiePair('not-a-cookie'),null);
 });
 test('directory requires per-row country and rejects tournament IDs and foreign domains',()=>{
  const id='12345678-1234-1234-1234-123456789abc',p=teDirectoryEvidence('<table><tr><td>[IRL]</td><td><a href="/profile/default.aspx?id='+id+'">Richie KENNEDY</a></td></tr><tr><td>[IRL]</td><td><a href="/sport/player.aspx?id='+id+'&amp;player=1">Other Person</a></td></tr><tr><td><a href="/player-profile/'+id+'">No Country</a></td></tr></table>');

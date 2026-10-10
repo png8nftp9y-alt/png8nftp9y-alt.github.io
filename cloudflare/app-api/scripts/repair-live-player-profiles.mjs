@@ -3,18 +3,19 @@
 import fs from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 import {evidenceCatalog} from '../lib/archived-profile-evidence.mjs';
-import {itfSearchEvidence,teDirectoryEvidence} from '../lib/live-profile-evidence.mjs';
+import {itfSearchEvidence,teDirectoryEvidence,publicCookiePair} from '../lib/live-profile-evidence.mjs';
 import {unresolvedSources,applyArchiveEvidence} from './repair-archived-player-profiles.mjs';
 import {syncPlayerIdentities,profileRecoveryAudit,addD1Metrics} from './sync-player-identities.mjs';
 async function main(){
  await fs.mkdir('tmp/live-profile-recovery',{recursive:true});
  const config=JSON.parse(await fs.readFile('wrangler.generated.jsonc','utf8')),db=config.d1_databases.find(d=>d.binding==='DB').database_id,metrics={rowsWritten:0,rowsRead:0},report={startedAt:new Date().toISOString(),metrics,requests:[]};
  async function query(sql){const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+process.env.CLOUDFLARE_ACCOUNT_ID+'/d1/database/'+db+'/query',{method:'POST',headers:{Authorization:'Bearer '+process.env.CLOUDFLARE_API_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)}),j=await r.json();if(!r.ok||j.success!==true||!j.result?.every(x=>x.success))throw Error('live_profile_d1_failed:'+r.status);addD1Metrics(metrics,j);return j.result[0].results||[]}
- const cookies=new Map();
+ const cookiesByHost=new Map();
  async function publicPage(url,options={}){
   let current=url,method=options.method||'GET',body=options.body;
-  for(let hop=0;hop<6;hop++){const r=await fetch(current,{method,body,redirect:'manual',signal:AbortSignal.timeout(20000),headers:{'User-Agent':'Mozilla/5.0','Content-Type':'application/x-www-form-urlencoded',Cookie:[...cookies].map(([k,v])=>k+'='+v).join('; ')}});
-   for(const v of r.headers.getSetCookie?.()||[]){const [key,value]=v.split(';')[0].split('=');if(key)cookies.set(key,value)}
+  for(let hop=0;hop<6;hop++){const host=new URL(current).hostname,cookies=cookiesByHost.get(host)||new Map();cookiesByHost.set(host,cookies);
+   const r=await fetch(current,{method,body,redirect:'manual',signal:AbortSignal.timeout(20000),headers:{'User-Agent':'Mozilla/5.0','Content-Type':'application/x-www-form-urlencoded',Cookie:[...cookies].map(([k,v])=>k+'='+v).join('; ')}});
+   for(const v of r.headers.getSetCookie?.()||[]){const pair=publicCookiePair(v);if(pair)cookies.set(...pair)}
    const text=await r.text(),location=r.headers.get('location');
    if(location&&r.status>=300&&r.status<400){current=new URL(location,current).href;method='GET';body=undefined;continue}
    if(r.status!==200)throw Error('official_source_http_'+r.status);
@@ -36,7 +37,7 @@ async function main(){
    }
    await fs.writeFile('tmp/live-profile-recovery/te-directory.html',page.text);
    const fields=[...page.text.matchAll(/<input\b[^>]*name=["']([^"']+)["'][^>]*>/gi)].map(m=>({name:m[1],tag:m[0]}));
-   report.directory={url:page.url,bytes:page.text.length,inputNames:fields.map(x=>x.name),scripts:[...page.text.matchAll(/<script\b[^>]*src=["']([^"']+)["']/gi)].map(m=>new URL(m[1],page.url).href)};
+   report.directory={url:page.url,bytes:page.text.length,inputNames:fields.map(x=>x.name),forms:[...page.text.matchAll(/<form\b[\s\S]*?<\/form>/gi)].map(m=>m[0]),scripts:[...page.text.matchAll(/<script\b[^>]*src=["']([^"']+)["']/gi)].map(m=>new URL(m[1],page.url).href)};
    const evidence=teDirectoryEvidence(page.text);catalog.add(evidence);report.directory.evidence=evidence.length;
   }catch(e){report.directory={status:'unreadable',error:e.message}}
   Object.assign(report,await applyArchiveEvidence(query,rows,catalog));report.mapping=await syncPlayerIdentities(query,{allowBulk:true});const after=await profileRecoveryAudit(query);report.after={unresolved:after.unresolved,byCircuit:after.byCircuit};await fs.writeFile('tmp/live-profile-recovery/player-profile-unresolved.json',JSON.stringify(after));report.status=after.unresolved?'unresolved_official_evidence':'complete_zero_verified';

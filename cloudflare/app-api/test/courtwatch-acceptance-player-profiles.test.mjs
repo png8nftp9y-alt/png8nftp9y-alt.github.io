@@ -6,7 +6,8 @@ import {readFileSync} from 'node:fs';
 import './sync-acceptance-player-profiles.test.mjs';
 test('acceptance publication triggers all circuits automatically without periodic heavy indexing',()=>{
  const y=readFileSync(new URL('../../../.github/workflows/courtwatch-acceptance-player-profiles.yml',import.meta.url),'utf8');
- for(const name of ['Court Watch v3 FITP player entries','Court Watch v3 Tennis Europe live entries','Court Watch v3 ITF acceptance discovery 42d','Court Watch v3 ITF known labels fast','Court Watch v3 ITF acceptance safety 120d'])assert.ok(y.includes(name));
+ for(const name of ['Court Watch v3 FITP player entries','Court Watch v3 Tennis Europe live entries','Court Watch v3 ITF acceptance discovery 42d'])assert.ok(y.includes(name));
+ assert.doesNotMatch(y,/Court Watch v3 ITF known labels fast|Court Watch v3 ITF acceptance safety 120d/);
  assert.match(y,/types: \[completed\]/);assert.doesNotMatch(y,/if:.*workflow_run.conclusion/);
  assert.match(y,/group: courtwatch-acceptance-.*contains\(github.event.workflow_run.name, 'FITP'\).*'fitp'.*'Europe'.*'tennis-europe'.*'itf'/);
  assert.match(y,/cancel-in-progress: false\n  queue: single/);

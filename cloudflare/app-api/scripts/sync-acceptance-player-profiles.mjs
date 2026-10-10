@@ -7,14 +7,16 @@ import {buildIncrementalSyncPlan} from '../lib/d1-incremental-sync.mjs';
 import {sqlString} from '../../../src/v3/itf-draw-document-d1.mjs';
 import {syncPlayerIdentities} from './sync-player-identities.mjs';
 // D1_WRITE_POLICY: incremental
-export function acceptancePlayers(circuit, doc) {
+const participantName=p=>p.name||p.playerName||p.full1||p.full2||[p.firstName,p.lastName].filter(Boolean).join(' ');
+export function acceptancePlayers(circuit, doc, knownFitpNames = new Map()) {
  if(!['fitp','tennis-europe','itf'].includes(circuit))throw Error('acceptance_circuit_invalid');
  if(!doc||typeof doc!=='object'||(circuit==='itf'?!Array.isArray(doc.participants):!doc.tournaments||typeof doc.tournaments!=='object'))throw Error('acceptance_source_incomplete');
  const participants=circuit==='itf'?doc.participants:Object.values(doc.tournaments).flatMap(t=>{if(!Array.isArray(t.participants))throw Error('acceptance_source_incomplete');return t.participants});
  if(!participants.length)throw Error('acceptance_source_incomplete');
  const rows=new Map();
  for(const p of participants){
-  const row=acquiredPlayer(circuit,{...p,name:p.name||p.playerName||p.full1||p.full2||[p.firstName,p.lastName].filter(Boolean).join(' ')});
+  let row=acquiredPlayer(circuit,{...p,name:participantName(p)});
+  if(!row&&circuit==='fitp'&&knownFitpNames.has(String(p.membershipCard||'')))row=acquiredPlayer(circuit,{...p,name:knownFitpNames.get(String(p.membershipCard))});
   if(!row)throw Error('acceptance_source_incomplete');
   // Reuse the established observed key for native IDs; unidentified names retain country/year distinctions.
   const source_key=row.officialId?circuit+'|id:'+row.officialId:'acceptance|'+row.sourceKey;
@@ -23,7 +25,25 @@ export function acceptancePlayers(circuit, doc) {
  return [...rows.values()].sort((a,b)=>a.source_key.localeCompare(b.source_key));
 }
 export async function syncAcceptanceProfiles(query,circuit,doc) {
- const rows=acceptancePlayers(circuit,doc),hash=crypto.createHash('sha256').update(JSON.stringify(rows)).digest('hex'),key='acceptanceProfiles:'+circuit;
+ const knownFitpNames=new Map();
+ if(circuit==='fitp'&&doc?.tournaments&&typeof doc.tournaments==='object'){
+  for(const t of Object.values(doc.tournaments)){
+   if(!Array.isArray(t?.participants))throw Error('acceptance_source_incomplete');
+   for(const p of t.participants){
+    if(!p||typeof p!=='object')throw Error('acceptance_source_incomplete');
+    if(acquiredPlayer(circuit,{...p,name:participantName(p)}))continue;
+    const card=String(p.membershipCard||'');
+    if(!/^\d{6,12}$/.test(card))throw Error('acceptance_source_incomplete');
+    if(knownFitpNames.has(card))continue;
+    const found=await query("SELECT display_name FROM observed_players WHERE circuit='fitp' AND official_id="+sqlString(card)+" UNION ALL SELECT display_name FROM search_acquired_players WHERE circuit='fitp' AND official_id="+sqlString(card));
+    const names=found.map(r=>acquiredPlayer('fitp',{name:r.display_name,membershipCard:card})).filter(Boolean);
+    const keys=new Set(names.map(r=>r.normalizedName.split(' ').sort().join(' ')));
+    if(keys.size!==1)throw Error('acceptance_fitp_existing_name_missing_or_ambiguous');
+    knownFitpNames.set(card,names[0].displayName);
+   }
+  }
+ }
+ const rows=acceptancePlayers(circuit,doc,knownFitpNames),hash=crypto.createHash('sha256').update(JSON.stringify(rows)).digest('hex'),key='acceptanceProfiles:'+circuit;
  const checkpoint=(await query('SELECT value FROM app_state WHERE key='+sqlString(key)))[0];
  let changed=0;
  if(checkpoint?.value!==hash){
@@ -41,7 +61,7 @@ export async function syncAcceptanceProfiles(query,circuit,doc) {
  const identity=pending.length?await syncPlayerIdentities(query,{allowBulk:!checkpoint}):{status:'unchanged',writes:0,pending:0};
  if(identity.status==='pending')throw Error('acceptance_identity_pending');
  if(checkpoint?.value!==hash)await query('INSERT INTO app_state(key,value,updated_at) VALUES('+sqlString(key)+','+sqlString(hash)+','+sqlString(new Date().toISOString())+') ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at WHERE value IS NOT excluded.value;');
- return {circuit,participants:rows.length,changed,identity,unchanged:checkpoint?.value===hash};
+ return {circuit,participants:rows.length,recoveredExistingFitpNames:knownFitpNames.size,changed,identity,unchanged:checkpoint?.value===hash};
 }
 async function main(){
  const config=JSON.parse(await fs.readFile('wrangler.generated.jsonc','utf8')),db=config.d1_databases.find(d=>d.binding==='DB').database_id;

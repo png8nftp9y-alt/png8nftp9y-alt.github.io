@@ -6,13 +6,18 @@ export function itfSearchEvidence(payload,expectedId){
   const id=String(direct(v,['playerid','personid','worldtennisid','id'])||'');
   if(validOfficialId('itf',id)&&id===String(expectedId)){
    const name=direct(v,['playername','fullname','displayname','name'])||[direct(v,['givenname','firstname']),direct(v,['familyname','lastname'])].filter(Boolean).join(' ');
-   const nationality=String(direct(v,['nationalitycode','countrycode','nationality'])||'').toUpperCase();
-   const profileUrl=direct(v,['profileurl','playerprofileurl','profilelink','url']);
+   const nationality=String(direct(v,['playernationalitycode','nationalitycode','countrycode','nationality'])||'').toUpperCase();
+   const nativeUrl=direct(v,['playerprofilelink','profileurl','playerprofileurl','profilelink','url']);
+   const profileUrl=typeof nativeUrl==='string'?new URL(nativeUrl,'https://www.itftennis.com').href:'';
    const e=profileEvidence('itf',{name,officialId:id,nationality,...(typeof profileUrl==='string'?{profileUrl}: {})});
    if(e?.profileUrl)out.push({...e,name,circuit:'itf'});
   }
   Object.values(v).forEach(walk);
  }walk(payload);return out;
+}
+export function publicCookiePair(value){
+ const pair=String(value).split(';')[0],i=pair.indexOf('=');
+ return i>0?[pair.slice(0,i),pair.slice(i+1)]:null;
 }
 const decode=s=>String(s||'').replace(/&amp;/g,'&').replace(/&#39;|&apos;/g,"'").replace(/&quot;/g,'"').replace(/&nbsp;/g,' ');
 const clean=s=>decode(s).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
