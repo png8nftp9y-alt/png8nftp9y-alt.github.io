@@ -4,7 +4,7 @@ import {includedPlayerIdSourceSql} from './player-id-audit-scope.mjs';
 
 // One aggregate SELECT gives a consistent D1 snapshot without exporting players.
 export const allPlayerIdAuditSql=`WITH eligible_links AS (
- SELECT * FROM player_circuit_identities WHERE ${includedPlayerIdSourceSql()}
+ SELECT source_key,canonical_id,circuit,official_id FROM player_circuit_identities WHERE ${includedPlayerIdSourceSql()}
 ), native AS (
  SELECT canonical_id,circuit,lower(trim(official_id)) AS official_id FROM eligible_links
  WHERE (circuit='fitp' AND length(trim(official_id)) BETWEEN 6 AND 12 AND trim(official_id) NOT GLOB '*[^0-9]*')
@@ -55,4 +55,15 @@ export function allPlayerIdAuditResult(row) {
  const passed=row.players>0&&row.players===row.players_with_id&&row.players_without_id===0
  &&row.unmapped_or_ambiguous_sources===0&&row.orphan_links===0&&row.pending_mapping===0&&row.mapping_status==='ready';
  return {status:passed?'all_eligible_players_have_native_id':'player_id_coverage_incomplete',passed,...row};
+}
+
+
+export function cloudflareAuditError(status,body,redactions=[]) {
+ const details=(body?.errors||[]).map(error=>{
+  let message=String(error.message||'');
+  for(const value of redactions.filter(Boolean))message=message.split(value).join('[redacted]');
+  message=message.replace(/'(?:[^']|'')*'/g,"'[redacted]'").replace(/[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}/gi,'[redacted]').replace(/\s+/g,' ').slice(0,500);
+  return {code:Number(error.code)||0,message};
+ });
+ return 'D1_audit_request_failed_'+status+': '+JSON.stringify(details);
 }

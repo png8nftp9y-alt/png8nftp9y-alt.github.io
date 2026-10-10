@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {database} from './search-sqlite-fixture.mjs';
 import {syncPlayerIdentities} from '../scripts/sync-player-identities.mjs';
-import {allPlayerIdAuditSql,allPlayerIdAuditResult} from '../lib/all-player-id-audit.mjs';
+import {allPlayerIdAuditSql,allPlayerIdAuditResult,cloudflareAuditError} from '../lib/all-player-id-audit.mjs';
 const guid='22cc93f0-672e-41ee-85f1-561829ed9315';
 function fixture(){const d=database({identityMapping:true});d.execute('CREATE TABLE manual_overrides(id TEXT,entity_type TEXT,entity_id TEXT,action TEXT,payload TEXT,active INTEGER)');return d;}
 function add(d,key,circuit,id,name){d.execute('INSERT INTO search_acquired_players VALUES(?,?,?,?,?,?)',[key,circuit,id,name.toUpperCase(),name,JSON.stringify({name,birthYear:2014,nationality:'GER'})]);}
@@ -34,4 +34,11 @@ test('D1_TEST_INCOMPLETE_SOURCE_GUARD: unmapped observed/configured/manual profi
   await syncPlayerIdentities(d.query);assert.equal((await audit(d)).passed,true);
   d.execute("INSERT INTO app_players(id,payload,seq) VALUES('unmapped-configured','{}',1)");d.execute("INSERT INTO manual_overrides VALUES('override','player','unmapped-manual','upsert','{}',1)");result=await audit(d);assert.equal(result.passed,false);assert.equal(result.unmapped_or_ambiguous_sources,2);
  }finally{d.close()}
+});
+
+
+test('Cloudflare audit failures preserve actionable error codes and redact secrets and quoted source values',()=>{
+ const error=cloudflareAuditError(400,{errors:[{code:7500,message:"no such table: missing_table; token secret_token; account secret_account; source 'Moez Ben-Amor'; 22cc93f0-672e-41ee-85f1-561829ed9315"}]},['secret_token','secret_account']);
+ assert.match(error,/7500/);assert.match(error,/no such table: missing_table/);assert.doesNotMatch(error,/secret_token|secret_account|Moez|22cc93f0/);
+ assert.match(cloudflareAuditError(400,{errors:[{code:7500,message:'Your account has exceeded daily row read limit.'}]}),/daily row read limit/);
 });
