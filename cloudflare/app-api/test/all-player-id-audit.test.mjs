@@ -24,7 +24,7 @@ test('D1_TEST_IDENTICAL_ZERO_WRITES: repeated full audits perform no writes or e
 test('D1_TEST_REAL_DELTAS_ONLY: a newly missing person fails until a valid circuit ID is mapped',async()=>{
  const d=fixture();try{
   add(d,'f','fitp','123456','Player One');await syncPlayerIdentities(d.query);assert.equal((await audit(d)).passed,true);
-  add(d,'missing','itf','name:Other Player','Other Player');await syncPlayerIdentities(d.query);let result=await audit(d);assert.equal(result.passed,false);assert.equal(result.players_without_id,1);
+  add(d,'missing','itf','name:Other Player','Other Player');await syncPlayerIdentities(d.query);let result=await audit(d);assert.equal(result.passed,false);assert.equal(result.players_without_id,1);assert.deepEqual(JSON.parse(result.missing_by_link_circuit),[{circuit:'itf',players:1}]);
   d.execute("UPDATE search_acquired_players SET official_id='800123456' WHERE source_key='missing'");await syncPlayerIdentities(d.query);result=await audit(d);assert.equal(result.passed,true);assert.equal(result.players_without_id,0);
  }finally{d.close()}
 });
@@ -33,7 +33,7 @@ test('D1_TEST_INCOMPLETE_SOURCE_GUARD: unmapped observed/configured/manual profi
   assert.equal((await audit(d)).passed,false);add(d,'f','fitp','123456','Player One');await syncPlayerIdentities(d.query);
   add(d,'new','itf','800123456','New Player');let result=await audit(d);assert.equal(result.passed,false);assert.equal(result.unmapped_or_ambiguous_sources,1);assert.equal(result.pending_mapping,1);
   await syncPlayerIdentities(d.query);assert.equal((await audit(d)).passed,true);
-  d.execute("INSERT INTO app_players(id,payload,seq) VALUES('unmapped-configured','{}',1)");d.execute("INSERT INTO manual_overrides VALUES('override','player','unmapped-manual','upsert','{}',1)");result=await audit(d);assert.equal(result.passed,false);assert.equal(result.unmapped_or_ambiguous_sources,2);
+  d.execute("INSERT INTO app_players(id,payload,seq) VALUES('unmapped-configured','{}',1)");d.execute("INSERT INTO manual_overrides VALUES('override','player','unmapped-manual','upsert','{}',1)");result=await audit(d);assert.equal(result.passed,false);assert.equal(result.unmapped_or_ambiguous_sources,2);assert.deepEqual(JSON.parse(result.unmapped_by_source_class),[{source:'configured',records:1},{source:'override',records:1}]);
  }finally{d.close()}
 });
 
