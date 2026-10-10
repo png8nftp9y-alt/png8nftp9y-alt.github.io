@@ -2223,3 +2223,8 @@ Validazione: 21 test mirati superati; `npm run check` app-api completo superato,
 In v3.js e v3.css entrambi i nomi cliccabili della coppia sono nello stesso contenitore su una riga. Nella sola pagina avversario il punteggio viene invertito per le sconfitte, mostrando il vincitore per primo (1-6 1-6 diventa 6-1 6-1). Tutti i set vengono invertiti insieme; tie-break, ritiro e walkover sono preservati. Classi win/loss e colori invariati; nessuna scrittura D1 aggiunta.
 
 Validazione: node --check superato; sei casi verificati sulle funzioni reali (vittoria, sconfitta, tre set, tie-break, walkover, ritiro), classe loss e unico contenitore con due link verificati. Verifica browser non eseguita perché Chromium non installato. Sui display stretti resta l'ellissi esistente, senza seconda riga. Report completo preservato: hash originale b263af77aa5a60f92a18ee6729e513005894b319 verificato con git hash-object. Pubblicazione concorrente ITF conservata nella nuova base.
+
+
+## 2026-10-10 — Caricamento aggiornato della correzione pagina avversario
+
+L'utente non vedeva le correzioni di doppio e punteggio dopo il deploy verde. Le funzioni e lo stile nuovi sono presenti nei file pubblicati dal commit 56525fd, ma v3.html conservava i vecchi riferimenti di versione a v3.js e v3.css. Aggiornati entrambi a 202610100312 per cambiare le chiavi della cache del browser al prossimo caricamento della pagina. Nessuna modifica a dati, D1 o colori. Verificata presenza delle funzioni e del wrapper della coppia sul ramo corrente; report completo preservato, blob dcfbd6fc25299cf279eae90a604c308d6dfffce9 verificato con git hash-object. Il deploy verrà collegato all'utente; occorre ricaricare la pagina aperta per eseguire il nuovo JavaScript.
