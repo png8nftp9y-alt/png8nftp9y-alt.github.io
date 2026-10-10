@@ -1,6 +1,8 @@
 // D1_WRITE_POLICY: incremental
 // buildIncrementalSyncPlan is enforced by applyArchiveEvidence; verified readback preserves source keys.
 import fs from 'node:fs/promises';
+import {gunzipSync} from 'node:zlib';
+import {nativeAcceptanceEvidence} from '../lib/native-acceptance-profile-evidence.mjs';
 import {pathToFileURL} from 'node:url';
 import {evidenceCatalog} from '../lib/archived-profile-evidence.mjs';
 import {itfSearchEvidence,teDirectoryEvidence,publicCookiePair,lookupTeDirectory} from '../lib/live-profile-evidence.mjs';
@@ -25,6 +27,7 @@ async function main(){
  }
  try{
   const rows=await unresolvedSources(query),catalog=evidenceCatalog(),known=JSON.parse(await fs.readFile(new URL('../data/verified-profile-evidence-20261010.json',import.meta.url),'utf8'));report.before=(await profileRecoveryAudit(query)).unresolved;catalog.add(known);
+  if(process.env.TE_NATIVE_ACCEPTANCE_CACHE){const doc=JSON.parse(gunzipSync(await fs.readFile(process.env.TE_NATIVE_ACCEPTANCE_CACHE)));const evidence=nativeAcceptanceEvidence(doc);catalog.add(evidence);report.nativeAcceptance={generatedAt:doc.generatedAt,tournaments:Object.keys(doc.tournaments).length,evidence:evidence.length};}
   for(const r of rows.filter(r=>r.circuit==='itf'&&!catalog.resolve(r))){
    const url='https://www.itftennis.com/tennis/api/PlayerApi/GetPlayerSearch?'+new URLSearchParams({searchString:r.display_name,circuitCode:'JT'});
    try{const p=await publicPage(url),json=JSON.parse(p.text),e=itfSearchEvidence(json,r.official_id);catalog.add(e);report.requests.push({circuit:'itf',officialId:r.official_id,evidence:e.length,status:'read'});await fs.writeFile('tmp/live-profile-recovery/itf-'+r.official_id+'.json',JSON.stringify(json));}catch(e){report.requests.push({circuit:'itf',officialId:r.official_id,status:'unreadable',error:e.message})}
@@ -33,6 +36,7 @@ async function main(){
   report.repaired=0;report.records=[];
   const saveDelta=async batch=>{const result=await applyArchiveEvidence(query,batch,catalog);report.repaired+=result.repaired;report.records.push(...result.records);await fs.writeFile('tmp/live-profile-recovery/report.json',JSON.stringify(report));};
   await saveDelta(rows.filter(r=>r.circuit==='itf'));
+  if(report.nativeAcceptance)await saveDelta(rows.filter(r=>r.circuit==='tennis-europe'));
   try{
    let page=await publicPage('https://te.tournamentsoftware.com/find/player');
    if(/CookiePurposes|SettingsOpen/.test(page.text)){
