@@ -9,7 +9,7 @@ import {unresolvedSources,applyArchiveEvidence} from './repair-archived-player-p
 import {syncPlayerIdentities,profileRecoveryAudit,addD1Metrics} from './sync-player-identities.mjs';
 async function main(){
  await fs.mkdir('tmp/live-profile-recovery',{recursive:true});
- const config=JSON.parse(await fs.readFile('wrangler.generated.jsonc','utf8')),db=config.d1_databases.find(d=>d.binding==='DB').database_id,metrics={rowsWritten:0,rowsRead:0},report={startedAt:new Date().toISOString(),metrics,requests:[]};
+ const config=JSON.parse(await fs.readFile('wrangler.generated.jsonc','utf8')),db=config.d1_databases.find(d=>d.binding==='DB').database_id,metrics={rowsWritten:0,rowsRead:0},report={startedAt:new Date().toISOString(),recoverySeries:'europe-profile-20261010',recoveryRunNumber:Number(process.env.GITHUB_RUN_NUMBER||0),metrics,requests:[]};
  async function query(sql){const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+process.env.CLOUDFLARE_ACCOUNT_ID+'/d1/database/'+db+'/query',{method:'POST',headers:{Authorization:'Bearer '+process.env.CLOUDFLARE_API_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)}),j=await r.json();if(!r.ok||j.success!==true||!j.result?.every(x=>x.success))throw Error('live_profile_d1_failed:'+r.status);addD1Metrics(metrics,j);return j.result[0].results||[]}
  const cookiesByHost=new Map();
  async function publicPage(url,options={}){

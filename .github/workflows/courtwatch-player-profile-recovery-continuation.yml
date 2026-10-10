@@ -1,0 +1,29 @@
+name: Court Watch profile recovery continuation
+on:
+  workflow_run:
+    workflows: [Court Watch targeted official player profile recovery]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: courtwatch-profile-recovery-continuation
+  cancel-in-progress: false
+  queue: single
+jobs:
+  continue:
+    if: github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify bounded continuation guards
+        run: node --test src/v3/continue-profile-recovery.test.mjs
+      - name: Continue only audited residual recovery with verified progress
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node src/v3/continue-profile-recovery.mjs

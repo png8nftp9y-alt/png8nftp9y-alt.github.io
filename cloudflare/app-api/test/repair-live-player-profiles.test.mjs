@@ -33,6 +33,15 @@ test('native search cards require named official profile anchors and main-header
  assert.equal(teProfileEvidence('<h2 class="media__title--large">Richie Kennedy</h2><img src="//static.tournamentsoftware.com/content/images/flags/IRL.svg">',candidates[0]),null);
  assert.equal(teProfileEvidence(profile('Richie Kennedy','IRL'),candidates[0],'https://example.com/player-profile/'+teId),null);
 });
+test('native ROM and MGO profile flags match the equivalent acquired ROU and MNE countries',()=>{
+ const candidate=teSearchCandidates(card(teId,'Known Europe Person'))[0];
+ for(const [native,acquired]of [['ROM','ROU'],['MGO','MNE']]){
+  const evidence=teProfileEvidence(profile('Known Europe Person',native),candidate),catalog=evidenceCatalog();catalog.add([evidence]);
+  const source={circuit:'tennis-europe',official_id:'',display_name:'Known Europe Person',nationality:acquired,payload:'{}'};
+  assert.equal(catalog.resolve(source)?.officialId,teId);
+  assert.equal(catalog.resolve({...source,nationality:'FRA'}),null);
+ }
+});
 test('directory paginates and retains conflicting exact-name GUIDs instead of choosing the first',async()=>{
  const second='12345678-1234-1234-1234-123456789abd',calls=[];
  const found=await lookupTeDirectory('Richie Kennedy',async(url,options)=>{calls.push(url);const u=new URL(url);return {url,text:u.searchParams.has('Page')?(u.searchParams.get('Page')==='1'?card(teId,'Richie Kennedy'):u.searchParams.get('Page')==='2'?card(second,'Richie Kennedy'):''):profile('Richie Kennedy','IRL')};});

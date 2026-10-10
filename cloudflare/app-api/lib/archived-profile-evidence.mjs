@@ -22,7 +22,7 @@ export function archivedCandidates(circuit,payload){
 }
 export function evidenceCatalog(){
  const byName=new Map(),byId=new Map();let entries=0;
- return {add(candidates){for(const p of candidates){const nk=p.circuit+'|'+playerNameKey(p.name),ik=p.circuit+'|'+String(p.officialId).toLowerCase();for(const [map,key]of [[byName,nk],[byId,ik]]){const values=map.get(key)||new Map();values.set(JSON.stringify([p.officialId,p.profileUrl,p.nationality,p.birthYear]),p);map.set(key,values);}entries++;}},get entries(){return entries;},resolve(row){
+ return {add(candidates){for(const candidate of candidates){const p={...candidate,nationality:canonicalNation(candidate.nationality)};const nk=p.circuit+'|'+playerNameKey(p.name),ik=p.circuit+'|'+String(p.officialId).toLowerCase();for(const [map,key]of [[byName,nk],[byId,ik]]){const values=map.get(key)||new Map();values.set(JSON.stringify([p.officialId,p.profileUrl,p.nationality,p.birthYear]),p);map.set(key,values);}entries++;}},get entries(){return entries;},resolve(row){
   const payload=JSON.parse(row.payload||'{}'),source={...payload,name:row.display_name,officialId:row.official_id,birthYear:row.birth_year||payload.birthYear,nationality:canonicalNation(row.nationality||payload.nationality||payload.country)};
   const exact=validOfficialId(row.circuit,row.official_id)?[...(byId.get(row.circuit+'|'+row.official_id.toLowerCase())?.values()||[])]:[];
   const years=new Set(exact.map(p=>Number(p.birthYear||String(p.birthDate||p.dateOfBirth||'').slice(0,4))).filter(Boolean)),nations=new Set(exact.map(p=>canonicalNation(p.nationality)).filter(Boolean));
