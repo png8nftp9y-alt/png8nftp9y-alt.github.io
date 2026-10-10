@@ -2433,3 +2433,8 @@ Run38053682552/job114219047771 richiesto dall’utente: failure nello step Build
 Run 38053682552 stopped safely before opponent imports: 12,960 legacy name-key rows appeared absent when the native Tennis Europe cache supplied GUID keys. Retain matching name aliases unchanged, import native rows through the shared incremental planner, and prefer a unique native profile for lookup. Preserve genuine homonym ambiguity and the 500 / 2% deletion guard. Incomplete source blocks migration. Version the import hash to ensure the transition is applied once.
 
 Validation: full app-api npm run check green; six focused tests include real SQLite import and identical replay with zero changes. Targeted profile run 38053815136 verified 68 repairs (79 to 11 remaining); federation-code redirect for Thelma was merged separately in PR75. Remaining ambiguous/country-conflicting profiles must remain unresolved until direct source evidence is verified.
+
+
+## 2026-10-10 — Privacy-preserving residual source inspection
+
+Ten source links remain after verified D1 green deployment. One-shot SELECT-only name-index probes inspect source structure, historical entry tournament counts, participant reference counts and country-agreement counts inside the runner. No source payload, name, ID, nationality value or tournament reference leaves the runner. No artifact upload or raw D1 export; only schema field names and aggregate counts by anonymous index appear in logs. This replaces the initially rejected raw-export diagnostic before publication. Validation: Node syntax, existing table schema, read-only query guard and reviewed output allowlist. No schedule or polling.
