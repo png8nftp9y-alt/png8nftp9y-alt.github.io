@@ -2,9 +2,11 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {continuationDecision,continueRecovery} from './continue-profile-recovery.mjs';
 const report={recoverySeries:'europe-profile-20261010',recoveryRunNumber:2,status:'unresolved_official_evidence',before:19901,after:{unresolved:15436},repaired:4465,mapping:{status:'ready',pending:0}};
-test('only verified decreasing residuals schedule another bounded recovery',()=>{
+test('verified decreasing residuals continue beyond eight passes and stop at zero or no progress',()=>{
  assert.equal(continuationDecision(report),'continue');
- for(const changed of [{repaired:0},{before:15436},{mapping:{status:'pending',pending:1}},{status:'failed'},{after:{unresolved:0}},{recoverySeries:'different'},{recoveryRunNumber:9},{recoveryRunNumber:NaN}])assert.notEqual(continuationDecision({...report,...changed}),'continue');
+ assert.equal(continuationDecision({...report,recoveryRunNumber:9}),'continue');
+ assert.equal(continuationDecision({...report,recoveryRunNumber:100}),'continue');
+ for(const changed of [{repaired:0},{before:15436},{mapping:{status:'pending',pending:1}},{status:'failed'},{after:{unresolved:0}},{recoverySeries:'different'},{recoveryRunNumber:1},{recoveryRunNumber:NaN}])assert.notEqual(continuationDecision({...report,...changed}),'continue');
 });
 test('continuation runs within the failed recovery instead of relying on another workflow event',()=>{
  const y=readFileSync(new URL('../../.github/workflows/courtwatch-player-profile-live-repair.yml',import.meta.url),'utf8'),s=readFileSync(new URL('./continue-profile-recovery.mjs',import.meta.url),'utf8');

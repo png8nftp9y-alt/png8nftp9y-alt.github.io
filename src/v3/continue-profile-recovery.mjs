@@ -3,7 +3,7 @@ import {pathToFileURL} from 'node:url';
 
 export function continuationDecision(report){
  if(report.recoverySeries!=='europe-profile-20261010')return 'different_series';
- if(!Number.isInteger(report.recoveryRunNumber)||report.recoveryRunNumber<2||report.recoveryRunNumber>=9)return 'bounded_series_finished';
+ if(!Number.isInteger(report.recoveryRunNumber)||report.recoveryRunNumber<2)return 'invalid_recovery_run';
  if(report.status!=='unresolved_official_evidence')return 'not_residual_audit';
  if(report.mapping?.status!=='ready'||report.mapping.pending!==0)return 'mapping_not_verified';
  if(!Number.isInteger(report.before)||!Number.isInteger(report.after?.unresolved)||report.after.unresolved<=0)return 'no_verified_residual';
