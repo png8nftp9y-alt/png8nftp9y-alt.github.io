@@ -477,3 +477,7 @@ button.brand:focus-visible{outline:2px solid var(--blue);outline-offset:4px;bord
 #playersView .playersList{grid-auto-rows:1fr}
 #playersView .playerRow{height:100%;box-sizing:border-box;justify-content:flex-start}
 #playersView .playerRow .avatar{flex-shrink:0}
+
+/* Keep each opponent doubles pairing on one line, including both clickable names. */
+.opponentHistoryMatches .opponentHistoryMatchup{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.opponentHistoryMatchup .opponentHistoryPerson{white-space:nowrap}

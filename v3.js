@@ -2607,6 +2607,13 @@ function opponentHistoryPersonHtml(person, event = "") {
       : `<button type="button" class="opponentHistoryPersonLink" data-open-current-opponent="${esc(person.profileId || "")}" data-opponent-name="${esc(readablePerson(person.name))}" data-opponent-event="${esc(event)}"><b>${esc(readablePerson(person.name))}</b></button>`;
   return `<span class="opponentHistoryPerson">${name}${participantDesignationHtml(person.designation)}${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`;
 }
+function opponentHistoryResultText(match) {
+  const result = matchResultText(match);
+  // History scores are oriented to the viewed player; display the winner first.
+  return match.won === false
+    ? result.replace(/(\d+(?:\(\d+\))?)-(\d+(?:\(\d+\))?)/g, "$2-$1")
+    : result;
+}
 function opponentHistoryMatchRowHtml(match, contextMatches = []) {
   const opponents = (match.opponents || [])
       .map((person) => opponentHistoryPersonHtml(person, match.event || ""))
@@ -2614,9 +2621,9 @@ function opponentHistoryMatchRowHtml(match, contextMatches = []) {
     matchup = `vs ${opponents || "Avversario da definire"}`,
     outcome =
       match.status === "completed" || match.retired || match.score
-        ? matchResultText(match) || "—"
+        ? opponentHistoryResultText(match) || "—"
         : readableText(match.status || "Programmato");
-  return `<div class="opponentHistoryMatch unifiedMatchRow"><span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(match.date) || "data da pubblicare")}</time><span class="matchRoundFull">${esc(fullMatchRoundLabel(match, contextMatches))}</span></span><span class="opponentHistoryOpponent unifiedMatchOpponent">${matchup}</span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
+  return `<div class="opponentHistoryMatch unifiedMatchRow"><span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(match.date) || "data da pubblicare")}</time><span class="matchRoundFull">${esc(fullMatchRoundLabel(match, contextMatches))}</span></span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span class="opponentHistoryMatchup">${matchup}</span></span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
 }
 function groupedMatchSections(matches, rowHtml, doublesKey) {
   const singles = matches.filter((match) => !doublesKey(match)),

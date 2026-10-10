@@ -2216,3 +2216,10 @@ Nuovo recupero mirato `repair-live-player-profiles.mjs`: sei pagine ufficiali IT
 Correzione per le nuove acceptance: `sport/player.aspx?id=...&player=...` contiene un UUID del torneo nel parametro `id`, non il GUID globale del giocatore. La guardia comune in `player-profile-evidence.mjs` impedisce di promuoverlo a ID giocatore. Questo non certifica retroattivamente tutti i vecchi GUID già memorizzati.
 
 Validazione: 21 test mirati superati; `npm run check` app-api completo superato, inclusi invarianti costi D1 e policy nuove scritture; YAML valido. Report completo preservato: blob originale 71c31a269a6e03856f574a7a97f0e8ca8c6c4130, verificato con git hash-object su 404.616 byte. La stringa iniziale preesistente “Warning: truncated output” fa parte di quel blob e non indica una lettura parziale. Risultato operativo del nuovo run ancora da verificare.
+
+
+## 2026-10-10 — Pagina avversario: doppio su una riga e punteggio vincitore per primo
+
+In v3.js e v3.css entrambi i nomi cliccabili della coppia sono nello stesso contenitore su una riga. Nella sola pagina avversario il punteggio viene invertito per le sconfitte, mostrando il vincitore per primo (1-6 1-6 diventa 6-1 6-1). Tutti i set vengono invertiti insieme; tie-break, ritiro e walkover sono preservati. Classi win/loss e colori invariati; nessuna scrittura D1 aggiunta.
+
+Validazione: node --check superato; sei casi verificati sulle funzioni reali (vittoria, sconfitta, tre set, tie-break, walkover, ritiro), classe loss e unico contenitore con due link verificati. Verifica browser non eseguita perché Chromium non installato. Sui display stretti resta l'ellissi esistente, senza seconda riga. Report completo preservato: hash originale b263af77aa5a60f92a18ee6729e513005894b319 verificato con git hash-object. Pubblicazione concorrente ITF conservata nella nuova base.
