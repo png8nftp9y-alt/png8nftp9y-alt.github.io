@@ -1,0 +1,55 @@
+name: Court Watch player profile archive repair once
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-player-profile-archive-repair.yml']
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      # D1_WRITE_POLICY: incremental; user-authorized historical recovery only.
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify archive evidence and incremental write guards
+        working-directory: cloudflare/app-api
+        run: node --test test/archived-profile-evidence.test.mjs test/player-native-profile-recovery.test.mjs test/player-identity-write-budget.test.mjs
+      - name: Restore retained official source archives without publishing
+        run: |
+          python -m pip install --disable-pip-version-check --quiet awscli
+          bash src/v3/tennis-europe-r2-cache.sh restore
+          bash src/v3/itf-r2-cache.sh restore
+      - name: Configure D1 and apply additive migrations
+        working-directory: cloudflare/app-api
+        run: |
+          npm install
+          node scripts/configure-d1.mjs
+          npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+      - name: Recover only unresolved official profiles and certify zero
+        working-directory: cloudflare/app-api
+        run: node scripts/repair-archived-player-profiles.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: player-profile-archive-repair
+          path: |
+            cloudflare/app-api/tmp/player-profile-archive-repair.json
+            cloudflare/app-api/tmp/player-profile-unresolved.json
+          retention-days: 30
