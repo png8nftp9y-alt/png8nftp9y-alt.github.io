@@ -2195,3 +2195,13 @@ Integrità report: hash Git calcolato su tutti i 400931 byte letti dal file sorg
 Verificato v3.js corrente: la pagina torneo mostra giocatori app/monitorati, match e iscrizioni, non la lista completa dei partecipanti FITP conservata in R2. La nuova associazione automatica ai profili non aggiunge questa funzione. ID presenti nelle fonti e lista integrale disponibile in UI sono due verifiche separate. Nel catalogo locale il rodeo Guanzate richiesto corrisponde a CBACECDC-0A54-4C4D-B85B-675E2574AD44, LOMB. 1152 TENNIS A-RETE - RODEO - U.10/12 SF/SM, date ufficiali 23–25 ottobre 2026. Il cache R2 specifico non è stato scaricato: nessun elenco o numero di iscritti specifico certificato.
 
 Integrità append: verifica ulteriore del report completo letto contro lo SHA canonico 43de479c54b3d72aca7fe5ba2b019b3ec46c9fbd mediante git hash-object, identico. Il marcatore iniziale di truncation esiste nel blob canonico, non è un troncamento di questa lettura. Tutto il contenuto preesistente viene conservato integralmente prima dell'append.
+
+## 2026-10-10 02:52 Europe/Rome — Risultato finale recupero storico profili
+
+Run 38008293874 / job 114086673412 concluso failure alle 02:50:24, durata esecuzione 14m37s (avvio 02:35:47). Recupero eseguito dalle 02:36:32 alle 02:50:21, senza timeout/errore HTTP nel risultato: controllo finale fallisce con official_profiles_still_unresolved:12114. Le scritture completate restano applicate.
+
+Prima 18250 link senza profilo ufficiale (ITF 5665, Europe 12585); riparati 6136; dopo 12114 (ITF 12, Europe 12102). Differenze: ITF recuperati 5653, Europe 483. Artefatto 11652974038 scaricato e verificato: tutti i 12102 Europe residui sono official_id_not_available; tutti i 12 ITF sono official_id_without_profile_url, con ID già presente. Non sommare questi link come persone uniche: audit finale Europe 7227 persone, ITF 12. Mapping ready, pending0, missing_observed0, missing_acquired0, people103491, links129184 al momento dell'audit.
+
+Verificati 5425 documenti ITF, 774729 candidati evidence; metriche script rowsWritten37807, rowsRead6296139. Sono metriche di questo script, non dell'intero account/workflow. Obiettivo zero ufficiale NON raggiunto: nessun rilancio identico effettuato. Prima di ulteriori recuperi servono evidenze aggiuntive per i residui, non IDs inventati o eliminazione dei giocatori.
+
+Integrità report: hash Git dell'intero file sorgente (403066 byte) uguale al blob canonico bac3c826468249014376823c776419d9513ce75a. Il marcatore di truncation iniziale è preesistente nel blob; l'append conserva tutti i byte precedenti.
