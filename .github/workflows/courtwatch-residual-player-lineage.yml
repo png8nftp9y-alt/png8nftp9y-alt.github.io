@@ -1,0 +1,28 @@
+name: Court Watch residual player lineage inspection once
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-residual-player-lineage.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Read retained native player references for residual source keys
+        run: node src/v3/inspect-residual-player-lineage.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: residual-player-lineage
+          path: tmp/residual-player-lineage/
+          retention-days: 7

@@ -1,13 +1,14 @@
 // D1_WRITE_POLICY: incremental
 // buildIncrementalSyncPlan is enforced by applyArchiveEvidence; verified readback preserves source keys.
 import fs from 'node:fs/promises';
+import {profileRecoveryDeltaWriter} from '../lib/profile-recovery-delta-writer.mjs';
 import {gunzipSync} from 'node:zlib';
 import {nativeAcceptanceEvidence} from '../lib/native-acceptance-profile-evidence.mjs';
 import {pathToFileURL} from 'node:url';
 import {evidenceCatalog} from '../lib/archived-profile-evidence.mjs';
 import {itfSearchEvidence,teDirectoryEvidence,publicCookiePair,lookupTeDirectory} from '../lib/live-profile-evidence.mjs';
 import {playerNameKey} from '../lib/player-circuit-profiles.mjs';
-import {unresolvedSources,applyArchiveEvidence} from './repair-archived-player-profiles.mjs';
+import {unresolvedSources} from './repair-archived-player-profiles.mjs';
 import {syncPlayerIdentities,profileRecoveryAudit,addD1Metrics} from './sync-player-identities.mjs';
 async function main(){
  await fs.mkdir('tmp/live-profile-recovery',{recursive:true});
@@ -34,7 +35,8 @@ async function main(){
   }
   // The official search route and main-profile country markup were verified on the runner.
   report.repaired=0;report.records=[];
-  const saveDelta=async batch=>{const result=await applyArchiveEvidence(query,batch,catalog);report.repaired+=result.repaired;report.records.push(...result.records);await fs.writeFile('tmp/live-profile-recovery/report.json',JSON.stringify(report));};
+  const writeDelta=profileRecoveryDeltaWriter(query,catalog);
+  const saveDelta=async batch=>{const result=await writeDelta(batch);report.repaired+=result.repaired;report.records.push(...result.records);await fs.writeFile('tmp/live-profile-recovery/report.json',JSON.stringify(report));};
   await saveDelta(rows.filter(r=>r.circuit==='itf'));
   if(report.nativeAcceptance)await saveDelta(rows.filter(r=>r.circuit==='tennis-europe'));
   try{
