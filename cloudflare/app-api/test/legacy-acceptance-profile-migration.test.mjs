@@ -26,3 +26,12 @@ test('already migrated native entry references still bind the original competiti
  assert.equal(legacyAcceptanceCandidate(source,[{...entry,source_player_id:id},{...entry,source_player_id:second}],doc),null);
  assert.equal(legacyAcceptanceCandidate(source,[{...entry,source_player_id:'123'}],doc),null);
 });
+
+test('retained legacy and native histories prove the same original participation after current cache expires a past tournament',()=>{
+ const expired={status:doc.status,tournaments:{[second]:{competitionId:second,participants:[]}}};
+ const native={...entry,source_player_id:id};
+ assert.equal(legacyAcceptanceCandidate(source,[entry,native],expired).officialId,id);
+ assert.equal(legacyAcceptanceCandidate(source,[native],expired),null);
+ assert.equal(legacyAcceptanceCandidate(source,[entry,{...native,payload:JSON.stringify({tournaments:[{competitionId:second}]})}],expired),null);
+ assert.equal(legacyAcceptanceCandidate(source,[entry,native,{...native,source_player_id:second}],expired),null);
+});
