@@ -1,0 +1,24 @@
+name: Court Watch terminal Europe residual inspection once
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-terminal-europe-residuals.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node src/v3/inspect-terminal-europe-residuals.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: terminal-europe-residuals
+          path: tmp/terminal-europe-residuals/
+          retention-days: 7
