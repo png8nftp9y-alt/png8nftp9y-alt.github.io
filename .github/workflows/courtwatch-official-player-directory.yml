@@ -1,0 +1,25 @@
+name: Court Watch official player directory inspection once
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-official-player-directory.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Inspect anonymous official directory and its public search code
+        run: node src/v3/inspect-official-player-directory.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: official-player-directory
+          path: tmp/official-player-directory/
+          retention-days: 7

@@ -2274,3 +2274,8 @@ FITP: un nome che la normalizzazione riduce a vuoto può essere recuperato solta
 ITF: i tre oggetti ufficiali salvati nel run 38011592906 hanno playerNationalityCode e playerProfileLink; il parser precedente non li leggeva. Aggiunti questi campi e risoluzione delle URL relative sul dominio ufficiale ITF, sempre con ID esatto. Europe: il cookie st contiene valori con '='; split('=') ne troncava il contenuto. Ora si conserva l'intero valore dopo il primo '=', con cookie separati per host, e si salvano le form del directory per il successivo recupero GUID. Nessuna supposizione di zero Europe. Workflow mirato una tantum riavviato dalla modifica del suo file; FITP fallito da rilanciare col codice aggiornato.
 
 Validazione: 19 test superati, inclusi replay FITP con nome recuperato a zero scritture, tessera sconosciuta/conflittuale bloccata, campi nativi ITF e cookie con '='. Policy D1 nuove funzionalità OK, YAML e diff check validi. Report intero preservato, blob b57f938ba52b3b697ff4b85273ec537ee0aff22b verificato prima dell'aggiunta. Ultimo audit operativo: 19.901 residui (Europe 19.898, ITF 3), da aggiornare solo dopo i nuovi run.
+
+
+### Directory Europe: verifica pubblica indipendente dal lock D1
+
+Per proseguire il recupero GUID senza aspettare la coda dei writer, aggiunta ispezione una tantum del directory ufficiale anonimo e degli script pubblici di ricerca. Nessun segreto, account autenticato, query o scrittura D1; conserva cookie pubblici di consenso per host e legge solo la pagina senza ricerca e i suoi script statici. Non viene programmata ricorrenza. Sintassi Node e YAML verificate. Lo scopo è identificare la form/API esatta prima di richiedere i profili mancanti, non dichiarare zero.
