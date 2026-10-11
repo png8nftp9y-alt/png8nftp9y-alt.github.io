@@ -2756,3 +2756,10 @@ Attivati tutti e quattro i pulsanti Altri: aprono lo stesso frontend con gruppo 
 Migrazione additiva 0035_other_player_list.sql: nuova tabella privata user_app_other_players, senza spostare o modificare le selezioni Main. Il gruppo è validato lato Worker; snapshot, aggiunte e rimozioni operano sul gruppo richiesto. Stesso giocatore ammesso in entrambi; rimozione Main non cancella Altri e viceversa. Profili salvati e recupero storico/iscrizioni condivisi, GET senza scritture e replay identico senza scritture. Gli override globali non inseriscono giocatori estranei nello snapshot Altri. Recupero dei circoli mancanti include le selezioni di entrambi i gruppi. La sincronizzazione futura delle variazioni di circolo/classifica FITP resta da realizzare insieme al motore FITP, come concordato.
 
 Validazione: 33 controlli Shield browser passati con dati sintetici e API simulate, inclusi aggiunta, ricarica, elenco Main invariato e rimozione Altri; test SQLite su persistenza, gruppi indipendenti, rimozioni, proprietario, replay a zero scritture e gruppi invalidi; test cache separate e rifiuto snapshot Main nella sezione Altri; controlli completi dell’app passati. I deploy frontend/Worker e la migrazione D1 sono demandati ai workflow del merge; nessun polling dei run.
+
+
+### 2026-10-11 — Verifica ownership compatibile con Altri
+
+- Run 38147675887 fallito nel controllo finale: `ownerMissingPersonalLinks=2`, dopo migrazioni e primo deploy Worker riusciti. Il controllo richiedeva una selezione Principali per ogni payload personale condiviso.
+- La parità ora verifica separatamente le appartenenze attive di Principali e Altri; i payload condivisi possono restare disponibili dopo una rimozione. Le rimozioni dai Principali non nascondono appartenenze Altri prive di dati. Nessuna modifica alle selezioni o ai dati dei giocatori.
+- Validazione: 7 test SQLite ownership passati, compresi Altri esclusivo, doppia appartenenza, metadati conservati dopo rimozione, dati mancanti e ID errati. Verifica remota da completare nel nuovo deploy; nessun polling dei run.

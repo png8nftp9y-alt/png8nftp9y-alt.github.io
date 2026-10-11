@@ -9,14 +9,15 @@ db.row_factory=sqlite3.Row
 db.executescript("""
 CREATE TABLE app_players(id TEXT PRIMARY KEY);
 CREATE TABLE user_app_players(user_id TEXT,courtwatch_id TEXT,PRIMARY KEY(user_id,courtwatch_id));
+CREATE TABLE user_app_other_players(user_id TEXT,courtwatch_id TEXT);
 CREATE TABLE user_app_player_removals(user_id TEXT,courtwatch_id TEXT);
 CREATE TABLE user_app_player_additions(user_id TEXT,courtwatch_id TEXT);
 """)
 data=json.loads(sys.argv[1])
 owner='user-federico-181099'
 db.executemany('INSERT INTO app_players VALUES(?)',[(x,) for x in data['base']])
-for table,key in [('user_app_players','links'),('user_app_player_removals','removed'),('user_app_player_additions','personal')]:
- db.executemany('INSERT INTO '+table+' VALUES(?,?)',[(owner,x) for x in data[key]])
+for table,key in [('user_app_players','links'),('user_app_other_players','others'),('user_app_player_removals','removed'),('user_app_player_additions','personal')]:
+ db.executemany('INSERT INTO '+table+' VALUES(?,?)',[(owner,x) for x in data.get(key,[])])
 print(json.dumps(dict(db.execute('SELECT '+sys.argv[2]).fetchone())))
 `;
 function verify(data) {
@@ -38,8 +39,16 @@ test('equal counts cannot hide wrong IDs',()=>{
  assert.ok(errors.some(x=>x.includes('ownerMissingBaseLinks=1')));
  assert.ok(errors.some(x=>x.includes('ownerUnresolvedLinks=1')));
 });
-test('personal additions require active links; removals remain respected',()=>{
- assert.equal(verify({base:[],links:[],removed:[],personal:['added']}).length,1);
+test('shared addition metadata may outlive membership; removals remain respected',()=>{
+ assert.deepEqual(verify({base:[],links:[],removed:[],personal:['added']}),[]);
  assert.deepEqual(verify({base:['a'],links:['a','added'],removed:['a','added'],personal:['added']}),[]);
 });
 test('missing query fields do not pass as zero',()=>assert.equal(ownershipErrors({}).length,3));
+
+test('Others-only and shared memberships resolve without requiring Main links',()=>{
+ assert.deepEqual(verify({base:['a'],links:['a'],others:['a','added'],removed:[],personal:['added']}),[]);
+});
+test('a Main tombstone does not suppress resolution checks for Others',()=>{
+ assert.deepEqual(verify({base:[],links:[],others:['added'],removed:['added'],personal:['added']}),[]);
+ assert.ok(verify({base:[],links:[],others:['unknown'],removed:['unknown'],personal:[]}).some(x=>x.includes('ownerUnresolvedOtherLinks=1')));
+});
