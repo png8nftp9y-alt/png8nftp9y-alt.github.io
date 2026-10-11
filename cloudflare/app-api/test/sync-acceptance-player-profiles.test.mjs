@@ -117,3 +117,15 @@ test('existing FITP ID cannot complete first Europe registration without the Eur
   assert.equal(diagnostic.status,'blocked');assert.equal(diagnostic.unsaved[0].name,name);
  }finally{d.close()}
 });
+
+test('D1_TEST_REAL_DELTAS_ONLY: 801 acquired players need three comparison reads and one changed-row readback',async()=>{const d=database();try{
+ const doc={participants:Array.from({length:801},(_,i)=>({name:'Batch Person '+i,worldTennisId:String(800100000+i),birthYear:2011}))};
+ const rows=acceptancePlayers('itf',doc),quote=v=>"'"+String(v).replaceAll("'","''")+"'";
+ await d.query('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES '+rows.map(r=>'('+[r.source_key,r.circuit,r.official_id,r.normalized_name,r.display_name,JSON.stringify(r.payload)].map(quote).join(',')+')').join(','));
+ const reads=[],query=async sql=>{if(sql.includes('FROM player_identity_pending_sources'))return[];if(sql.startsWith('SELECT source_key,circuit,official_id'))reads.push(sql);return d.query(sql)};
+ await syncAcceptanceProfiles(query,'itf',doc);assert.equal(reads.length,3);assert.ok(reads.every(q=>q.includes('normalized_name,display_name,payload')));
+ reads.length=0;doc.participants[600].birthYear=2012;const result=await syncAcceptanceProfiles(query,'itf',doc);
+ assert.equal(result.changed,1);assert.equal(reads.length,4);assert.equal(reads.filter(q=>!q.includes('normalized_name,display_name,payload')).length,1);
+ const readback=reads.find(q=>!q.includes('normalized_name,display_name,payload'));assert.match(readback,/itf\|id:800100600/);assert.ok(!readback.includes('itf|id:800100599'));
+ const before=d.writes();reads.length=0;await syncAcceptanceProfiles(query,'itf',doc);assert.equal(reads.length,0);assert.equal(d.writes(),before);
+}finally{d.close()}});

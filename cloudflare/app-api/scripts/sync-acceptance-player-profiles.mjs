@@ -1,3 +1,4 @@
+import {acceptanceQueryBatches} from '../lib/acceptance-query-batches.mjs';
 import {saveAcceptanceImportDiagnostics} from '../lib/acceptance-import-diagnostics.mjs';
 import fs from 'node:fs/promises';
 import {gunzipSync} from 'node:zlib';
@@ -53,16 +54,19 @@ async function importAcceptanceProfiles(query,circuit,doc,options,context) {
  const checkpoint=(await query('SELECT value FROM app_state WHERE key='+sqlString(key)))[0];
  let changed=0;
  if(checkpoint?.value!==hash){
-  for(let i=0;i<rows.length;i+=40){
-   const incoming=rows.slice(i,i+40),current=await query('SELECT source_key,circuit,official_id,normalized_name,display_name,payload FROM observed_players WHERE source_key IN ('+incoming.map(r=>sqlString(r.source_key)).join(',')+')');
+  let processed=0;
+  for(const incoming of acceptanceQueryBatches(rows)){
+   const current=await query('SELECT source_key,circuit,official_id,normalized_name,display_name,payload FROM observed_players WHERE source_key IN ('+incoming.map(r=>sqlString(r.source_key)).join(',')+')');
    const parsed=current.map(r=>({...r,payload:JSON.parse(r.payload)})),prior=new Map(parsed.map(r=>[r.source_key,r]));
    const merged=incoming.map(r=>({...r,official_id:r.official_id||prior.get(r.source_key)?.official_id||'',payload:{...(prior.get(r.source_key)?.payload||{}),...Object.fromEntries(Object.entries(r.payload).filter(([,v])=>v!==''&&v!=null))}}));
    const plan=buildIncrementalSyncPlan({current:parsed,incoming:merged,keyOf:r=>r.source_key,sourceComplete:true});
    const delta=[...plan.inserts,...plan.updates.map(u=>u.after)];changed+=delta.length;
    for(let j=0;j<delta.length;j+=20)await query(delta.slice(j,j+20).map(r=>'INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES('+[r.source_key,r.circuit,r.official_id,r.normalized_name,r.display_name,JSON.stringify(r.payload)].map(sqlString).join(',')+') ON CONFLICT(source_key) DO UPDATE SET official_id=excluded.official_id,normalized_name=excluded.normalized_name,display_name=excluded.display_name,payload=excluded.payload WHERE official_id IS NOT excluded.official_id OR normalized_name IS NOT excluded.normalized_name OR display_name IS NOT excluded.display_name OR payload IS NOT excluded.payload;').join('\n'));
-   const saved=await query('SELECT source_key,circuit,official_id FROM observed_players WHERE source_key IN ('+incoming.map(r=>sqlString(r.source_key)).join(',')+')');
-   const verified=new Map(saved.map(r=>[r.source_key,r]));
+   // Unchanged rows were already read and compared. Only mutations require readback.
+   const saved=delta.length?await query('SELECT source_key,circuit,official_id FROM observed_players WHERE source_key IN ('+delta.map(r=>sqlString(r.source_key)).join(',')+')'):[];
+   const verified=new Map([...parsed,...saved].map(r=>[r.source_key,r]));
    if(incoming.some(r=>verified.get(r.source_key)?.circuit!==r.circuit||verified.get(r.source_key)?.official_id!==r.official_id))throw Error('acceptance_saved_circuit_id_unverified');
+   processed+=incoming.length;if(processed%4000<incoming.length||processed===rows.length)options.onProgress?.({phase:'compare',processed,total:rows.length,changed});
   }
  }
  const pending=await query('SELECT source_key FROM player_identity_pending_sources LIMIT 1');
@@ -76,7 +80,7 @@ export async function syncAcceptanceProfiles(query,circuit,doc,options={}) {
  const context={rows:null};
  try {
   const result=await importAcceptanceProfiles(query,circuit,doc,options,context);
-  await saveAcceptanceImportDiagnostics(query,circuit,{rows:context.rows,status:'complete'});
+  await saveAcceptanceImportDiagnostics(query,circuit,{rows:context.rows,status:'complete',verified:true});
   return result;
  }catch(error){
   const message=String(error?.message||'');
@@ -88,8 +92,9 @@ export async function syncAcceptanceProfiles(query,circuit,doc,options={}) {
 }
 async function main(){
  const config=JSON.parse(await fs.readFile('wrangler.generated.jsonc','utf8')),db=config.d1_databases.find(d=>d.binding==='DB').database_id;
- async function query(sql){const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+process.env.CLOUDFLARE_ACCOUNT_ID+'/d1/database/'+db+'/query',{method:'POST',headers:{Authorization:'Bearer '+process.env.CLOUDFLARE_API_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)}),j=await r.json();if(!r.ok||j.success!==true||!j.result?.every(x=>x.success))throw Error('acceptance_d1_query_failed:'+r.status);return j.result[0].results||[]}
+ const metrics={queries:0,rowsRead:0,rowsWritten:0};
+ async function query(sql){metrics.queries++;const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+process.env.CLOUDFLARE_ACCOUNT_ID+'/d1/database/'+db+'/query',{method:'POST',headers:{Authorization:'Bearer '+process.env.CLOUDFLARE_API_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)}),j=await r.json();if(!r.ok||j.success!==true||!j.result?.every(x=>x.success))throw Error('acceptance_d1_query_failed:'+r.status);for(const result of j.result){metrics.rowsRead+=Number(result.meta?.rows_read||0);metrics.rowsWritten+=Number(result.meta?.rows_written||0)}return j.result[0].results||[]}
  const doc=JSON.parse(gunzipSync(await fs.readFile(process.env.ACCEPTANCE_CACHE_FILE)));
- const audit=await syncAcceptanceProfiles(query,process.env.ACCEPTANCE_CIRCUIT,doc,{recoverMissing:acceptanceNativeIdRecovery(doc)});await fs.mkdir('tmp',{recursive:true});await fs.writeFile('tmp/acceptance-player-profiles.json',JSON.stringify(audit)+'\n');console.log(JSON.stringify(audit));
+ const started=Date.now();const audit=await syncAcceptanceProfiles(query,process.env.ACCEPTANCE_CIRCUIT,doc,{recoverMissing:acceptanceNativeIdRecovery(doc),onProgress:progress=>console.log(JSON.stringify(progress))});audit.d1Metrics=metrics;audit.elapsedMs=Date.now()-started;await fs.mkdir('tmp',{recursive:true});await fs.writeFile('tmp/acceptance-player-profiles.json',JSON.stringify(audit)+'\n');console.log(JSON.stringify(audit));
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
