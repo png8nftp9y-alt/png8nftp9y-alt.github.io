@@ -2763,3 +2763,11 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Run 38147675887 fallito nel controllo finale: `ownerMissingPersonalLinks=2`, dopo migrazioni e primo deploy Worker riusciti. Il controllo richiedeva una selezione Principali per ogni payload personale condiviso.
 - La parità ora verifica separatamente le appartenenze attive di Principali e Altri; i payload condivisi possono restare disponibili dopo una rimozione. Le rimozioni dai Principali non nascondono appartenenze Altri prive di dati. Nessuna modifica alle selezioni o ai dati dei giocatori.
 - Validazione: 7 test SQLite ownership passati, compresi Altri esclusivo, doppia appartenenza, metadati conservati dopo rimozione, dati mancanti e ID errati. Verifica remota da completare nel nuovo deploy; nessun polling dei run.
+
+
+### 2026-10-11 — Ricerca Altri e categoria Martina Busa
+
+- Segnalazione: Martina Busa non trovata dalla ricerca e non riconosciuta dal selettore Under 10. In presenza di indice identità pending la ricerca usa le sorgenti acquisite; un indice ready senza risultati iniziali consente lo stesso fallback. I cursori mantengono il percorso originale durante la paginazione. Nessuna scrittura per la ricerca.
+- Migrazione 0036: registra solo se assente l’identità FITP di Martina Busa, tessera 6562748855, conservata nel roster originale data.json. Non iscrive il giocatore a nessun elenco e non sovrascrive metadati acquisiti; riesecuzione senza scritture.
+- Il selettore legge anche birthDate/dateOfBirth ISO. Per Busa senza anno acquisito, categoria U10 confermata dall’utente valida solo nel 2026, protetta da nome e tessera, senza inferire anno di nascita. Un anno acquisito ha precedenza; nessuna estensione automatica al 2027.
+- Validazione: controllo app-api completo passato sulla versione finale; 14 regressioni ricerca/paginazione, identità, migrazione e categorie passate. Release guard e diff whitespace verificati. Sessione browser online bloccata dal login Cloudflare Access, quindi nessuna prova live autenticata. Pubblicazione e migrazione remota da completare con Actions; nessun polling.

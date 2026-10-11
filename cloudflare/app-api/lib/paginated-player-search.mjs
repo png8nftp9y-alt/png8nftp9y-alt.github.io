@@ -2,7 +2,7 @@ import {mappedPlayerSearch,storedIdentity} from './player-identity-lookup.mjs';
 import {normalizePlayerName,officialPlayerUrl} from './player-circuit-profiles.mjs';
 export const SEARCH_PAGE_SIZE=60;
 function cursor(value){if(!value)return null;try{const row=JSON.parse(decodeURIComponent(escape(atob(value))));if(typeof row.n!=='string'||typeof row.k!=='string'||row.n.length>240||row.k.length>400)throw Error();return row}catch{throw Object.assign(Error('invalid_search_cursor'),{status:400})}}
-const encode=row=>btoa(unescape(encodeURIComponent(JSON.stringify({n:row.normalized_name,k:row.cursor_key}))));
+const encode=(row,mode='source')=>btoa(unescape(encodeURIComponent(JSON.stringify({n:row.normalized_name,k:row.cursor_key,m:mode}))));
 const compare=(a,b)=>a.normalized_name<b.normalized_name?-1:a.normalized_name>b.normalized_name?1:a.cursor_key<b.cursor_key?-1:a.cursor_key>b.cursor_key?1:0;
 const nameKey=name=>normalizePlayerName(name).split(' ').sort().join(' ');
 const payload=row=>{try{return JSON.parse(row.payload||'{}')}catch{return {}}};
@@ -42,7 +42,10 @@ export async function searchIdentityProfile(db,name,identity){
 export async function paginatedPlayerSearch(db,query,userId,after=''){
  const tokens=normalizePlayerName(query).split(' ').filter(Boolean).slice(0,5);if(!tokens.length)return{results:[],nextCursor:null};
  const seek=cursor(after),where=tokens.map(()=>'normalized_name LIKE ?').join(' AND ')+(seek?' AND (normalized_name>? OR (normalized_name=? AND cursor_key>?))':''),binds=[...tokens.map(t=>'%'+t+'%'),...(seek?[seek.n,seek.n,seek.k]:[])];
- const mapped=await mappedPlayerSearch(db,{tokens,seek,pageSize:SEARCH_PAGE_SIZE,encode,userId});if(mapped)return mapped;
+ // Keep source cursors on the same index if canonical mapping catches up between pages.
+ const mapped=seek?.m==='source'?null:await mappedPlayerSearch(db,{tokens,seek,pageSize:SEARCH_PAGE_SIZE,encode:row=>encode(row,'mapped'),userId});
+ if(mapped&&(mapped.results.length||after))return mapped;
+ // A partial identity map must not hide an acquired player on the first page.
  const rows=await select(db,where,binds,'LIMIT 61'),page=rows.slice(0,SEARCH_PAGE_SIZE);
  // Expand exact normal/reversed names before grouping. Every group has a stable
  // first source-row anchor, so aliases encountered on later pages are not repeated.

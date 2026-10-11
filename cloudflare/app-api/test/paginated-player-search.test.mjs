@@ -19,3 +19,12 @@ test('repeated same-circuit observations collapse and selected source keeps all 
  const page=await paginatedPlayerSearch(d.db,'Darko Sartori',null);assert.equal(page.results.length,1);assert.equal(page.results[0].circuitProfiles.length,2);
  const {searchIdentityProfile}=await import('../lib/paginated-player-search.mjs');const person=await searchIdentityProfile(d.db,'Darko Sartori','retry');assert.equal(person.sourceCircuit,'tennis-europe');assert.equal(person.circuitProfiles.length,2);assert.ok(person.circuitProfiles.some(p=>p.url.endsWith(guid)));
 }finally{d.close()}});
+
+test('partial identity index falls back to acquired sources and keeps source pagination',async()=>{const d=database({identityMapping:true});try{
+ d.execute("INSERT INTO player_identity_people(canonical_id,name_key,payload) VALUES(?,?,?)",["known","BUSA 000",JSON.stringify({name:"Busa 0",canonicalId:"known"})]);
+ d.execute("INSERT INTO player_identity_sync(id,status) VALUES('current','pending')");
+ for(let i=0;i<65;i++)d.execute('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',['f'+i,'fitp',String(100000+i),'BUSA '+String(i).padStart(3,'0'),'Busa '+i,'{}']);
+ d.execute("INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES('f0','known','BUSA 000','fitp','100000','BUSA 000','Busa 0')");
+ const before=d.writes();const first=await paginatedPlayerSearch(d.db,'Busa',null);assert.equal(first.results.length,60);assert.ok(first.nextCursor);
+ const second=await paginatedPlayerSearch(d.db,'Busa',null,first.nextCursor);assert.equal(second.results.length,5);assert.equal(second.nextCursor,null);assert.equal(d.writes(),before);
+}finally{d.close()}});
