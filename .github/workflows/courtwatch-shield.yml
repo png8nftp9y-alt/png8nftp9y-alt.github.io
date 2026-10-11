@@ -34,7 +34,7 @@ jobs:
         with:
           node-version: 20
       - name: Run CourtWatch release guard
-        run: node tools/courtwatch-release-guard.mjs
+        run: node --test tools/courtwatch-refresh-contract.test.mjs && node tools/courtwatch-release-guard.mjs
       - name: Install browser for functional shield
         run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
       - name: Run complete functional shield

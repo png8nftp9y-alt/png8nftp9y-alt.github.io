@@ -1,5 +1,5 @@
 import {storedIdentity} from '../lib/player-identity-lookup.mjs';
-import {currentRankingCategoryAllowed} from '../lib/current-ranking-category.mjs';
+import {currentRankingCategoryAllowed,latestRankingPublicationsSql,latestPreparedPlayerRanking} from '../lib/current-ranking-category.mjs';
 import {loadPlayerIdDiagnostics,renderPlayerIdDiagnostics} from '../lib/admin-player-id-diagnostics.mjs';
 import {selectOpponentEntryProfiles} from '../lib/opponent-entry-native-aliases.mjs';
 import {sharedTournamentMetadata} from '../lib/tournament-metadata-cache.mjs';
@@ -36,13 +36,16 @@ async function enrichTennisEuropeRankings(env,players,matches,courtwatchIds){
   const targets=[...new Set(matches.flatMap(match=>[match.partner,...(match.opponentOptions||String(match.opponent||'').split(/\s*\/\s*/))]).map(normalizeTennisEuropeName).filter(Boolean))];
   if(targets.length){const rows=await optionalRows(env.DB.prepare(`SELECT profile_id,normalized_name,nationality,category,ranking,ranking_date FROM tennis_europe_ranking_history WHERE normalized_name IN (${targets.map(()=>'?').join(',')}) ORDER BY normalized_name,ranking_date DESC`).bind(...targets));for(const match of matches){const event=String(match.event||match.draw||''),age=event.match(/(?:^|[^0-9])(14|16)(?:[^0-9]|$)/)?.[1]||'',gender=/^(?:B|BOY)/i.test(event)?'B':/^(?:G|GIRL)/i.test(event)?'G':'',category=gender&&age?gender+age:'',date=String(match.date||'9999-12-31').slice(0,10);for(const [role,names] of [['partner',String(match.partner||'').split(/\s*\/\s*/)],['opponent',match.opponentOptions||String(match.opponent||'').split(/\s*\/\s*/)]])names.filter(Boolean).forEach((name,index)=>{const normalized=normalizeTennisEuropeName(name),row=rows.find(item=>item.normalized_name===normalized&&item.ranking_date<=date&&(!category||item.category===category))||rows.find(item=>item.normalized_name===normalized&&item.ranking_date<=date);if(!row)return;const prefix=role==='partner'?'partnerTe':'opponentTe',rankKey=prefix+'Rankings',dateKey=prefix+'RankingDates',profileKey=prefix+'ProfileIds',categoryKey=prefix+'RankingCategories';match[rankKey]??=[];match[dateKey]??=[];match[profileKey]??=[];match[categoryKey]??=[];if(!match[rankKey][index]){match[rankKey][index]=row.ranking;match[dateKey][index]=row.ranking_date;match[profileKey][index]=row.profile_id;match[categoryKey][index]=row.category}})}}
 }
+async function latestRankingPublications(env){return Object.fromEntries((await optionalRows(env.DB.prepare(latestRankingPublicationsSql))).filter(r=>r.ranking_date).map(r=>[r.category,r.ranking_date]));}
 async function applyPreparedTennisEuropeRankings(env,players,matches,courtwatchIds){
   if(!courtwatchIds.length)return;
-  const marks=courtwatchIds.map(()=>'?').join(','),[current,snapshots]=await Promise.all([
+  const marks=courtwatchIds.map(()=>'?').join(','),[current,snapshots,publicationDates]=await Promise.all([
     optionalRows(env.DB.prepare(`SELECT courtwatch_id,payload FROM tennis_europe_current_player_rankings WHERE courtwatch_id IN (${marks})`).bind(...courtwatchIds)),
-    optionalRows(env.DB.prepare(`SELECT courtwatch_id,match_id,participant_role,participant_index,profile_id,category,ranking,ranking_date FROM tennis_europe_match_ranking_snapshots WHERE courtwatch_id IN (${marks})`).bind(...courtwatchIds))
+    optionalRows(env.DB.prepare(`SELECT courtwatch_id,match_id,participant_role,participant_index,profile_id,category,ranking,ranking_date FROM tennis_europe_match_ranking_snapshots WHERE courtwatch_id IN (${marks})`).bind(...courtwatchIds)),
+    latestRankingPublications(env)
   ]),playerMap=new Map(players.map(player=>[player.id,player]));
   for(const row of current){const player=playerMap.get(row.courtwatch_id);if(!player)continue;let prepared={};try{prepared=JSON.parse(row.payload||'{}')}catch{}if(prepared.tennisEuropeRankings)player.tennisEuropeRankings=prepared.tennisEuropeRankings;if(prepared.tennisEuropeRankingDates)player.tennisEuropeRankingDates=prepared.tennisEuropeRankingDates;if(prepared.tennisEuropeRanking)player.tennisEuropeRanking=prepared.tennisEuropeRanking}
+  for(const player of players)Object.assign(player,latestPreparedPlayerRanking(player,publicationDates));
   const matchMap=new Map(matches.map(match=>[`${match.playerId}|${match.matchId||match.id}`,match]));
   for(const row of snapshots){const match=matchMap.get(`${row.courtwatch_id}|${row.match_id}`);if(!match||!row.ranking)continue;if(row.participant_role==='player'){match.playerTeRanking=row.ranking;match.playerTeRankingDate=row.ranking_date;match.playerTeProfileId=row.profile_id;continue}const prefix=row.participant_role==='partner'?'partnerTe':'opponentTe',rankKey=prefix+'Rankings',dateKey=prefix+'RankingDates',profileKey=prefix+'ProfileIds',categoryKey=prefix+'RankingCategories';match[rankKey]??=[];match[dateKey]??=[];match[profileKey]??=[];match[categoryKey]??=[];match[rankKey][row.participant_index]=row.ranking;match[dateKey][row.participant_index]=row.ranking_date;match[profileKey][row.participant_index]=row.profile_id;match[categoryKey][row.participant_index]=row.category}
 }
@@ -51,7 +54,8 @@ async function currentTennisEuropePlayerRanking(env,{playerId,name}){
   for(const row of [...aliasRows,...nameRows]){const current=latest.get(row.category);if(!current||String(row.ranking_date||'')>String(current.ranking_date||''))latest.set(row.category,row)}
   const canonical=await storedIdentity(env.DB,playerId),configured=!canonical&&playerId?await env.DB.prepare('SELECT payload FROM app_players WHERE id=?').bind(playerId).first():null;
   let person=canonical||{};if(configured)try{person=JSON.parse(configured.payload)}catch{}
-  return{playerId,rankings:[...latest.values()].filter(row=>currentRankingCategoryAllowed(row.category,person)).sort((a,b)=>String(a.category).localeCompare(String(b.category)))};
+  const latestRankingDates=await latestRankingPublications(env);
+  return{playerId,latestRankingDates,rankings:[...latest.values()].filter(row=>row.ranking_date===latestRankingDates[row.category]&&currentRankingCategoryAllowed(row.category,person)).sort((a,b)=>String(a.category).localeCompare(String(b.category)))};
 }
 async function searchPlayers(env,query,userId,cursor=''){return paginatedPlayerSearch(env.DB,query,userId,cursor)}
 const incompleteCompletedScore=(value,status,decided=false)=>{const sets=String(value||'').match(/\d+(?:\(\d+\))?-\d+(?:\(\d+\))?/g)||[];if(!sets.length)return false;let left=0,right=0;for(const set of sets){const points=set.match(/^(\d+)(?:\(\d+\))?-(\d+)/);if(!points)continue;const a=Number(points[1]),b=Number(points[2]),high=Math.max(a,b),low=Math.min(a,b),completeSet=high>=6&&(high-low>=2||(high===7&&low===6));if(!completeSet)continue;a>b?left++:right++}return Math.max(left,right)<2};
@@ -90,7 +94,9 @@ async function universalOpponentHistory(env,options){
  else if(history.profile?.profile_id){person.circuits=['tennis-europe'];person.profileSync={tennisEurope:{profileId:history.profile.profile_id}};}
  if(identity)Object.assign(person,identity,{name:options.name});
  const profiles=await resolveCircuitProfiles(env.DB,[person]),tournaments=opponentTournamentWindow([...entries,...history.tournaments,...other],asOf);
- return{...history,asOf,tournaments,circuitProfiles:[...new Map([...(profiles.get(person)||circuitProfiles(person)),...(identity?.circuitProfiles||[])].map(p=>[p.circuit,p])).values()],sources:[...new Set(tournaments.map(t=>t.circuit||'tennis-europe'))]};
+ const current=await currentTennisEuropePlayerRanking(env,{playerId:person.canonicalId||person.id||options.profileId,name:person.name});
+ const currentProfile=current.rankings.find(row=>currentRankingCategoryAllowed(row.category,person));
+ return{...history,profile:currentProfile?{...history.profile,...currentProfile}:history.profile?{...history.profile,ranking:null}:null,asOf,tournaments,circuitProfiles:[...new Map([...(profiles.get(person)||circuitProfiles(person)),...(identity?.circuitProfiles||[])].map(p=>[p.circuit,p])).values()],sources:[...new Set(tournaments.map(t=>t.circuit||'tennis-europe'))]};
 }
 function adminAuthorized(request,env){if(!env.ADMIN_TOKEN)return false;const value=request.headers.get('authorization')||'';if(!value.startsWith('Basic '))return false;try{const decoded=atob(value.slice(6)),i=decoded.indexOf(':');return i>=0&&decoded.slice(i+1)===env.ADMIN_TOKEN}catch{return false}}
 const adminHeaders={'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Frame-Options':'DENY','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"};

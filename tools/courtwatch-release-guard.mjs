@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {validAppRefreshContract} from './courtwatch-refresh-contract.mjs';
 import { execFileSync } from 'node:child_process';
 
 const failures=[];
@@ -17,7 +18,7 @@ for(const id of baseline.requiredDomIds)html.includes('id="'+id+'"')?pass('dom-'
 for(const asset of baseline.requiredAssetVersions)html.includes(asset)?pass('asset-'+asset,'versionato'):fail('asset-'+asset,'cache-buster mancante');
 js.includes("location.origin+'/app/api'")?pass('private-api','/app/api stessa origine'):fail('private-api','endpoint autenticato atteso mancante');
 !/\bprompt\s*\(/.test(js)?pass('analysis-password','nessun prompt password'):fail('analysis-password','prompt() trovato nel client');
-js.includes('setInterval(load,30000)')?pass('refresh-contract','refresh applicazione 30s preservato'):fail('refresh-contract','refresh applicazione modificato o mancante');
+validAppRefreshContract(js)?pass('refresh-contract','refresh 30s fuori dalle schede avversario verificato'):fail('refresh-contract','atteso refresh 30s sulle pagine principali e nessun refresh nella scheda avversario');
 
 const players=json('dist/v3/players.json').players;
 const tournaments=json('dist/v3/tournaments.json').tournaments;
@@ -46,3 +47,4 @@ fs.writeFileSync('artifacts/courtwatch-release-guard.json',JSON.stringify(report
 for(const item of results)console.log((item.status==='pass'?'✓':'✗')+' '+item.name+' — '+item.detail);
 if(failures.length){console.error('\nPubblicazione bloccata:\n- '+failures.join('\n- '));process.exit(1)}
 console.log('\nCourtWatch release guard: tutti i controlli superati.');
+
