@@ -38,3 +38,23 @@ test('pending mapping is visible and diagnostics refresh only on page load',asyn
  assert.match(source,/view==='diagnostica'\?renderPlayerIdDiagnostics/);
  assert.ok(source.includes("${view==='diagnostica'?'':'<meta http-equiv=\"refresh\" content=\"300\">'}"));
 });
+
+test('manual refresh submits a GET and each read sees current D1 rather than a retained snapshot',async()=>{
+ const d=database({identityMapping:true});try{
+  for(let i=1;i<=24;i++)add(d,'e'+i,'person'+i,'tennis-europe','name:Player '+i);
+  const before=await loadPlayerIdDiagnostics(d.db);
+  assert.equal(before.find(r=>r.circuit==='tennis-europe').missing,24);
+  assert.ok(Number.isFinite(Date.parse(before.checkedAt)));
+  const html=renderPlayerIdDiagnostics(before);
+  assert.match(html,/<form method="get" action="\/admin\/diagnostica#id-circuiti"><button type="submit"/);
+  assert.doesNotMatch(html,/<a href="\/admin\/diagnostica#id-circuiti">Aggiorna conteggi/);
+  assert.match(html,/<time datetime="[^" ]+">/);
+  for(let i=1;i<=24;i++)d.execute('UPDATE player_circuit_identities SET official_id=? WHERE source_key=?',[String(i).padStart(8,'0')+'-1234-1234-1234-123456789abc','e'+i]);
+  const writes=d.writes(),after=await loadPlayerIdDiagnostics(d.db);
+  assert.equal(after.find(r=>r.circuit==='tennis-europe').missing,0);
+  assert.equal(after.coverage.find(r=>r.circuit==='tennis-europe').records_missing_circuit_id,0);
+  assert.equal(d.writes(),writes);
+  assert.equal(before.find(r=>r.circuit==='tennis-europe').missing,24);
+  assert.doesNotMatch(renderPlayerIdDiagnostics(after),/<script|http-equiv/);
+ }finally{d.close()}
+});
