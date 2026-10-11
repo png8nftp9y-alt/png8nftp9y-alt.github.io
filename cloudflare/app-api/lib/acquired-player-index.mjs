@@ -1,3 +1,4 @@
+import {sourceNativeEvidence,hasConflictingNativeSource} from './native-player-source-fields.mjs';
 // D1_WRITE_POLICY: incremental
 import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
 import crypto from 'node:crypto';
@@ -5,9 +6,9 @@ import {profileEvidence} from './player-profile-evidence.mjs';
 import {normalizePlayerName,playerNameKey,officialPlayerUrl} from './player-circuit-profiles.mjs';
 import {playerSourceMetadata} from './personal-player-metadata.mjs';
 const hash=value=>crypto.createHash('sha256').update(value).digest('hex').slice(0,24);
-export function acquiredPlayer(circuit,source={}){
+export function acquiredPlayer(circuit,source={}, {nativeFields=true}={}){
  const name=String(source.name||source.display_name||source.playerName||[source.firstName,source.lastName].filter(Boolean).join(' ')).trim();if(!normalizePlayerName(name))return null;
- const metadata=playerSourceMetadata(source),evidence=profileEvidence(circuit,{...source,...metadata,name}),officialId=evidence?.officialId||'';
+ const metadata=playerSourceMetadata(source),evidence=nativeFields&&hasConflictingNativeSource(circuit,source)?null:profileEvidence(circuit,{...source,...metadata,name})||(nativeFields?sourceNativeEvidence(circuit,{...source,...metadata,name}):null),officialId=evidence?.officialId||'';
  const identity=officialId?'id:'+officialId:'name:'+hash(playerNameKey(name)+'|'+String(metadata.nationality||'').toUpperCase()+'|'+(metadata.birthYear||''));
  const sourceKey='acquired|'+circuit+'|'+identity;
  const payload={...metadata,displayName:name,officialId,circuit,profileUrl:evidence?.profileUrl||''};

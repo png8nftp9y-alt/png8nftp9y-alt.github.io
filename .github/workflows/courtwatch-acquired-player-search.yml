@@ -39,7 +39,7 @@ jobs:
         run: node --test test/courtwatch-acquired-player-search.test.mjs
       - name: Test incremental source and replay guards
         working-directory: cloudflare/app-api
-        run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs test/player-profile-evidence.test.mjs test/player-identity-write-budget.test.mjs test/player-native-profile-recovery.test.mjs test/europe-match-profile-recovery.test.mjs
+        run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs test/player-profile-evidence.test.mjs test/player-identity-write-budget.test.mjs test/player-native-profile-recovery.test.mjs test/europe-match-profile-recovery.test.mjs test/circuit-native-source-recovery.test.mjs
       - name: Configure database and apply additive migrations
         working-directory: cloudflare/app-api
         run: |
@@ -50,11 +50,16 @@ jobs:
         working-directory: cloudflare/app-api
         run: node scripts/sync-acquired-player-search.mjs
       - name: Link acquired players to persistent circuit identities
+        id: identity_mapping
         working-directory: cloudflare/app-api
         run: node scripts/sync-player-identities.mjs
       - name: Resolve missing Europe match IDs through their official tournament profiles
         working-directory: cloudflare/app-api
         run: node scripts/recover-europe-match-profiles.mjs
+      - name: Resolve missing FITP and ITF IDs from original participant references
+        if: ${{ !cancelled() && steps.identity_mapping.outcome == 'success' }}
+        working-directory: cloudflare/app-api
+        run: node scripts/recover-circuit-native-profiles.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -65,4 +70,5 @@ jobs:
             cloudflare/app-api/tmp/player-identity-d1-metrics.json
             cloudflare/app-api/tmp/player-profile-unresolved.json
             cloudflare/app-api/tmp/europe-match-profile-recovery.json
+            cloudflare/app-api/tmp/circuit-native-profile-recovery.json
           retention-days: 30

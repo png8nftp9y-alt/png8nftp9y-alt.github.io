@@ -1,8 +1,10 @@
+import {circuitAcceptanceRecovery,circuitOfficialJson} from './circuit-native-source-recovery.mjs';
 import {acceptanceSourceProfiles} from './acceptance-source-profile-provenance.mjs';
 import {publicCookiePair} from './live-profile-evidence.mjs';
 // Only exact original acceptance references are inspected, never a name-only directory lookup.
 export function acceptanceNativeIdRecovery(doc,{fetchPage=fetch}={}){
  const cookies=new Map();let consent;
+ const otherCircuits=circuitAcceptanceRecovery(doc,{officialJson:circuitOfficialJson({fetchPage})});
  async function publicPage(url,options={}){let method=options.method||'GET',body=options.body;
   for(let i=0;i<6;i++){
    const u=new URL(url);if(u.protocol!=='https:'||u.hostname!=='te.tournamentsoftware.com'||u.username||u.password)throw Error('acceptance_foreign_profile_url');
@@ -15,9 +17,10 @@ export function acceptanceNativeIdRecovery(doc,{fetchPage=fetch}={}){
  }
  return async rows=>{
   const sources=rows.filter(r=>r.circuit==='tennis-europe').map(r=>({...r,source_table:'observed_players',nationality:r.payload?.nationality||'',birth_year:r.payload?.birthYear||null}));
-  if(!sources.length)return new Map();
+  const recovered=await otherCircuits(rows);
+  if(!sources.length)return recovered;
   // Lazy and cached: lists already containing all native IDs make no extra requests.
   consent??=(async()=>{const p=await publicPage('https://te.tournamentsoftware.com/find/player');if(/CookiePurposes|SettingsOpen/.test(p.text))await publicPage('https://te.tournamentsoftware.com/cookiewall/Save',{method:'POST',body:new URLSearchParams({ReturnUrl:'/find/player',SettingsOpen:'false',CookiePurposes:'1'}).toString()});})();
-  try{await consent;const result=await acceptanceSourceProfiles(sources,doc,publicPage);return new Map([...result.resolved].map(([key,e])=>[key.slice('observed_players|'.length),e]));}catch{return new Map();}
+  try{await consent;const result=await acceptanceSourceProfiles(sources,doc,publicPage);for(const [key,e]of result.resolved)recovered.set(key.slice('observed_players|'.length),e);return recovered;}catch{return recovered;}
  };
 }
