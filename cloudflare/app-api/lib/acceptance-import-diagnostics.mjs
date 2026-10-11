@@ -1,17 +1,18 @@
+import {acceptanceQueryBatches} from './acceptance-query-batches.mjs';
 import {validOfficialId} from './player-profile-evidence.mjs';
 import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
 import {sqlString} from '../../../src/v3/itf-draw-document-d1.mjs';
 // D1_WRITE_POLICY: incremental. Diagnostic snapshots only; never create ID-less players.
 export const acceptanceDiagnosticsKey=circuit=>'acceptanceDiagnostics:'+circuit;
-export async function saveAcceptanceImportDiagnostics(query,circuit,{rows=null,status,reason=''}) {
+export async function saveAcceptanceImportDiagnostics(query,circuit,{rows=null,status,reason='',verified=false}) {
  if(!['fitp','tennis-europe','itf'].includes(circuit))return;
  const key=acceptanceDiagnosticsKey(circuit),previous=(await query('SELECT value FROM app_state WHERE key='+sqlString(key)))[0];
  if(status==='complete'&&previous){const prior=JSON.parse(previous.value);if(prior.status==='complete'&&prior.participants===rows?.length&&prior.unsaved?.length===0)return prior;}
  let unsaved=null;
  if(rows){
   unsaved=[];
-  for(let i=0;i<rows.length;i+=40){
-   const batch=rows.slice(i,i+40),found=await query('SELECT source_key,circuit,official_id FROM observed_players WHERE source_key IN ('+batch.map(r=>sqlString(r.source_key)).join(',')+')');
+  for(const batch of verified&&status==='complete'?[]:acceptanceQueryBatches(rows)){
+   const found=await query('SELECT source_key,circuit,official_id FROM observed_players WHERE source_key IN ('+batch.map(r=>sqlString(r.source_key)).join(',')+')');
    const saved=new Map(found.map(r=>[r.source_key,r]));
    for(const r of batch){const p=saved.get(r.source_key);if(!p||p.circuit!==r.circuit||!validOfficialId(circuit,p.official_id)||(validOfficialId(circuit,r.official_id)&&p.official_id!==r.official_id))unsaved.push({source_key:r.source_key,name:r.display_name,reason:validOfficialId(circuit,r.official_id)?'import_blocked':reason});}
   }
