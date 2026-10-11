@@ -47,7 +47,7 @@ test('foreign player affiliation is nationality; Italian affiliation remains clu
  const c={esc:v=>v,nationalityHtml:v=>'flag:'+v};vm.createContext(c);
  vm.runInContext(source.slice(source.indexOf('function foreignPlayerCountry('),source.indexOf('function playerBirthLabel(')),c);
  assert.equal(c.personalPlayerAffiliationHtml({nationality:'SUI',club:'Old club'}),'flag:SUI');
- assert.equal(c.personalPlayerAffiliationHtml({nationality:'ITA',club:'Tennis Club Lecco'}),'tennis club lecco');
+ assert.equal(c.personalPlayerAffiliationHtml({nationality:'ITA',club:'Tennis Club Lecco'}),'Tennis Club Lecco');
 });
 test('promoting an opponent replaces its route so Back returns to the originating page',async()=>{
  const stack=['#calendar','#opponent-profile/profile-milana/Milana%20Shein/GS14'];

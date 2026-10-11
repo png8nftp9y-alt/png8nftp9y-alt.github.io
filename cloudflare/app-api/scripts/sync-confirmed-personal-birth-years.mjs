@@ -19,7 +19,7 @@ export function resolveConfirmedYears(rows){
 }
 export function birthYearUpdateSql(row,year){
  const before=JSON.parse(row.payload),card=String(before.membershipCard||'');
- if(!/^\d+$/.test(card)||row.observed_source_key!=='fitp|id:'+card||displayPlayerClub(before.club)!=='tennis club lecco')throw Error('Incomplete selected identity');
+ if(!/^\d+$/.test(card)||row.observed_source_key!=='fitp|id:'+card||displayPlayerClub(before.club)!=='Tennis Club Lecco')throw Error('Incomplete selected identity');
  if(!Number.isInteger(year)||year<1900||year>new Date().getUTCFullYear())throw Error('Incomplete birth-year source');
  if(before.birthYear&&Number(before.birthYear)!==year)throw Error('Conflicting saved birth year');
  if(before.birthDate&&Number(String(before.birthDate).slice(0,4))!==year)throw Error('Conflicting saved birth date');
