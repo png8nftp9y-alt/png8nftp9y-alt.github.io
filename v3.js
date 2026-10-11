@@ -535,7 +535,7 @@ function personalNationalityHtml(player) {
  return country?nationalityHtml(country):'';
 }
 function displayPlayerClub(value) {
- return String(value || '').replace(/\bassociazione\s+sportiva\s+dilettantistica\b/gi, '').replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi, '').replace(/\s+/g, ' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g, '').trim().toLocaleLowerCase('it-IT');
+ return String(value || '').replace(/\bassociazione\s+sportiva\s+dilettantistica\b/gi, '').replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi, '').replace(/\s+/g, ' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g, '').trim().toLocaleLowerCase('it-IT').replace(/(^|[\s’\u0027-])\p{L}/gu, letter => letter.toLocaleUpperCase('it-IT'));
 }
 function personalPlayerAffiliationHtml(player) {
  const country=foreignPlayerCountry(player);

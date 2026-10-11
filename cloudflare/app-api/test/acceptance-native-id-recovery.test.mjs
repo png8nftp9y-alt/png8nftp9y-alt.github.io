@@ -18,7 +18,17 @@ test('unavailable or foreign official profiles do not write a name-only player o
  for(const response of [()=>new Response('',{status:503}),()=>new Response('',{status:302,headers:{location:'https://example.com/'}})]){
   const d=database({identityMapping:true});try{
    let foreign=0;const recoverMissing=acceptanceNativeIdRecovery(doc,{fetchPage:async url=>{if(url.includes('example.com'))foreign++;return response();}});
-   await assert.rejects(syncAcceptanceProfiles(d.query,'tennis-europe',doc,{recoverMissing}),/player_circuit_id_required/);assert.equal(d.writes(),0);assert.equal(foreign,0);
+   await assert.rejects(syncAcceptanceProfiles(d.query,'tennis-europe',doc,{recoverMissing}),/player_circuit_id_required/);assert.equal(d.execute('SELECT * FROM observed_players').length,0);
+   assert.equal(d.execute('SELECT * FROM player_identity_people').length,0);
+   assert.equal(d.execute('SELECT * FROM player_circuit_identities').length,0);
+   assert.equal(d.execute("SELECT * FROM app_state WHERE key='acceptanceProfiles:tennis-europe'").length,0);
+   const diagnostic=JSON.parse(d.execute("SELECT value FROM app_state WHERE key='acceptanceDiagnostics:tennis-europe'")[0].value);
+   assert.equal(diagnostic.status,'blocked');assert.equal(diagnostic.reason,'id_required');assert.equal(diagnostic.unsaved.length,1);assert.equal(diagnostic.unsaved[0].name,player.playerName);
+   assert.equal(d.writes(),1);assert.equal(foreign,0);
+   const writes=d.writes();
+   await assert.rejects(syncAcceptanceProfiles(d.query,'tennis-europe',doc,{recoverMissing}),/player_circuit_id_required/);
+   assert.equal(d.writes(),writes);
   }finally{d.close()}
  }
 });
+

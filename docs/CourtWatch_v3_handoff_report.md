@@ -2645,3 +2645,23 @@ Changed acceptance workflow tests, acceptance importer, optional observed-index 
 - Componenti: Worker API, metadati e mapping dei profili, proiezione dello storico personale, v3.js/v3.html, test e npm check.
 - Validazione: npm run check completo riuscito; test aggiuntivi di indicizzazione/identità 51/51, test mirati di navigazione/metadati/storico 60/60 e test SQLite multicircuito. Il test integrato verifica i tre circuiti prima e dopo l’aggiunta, tre passati più il futuro più vicino, storico con incontri, esclusione delle iscrizioni di un omonimo con tessera differente e zero scritture nelle GET. Verificati sintassi JavaScript e git diff --check.
 - Limite della verifica: i casi produttivi Arginelli/Pizzi non sono stati interrogati nella D1 privata in questa sessione; il test usa fixture controllate. I dati mostrabili dipendono dai profili collegati e dai tornei già acquisiti. Il successo dei controlli locali non certifica il deploy o il contenuto dello storico ITF ufficiale completo.
+
+
+### 2026-10-11 — Sblocco test acceptance profiles e verifica ingresso in un nuovo circuito
+
+- Run segnalato dall’utente: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38103811902 ; fallimento nel job 114364993277, step Verify incremental acceptance registration. 24 test riusciti e 1 fallito. Configurazione D1, lettura cache R2 e registrazione liste saltate: questo run non ha eseguito l’import produttivo.
+- Causa: acceptance-native-id-recovery.test pretendeva writes=0 per un recupero ID fallito, mentre il registro diagnostico introdotto in PR99 salva correttamente una sola riga blocked in app_state. Non è evidenza di un giocatore senza ID salvato. Corretto il test per verificare zero giocatori, zero collegamenti canonici, zero checkpoint di completamento, una segnalazione con il nome non salvato e zero nuove scritture al replay identico. Nessuna guardia ID indebolita e nessuna modifica alla logica di import.
+- Verifiche aggiunte: un giocatore noto FITP che entra in Europe e ITF conserva lo stesso canonical_id e acquisisce tutti e tre gli ID nativi e i collegamenti ufficiali. Una tessera FITP già nota non completa l’ingresso Europe senza GUID: nessun nuovo profilo Europe, nessun checkpoint, diagnostica blocked.
+- Funzionamento: alla conclusione della pubblicazione delle liste del nuovo circuito viene avviato acceptance player profiles; salva nome e ID del circuito, verifica la rilettura e aggiorna il mapping della persona. Dati anagrafici o ID discordanti mantengono profili separati. Una nuova partecipazione non implica riutilizzare l’ID di un altro circuito. I dati del circuito diventano visualizzabili dopo acquisizione e collegamento; un ID non recuperato resta segnalato e da riprocessare. I tempi reali includono la coda serializzata D1.
+- Validazione: eseguita la stessa suite dello step fallito, con i due nuovi casi multicircuito; 29/29 test riusciti e git diff --check. Il successo locale non certifica ancora la riuscita del prossimo import produttivo.
+- Link modifiche circoli in minuscolo / schede multicircuito (richiesta Arginelli/Pizzi): Worker riuscito https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38104220928 ; frontend riuscito https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38104226112 . Il precedente Pages 38104220607 è stato cancellato e sostituito dal run riuscito, su commit successivo contenente integralmente PR100. Nessuna verifica nominativa della D1 privata Arginelli/Pizzi eseguita.
+- Preferenza operativa dell’utente: indicare sempre i link dei run associati a ogni lavoro, con etichette comprensibili (es. circoli in minuscolo, Arginelli/Pizzi). Nessun polling.
+
+
+### 2026-10-11 — Precisazione formato circoli
+
+- Requisito corrente: mostrare il circolo come Tennis Club Lecco, con le iniziali maiuscole; rimuovere associazione sportiva dilettantistica e ASD/A.S.D. Il testo completamente minuscolo non è più il formato richiesto.
+- Adeguati il formatter condiviso dei metadati e il formatter frontend; riviste le aspettative dei test e la verifica del circolo per gli anni di nascita confermati. Aggiornata la versione dello script frontend per evitare cache obsolete.
+- Questa modifica e lo sblocco dei test acceptance profiles vengono pubblicati insieme al report. Le verifiche del recupero ID e dei collegamenti tra circuiti restano attive.
+
+- Validazione formato corrente: npm run check completo riuscito, inclusi test di normalizzazione circoli API/UI, proiezione personale e schede multicircuito. La suite del percorso acceptance profiles è riuscita con 29 test. Il run fallito viene riavviato dopo l’integrazione della correzione; il suo esito produttivo resta da verificare.
