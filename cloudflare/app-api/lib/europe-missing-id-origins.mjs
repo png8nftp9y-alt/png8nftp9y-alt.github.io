@@ -40,3 +40,6 @@ export function europeMissingIdOriginsResult(row){
  return {missingPeople:Number(row.missing_people),pendingMapping:Number(row.pending_mapping),origins:JSON.parse(row.origins||'[]'),
  acceptance:diagnostic?{status:diagnostic.status,reason:diagnostic.reason,participants:diagnostic.participants,unsavedRecords:Array.isArray(unsaved)?unsaved.length:null,reasons}:null};
 }
+
+export const europeMissingIdDetailsSql=europeMissingIdOriginsSql.split('\nSELECT (SELECT COUNT(*) FROM missing)')[0]+`
+SELECT l.canonical_id,l.source_key,a.normalized_name,a.display_name FROM eligible_links l JOIN missing m ON m.canonical_id=l.canonical_id JOIN search_acquired_players a ON a.source_key=l.source_key WHERE l.circuit='tennis-europe' ORDER BY l.source_key`;
