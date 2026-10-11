@@ -1,4 +1,4 @@
-// Read-only production diagnosis for the two user-reported player searches.
+// Read-only production diagnosis including verification after the current-ranking category fix.
 import worker from '../src/index.js';
 const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
 if(!account||!token)throw Error('diagnostic_credentials_missing');
