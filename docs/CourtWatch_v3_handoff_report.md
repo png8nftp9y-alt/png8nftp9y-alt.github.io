@@ -2835,3 +2835,5 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Regressione aggiunta: record name-only già coperto da profilo canonico verificato, zero richieste HTTP, zero scritture e zero residui. Le regressioni 24→0, nuovi casi, replay e conflitti restano attive. Esito del run originale conservato: recupero produttivo dei 24 riuscito, stato CI rosso per perimetro più ampio; successivo esito CI non anticipato.
 
 - Verifica della correzione: 6 test recupero e 5 test audit origine passati; sintassi e diff passati. Il gate resta basato sull'audit reale, senza rimuovere errori o cancellare evidenze.
+
+- PR [#117](https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/117) integrata nel merge `ae275eb01edc2423810f926517ed7e057ab1910b`. Rilanciato una sola volta il job 114559892531 per verificare il gate corretto sullo stesso [run 38169371689](https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38169371689); checkout main usa la correzione. Avvio accettato da GitHub, esito non monitorato. I 24→0 restano attestati dall'audit produttivo del primo tentativo.
