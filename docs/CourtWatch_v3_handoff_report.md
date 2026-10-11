@@ -2679,3 +2679,10 @@ Changed acceptance workflow tests, acceptance importer, optional observed-index 
 
 - Run frontend 38138619315 annullato durante Upload artifact; il log riporta The operation was canceled, senza un errore di compilazione identificato.
 - Pubblicazione successiva riuscita: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38138671888 ; commit ffd0f25074203176ddbe3b16fdb2376b68652f92 discendente di PR101 (86c7be777502ee020aec72e1c33f1177940022fa). Confronto commit: nessuna modifica a v3.js/v3.html tra la correzione e il frontend riuscito. Il formato Tennis Club Lecco è incluso nella versione pubblicata. Un’altra pubblicazione dati 38138735496 era in progress alla singola lettura. Nessun polling e nessun riavvio necessario del vecchio run annullato.
+
+
+### 2026-10-11 14:21 Europe/Rome — Acceptance ITF riuscito; retry Europe e FITP
+
+- Verificato successo del tentativo 2 ITF: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38103811902/attempts/2 ; terminato 14:20:53 Europe/Rome, job 114467637682. Log: 29 test riusciti, zero falliti; configurazione e lettura lista R2 eseguite; import produttivo circuit=itf, participants=14246, recoveredCircuitIds=0, excludedRecords=0, changed=0, identity unchanged/writes=0/pending=0, unchanged=true. La lista era già registrata e il replay non ha scritto nuovi giocatori o identità.
+- I run rossi recenti Europe 38138431533 e FITP 38138371109 utilizzavano il test precedente alla PR101; Europe terminato 14:14:44, con attesa writes=0 e scrittura diagnostica=1, prima dell’integrazione della correzione. Non sono nuovi fallimenti della versione corretta.
+- Riavviati una volta i job dei due circuiti con checkout main aggiornato: Europe https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38138431533 (job originario 114467046945); FITP https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38138371109 (job originario 114466866868). Richieste accettate; esiti dei nuovi tentativi non ancora verificati. Nessun polling e nessun indebolimento delle guardie ID.
