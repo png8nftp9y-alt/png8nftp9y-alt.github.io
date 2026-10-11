@@ -2714,3 +2714,8 @@ La copertura FITP di Arginelli resta non certificata. La diagnosi produttiva SEL
 
 
 Run della correzione PR #102 (merge `34b2729afb6132d6dcefbb5010d06850a7cb8958`), rilevati all’avvio del 2026-10-11: [Worker e aggiunte multicircuito](https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38140502207), [frontend e cognomi](https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38140501580), [D1 e recupero dei circoli delle selezioni esistenti](https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38140502193), [policy incrementale D1](https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38140502145). Worker/frontend/policy in corso e D1 in coda al momento della lettura: non ancora attestato il recupero reale dei circoli né la copertura FITP di Arginelli. Il run diagnostico rifiutato non è stato creato.
+
+
+### 2026-10-11 — Diagnosi aggregata Pizzi/Arginelli autorizzata
+
+Alle 15:01 Europe/Rome l’utente ha autorizzato espressamente la diagnosi D1 e la pubblicazione nei log GitHub esclusivamente di conteggi, circuiti e booleani, senza nomi completi, ID o dettagli dei tornei. Pubblicata diagnosi strettamente SELECT per confrontare ricerca generale, identità native collegate, voci torneo indicizzate, scheda avversario e proiezione osservati. Guard SQL e adapter senza metodi di scrittura; credenziali solo da secrets, nessuna esportazione di record individuali. Controllo sintattico node --check passato. Risultati e completezza FITP di Arginelli ancora da verificare al momento della pubblicazione; nessun run precedente certificava i casi reali. Il recupero circoli PR #102 è nel run D1 38140502193, ancora in corso prima dello step di recupero alla lettura iniziale.
