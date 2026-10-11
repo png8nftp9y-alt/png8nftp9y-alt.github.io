@@ -6,6 +6,7 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {addCourtWatchPlayer,personalPlayerAdditions} from '../lib/courtwatch-player-additions.mjs';
 import worker from '../src/index.js';
+import {paginatedPlayerSearch} from '../lib/paginated-player-search.mjs';
 
 const python=`import json,sqlite3,sys
 p=json.load(sys.stdin)
@@ -32,6 +33,37 @@ function database({identityMapping=false}={}){
  return{env:{DB:db},execute,writes:()=>writes,close:()=>rmSync(directory,{recursive:true,force:true})};
 }
 const user={id:'user-federico-181099'};
+test('actual canonical search result remains addable after its upstream source row disappears; replay writes zero',async()=>{
+ const d=database({identityMapping:true});try{
+  const key='fitp|id:123456789',id='cw-retained',name='Retained Player',person={canonicalId:id,name,sourceKey:key,identity:'123456789',circuit:'fitp',nationality:'ITA',club:'Tennis Club Lecco'};
+  d.execute('INSERT INTO player_identity_people VALUES(?,?,?)',[id,'PLAYER RETAINED',JSON.stringify(person)]);
+  d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,display_name,normalized_name,nationality) VALUES(?,?,?,?,?,?,?,?)',[key,id,'PLAYER RETAINED','fitp','123456789',name,'RETAINED PLAYER','ITA']);
+  d.execute("INSERT INTO player_identity_sync(id,status) VALUES('current','ready')");
+  const result=(await paginatedPlayerSearch(d.env.DB,'Retained',user.id)).results[0];assert.equal(result.sourceKey,key);
+  const first=await addCourtWatchPlayer(d.env,user,result,{fetchClub:async()=>''});assert.equal(first.added,true);assert.equal(first.playerId,id);assert.equal(first.player.membershipCard,'123456789');
+  const before=d.writes();assert.equal((await addCourtWatchPlayer(d.env,user,result,{fetchClub:async()=>''})).changed,false);assert.equal(d.writes(),before);
+  await assert.rejects(addCourtWatchPlayer(d.env,user,{...result,name:'Different Player'}),/player_not_found/);
+ }finally{d.close()}
+});
+test('canonical search spelling is verified through the exact mapping rather than rejected as missing',async()=>{
+ const d=database({identityMapping:true});try{
+  const key='itf|id:800123456',id='cw-corrected',name='Corrected Full Name';
+  d.execute('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',[key,'itf','800123456','OLD NAME','Old Name','{}']);
+  d.execute('INSERT INTO player_identity_people VALUES(?,?,?)',[id,'CORRECTED FULL NAME',JSON.stringify({canonicalId:id,name,sourceKey:key,identity:'800123456',circuit:'itf'})]);
+  d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,display_name,normalized_name) VALUES(?,?,?,?,?,?,?)',[key,id,'CORRECTED FULL NAME','itf','800123456','Old Name','OLD NAME']);
+  d.execute("INSERT INTO player_identity_sync(id,status) VALUES('current','ready')");
+  const selected=(await paginatedPlayerSearch(d.env.DB,'Corrected',user.id)).results[0];assert.equal((await addCourtWatchPlayer(d.env,user,selected)).added,true);
+ }finally{d.close()}
+});
+test('saved personal player can be added to Others by its exact owned ID; another owner cannot reuse private data',async()=>{
+ const d=database();try{
+  const first=await addCourtWatchPlayer(d.env,user,{sourceKey:'itf|id:101'});
+  const other=await addCourtWatchPlayer(d.env,user,{courtwatchId:first.playerId,name:'Test Player',group:'others'});assert.equal(other.playerId,first.playerId);
+  const before=d.writes();assert.equal((await addCourtWatchPlayer(d.env,user,{identity:first.playerId,name:'Test Player',group:'others'})).changed,false);assert.equal(d.writes(),before);
+  await assert.rejects(addCourtWatchPlayer(d.env,{id:'another-user'},{courtwatchId:first.playerId,name:'Test Player',group:'others'}),/player_not_found/);
+  await assert.rejects(addCourtWatchPlayer(d.env,user,{courtwatchId:first.playerId,name:'Wrong Name',group:'others'}),/player_identity_ambiguous/);
+ }finally{d.close()}
+});
 test('other list starts empty and persists independently from Main',async()=>{
  const d=database();try{
   const first=await addCourtWatchPlayer(d.env,user,{sourceKey:'itf|id:101'});

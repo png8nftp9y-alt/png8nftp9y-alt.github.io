@@ -30,16 +30,35 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
  if(!sourceKey&&!courtwatchId&&identity){
   const configured=await env.DB.prepare('SELECT id,payload FROM app_players WHERE id=?').bind(identity).first();
   if(configured){if(name&&nameKey(parse(configured.payload).name)!==nameKey(name))throw failure('player_identity_ambiguous',409);courtwatchId=configured.id;}
+  else if(await env.DB.prepare('SELECT courtwatch_id FROM user_app_player_additions WHERE user_id=? AND courtwatch_id=?').bind(user.id,identity).first())courtwatchId=identity;
  }
  let player,observedSourceKey;
  if(courtwatchId&&!sourceKey){
-  const row=await env.DB.prepare('SELECT id,payload FROM app_players WHERE id=?').bind(courtwatchId).first();
+  let row=await env.DB.prepare('SELECT id,payload FROM app_players WHERE id=?').bind(courtwatchId).first();
+  if(!row){const personal=await env.DB.prepare('SELECT courtwatch_id AS id,observed_source_key,payload FROM user_app_player_additions WHERE user_id=? AND courtwatch_id=?').bind(user.id,courtwatchId).first();if(personal)row=personal;}
   if(!row)throw failure('player_not_found',404);
-  player={...parse(row.payload),id:row.id,userAdded:true};observedSourceKey='courtwatch|'+row.id;
+  if(name&&nameKey(parse(row.payload).name)!==nameKey(name))throw failure('player_identity_ambiguous',409);
+  player={...parse(row.payload),id:row.id,userAdded:true};observedSourceKey=row.observed_source_key||'courtwatch|'+row.id;
  }else{
   const sourceTable=(sourceKey||identity).startsWith('acquired|')?'search_acquired_players':'observed_players';
   let rows=(await env.DB.prepare(`SELECT source_key,circuit,official_id,display_name,payload FROM ${sourceTable} WHERE source_key=? OR official_id=? LIMIT 20`).bind(sourceKey||identity,sourceKey?'':identity).all()).results||[];
   if(!rows.length&&!sourceKey&&identity){try{rows=(await env.DB.prepare('SELECT source_key,circuit,official_id,display_name,payload FROM search_acquired_players WHERE source_key=? OR official_id=? LIMIT 20').bind(identity,identity).all()).results||[]}catch(error){if(!/no such table/i.test(error.message))throw error}}
+  // Search may return a retained canonical identity after an upstream rebuild,
+  // or its verified current name may differ from the original circuit spelling.
+  // Resolve the exact server-side identity; never replace a selected source by name.
+  if(!rows.some(row=>(!sourceKey||row.source_key===sourceKey)&&(!name||nameKey(row.display_name)===nameKey(name)))){
+   const selected=await storedIdentity(env.DB,sourceKey||identity);
+   if(selected&&(!name||nameKey(selected.name)===nameKey(name))){
+    const retainedKey=sourceKey||selected.sourceKey;
+    if(retainedKey){
+     const link=await env.DB.prepare('SELECT source_key,circuit,official_id,display_name,nationality,birth_year,profile_url FROM player_circuit_identities WHERE source_key=? AND canonical_id=?').bind(retainedKey,selected.canonicalId).first();
+     if(link&&['fitp','tennis-europe','itf'].includes(link.circuit)){
+      const original=rows.find(r=>r.source_key===retainedKey);
+      rows=[{...link,display_name:selected.name,payload:JSON.stringify({...selected,...parse(original?.payload),birthYear:link.birth_year||selected.birthYear,nationality:link.nationality||selected.nationality,profileUrl:link.profile_url||parse(original?.payload).profileUrl||''})}];
+     }
+    }
+   }
+  }
   if(!rows.length&&!sourceKey&&name){
    const normalized=name.normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,' ').trim(),reverse=normalized.split(' ').reverse().join(' '),variants=[...new Set([normalized.toUpperCase(),reverse.toUpperCase(),normalized.toLowerCase(),reverse.toLowerCase()])];
    rows=(await env.DB.prepare(`SELECT source_key,circuit,official_id,display_name,payload FROM observed_players WHERE normalized_name IN (${variants.map(()=>'?').join(',')}) LIMIT 20`).bind(...variants).all()).results||[];
