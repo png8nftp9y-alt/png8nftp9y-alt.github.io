@@ -2794,3 +2794,11 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Output: only public tournament/event names, official source URLs and aggregate affected counts. No player names, canonical IDs, acquired source keys, or private participant payloads in Actions logs. Unmatched count remains visible rather than guessed.
 - Validation: existing SQLite provenance tests, JavaScript syntax checks and diff whitespace checks.
 - Limit: current retained history establishes occurrences, not which occurrence was first inserted historically. Zero database mutations.
+
+
+
+### 2026-10-11 — Correct participant normalization in read-only provenance audit
+- Reason: acquired search names are uppercase, whereas Europe match participant names are stored lowercase. The first exact-source audit returned zero matches due to this query mismatch, not evidence of historical absence.
+- Components: convert query parameter names to the Europe participant index normalization; keep indexed column unchanged and preserve exact source-key verification.
+- Validation: production seed normalization inspected; syntax check and SQLite provenance tests pass. No writes or player identifiers exported.
+- Limitation: tournament occurrence dates cannot prove the original insertion timestamp.
