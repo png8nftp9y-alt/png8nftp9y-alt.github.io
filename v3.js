@@ -256,9 +256,8 @@ const readablePerson = (value) => {
   )
     words.pop();
   const name = words.join(" ");
-  return name && name === name.toLocaleUpperCase("it-IT")
-    ? name.toLocaleLowerCase("it-IT").replace(/(^|[\s'’-])\p{L}/gu, letter => letter.toLocaleUpperCase("it-IT"))
-    : name;
+  return name.split(' ').map(word => word.length > 1 && word === word.toLocaleUpperCase('it-IT')
+    ? word.toLocaleLowerCase('it-IT').replace(/(^|[’\u0027-])\p{L}/gu, letter => letter.toLocaleUpperCase('it-IT')) : word).join(' ');
 };
 const IOC_REGION = {
   AUT: "AT",
@@ -2181,7 +2180,7 @@ function requestPlayerRemoval(playerId) {
   dialog.id = 'playerRemovalDialog';
   dialog.className = 'playerRemovalDialog';
   dialog.setAttribute('aria-labelledby', 'playerRemovalQuestion');
-  dialog.innerHTML = `<div class="playerRemovalIcon" aria-hidden="true">⚠️</div><h2 id="playerRemovalQuestion">Sei davvero sicuro di voler rimuovere ${esc(player.name)} dall’elenco Courtwatch.</h2><p class="playerRemovalError" role="alert" hidden></p><div class="playerRemovalActions"><button type="button" class="btn" data-removal-no autofocus>No</button><button type="button" class="btn" data-removal-yes>Sì</button></div>`;
+  dialog.innerHTML = `<div class="playerRemovalIcon" aria-hidden="true">⚠️</div><h2 id="playerRemovalQuestion">Sei davvero sicuro di voler rimuovere ${esc(readablePerson(player.name))} dall’elenco Courtwatch.</h2><p class="playerRemovalError" role="alert" hidden></p><div class="playerRemovalActions"><button type="button" class="btn" data-removal-no autofocus>No</button><button type="button" class="btn" data-removal-yes>Sì</button></div>`;
   document.body.append(dialog);
   const yes = dialog.querySelector('[data-removal-yes]');
   const no = dialog.querySelector('[data-removal-no]');
@@ -2923,7 +2922,7 @@ function renderProfile(id) {
     })
     .join("");
   $("profileContent").innerHTML =
-    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><div class="playerNameWithCircuits"><h2>${esc(p.name)}</h2><span class="playerCircuitProfiles">${playerCircuitLinksHtml(p.circuitProfiles||[])}</span></div><p>${personalPlayerAffiliationHtml(p)}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
+    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><div class="playerNameWithCircuits"><h2>${esc(readablePerson(p.name))}</h2><span class="playerCircuitProfiles">${playerCircuitLinksHtml(p.circuitProfiles||[])}</span></div><p>${personalPlayerAffiliationHtml(p)}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
   loadCurrentPlayerRanking(p);
   $("profileContent")
     .querySelectorAll("[data-open-tournament]")

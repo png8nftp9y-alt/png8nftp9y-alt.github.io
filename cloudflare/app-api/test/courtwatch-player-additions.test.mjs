@@ -18,12 +18,13 @@ with c:
   rows=[dict(row) for row in cursor.fetchall()] if cursor.description else []
 print(json.dumps({'rows':rows,'writes':c.total_changes}))
 `;
-function database(){
+function database({identityMapping=false}={}){
  const directory=mkdtempSync(path.join(tmpdir(),'courtwatch-add-player-')),file=path.join(directory,'db.sqlite');
  const call=body=>{const result=spawnSync('python3',['-c',python],{encoding:'utf8',input:JSON.stringify({file,...body})});assert.equal(result.status,0,result.stderr);return JSON.parse(result.stdout)};
  let schema=['0002_app_compatibility.sql','0004_observed_players.sql','0005_user_control_foundation.sql'].map(name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8')).join('\n');
  schema+='\nCREATE TABLE match_analyses(match_key TEXT,analysis TEXT,updated_at TEXT);\n';
  schema+=['0012_single_account_ownership.sql','0024_user_player_removals.sql','0027_user_player_additions.sql'].map(name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8')).join('\n');
+ if(identityMapping)schema+=['0028_acquired_player_search.sql','0029_player_circuit_identities.sql'].map(name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8')).join('\n');
  call({schema});let writes=0;
  const db={prepare(sql){const statement={sql,values:[],bind(...values){return {...statement,values,first:async()=>call({statements:[{sql,values}]}).rows[0]||null,all:async()=>({results:call({statements:[{sql,values}]}).rows})}}};return statement},async batch(statements){const result=call({statements});writes+=result.writes;return result}};
  const execute=(sql,values=[])=>call({statements:[{sql,values}]});
@@ -151,3 +152,22 @@ test('opponent identity of configured player adds exact app player and replay wr
  }finally{db.close()}
 });
 
+
+test('Europe addition recovers the club through its verified canonical FITP identity before saving',async()=>{
+ const db=database({identityMapping:true});try{
+  const guid='12345678-1234-1234-1234-123456789abc',key='tennis-europe|id:'+guid;
+  const profiles=[{circuit:'fitp',url:'https://www.fitp.it/Pagina-Giocatore/?cardNumber='+btoa('123456')},{circuit:'tennis-europe',url:'https://te.tournamentsoftware.com/player-profile/'+guid}];
+  db.execute('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',[key,'tennis-europe',guid,'TEST PLAYER','Test Player','{}']);
+  db.execute('INSERT INTO player_identity_people VALUES(?,?,?)',['person:test','PLAYER TEST',JSON.stringify({canonicalId:'person:test',name:'Test Player',circuitProfiles:profiles})]);
+  db.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES(?,?,?,?,?,?,?)',[key,'person:test','PLAYER TEST','tennis-europe',guid,'TEST PLAYER','Test Player']);
+  let release,started;const began=new Promise(resolve=>started=resolve);
+  const pending=addCourtWatchPlayer(db.env,user,{sourceKey:key},{fetchClub:card=>{assert.equal(card,'123456');started();return new Promise(resolve=>release=resolve)}});
+  await began;assert.equal(db.writes(),0);release('A.S.D. TENNIS CLUB LECCO');
+  const result=await pending;
+  assert.equal(result.playerId,'person:test');assert.equal(result.player.membershipCard,'123456');assert.equal(result.player.club,'Tennis Club Lecco');
+  assert.deepEqual(result.player.circuits,['tennis-europe','fitp']);
+  const before=db.writes();const replay=await addCourtWatchPlayer(db.env,user,{sourceKey:key},{fetchClub:()=>{throw Error('must reuse club')}});
+  assert.equal(replay.changed,false);assert.equal(db.writes(),before);
+  const read=await personalPlayerAdditions(db.env,user.id);assert.equal(read[0].club,'Tennis Club Lecco');assert.equal(db.writes(),before);
+ }finally{db.close()}
+});

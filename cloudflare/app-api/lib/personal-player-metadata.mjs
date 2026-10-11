@@ -7,8 +7,8 @@ export function displayPlayerClub(value) {
 }
 export function displayPlayerName(value) {
  const name=String(value||'').replace(/\s+/g,' ').trim();
- return name && name===name.toLocaleUpperCase('it-IT')
-  ? name.toLocaleLowerCase('it-IT').replace(/(^|[\s'’-])\p{L}/gu,letter=>letter.toLocaleUpperCase('it-IT')) : name;
+ return name.split(' ').map(word=>word.length>1&&word===word.toLocaleUpperCase('it-IT')
+  ? word.toLocaleLowerCase('it-IT').replace(/(^|[’\u0027-])\p{L}/gu,letter=>letter.toLocaleUpperCase('it-IT')):word).join(' ');
 }
 export function playerSourceMetadata(source={}) {
  const result={};

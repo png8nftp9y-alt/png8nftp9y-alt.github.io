@@ -6,6 +6,8 @@ test('uppercase source names become readable while existing mixed case is preser
  assert.equal(displayPlayerName('PAOLO BRAMBILLA'),'Paolo Brambilla');
  assert.equal(displayPlayerName("ÉLODIE D'ANGELO"),"Élodie D'Angelo");
  assert.equal(displayPlayerName('Anna McDonald'),'Anna McDonald');
+ assert.equal(displayPlayerName('Anna PIZZI'),'Anna Pizzi');
+ assert.equal(displayPlayerName('Anna ARGINELLI'),'Anna Arginelli');
 });
 test('personal metadata preserves the player ID and known club; fills indexed club only when missing',()=>{
  assert.deepEqual(personalPlayerMetadata({id:'cw-id',name:'PAOLO BRAMBILLA',club:''},{club:'Official Club'}),{id:'cw-id',name:'Paolo Brambilla',club:'Official Club'});

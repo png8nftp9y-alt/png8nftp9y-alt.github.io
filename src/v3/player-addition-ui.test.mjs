@@ -91,3 +91,13 @@ test('protected app with external base navigates after addition on its own origi
  await c.context.addCourtWatchPlayerFromUi({identity:'fitp|id:5754459584',name:player.name},c.button);
  assert.deepEqual(urls,['https://courtwatch-app-api.ckrk9ggvrb.workers.dev/app#player/cw-test']);assert.deepEqual(c.opened,[player.id]);assert.equal(c.state.selected.has(player.id),true);assert.equal(c.root.error,undefined);
 });
+
+
+test('mixed-case source surnames are readable in search, observed list and player hero',()=>{
+ const readable=source.slice(source.indexOf('const readablePerson ='),source.indexOf('const IOC_REGION ='));
+ const ctx={readableText:x=>String(x||'')};vm.createContext(ctx);vm.runInContext(readable,ctx);
+ assert.equal(vm.runInContext('readablePerson("Anna PIZZI")',ctx),'Anna Pizzi');
+ assert.equal(vm.runInContext('readablePerson("Anna ARGINELLI")',ctx),'Anna Arginelli');
+ assert.equal(vm.runInContext('readablePerson("Anna McDonald")',ctx),'Anna McDonald');
+ assert.ok(source.includes('<h2>${esc(readablePerson(p.name))}</h2>'));
+});
