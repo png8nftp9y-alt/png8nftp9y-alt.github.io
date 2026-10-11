@@ -1,4 +1,5 @@
-import {mappedPlayerId} from './player-identity-lookup.mjs';
+import {mappedPlayerId,storedIdentity} from './player-identity-lookup.mjs';
+import {playerCircuitIdentities} from './player-circuit-profiles.mjs';
 import {personalPlayerMetadata,officialFitpClub} from './personal-player-metadata.mjs';
 // D1_WRITE_POLICY: incremental
 import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
@@ -74,5 +75,17 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
 export async function personalPlayerAdditions(env,userId){
  const rows=(await env.DB.prepare('SELECT a.payload,o.payload AS observed_payload FROM user_app_player_additions a JOIN user_app_players u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id LEFT JOIN observed_players o ON o.source_key=a.observed_source_key WHERE a.user_id=? AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=a.user_id AND r.courtwatch_id=a.courtwatch_id) ORDER BY a.created_at,a.courtwatch_id').bind(userId).all()).results||[];
  const acquired=rows.filter(row=>String(parse(row.payload).sourceKey||'').startsWith('acquired|')),metadata=new Map();for(let i=0;i<acquired.length;i+=40){const keys=acquired.slice(i,i+40).map(row=>parse(row.payload).sourceKey);try{for(const row of (await env.DB.prepare(`SELECT source_key,payload FROM search_acquired_players WHERE source_key IN (${keys.map(()=>'?').join(',')})`).bind(...keys).all()).results||[])metadata.set(row.source_key,parse(row.payload))}catch(error){if(!/no such table/i.test(error.message))throw error}}
- return rows.map(row=>{const p=parse(row.payload);return personalPlayerMetadata(p,metadata.get(p.sourceKey)||parse(row.observed_payload))}).filter(player=>player.id&&player.name);
+ const players=[];
+ for(const row of rows){const p=parse(row.payload),identity=await storedIdentity(env.DB,p.sourceKey||p.id);
+  const player=personalPlayerMetadata({...p,circuitProfiles:identity?.circuitProfiles||p.circuitProfiles||[]},{...identity,...(metadata.get(p.sourceKey)||parse(row.observed_payload))});
+  for(const link of playerCircuitIdentities(player)){
+   if(link.circuit==='fitp')player.membershipCard=link.profileId;
+   if(link.circuit==='itf')player.worldTennisId=link.profileId;
+   if(link.circuit==='tennis-europe')player.profileSync={...player.profileSync,tennisEurope:{...player.profileSync?.tennisEurope,profileId:link.profileId}};
+  }
+  player.circuits=[...new Set([...(player.circuits||[]),...playerCircuitIdentities(player).map(p=>p.circuit)])];
+  if(player.id&&player.name)players.push(player);
+ }
+ return players;
 }
+

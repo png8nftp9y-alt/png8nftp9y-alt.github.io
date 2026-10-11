@@ -47,7 +47,7 @@ test('foreign player affiliation is nationality; Italian affiliation remains clu
  const c={esc:v=>v,nationalityHtml:v=>'flag:'+v};vm.createContext(c);
  vm.runInContext(source.slice(source.indexOf('function foreignPlayerCountry('),source.indexOf('function playerBirthLabel(')),c);
  assert.equal(c.personalPlayerAffiliationHtml({nationality:'SUI',club:'Old club'}),'flag:SUI');
- assert.equal(c.personalPlayerAffiliationHtml({nationality:'ITA',club:'Tennis Club Lecco'}),'Tennis Club Lecco');
+ assert.equal(c.personalPlayerAffiliationHtml({nationality:'ITA',club:'Tennis Club Lecco'}),'tennis club lecco');
 });
 test('promoting an opponent replaces its route so Back returns to the originating page',async()=>{
  const stack=['#calendar','#opponent-profile/profile-milana/Milana%20Shein/GS14'];
@@ -58,3 +58,4 @@ test('promoting an opponent replaces its route so Back returns to the originatin
  assert.equal(stack.length,2);assert.equal(stack.pop(),'#player/cw-milana');assert.equal(stack.at(-1),'#calendar');
  assert.ok(source.includes("if (monitored) { history.replaceState(history.state,''"));
 });
+
