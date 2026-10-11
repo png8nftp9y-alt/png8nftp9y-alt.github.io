@@ -85,3 +85,35 @@ test('ID readback is required before completing acceptance registration',async()
   assert.equal(d.execute("SELECT * FROM app_state WHERE key LIKE 'acceptanceProfiles:%'").length,0);
  }finally{d.close()}
 });
+
+
+test('known player entering another circuit gains its native ID on the same canonical person',async()=>{
+ const d=database({identityMapping:true});try{
+  const name='Known Circuit Person',nationality='ITA',birthYear=2011,card='123456789',guid='12345678-1234-1234-1234-123456789abc';
+  const fitp={tournaments:{a:{participants:[{full1:name,membershipCard:card,nationality,birthYear}]}}};
+  await syncAcceptanceProfiles(d.query,'fitp',fitp);
+  const first=d.execute('SELECT canonical_id FROM player_identity_people')[0].canonical_id;
+  const europe={tournaments:{b:{participants:[{playerName:name,participantId:guid,nationality,birthYear}]}}};
+  await syncAcceptanceProfiles(d.query,'tennis-europe',europe);
+  await syncAcceptanceProfiles(d.query,'itf',{participants:[{name,worldTennisId:'800123456',nationality,birthYear}]});
+  const people=d.execute('SELECT * FROM player_identity_people');assert.equal(people.length,1);assert.equal(people[0].canonical_id,first);
+  const links=d.execute('SELECT canonical_id,circuit,official_id FROM player_circuit_identities');
+  assert.equal(links.length,3);assert.ok(links.every(p=>p.canonical_id===first));
+  assert.deepEqual(new Set(links.map(p=>p.official_id)),new Set([card,guid,'800123456']));
+  assert.equal(JSON.parse(people[0].payload).circuitProfiles.length,3);
+ }finally{d.close()}
+});
+
+test('existing FITP ID cannot complete first Europe registration without the Europe ID',async()=>{
+ const d=database({identityMapping:true});try{
+  const name='Known Circuit Person',nationality='ITA',birthYear=2011;
+  await syncAcceptanceProfiles(d.query,'fitp',{tournaments:{a:{participants:[{full1:name,membershipCard:'123456789',nationality,birthYear}]}}});
+  const before=d.execute('SELECT * FROM player_circuit_identities');
+  await assert.rejects(syncAcceptanceProfiles(d.query,'tennis-europe',{tournaments:{b:{participants:[{playerName:name,nationality,birthYear}]}}}),/player_circuit_id_required/);
+  assert.deepEqual(d.execute('SELECT * FROM player_circuit_identities'),before);
+  assert.equal(d.execute("SELECT * FROM observed_players WHERE circuit='tennis-europe'").length,0);
+  assert.equal(d.execute("SELECT * FROM app_state WHERE key='acceptanceProfiles:tennis-europe'").length,0);
+  const diagnostic=JSON.parse(d.execute("SELECT value FROM app_state WHERE key='acceptanceDiagnostics:tennis-europe'")[0].value);
+  assert.equal(diagnostic.status,'blocked');assert.equal(diagnostic.unsaved[0].name,name);
+ }finally{d.close()}
+});

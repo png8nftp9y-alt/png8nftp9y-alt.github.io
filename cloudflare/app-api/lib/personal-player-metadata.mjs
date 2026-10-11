@@ -3,7 +3,7 @@ export function displayPlayerClub(value) {
   .replace(/\bassociazione\s+sportiva\s+dilettantistica\b/gi,'')
   .replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi,'')
   .replace(/\s+/g,' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g,'').trim()
-  .toLocaleLowerCase('it-IT');
+  .toLocaleLowerCase('it-IT').replace(/(^|[\s’\u0027-])\p{L}/gu, letter => letter.toLocaleUpperCase('it-IT'));
 }
 export function displayPlayerName(value) {
  const name=String(value||'').replace(/\s+/g,' ').trim();

@@ -8,15 +8,15 @@ test('uppercase source names become readable while existing mixed case is preser
  assert.equal(displayPlayerName('Anna McDonald'),'Anna McDonald');
 });
 test('personal metadata preserves the player ID and known club; fills indexed club only when missing',()=>{
- assert.deepEqual(personalPlayerMetadata({id:'cw-id',name:'PAOLO BRAMBILLA',club:''},{club:'Official Club'}),{id:'cw-id',name:'Paolo Brambilla',club:'official club'});
- assert.equal(personalPlayerMetadata({name:'Name',club:'Current Club'},{club:'Other Club'}).club,'current club');
+ assert.deepEqual(personalPlayerMetadata({id:'cw-id',name:'PAOLO BRAMBILLA',club:''},{club:'Official Club'}),{id:'cw-id',name:'Paolo Brambilla',club:'Official Club'});
+ assert.equal(personalPlayerMetadata({name:'Name',club:'Current Club'},{club:'Other Club'}).club,'Current Club');
 });
 test('club lookup uses exact card and extracts official tennis club field',async()=>{
  let request;
  const club=await officialFitpClub('001234',async(url,options)=>{
   request={url,options};return{ok:true,json:async()=>({player:{tennis_club_name:'  Circolo   ufficiale '}})};
  });
- assert.equal(club,'circolo ufficiale');
+ assert.equal(club,'Circolo Ufficiale');
  assert.equal(JSON.parse(request.options.body).cardNumber,btoa('001234'));
 });
 test('missing club is not fabricated and HTTP failure stays visible',async()=>{
@@ -27,10 +27,10 @@ test('missing club is not fabricated and HTTP failure stays visible',async()=>{
 
 test('Lecco club alias applies to stored selections and freshly recovered official clubs',async()=>{
  const raw='ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO';
- assert.equal(personalPlayerMetadata({name:'Player',club:raw}).club,'tennis club lecco');
- assert.equal(personalPlayerMetadata({name:'Player'},{club:raw}).club,'tennis club lecco');
- assert.equal(await officialFitpClub('1234',async()=>({ok:true,json:async()=>({player:{tennis_club_name:raw}})})),'tennis club lecco');
- assert.equal(personalPlayerMetadata({name:'Player',club:'Altro circolo'}).club,'altro circolo');
+ assert.equal(personalPlayerMetadata({name:'Player',club:raw}).club,'Tennis Club Lecco');
+ assert.equal(personalPlayerMetadata({name:'Player'},{club:raw}).club,'Tennis Club Lecco');
+ assert.equal(await officialFitpClub('1234',async()=>({ok:true,json:async()=>({player:{tennis_club_name:raw}})})),'Tennis Club Lecco');
+ assert.equal(personalPlayerMetadata({name:'Player',club:'Altro circolo'}).club,'Altro Circolo');
 });
 
 test('FITP ranking is restored for old personal selections from their exact source metadata',()=>{
@@ -68,7 +68,7 @@ test('real index builder carries source demographics and keeps them through late
   await new Promise((resolve,reject)=>cp.execFile(process.execPath,[builder],{cwd},(error)=>error?reject(error):resolve()));
   const rows=JSON.parse(await fs.readFile(path.join(cwd,'observed-players.json'),'utf8')).players;
   const fitp=rows.find(p=>p.officialId==='000123');
-  assert.equal(fitp.birthYear,2010);assert.equal(fitp.sex,'F');assert.equal(fitp.club,'tennis club lecco');assert.equal(fitp.ranking,'4.2');
+  assert.equal(fitp.birthYear,2010);assert.equal(fitp.sex,'F');assert.equal(fitp.club,'Tennis Club Lecco');assert.equal(fitp.ranking,'4.2');
   assert.equal(rows.find(p=>p.officialId==='12345678-1234-1234-1234-123456789abc').birthYear,2011);
   assert.equal(rows.find(p=>p.officialId==='800123456').birthYear,2009);
  }finally{await fs.rm(root,{recursive:true,force:true})}
