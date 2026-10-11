@@ -16,3 +16,10 @@ test('blocked acceptance diagnostics distinguish missing IDs from valid records 
 
 test('D1_TEST_IDENTICAL_ZERO_WRITES: replay gives identical counts with zero mutations',async()=>{const d=database({identityMapping:true});try{const before=d.writes();const a=europeMissingIdOriginsResult((await d.query(europeMissingIdOriginsSql))[0]);const b=europeMissingIdOriginsResult((await d.query(europeMissingIdOriginsSql))[0]);assert.deepEqual(a,b);assert.equal(d.writes(),before);}finally{d.close()}});
 test('D1_TEST_INCOMPLETE_SOURCE_GUARD: unavailable counts cannot be reported as zero',()=>{for(const row of [undefined,{}, {missing_people:null,pending_mapping:0},{missing_people:0,pending_mapping:'bad'}])assert.throws(()=>europeMissingIdOriginsResult(row),/unavailable/);});
+
+test('configured canonical Europe profile is counted identically to admin evidence',async()=>{const d=database({identityMapping:true});try{
+ const guid='12345678-1234-1234-1234-123456789abc';
+ d.execute('INSERT INTO player_identity_people VALUES(?,?,?)',['p','TEST PERSON',JSON.stringify({circuitProfiles:[{circuit:'tennis-europe',url:'https://te.tournamentsoftware.com/player-profile/'+guid}]})]);
+ for(const [key,circuit]of [['courtwatch|p','courtwatch'],['tennis-europe|name:TEST PERSON','tennis-europe']])d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES(?,?,?,?,?,?,?)',[key,'p','TEST PERSON',circuit,'','TEST PERSON','Test Person']);
+ assert.equal(europeMissingIdOriginsResult((await d.query(europeMissingIdOriginsSql))[0]).missingPeople,0);
+}finally{d.close()}});
