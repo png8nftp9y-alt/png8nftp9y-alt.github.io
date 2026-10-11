@@ -1,0 +1,27 @@
+name: Court Watch per circuit player ID audit once
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-per-circuit-player-id-audit.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      # Read-only aggregate audit: no migrations, imports or player exports.
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test each source requires an ID in its own circuit
+        run: node --test test/per-circuit-player-id-audit.test.mjs test/player-id-audit-scope.test.mjs
+      - name: Count FITP, Tennis Europe and ITF records missing their own circuit ID
+        run: node scripts/per-circuit-player-id-audit.mjs
