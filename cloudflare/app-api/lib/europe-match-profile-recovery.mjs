@@ -5,6 +5,7 @@ import {retainedPlayerReference,tournamentProfileAnchor,tournamentFederationAlia
 import {teProfileEvidence,publicCookiePair} from './live-profile-evidence.mjs';
 import {sqlString} from '../../../src/v3/itf-draw-document-d1.mjs';
 import {applyArchiveEvidence} from '../scripts/repair-archived-player-profiles.mjs';
+import {europeMissingIdDetailsSql} from './europe-missing-id-origins.mjs';
 // D1_WRITE_POLICY: incremental. applyArchiveEvidence enforces buildIncrementalSyncPlan,
 // optimistic payload guards and exact readback; source keys and match history are retained.
 const host='https://te.tournamentsoftware.com';
@@ -69,13 +70,17 @@ export async function europeMatchProfileEvidence(rows,query,publicPage){
 }
 
 export async function recoverEuropeMatchProfiles(query,{publicPage=europePublicPages(),onProgress=()=>{}}={}){
- let after='',examined=0,repaired=0,unresolved=0,requests=0;
- while(true){
-  const rows=(await query(`SELECT s.*,l.nationality,l.birth_year FROM search_acquired_players s LEFT JOIN player_circuit_identities l ON l.source_key=s.source_key WHERE s.circuit='tennis-europe' AND s.source_key LIKE 'acquired|tennis-europe|name:%' AND COALESCE(s.official_id,'')='' AND s.source_key>${sqlString(after)} ORDER BY s.source_key LIMIT 100`)).map(r=>({...r,source_table:'search_acquired_players'}));
-  if(!rows.length)break;
+ let examined=0,repaired=0,unresolved=0,requests=0;
+ // Use exactly the production missing-person scope. A legacy source without an
+ // ID does not require HTTP recovery if its canonical person already has one.
+ const targets=await query(europeMissingIdDetailsSql);
+ for(let offset=0;offset<targets.length;offset+=100){
+  const keys=targets.slice(offset,offset+100).map(r=>sqlString(r.source_key)).join(',');
+  const rows=(await query(`SELECT s.*,l.nationality,l.birth_year FROM search_acquired_players s LEFT JOIN player_circuit_identities l ON l.source_key=s.source_key WHERE s.circuit='tennis-europe' AND s.source_key IN (${keys}) AND COALESCE(s.official_id,'')='' ORDER BY s.source_key`)).map(r=>({...r,source_table:'search_acquired_players'}));
+  if(!rows.length)continue;
   const evidence=await europeMatchProfileEvidence(rows,query,publicPage);
   const delta=await applyArchiveEvidence(query,rows,{resolve:r=>evidence.resolved.get(r.source_table+'|'+r.source_key)});
-  examined+=rows.length;repaired+=delta.repaired;unresolved+=rows.length-delta.repaired;requests+=evidence.report.requests;after=rows.at(-1).source_key;
+  examined+=rows.length;repaired+=delta.repaired;unresolved+=rows.length-delta.repaired;requests+=evidence.report.requests;
   onProgress({examined,repaired,unresolved,requests});
  }
  return{examined,repaired,unresolved,requests};

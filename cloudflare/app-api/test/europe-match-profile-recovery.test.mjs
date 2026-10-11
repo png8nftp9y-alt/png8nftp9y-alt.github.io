@@ -49,6 +49,18 @@ test('new OOP player is resolved on the next ordinary cycle; older resolved play
   assert.equal((await recoverEuropeMatchProfiles(d.query,{publicPage:officialPages(calls)})).repaired,1);assert.equal(calls.length,2);assert.ok(calls.every(url=>!url.endsWith('player=1')&&!url.endsWith(guid(1))));
  }finally{d.close()}
 });
+test('legacy name source already covered by an exact canonical native profile does not cause HTTP or a false residual',async()=>{
+ const d=database({identityMapping:true});try{
+  fixture(d);await syncAcquiredSearch(d.query);await syncPlayerIdentities(d.query);
+  const person=(await d.query('SELECT canonical_id,payload FROM player_identity_people'))[0],payload=JSON.parse(person.payload);
+  payload.circuitProfiles=[{circuit:'tennis-europe',url:host+'/player-profile/'+guid(1)}];
+  d.execute('UPDATE player_identity_people SET payload=? WHERE canonical_id=?',[JSON.stringify(payload),person.canonical_id]);
+  d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,display_name,normalized_name) VALUES(?,?,?,?,?,?,?)',['courtwatch|configured',person.canonical_id,'1 PLAYER TEST','courtwatch','configured','Test Player 1','TEST PLAYER 1']);
+  assert.equal(europeMissingIdOriginsResult((await d.query(europeMissingIdOriginsSql))[0]).missingPeople,0);
+  const writes=d.writes(),result=await recoverEuropeMatchProfiles(d.query,{publicPage:async()=>{throw Error('already identified person fetched')}});
+  assert.deepEqual(result,{examined:0,repaired:0,unresolved:0,requests:0});assert.equal(d.writes(),writes);
+ }finally{d.close()}
+});
 test('exact acquired hash rejects homonyms with different nationality; wrong global names/countries and unavailable pages remain unresolved without writes',async()=>{
  for(const options of [{wrongName:true},{wrongNation:true},{fail:true}]){
   const d=database({identityMapping:true});try{
