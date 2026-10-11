@@ -1,16 +1,16 @@
+import {playerCircuitIdentities} from './player-circuit-profiles.mjs';
 const normalized=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
 const nameKey=value=>normalized(value).split(' ').sort().join(' ');
 const parsed=value=>{try{return JSON.parse(value||'{}')}catch{return {}}};
 const rows=async(db,sql,values)=>(await db.prepare(sql).bind(...values).all()).results||[];
 const reverseScore=value=>String(value||'').split(/\s+/).map(set=>{const m=set.match(/^(\d+)(\(\d+\))?-(\d+)(\(\d+\))?$/);return m?`${m[3]}${m[4]||''}-${m[1]}${m[2]||''}`:set}).join(' ');
 
-export async function personalTennisEuropeHistory(db,player){
- if(player.sourceCircuit!=='tennis-europe')return {player,tournaments:[],matches:[]};
+async function personalHistory(db,player,circuit){
  const name=normalized(player.name),variants=[...new Set([name,name.split(' ').reverse().join(' ')])];
  if(!name)return {player,tournaments:[],matches:[]};
  const sources=[];let last='';
  while(true){
-  const batch=await rows(db,`SELECT DISTINCT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM match_participants self JOIN matches m ON m.id=self.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE lower(self.normalized_name) IN (${variants.map(()=>'?').join(',')}) AND m.circuit='tennis-europe' AND m.id>? ORDER BY m.id LIMIT 250`,[...variants,last]);
+  const batch=await rows(db,`SELECT DISTINCT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM match_participants self JOIN matches m ON m.id=self.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE lower(self.normalized_name) IN (${variants.map(()=>'?').join(',')}) AND m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...variants,circuit,last]);
   sources.push(...batch);if(batch.length<250)break;
   const next=batch.at(-1).match_id;if(next<=last)throw Error('personal_history_pagination_failed');last=next;
  }
@@ -27,12 +27,23 @@ export async function personalTennisEuropeHistory(db,player){
   if(self.length!==1)throw Error('personal_history_identity_ambiguous');
   const own=self[0],partners=people.filter(p=>p.team_index===own.team_index&&p!==own),opponents=people.filter(p=>p.team_index!==own.team_index);
   const competitionId=raw.competitionId||t.competitionId||source.source_tournament_id||source.tournament_id;
-  const tournament={...t,id:source.tournament_id,competitionId,name:t.name||t.tournamentName||raw.tournamentName||competitionId,circuit:'tennis-europe',playerId:player.id,playerName:player.name,calendarState:'draw_confirmed',entryStatus:'official_draw',calendarListLabel:'',startDate:t.startDate||t.officialStartDate||source.played_date,endDate:t.endDate||source.played_date};
+  const tournament={...t,id:source.tournament_id,competitionId,name:t.name||t.tournamentName||raw.tournamentName||competitionId,circuit,playerId:player.id,playerName:player.name,calendarState:'draw_confirmed',entryStatus:'official_draw',calendarListLabel:'',startDate:t.startDate||t.officialStartDate||source.played_date,endDate:t.endDate||source.played_date};
   tournaments.set(source.tournament_id,tournament);
   const event=raw.event||raw.draw||'',double=partners.length>0||/^GD|^BD|DOUBLE/i.test(event);
   const score=own.team_index===1?reverseScore(raw.score||raw.result):String(raw.score||raw.result||'');
   const decided=own.is_winner!==null&&own.is_winner!==undefined;
-  matches.push({...raw,id:source.match_id,matchId:source.match_id,playerId:player.id,playerName:player.name,circuit:'tennis-europe',competitionId,tournamentName:tournament.name,location:tournament.location||'',surface:tournament.surface||'',environment:tournament.environment||tournament.indoorOutdoor||'',date:source.played_date,draw:event,event,matchType:double?'doubles':'singles',partner:partners.map(p=>p.display_name).join(' / '),partnerNationalities:partners.map(p=>p.nationality||''),partnerTeProfileIds:partners.map(p=>p.source_player_id||''),opponent:opponents.map(p=>p.display_name).join(' / '),opponentOptions:opponents.map(p=>p.display_name),opponentNationalities:opponents.map(p=>p.nationality||''),opponentTeProfileIds:opponents.map(p=>p.source_player_id||''),score,result:score,advances:decided?Boolean(own.is_winner):undefined});
+  matches.push({...raw,id:source.match_id,matchId:source.match_id,playerId:player.id,playerName:player.name,circuit,competitionId,tournamentName:tournament.name,location:tournament.location||'',surface:tournament.surface||'',environment:tournament.environment||tournament.indoorOutdoor||'',date:source.played_date,draw:event,event,matchType:double?'doubles':'singles',partner:partners.map(p=>p.display_name).join(' / '),partnerNationalities:partners.map(p=>p.nationality||''),partnerTeProfileIds:partners.map(p=>p.source_player_id||''),opponent:opponents.map(p=>p.display_name).join(' / '),opponentOptions:opponents.map(p=>p.display_name),opponentNationalities:opponents.map(p=>p.nationality||''),opponentTeProfileIds:opponents.map(p=>p.source_player_id||''),score,result:score,advances:decided?Boolean(own.is_winner):undefined});
  }
  return {player:enriched,tournaments:[...tournaments.values()],matches};
+}
+
+
+export async function personalTennisEuropeHistory(db,player){
+ return player.sourceCircuit==='tennis-europe'?personalHistory(db,player,'tennis-europe'):{player,tournaments:[],matches:[]};
+}
+export async function personalCircuitHistory(db,player){
+ const circuits=playerCircuitIdentities(player).map(p=>p.circuit);
+ if(!circuits.length&&['fitp','tennis-europe','itf'].includes(player.sourceCircuit))circuits.push(player.sourceCircuit);
+ const histories=await Promise.all(circuits.map(c=>personalHistory(db,player,c)));
+ return {player:histories.reduce((p,h)=>({...p,...h.player}),player),tournaments:histories.flatMap(h=>h.tournaments),matches:histories.flatMap(h=>h.matches)};
 }

@@ -1,7 +1,9 @@
 export function displayPlayerClub(value) {
- const club=String(value||'').replace(/\s+/g,' ').trim();
- const key=club.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,' ').trim();
- return key.includes('TENNIS CLUB LECCO') ? 'Tennis Club Lecco' : club;
+ return String(value||'')
+  .replace(/\bassociazione\s+sportiva\s+dilettantistica\b/gi,'')
+  .replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi,'')
+  .replace(/\s+/g,' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g,'').trim()
+  .toLocaleLowerCase('it-IT');
 }
 export function displayPlayerName(value) {
  const name=String(value||'').replace(/\s+/g,' ').trim();
@@ -56,3 +58,4 @@ export async function officialFitpClub(card,fetcher=fetch) {
  const club=profile?.tennis_club_name||profile?.TennisClubName||profile?.club;
  return typeof club==='string'?displayPlayerClub(club):'';
 }
+

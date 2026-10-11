@@ -20,6 +20,16 @@ export function officialPlayerUrl(circuit,player={}){
 }
 const identityFor=(c,p)=>String(c==='fitp'?p.membershipCard||'':c==='tennis-europe'?p.profileSync?.tennisEurope?.profileId||'':p.worldTennisId||'');
 const officialIdentity=(c,id)=>c==='fitp'?/^\d{6,12}$/.test(id):c==='tennis-europe'?guid.test(id):/^800\d{6}$/.test(id);
+export function playerCircuitIdentities(player){
+ const ids=new Map(),conflicts=new Set();
+ const add=(c,id)=>{if(!officialIdentity(c,String(id||'')))return;const key=c==='tennis-europe'?String(id).toLowerCase():String(id);if(ids.has(c)&&ids.get(c)!==key)conflicts.add(c);else ids.set(c,key);};
+ for(const c of ['fitp','tennis-europe','itf'])add(c,identityFor(c,player));
+ add(profileCircuit(player.sourceCircuit||player.circuit),player.sourcePlayerId||player.officialId);
+ for(const p of player.circuitProfiles||[]){const c=profileCircuit(p.circuit),url=officialPlayerUrl(c,{profileUrl:p.url});if(!url)continue;const u=new URL(url);
+  try{add(c,c==='fitp'?atob(u.searchParams.get('cardNumber')):c==='tennis-europe'?u.pathname.split('/').filter(Boolean).at(-1):u.pathname.match(/\/(800\d{6})\//)?.[1]);}catch{}
+ }
+ return ['fitp','tennis-europe','itf'].filter(c=>ids.has(c)&&!conflicts.has(c)).map(c=>({circuit:c,profileId:ids.get(c)}));
+}
 export function circuitProfiles(player,rows=[]){
  const source=profileCircuit(player.sourceCircuit||player.circuit),known=new Set(),result=new Map();
  // A configured circuits array is eligibility, not evidence of a profile or participation.
@@ -54,3 +64,4 @@ export async function resolveCircuitProfiles(db,players){
  }
  return results;
 }
+

@@ -102,7 +102,7 @@ test('FITP addition waits for official club before persisting or confirming',asy
   const operation=addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:777'},{fetchClub:card=>{assert.equal(card,'777');started();return new Promise(resolve=>release=resolve)}});
   await began;assert.equal(db.writes(),0);
   release('ASSOCIAZIONE SPORTIVA DILETTANTISTICA TENNIS CLUB LECCO');
-  const result=await operation;assert.equal(result.player.club,'Tennis Club Lecco');assert.equal(result.player.name,'Riccardo Galbiati');
+  const result=await operation;assert.equal(result.player.club,'tennis club lecco');assert.equal(result.player.name,'Riccardo Galbiati');
   const before=db.writes();await addCourtWatchPlayer(db.env,user,{sourceKey:'fitp|id:777'},{fetchClub:()=>{throw Error('must reuse stored club')}});
   assert.equal(db.writes(),before);
  }finally{db.close()}
@@ -150,3 +150,4 @@ test('opponent identity of configured player adds exact app player and replay wr
   await assert.rejects(addCourtWatchPlayer(db.env,user,{identity:'configured-new',name:'Another Person'}),/player_identity_ambiguous/);
  }finally{db.close()}
 });
+
