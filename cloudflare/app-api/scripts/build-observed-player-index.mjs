@@ -1,6 +1,9 @@
 import fs from 'node:fs/promises';
 import {gunzipSync} from 'node:zlib';
 import crypto from 'node:crypto';
+import {requirePlayerCircuitIds} from '../lib/required-player-circuit-id.mjs';
+// D1_WRITE_POLICY: incremental; source-bound recovery SELECTs only.
+// buildIncrementalSyncPlan is enforced by the downstream importer.
 import {playerSourceMetadata} from '../lib/personal-player-metadata.mjs';
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
 const readGz=async file=>JSON.parse(gunzipSync(await fs.readFile(file)));
@@ -24,7 +27,15 @@ for(const [name,refs] of Object.entries(te.byName||{})){const first=(refs||[])[0
 const itf=await readGz('tmp/observed/itf_participant_cache.json.gz'),itfSourceSlot=(await fs.readFile('tmp/observed/itf-source-slot.txt','utf8')).trim();
 for(const p of itf.participants||[]){const name=p.name||p.playerName||[p.firstName,p.lastName].filter(Boolean).join(' '),id=p.worldTennisId||p.id||p.playerId||p.worldTennisNumber||'';add('itf',id,name,1,{...playerSourceMetadata(p),lastObservedAt:p.observedAt||itf.generatedAt||now})}
 if(!(itf.participants||[]).length)throw new Error('Selected ITF participant cache is empty');
-const players=[...rows.values()].sort((a,b)=>a.circuit.localeCompare(b.circuit)||a.displayName.localeCompare(b.displayName));
+async function knownSourceIds(sql){
+ const config=await read('wrangler.generated.jsonc'),db=config.d1_databases.find(d=>d.binding==='DB').database_id;
+ const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
+ if(!account||!token)throw Error('observed_native_id_recovery_credentials_missing');
+ const response=await fetch('https://api.cloudflare.com/client/v4/accounts/'+account+'/d1/database/'+db+'/query',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)});
+ const result=await response.json();if(!response.ok||!result.success||!result.result?.every(r=>r.success))throw Error('observed_native_id_recovery_failed');return result.result[0].results||[];
+}
+const required=await requirePlayerCircuitIds(knownSourceIds,[...rows.values()].map(r=>({source_key:r.sourceKey,circuit:r.circuit,official_id:r.officialId,display_name:r.displayName,payload:r})));
+const players=required.rows.map(r=>({...r.payload,sourceKey:r.source_key,officialId:r.official_id})).sort((a,b)=>a.circuit.localeCompare(b.circuit)||a.displayName.localeCompare(b.displayName));
 const counts=Object.fromEntries(['fitp','tennis-europe','itf'].map(c=>[c,players.filter(p=>p.circuit===c).length]));
 await fs.writeFile('observed-players.json',JSON.stringify({version:1,generatedAt:now,counts,total:players.length,sources:{fitp:'current',tennisEurope:'current',itf:itfSourceSlot},players})+'\n');
-console.log(JSON.stringify({status:'observed_player_index_built',total:players.length,counts,sources:{fitp:'current',tennisEurope:'current',itf:itfSourceSlot},monitored:players.filter(p=>p.monitored).length}));
+console.log(JSON.stringify({status:'observed_player_index_built',total:players.length,counts,sources:{fitp:'current',tennisEurope:'current',itf:itfSourceSlot},monitored:players.filter(p=>p.monitored).length,recoveredCircuitIds:required.recovered,excludedRecords:required.excludedRecords}));

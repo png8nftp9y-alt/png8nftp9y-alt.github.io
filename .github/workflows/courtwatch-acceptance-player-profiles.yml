@@ -41,7 +41,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Verify incremental acceptance registration
-        run: node --test test/sync-acceptance-player-profiles.test.mjs test/courtwatch-acceptance-player-profiles.test.mjs
+        run: node --test test/sync-acceptance-player-profiles.test.mjs test/courtwatch-acceptance-player-profiles.test.mjs test/required-player-circuit-id.test.mjs test/acceptance-native-id-recovery.test.mjs
       - name: Configure D1
         run: |
           npm install

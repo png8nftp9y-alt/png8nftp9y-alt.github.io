@@ -60,8 +60,8 @@ test('real index builder carries source demographics and keeps them through late
   await fs.mkdir(path.join(cwd,'tmp/observed'),{recursive:true});await fs.writeFile(path.join(root,'players.json'),JSON.stringify({players:[]}));
   const fixtures={
    'fitp_participant_cache.json.gz':{tournaments:{a:{fetchedAt:'2026-10-07T10:00:00Z',participants:[{membershipCard:'000123',full1:'TEST PLAYER',ranking:'4.2',raw:{BirthYear:2010,Sex:'F',tennis_club_name:'Tennis Club Lecco'}}]},b:{fetchedAt:'2026-10-07T11:00:00Z',participants:[{membershipCard:'000123',full1:'TEST PLAYER'}]}}},
-   'tennis_europe_participant_index.json.gz':{byName:{'TE PLAYER':[{participantId:'te-1',playerName:'TE Player',birthDate:'2011-04-01',sex:'M'}]}},
-   'itf_participant_cache.json.gz':{participants:[{worldTennisId:'itf-1',name:'ITF Player',birthYear:2009,nationality:'ITA'}]}};
+   'tennis_europe_participant_index.json.gz':{byName:{'TE PLAYER':[{participantId:'12345678-1234-1234-1234-123456789abc',playerName:'TE Player',birthDate:'2011-04-01',sex:'M'}]}},
+   'itf_participant_cache.json.gz':{participants:[{worldTennisId:'800123456',name:'ITF Player',birthYear:2009,nationality:'ITA'}]}};
   for(const [name,data]of Object.entries(fixtures))await fs.writeFile(path.join(cwd,'tmp/observed',name),zlib.gzipSync(JSON.stringify(data)));
   await fs.writeFile(path.join(cwd,'tmp/observed/itf-source-slot.txt'),'current');
   const builder=url.fileURLToPath(new URL('../scripts/build-observed-player-index.mjs',import.meta.url));
@@ -69,7 +69,7 @@ test('real index builder carries source demographics and keeps them through late
   const rows=JSON.parse(await fs.readFile(path.join(cwd,'observed-players.json'),'utf8')).players;
   const fitp=rows.find(p=>p.officialId==='000123');
   assert.equal(fitp.birthYear,2010);assert.equal(fitp.sex,'F');assert.equal(fitp.club,'Tennis Club Lecco');assert.equal(fitp.ranking,'4.2');
-  assert.equal(rows.find(p=>p.officialId==='te-1').birthYear,2011);
-  assert.equal(rows.find(p=>p.officialId==='itf-1').birthYear,2009);
+  assert.equal(rows.find(p=>p.officialId==='12345678-1234-1234-1234-123456789abc').birthYear,2011);
+  assert.equal(rows.find(p=>p.officialId==='800123456').birthYear,2009);
  }finally{await fs.rm(root,{recursive:true,force:true})}
 });
