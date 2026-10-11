@@ -44,10 +44,10 @@ test('a refreshed ID-less acceptance retains the official GUID recovered on the 
   const profile=await storedIdentity(d.db,source.source_key);assert.ok(profile.circuitProfiles.some(p=>p.url===payload.profileUrl));
  }finally{d.close()}
 });
-test('D1_TEST_INCOMPLETE_SOURCE_GUARD: empty or malformed lists never mutate D1 or mark checkpoints',async()=>{
+test('D1_TEST_INCOMPLETE_SOURCE_GUARD: empty or malformed lists write diagnostics only and never player checkpoints',async()=>{
  const d=database({identityMapping:true});try{
   for(const doc of [{},{participants:[]},{participants:[{}]}])await assert.rejects(syncAcceptanceProfiles(d.query,'itf',doc),/incomplete/);
-  assert.equal(d.writes(),0);assert.equal(d.execute('SELECT * FROM app_state').length,0);
+  assert.equal(d.execute('SELECT * FROM observed_players').length,0);assert.equal(d.execute("SELECT * FROM app_state WHERE key LIKE 'acceptanceProfiles:%'").length,0);
   assert.equal(acceptancePlayers('itf',{participants:[{name:'Same Name',nationality:'ITA'},{name:'Same Name',nationality:'FRA'}]}).length,2);
  }finally{d.close()}
 });
@@ -61,27 +61,27 @@ test('malformed FITP name recovers only the same known official card and replay 
   assert.equal(d.execute('SELECT * FROM player_identity_people').length,1);
  }finally{d.close()}
 });
-test('unknown or conflicting FITP card names fail before writes and never checkpoint',async()=>{
+test('unknown or conflicting FITP card names fail before player writes and never checkpoint',async()=>{
  const d=database({identityMapping:true});try{
   const doc={tournaments:{t:{participants:[{full1:'***************',membershipCard:'1234567890'}]}}};
-  await assert.rejects(syncAcceptanceProfiles(d.query,'fitp',doc),/missing_or_ambiguous/);assert.equal(d.writes(),0);
+  await assert.rejects(syncAcceptanceProfiles(d.query,'fitp',doc),/source_incomplete/);assert.equal(d.execute('SELECT * FROM observed_players').length,0);
   d.execute("INSERT INTO search_acquired_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES('a','fitp','1234567890','FIRST PERSON','First Person','{}'),('b','fitp','1234567890','OTHER PERSON','Other Person','{}')");
-  const before=d.writes();await assert.rejects(syncAcceptanceProfiles(d.query,'fitp',doc),/missing_or_ambiguous/);assert.equal(d.writes(),before);
-  assert.equal(d.execute('SELECT * FROM app_state').length,0);
+  const before=d.writes();await assert.rejects(syncAcceptanceProfiles(d.query,'fitp',doc),/source_incomplete/);assert.equal(d.writes(),before);
+  assert.equal(d.execute("SELECT * FROM app_state WHERE key LIKE 'acceptanceProfiles:%'").length,0);
  }finally{d.close()}
 });
 
-test('new ID-less list players block the whole import before any writes or checkpoint in all circuits',async()=>{
+test('new ID-less list players block player writes and checkpoint in all circuits',async()=>{
  for(const [c,doc] of fixtures){const d=database({identityMapping:true});try{
   const bad={name:'New Missing Person'},input=c==='itf'?{participants:[...doc.participants,bad]}:{tournaments:{a:{participants:[...doc.tournaments.a.participants,bad]}}};
   await assert.rejects(syncAcceptanceProfiles(d.query,c,input),/player_circuit_id_required/);
-  assert.equal(d.writes(),0);assert.equal(d.execute('SELECT * FROM observed_players').length,0);assert.equal(d.execute('SELECT * FROM app_state').length,0);
+  assert.equal(d.execute('SELECT * FROM observed_players').length,0);assert.equal(d.execute("SELECT * FROM app_state WHERE key LIKE 'acceptanceProfiles:%'").length,0);
  }finally{d.close()}}
 });
 test('ID readback is required before completing acceptance registration',async()=>{
  const d=database({identityMapping:true});try{
   const query=async sql=>sql.startsWith('SELECT source_key,circuit,official_id FROM observed_players')?[]:d.query(sql);
-  await assert.rejects(syncAcceptanceProfiles(query,...fixtures[2]),/saved_circuit_id_unverified/);
-  assert.equal(d.execute('SELECT * FROM app_state').length,0);
+  await assert.rejects(syncAcceptanceProfiles(query,...fixtures[2]),/save_unverified/);
+  assert.equal(d.execute("SELECT * FROM app_state WHERE key LIKE 'acceptanceProfiles:%'").length,0);
  }finally{d.close()}
 });
