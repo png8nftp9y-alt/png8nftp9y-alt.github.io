@@ -21,17 +21,57 @@ print(json.dumps({'rows':rows,'writes':c.total_changes}))
 function database({identityMapping=false}={}){
  const directory=mkdtempSync(path.join(tmpdir(),'courtwatch-add-player-')),file=path.join(directory,'db.sqlite');
  const call=body=>{const result=spawnSync('python3',['-c',python],{encoding:'utf8',input:JSON.stringify({file,...body})});assert.equal(result.status,0,result.stderr);return JSON.parse(result.stdout)};
- let schema=['0002_app_compatibility.sql','0004_observed_players.sql','0005_user_control_foundation.sql'].map(name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8')).join('\n');
+ let schema=['0001_universal_schema.sql','0002_app_compatibility.sql','0004_observed_players.sql','0005_user_control_foundation.sql'].map(name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8')).join('\n');
  schema+='\nCREATE TABLE match_analyses(match_key TEXT,analysis TEXT,updated_at TEXT);\n';
- schema+=['0012_single_account_ownership.sql','0024_user_player_removals.sql','0027_user_player_additions.sql'].map(name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8')).join('\n');
+ schema+=['0012_single_account_ownership.sql','0024_user_player_removals.sql','0027_user_player_additions.sql','0035_other_player_list.sql'].map(name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8')).join('\n');
  if(identityMapping)schema+=['0028_acquired_player_search.sql','0029_player_circuit_identities.sql'].map(name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8')).join('\n');
  call({schema});let writes=0;
- const db={prepare(sql){const statement={sql,values:[],bind(...values){return {...statement,values,first:async()=>call({statements:[{sql,values}]}).rows[0]||null,all:async()=>({results:call({statements:[{sql,values}]}).rows})}}};return statement},async batch(statements){const result=call({statements});writes+=result.writes;return result}};
+ const db={prepare(sql){const statement={sql,values:[],first:async()=>call({statements:[{sql,values:[]}]}).rows[0]||null,all:async()=>({results:call({statements:[{sql,values:[]}]}).rows}),bind(...values){return {...statement,values,first:async()=>call({statements:[{sql,values}]}).rows[0]||null,all:async()=>({results:call({statements:[{sql,values}]}).rows})}}};return statement},async batch(statements){const result=call({statements});writes+=result.writes;return result}};
  const execute=(sql,values=[])=>call({statements:[{sql,values}]});
  execute("INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)",['itf|id:101','itf','101','TEST PLAYER','Test Player','{}']);
  return{env:{DB:db},execute,writes:()=>writes,close:()=>rmSync(directory,{recursive:true,force:true})};
 }
 const user={id:'user-federico-181099'};
+test('other list starts empty and persists independently from Main',async()=>{
+ const d=database();try{
+  const first=await addCourtWatchPlayer(d.env,user,{sourceKey:'itf|id:101'});
+  assert.deepEqual(await personalPlayerAdditions(d.env,user.id,'others'),[]);
+  const other=await addCourtWatchPlayer(d.env,user,{sourceKey:'itf|id:101',group:'others'});
+  assert.equal(other.playerId,first.playerId);
+  assert.equal((await personalPlayerAdditions(d.env,user.id)).length,1);
+  assert.equal((await personalPlayerAdditions(d.env,user.id,'others')).length,1);
+  const before=d.writes();
+  assert.equal((await addCourtWatchPlayer(d.env,user,{sourceKey:'itf|id:101',group:'others'})).changed,false);
+  assert.equal(d.writes(),before);
+  assert.deepEqual(await personalPlayerAdditions(d.env,'another-user','others'),[]);
+ }finally{d.close()}
+});
+test('Others-only addition does not create a main membership; invalid groups do not write',async()=>{
+ const d=database();try{
+  await assert.rejects(addCourtWatchPlayer(d.env,user,{sourceKey:'itf|id:101',group:'invalid'}),/invalid_player_group/);
+  assert.equal(d.writes(),0);
+  const other=await addCourtWatchPlayer(d.env,user,{sourceKey:'itf|id:101',group:'others'});
+  assert.deepEqual(await personalPlayerAdditions(d.env,user.id),[]);
+  assert.equal((await personalPlayerAdditions(d.env,user.id,'others'))[0].id,other.playerId);
+ }finally{d.close()}
+});
+test('protected snapshots and removals are scoped; main removal does not hide Others',async()=>{
+ const d=database();try{
+  const id='configured-test',player={id,name:'Test Player',worldTennisId:'101'};
+  d.execute('INSERT INTO app_players(seq,id,payload) VALUES(?,?,?)',[1,id,JSON.stringify(player)]);
+  await addCourtWatchPlayer(d.env,user,{courtwatchId:id});
+  const headers={'Cf-Access-Authenticated-User-Email':'federico181099@gmail.com'};
+  const request=async(group,path='/app-snapshot',method='GET')=>worker.fetch(new Request('https://courtwatch.example/app/api'+path,{method,headers:{...headers,'X-CourtWatch-Group':group}}),d.env);
+  const empty=await request('others');assert.equal(empty.status,200);assert.deepEqual((await empty.json()).players,[]);
+  await addCourtWatchPlayer(d.env,user,{courtwatchId:id,group:'others'});
+  const others=await request('others');assert.equal(others.status,200);assert.equal((await others.json()).players[0].id,id);
+  const removed=await request('main','/courtwatch-player?playerId='+id,'DELETE');assert.equal(removed.status,200);
+  assert.deepEqual((await (await request('main')).json()).players,[]);
+  assert.equal((await (await request('others')).json()).players[0].id,id);
+  assert.equal((await request('others','/courtwatch-player?playerId='+id,'DELETE')).status,200);
+  assert.deepEqual((await (await request('others')).json()).players,[]);
+ }finally{d.close()}
+});
 test('D1_TEST_INITIAL_IMPORT: selected official identity becomes a persistent personal player',async()=>{
  const db=database();try{
   const result=await addCourtWatchPlayer(db.env,user,{sourceKey:'itf|id:101',name:'Test Player'});

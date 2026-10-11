@@ -37,7 +37,7 @@ test('normal reload retains a D1-added player absent from static JSON and their 
  const person={id:'cw-test',name:'Test Player',userAdded:true},ctx={console,Map,Set,Promise,Date,state:{data:{players:[],tournaments:[]},selected:new Set()},loadRunning:false,uiSelectionRestored:true,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),cachedData:()=>null,saveCachedData(){},saveUiState(){},syncLabel(){},renderIfDataChanged(){},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,iso:d=>d.toISOString().slice(0,10),add:(d,n)=>new Date(+d+n*86400000),
   apiProjection:async()=>({generatedAt:'2026-10-01T00:00:00Z',players:[{id:'static-player',name:'Static Player'},person],tournaments:[{playerId:person.id,competitionId:'J30',circuit:'itf'}],matches:[]}),
   v3json:async name=>name==='players.json'?{generatedAt:'2026-10-06T00:00:00Z',players:[{id:'static-player',name:'Static Player'}]}:name==='tournaments.json'?{generatedAt:'2026-10-06T00:00:00Z',tournaments:[]}:{} };
- vm.createContext(ctx);vm.runInContext(loader,ctx);await ctx.load();
+ vm.createContext(ctx);ctx.PLAYER_GROUP='main';vm.runInContext(loader,ctx);await ctx.load();
  assert.equal(ctx.state.data.players.some(p=>p.id===person.id),true);assert.equal(ctx.state.data.tournaments.some(t=>t.playerId===person.id),true);
 });
 
@@ -56,7 +56,7 @@ test('cold reload discards a partial old cache and first renders all personal to
  const ctx={console,Map,Set,Promise,Date,state:{data:null,selected:new Set()},loadRunning:false,uiSelectionRestored:false,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),cachedData:()=>partial,saveCachedData(){},saveUiState(){},syncLabel(){},renderIfDataChanged(){renders.push(ctx.state.data.tournaments.length)},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,iso:d=>d.toISOString().slice(0,10),add:(d,n)=>new Date(+d+n*86400000),
  apiProjection:()=>new Promise(resolve=>release=resolve),
  v3json:async name=>name==='players.json'?{players:[{id:'base',name:'Base'}]}:name==='tournaments.json'?{tournaments:[]}:{}};
- vm.createContext(ctx);vm.runInContext(loader,ctx);const loading=ctx.load();
+ vm.createContext(ctx);ctx.PLAYER_GROUP='main';vm.runInContext(loader,ctx);const loading=ctx.load();
  assert.equal(renders.length,0);
  release({generatedAt:'2026-10-07T21:00:00Z',players:[person],tournaments:[{playerId:person.id,name:'Cantù'}],matches:[]});
  await loading;assert.deepEqual(renders,[1]);assert.equal(ctx.state.data.personalProjectionComplete,true);

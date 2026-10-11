@@ -1,3 +1,4 @@
+import {allPersonalMembershipsSql} from '../lib/player-list-group.mjs';
 // D1_WRITE_POLICY: incremental
 import {spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
@@ -26,11 +27,10 @@ export function clubUpdateSql(row,club){
  if(!plan.updates.length)return '';
  return `UPDATE user_app_player_additions SET payload=${esc(JSON.stringify(plan.updates[0].after.payload))}
  WHERE user_id=${esc(row.user_id)} AND courtwatch_id=${esc(row.courtwatch_id)} AND payload=${esc(row.payload)}
- AND EXISTS (SELECT 1 FROM user_app_players u WHERE u.user_id=user_app_player_additions.user_id AND u.courtwatch_id=user_app_player_additions.courtwatch_id)
- AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=user_app_player_additions.user_id AND r.courtwatch_id=user_app_player_additions.courtwatch_id)`;
+ AND EXISTS (SELECT 1 FROM ${allPersonalMembershipsSql} u WHERE u.user_id=user_app_player_additions.user_id AND u.courtwatch_id=user_app_player_additions.courtwatch_id)`;
 }
 export const personalMissingClubsSql=`SELECT a.user_id,a.courtwatch_id,a.payload FROM user_app_player_additions a
- JOIN user_app_players u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id
+ JOIN ${allPersonalMembershipsSql} u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id
  WHERE COALESCE(json_extract(a.payload,'$.club'),'')=''
  AND (COALESCE(json_extract(a.payload,'$.membershipCard'),'')<>'' OR EXISTS (
   SELECT 1 FROM player_circuit_identities fitp WHERE fitp.circuit='fitp' AND fitp.canonical_id IN (
@@ -41,7 +41,6 @@ export const personalMissingClubsSql=`SELECT a.user_id,a.courtwatch_id,a.payload
    UNION SELECT canonical_id FROM player_identity_people WHERE canonical_id=a.courtwatch_id
    AND NOT EXISTS(SELECT 1 FROM player_identity_aliases WHERE alias_id=a.courtwatch_id)
   )))
- AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=a.user_id AND r.courtwatch_id=a.courtwatch_id)
  ORDER BY a.created_at,a.courtwatch_id LIMIT 100`;
 async function main(){
 const rows=run(personalMissingClubsSql).flatMap(x=>x.results||[]);

@@ -17,7 +17,8 @@ const server=http.createServer(async(req,res)=>{
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base='http://127.0.0.1:'+server.address().port;
 const browser=await chromium.launch({headless:true}),page=await browser.newPage({viewport:{width:1440,height:1000}});
-const errors=[],analysis=new Map(),checks=[];
+const errors=[],analysis=new Map(),checks=[],otherPlayers=new Map();
+const otherPerson={id:'shield-other',name:'Test Other',sourceKey:'itf|id:800000001',sourceCircuit:'itf',worldTennisId:'800000001',userAdded:true,nationality:'ITA',club:'Tennis Club Demo'};
 page.on('pageerror',error=>errors.push(String(error)));
 page.on('console',message=>{if(message.type()==='error'&&!/favicon|404/.test(message.text()))errors.push(message.text())});
 await page.route('https://courtwatch-app-api.ckrk9ggvrb.workers.dev/v1/app-snapshot**',route=>route.fulfill({json:{generatedAt:new Date(0).toISOString(),players:[{id:'shield-projection'}],tournaments:[],matches:[]}}));
@@ -32,6 +33,19 @@ await page.route('https://png8nftp9y-alt.github.io/dist/v3/**',async route=>{
 await page.route('**/app/api/**',async route=>{
   const request=route.request(),url=new URL(request.url()),api=url.pathname.replace(/^\/app\/api/,'');
   if(api==='/session')return route.fulfill({json:{user:{id:'shield-user',email:'shield@courtwatch.test',displayName:'CourtWatch Shield',role:'admin'}}});
+  const group=request.headers()['x-courtwatch-group']||'main';
+  if(api==='/app-snapshot'&&group==='others')return route.fulfill({json:{group,generatedAt:new Date().toISOString(),players:[...otherPlayers.values()],tournaments:[...otherPlayers.values()].map(p=>({playerId:p.id,name:'Torneo Demo',competitionId:'shield-demo',circuit:'itf',startDate:new Date().toISOString().slice(0,10),endDate:new Date().toISOString().slice(0,10)})),matches:[]}});
+  if(api==='/player-search')return route.fulfill({json:{results:[{sourceKey:otherPerson.sourceKey,identity:otherPerson.worldTennisId,name:otherPerson.name,circuit:'itf'}],nextCursor:null}});
+  if(api==='/courtwatch-player'&&request.method()==='POST'){
+    requireCheck(group==='others','aggiunta inviata al gruppo Altri');
+    otherPlayers.set(otherPerson.id,otherPerson);
+    return route.fulfill({json:{added:true,player:otherPerson,playerId:otherPerson.id,group}});
+  }
+  if(api==='/courtwatch-player'&&request.method()==='DELETE'){
+    requireCheck(group==='others','rimozione inviata al gruppo Altri');
+    otherPlayers.delete(url.searchParams.get('playerId'));
+    return route.fulfill({json:{removed:true,playerId:otherPerson.id,group}});
+  }
   if(api==='/match-analysis-status')return route.fulfill({json:{matches:[...analysis.keys()].map(matchKey=>({matchKey,updatedAt:new Date().toISOString()}))}});
   if(api==='/match-analysis'){
     const body=request.method()==='PUT'?JSON.parse(request.postData()||'{}'):null,key=body?.matchKey||url.searchParams.get('matchKey')||'';
@@ -112,6 +126,29 @@ try{
   }
   await page.locator('#brandHome').click();await page.locator('#homeView.active').waitFor({state:'visible'});
   requireCheck(await page.locator('#homeView').isVisible(),'layout mobile home');
+  requireCheck(await page.locator('[data-switch-player-group]').count()===4,'quattro accessi alla sezione parallela');
+  await page.locator('#homeOthers').click();await page.waitForURL(url=>url.searchParams.get('group')==='others',{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='0');
+  requireCheck(await page.locator('#activePlayerGroup').isVisible(),'sezione Altri riconoscibile');
+  await openSection('players');
+  requireCheck(await page.locator('#playersList [data-profile]').count()===0,'Altri inizialmente vuoto');
+  await page.locator('#addPlayer').click();await page.locator('#addPlayerQuery').fill(otherPerson.name);
+  await page.locator('[data-add-player-search]').evaluate(form=>form.requestSubmit());
+  await page.locator('#addPlayerDialog [data-search-player]').first().click();
+  await page.waitForFunction(()=>location.hash==='#player/shield-other');
+  requireCheck(await page.locator('#profileContent').textContent().then(s=>s.includes('Torneo Demo')),'Altri usa scheda e tornei condivisi');
+  await page.reload({waitUntil:'domcontentloaded'});await page.locator('#profileView.active').waitFor({state:'visible'});
+  await openSection('players');await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='1');
+  requireCheck(await page.locator('#playersList [data-profile]').count()===1,'Altri conservato dopo ricarica');
+  await page.locator('#playersView [data-switch-player-group]').click();await page.waitForURL(url=>!url.searchParams.has('group'),{waitUntil:'domcontentloaded'});
+  await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='23');
+  requireCheck(await page.locator('#playersList [data-profile="shield-other"]').count()===0,'aggiunta Altri non modifica Principali');
+  await page.locator('#homeOthers').click();await page.waitForURL(url=>url.searchParams.get('group')==='others',{waitUntil:'domcontentloaded'});await openSection('players');
+  await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='1');
+  await page.locator('#removePlayer').click();await page.locator('[data-remove-player="shield-other"]').click();
+  await page.locator('[data-removal-yes]').click();await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='0');
+  requireCheck(otherPlayers.size===0,'rimozione Altri persistente');
+  await page.locator('#brandHome').click();await page.locator('#homeView.active').waitFor({state:'visible'});
   requireCheck(errors.length===0,'nessun errore browser',errors.join(' | '));
   await page.screenshot({path:path.join(artifacts,'courtwatch-shield-ui.png'),fullPage:true});
   await fs.writeFile(path.join(artifacts,'courtwatch-shield-ui.json'),JSON.stringify({generatedAt:new Date().toISOString(),passed:true,checks},null,2)+'\n');
