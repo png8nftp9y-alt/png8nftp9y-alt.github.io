@@ -2719,3 +2719,10 @@ Run della correzione PR #102 (merge `34b2729afb6132d6dcefbb5010d06850a7cb8958`),
 ### 2026-10-11 — Diagnosi aggregata Pizzi/Arginelli autorizzata
 
 Alle 15:01 Europe/Rome l’utente ha autorizzato espressamente la diagnosi D1 e la pubblicazione nei log GitHub esclusivamente di conteggi, circuiti e booleani, senza nomi completi, ID o dettagli dei tornei. Pubblicata diagnosi strettamente SELECT per confrontare ricerca generale, identità native collegate, voci torneo indicizzate, scheda avversario e proiezione osservati. Guard SQL e adapter senza metodi di scrittura; credenziali solo da secrets, nessuna esportazione di record individuali. Controllo sintattico node --check passato. Risultati e completezza FITP di Arginelli ancora da verificare al momento della pubblicazione; nessun run precedente certificava i casi reali. Il recupero circoli PR #102 è nel run D1 38140502193, ancora in corso prima dello step di recupero alla lettura iniziale.
+
+
+### 2026-10-11 — Circoli: ulteriori designazioni legali; diagnosi Jersix e ranking Ghiselli
+
+Richiesta utente: non mostrare Dilettantistico né Associazione Culturale E Sportiva Dilettantistica nei circoli. Estesa pulizia API/UI alle forme dilettantistico/dilettantistica e alla designazione completa, conservando il nome del circolo con iniziali leggibili. Versione asset v3 aggiornata. Tre test multicircuito/formatter passati e controllo sintattico diagnostico passato.
+
+Estesa la diagnosi SELECT autorizzata con soli booleani per presenza del torneo Jersix nelle voci FITP indicizzate e nella proiezione osservati di Arginelli, e per l’origine storica/anno precedente del ranking U14 visualizzato per Ghiselli. Nessun nome completo, ID, valore di ranking o dettaglio di torneo nei log. I risultati non vengono copiati nel report pubblico. Dal codice il servizio player-ranking sceglie l’ultima riga separatamente per ogni categoria, senza distinguere automaticamente una categoria storica da quella corrente; la diagnosi deve verificare se questo è il caso segnalato prima di dichiararlo risolto.

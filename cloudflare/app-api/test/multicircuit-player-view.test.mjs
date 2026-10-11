@@ -56,7 +56,7 @@ test('search opponent and followed snapshot use all three circuits; only opponen
 test('club display removes legal designation and uses readable initials in API and UI',()=>{
  const source=readFileSync(new URL('../../../v3.js',import.meta.url),'utf8'),context={};vm.createContext(context);
  vm.runInContext(source.slice(source.indexOf('function displayPlayerClub('),source.indexOf('function personalPlayerAffiliationHtml(')),context);
- for(const [input,expected] of [['ASSOCIAZIONE SPORTIVA DILETTANTISTICA Tennis Club Lecco','Tennis Club Lecco'],['Tennis Milano Associazione Sportiva Dilettantistica','Tennis Milano'],['A.S.D.  Tennis Roma','Tennis Roma'],['ASD Tennis Genova','Tennis Genova'],['Tennis Àquila','Tennis Àquila']]){
+ for(const [input,expected] of [['ASSOCIAZIONE SPORTIVA DILETTANTISTICA Tennis Club Lecco','Tennis Club Lecco'],['Tennis Milano Associazione Sportiva Dilettantistica','Tennis Milano'],['A.S.D.  Tennis Roma','Tennis Roma'],['ASD Tennis Genova','Tennis Genova'],['Tennis Àquila','Tennis Àquila'],['Associazione Culturale E Sportiva Dilettantistica Tennis Club Lecco','Tennis Club Lecco'],['Circolo Dilettantistico Tennis Lecco','Circolo Tennis Lecco']]){
   assert.equal(displayPlayerClub(input),expected);assert.equal(context.displayPlayerClub(input),expected);
  }
 });
