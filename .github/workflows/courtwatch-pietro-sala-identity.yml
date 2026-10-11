@@ -1,0 +1,39 @@
+name: Court Watch Pietro Sala confirmed circuit identity
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-pietro-sala-identity.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  link:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      # D1_WRITE_POLICY: incremental; exact user-requested identity link and verified deltas.
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test exact identities, homonym separation and complete followed history
+        run: node --test test/confirmed-pietro-sala-link.test.mjs test/player-identity-mapping.test.mjs test/opponent-canonical-history.test.mjs test/personal-tennis-europe-history.test.mjs
+      - run: node scripts/configure-d1.mjs
+      - name: Link only the verified CT Decimomannu card with ITF junior 800638581
+        run: node scripts/link-pietro-sala-profiles.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pietro-sala-confirmed-identity
+          path: cloudflare/app-api/tmp/pietro-sala-identity.json
+          retention-days: 30

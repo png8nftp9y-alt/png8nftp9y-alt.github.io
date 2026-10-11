@@ -57,7 +57,8 @@ export async function syncPlayerIdentities(query,{allowBulk=false,maxChanges=500
  const loaded=new Set(rows.map(r=>r.source_key));
  // Preserve retained acquired evidence, including sources no longer in current indexes.
  for(const r of currentLinks)if(!loaded.has(r.source_key))rows.push({...r,payload:JSON.stringify({birthYear:r.birth_year,nationality:r.nationality,profileUrl:r.profile_url})});
- const plan=buildIdentityMapping(rows,{currentLinks,currentPeople,currentAliases,sourceComplete:true}),statements=identityMappingSql(plan);const changedRecords=Object.values(plan.plans).reduce((n,p)=>n+p.inserts.length+p.updates.length,0);if(!allowBulk&&changedRecords>maxChanges)throw Error('identity_bulk_write_blocked:'+changedRecords+'; explicit allow_bulk_identity_writes required');await write(query,statements);
+ const confirmedLinks=(await query("SELECT value FROM app_state WHERE key LIKE 'confirmedPlayerCircuitLink:%' ORDER BY key")).map(r=>JSON.parse(r.value));
+ const plan=buildIdentityMapping(rows,{currentLinks,currentPeople,currentAliases,sourceComplete:true,confirmedLinks}),statements=identityMappingSql(plan);const changedRecords=Object.values(plan.plans).reduce((n,p)=>n+p.inserts.length+p.updates.length,0);if(!allowBulk&&changedRecords>maxChanges)throw Error('identity_bulk_write_blocked:'+changedRecords+'; explicit allow_bulk_identity_writes required');await write(query,statements);
  // Revision predicate retains a source changed while this snapshot was processed.
  const clears=[];for(let i=0;i<pending.length;i+=100)clears.push(`DELETE FROM player_identity_pending_sources WHERE (source_table,source_key,revision) IN (${pending.slice(i,i+100).map(p=>'('+sqlString(p.source_table)+','+sqlString(p.source_key)+','+Number(p.revision)+')').join(',')});`);await write(query,clears);
  const remaining=Number((await query('SELECT COUNT(*) AS total FROM player_identity_pending_sources'))[0].total);
