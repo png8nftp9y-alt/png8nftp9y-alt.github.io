@@ -2786,3 +2786,11 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Audit 38166628431 fallito: Cloudflare 7429 / HTTP 429, limite CPU D1 nella query globale, senza risultati e senza scritture. Non attribuite origini ai 24 casi sulla base di questo fallimento.
 - Query ristretta alle sole sorgenti Europe e CourtWatch necessarie per le evidenze del profilo, set di ID nativi e mancanti materializzati, anti-join indicizzabile anziché verifica correlata del set globale per ogni sorgente. Stesso formato GUID e stesso riconoscimento dei profili canonici configurati usati dall’admin. Nessun nuovo indice, migrazione o mutazione.
 - Cinque regressioni SQLite dell’audit passate, inclusa evidenza da profilo canonico configurato. Nuovo audit remoto una tantum; nessun polling o rilancio del vecchio SQL.
+
+
+### 2026-10-11 — Exact source references for 24 missing Europe IDs
+- Reason: aggregate origin audit proved all 24 originate in acquired match history; user requests exact tournaments and events.
+- Components: read-only Europe origin audit now retrieves missing source keys, filters match participants by indexed normalized names, and reconstructs the exact acquired source key with the production helper before exporting references. No name-only attribution.
+- Output: only public tournament/event names, official source URLs and aggregate affected counts. No player names, canonical IDs, acquired source keys, or private participant payloads in Actions logs. Unmatched count remains visible rather than guessed.
+- Validation: existing SQLite provenance tests, JavaScript syntax checks and diff whitespace checks.
+- Limit: current retained history establishes occurrences, not which occurrence was first inserted historically. Zero database mutations.
