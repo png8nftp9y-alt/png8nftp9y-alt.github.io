@@ -6,9 +6,11 @@ const V3 = "https://png8nftp9y-alt.github.io/dist/v3/";
 // statSpans[0].hidden=profileOutcomeFilter!=='all'
 const PRIVATE_API = location.origin + "/app/api";
 const APP_API = PRIVATE_API + "/app-snapshot";
-const LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1";
-const CALENDAR_CACHE = "courtwatch-v3-calendar-v1";
-const UI_STATE_CACHE = "courtwatch-v3-ui-state-v1";
+const PLAYER_GROUP = /(?:^|[?&])group=others(?:&|$)/.test(location.search || "") ? "others" : "main";
+const GROUP_CACHE_SUFFIX = PLAYER_GROUP === "others" ? "-others" : "";
+const LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1" + GROUP_CACHE_SUFFIX;
+const CALENDAR_CACHE = "courtwatch-v3-calendar-v1" + GROUP_CACHE_SUFFIX;
+const UI_STATE_CACHE = "courtwatch-v3-ui-state-v1" + GROUP_CACHE_SUFFIX;
 const DEVICE_ID_CACHE = "courtwatch-device-id-v1";
 const PLAYER_RANKING_CACHE = "courtwatch-player-rankings-v1";
 const OPPONENT_HISTORY_CACHE = "courtwatch-opponent-history-v3";
@@ -35,6 +37,7 @@ function privateApiOptions(options = {}) {
   const id = courtWatchDeviceId(),
     headers = new Headers(options.headers || {});
   if (id) headers.set("X-CourtWatch-Device", id);
+  if (PLAYER_GROUP === "others") headers.set("X-CourtWatch-Group", "others");
   return { ...options, headers };
 }
 
@@ -790,6 +793,7 @@ async function fetchProjection(url, timeoutMs) {
       !Array.isArray(data.matches)
     )
       throw Error("Proiezione API incompleta");
+    if (PLAYER_GROUP === "others" && data.group !== "others") throw Error("Sezione Altri non ancora disponibile");
     return data;
   } finally {
     clearTimeout(timer);
@@ -2233,7 +2237,7 @@ function renderPlayers() {
         card = p.membershipCard ? ` · tessera ${p.membershipCard}` : "";
       return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${esc(club)}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
-    .join("");
+    .join("") || '<div class="empty">Nessun giocatore. Premi + per aggiungerne uno.</div>';
   document.querySelectorAll("[data-profile]").forEach(
     (x) => {
       const player = ps.find((item) => item.id === x.dataset.profile),
@@ -3607,6 +3611,22 @@ function toggleDatePopover() {
   pop.hidden = false;
 }
 function wire() {
+  if (PLAYER_GROUP === "others") {
+    document.title = "Court Watch · Altri";
+    $("activePlayerGroup").hidden = false;
+  }
+  document.querySelectorAll("[data-switch-player-group]").forEach(button => {
+    button.textContent = PLAYER_GROUP === "others" ? (button.id === "homeOthers" ? "Vai a Principali" : "Principali") : button.textContent;
+    button.setAttribute("aria-label", PLAYER_GROUP === "others" ? "Apri giocatori principali" : "Apri altri giocatori");
+    button.onclick = () => {
+      saveUiState();
+      const target = new URL(location.href);
+      if (PLAYER_GROUP === "main") target.searchParams.set("group", "others");
+      else target.searchParams.delete("group");
+      target.hash = "";
+      location.assign(target.href);
+    };
+  });
   wirePlayersColumnHeight();
   $("addPlayer").onclick = openAddPlayerDialog;
   $("removePlayer").onclick = togglePlayerRemovalMode;
@@ -3853,6 +3873,7 @@ async function load() {
 
     const previous = state.data || cachedData() || {};
     const projection = await projectionPromise;
+    if (PLAYER_GROUP === "others" && !projection) throw Error("Dati della sezione Altri non disponibili");
     const jsonGeneration = Math.max(
         ...[docs.players?.generatedAt, docs.tournaments?.generatedAt]
           .map(Date.parse)

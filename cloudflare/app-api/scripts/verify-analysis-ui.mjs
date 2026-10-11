@@ -101,7 +101,7 @@ assert.ok(hasSource('function groupedMatchSections(') && hasSource('matchTypeHea
 assert.ok(hasSource('function fullMatchRoundLabel(') && hasSource('Qualification round ${Math.max') && hasSource('matchRoundFull'), 'all match pages must use full round labels and ordinal qualification rounds');
 assert.ok(hasSource('/bonus\\s*draw/i.test(source)') && hasSource('Bonus ${value}'), 'bonus draws must prefix the complete round label');
 assert.ok(!hasSource('<span class="matchType">${matchType}</span>'), 'grouped match rows must not repeat the match type');
-assert.ok(html.includes('id="homeOthers" class="playersHeaderAction"') && (html.match(/class="playersHeaderAction"[^>]*>Altri<\/button>/g) || []).length >= 2, 'inactive Altri labels must match the players environment');
+assert.ok((html.match(/data-switch-player-group/g) || []).length === 4 && hasSource('X-CourtWatch-Group') && hasSource('GROUP_CACHE_SUFFIX'), 'Altri must share routes with a scoped persistent player list and caches');
 assert.ok(hasSource('Acceptance list: '), 'scheduled Tennis Europe tournaments must label the acceptance list');
 assert.ok(hasSource('querySelectorAll(".unifiedMatchRow")') && hasSource('class="result ${outcome}"') && hasSource('$("brandHome").onclick'), 'tournament counters must read unified rows and the brand must return home');
 assert.ok(!hasSource('$("resetHome")') && hasSource('String(a.startDate || "").localeCompare'), 'home label must be absent and weekly tournaments must be ordered');

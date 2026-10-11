@@ -4,19 +4,20 @@ import {spawnSync} from 'node:child_process';
 import {database} from './search-sqlite-fixture.mjs';
 import {personalMissingClubsSql,personalFitpClubCard,clubUpdateSql} from '../scripts/sync-personal-fitp-clubs.mjs';
 const row={user_id:'owner',courtwatch_id:'player',payload:JSON.stringify({id:'player',name:'Camilla Frigerio',membershipCard:'123',club:''})};
-function execute(sql,{payload=row.payload,removed=false}={}){
+function execute(sql,{payload=row.payload,removed=false,other=false}={}){
  const python=`import json,sqlite3,sys
 p=json.load(sys.stdin);db=sqlite3.connect(':memory:')
-db.executescript("CREATE TABLE user_app_player_additions(user_id TEXT,courtwatch_id TEXT,payload TEXT);CREATE TABLE user_app_players(user_id TEXT,courtwatch_id TEXT);CREATE TABLE user_app_player_removals(user_id TEXT,courtwatch_id TEXT);")
+db.executescript("CREATE TABLE user_app_player_additions(user_id TEXT,courtwatch_id TEXT,payload TEXT);CREATE TABLE user_app_players(user_id TEXT,courtwatch_id TEXT);CREATE TABLE user_app_player_removals(user_id TEXT,courtwatch_id TEXT);CREATE TABLE user_app_other_players(user_id TEXT,courtwatch_id TEXT);")
 db.execute('INSERT INTO user_app_player_additions VALUES(?,?,?)',('owner','player',p['payload']))
 db.execute("INSERT INTO user_app_players VALUES('owner','player')")
 db.execute("INSERT INTO user_app_player_additions VALUES('owner','other','{}')")
 if p['removed']:db.execute("INSERT INTO user_app_player_removals VALUES('owner','player')")
+if p['other']:db.execute("INSERT INTO user_app_other_players VALUES('owner','player')")
 before=db.total_changes
 if p['sql']:db.execute(p['sql'])
 print(json.dumps({'writes':db.total_changes-before,'player':json.loads(db.execute("SELECT payload FROM user_app_player_additions WHERE courtwatch_id='player'").fetchone()[0]),'other':db.execute("SELECT payload FROM user_app_player_additions WHERE courtwatch_id='other'").fetchone()[0]}))
 `;
- const result=spawnSync('python3',['-c',python],{input:JSON.stringify({sql,payload,removed}),encoding:'utf8'});
+ const result=spawnSync('python3',['-c',python],{input:JSON.stringify({sql,payload,removed,other}),encoding:'utf8'});
  assert.equal(result.status,0,result.stderr);return JSON.parse(result.stdout);
 }
 test('D1_TEST_INITIAL_IMPORT: first verified club fills the selected personal profile',()=>{
@@ -65,4 +66,9 @@ test('scheduled club recovery includes linked Europe selections and excludes unk
   const before=d.writes(),rows=d.execute(personalMissingClubsSql);
   assert.deepEqual(rows.map(r=>r.courtwatch_id),['selected']);assert.equal(d.writes(),before);
  }finally{d.close()}
+});
+
+test("club recovery also updates an Others selection removed from Main",()=>{
+ const result=execute(clubUpdateSql(row,"Official Club"),{removed:true,other:true});
+ assert.equal(result.writes,1);assert.equal(result.player.club,"Official Club");
 });
