@@ -5,6 +5,8 @@ import {pathToFileURL} from 'node:url';
 import {acquiredPlayer} from '../lib/acquired-player-index.mjs';
 import {buildIncrementalSyncPlan} from '../lib/d1-incremental-sync.mjs';
 import {sqlString} from '../../../src/v3/itf-draw-document-d1.mjs';
+import {requirePlayerCircuitIds} from '../lib/required-player-circuit-id.mjs';
+import {acceptanceNativeIdRecovery} from '../lib/acceptance-native-id-recovery.mjs';
 import {syncPlayerIdentities} from './sync-player-identities.mjs';
 // D1_WRITE_POLICY: incremental
 const participantName=p=>p.name||p.playerName||p.full1||p.full2||[p.firstName,p.lastName].filter(Boolean).join(' ');
@@ -24,7 +26,7 @@ export function acceptancePlayers(circuit, doc, knownFitpNames = new Map()) {
  }
  return [...rows.values()].sort((a,b)=>a.source_key.localeCompare(b.source_key));
 }
-export async function syncAcceptanceProfiles(query,circuit,doc) {
+export async function syncAcceptanceProfiles(query,circuit,doc,options={}) {
  const knownFitpNames=new Map();
  if(circuit==='fitp'&&doc?.tournaments&&typeof doc.tournaments==='object'){
   for(const t of Object.values(doc.tournaments)){
@@ -43,7 +45,8 @@ export async function syncAcceptanceProfiles(query,circuit,doc) {
    }
   }
  }
- const rows=acceptancePlayers(circuit,doc,knownFitpNames),hash=crypto.createHash('sha256').update(JSON.stringify(rows)).digest('hex'),key='acceptanceProfiles:'+circuit;
+ const required=await requirePlayerCircuitIds(query,acceptancePlayers(circuit,doc,knownFitpNames),options);
+ const rows=required.rows,hash=crypto.createHash('sha256').update(JSON.stringify(rows)).digest('hex'),key='acceptanceProfiles:'+circuit;
  const checkpoint=(await query('SELECT value FROM app_state WHERE key='+sqlString(key)))[0];
  let changed=0;
  if(checkpoint?.value!==hash){
@@ -54,6 +57,9 @@ export async function syncAcceptanceProfiles(query,circuit,doc) {
    const plan=buildIncrementalSyncPlan({current:parsed,incoming:merged,keyOf:r=>r.source_key,sourceComplete:true});
    const delta=[...plan.inserts,...plan.updates.map(u=>u.after)];changed+=delta.length;
    for(let j=0;j<delta.length;j+=20)await query(delta.slice(j,j+20).map(r=>'INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES('+[r.source_key,r.circuit,r.official_id,r.normalized_name,r.display_name,JSON.stringify(r.payload)].map(sqlString).join(',')+') ON CONFLICT(source_key) DO UPDATE SET official_id=excluded.official_id,normalized_name=excluded.normalized_name,display_name=excluded.display_name,payload=excluded.payload WHERE official_id IS NOT excluded.official_id OR normalized_name IS NOT excluded.normalized_name OR display_name IS NOT excluded.display_name OR payload IS NOT excluded.payload;').join('\n'));
+   const saved=await query('SELECT source_key,circuit,official_id FROM observed_players WHERE source_key IN ('+incoming.map(r=>sqlString(r.source_key)).join(',')+')');
+   const verified=new Map(saved.map(r=>[r.source_key,r]));
+   if(incoming.some(r=>verified.get(r.source_key)?.circuit!==r.circuit||verified.get(r.source_key)?.official_id!==r.official_id))throw Error('acceptance_saved_circuit_id_unverified');
   }
  }
  const pending=await query('SELECT source_key FROM player_identity_pending_sources LIMIT 1');
@@ -61,12 +67,12 @@ export async function syncAcceptanceProfiles(query,circuit,doc) {
  const identity=pending.length?await syncPlayerIdentities(query,{allowBulk:!checkpoint}):{status:'unchanged',writes:0,pending:0};
  if(identity.status==='pending')throw Error('acceptance_identity_pending');
  if(checkpoint?.value!==hash)await query('INSERT INTO app_state(key,value,updated_at) VALUES('+sqlString(key)+','+sqlString(hash)+','+sqlString(new Date().toISOString())+') ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at WHERE value IS NOT excluded.value;');
- return {circuit,participants:rows.length,recoveredExistingFitpNames:knownFitpNames.size,changed,identity,unchanged:checkpoint?.value===hash};
+ return {circuit,participants:rows.length,recoveredCircuitIds:required.recovered,excludedRecords:required.excludedRecords,recoveredExistingFitpNames:knownFitpNames.size,changed,identity,unchanged:checkpoint?.value===hash};
 }
 async function main(){
  const config=JSON.parse(await fs.readFile('wrangler.generated.jsonc','utf8')),db=config.d1_databases.find(d=>d.binding==='DB').database_id;
  async function query(sql){const r=await fetch('https://api.cloudflare.com/client/v4/accounts/'+process.env.CLOUDFLARE_ACCOUNT_ID+'/d1/database/'+db+'/query',{method:'POST',headers:{Authorization:'Bearer '+process.env.CLOUDFLARE_API_TOKEN,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)}),j=await r.json();if(!r.ok||j.success!==true||!j.result?.every(x=>x.success))throw Error('acceptance_d1_query_failed:'+r.status);return j.result[0].results||[]}
  const doc=JSON.parse(gunzipSync(await fs.readFile(process.env.ACCEPTANCE_CACHE_FILE)));
- const audit=await syncAcceptanceProfiles(query,process.env.ACCEPTANCE_CIRCUIT,doc);await fs.mkdir('tmp',{recursive:true});await fs.writeFile('tmp/acceptance-player-profiles.json',JSON.stringify(audit)+'\n');console.log(JSON.stringify(audit));
+ const audit=await syncAcceptanceProfiles(query,process.env.ACCEPTANCE_CIRCUIT,doc,{recoverMissing:acceptanceNativeIdRecovery(doc)});await fs.mkdir('tmp',{recursive:true});await fs.writeFile('tmp/acceptance-player-profiles.json',JSON.stringify(audit)+'\n');console.log(JSON.stringify(audit));
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();

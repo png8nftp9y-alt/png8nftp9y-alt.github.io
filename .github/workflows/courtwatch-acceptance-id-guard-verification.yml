@@ -1,0 +1,27 @@
+name: Court Watch acceptance ID guard verification
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-acceptance-id-guard-verification.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      # Read-only live verification; test writes use disposable SQLite fixtures.
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test new player IDs, source-bound recovery, saved IDs and the three publication triggers
+        run: node --test test/courtwatch-acceptance-player-profiles.test.mjs test/required-player-circuit-id.test.mjs test/acceptance-native-id-recovery.test.mjs test/build-observed-player-index.test.mjs
+      - name: Verify current own-circuit ID coverage anonymously without writes
+        run: node scripts/per-circuit-player-id-audit.mjs
