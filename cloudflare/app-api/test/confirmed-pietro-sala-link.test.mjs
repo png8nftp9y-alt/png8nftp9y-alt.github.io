@@ -41,3 +41,12 @@ test('followed ITF profile exposes all ten acquired tournaments by native ID des
   const recent=await otherCircuitOpponentHistory(d.db,{name:player.name,asOf:'2026-10-11',identity:player});assert.deepEqual(new Set(recent.map(t=>t.id)),new Set(['t7','t8','t9']));assert.equal(d.writes(),writes);
  }finally{d.close()}
 });
+
+import {recoverPietroSalaFitpClubs} from '../lib/confirmed-pietro-sala-link.mjs';
+test('missing acquired clubs resolve from the exact official card sheet and keep the Giussano homonym separate',async()=>{
+ const candidates=[{...rows[0],official_id:'4537099241',payload:'{}'},{...rows[1],official_id:'0264379435',payload:'{}'},rows[2]];
+ let requests=0;const fetcher=async(url,options)=>{requests++;assert.equal(url,'https://dp-myfit-test-function-v2.azurewebsites.net/api/v1/tesserati/dettaglio/semplice');const card=atob(JSON.parse(options.body).cardNumber);return {ok:true,json:async()=>({player:{name:'PIETRO',surname:'SALA',membershipCard:'*******'+card.slice(-3),tennis_club_name:card==='4537099241'?'AS DILETTANTISTICA CIRCOLO TENNIS DECIMOMANNU':'CIRCOLO TENNIS GIUSSANO'}})}};
+ const enriched=await recoverPietroSalaFitpClubs(candidates,{fetcher});assert.equal(requests,2);assert.equal(selectPietroSalaLink(enriched).identities[0].officialId,'4537099241');assert.equal(candidates[0].payload,'{}');
+ await assert.rejects(recoverPietroSalaFitpClubs(candidates,{fetcher:async()=>({ok:true,json:async()=>({player:{name:'Other',surname:'Player',membershipCard:'*******241',tennis_club_name:'Decimomannu'}})})}),/mismatch/);
+ await assert.rejects(recoverPietroSalaFitpClubs(candidates,{fetcher:async()=>({ok:false})}),/unavailable/);
+});

@@ -31,3 +31,18 @@ export async function saveConfirmedPietroSalaLink(query,rule,rows){
  }
  return {changed:true};
 }
+
+// Official endpoint verified in FITP's public player-details_v7.2.2.js.
+export async function recoverPietroSalaFitpClubs(rows,{fetcher=fetch}={}){
+ const cards=[...new Set(rows.filter(r=>r.circuit==='fitp'&&playerNameKey(r.display_name)==='PIETRO SALA'&&validOfficialId('fitp',r.official_id)).map(r=>r.official_id))];
+ if(cards.length>5)throw Error('pietro_sala_candidate_limit');
+ const profiles=new Map();
+ for(const card of cards){
+  const response=await fetcher('https://dp-myfit-test-function-v2.azurewebsites.net/api/v1/tesserati/dettaglio/semplice',{method:'POST',headers:{'Content-Type':'application/json',Origin:'https://www.fitp.it',Referer:'https://www.fitp.it/Pagina-Giocatore/'},body:JSON.stringify({cardNumber:btoa(card),fromYear:2026,toYear:2026}),signal:AbortSignal.timeout(15000)});
+  if(!response.ok)throw Error('pietro_sala_official_fitp_unavailable');
+  const p=(await response.json()).player;
+  if(!p||playerNameKey([p.name,p.surname].join(' '))!=='PIETRO SALA'||!String(p.membershipCard||'').endsWith(card.slice(-3))||!String(p.tennis_club_name||'').trim())throw Error('pietro_sala_official_fitp_mismatch');
+  profiles.set(card,p);
+ }
+ return rows.map(row=>{const p=profiles.get(row.official_id);if(row.circuit!=='fitp'||!p)return row;const original=typeof row.payload==='string'?JSON.parse(row.payload):row.payload||{};return {...row,payload:JSON.stringify({...original,club:p.tennis_club_name,fitpClubEvidence:{endpoint:'https://dp-myfit-test-function-v2.azurewebsites.net/api/v1/tesserati/dettaglio/semplice',clubId:p.tennis_club_id,province:p.tennis_club_province}})};});
+}

@@ -2,7 +2,7 @@ name: Court Watch Pietro Sala confirmed circuit identity
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/courtwatch-pietro-sala-identity.yml']
+    paths: ['.github/workflows/courtwatch-pietro-sala-identity.yml', 'cloudflare/app-api/lib/confirmed-pietro-sala-link.mjs', 'cloudflare/app-api/scripts/link-pietro-sala-profiles.mjs']
   workflow_dispatch:
 permissions:
   contents: read
