@@ -2693,3 +2693,10 @@ Changed acceptance workflow tests, acceptance importer, optional observed-index 
 - Utente segnala che il run in errore non è quello indicato in precedenza. Singola lettura dei run recenti del workflow Court Watch acceptance player profiles: 38138633558 riuscito (terminato 14:21:37), Europe 38138431533 tentativo 2 riuscito (14:23:24), FITP 38138371109 tentativo 2 in progress alla lettura. Il rosso più recente presente nell’elenco era 38137450770, terminato 13:59:54 prima della correzione, con fallimento nello step test e import saltato. Non attribuito questo errore al run non identificato dell’utente.
 - Serve il link esatto del run rosso segnalato per distinguere un eventuale nuovo errore da tentativi precedenti. Nessun altro retry avviato e nessun polling.
 - Promemoria funzione workflow: legge le liste R2 pubblicate dal circuito, richiede nome e ID nativo del circuito, salva e verifica la rilettura, aggiorna identità e collegamenti CourtWatch, registra diagnostica per nomi non salvati; non certifica l’acquisizione di tutti i tabelloni storici ITF.
+
+
+### 2026-10-11 14:27 Europe/Rome — Run rosso identificato dall’utente
+
+- Link esatto confermato: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38137450770 . Log job 114464131093: sorgente Tennis Europe live entries; test acceptance-native-id-recovery fallito con 1 !== 0 alle 13:59:40, import D1 saltato. È il test della scrittura diagnostica già corretto in PR101, precedente alla sua integrazione. Non è un nuovo fallimento produttivo successivo alla correzione.
+- Successivo tentativo Europe già riuscito: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38138431533/attempts/2 . Un run precedente resta rosso nella cronologia dopo una correzione; non riavviato ulteriormente il vecchio import, perché la stessa sorgente Europe ha già un tentativo successivo riuscito. Nessun polling.
+- FITP 38138371109 tentativo 2: alla singola verifica job 114468687933 ha superato test, configurazione e lettura cache e sta eseguendo registrazione. Esito finale FITP non ancora certificato.
