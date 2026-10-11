@@ -2665,3 +2665,11 @@ Changed acceptance workflow tests, acceptance importer, optional observed-index 
 - Questa modifica e lo sblocco dei test acceptance profiles vengono pubblicati insieme al report. Le verifiche del recupero ID e dei collegamenti tra circuiti restano attive.
 
 - Validazione formato corrente: npm run check completo riuscito, inclusi test di normalizzazione circoli API/UI, proiezione personale e schede multicircuito. La suite del percorso acceptance profiles è riuscita con 29 test. Il run fallito viene riavviato dopo l’integrazione della correzione; il suo esito produttivo resta da verificare.
+
+
+### 2026-10-11 14:16 Europe/Rome — Integrazione correzione e riavvio registrazione
+
+- Integrata PR101 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/101 ; commit squash 86c7be777502ee020aec72e1c33f1177940022fa. Formato corrente Tennis Club Lecco, senza dicitura legale; test della diagnostica e passaggio tra circuiti corretti, guardie ID conservate.
+- Riavviato il job 114364993277 del run acceptance player profiles https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38103811902 . Richiesta di riavvio accettata dal servizio. Il workflow legge main nel checkout, quindi il nuovo tentativo utilizza il test corretto.
+- Run deploy formato circoli e schede multicircuito: Worker https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38138620049 ; frontend GitHub Pages https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38138619315 ; D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38138619992 ; controllo policy D1 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38138620034 . Tutti in progress alla singola lettura iniziale; esito produttivo non ancora certificato. Nessun polling.
+- Nella PR erano presenti avvisi relativi al preview Vercel (limite giornaliero deploy) e al backup Cloudflare Pages (build fallita). Non sono l’esito dei run GitHub Pages/Worker della nuova integrazione e non dimostrano un errore nel recupero ID; non effettuata una diagnosi di questi preview esterna allo scopo corrente.
