@@ -1,6 +1,7 @@
 export function displayPlayerClub(value) {
  return String(value||'')
-  .replace(/\bassociazione\s+sportiva\s+dilettantistica\b/gi,'')
+  .replace(/\bassociazione\s+(?:culturale\s+(?:e\s+)?)?sportiva\s+dilettantistic[ao]\b/gi,'')
+  .replace(/\bdilettantistic[ao]\b/gi,'')
   .replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi,'')
   .replace(/\s+/g,' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g,'').trim()
   .toLocaleLowerCase('it-IT').replace(/(^|[\s’\u0027-])\p{L}/gu, letter => letter.toLocaleUpperCase('it-IT'));
