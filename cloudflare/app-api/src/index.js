@@ -1,3 +1,5 @@
+import {storedIdentity} from '../lib/player-identity-lookup.mjs';
+import {currentRankingCategoryAllowed} from '../lib/current-ranking-category.mjs';
 import {loadPlayerIdDiagnostics,renderPlayerIdDiagnostics} from '../lib/admin-player-id-diagnostics.mjs';
 import {selectOpponentEntryProfiles} from '../lib/opponent-entry-native-aliases.mjs';
 import {sharedTournamentMetadata} from '../lib/tournament-metadata-cache.mjs';
@@ -47,7 +49,9 @@ async function applyPreparedTennisEuropeRankings(env,players,matches,courtwatchI
 async function currentTennisEuropePlayerRanking(env,{playerId,name}){
   const normalized=normalizeTennisEuropeName(name),aliasRows=playerId?await optionalRows(env.DB.prepare('SELECT h.category,h.ranking,h.ranking_date,h.profile_id FROM tennis_europe_player_aliases a JOIN tennis_europe_ranking_history h ON h.profile_id=a.profile_id WHERE a.courtwatch_id=? ORDER BY h.ranking_date DESC').bind(playerId)):[],exactRows=!aliasRows.length&&normalized?await optionalRows(env.DB.prepare('SELECT category,ranking,ranking_date,profile_id,normalized_name FROM tennis_europe_ranking_history WHERE normalized_name=? ORDER BY ranking_date DESC').bind(normalized)):[],token=normalized.split(' ').filter(part=>part.length>=4).sort((a,b)=>b.length-a.length)[0]||'',candidateRows=!aliasRows.length&&!exactRows.length&&token?await optionalRows(env.DB.prepare('SELECT category,ranking,ranking_date,profile_id,normalized_name FROM tennis_europe_ranking_history WHERE normalized_name LIKE ? ORDER BY ranking_date DESC LIMIT 250').bind(`%${token}%`)):[],nameKey=tennisEuropeNameKey(normalized),nameRows=exactRows.length?exactRows:candidateRows.filter(row=>tennisEuropeNameKey(row.normalized_name)===nameKey),latest=new Map();
   for(const row of [...aliasRows,...nameRows]){const current=latest.get(row.category);if(!current||String(row.ranking_date||'')>String(current.ranking_date||''))latest.set(row.category,row)}
-  return{playerId,rankings:[...latest.values()].sort((a,b)=>String(a.category).localeCompare(String(b.category)))};
+  const canonical=await storedIdentity(env.DB,playerId),configured=!canonical&&playerId?await env.DB.prepare('SELECT payload FROM app_players WHERE id=?').bind(playerId).first():null;
+  let person=canonical||{};if(configured)try{person=JSON.parse(configured.payload)}catch{}
+  return{playerId,rankings:[...latest.values()].filter(row=>currentRankingCategoryAllowed(row.category,person)).sort((a,b)=>String(a.category).localeCompare(String(b.category)))};
 }
 async function searchPlayers(env,query,userId,cursor=''){return paginatedPlayerSearch(env.DB,query,userId,cursor)}
 const incompleteCompletedScore=(value,status,decided=false)=>{const sets=String(value||'').match(/\d+(?:\(\d+\))?-\d+(?:\(\d+\))?/g)||[];if(!sets.length)return false;let left=0,right=0;for(const set of sets){const points=set.match(/^(\d+)(?:\(\d+\))?-(\d+)/);if(!points)continue;const a=Number(points[1]),b=Number(points[2]),high=Math.max(a,b),low=Math.min(a,b),completeSet=high>=6&&(high-low>=2||(high===7&&low===6));if(!completeSet)continue;a>b?left++:right++}return Math.max(left,right)<2};

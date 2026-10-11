@@ -375,18 +375,16 @@ const teRankHtml = (value) => {
 };
 const playerRankingSummary = (player) => {
   const cached = playerRankingCache.get(String(player?.id || "")),
-    labels = cached?.rankings?.length
-      ? currentPlayerRankingLabels(player, cached.rankings)
-      : [
-          player?.ranking ? `${readableText(player.ranking)} FITP` : "",
-          player?.tennisEuropeRanking
-            ? readableText(player.tennisEuropeRanking)
-            : "",
-        ].filter(Boolean);
+    labels = currentPlayerRankingLabels(player, cached?.rankings || []);
   return labels.length
     ? `<span id="playerLiveRankings" class="playerAllRankings"> · ${labels.map(esc).join(" · ")}</span>`
     : '<span id="playerLiveRankings" class="playerAllRankings"></span>';
 };
+function currentRankingCategoryAllowed(category, player) {
+ const limit=Number(String(category||'').match(/(?:U|B|G)(14|16)\b/i)?.[1]);
+ const year=new Date().getUTCFullYear(),birthYear=Number(player?.birthYear||String(player?.birthDate||player?.dateOfBirth||'').slice(0,4));
+ return !limit||!Number.isInteger(birthYear)||birthYear<1900||birthYear>year||year-birthYear<=limit;
+}
 function currentPlayerRankingLabels(player, rows = []) {
   const labels = [];
   if (player?.ranking) labels.push(`${readableText(player.ranking)} FITP`);
@@ -397,10 +395,10 @@ function currentPlayerRankingLabels(player, rows = []) {
         ranking,
       }));
   for (const row of liveRows)
-    if (row?.ranking)
+    if (row?.ranking && currentRankingCategoryAllowed(row.category, player))
       labels.push(`n°${row.ranking} TE${row.category ? ` ${row.category.replace(/^[BG]/, "U")}` : ""}`);
   if (!liveRows.length && player?.tennisEuropeRanking)
-    labels.push(...String(player.tennisEuropeRanking).split(/\s*·\s*/).filter(Boolean));
+    labels.push(...String(player.tennisEuropeRanking).split(/\s*·\s*/).filter(label=>label&&currentRankingCategoryAllowed(label,player)));
   return labels;
 }
 async function loadCurrentPlayerRanking(player) {
