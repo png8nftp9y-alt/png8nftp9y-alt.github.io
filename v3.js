@@ -375,7 +375,7 @@ const teRankHtml = (value) => {
 };
 const playerRankingSummary = (player) => {
   const cached = playerRankingCache.get(String(player?.id || "")),
-    labels = currentPlayerRankingLabels(player, cached?.rankings || []);
+    labels = currentPlayerRankingLabels(player, cached?.rankings ?? null);
   return labels.length
     ? `<span id="playerLiveRankings" class="playerAllRankings"> · ${labels.map(esc).join(" · ")}</span>`
     : '<span id="playerLiveRankings" class="playerAllRankings"></span>';
@@ -385,20 +385,24 @@ function currentRankingCategoryAllowed(category, player) {
  const year=new Date().getUTCFullYear(),birthYear=Number(player?.birthYear||String(player?.birthDate||player?.dateOfBirth||'').slice(0,4));
  return !limit||!Number.isInteger(birthYear)||birthYear<1900||birthYear>year||year-birthYear<=limit;
 }
-function currentPlayerRankingLabels(player, rows = []) {
+function latestCurrentRankingRow(row,player) {
+ const dates=player?.tennisEuropeLatestRankingDates||{},category=String(row.category||'').toUpperCase(),age=category.match(/(14|16)$/)?.[1],sex=String(player?.sex||player?.gender||'').toUpperCase();
+ const latest=dates[category]||(age&&['M','F'].includes(sex)?dates[(sex==='M'?'B':'G')+age]:age?[dates['B'+age],dates['G'+age]].filter(Boolean).sort().at(-1):'');
+ return Boolean(latest&&row.ranking_date&&row.ranking_date===latest);
+}
+function currentPlayerRankingLabels(player, rows = null) {
   const labels = [];
   if (player?.ranking) labels.push(`${readableText(player.ranking)} FITP`);
-  const liveRows = rows.length
+  const liveRows = Array.isArray(rows)
     ? rows
     : Object.entries(player?.tennisEuropeRankings || {}).map(([category, ranking]) => ({
         category: category === "u14" ? "U14" : category === "u16" ? "U16" : category,
-        ranking,
+        ranking,ranking_date:player?.tennisEuropeRankingDates?.[category],
       }));
   for (const row of liveRows)
-    if (row?.ranking && currentRankingCategoryAllowed(row.category, player))
+    if (row?.ranking && currentRankingCategoryAllowed(row.category, player) && latestCurrentRankingRow(row,player))
       labels.push(`n°${row.ranking} TE${row.category ? ` ${row.category.replace(/^[BG]/, "U")}` : ""}`);
-  if (!liveRows.length && player?.tennisEuropeRanking)
-    labels.push(...String(player.tennisEuropeRanking).split(/\s*·\s*/).filter(label=>label&&currentRankingCategoryAllowed(label,player)));
+
   return labels;
 }
 async function loadCurrentPlayerRanking(player) {
@@ -418,10 +422,11 @@ async function loadCurrentPlayerRanking(player) {
         .finally(() => playerRankingRequests.delete(key)),
     );
   try {
-    const data = await playerRankingRequests.get(key),
-      target = $("playerLiveRankings"),
+    const data = await playerRankingRequests.get(key);
+    player.tennisEuropeLatestRankingDates=data.latestRankingDates||{};
+    const target = $("playerLiveRankings"),
       labels = currentPlayerRankingLabels(player, data.rankings || []);
-    if ((data.rankings || []).length) {
+    {
       playerRankingCache.set(key, data);
       saveEntries(PLAYER_RANKING_CACHE, playerRankingCache);
     }
@@ -2663,6 +2668,7 @@ function renderOpponentHistory(data) {
     body = $("opponentTournamentHistory");
   const profileRanking = $("opponentProfileRanking"),
     profile = data.profile || null;
+  if(profileRanking){profileRanking.hidden=true;profileRanking.textContent="";}
   if (profileRanking && profile?.ranking) {
     const category = /14$/.test(profile.category || "")
       ? " U14"
@@ -2706,7 +2712,7 @@ function renderOpponentHistory(data) {
 }
 function opponentHistoryKey(name, event = "", profileId = "") {
   const asOf = iso(new Date()),
-    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "circuits-v2"].join("|");
+    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "latest-rankings-v3"].join("|");
   return { asOf, requestKey };
 }
 async function fetchOpponentHistory(name, event = "", profileId = "", refresh = false) {
