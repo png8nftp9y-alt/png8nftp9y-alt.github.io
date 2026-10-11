@@ -7,7 +7,7 @@ import {sqlString} from '../../../src/v3/itf-draw-document-d1.mjs';
 // D1_WRITE_POLICY: incremental
 const parsed=value=>{try{return JSON.parse(value||'{}')}catch{throw Error('identity_source_incomplete')}};
 const officialKey=r=>{const id=String(r.official_id||'').toLowerCase();return (r.circuit==='fitp'?/^\d{6,12}$/.test(id):r.circuit==='itf'?/^800\d{6}$/.test(id):r.circuit==='tennis-europe'?/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id):false)?r.circuit+'|'+id:''};
-export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],currentAliases=[],sourceComplete=true}={}){
+export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],currentAliases=[],sourceComplete=true,confirmedLinks=[]}={}){
  if(!sourceComplete)throw Error('identity_source_incomplete');
  const all=[...new Map(rows.map(r=>[r.source_key,r])).values()];for(const r of all){if(!r.source_key)throw Error('identity_source_incomplete');parsed(r.payload);}
  const names=new Map();for(const r of all){const key=playerNameKey(r.display_name)||'source:'+r.source_key;const list=names.get(key)||[];list.push(r);names.set(key,list);}
@@ -20,6 +20,18 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
  // distinct official profiles or inconsistent birth/country evidence.
  const parent=sets.map((_,i)=>i),find=i=>parent[i]===i?i:parent[i]=find(parent[i]),official=new Map();
  sets.forEach((members,i)=>members.forEach(r=>{const key=officialKey(r);if(!key)return;if(official.has(key))parent[find(i)]=find(official.get(key));else official.set(key,i)}));
+ // User-confirmed cross-circuit links are exact native IDs, never name matches.
+ for(const rule of confirmedLinks){
+  if(!Array.isArray(rule.identities)||rule.identities.length!==2||new Set(rule.identities.map(x=>x.circuit)).size!==2)throw Error('confirmed_identity_link_invalid');
+  const wanted=new Set(rule.identities.map(x=>officialKey({circuit:x.circuit,official_id:x.officialId})));if(wanted.has(''))throw Error('confirmed_identity_link_invalid');
+  const found=sets.map((members,i)=>({members,i})).filter(g=>g.members.some(r=>wanted.has(officialKey(r))));
+  if(new Set(found.flatMap(g=>g.members.map(officialKey).filter(k=>wanted.has(k)))).size!==wanted.size)continue;
+  const roots=new Set(found.map(g=>find(g.i))),members=sets.flatMap((g,i)=>roots.has(find(i))?g:[]),ids=new Map();
+  for(const r of members){const key=officialKey(r);if(!key)continue;const known=ids.get(r.circuit)||new Set();known.add(key);ids.set(r.circuit,known);}
+  if([...ids.values()].some(s=>s.size>1))throw Error('confirmed_identity_link_conflicts_with_existing_profile');
+  if(rule.nameKey&&members.some(r=>r.circuit!=='courtwatch'&&playerNameKey(r.display_name)!==rule.nameKey))throw Error('confirmed_identity_link_name_changed');
+  const root=find(found[0].i);for(const g of found)parent[find(g.i)]=root;
+ }
  const priorBySource=new Map(currentLinks.map(r=>[r.source_key,r.canonical_id])),priorGroups=new Map();
  sets.forEach((members,i)=>{for(const id of new Set(members.map(r=>priorBySource.get(r.source_key)).filter(Boolean))){const previous=priorGroups.get(id)||[];for(const j of previous){const combined=[...sets[find(i)],...sets[find(j)]].map(r=>({...r,display_name:'Persisted identity'}));if(mergeSearchIdentities(combined,new Map()).length===1)parent[find(i)]=find(j);}previous.push(i);priorGroups.set(id,previous);}});
  const groups=new Map();sets.forEach((members,i)=>{const root=find(i);groups.set(root,[...(groups.get(root)||[]),...members]);});
