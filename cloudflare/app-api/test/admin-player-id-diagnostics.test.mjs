@@ -11,6 +11,7 @@ test('counts native IDs and canonical people without inflating missing aliases o
   add(d,'e1','person1','tennis-europe',guid);add(d,'e2','person1','tennis-europe',guid.toUpperCase());
   add(d,'e-missing','person2','tennis-europe','name:Same Name');add(d,'i1','person3','itf','800123456');
   const writes=d.writes(),rows=await loadPlayerIdDiagnostics(d.db);assert.equal(d.writes(),writes);
+  assert.equal(rows.coverage.length,3);assert.equal(rows.coverage.find(r=>r.circuit==='tennis-europe').records_missing_circuit_id,1);
   assert.deepEqual(rows.map(({circuit,ids,players,missing})=>({circuit,ids,players,missing})),[
    {circuit:'fitp',ids:1,players:1,missing:0},{circuit:'tennis-europe',ids:1,players:2,missing:1},{circuit:'itf',ids:1,players:1,missing:0}
   ]);

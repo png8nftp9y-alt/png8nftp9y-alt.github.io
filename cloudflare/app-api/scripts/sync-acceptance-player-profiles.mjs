@@ -1,3 +1,4 @@
+import {saveAcceptanceImportDiagnostics} from '../lib/acceptance-import-diagnostics.mjs';
 import fs from 'node:fs/promises';
 import {gunzipSync} from 'node:zlib';
 import crypto from 'node:crypto';
@@ -26,7 +27,7 @@ export function acceptancePlayers(circuit, doc, knownFitpNames = new Map()) {
  }
  return [...rows.values()].sort((a,b)=>a.source_key.localeCompare(b.source_key));
 }
-export async function syncAcceptanceProfiles(query,circuit,doc,options={}) {
+async function importAcceptanceProfiles(query,circuit,doc,options,context) {
  const knownFitpNames=new Map();
  if(circuit==='fitp'&&doc?.tournaments&&typeof doc.tournaments==='object'){
   for(const t of Object.values(doc.tournaments)){
@@ -45,7 +46,9 @@ export async function syncAcceptanceProfiles(query,circuit,doc,options={}) {
    }
   }
  }
- const required=await requirePlayerCircuitIds(query,acceptancePlayers(circuit,doc,knownFitpNames),options);
+ context.rows=acceptancePlayers(circuit,doc,knownFitpNames);
+ const required=await requirePlayerCircuitIds(query,context.rows,options);
+ context.rows=required.rows;
  const rows=required.rows,hash=crypto.createHash('sha256').update(JSON.stringify(rows)).digest('hex'),key='acceptanceProfiles:'+circuit;
  const checkpoint=(await query('SELECT value FROM app_state WHERE key='+sqlString(key)))[0];
  let changed=0;
@@ -68,6 +71,20 @@ export async function syncAcceptanceProfiles(query,circuit,doc,options={}) {
  if(identity.status==='pending')throw Error('acceptance_identity_pending');
  if(checkpoint?.value!==hash)await query('INSERT INTO app_state(key,value,updated_at) VALUES('+sqlString(key)+','+sqlString(hash)+','+sqlString(new Date().toISOString())+') ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at WHERE value IS NOT excluded.value;');
  return {circuit,participants:rows.length,recoveredCircuitIds:required.recovered,excludedRecords:required.excludedRecords,recoveredExistingFitpNames:knownFitpNames.size,changed,identity,unchanged:checkpoint?.value===hash};
+}
+export async function syncAcceptanceProfiles(query,circuit,doc,options={}) {
+ const context={rows:null};
+ try {
+  const result=await importAcceptanceProfiles(query,circuit,doc,options,context);
+  await saveAcceptanceImportDiagnostics(query,circuit,{rows:context.rows,status:'complete'});
+  return result;
+ }catch(error){
+  const message=String(error?.message||'');
+  const reason=message.startsWith('player_circuit_id_required:')?'id_required':/incomplete|name_missing_or_ambiguous/.test(message)?'source_incomplete':/saved_circuit_id_unverified/.test(message)?'save_unverified':/identity_pending/.test(message)?'identity_pending':'import_failed';
+  try{await saveAcceptanceImportDiagnostics(query,circuit,{rows:context.rows,status:'blocked',reason});}catch{throw Error('acceptance_import_failed_and_diagnostics_unavailable');}
+  // Anonymous failure code only: no player data or SQL reaches workflow logs.
+  throw Error('acceptance_'+reason+':'+(message.startsWith('player_circuit_id_required:')?message:'registration_incomplete'));
+ }
 }
 async function main(){
  const config=JSON.parse(await fs.readFile('wrangler.generated.jsonc','utf8')),db=config.d1_databases.find(d=>d.binding==='DB').database_id;
