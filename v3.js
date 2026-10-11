@@ -1476,13 +1476,18 @@ function bindPlayerHold(element, playerId) {
 function playerDemographics(player) {
   const stored = PLAYER_DEMOGRAPHICS[player?.id] || [];
   return {
-    birthYear: Number(player?.birthYear || stored[0]),
+    birthYear: Number(player?.birthYear || String(player?.birthDate || player?.dateOfBirth || "").match(/^(\d{4})-\d{2}-\d{2}/)?.[1] || stored[0]),
     sex: String(player?.sex || stored[1] || "").toUpperCase(),
   };
 }
 function playerAgeCategory(player, year = state.month.getFullYear()) {
   const birthYear = playerDemographics(player).birthYear;
-  if (!Number.isInteger(birthYear)) return "";
+  if (!Number.isInteger(birthYear)) {
+    // User-confirmed category for 2026; do not infer a birth year or carry it forward.
+    const nameKey = String(player?.name || '').normalize('NFKD').toLowerCase().split(/\s+/).sort().join(' ');
+    if (year === 2026 && String(player?.membershipCard || player?.sourcePlayerId || '') === '6562748855' && nameKey === 'busa martina') return 'U10';
+    return '';
+  }
   const age = year - birthYear;
   return age <= 10
     ? "U10"

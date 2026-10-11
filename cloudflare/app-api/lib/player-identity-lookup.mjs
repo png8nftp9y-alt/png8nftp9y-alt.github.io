@@ -1,12 +1,12 @@
 const optional=async(db,sql,values=[])=>{try{return(await db.prepare(sql).bind(...values).all()).results||[]}catch(e){if(/no such table/i.test(e.message))return[];throw e}};
-export async function identityMapReady(db){const rows=await optional(db,"SELECT status FROM player_identity_sync WHERE id='current' AND status IN ('ready','pending') AND EXISTS(SELECT 1 FROM player_identity_people LIMIT 1)");return rows.length===1;}
+export async function identityMapReady(db,{allowPending=true}={}){const rows=await optional(db,"SELECT status FROM player_identity_sync WHERE id='current' AND status IN ('ready','pending') AND EXISTS(SELECT 1 FROM player_identity_people LIMIT 1)");return rows.length===1&&(allowPending||rows[0].status==='ready');}
 export async function storedIdentity(db,identity){
  if(!identity)return null;
  const rows=await optional(db,'SELECT p.payload FROM player_identity_people p WHERE p.canonical_id IN (SELECT canonical_id FROM player_identity_people WHERE canonical_id=? AND NOT EXISTS(SELECT 1 FROM player_identity_aliases WHERE alias_id=player_identity_people.canonical_id) UNION SELECT COALESCE(a.canonical_id,l.canonical_id) FROM player_circuit_identities l LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE l.source_key=? UNION SELECT canonical_id FROM player_identity_aliases WHERE alias_id=?) AND EXISTS(SELECT 1 FROM player_circuit_identities live WHERE live.canonical_id=p.canonical_id) LIMIT 2',[identity,identity,identity]);
  if(rows.length!==1)return null;try{return JSON.parse(rows[0].payload)}catch{return null}
 }
 export async function mappedPlayerSearch(db,{tokens,seek,pageSize,encode,userId}){
- if(!await identityMapReady(db))return null;
+ if(!await identityMapReady(db,{allowPending:Boolean(seek)}))return null;
  const where=tokens.map(()=>"p.name_key LIKE ?").join(' AND ')+(seek?' AND (p.name_key>? OR (p.name_key=? AND p.canonical_id>?))':'');
  const rows=await optional(db,`SELECT p.payload,p.name_key AS normalized_name,p.canonical_id AS cursor_key FROM player_identity_people p WHERE ${where} AND EXISTS(SELECT 1 FROM player_circuit_identities l WHERE l.canonical_id=p.canonical_id) ORDER BY p.name_key,p.canonical_id LIMIT ${pageSize+1}`,[...tokens.map(t=>'%'+t+'%'),...(seek?[seek.n,seek.n,seek.k]:[])]);
  const linked=userId?await optional(db,'SELECT a.canonical_id,u.courtwatch_id FROM user_app_players u JOIN player_identity_aliases a ON a.alias_id=u.courtwatch_id WHERE u.user_id=? AND NOT EXISTS(SELECT 1 FROM user_app_player_removals r WHERE r.user_id=u.user_id AND r.courtwatch_id=u.courtwatch_id)',[userId]):[],ids=new Map(linked.map(r=>[r.canonical_id,r.courtwatch_id]));
