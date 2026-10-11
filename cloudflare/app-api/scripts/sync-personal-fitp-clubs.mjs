@@ -2,13 +2,20 @@
 import {spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {buildIncrementalSyncPlan} from '../lib/d1-incremental-sync.mjs';
+import {hydratePersonalCircuitIdentity} from '../lib/courtwatch-player-additions.mjs';
+import {playerCircuitIdentities} from '../lib/player-circuit-profiles.mjs';
 import {officialFitpClub} from '../lib/personal-player-metadata.mjs';
 const esc=value=>"'"+String(value).replaceAll("'","''")+"'";
 const run=sql=>{
  const result=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',sql,'--json'],{encoding:'utf8'});
- if(result.status!==0)throw Error(result.stderr||result.stdout);
+ if(result.status!==0)throw Error('Personal club D1 operation failed');
  return JSON.parse(result.stdout);
 };
+export async function personalFitpClubCard(db,player){
+ const hydrated=await hydratePersonalCircuitIdentity(db,player);
+ return playerCircuitIdentities(hydrated).find(link=>link.circuit==='fitp')?.profileId||'';
+}
+const lookupDb={prepare(sql){return{bind(...values){const bound=sql.replace(/\?/g,()=>esc(values.shift()));return{all:async()=>({results:run(bound).flatMap(x=>x.results||[])})}}}}};
 export function clubUpdateSql(row,club){
  const before=JSON.parse(row.payload);
  if(before.club)return '';
@@ -22,17 +29,26 @@ export function clubUpdateSql(row,club){
  AND EXISTS (SELECT 1 FROM user_app_players u WHERE u.user_id=user_app_player_additions.user_id AND u.courtwatch_id=user_app_player_additions.courtwatch_id)
  AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=user_app_player_additions.user_id AND r.courtwatch_id=user_app_player_additions.courtwatch_id)`;
 }
-async function main(){
-const rows=run(`SELECT a.user_id,a.courtwatch_id,a.payload FROM user_app_player_additions a
+export const personalMissingClubsSql=`SELECT a.user_id,a.courtwatch_id,a.payload FROM user_app_player_additions a
  JOIN user_app_players u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id
  WHERE COALESCE(json_extract(a.payload,'$.club'),'')=''
- AND COALESCE(json_extract(a.payload,'$.membershipCard'),'')<>''
+ AND (COALESCE(json_extract(a.payload,'$.membershipCard'),'')<>'' OR EXISTS (
+  SELECT 1 FROM player_circuit_identities fitp WHERE fitp.circuit='fitp' AND fitp.canonical_id IN (
+   SELECT COALESCE(alias.canonical_id,source.canonical_id) FROM player_circuit_identities source
+   LEFT JOIN player_identity_aliases alias ON alias.alias_id=source.canonical_id
+   WHERE source.source_key=COALESCE(NULLIF(json_extract(a.payload,'$.sourceKey'),''),a.courtwatch_id)
+   UNION SELECT canonical_id FROM player_identity_aliases WHERE alias_id=a.courtwatch_id
+   UNION SELECT canonical_id FROM player_identity_people WHERE canonical_id=a.courtwatch_id
+   AND NOT EXISTS(SELECT 1 FROM player_identity_aliases WHERE alias_id=a.courtwatch_id)
+  )))
  AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=a.user_id AND r.courtwatch_id=a.courtwatch_id)
- ORDER BY a.created_at,a.courtwatch_id LIMIT 100`).flatMap(x=>x.results||[]);
+ ORDER BY a.created_at,a.courtwatch_id LIMIT 100`;
+async function main(){
+const rows=run(personalMissingClubsSql).flatMap(x=>x.results||[]);
 let recovered=0,unavailable=0;
 for(const row of rows){
  let club='';
- try{club=await officialFitpClub(JSON.parse(row.payload).membershipCard)}catch(error){console.warn('Personal FITP club unavailable:',row.courtwatch_id,error.message)}
+ try{const card=await personalFitpClubCard(lookupDb,JSON.parse(row.payload));if(card)club=await officialFitpClub(card)}catch{console.warn('Personal FITP club source unavailable')}
  if(!club){unavailable++;continue}
  const sql=clubUpdateSql(row,club);
  if(!sql)continue;
@@ -42,3 +58,4 @@ for(const row of rows){
 console.log(JSON.stringify({status:'personal_fitp_club_sync',checked:rows.length,recovered,unavailable}));
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();
+

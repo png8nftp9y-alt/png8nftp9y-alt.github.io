@@ -8,6 +8,18 @@ const nameKey=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f
 const failure=(message,status=400)=>Object.assign(new Error(message),{status});
 const parse=value=>{try{return JSON.parse(value||'{}')}catch{return{}}};
 
+export async function hydratePersonalCircuitIdentity(db,player){
+ const identity=await storedIdentity(db,player.sourceKey||player.id);
+ const result=personalPlayerMetadata({...player,circuitProfiles:identity?.circuitProfiles||player.circuitProfiles||[]},identity||{});
+ for(const link of playerCircuitIdentities(result)){
+  if(link.circuit==='fitp')result.membershipCard=link.profileId;
+  if(link.circuit==='itf')result.worldTennisId=link.profileId;
+  if(link.circuit==='tennis-europe')result.profileSync={...result.profileSync,tennisEurope:{...result.profileSync?.tennisEurope,profileId:link.profileId}};
+ }
+ result.circuits=[...new Set([...(result.circuits||[]),...playerCircuitIdentities(result).map(p=>p.circuit)])];
+ return result;
+}
+
 export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpClub}={}){
  let sourceKey=String(body?.sourceKey||'').trim(),courtwatchId=String(body?.courtwatchId||'').trim(),identity=String(body?.identity||'').trim(),name=String(body?.name||'').trim();
  if((!sourceKey&&!courtwatchId&&!identity)||sourceKey.length>240||courtwatchId.length>160||identity.length>160||name.length>160)throw failure('invalid_player');
@@ -50,7 +62,7 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
   observedSourceKey=row.source_key;
  }
  const mapped=await mappedPlayerId(env.DB,observedSourceKey,user.id);if(mapped){player.id=mapped.playerId;player.canonicalId=mapped.canonicalId;}
- player=personalPlayerMetadata(player);
+ player=await hydratePersonalCircuitIdentity(env.DB,player);
  let [previous,linked,removed]=await Promise.all([
   env.DB.prepare('SELECT courtwatch_id,observed_source_key,payload FROM user_app_player_additions WHERE user_id=? AND observed_source_key=?').bind(user.id,observedSourceKey).first(),
   env.DB.prepare('SELECT courtwatch_id FROM user_app_players WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first(),
@@ -76,14 +88,8 @@ export async function personalPlayerAdditions(env,userId){
  const rows=(await env.DB.prepare('SELECT a.payload,o.payload AS observed_payload FROM user_app_player_additions a JOIN user_app_players u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id LEFT JOIN observed_players o ON o.source_key=a.observed_source_key WHERE a.user_id=? AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=a.user_id AND r.courtwatch_id=a.courtwatch_id) ORDER BY a.created_at,a.courtwatch_id').bind(userId).all()).results||[];
  const acquired=rows.filter(row=>String(parse(row.payload).sourceKey||'').startsWith('acquired|')),metadata=new Map();for(let i=0;i<acquired.length;i+=40){const keys=acquired.slice(i,i+40).map(row=>parse(row.payload).sourceKey);try{for(const row of (await env.DB.prepare(`SELECT source_key,payload FROM search_acquired_players WHERE source_key IN (${keys.map(()=>'?').join(',')})`).bind(...keys).all()).results||[])metadata.set(row.source_key,parse(row.payload))}catch(error){if(!/no such table/i.test(error.message))throw error}}
  const players=[];
- for(const row of rows){const p=parse(row.payload),identity=await storedIdentity(env.DB,p.sourceKey||p.id);
-  const player=personalPlayerMetadata({...p,circuitProfiles:identity?.circuitProfiles||p.circuitProfiles||[]},{...identity,...(metadata.get(p.sourceKey)||parse(row.observed_payload))});
-  for(const link of playerCircuitIdentities(player)){
-   if(link.circuit==='fitp')player.membershipCard=link.profileId;
-   if(link.circuit==='itf')player.worldTennisId=link.profileId;
-   if(link.circuit==='tennis-europe')player.profileSync={...player.profileSync,tennisEurope:{...player.profileSync?.tennisEurope,profileId:link.profileId}};
-  }
-  player.circuits=[...new Set([...(player.circuits||[]),...playerCircuitIdentities(player).map(p=>p.circuit)])];
+ for(const row of rows){const p=parse(row.payload);
+  const player=await hydratePersonalCircuitIdentity(env.DB,personalPlayerMetadata(p,metadata.get(p.sourceKey)||parse(row.observed_payload)));
   if(player.id&&player.name)players.push(player);
  }
  return players;

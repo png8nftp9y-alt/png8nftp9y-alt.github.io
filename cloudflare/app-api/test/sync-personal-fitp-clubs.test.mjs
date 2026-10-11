@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
-import {clubUpdateSql} from '../scripts/sync-personal-fitp-clubs.mjs';
+import {database} from './search-sqlite-fixture.mjs';
+import {personalMissingClubsSql,personalFitpClubCard,clubUpdateSql} from '../scripts/sync-personal-fitp-clubs.mjs';
 const row={user_id:'owner',courtwatch_id:'player',payload:JSON.stringify({id:'player',name:'Camilla Frigerio',membershipCard:'123',club:''})};
 function execute(sql,{payload=row.payload,removed=false}={}){
  const python=`import json,sqlite3,sys
@@ -36,4 +37,32 @@ test('D1_TEST_REAL_DELTAS_ONLY: only the selected missing club changes and concu
 test('D1_TEST_INCOMPLETE_SOURCE_GUARD: missing club cannot overwrite data and removals block delayed updates',()=>{
  assert.throws(()=>clubUpdateSql(row,''),/Incomplete/);
  assert.equal(execute(clubUpdateSql(row,'Official Club'),{removed:true}).writes,0);
+});
+
+
+test('existing Europe selections recover only the FITP card of their unique canonical identity',async()=>{
+ const d=database({identityMapping:true});try{
+  const sourceKey='selected-europe',profiles=[{circuit:'fitp',url:'https://www.fitp.it/Pagina-Giocatore/?cardNumber='+btoa('123456')}];
+  d.execute('INSERT INTO player_identity_people VALUES(?,?,?)',['person:test','PLAYER TEST',JSON.stringify({canonicalId:'person:test',name:'Test Player',circuitProfiles:profiles})]);
+  d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES(?,?,?,?,?,?,?)',[sourceKey,'person:test','PLAYER TEST','tennis-europe','12345678-1234-1234-1234-123456789abc','TEST PLAYER','Test Player']);
+  const before=d.writes();
+  assert.equal(await personalFitpClubCard(d.db,{id:'old-selection',sourceKey,name:'Test Player'}),'123456');
+  assert.equal(await personalFitpClubCard(d.db,{id:'homonym',sourceKey:'unlinked',name:'Test Player'}),'');
+  assert.equal(await personalFitpClubCard(d.db,{id:'conflict',sourceKey,name:'Test Player',membershipCard:'654321'}),'');
+  assert.equal(d.writes(),before);
+ }finally{d.close()}
+});
+
+test('scheduled club recovery includes linked Europe selections and excludes unknown names and removals',()=>{
+ const d=database({identityMapping:true});try{
+  d.execute('INSERT INTO player_identity_people VALUES(?,?,?)',['person:test','PLAYER TEST','{}']);
+  for(const [sourceKey,circuit,native] of [['selected-europe','tennis-europe','12345678-1234-1234-1234-123456789abc'],['fitp|id:123456','fitp','123456']])d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES(?,?,?,?,?,?,?)',[sourceKey,'person:test','PLAYER TEST',circuit,native,'TEST PLAYER','Test Player']);
+  for(const [id,sourceKey,club] of [['selected','selected-europe',''],['unknown','unlinked',''],['populated','selected-europe','Known Club'],['removed','selected-europe','']]){
+   d.execute('INSERT INTO user_app_player_additions VALUES(?,?,?,?,?)',['owner',id,sourceKey+'|'+id,JSON.stringify({id,sourceKey,name:'Test Player',club}),'2026-10-11']);
+   d.execute('INSERT INTO user_app_players VALUES(?,?,?)',['owner',id,'2026-10-11']);
+  }
+  d.execute('INSERT INTO user_app_player_removals VALUES(?,?,?)',['owner','removed','2026-10-11']);
+  const before=d.writes(),rows=d.execute(personalMissingClubsSql);
+  assert.deepEqual(rows.map(r=>r.courtwatch_id),['selected']);assert.equal(d.writes(),before);
+ }finally{d.close()}
 });
