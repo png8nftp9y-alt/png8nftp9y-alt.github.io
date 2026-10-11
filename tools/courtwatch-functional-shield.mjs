@@ -20,7 +20,15 @@ const browser=await chromium.launch({headless:true}),page=await browser.newPage(
 const errors=[],analysis=new Map(),checks=[];
 page.on('pageerror',error=>errors.push(String(error)));
 page.on('console',message=>{if(message.type()==='error'&&!/favicon|404/.test(message.text()))errors.push(message.text())});
-page.route('https://courtwatch-app-api.ckrk9ggvrb.workers.dev/v1/app-snapshot**',route=>route.fulfill({json:{generatedAt:new Date(0).toISOString(),players:[{id:'shield-projection'}],tournaments:[],matches:[]}}));
+await page.route('https://courtwatch-app-api.ckrk9ggvrb.workers.dev/v1/app-snapshot**',route=>route.fulfill({json:{generatedAt:new Date(0).toISOString(),players:[{id:'shield-projection'}],tournaments:[],matches:[]}}));
+// Exercise the proposed commit's data, independently of the deployed site.
+await page.route('https://png8nftp9y-alt.github.io/dist/v3/**',async route=>{
+  const file=path.basename(new URL(route.request().url()).pathname);
+  try{
+    const body=await fs.readFile(path.join(root,'dist/v3',file));
+    return route.fulfill({body,contentType:'application/json',headers:{'Access-Control-Allow-Origin':'*'}});
+  }catch{return route.fulfill({status:404,body:'not found',headers:{'Access-Control-Allow-Origin':'*'}})}
+});
 await page.route('**/app/api/**',async route=>{
   const request=route.request(),url=new URL(request.url()),api=url.pathname.replace(/^\/app\/api/,'');
   if(api==='/session')return route.fulfill({json:{user:{id:'shield-user',email:'shield@courtwatch.test',displayName:'CourtWatch Shield',role:'admin'}}});
@@ -34,6 +42,10 @@ await page.route('**/app/api/**',async route=>{
   return route.fulfill({status:404,json:{error:'not_found'}});
 });
 const requireCheck=(condition,name,detail='')=>{if(!condition)throw new Error(name+(detail?': '+detail:''));checks.push({name,status:'pass',detail})};
+const openSection=async section=>{
+  await page.locator(`[data-home-route="${section}"]:visible`).first().click();
+  await page.locator(`#${section}View.active`).waitFor({state:'visible'});
+};
 try{
   const appSource=await fs.readFile(path.join(root,'v3.js'),'utf8');
   requireCheck(appSource.includes('${agendaDrawCodeHtml(m,itemTournament)}</div><${whenTag} class="agendaWhenDetails'),'sigla evento linkata al tabellone nella colonna sinistra');
@@ -43,10 +55,15 @@ try{
   requireCheck(await page.locator('#playersList [data-profile]').count()===23,'23 giocatori');
   requireCheck(await page.locator('#calendar .tourBand').count()>0,'calendario popolato');
   requireCheck(await page.locator('#playerFilters button').count()===23,'filtri giocatori');
+  requireCheck(await page.locator('#homeView.active').isVisible(),'home con sezioni');
+  await openSection('calendar');
+  requireCheck(await page.locator('#toggleAll').isVisible(),'filtri nella pagina calendario');
   await page.locator('#toggleAll').click();await page.locator('#toggleAll').click();
   requireCheck(await page.locator('#accountMenuButton').isVisible(),'menu account');
   await page.locator('#accountMenuButton').click();
   requireCheck(!(await page.locator('#accountMenu').getAttribute('hidden')),'logout disponibile');
+  await page.locator('#accountMenuButton').click();
+  await openSection('players');
 
   const rows=page.locator('#playersList [data-profile]');let analysisButton=null;
   for(let i=0;i<Math.min(23,await rows.count());i++){
@@ -60,7 +77,7 @@ try{
       if(!analysisButton&&await page.locator('[data-match-analysis]:visible').count())analysisButton=page.locator('[data-match-analysis]:visible').first();
     }
     if(analysisButton)break;
-    await page.locator('#backHome').click();await page.waitForTimeout(50);
+    await page.locator('#backHome').click();await page.locator('#playersView.active').waitFor({state:'visible'});
   }
   requireCheck(Boolean(analysisButton),'profilo e partite');
   requireCheck(await page.locator('#profileCircuitFilter').count()===1,'filtro circuito profilo');
@@ -81,13 +98,20 @@ try{
 
   const tournament=page.locator('[data-open-tournament]:visible').first();
   if(await tournament.count()){await tournament.click();await page.waitForTimeout(100);requireCheck(await page.locator('#profileView.active').count()===1,'dettaglio torneo')}
-  await page.locator('#resetHome').click();await page.waitForTimeout(100);
-  requireCheck(await page.locator('#homeView.active').count()===1,'Home Oggi');
+  await page.locator('#brandHome').click();await page.locator('#homeView.active').waitFor({state:'visible'});
+  requireCheck(await page.locator('#homeView.active').isVisible(),'logo torna alla home');
+  await openSection('agenda');
+  const agendaDate=await page.locator('#agendaToday').textContent();
   await page.locator('#nextAgenda').click();await page.locator('#prevAgenda').click();
-  requireCheck(await page.locator('#dailyAgenda').count()===1,'navigazione agenda');
+  requireCheck(await page.locator('#dailyAgenda').isVisible()&&await page.locator('#agendaToday').textContent()===agendaDate,'navigazione agenda');
 
   await page.setViewportSize({width:390,height:844});
-  requireCheck(await page.locator('#homeView').isVisible(),'layout mobile');
+  for(const section of ['calendar','players','agenda']){
+    await openSection(section);
+    requireCheck(await page.locator(`#${section}View`).isVisible(),'layout mobile '+section);
+  }
+  await page.locator('#brandHome').click();await page.locator('#homeView.active').waitFor({state:'visible'});
+  requireCheck(await page.locator('#homeView').isVisible(),'layout mobile home');
   requireCheck(errors.length===0,'nessun errore browser',errors.join(' | '));
   await page.screenshot({path:path.join(artifacts,'courtwatch-shield-ui.png'),fullPage:true});
   await fs.writeFile(path.join(artifacts,'courtwatch-shield-ui.json'),JSON.stringify({generatedAt:new Date().toISOString(),passed:true,checks},null,2)+'\n');
