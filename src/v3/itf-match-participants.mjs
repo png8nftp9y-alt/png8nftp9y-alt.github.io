@@ -9,8 +9,8 @@ export function itfMatchParticipants(match){
  }
  return out;
 }
-export function itfParticipantSQL(match){
- const stored=JSON.stringify(match,(key,value)=>['generatedAt','observedAt','sourceObservedAt'].includes(key)?undefined:value);
+export function itfParticipantSQL(match,{expectedPayload}={}){
+ const stored=expectedPayload??JSON.stringify(match,(key,value)=>['generatedAt','observedAt','sourceObservedAt'].includes(key)?undefined:value);
  return itfMatchParticipants(match).map(row=>{
   const fields=Object.keys(row),columns=fields.filter(k=>k!=='match_id'&&k!=='participant_key');
   return `INSERT INTO match_participants(${fields.join(',')}) SELECT ${fields.map(k=>typeof row[k]==='number'?row[k]:sqlString(row[k])).join(',')} WHERE EXISTS(SELECT 1 FROM matches WHERE id=${sqlString(match.id)} AND circuit='itf' AND payload=${sqlString(stored)}) ON CONFLICT(match_id,participant_key) DO UPDATE SET ${columns.map(k=>k+'=excluded.'+k).join(',')} WHERE ${columns.map(k=>'match_participants.'+k+' IS NOT excluded.'+k).join(' OR ')};`;
