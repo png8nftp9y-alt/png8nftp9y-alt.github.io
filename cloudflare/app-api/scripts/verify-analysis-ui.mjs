@@ -1,3 +1,4 @@
+import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -87,7 +88,15 @@ assert.ok(hasApiSource("const targets=[...new Set(matches.flatMap"), 'match snap
 assert.ok(hasSource('https://te.tournamentsoftware.com/tournament/'), 'opponent tournament name must link to its official homepage');
 assert.ok(hasSource('bindParticipantNavigation($("profileContent"))'), 'profile and tournament pages must bind participant links');
 assert.ok(hasSource('opponentHistoryCourtWatch') && hasSource('bindParticipantNavigation(body)'), 'CourtWatch players in opponent history must open their full profile');
-assert.ok(hasSource('function dedupeAgendaMatches(') && hasSource('sameAgendaMatch(existing, m)'), 'agenda must deduplicate shared CourtWatch matches');
+assert.ok(hasSource('function dedupeAgendaMatches('), 'agenda deduplication function must exist');
+const agendaContext={circuit:m=>m.circuit,agendaCourtMatchNumber:m=>Number(m.courtMatchNumber)||0,sameAgendaMatch:(a,b)=>Boolean(a.matchId)&&a.matchId===b.matchId};
+vm.createContext(agendaContext);
+const agendaStart=source.indexOf('function dedupeAgendaMatches('),agendaEnd=source.indexOf('function agendaMatchRows(',agendaStart);
+assert.ok(agendaStart>=0&&agendaEnd>agendaStart,'agenda deduplication block must exist');
+vm.runInContext(source.slice(agendaStart,agendaEnd),agendaContext);
+const sharedMatch={matchId:'shared-test',circuit:'tennis-europe',date:'2026-10-13'};
+assert.equal(agendaContext.dedupeAgendaMatches([{...sharedMatch,playerId:'one'},{...sharedMatch,playerId:'two'}]).length,1,'agenda must deduplicate shared CourtWatch matches');
+assert.equal(agendaContext.dedupeAgendaMatches([{...sharedMatch,playerId:'one'},{...sharedMatch,matchId:'different',playerId:'two'}]).length,2,'agenda must retain distinct matches');
 assert.ok(hasSource('function agendaResultHtml(') && hasSource('Vincitore:'), 'shared CourtWatch match must name the winner');
 assert.ok(hasSource('courtWatchOpponent') && hasSource('opponentPlayerLink'), 'opponent styling must distinguish CourtWatch players');
 assert.ok(hasApiSource("profileKey=prefix+'ProfileIds'") && hasApiSource("dateKey=prefix+'RankingDates'"), 'API must expose opponent ranking identity and date');

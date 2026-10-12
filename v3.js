@@ -1790,24 +1790,24 @@ function sameAgendaMatch(a, b) {
 }
 function dedupeAgendaMatches(items) {
   const name = v => String(v || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-  const opponents = m => (m.opponentOptions?.length ? m.opponentOptions : String(m.opponent || '').split(/\s*\/\s*/)).map(name).filter(Boolean);
-  const doubles = m => /\b[bg]d\d+\b|doubles|doppio/i.test([m.event,m.draw,m.matchType,m.eventType].join(' '));
-  const slot = m => {
-    const tournament = String(m.competitionId || '').toLowerCase();
-    const date = String(m.date || '').replaceAll('-', '');
-    const court = name(m.court).replace(/^(court|campo)\s*/, '');
-    const number = agendaCourtMatchNumber(m);
+  const opponents = match => (match.opponentOptions?.length ? match.opponentOptions : String(match.opponent || '').split(/\s*\/\s*/)).map(name).filter(Boolean);
+  const doubles = match => /\b[bg]d\d+\b|doubles|doppio/i.test([match.event,match.draw,match.matchType,match.eventType].join(' '));
+  const slot = match => {
+    const tournament = String(match.competitionId || '').toLowerCase();
+    const date = String(match.date || '').replaceAll('-', '');
+    const court = name(match.court).replace(/^(court|campo)\s*/, '');
+    const number = agendaCourtMatchNumber(match);
     return tournament && date && court && number ? [tournament,date,court,number].join('|') : '';
   };
-  const complete = items.filter(m => circuit(m) === 'tennis-europe' && doubles(m) && m.partner && opponents(m).length === 2);
+  const complete = items.filter(match => circuit(match) === 'tennis-europe' && doubles(match) && match.partner && opponents(match).length === 2);
   const unique = [];
-  for (const m of items) {
-    const key = slot(m), op = opponents(m);
-    const wrong = !m.manual && !m.partner && !m.score && !m.result &&
-      circuit(m) === 'tennis-europe' && doubles(m) && op.length === 1 && key &&
-      complete.some(full => full.playerId === m.playerId && slot(full) === key && name(full.partner) === op[0]);
+  for (const match of items) {
+    const key = slot(match), op = opponents(match);
+    const wrong = !match.manual && !match.partner && !match.score && !match.result &&
+      circuit(match) === 'tennis-europe' && doubles(match) && op.length === 1 && key &&
+      complete.some(full => full.playerId === match.playerId && slot(full) === key && name(full.partner) === op[0]);
     if (wrong) continue;
-    if (!unique.some(existing => sameAgendaMatch(existing,m))) unique.push(m);
+    if (!unique.some(existing => sameAgendaMatch(existing, match))) unique.push(match);
   }
   return unique;
 }

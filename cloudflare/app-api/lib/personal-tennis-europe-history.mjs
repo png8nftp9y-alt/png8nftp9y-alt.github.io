@@ -1,3 +1,42 @@
+import {playerNameKey} from './player-circuit-profiles.mjs';
+import {playerSourceMetadata} from './personal-player-metadata.mjs';
+import {profileEvidence} from './player-profile-evidence.mjs';
+import {sourceNativeEvidence,hasConflictingNativeSource} from './native-player-source-fields.mjs';
+import {storedIdentities} from './player-identity-lookup.mjs';
+
+async function participantSourceKey(circuit,participant) {
+ const raw=parsed(participant.payload);
+ const source={...raw,name:participant.display_name,source_player_id:participant.source_player_id,nationality:participant.nationality||raw.nationality};
+ const metadata=playerSourceMetadata(source);
+ const evidence=hasConflictingNativeSource(circuit,source)?null:
+   profileEvidence(circuit,{...source,...metadata})||sourceNativeEvidence(circuit,{...source,...metadata});
+ if(evidence?.officialId)return 'acquired|'+circuit+'|id:'+evidence.officialId;
+ const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(playerNameKey(source.name)+'|'+String(metadata.nationality||'').toUpperCase()+'|'+(metadata.birthYear||'')));
+ const hash=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('').slice(0,24);
+ return 'acquired|'+circuit+'|name:'+hash;
+}
+async function verifiedParticipantAliases(db,player,circuit,native,variants) {
+ const aliases=new Set();
+ if(!native)return aliases;
+ const candidateNames=[...new Set(variants.flatMap(v=>[v,v.toUpperCase()]))];
+ const candidates=[];let lastMatch='',lastParticipant='';
+ while(true){
+  const batch=await rows(db,`SELECT p.match_id,p.participant_key,p.source_player_id,p.display_name,p.normalized_name,p.nationality,p.payload FROM match_participants p JOIN matches m ON m.id=p.match_id WHERE p.normalized_name IN (${candidateNames.map(()=>'?').join(',')}) AND m.circuit=? AND (p.match_id,p.participant_key)>(?,?) ORDER BY p.match_id,p.participant_key LIMIT 250`,[...candidateNames,circuit,lastMatch,lastParticipant]);
+  candidates.push(...batch);if(batch.length<250)break;
+  const end=batch.at(-1);lastMatch=end.match_id;lastParticipant=end.participant_key;
+ }
+ const keyed=await Promise.all(candidates.map(async p=>({p,key:await participantSourceKey(circuit,p)})));
+ const people=await storedIdentities(db,[player.sourceKey,player.canonicalId,player.id,...keyed.map(x=>x.key)]);
+ const targetIds=new Set([player.canonicalId,...[player.sourceKey,player.id].map(k=>people.get(k)?.canonicalId)].filter(Boolean));
+ for(const {p,key} of keyed){
+  const person=people.get(key),link=person&&playerCircuitIdentities(person).find(x=>x.circuit===circuit);
+  const exact=link&&link.profileId.toLowerCase()===String(native).toLowerCase();
+  const canonical=person?.canonicalId&&targetIds.has(person.canonicalId)&&(!link||link.profileId.toLowerCase()===String(native).toLowerCase());
+  if(exact||canonical||(!person&&key===player.sourceKey))aliases.add(JSON.stringify([p.match_id,p.participant_key]));
+ }
+ return aliases;
+}
+
 import {playerCircuitIdentities} from './player-circuit-profiles.mjs';
 const normalized=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
 const nameKey=value=>normalized(value).split(' ').sort().join(' ');
@@ -9,7 +48,9 @@ async function personalHistory(db,player,circuit){
  const name=normalized(player.name),variants=[...new Set([name,name.split(' ').reverse().join(' ')])];
  if(!name)return {player,tournaments:[],matches:[]};
  const native=playerCircuitIdentities(player).find(p=>p.circuit===circuit)?.profileId;
- const identityWhere=native?'self.source_player_id=?':`lower(self.normalized_name) IN (${variants.map(()=>'?').join(',')})`,identityValues=native?[native]:variants;
+ const aliases=await verifiedParticipantAliases(db,player,circuit,native,variants);
+ const aliasMatches=[...new Set([...aliases].map(key=>JSON.parse(key)[0]))];
+ const identityWhere=native?'(self.source_player_id=? OR self.match_id IN (SELECT value FROM json_each(?)))':`lower(self.normalized_name) IN (${variants.map(()=>'?').join(',')})`,identityValues=native?[native,JSON.stringify(aliasMatches)]:variants;
  const sources=[];let last='';
  while(true){
   const batch=await rows(db,`SELECT DISTINCT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM match_participants self JOIN matches m ON m.id=self.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE ${identityWhere} AND m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...identityValues,circuit,last]);
@@ -17,8 +58,8 @@ async function personalHistory(db,player,circuit){
   const next=batch.at(-1).match_id;if(next<=last)throw Error('personal_history_pagination_failed');last=next;
  }
  const participants=[];
- for(let i=0;i<sources.length;i+=40){const ids=sources.slice(i,i+40).map(x=>x.match_id);participants.push(...await rows(db,`SELECT match_id,source_player_id,display_name,normalized_name,nationality,team_index,is_winner,payload FROM match_participants WHERE match_id IN (${ids.map(()=>'?').join(',')}) ORDER BY match_id,team_index,participant_key`,ids));}
- const isSelf=p=>native?String(p.source_player_id).toLowerCase()===native.toLowerCase():nameKey(p.normalized_name||p.display_name)===nameKey(player.name);
+ for(let i=0;i<sources.length;i+=40){const ids=sources.slice(i,i+40).map(x=>x.match_id);participants.push(...await rows(db,`SELECT match_id,participant_key,source_player_id,display_name,normalized_name,nationality,team_index,is_winner,payload FROM match_participants WHERE match_id IN (${ids.map(()=>'?').join(',')}) ORDER BY match_id,team_index,participant_key`,ids));}
+ const isSelf=p=>native?(String(p.source_player_id).toLowerCase()===native.toLowerCase()||aliases.has(JSON.stringify([p.match_id,p.participant_key]))):nameKey(p.normalized_name||p.display_name)===nameKey(player.name);
  const selfRows=participants.filter(isSelf);
  const countries=[...new Set(selfRows.map(p=>String(p.nationality||'').toUpperCase()).filter(Boolean))];
  const country=String(player.nationality||'').toUpperCase();

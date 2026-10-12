@@ -3237,3 +3237,17 @@ qualifying dates or invented venue names. Production checks follow in Actions.
 Align the agenda deduplication marker with the current loop variable m.
 Preserve the check and agenda behavior. Name the existing Worker check step
 and trigger a fresh guarded deployment. Validation: verify-analysis-ui passed.
+
+
+## Associazione completa delle partite dei giocatori aggiunti
+- ID locali degli incontri collegati ai profili tramite le associazioni canoniche verificate e la provenienza dei record acquisiti.
+- Nessun limite di data, torneo o numero di partite; circuiti FITP, ITF e Tennis Europe.
+- Applicato anche ai giocatori già aggiunti, senza rimozione e nuova aggiunta.
+- Omonimi e ID locali riutilizzati mantenuti separati; nessuna associazione per solo nome quando esiste un ID globale.
+- Test SQLite e API: 270 partite Europe più FITP/ITF, tutte presenti nello snapshot Altri; rilettura senza scritture.
+- Ripristinata la forma della chiamata di deduplicazione richiesta dal controllo UI, conservando la correzione Cereghini.
+- Nuova regressione inclusa nei controlli CI. Verifica produzione da completare dopo deploy.
+- Run API precedente bloccato prima del deploy:
+  https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38308789099
+
+- Sostituito il controllo testuale della chiamata agenda con una verifica eseguibile: incontri condivisi deduplicati, incontri distinti conservati. Nessun controllo disabilitato.

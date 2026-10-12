@@ -182,7 +182,7 @@ async function protectedApp(request,env,path,url){
     for(const t of unreleasedHistory){const official=officialItf.get(String(t.competitionId||'').toUpperCase())||{};const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;allHistory.set(key,mergePersonalHistoryTournament({...t,location:t.location||official.location||'',startDate:t.startDate||official.startDate||'',endDate:t.endDate||official.endDate||''},allHistory.get(key)));}
     tournaments.splice(0,tournaments.length,...allHistory.values());
     for(const player of added){
-      const history=await personalCircuitHistory(env.DB,player,{publishedCircuits:['tennis-europe']});
+      const history=await personalCircuitHistory(env.DB,player);
       const position=players.findIndex(p=>p.id===player.id);if(position>=0)players[position]=personalPlayerMetadata({...history.player,sourceCircuit:player.sourceCircuit});
       const tournamentMap=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
       for(const t of history.tournaments){const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;tournamentMap.set(key,mergePersonalHistoryTournament(t,tournamentMap.get(key)));}
