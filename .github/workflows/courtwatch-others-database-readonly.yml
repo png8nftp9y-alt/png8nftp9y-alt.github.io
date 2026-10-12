@@ -2,7 +2,7 @@ name: Court Watch Others database read-only snapshot
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/courtwatch-others-database-readonly.yml']
+    paths: ['cloudflare/app-api/lib/player-identity-lookup.mjs', 'cloudflare/app-api/lib/courtwatch-player-additions.mjs', '.github/workflows/courtwatch-others-database-readonly.yml']
   workflow_dispatch:
 permissions:
   contents: read

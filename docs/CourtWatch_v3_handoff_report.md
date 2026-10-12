@@ -1,3 +1,9 @@
+## 12 ottobre 2026 — Riduce letture identità nel caricamento Altri
+
+Diagnosi SELECT-only 38192925627: dati presenti, risposta 200 in 3725 ms, 8 giocatori, 161 tornei, 33 partite, 53 query. Il test locale non replica il limite query del Worker; Cloudflare documenta 50 query su Workers Free, 1000 su Paid. Piano account e causa live non ancora accertati, quindi nessuna dichiarazione definitiva di root cause. Browser di verifica bloccato sulla login; browserAuth non eseguito perché automatic approval review ha raggiunto il limite d’uso, non per sicurezza.
+
+Otto risoluzioni identità personali seriali sostituite da una lettura indicizzata dei soli ID richiesti. Canonici, alias, ambiguità e dati restituiti conservati; zero scritture. Riduzione attesa da 53 a 46 letture sul dataset verificato. TCL e filtro PUC rimangono. 26 test mirati passati, inclusa equivalenza tra lookup singoli e batch su fonti/canonici/alias/ambiguità; regressione inserita nel check di deploy. Diagnosi read-only si attiva una volta con queste due modifiche per verificare quantità e conteggi effettivi. No polling. Blocco live ancora da attestare.
+
 ## 12 ottobre 2026 — Conserva TCL e ripristina esclusione ITF da PUC
 
 Ripristinato il filtro withoutPucItfReferences della PR #133, ritirato dal rollback frontend. TCL e navigazione speculare conservati. Esclusi soltanto riferimenti ITF presentati come FITP/PUC; dati nativi ITF mantenuti. Due regressioni PUC passate. Nessun’altra modifica alle pipeline o al database. Il blocco Altri resta da risolvere; test Shield con dati sintetici non provano il caricamento sul database di produzione. Diagnosi read-only avviata https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192925627. No polling.
