@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const source=readFileSync(new URL('../../v3.js',import.meta.url),'utf8');
+const mergeSource = source.slice(source.indexOf('function mergeKnownMatches('), source.indexOf('function clearDemographicFilters('));
 const restore=source.slice(source.indexOf('function restoreCachedProjectionBeforeFirstRender()'),source.indexOf('function saveCachedData(data)'));
 const filter=source.slice(source.indexOf('function renderFilters()'),source.indexOf('function matchTournament('));
 const readable=source.slice(source.indexOf('const readablePerson ='),source.indexOf('const IOC_REGION ='));
@@ -86,7 +87,17 @@ test('actual load with unavailable API keeps cached personal calendar after JSON
  v3json:async name=>name==='players.json'?{players:[{id:'base'}]}:name==='tournaments.json'?{tournaments:[{playerId:'base',name:'Base'}]}:{}});
  ctx.state.data={players:[{id:'base'},{id:'new',userAdded:true}],tournaments:[{playerId:'new',name:'Cantù'}],matches:[]};
  const loader=source.slice(source.indexOf('async function load()'),source.indexOf('document.addEventListener("click", (event) => {',source.indexOf('async function load()')));
- ctx.PLAYER_GROUP='main';vm.runInContext(loader,ctx);await ctx.load();
+ ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);await ctx.load();
  assert.deepEqual(Array.from(ctx.state.data.tournaments,t=>t.name),['Base','Cantù']);
  assert.equal(ctx.cachedData().tournaments.some(t=>t.playerId==='new'),true);
+});
+
+test('quota fallback keeps all acquired historical matches across a page reload',()=>{
+ const {ctx,values}=cacheContext({},4500);
+ const old={id:'old',playerId:'a',date:'2026-01-01',score:'6-4 6-3'};
+ ctx.saveCachedData({players:[{id:'a'}],tournaments:[],matches:[old],opponents:[{raw:'x'.repeat(10000)}],personalProjectionComplete:true});
+ assert.equal(values.has('full'),false);
+ assert.equal(ctx.cachedData().matches[0].id,'old');
+ ctx.state.data=null;ctx.restoreCachedProjectionBeforeFirstRender();
+ assert.equal(ctx.state.data.matches[0].score,'6-4 6-3');
 });

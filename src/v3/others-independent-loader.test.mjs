@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const source = readFileSync(new URL('../../v3.js', import.meta.url), 'utf8');
+const mergeSource = source.slice(source.indexOf('function mergeKnownMatches('), source.indexOf('function clearDemographicFilters('));
 const loader = source.slice(source.indexOf('async function load()'), source.indexOf('document.addEventListener("click", (event) => {', source.indexOf('async function load()')));
 const label = source.slice(source.indexOf('function syncLabel('), source.indexOf('function unavailableLabel('));
 function setup(group, projection, {cached = null, staticData = {}, staticOffline = false} = {}) {
@@ -22,7 +23,7 @@ function setup(group, projection, {cached = null, staticData = {}, staticOffline
     renderIfDataChanged() {}, restoreUiScroll() {}, unavailableLabel: () => unavailable++,
     $: id => nodes[id] || {},
   };
-  vm.createContext(ctx); vm.runInContext(label + loader, ctx);
+  vm.createContext(ctx); vm.runInContext(mergeSource + label + loader, ctx);
   return {ctx, nodes, saved: () => saved, requests: () => requests, unavailable: () => unavailable};
 }
 const player = {id: 'a', name: 'Europe Player', userAdded: true};
@@ -101,4 +102,25 @@ test('old or missing generation does not show misleading delay warnings', () => 
   assert.equal(c.nodes.syncStatus.hidden, true);
   assert.equal(c.nodes.syncStatus.textContent, '');
   assert.equal(c.nodes.dataAlert.hidden, true);
+});
+
+for (const group of ['main', 'others']) {
+  test(`${group}: partial refresh keeps all acquired historical matches and scores`, async () => {
+    const snapshot = {group, players: [player], tournaments: [{playerId: 'a'}], matches};
+    const c = setup(group, snapshot);
+    await c.ctx.load();
+    c.ctx.state.data.matches[0].score = '6-4 6-3';
+    snapshot.matches = [{...matches[0], score: '', opponent: 'New opponent'}];
+    await c.ctx.load();
+    assert.equal(c.ctx.state.data.matches.length, 3);
+    assert.equal(c.ctx.state.data.matches[0].score, '6-4 6-3');
+    assert.equal(c.ctx.state.data.matches[0].opponent, 'New opponent');
+  });
+}
+test('one slow snapshot request is allowed to complete without an abort-and-restart cycle', async () => {
+  const calls = [], ctx = {APP_API: '/snapshot', fetchProjection: async (url, timeout) => {calls.push({url, timeout}); return {matches: []};}};
+  vm.createContext(ctx);
+  vm.runInContext(source.slice(source.indexOf('async function apiProjection()'), source.indexOf('function cachedData()')), ctx);
+  await ctx.apiProjection();
+  assert.deepEqual(calls, [{url: '/snapshot', timeout: 45000}]);
 });

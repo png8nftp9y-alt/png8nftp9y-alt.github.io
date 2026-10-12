@@ -813,12 +813,9 @@ async function fetchProjection(url, timeoutMs) {
   }
 }
 async function apiProjection() {
-  try {
-    return await fetchProjection(APP_API, 8000);
-  } catch (privateError) {
-    console.warn("Snapshot privato lento: recupero snapshot D1 rapido", privateError);
-    return fetchProjection(APP_API, 15000);
-  }
+  // Personal histories can outlive a short timeout. Keep one request in flight;
+  // the cached projection stays visible while it completes.
+  return fetchProjection(APP_API, 45000);
 }
 function cachedData() {
   try {
@@ -848,11 +845,10 @@ function restoreCachedProjectionBeforeFirstRender() {
   return true;
 }
 function calendarCacheSnapshot(data, cachedAt) {
-  const current = iso(add(new Date(), -14));
   return {
     players: data.players,
     tournaments: data.tournaments,
-    matches: (data.matches || []).filter(match => String(match.date || "").slice(0, 10) >= current),
+    matches: data.matches || [],
     agenda: data.agenda || [],
     results: [], opponents: [], tournamentEntries: [],
     generatedAt: data.generatedAt,
@@ -1433,6 +1429,18 @@ function mergeAgenda(agenda, matches) {
       !m.result && !m.score);
   });
 }
+function mergeKnownMatches(...sources) {
+  const matches = new Map();
+  for (const rows of sources) for (const match of rows || []) {
+    const key = agendaKey(match), previous = matches.get(key) || {};
+    // A partial response cannot erase already acquired score/participant fields.
+    const update = Object.fromEntries(Object.entries(match).filter(([, value]) =>
+      value !== undefined && value !== null && value !== "" &&
+      (!Array.isArray(value) || value.length > 0)));
+    matches.set(key, { ...previous, ...update });
+  }
+  return [...matches.values()];
+}
 function clearDemographicFilters() {
   state.categoryFilters.clear();
   state.sexFilter = "all";
@@ -1791,6 +1799,22 @@ function dedupeAgendaMatches(items) {
     if (!unique.some(existing => sameAgendaMatch(existing, match))) unique.push(match);
   }
   return unique;
+}
+function canonicalPlayerMatches(items) {
+  const players = new Map();
+  for (const match of items || []) {
+    const rows = players.get(match.playerId) || [];
+    rows.push(match);
+    players.set(match.playerId, rows);
+  }
+  return [...players.values()].flatMap(rows =>
+    dedupeAgendaMatches(mergeAgenda([], rows)));
+}
+function normalizeMatchProjection(data) {
+  if (!data) return data;
+  const matches = canonicalPlayerMatches(data.matches || []);
+  return { ...data, matches,
+    agenda: canonicalPlayerMatches(mergeAgenda(data.agenda || [], matches)) };
 }
 function agendaMatchRows(matches) {
   const groups = [];
@@ -2342,7 +2366,7 @@ async function addCourtWatchPlayerFromUi(result, button) {
       projectionReady = false;
       projection = {players:[...(state.data.players || []).filter(p => p.id !== data.playerId),data.player],tournaments:state.data.tournaments || [],matches:state.data.matches || []};
     }
-    state.data = {...state.data,players:projection.players,tournaments:projection.tournaments,matches:projection.matches,personalProjectionComplete:projectionReady};
+    state.data = {...state.data,players:projection.players,tournaments:projection.tournaments,matches:mergeKnownMatches(state.data.matches || [], projection.matches),personalProjectionComplete:projectionReady};
     removedCourtWatchPlayers.delete(data.playerId);
     confirmedCourtWatchPlayers.set(data.playerId,data.player);
     state.data.players = [...(state.data.players || []).filter(p => p.id !== data.playerId),data.player];
@@ -2513,6 +2537,7 @@ function renderDataSignature(data) {
   );
 }
 function renderIfDataChanged() {
+  state.data = normalizeMatchProjection(state.data);
   const signature = renderDataSignature(state.data);
   if (signature === renderedDataSignature) {
     renderDiagnostics();
@@ -2927,7 +2952,7 @@ function renderProfile(id) {
     byTournament = new Map();
   for (const t of ts) byTournament.set(keyOf(t), { t, matches: [] });
   for (const m of ms) {
-    if ((state.data.tournaments || []).some(t => t.playerId === id && keyOf(t) === keyOf(m) && !playerTournamentEligible(t))) continue;
+    // Acquired match evidence remains visible even if acceptance metadata is partial.
     const key = keyOf(m),
       group = byTournament.get(key) || {
         t: {
@@ -3493,7 +3518,7 @@ renderProfile = function (id) {
   applyFilter();
 };
 function route() {
-  state.data = withoutPucItfReferences(state.data);
+  state.data = normalizeMatchProjection(withoutPucItfReferences(state.data));
   const player = location.hash.match(/^#player\/(.+)$/),
     currentOpponent = location.hash.match(
       /^#opponent-profile\/([^/]+)\/([^/]+)\/([^/]+)$/,
@@ -3988,27 +4013,10 @@ async function load() {
         ? docs.matches.matches
         : [],
       previousMatches = Array.isArray(previous.matches) ? previous.matches : [],
-      freshMatches = projectedMatches.length
-        ? projectedMatches
-        : jsonMatches.length
-          ? jsonMatches
-          : previousMatches,
-      freshMatchKeys = new Set(freshMatches.map(agendaKey)),
-      retainedCurrentMatches = previousMatches.filter(
-        (match) =>
-          !freshMatchKeys.has(agendaKey(match)) &&
-          (!match.date ||
-            String(match.date).slice(0, 10) >= iso(add(new Date(), -2))),
-      ),
-      baseMatches = [...retainedCurrentMatches, ...freshMatches],
       manualMatches = Array.isArray(docs.manual?.matches)
         ? docs.manual.matches
         : [],
-      matches = [
-        ...new Map(
-          [...baseMatches, ...manualMatches].map((m) => [agendaKey(m), m]),
-        ).values(),
-      ];
+      matches = mergeKnownMatches(previousMatches, jsonMatches, projectedMatches, manualMatches);
     const agenda = Array.isArray(docs.agenda?.agenda)
       ? docs.agenda.agenda
       : previous.agenda || [];

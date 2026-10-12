@@ -3253,6 +3253,42 @@ and trigger a fresh guarded deployment. Validation: verify-analysis-ui passed.
 - Sostituito il controllo testuale della chiamata agenda con una verifica eseguibile: incontri condivisi deduplicati, incontri distinti conservati. Nessun controllo disabilitato.
 
 
+## 2026-10-13 — Preserve acquired matches across refresh and every player view
+
+The previous green browser check rendered a captured D1 response; it did not
+verify the published asset, repeated refresh, cache fallback, or player-profile
+correction. The user still observed missing matches and Cereghini's provisional
+partner-as-opponent doubles row in her player profile.
+
+Remove the two-day retention cutoff and the fourteen-day match cutoff in the
+lightweight cache. Merge all already acquired matches with static, API and manual
+updates by player/match identity; an absent row or an empty score/participant field
+in a partial response cannot erase known data. Adding another player also preserves
+existing matches. Acquired player matches are not hidden by contradictory or
+partial acceptance metadata. Membership isolation and explicit player removals
+remain intact.
+Apply the existing evidence-based pending/false-double correction to the shared
+match projection before routing or rendering, including the player profile and
+legacy cached data. Keep each monitored player's perspective separate. Preserve
+scored/manual rows and genuinely different dates, courts, rounds and slots.
+Version the JavaScript asset in v3.html so browsers request the new release.
+
+Use one common 45-second snapshot request while cached data stays visible,
+instead of abandoning one request at eight seconds and starting another with
+fifteen seconds. The real D1 replay returned HTTP 200 with 305 matches in 26.3
+seconds across 87 HTTP-backed diagnostic queries; this does not measure native
+Worker latency and does not claim backend optimization. No polling was added.
+
+Validation: 39 executable unit/regression tests and the analysis UI contract
+check pass; JavaScript syntax passes. Extend the CI browser workflow to test
+initial player rendering, a partial second response, existing score retention,
+quota-forced lightweight-cache reload, and the corrected Cereghini double in
+both groups. The real snapshot verifier compares the normalized shared match
+projection, preserving valid matches while excluding proven superseded rows.
+Local browser execution is unavailable: Chromium is absent and its download
+failed. Browser CI and verification of the newly published release remain
+pending, and are not represented as completed production validation.
+
 ## 2026-10-13 — Shared TCL and Altri data loading
 
 User requires identical application behavior; only the membership list differs.
