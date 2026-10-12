@@ -2935,3 +2935,11 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 
 - PR #123 integrata https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/123 , merge `fff063147f59444c411c79495b0e89b6b5e5dcab`. Conflitto del solo report risolto preservando gli aggiornamenti indipendenti su main.
 - Run avviati, unica lettura iniziale senza polling: recupero metadati/storico Pietro Sala https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275715 (pending sul blocco D1); deploy Worker https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275740 (in_progress); D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275751 (pending); policy incrementale https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275701 (completed); verifica associazione invariata https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275667 (pending). Risultati produttivi della riparazione non ancora certificati. Stato della copertura completo/parziale verrà letto dall’artefatto del recupero, non dedotto dal semplice deploy.
+
+
+## 12 ottobre 2026 — Circolo Natale e Zanaga: congiunzione E residua
+
+- Segnalazione utente: «E» di troppo dopo il circolo di Manuel Natale e Niccolò Zanaga. Schede ufficiali FITP verificate con le rispettive tessere: entrambe restituiscono ASSOCIAZIONE TENNIS CESANO MADERNO ASSOCIAZIONE SPORTIVA DILETTANTISTICA E RICREATIVA.
+- Causa: le rimozioni separate della forma associativa e di «ricreativa» lasciavano la congiunzione. Frontend e modulo dei metadati personali rimuovono ora «e ricreativa» insieme e la E finale residua nei nomi già normalizzati. Risultato: «Associazione Tennis Cesano Maderno». Congiunzioni interne come «Tennis e Padel» e «Ricreativo» conservate; nessuna modifica ai nomi ufficiali delle sorgenti.
+- Validazione: regressione sui nomi ufficiali e sui payload già normalizzati, concordanza frontend/server, casi di conservazione e idempotenza, test metadati/affiliazione e sintassi Node. Nessuna migrazione o scrittura D1 richiesta.
+- Pubblicazione e run da registrare dopo integrazione; nessun polling.

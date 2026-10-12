@@ -540,7 +540,7 @@ function personalNationalityHtml(player) {
  return country?nationalityHtml(country):'';
 }
 function displayPlayerClub(value) {
- return String(value || '').replace(/\bassociazione\s+(?:culturale\s+(?:e\s+)?)?sportiva\s+dilettantistic[ao]\b/gi, '').replace(/\bricreativa\b/gi, "").replace(/\bdilettantistic[ao]\b/gi, '').replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi, '').replace(/\s+/g, ' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g, '').trim().toLocaleLowerCase('it-IT').replace(/(^|[\s’\u0027-])\p{L}/gu, letter => letter.toLocaleUpperCase('it-IT'));
+ return String(value || '').replace(/\bassociazione\s+(?:culturale\s+(?:e\s+)?)?sportiva\s+dilettantistic[ao]\b/gi, '').replace(/\b(?:e\s+)?ricreativa\b/gi, "").replace(/\bdilettantistic[ao]\b/gi, '').replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi, '').replace(/\s+/g, ' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g, '').trim().replace(/(?:\s+e)+$/gi, '').toLocaleLowerCase('it-IT').replace(/(^|[\s’\u0027-])\p{L}/gu, letter => letter.toLocaleUpperCase('it-IT'));
 }
 function personalPlayerAffiliationHtml(player) {
  const country=foreignPlayerCountry(player);
