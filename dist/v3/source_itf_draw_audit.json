@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-12T11:07:12.232Z",
+  "generatedAt": "2026-10-12T11:24:19.141Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,28 +8,28 @@
     "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
-    "declaredSections": 6,
-    "requestedSections": 4,
+    "declaredSections": 5,
+    "requestedSections": 3,
     "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
     "resolvedSections": 2,
-    "missingSections": 4,
+    "missingSections": 3,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 4,
+    "retrySections": 3,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 4,
+    "notPublishedOrIncompleteSections": 3,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 462,
+    "globalCompleteTournaments": 463,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 64,
+    "globalPendingTotal": 63,
     "globalPendingTechnical": 33,
-    "globalPendingPublication": 31,
+    "globalPendingPublication": 30,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -84,7 +84,6 @@
       "J-J30-BUL-2026-003",
       "J-J30-FRA-2026-007",
       "J-J30-TUR-2026-009",
-      "J-J60-DEN-2026-003",
       "J-J60-DOM-2026-004",
       "J-J60-MAR-2026-002",
       "J-J60-PAN-2026-001",
@@ -101,16 +100,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-HUN-2026-002",
-      "tournamentName": "J60 Mogyorod",
+      "competitionId": "J-J60-DOM-2026-004",
+      "tournamentName": "J60 Santo Domingo",
       "decision": "pending",
       "playersFound": [],
-      "declaredSections": 6,
+      "declaredSections": 5,
       "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
       "resolvedSections": 2,
-      "missingSections": 4,
+      "missingSections": 3,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -136,13 +135,6 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -175,7 +167,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 34,
+              "players": 28,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -197,24 +189,11 @@
         },
         {
           "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
           "populated": true,
           "events": [
             {
-              "event": "G-S-Q-KO",
-              "players": 28,
+              "event": "G-S-M-KO",
+              "players": 21,
               "error": null,
               "failureType": null,
               "resolved": true
