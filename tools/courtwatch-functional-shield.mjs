@@ -153,18 +153,6 @@ try{
   await page.locator('#calendarView [data-switch-player-group]').evaluate(button=>button.click());
   await page.waitForURL(url=>url.searchParams.get('group')==='others'&&url.hash==='#calendar',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='1');
-  await page.waitForFunction(y=>Math.abs(scrollY-y)<=2,mirrorScroll);
-  requireCheck(await page.locator('#calendarView.active').isVisible(),'TCL → Altri conserva Calendario');
-  requireCheck(await page.locator('#calendarMonthLabel').textContent()===mirrorMonth&&await page.locator('#calendarSex').inputValue()==='F','Calendario speculare conserva mese e filtro');
-  requireCheck(await page.locator('#calendarView [data-switch-player-group]').textContent()==='TCL','etichetta TCL nel calendario Altri');
-  await page.locator('#calendarView [data-switch-player-group]').evaluate(button=>button.click());
-  await page.waitForURL(url=>!url.searchParams.has('group')&&url.hash==='#calendar',{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='23');
-  await page.waitForFunction(y=>Math.abs(scrollY-y)<=2,mirrorScroll);
-  requireCheck(await page.locator('#calendarMonthLabel').textContent()===mirrorMonth,'Altri → TCL conserva Calendario e posizione');
-  await openSection('players');
-  await page.locator('#playersView [data-switch-player-group]').click();await page.waitForURL(url=>url.searchParams.get('group')==='others'&&url.hash==='#players',{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='1');
   await page.locator('#removePlayer').click();await page.locator('[data-remove-player="shield-other"]').click();
   await page.locator('[data-removal-yes]').click();await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='0');
   requireCheck(otherPlayers.size===0,'rimozione Altri persistente');

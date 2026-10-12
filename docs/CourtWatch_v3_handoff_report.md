@@ -2971,6 +2971,8 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Nessuna modifica al frontend TCL funzionante. Test sullo snapshot Altri e sull’assenza di query FITP/ITF nel percorso pubblico passati. La causa produttiva precisa resta da verificare tramite log/sessione: browser dell’agente fermo al login Cloudflare Access, nessuna sessione utente disponibile. Non dichiarata cancellazione dei dati senza evidenza.
 - Correzione e report pubblicati insieme; verifica deploy da attestare al relativo run. Nessun polling.
 
+- Ripristino integrato con PR #126 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/126 , merge `c7c690a82346a720dd6d7931171f352bb4bf66b2`. Nove test mirati finali passati. Run deploy urgente Worker https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190398001 (in_progress all’unica lettura); D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190398056 (pending); CRUD https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190398075 (in_progress); policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190397999 (completed). Nessuna nuova migrazione/import richiesta dal ripristino. Funzionamento live Altri ancora da confermare dopo deploy; nessun polling.
+
 
 ## 12 ottobre 2026 — Ripresa TCL: verifica browser della navigazione speculare
 
