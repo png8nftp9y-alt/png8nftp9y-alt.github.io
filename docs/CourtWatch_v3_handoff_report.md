@@ -1,3 +1,9 @@
+## 2026-10-12 — Fix source-check fixtures blocking ITF history deployment
+Run 38197564049 attempt failed at Check source before any Worker deployment or D1 import. The opponent-entry generator's test omitted the newly required official draw cache. Full validation additionally found two isolated calendar tests missing the new concluded-date helper.
+Updated the generator fixture with official cached draw presence and assertions on imported native ITF profile evidence; updated isolated calendar fixtures to load the date helper with a fixed test date.
+Validation: 17 focused importer/UI tests pass, and npm run check exits 0 on a clean main archive with these fixes. The tar archive has no Git history, so Git-diff policy checks do not inspect a commit range locally; the CI checkout provides that history. No runtime guards removed or import fallback added.
+Previous failed run performed no deployment/import. The existing workflow checks out main and will be rerun after merge; production completion remains unconfirmed.
+
 ## 2026-10-12 — General ITF draw history in opponent entry indexes
 Cause: opponent entry profiles were assembled from acceptance participants only; official cached draw players were omitted. In addition, the restore routine chose the largest cache, allowing stale backup acceptance statuses to supersede current ones.
 The importer now includes every native ITF ID present in populated, nonfailed official cached draws, across all acquired tournaments. It deduplicates singles/doubles by player and competition, stores official draw confirmation and keeps explicit acceptance withdrawals excluded. No match scores are published by this path.
