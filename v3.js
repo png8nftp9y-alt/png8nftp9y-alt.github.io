@@ -8,8 +8,8 @@ const PRIVATE_API = location.origin + "/app/api";
 const APP_API = PRIVATE_API + "/app-snapshot";
 const PLAYER_GROUP = /(?:^|[?&])group=others(?:&|$)/.test(location.search || "") ? "others" : "main";
 const GROUP_CACHE_SUFFIX = PLAYER_GROUP === "others" ? "-others" : "";
-const LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1" + GROUP_CACHE_SUFFIX;
-const CALENDAR_CACHE = "courtwatch-v3-calendar-v1" + GROUP_CACHE_SUFFIX;
+const LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1" + GROUP_CACHE_SUFFIX + (PLAYER_GROUP === "others" ? "-v2" : "");
+const CALENDAR_CACHE = "courtwatch-v3-calendar-v1" + GROUP_CACHE_SUFFIX + (PLAYER_GROUP === "others" ? "-v2" : "");
 const UI_STATE_CACHE = "courtwatch-v3-ui-state-v1" + GROUP_CACHE_SUFFIX;
 const DEVICE_ID_CACHE = "courtwatch-device-id-v1";
 const PLAYER_RANKING_CACHE = "courtwatch-player-rankings-v1";
@@ -3849,7 +3849,61 @@ function wire() {
   });
   addEventListener("pagehide", saveUiState);
 }
+function othersSnapshotData(projection) {
+  if (projection?.group !== "others" || !Array.isArray(projection.players) || !Array.isArray(projection.tournaments) || !Array.isArray(projection.matches)) throw Error("Snapshot Altri incompleto");
+  const players = projection.players.filter(p => p?.id && p.name && !removedCourtWatchPlayers.has(p.id));
+  const ids = new Set(players.map(p => p.id));
+  const matches = projection.matches.filter(m => ids.has(m.playerId) && circuit(m) === "tennis-europe");
+  const timestamp = Date.parse(projection.generatedAt || "");
+  return withoutPucItfReferences({
+    group: "others", personalProjectionComplete: true, players,
+    tournaments: projection.tournaments.filter(t => ids.has(t.playerId)),
+    matches, agenda: mergeAgenda([], matches), results: [], opponents: [],
+    tournamentEntries: [], diagnostics: {overall: "green", items: []},
+    generatedAt: new Date(Number.isFinite(timestamp) ? timestamp : Date.now()).toISOString()
+  });
+}
+async function loadOthers() {
+  if (loadRunning) return;
+  loadRunning = true;
+  const epoch = state.playerSelectionEpoch || 0;
+  try {
+    const projection = await fetchProjection(APP_API, 15000);
+    if (epoch !== (state.playerSelectionEpoch || 0)) return;
+    const data = othersSnapshotData(projection);
+    state.data = data;
+    for (const p of data.players) confirmedCourtWatchPlayers.delete(p.id);
+    if (!uiSelectionRestored) { state.selected = new Set(data.players.map(p => p.id)); uiSelectionRestored = true; }
+    else state.selected = new Set([...state.selected].filter(id => data.players.some(p => p.id === id)));
+    saveCachedData(data);
+    syncLabel(data, false);
+    const alert = $("dataAlert"); if (alert) alert.hidden = true;
+    renderIfDataChanged();
+    restoreUiScroll(true);
+  } catch (error) {
+    if (epoch !== (state.playerSelectionEpoch || 0)) return;
+    const cached = state.data || cachedData();
+    if (cached?.personalProjectionComplete && Array.isArray(cached.players)) {
+      state.data = cached;
+      if (!uiSelectionRestored) { state.selected = new Set(cached.players.map(p => p.id)); uiSelectionRestored = true; }
+      syncLabel(cached, true);
+      renderIfDataChanged();
+    } else unavailableLabel();
+    const alert = $("dataAlert");
+    if (alert) {
+      alert.hidden = false;
+      alert.textContent = "Altri: caricamento non riuscito. ";
+      const retry = document.createElement("button");
+      retry.type = "button"; retry.textContent = "Riprova";
+      retry.onclick = () => loadOthers();
+      alert.append(retry);
+    }
+    console.error("others_snapshot_unavailable", error);
+  } finally { loadRunning = false; }
+}
+
 async function load() {
+  if (PLAYER_GROUP === "others") return loadOthers();
   if (loadRunning) return;
   const selectionEpoch = state.playerSelectionEpoch || 0;
   const immediate = !state.data && cachedData();

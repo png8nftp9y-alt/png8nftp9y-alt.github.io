@@ -1,3 +1,9 @@
+## 12 ottobre 2026 — Altri ricostruito con caricamento indipendente
+
+Su richiesta esplicita di rifare Altri: nuova loadOthers separata da load TCL, basata solo sulla API privata con gruppo others verificato. Nessuna attesa dei dieci JSON statici TCL, nessun confronto con la loro generazione o fusione dei giocatori TCL. Questo rimuove una dipendenza errata verificata nel codice precedente: un JSON essenziale TCL mancante impediva di utilizzare perfino uno snapshot personale API valido. Non è ancora provato che fosse l’unica causa live.
+
+Nuovo snapshot scoped per ID personali, tutte le iscrizioni conservate, risultati FITP/ITF non implementati esclusi, date generazione mancanti gestite. Cache dati/calendario Altri v2 per non riutilizzare vecchie proiezioni; preferenze/navigazione TCL e Home conservate. Errore esplicito con Riprova e rilascio del blocco loading in finally. Backend batch già verificato: 46 query, 8 giocatori, 161 tornei. 14 test mirati passati: JSON statici indisponibili, gruppo errato rifiutato, retry, rimozioni, cache e PUC; esito live da attestare. Nessun polling.
+
 ## 12 ottobre 2026 — Riduce letture identità nel caricamento Altri
 
 Diagnosi SELECT-only 38192925627: dati presenti, risposta 200 in 3725 ms, 8 giocatori, 161 tornei, 33 partite, 53 query. Il test locale non replica il limite query del Worker; Cloudflare documenta 50 query su Workers Free, 1000 su Paid. Piano account e causa live non ancora accertati, quindi nessuna dichiarazione definitiva di root cause. Browser di verifica bloccato sulla login; browserAuth non eseguito perché automatic approval review ha raggiunto il limite d’uso, non per sicurezza.
