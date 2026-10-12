@@ -3183,3 +3183,12 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Lo stesso filtro è applicato allo storico avversario ricevuto separatamente dalla API; acquisizione PUC, pipeline ITF e archivi rimangono invariati. 17 regressioni mirate passate; release guard e sintassi controllati prima della pubblicazione.
 
 - Integrata PR #133 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/133, merge edeca6a5f1ab5585717dbf073c479c550d7d1fa8. Run rilevati una sola volta, senza polling: Court Watch global D1 incremental policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192294341 (success); CourtWatch Shield https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192294326 (in_progress); Court Watch global D1 incremental policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192301441 (in_progress); pages build and deployment https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192300835 (in_progress). Pubblicazione finale e Shield ancora da confermare all’esito dei run.
+
+
+## Sala SUI e doppio Cereghini — correzione locale 12 ottobre 2026
+- Sala: nazionalità svizzera aggiunta mantenendo circolo e tessera.
+- Agenda: doppio provvisorio nascosto quando esiste quello completo per stesso giocatore, torneo, data, evento e turno. Manuali e risultati conservati.
+- OOP ufficiale 13 ottobre: Cereghini/Dirnbek contro Luczak/Pismennyi; Court 2, non prima delle 14:00.
+- Sintassi e tre test mirati passati. Modifica locale, pubblicazione ancora da eseguire.
+- Run fonte: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38303621196
+- Run import: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38303833075
