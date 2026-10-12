@@ -3204,3 +3204,11 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Controllo completo Worker passato sul Mac usando python3 anche per i test che richiamano python.
 
 - Corretto elenco Giocatori: mostra circolo senza nazionalità. Nazionalità mantenuta soltanto nella pagina giocatore.
+
+
+## Cereghini: compagna mostrata erroneamente come avversaria
+- Caso reale: due righe GD14 R16, Court 2, incontro 5 del 13 ottobre.
+- Conservata Cereghini/Dirnbek contro Luczak/Pismennyi.
+- Esclusa la riga Cereghini contro Dirnbek solo quando esiste la coppia completa nello stesso slot ufficiale.
+- Manuali, risultati, altri slot e avversari diversi conservati. Regola valida anche per incontri futuri.
+- Nessuna cancellazione D1; la precedente correzione dei provvisori non risolveva questo caso.
