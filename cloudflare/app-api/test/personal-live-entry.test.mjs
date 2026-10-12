@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {personalLiveEntry,mergePersonalLiveTournaments} from '../lib/personal-live-entry.mjs';
+import {personalLiveEntry,mergePersonalLiveTournaments,mergePersonalHistoryTournament} from '../lib/personal-live-entry.mjs';
 test('all personal TE and ITF additions use the same live MD/Q/A acceptance labels',()=>{
  for(const circuit of ['tennis-europe','itf'])for(const code of ['MD','Q','A']){
   const t=personalLiveEntry({circuit,acceptanceCode:code,acceptancePosition:7});
@@ -23,7 +23,7 @@ test('withdrawals remain withdrawn and unknown positions are never fabricated as
 test('protected personal snapshot merges current labels and history cannot replace acceptance fields',()=>{
  const source=readFileSync(new URL('../src/index.js',import.meta.url),'utf8');
  assert.ok(source.includes('mergePersonalLiveTournaments(tournaments,entries.map('));
- assert.ok(source.includes("tournamentMap.set(key,{...t,...tournamentMap.get(key),calendarState:t.calendarState,entryStatus:t.entryStatus,calendarListLabel:''})"));
+ assert.ok(source.includes("tournamentMap.set(key,mergePersonalHistoryTournament(t,tournamentMap.get(key)))"));
 });
 test('certified draw presence survives acceptance refresh, scoped to player circuit and tournament',()=>{
  const old={playerId:'one',competitionId:'T',circuit:'tennis-europe',calendarState:'draw_confirmed',entryStatus:'official_draw',calendarListLabel:''};
@@ -31,4 +31,14 @@ test('certified draw presence survives acceptance refresh, scoped to player circ
  const merged=mergePersonalLiveTournaments([old],entries,'one');assert.equal(merged[0].calendarListLabel,'');assert.equal(merged[0].calendarState,'draw_confirmed');assert.equal(merged[1].calendarListLabel,'Q-4');assert.equal(merged[2].calendarListLabel,'A-3');
  assert.equal(mergePersonalLiveTournaments([old],[entries[0]],'two')[1].calendarListLabel,'MD-2');
  assert.equal(personalLiveEntry({...entries[0],drawUrl:'https://example.org/draw'}).calendarListLabel,'MD-2');
+});
+
+test('explicit withdrawal survives both a stale draw confirmation and subsequent history projection for every circuit',()=>{
+for(const circuit of ['itf','tennis-europe','fitp']){
+ const prior={playerId:'one',circuit,competitionId:'T',calendarState:'draw_confirmed',entryStatus:'official_draw'};
+ const withdrawn=mergePersonalLiveTournaments([prior],[{competitionId:'T',circuit,entryStatus:'withdrawn'}],'one')[0];
+ assert.equal(withdrawn.entryStatus,'withdrawn');assert.equal(withdrawn.status,'withdrawn');
+ assert.equal(mergePersonalHistoryTournament(prior,withdrawn).entryStatus,'withdrawn');
+ assert.equal(personalLiveEntry({...prior,acceptanceCode:'W'}).entryStatus,'withdrawn');
+}
 });
