@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {cachedItfDrawEntries,mergeItfDrawTournament} from '../lib/itf-cached-draw-entries.mjs';
+test('all native IDs receive every acquired tournament, deduplicated across draws; failed and empty draws cannot confirm presence',()=>{
+const d={tournaments:{one:{competitionId:'TEST-1',startDate:'2026-01-01',eventCache:{single:{populated:true,players:[{id:'1',name:'One'},{id:'2',name:'Two'}]},double:{populated:true,players:[{id:'1',name:'One'}]},bad:{populated:true,failureType:'http',players:[{id:'3',name:'Three'}]}}},two:{competitionId:'TEST-2',startDate:'2026-02-01',eventCache:{single:{populated:true,players:[{id:'2',name:'Two'}]}}}}};
+const rows=cachedItfDrawEntries(d);assert.equal(rows.length,3);assert.deepEqual(rows.filter(r=>r.id==='2').map(r=>r.tournament.competitionId),['TEST-1','TEST-2']);assert.ok(rows.every(r=>r.tournament.drawConfirmed));assert.equal(rows.some(r=>r.id==='3'),false);
+});
+test('draw confirmation replaces obsolete alternate labels while retaining explicit withdrawals',()=>{const draw={competitionId:'TEST',entryStatus:'official_draw',drawConfirmed:true};assert.equal(mergeItfDrawTournament({acceptanceCode:'A',location:'Official place'},draw).acceptanceCode,'');assert.equal(mergeItfDrawTournament({acceptanceCode:'W'},draw).entryStatus,'withdrawn');});
