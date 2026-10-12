@@ -2900,3 +2900,13 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Fonte attività ITF provata in sola lettura: HTTP 200 con pagina Incapsula non JSON. La completezza dello storico ufficiale non è certificabile da questa risposta; il workflow conta separatamente tornei/match effettivamente acquisiti per ID. Nessun polling.
 
 - Correzione del recupero circolo integrata con PR #121 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/121 , merge `732cf61be6a3808b21e55909a57ec77f9847acdb`. Run avviati (unica lettura iniziale, nessun polling): associazione Pietro Sala https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38175095515 ; Worker https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38175095510 ; D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38175095559 ; policy incrementale https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38175095499 . Esito produttivo dell’associazione e conteggio storico ancora da certificare.
+
+
+## 12 ottobre 2026 — Rimuovere solo «ricreativa» dai circoli
+
+- Richiesta corretta dall’utente: eliminare soltanto la parola «ricreativa» nei nomi visualizzati dei circoli. Aggiunto il filtro per parola intera, senza distinzione maiuscole/minuscole, sia nel frontend sia nella normalizzazione dei metadati personali; denominazioni ufficiali delle sorgenti conservate.
+- Verifica: sintassi frontend e modulo; regressioni metadati personali e visualizzazione affiliazione; controllo mirato parola intera e concordanza frontend/server.
+- Date di nascita ancora aperte, inclusa Martina Busa: nessuna data inventata dalla categoria U10. Il tentativo di lettura della scheda ufficiale FITP è stato bloccato dall’auto-review perché comporta trasmettere la tessera all’endpoint Azure per ottenere la nascita; nessuna richiesta alternativa eseguita. Il codice attuale usa ancora un vecchio endpoint per recuperare i circoli personali; l’aggiornamento del recupero deve essere verificato separatamente.
+
+- Autorizzazione esplicita ribadita dall’utente il 12 ottobre: pubblicazione nel repository e verifiche ufficiali FITP autorizzate; mantenere sempre questo report e riportare i link dei run coinvolti a fine lavoro.
+- Verifica ufficiale della tessera esatta di Martina Busa al servizio FITP attuale riuscita: nome/cognome e suffisso tessera concordanti, Tennis Club Lecco e ranking 4.NC. La risposta non contiene né data né anno di nascita: il recupero della nascita di Busa resta irrisolto per assenza del dato nella scheda, non per il precedente blocco di autorizzazione. Nessuna data dedotta da categoria o statistiche.
