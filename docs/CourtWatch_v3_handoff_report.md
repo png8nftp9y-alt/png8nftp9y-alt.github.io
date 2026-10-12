@@ -2993,3 +2993,10 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Controllo completo Worker rieseguito localmente dopo la correzione: completato con successo, incluso test multicircuito corretto e policy D1. Nessun controllo saltato.
 
 - Correzione test integrata con PR #128 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/128 , merge `24a41f10d134439a21a986a2287061a6bdbc0e1a`. Nuovi run, unica lettura iniziale senza polling: deploy ripristino Worker https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190705812 (in_progress); D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190705817 (pending); policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190705914 (in_progress). Il run precedente non aveva distribuito la correzione; funzionamento live Altri da attestare sul nuovo deploy.
+
+
+## 12 ottobre 2026 — Shield TCL: ripristino del percorso completo dopo conflitto
+
+- Run indicato https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190591676, job 114622316695: release guard e installazione browser riusciti; test E2E fallito sul click #removePlayer nascosto, perché la pagina attiva era ancora Calendario.
+- Causa verificata sul file del commit e4dc43565d3861cac78125bbeba8a84b58191c27: durante la risoluzione del conflitto della PR #127 è stato troncato il blocco tra l’ingresso nel Calendario Altri e il ritorno a Giocatori. Ripristinate le verifiche di mese/filtro/scroll e il percorso Calendario Altri → Calendario TCL → Giocatori TCL → Giocatori Altri prima del CRUD. Nessun click forzato né rimozione di controlli; codice applicativo e dati invariati.
+- Nuovo esito E2E da verificare al relativo run; sintassi controllata prima della pubblicazione. Report nello stesso commit.
