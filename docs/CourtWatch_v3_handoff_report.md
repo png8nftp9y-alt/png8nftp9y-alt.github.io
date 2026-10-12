@@ -1,3 +1,10 @@
+## 2026-10-12 — Exact native-ID batch for personal tournament entry profiles
+Further cause of incomplete projections: personal entry histories queried source name variants first and only then filtered an official ID. A name spelling difference could therefore omit an otherwise exactly associated source profile.
+All associated personal native IDs now load opponent_entry_profiles together in one indexed query. The subsequent projection uses these exact-ID rows without the name gate, retaining per-circuit identity checks, withdrawal state and official tournament metadata. Mapped missing profiles stay empty; no homonym fallback. Optional absent legacy table remains read-compatible, as before.
+This also replaces repeated per-player/per-circuit entry reads, reducing the snapshot subrequest budget. The previous real snapshot test passed rendering (8/8 players, Home, no JS errors) but still measured 48 local D1 reads; the new batch addresses those avoidable reads.
+Validation: exact-ID SQLite test covers a different source name and a foreign homonym; projection test checks name-independent exact rows retain withdrawal; scoped snapshot tests pass with missing optional entry table; npm run check exits 0.
+Limitations: production query count, browser state and acquisition coverage after this change remain to be verified. Exact source/index completeness is not claimed to be complete lifetime ITF history. Local archive lacks Git history for policy range checks; CI provides it.
+
 ## 2026-10-12 — Preserve withdrawals through draw/history merges and reduce Others snapshot work
 User still observed withdrawn tournaments, incomplete ITF history and the red Others load-failure line after the prior import succeeded.
 Verified merge defect: a prior draw confirmation could overwrite an incoming withdrawn entry, and the later history merge forced official_draw over current withdrawals. Explicit withdrawal/cancellation now has precedence in both merges for every circuit, including withdrawals with no W code.
