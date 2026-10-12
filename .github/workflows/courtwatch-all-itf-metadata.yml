@@ -1,14 +1,21 @@
 name: Court Watch all ITF tournament metadata acquisition
 on:
-  push:
-    branches: [main]
-    paths: ['src/v3/recover-all-itf-metadata.mjs']
   workflow_dispatch:
   workflow_call:
 permissions: {contents: write}
 concurrency: {group: courtwatch-all-itf-metadata, cancel-in-progress: false}
 jobs:
+  scope:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.freeze.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - id: freeze
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   acquire:
+    needs: scope
     runs-on: ubuntu-latest
     timeout-minutes: 35
     strategy:
@@ -18,14 +25,16 @@ jobs:
     env:
       ITF_METADATA_SHARD: ${{ matrix.shard }}
       ITF_METADATA_TOTAL: 8
+      ITF_FACTSHEET_ACQUISITION_URL: ${{ secrets.ITF_FACTSHEET_ACQUISITION_URL || vars.ITF_FACTSHEET_ACQUISITION_URL }}
+      ITF_FACTSHEET_ACQUIRER_TOKEN: ${{ secrets.ITF_FACTSHEET_ACQUIRER_TOKEN }}
       ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL || vars.ITF_ACQUISITION_URL }}
       ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main}
+        with: {ref: "${{ needs.scope.outputs.sha }}"}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: node --test src/v3/recover-all-itf-metadata.test.mjs
+      - run: node --test src/v3/recover-all-itf-metadata.test.mjs src/v3/itf-metadata-d1.test.mjs infra/itf-acquirer/factsheet-url.test.mjs
       - name: Reuse saved fields and acquire missing official factsheets
         run: node src/v3/recover-all-itf-metadata.mjs
       - uses: actions/upload-artifact@v4
@@ -35,12 +44,19 @@ jobs:
           if-no-files-found: error
           retention-days: 3
   publish:
-    needs: acquire
+    needs: [scope, acquire]
+    concurrency:
+      group: courtwatch-d1-writes
+      cancel-in-progress: false
+      queue: max
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 0}
+        with: {ref: "${{ needs.scope.outputs.sha }}", fetch-depth: 0}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
@@ -49,11 +65,22 @@ jobs:
           merge-multiple: true
           path: /tmp/itf-metadata
       - run: node src/v3/recover-all-itf-metadata.mjs --merge
+      - name: Configure existing D1 database
+        working-directory: cloudflare/app-api
+        run: node scripts/configure-d1.mjs
+      - name: Persist all calendar and acquired factsheet metadata with verified readback
+        run: node src/v3/sync-itf-metadata-d1.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-metadata-d1-verification
+          path: dist/v3/audits/itf-metadata-d1.json
+          retention-days: 30
       - name: Save acquired fields and exact missing-data report
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add history/itf_official_metadata.json dist/v3/itf_tournament_metadata_diagnostics.json docs/CourtWatch_v3_handoff_report.md
+          git add history/itf_official_metadata.json dist/v3/itf_tournament_metadata_diagnostics.json docs/CourtWatch_v3_handoff_report.md dist/v3/audits/itf-metadata-d1.json
           git commit -m "Acquire metadata for all official ITF tournaments"
           git pull --rebase origin main
           git push origin HEAD:main

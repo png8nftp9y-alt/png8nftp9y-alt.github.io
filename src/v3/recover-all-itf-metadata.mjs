@@ -4,13 +4,13 @@ import {factsheetMeta,tournamentFactSheetMeta} from './itf-common.mjs';
 const fields=['venueName','address','qualificationStartDate'];
 const validDate=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s||''));
 export async function recoverMetadata(targets,existing,acquire){
- const metadata={...existing},remaining=[];let acquired=0,index=0;
+ const metadata={...existing},remaining=[],failures=[];let acquired=0,index=0;
  const unique=[...new Map(targets.map(t=>[String(t.competitionId||'').toUpperCase(),t])).values()].filter(t=>t.competitionId);
  await Promise.all(Array.from({length:Math.min(1,unique.length)},async()=>{
   while(index<unique.length){
    const t=unique[index++],id=String(t.competitionId).toUpperCase(),previous=metadata[id]||{};
    if(fields.every(f=>previous[f])&&validDate(previous.qualificationStartDate))continue;
-   let result={};try{result=await acquire(t)||{}}catch{}
+   let result={};try{result=await acquire(t)||{}}catch(error){failures.push({competitionId:id,error:String(error.message||'factsheet_acquisition_failed').slice(0,100)});}
    const next={...previous};
    for(const f of fields){const value=typeof result[f]==='string'?result[f].trim():'';if(value&&(f!=='qualificationStartDate'||validDate(value)))next[f]=value;}
    if(fields.some(f=>next[f]!==previous[f])){
@@ -20,16 +20,20 @@ export async function recoverMetadata(targets,existing,acquire){
    if(missing.length)remaining.push({competitionId:id,missing});
   }
  }));
- return {metadata,acquired,checked:unique.length,remaining};
+ return {metadata,acquired,checked:unique.length,remaining,failures};
 }
-async function acquire(t){
- const url=String(process.env.ITF_ACQUISITION_URL||'').replace(/\/v1\/fetch\/?$/,'/v1/factsheet'),token=process.env.ITF_ACQUIRER_TOKEN||'';
+export async function acquire(t,fetcher=fetch){
+ const url=String(process.env.ITF_FACTSHEET_ACQUISITION_URL||process.env.ITF_ACQUISITION_URL||'').trim().replace(/\/v1\/fetch\/?$/i,'/v1/factsheet'),token=String(process.env.ITF_FACTSHEET_ACQUIRER_TOKEN||process.env.ITF_ACQUIRER_TOKEN||'').trim();
  if(url&&token){
-  const response=await fetch(url,{method:'POST',headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify({url:t.sourceUrl}),signal:AbortSignal.timeout(35000)});
-  if(response.ok){const data=await response.json();if(data.ok&&data.responseKind==='rendered_text'&&data.text)return tournamentFactSheetMeta(data.text);}
-  return {};
+  const response=await fetcher(url,{method:'POST',headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify({url:t.sourceUrl}),signal:AbortSignal.timeout(35000)});
+  if(!response.ok)throw Error('factsheet_http_'+response.status);
+  const data=await response.json();
+  if(!data.ok||data.responseKind!=='rendered_text'||!data.text)throw Error('factsheet_'+String(data.responseKind||'invalid_response').replace(/[^a-z_]/gi,'').slice(0,50));
+  return tournamentFactSheetMeta(data.text);
  }
- return factsheetMeta(t);
+ const result=await factsheetMeta(t);
+ if(!fields.some(f=>result?.[f]))throw Error('factsheet_no_official_fields');
+ return result;
 }
 
 export function storedMetadata(doc){
@@ -65,15 +69,15 @@ async function collect(){
  const result=await recoverMetadata(selected,saved,acquire);
  const ids=new Set(selected.map(t=>String(t.competitionId).toUpperCase()));
  const metadata=Object.fromEntries(Object.entries(result.metadata).filter(([id])=>ids.has(id)));
- await write('dist/v3/shards/itf-metadata/meta-'+shard+'.json',{shard,total,checked:result.checked,acquired:result.acquired,metadata,remaining:result.remaining});
+ await write('dist/v3/shards/itf-metadata/meta-'+shard+'.json',{shard,total,checked:result.checked,acquired:result.acquired,metadata,remaining:result.remaining,failures:result.failures});
  console.log('ITF_METADATA_SHARD='+JSON.stringify({shard,checked:result.checked,acquired:result.acquired,remaining:result.remaining.length}));
 }
 async function merge(){
- const old=await read('history/itf_official_metadata.json'),all={...(old.tournaments||{})},remaining=[];let checked=0,acquired=0;
+ const old=await read('history/itf_official_metadata.json'),all={...(old.tournaments||{})},remaining=[],failures=[];let checked=0,acquired=0;
  const names=(await fs.readdir('/tmp/itf-metadata')).filter(n=>/^meta-\d+\.json$/.test(n));
  if(names.length!==8)throw Error('Missing metadata shard: '+names.length+'/8; archive unchanged');
  for(const name of names){
-  const d=await read('/tmp/itf-metadata/'+name);checked+=d.checked;acquired+=d.acquired;remaining.push(...d.remaining);
+  const d=await read('/tmp/itf-metadata/'+name);checked+=d.checked;acquired+=d.acquired;remaining.push(...d.remaining);failures.push(...(d.failures||[]));
   for(const[id,row]of Object.entries(d.metadata)){
    const prev=all[id]||{},next={...prev};
    for(const[field,value]of Object.entries(row))if(value)next[field]=value;
@@ -82,7 +86,7 @@ async function merge(){
  }
  const now=new Date().toISOString();
  await write('history/itf_official_metadata.json',{...old,updatedAt:now,tournaments:all});
- await write('dist/v3/itf_tournament_metadata_diagnostics.json',{generatedAt:now,scope:'all_official_itf_tournaments',status:remaining.length?'incomplete':'complete',checked,acquired,remaining});
+ await write('dist/v3/itf_tournament_metadata_diagnostics.json',{generatedAt:now,scope:'all_official_itf_tournaments',status:remaining.length?'incomplete':'complete',checked,acquired,remaining,failures});
  await fs.appendFile('docs/CourtWatch_v3_handoff_report.md','\nGlobal ITF metadata '+now+': '+JSON.stringify({checked,acquired,remaining:remaining.length})+'. Existing metadata reused; only missing official factsheet fields acquired; unresolved records retained explicitly.\n');
  console.log('ITF_METADATA_GLOBAL='+JSON.stringify({checked,acquired,remaining:remaining.length}));
 }
