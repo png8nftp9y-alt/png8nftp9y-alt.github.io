@@ -2937,6 +2937,7 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Run avviati, unica lettura iniziale senza polling: recupero metadati/storico Pietro Sala https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275715 (pending sul blocco D1); deploy Worker https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275740 (in_progress); D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275751 (pending); policy incrementale https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275701 (completed); verifica associazione invariata https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275667 (pending). Risultati produttivi della riparazione non ancora certificati. Stato della copertura completo/parziale verrà letto dall’artefatto del recupero, non dedotto dal semplice deploy.
 
 
+
 ## 12 ottobre 2026 — Circolo Natale e Zanaga: congiunzione E residua
 
 - Segnalazione utente: «E» di troppo dopo il circolo di Manuel Natale e Niccolò Zanaga. Schede ufficiali FITP verificate con le rispettive tessere: entrambe restituiscono ASSOCIAZIONE TENNIS CESANO MADERNO ASSOCIAZIONE SPORTIVA DILETTANTISTICA E RICREATIVA.
@@ -2945,3 +2946,8 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Pubblicazione e run da registrare dopo integrazione; nessun polling.
 
 - Correzione integrata con PR #124 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/124, merge f17146eb44e7ffc083515049d053a5c7cded30b6. Unica lettura iniziale dei run, senza polling: Court Watch global D1 incremental policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189393842 (in_progress); Court Watch Cloudflare app Worker hotfix https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189393837 (in_progress); Court Watch Cloudflare D1 and app API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189393849 (pending); pages build and deployment https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189393289 (queued). Deploy finale non ancora certificato.
+
+## Verifica puntuale 12 ottobre 2026, 02:50 Europe/Rome — D1/API e recupero Pietro Sala
+
+- Job indicato dall’utente https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189047518/job/114618194510 : log conferma D1 verde, deploy Worker versione `0ea7d4d8-d99a-47e0-aeb4-ab4921399ef2` riuscito e parità API live verde alle 02:50. Questo run non certifica il recupero dei metadati/storico Pietro Sala.
+- Recupero mirato https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275715 , job `114619226949`: appena iniziato, checkout in corso all’unica lettura. Non ancora eseguito il passaggio di salvataggio metadati/proiezione match; nessun conteggio storico produttivo nuovo attestato. L’utente segnala gli altri run verdi, mantenuto distinto il recupero specifico ancora in corso. Nessun polling.
