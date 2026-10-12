@@ -49,3 +49,21 @@ test('global manual overrides do not populate the empty Others list',async()=>{
   const data=await r.json();assert.deepEqual(data.players,[]);assert.deepEqual(data.tournaments,[]);assert.deepEqual(data.matches,[]);
  }finally{d.close()}
 });
+
+test('unreleased ITF history never blocks the owned Others snapshot',async()=>{
+ const d=setup();try{
+  await d.request('/courtwatch-player','others','POST',{sourceKey:'itf|id:800000001'});
+  const prepare=d.db.prepare.bind(d.db);d.db.prepare=sql=>{
+   if(sql.startsWith('SELECT DISTINCT m.id AS match_id'))return{bind(){return{all:async()=>{throw Error('personal_history_identity_ambiguous')}}}};
+   return prepare(sql);
+  };
+  const snapshot=await d.request('/app-snapshot','others');assert.equal(snapshot.status,200);assert.equal((await snapshot.json()).players.length,1);
+ }finally{d.close()}
+});
+
+test('public personal projection does not read unreleased FITP or ITF matches',async()=>{
+ const {personalCircuitHistory}=await import('../lib/personal-tennis-europe-history.mjs');
+ const db={prepare(){throw Error('unreleased_history_was_queried')}};
+ const history=await personalCircuitHistory(db,{name:'Pietro Sala',membershipCard:'4537099241',worldTennisId:'800638581'},{publishedCircuits:['tennis-europe']});
+ assert.equal(history.matches.length,0);assert.equal(history.tournaments.length,0);
+});
