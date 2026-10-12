@@ -2,8 +2,9 @@ name: Court Watch all ITF tournament metadata acquisition
 on:
   push:
     branches: [main]
-    paths: ['src/v3/recover-all-itf-metadata.mjs', '.github/workflows/courtwatch-all-itf-metadata.yml']
+    paths: ['src/v3/recover-all-itf-metadata.mjs']
   workflow_dispatch:
+  workflow_call:
 permissions: {contents: write}
 concurrency: {group: courtwatch-all-itf-metadata, cancel-in-progress: false}
 jobs:
@@ -21,6 +22,7 @@ jobs:
       ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: node --test src/v3/recover-all-itf-metadata.test.mjs

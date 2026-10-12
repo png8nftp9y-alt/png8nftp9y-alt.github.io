@@ -3263,3 +3263,14 @@ report. Do not invent missing dates or treat partial acquisition as complete.
 Limit only ITF metadata cache lifetime to one minute; no new app polling.
 Validation: three acquisition-policy tests and eight-shard merge fixture passed.
 Real acquisition status is reported separately by the workflow.
+
+
+## Automatic metadata acquisition for future ITF tournaments — 2026-10-13
+
+Run the reusable metadata acquisition workflow after successful tournament-map
+publication. Read the newly published main catalogue, reuse saved fields and
+acquire only missing official factsheet metadata without player filters.
+Keep concurrency at one. Remove the workflow-file push trigger to avoid
+duplicating the current backfill. Validation: both YAML workflows parsed;
+dependency, inherited secrets, current catalogue checkout and concurrency checked.
+Production execution is verified separately through Actions.
