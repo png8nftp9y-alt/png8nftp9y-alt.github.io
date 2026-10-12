@@ -1,5 +1,7 @@
 import fs from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
+import {createRequire} from 'node:module';
+import {browserFactsheet} from './itf-metadata-browser.mjs';
 import {factsheetMeta,tournamentFactSheetMeta} from './itf-common.mjs';
 const fields=['venueName','address','qualificationStartDate'];
 const validDate=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s||''));
@@ -66,7 +68,16 @@ async function collect(){
  const targets=[...new Map(catalogues.flatMap(d=>d.tournaments||[]).map(t=>[String(t.competitionId).toUpperCase(),t])).values()];
  const number=s=>[...s].reduce((n,c)=>(n*31+c.charCodeAt(0))>>>0,0);
  const selected=targets.filter(t=>number(String(t.competitionId).toUpperCase())%total===shard);
- const result=await recoverMetadata(selected,saved,acquire);
+ let context;
+ let acquireSelected=acquire;
+ if(process.env.ITF_METADATA_BROWSER==='1'){
+  const require=createRequire(new URL('../../infra/itf-acquirer/package.json',import.meta.url));
+  const {chromium}=require('playwright');
+  context=await chromium.launchPersistentContext('',{headless:true,locale:'en-GB',timezoneId:'Europe/Rome'});
+  acquireSelected=t=>browserFactsheet(context,t);
+ }
+ let result;
+ try{result=await recoverMetadata(selected,saved,acquireSelected);}finally{await context?.close();}
  const ids=new Set(selected.map(t=>String(t.competitionId).toUpperCase()));
  const metadata=Object.fromEntries(Object.entries(result.metadata).filter(([id])=>ids.has(id)));
  await write('dist/v3/shards/itf-metadata/meta-'+shard+'.json',{shard,total,checked:result.checked,acquired:result.acquired,metadata,remaining:result.remaining,failures:result.failures});

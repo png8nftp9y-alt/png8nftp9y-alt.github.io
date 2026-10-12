@@ -1,5 +1,8 @@
 name: Court Watch all ITF tournament metadata acquisition
 on:
+  push:
+    branches: [main]
+    paths: ['src/v3/itf-metadata-browser.mjs']
   workflow_dispatch:
   workflow_call:
 permissions: {contents: write}
@@ -17,7 +20,7 @@ jobs:
   acquire:
     needs: scope
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 100
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -25,6 +28,7 @@ jobs:
     env:
       ITF_METADATA_SHARD: ${{ matrix.shard }}
       ITF_METADATA_TOTAL: 8
+      ITF_METADATA_BROWSER: 1
       ITF_FACTSHEET_ACQUISITION_URL: ${{ secrets.ITF_FACTSHEET_ACQUISITION_URL || vars.ITF_FACTSHEET_ACQUISITION_URL }}
       ITF_FACTSHEET_ACQUIRER_TOKEN: ${{ secrets.ITF_FACTSHEET_ACQUIRER_TOKEN }}
       ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL || vars.ITF_ACQUISITION_URL }}
@@ -34,7 +38,11 @@ jobs:
         with: {ref: "${{ needs.scope.outputs.sha }}"}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: node --test src/v3/recover-all-itf-metadata.test.mjs src/v3/itf-metadata-d1.test.mjs infra/itf-acquirer/factsheet-url.test.mjs
+      - name: Install the ITF browser on the GitHub runner
+        run: |
+          npm install --prefix infra/itf-acquirer --omit=dev
+          infra/itf-acquirer/node_modules/.bin/playwright install --with-deps chromium
+      - run: node --test src/v3/itf-metadata-browser.test.mjs src/v3/recover-all-itf-metadata.test.mjs src/v3/itf-metadata-d1.test.mjs infra/itf-acquirer/factsheet-url.test.mjs
       - name: Reuse saved fields and acquire missing official factsheets
         run: node src/v3/recover-all-itf-metadata.mjs
       - uses: actions/upload-artifact@v4
