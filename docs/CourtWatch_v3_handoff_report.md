@@ -1,3 +1,8 @@
+## 2026-10-12 — Version the corrected Others frontend asset
+The public v3.js now contains the neutral retry status and no red Others failure banner, verified by fetching the published asset. However, v3.html still referenced the old v3.js?v=202610120416 URL from before the later frontend corrections. Change the JS asset version so normal page loads request the corrected asset instead of reusing that browser cache key.
+Only the JS query version changes; Home/TCL shell and styles are preserved. No new polling or automatic refresh introduced.
+Validation: published JS check confirms red banner string absent and neutral retry/eligibility helper present; exact HTML replacement inspected. Backend exact-ID batch deploy 38244116152 succeeded; enhanced real-snapshot check remains to be read once on completion.
+
 ## 2026-10-12 — Verify personal history rules and native-ID batches on the real snapshot
 The real-snapshot browser workflow previously triggered only on frontend/verifier changes, so the exact native-ID backend batch would not automatically receive this check. Add backend index and personal library paths.
 The browser check now records aggregate tournament/history counts and fails if visible concluded acceptance labels, visible withdrawals or unpublished FITP/ITF match results occur. ITF location gaps are counted for investigation, without logging player IDs, names, tournament details or profile metadata values. Existing eight-player/Home/no-JS-errors checks remain.
