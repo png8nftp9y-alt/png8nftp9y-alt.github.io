@@ -2,6 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {recoverMetadata} from './recover-all-itf-metadata.mjs';
 import {acquire} from './recover-all-itf-metadata.mjs';
+test('progress/checkpoints preserve acquired fields and stop repeated useless reads',async()=>{
+ const targets=Array.from({length:12},(_,i)=>({competitionId:'J-'+i})),events=[],saved=[],calls=[];
+ const r=await recoverMetadata(targets,{},async t=>{calls.push(t.competitionId);if(t.competitionId==='J-0')return{venueName:'Official Club'};throw Error('timeout');},{maxConsecutiveFailures:5,onProgress:p=>events.push(p),onCheckpoint:p=>saved.push(JSON.parse(JSON.stringify(p)))});
+ assert.equal(calls.length,6);assert.equal(r.processed,6);assert.equal(r.checked,12);assert.equal(r.stoppedReason,'consecutive_unproductive_reads');assert.equal(r.metadata['J-0'].venueName,'Official Club');assert.equal(r.remaining.length,12);assert.equal(saved.at(-1).metadata['J-0'].venueName,'Official Club');assert.equal(events.filter(x=>x.phase==='start').length,6);assert.equal(events.filter(x=>x.phase==='finish').length,6);
+});
 test('dedicated factsheet endpoint and HTTP failures are observable',async()=>{
  const keys=['ITF_FACTSHEET_ACQUISITION_URL','ITF_FACTSHEET_ACQUIRER_TOKEN'],old=keys.map(k=>process.env[k]);
  try{

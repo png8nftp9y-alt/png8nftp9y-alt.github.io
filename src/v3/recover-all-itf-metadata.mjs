@@ -5,24 +5,36 @@ import {browserFactsheet} from './itf-metadata-browser.mjs';
 import {factsheetMeta,tournamentFactSheetMeta} from './itf-common.mjs';
 const fields=['venueName','address','qualificationStartDate'];
 const validDate=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s||''));
-export async function recoverMetadata(targets,existing,acquire){
- const metadata={...existing},remaining=[],failures=[];let acquired=0,index=0;
+export async function recoverMetadata(targets,existing,acquire,options={}){
+ const metadata={...existing},failures=[];
  const unique=[...new Map(targets.map(t=>[String(t.competitionId||'').toUpperCase(),t])).values()].filter(t=>t.competitionId);
- await Promise.all(Array.from({length:Math.min(1,unique.length)},async()=>{
-  while(index<unique.length){
-   const t=unique[index++],id=String(t.competitionId).toUpperCase(),previous=metadata[id]||{};
-   if(fields.every(f=>previous[f])&&validDate(previous.qualificationStartDate))continue;
-   let result={};try{result=await acquire(t)||{}}catch(error){failures.push({competitionId:id,error:String(error.message||'factsheet_acquisition_failed').slice(0,100)});}
+ let acquired=0,processed=0,consecutiveFailures=0,stoppedReason='';
+ const started=Date.now(),missing=row=>fields.filter(f=>!row?.[f]||(f==='qualificationStartDate'&&!validDate(row[f])));
+ const snapshot=()=>({metadata,acquired,checked:unique.length,processed,remaining:unique.map(t=>({competitionId:String(t.competitionId).toUpperCase(),missing:missing(metadata[String(t.competitionId).toUpperCase()])})).filter(x=>x.missing.length),failures,stoppedReason});
+ await options.onCheckpoint?.(snapshot());
+ for(const t of unique){
+  if(options.maxElapsedMs&&Date.now()-started>=options.maxElapsedMs){stoppedReason='time_budget_exhausted';break;}
+  const id=String(t.competitionId).toUpperCase(),previous=metadata[id]||{},begin=Date.now();
+  await options.onProgress?.({phase:'start',competitionId:id,processed,total:unique.length,acquired});
+  let status='reused',error='';
+  if(missing(previous).length){
+   let result={};
+   try{result=await acquire(t)||{};}catch(e){error=String(e.message||'factsheet_acquisition_failed').split('\n')[0].slice(0,100);}
    const next={...previous};
-   for(const f of fields){const value=typeof result[f]==='string'?result[f].trim():'';if(value&&(f!=='qualificationStartDate'||validDate(value)))next[f]=value;}
-   if(fields.some(f=>next[f]!==previous[f])){
-    metadata[id]={...next,competitionId:id,sourceUrl:t.sourceUrl||previous.sourceUrl||'',sourceField:'official_fact_sheet',observedAt:new Date().toISOString()};acquired++;
-   }
-   const saved=metadata[id]||previous,missing=fields.filter(f=>!saved[f]||(f==='qualificationStartDate'&&!validDate(saved[f])));
-   if(missing.length)remaining.push({competitionId:id,missing});
+   for(const f of fields){const v=typeof result[f]==='string'?result[f].trim():'';if(v&&(f!=='qualificationStartDate'||validDate(v)))next[f]=v;}
+   const usable=fields.some(f=>typeof result[f]==='string'&&result[f].trim()&&(f!=='qualificationStartDate'||validDate(result[f])));
+   if(fields.some(f=>next[f]!==previous[f])){metadata[id]={...next,competitionId:id,sourceUrl:t.sourceUrl||previous.sourceUrl||'',sourceField:'official_fact_sheet',observedAt:new Date().toISOString()};acquired++;status='acquired';}
+   else status=usable?'partial_unchanged':'failed';
+   if(usable)consecutiveFailures=0;
+   else{consecutiveFailures++;failures.push({competitionId:id,error:error||'factsheet_no_usable_fields'});}
   }
- }));
- return {metadata,acquired,checked:unique.length,remaining,failures};
+  processed++;
+  await options.onProgress?.({phase:'finish',competitionId:id,processed,total:unique.length,status,error,elapsedMs:Date.now()-begin,acquired,consecutiveFailures});
+  if(options.maxConsecutiveFailures&&consecutiveFailures>=options.maxConsecutiveFailures)stoppedReason='consecutive_unproductive_reads';
+  await options.onCheckpoint?.(snapshot());
+  if(stoppedReason)break;
+ }
+ const result=snapshot();await options.onCheckpoint?.(result);return result;
 }
 export async function acquire(t,fetcher=fetch){
  const url=String(process.env.ITF_FACTSHEET_ACQUISITION_URL||process.env.ITF_ACQUISITION_URL||'').trim().replace(/\/v1\/fetch\/?$/i,'/v1/factsheet'),token=String(process.env.ITF_FACTSHEET_ACQUIRER_TOKEN||process.env.ITF_ACQUIRER_TOKEN||'').trim();
@@ -58,7 +70,7 @@ export function storedMetadata(doc){
  visit(doc);return out;
 }
 const read=async p=>JSON.parse(await fs.readFile(p,'utf8'));
-const write=async(p,d)=>{await fs.mkdir(p.slice(0,p.lastIndexOf('/')),{recursive:true});await fs.writeFile(p,JSON.stringify(d,null,2)+'\n');};
+const write=async(p,d)=>{await fs.mkdir(p.slice(0,p.lastIndexOf('/')),{recursive:true});await fs.writeFile(p+'.tmp',JSON.stringify(d,null,2)+'\n');await fs.rename(p+'.tmp',p);};
 async function collect(){
  const shard=Number(process.env.ITF_METADATA_SHARD||0),total=Number(process.env.ITF_METADATA_TOTAL||8);
  const paths=['history/itf_player_tournament_db.json','history/itf_historical_player_tournaments.json','history/itf_draw_target_db.json','dist/v3/tournaments.json','history/itf_official_metadata.json'];
@@ -77,11 +89,16 @@ async function collect(){
   acquireSelected=t=>browserFactsheet(context,t);
  }
  let result;
- try{result=await recoverMetadata(selected,saved,acquireSelected);}finally{await context?.close();}
+ try{result=await recoverMetadata(selected,saved,acquireSelected,{
+  maxConsecutiveFailures:5,maxElapsedMs:15*60*1000,
+  onProgress:p=>console.log('ITF_METADATA_PROGRESS='+JSON.stringify({shard,...p})),
+  onCheckpoint:d=>write('dist/v3/shards/itf-metadata/meta-'+shard+'.json',{shard,total,...d,metadata:Object.fromEntries(Object.entries(d.metadata).filter(([id])=>selected.some(t=>String(t.competitionId).toUpperCase()===id)))})
+ });}finally{await context?.close();}
  const ids=new Set(selected.map(t=>String(t.competitionId).toUpperCase()));
  const metadata=Object.fromEntries(Object.entries(result.metadata).filter(([id])=>ids.has(id)));
- await write('dist/v3/shards/itf-metadata/meta-'+shard+'.json',{shard,total,checked:result.checked,acquired:result.acquired,metadata,remaining:result.remaining,failures:result.failures});
- console.log('ITF_METADATA_SHARD='+JSON.stringify({shard,checked:result.checked,acquired:result.acquired,remaining:result.remaining.length}));
+ await write('dist/v3/shards/itf-metadata/meta-'+shard+'.json',{shard,total,checked:result.checked,acquired:result.acquired,metadata,remaining:result.remaining,failures:result.failures,processed:result.processed,stoppedReason:result.stoppedReason});
+ console.log('ITF_METADATA_SHARD='+JSON.stringify({shard,checked:result.checked,processed:result.processed,acquired:result.acquired,remaining:result.remaining.length,stoppedReason:result.stoppedReason}));
+ if(result.stoppedReason)process.exitCode=2;
 }
 async function merge(){
  const old=await read('history/itf_official_metadata.json'),all={...(old.tournaments||{})},remaining=[],failures=[];let checked=0,acquired=0;

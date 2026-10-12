@@ -20,10 +20,10 @@ jobs:
   acquire:
     needs: scope
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 25
     strategy:
       fail-fast: false
-      max-parallel: 1
+      max-parallel: 4
       matrix: {shard: [0,1,2,3,4,5,6,7]}
     env:
       ITF_METADATA_SHARD: ${{ matrix.shard }}
@@ -46,12 +46,14 @@ jobs:
       - name: Reuse saved fields and acquire missing official factsheets
         run: node src/v3/recover-all-itf-metadata.mjs
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: itf-metadata-${{ matrix.shard }}
           path: dist/v3/shards/itf-metadata/meta-${{ matrix.shard }}.json
           if-no-files-found: error
           retention-days: 3
   publish:
+    if: ${{ always() && needs.scope.result == 'success' && !cancelled() }}
     needs: [scope, acquire]
     concurrency:
       group: courtwatch-d1-writes

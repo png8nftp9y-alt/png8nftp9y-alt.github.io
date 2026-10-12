@@ -1,0 +1,36 @@
+name: Court Watch restart ITF metadata with visible progress once
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-itf-metadata-restart-once.yml']
+permissions:
+  contents: read
+  actions: write
+jobs:
+  restart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Replace the exact old silent run with the corrected main workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPOSITORY: ${{ github.repository }}
+        run: |
+          node --input-type=module <<'JS'
+          const repo=process.env.GH_REPOSITORY;
+          if(repo!=='png8nftp9y-alt/png8nftp9y-alt.github.io')throw Error('Unexpected repository');
+          const base='https://api.github.com/repos/'+repo;
+          async function api(path,method='GET',body){
+            const r=await fetch(base+path,{method,headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(30000)});
+            if(!r.ok)throw Error('GitHub request failed HTTP '+r.status);
+            const text=await r.text();return text?JSON.parse(text):null;
+          }
+          const old=await api('/actions/runs/38318926365');
+          if(old.name!=='Court Watch all ITF tournament metadata acquisition'||old.head_sha!=='d5513d4c960e10274f3c1769cc18d22c92081e4f')throw Error('Old-run identity mismatch; no cancellation');
+          if(old.status!=='completed'){
+            await api('/actions/runs/38318926365/cancel','POST');
+            console.log('Cancellation requested only for old silent metadata run 38318926365. Unpublished in-memory fields will be reacquired.');
+          }
+          await api('/actions/workflows/courtwatch-all-itf-metadata.yml/dispatches','POST',{ref:'main'});
+          console.log('Corrected metadata workflow dispatched on main. No D1/source data deleted.');
+          JS
