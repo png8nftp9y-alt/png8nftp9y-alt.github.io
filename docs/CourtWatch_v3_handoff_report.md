@@ -2970,3 +2970,12 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Le 33 partite/9 tornei del recupero Sala provenivano dai tabelloni ufficiali già archiviati in D1, inclusi punteggi delle squadre. Non da un motore risultati FITP/ITF completato. Il collegamento allo storico pubblico era prematuro: ripristinato il percorso di pubblicazione precedente, mantenendo i documenti e le relazioni acquisite internamente. Nessuna cancellazione.
 - Nessuna modifica al frontend TCL funzionante. Test sullo snapshot Altri e sull’assenza di query FITP/ITF nel percorso pubblico passati. La causa produttiva precisa resta da verificare tramite log/sessione: browser dell’agente fermo al login Cloudflare Access, nessuna sessione utente disponibile. Non dichiarata cancellazione dei dati senza evidenza.
 - Correzione e report pubblicati insieme; verifica deploy da attestare al relativo run. Nessun polling.
+
+
+## 12 ottobre 2026 — Ripresa TCL: verifica browser della navigazione speculare
+
+- Ripresa richiesta dall’utente dopo stop. Pubblicazione TCL già presente: Pages successivo 38189750273 verde sul commit bd2a65082ca3d4b7ad0781a7ab85be05f93b6795, policy incrementale 38189725635 verde. Il primo Pages 38189725021 è cancellato; nessun rilancio.
+- Shield PR #125, run 38189721853, fallito per timeout sul pulsante #homeOthers nascosto dopo il ritorno da Altri: il vecchio test presupponeva il ritorno alla Home, mentre ora la pagina resta Giocatori come richiesto. Release guard riuscito; fallimento non prova errore della nuova navigazione.
+- Aggiornato il flusso Shield per usare il pulsante della pagina corrente e verificare Giocatori ↔ Giocatori e Calendario ↔ Calendario bidirezionali, mese, filtro sesso, scroll non nullo, etichetta TCL e separazione dei giocatori. Nessun cambiamento API o dati; risultati della nuova esecuzione da registrare.
+
+- Sintassi Shield, quattro regressioni gruppo e diff passati. Installazione Chromium locale tentata per completare il controllo browser: download restituito non valido, browser non disponibile. Verifica E2E eseguita dal workflow Shield della nuova PR; non dichiarata passata prima del risultato.
