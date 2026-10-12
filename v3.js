@@ -885,32 +885,13 @@ function cachedPersonalTournaments(previous, visiblePlayers) {
   return (previous.tournaments || []).filter(tournament => personalIds.has(tournament.playerId));
 }
 function syncLabel(data, fallback = false) {
-  const status = $("syncStatus"),
-    alert = $("dataAlert"),
-    stamp = Date.parse(data.generatedAt || ""),
-    when = new Intl.DateTimeFormat("it-IT", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(Number.isFinite(stamp) ? stamp : Date.now())),
-    age = Number.isFinite(stamp) ? Date.now() - stamp : Infinity;
+  // Refresh failures remain in the console; an existing projection stays usable.
+  const status = $("syncStatus"), alert = $("dataAlert");
+  status.hidden = true;
+  status.className = "status";
+  status.textContent = "";
   alert.hidden = true;
   alert.textContent = "";
-  status.className = "status";
-  if (fallback) {
-    status.hidden = true;
-    status.classList.add("fallback");
-    status.textContent = "";
-    return;
-  }
-  if (!Number.isFinite(stamp) || age > 45 * 60 * 1000) {
-    status.hidden = false;
-    status.classList.add("delay");
-    status.textContent =
-      "Dati aggiornati con ritardo · ultimo aggiornamento " + when;
-    return;
-  }
-  status.hidden = true;
-  status.textContent = "";
 }
 function unavailableLabel() {
   const status = $("syncStatus"),
@@ -3889,63 +3870,7 @@ function wire() {
   });
   addEventListener("pagehide", saveUiState);
 }
-function othersSnapshotData(projection) {
-  if (projection?.group !== "others" || !Array.isArray(projection.players) || !Array.isArray(projection.tournaments) || !Array.isArray(projection.matches)) throw Error("Snapshot Altri incompleto");
-  const players = projection.players.filter(p => p?.id && p.name && !removedCourtWatchPlayers.has(p.id));
-  const ids = new Set(players.map(p => p.id));
-  const matches = projection.matches.filter(m => ids.has(m.playerId) && circuit(m) === "tennis-europe");
-  const timestamp = Date.parse(projection.generatedAt || "");
-  return withoutPucItfReferences({
-    group: "others", personalProjectionComplete: true, players,
-    tournaments: projection.tournaments.filter(t => ids.has(t.playerId)),
-    matches, agenda: mergeAgenda([], matches), results: [], opponents: [],
-    tournamentEntries: [], diagnostics: {overall: "green", items: []},
-    generatedAt: new Date(Number.isFinite(timestamp) ? timestamp : Date.now()).toISOString()
-  });
-}
-async function loadOthers() {
-  if (loadRunning) return;
-  loadRunning = true;
-  const epoch = state.playerSelectionEpoch || 0;
-  try {
-    const projection = await fetchProjection(APP_API, 15000);
-    if (epoch !== (state.playerSelectionEpoch || 0)) return;
-    const data = othersSnapshotData(projection);
-    state.data = data;
-    for (const p of data.players) confirmedCourtWatchPlayers.delete(p.id);
-    if (!uiSelectionRestored) { state.selected = new Set(data.players.map(p => p.id)); uiSelectionRestored = true; }
-    else state.selected = new Set([...state.selected].filter(id => data.players.some(p => p.id === id)));
-    saveCachedData(data);
-    syncLabel(data, false);
-    const alert = $("dataAlert"); if (alert) alert.hidden = true;
-    renderIfDataChanged();
-    restoreUiScroll(true);
-  } catch (error) {
-    if (epoch !== (state.playerSelectionEpoch || 0)) return;
-    const cached = state.data || cachedData();
-    if (cached?.personalProjectionComplete && Array.isArray(cached.players)) {
-      state.data = cached;
-      if (!uiSelectionRestored) { state.selected = new Set(cached.players.map(p => p.id)); uiSelectionRestored = true; }
-      syncLabel(cached, true);
-      renderIfDataChanged();
-    }
-    const alert = $("dataAlert"); if (alert) { alert.hidden = true; alert.textContent = ""; }
-    const status = $("syncStatus");
-    if (status) {
-      status.hidden = false;
-      status.className = "status";
-      status.textContent = cached?.personalProjectionComplete ? "Aggiornamento non riuscito. " : "Dati non disponibili. ";
-      const retry = document.createElement("button");
-      retry.type = "button"; retry.textContent = "Riprova";
-      retry.onclick = () => loadOthers();
-      status.append(retry);
-    }
-    console.error("others_snapshot_unavailable", error);
-  } finally { loadRunning = false; }
-}
-
 async function load() {
-  if (PLAYER_GROUP === "others") return loadOthers();
   if (loadRunning) return;
   const selectionEpoch = state.playerSelectionEpoch || 0;
   const immediate = !state.data && cachedData();
@@ -4001,14 +3926,17 @@ async function load() {
         settled[i].status === "fulfilled" ? settled[i].value : null,
       ]),
     );
-    if (!Array.isArray(docs.players?.players) || !docs.players.players.length)
-      throw Error("Elenco giocatori essenziale non disponibile");
-    if (!Array.isArray(docs.tournaments?.tournaments))
-      throw Error("Calendario tornei essenziale non disponibile");
-
     const previous = state.data || cachedData() || {};
     const projection = await projectionPromise;
-    if (PLAYER_GROUP === "others" && !projection) throw Error("Dati della sezione Altri non disponibili");
+    // Only membership is group-specific. Data loading, merging and rendering are shared.
+    if (projection && PLAYER_GROUP === "others" && projection.group !== "others")
+      throw Error("Snapshot del gruppo errato");
+    const staticPlayers = Array.isArray(docs.players?.players) ? docs.players.players : [];
+    const staticTournaments = Array.isArray(docs.tournaments?.tournaments) ? docs.tournaments.tournaments : null;
+    if (!projection && PLAYER_GROUP === "others" && previous.personalProjectionComplete !== true)
+      throw Error("Elenco personale non disponibile");
+    if (!projection && PLAYER_GROUP === "main" && (!staticPlayers.length || !staticTournaments))
+      throw Error("Dati essenziali non disponibili");
     const jsonGeneration = Math.max(
         ...[docs.players?.generatedAt, docs.tournaments?.generatedAt]
           .map(Date.parse)
@@ -4018,7 +3946,7 @@ async function load() {
       apiGeneration = Date.parse(projection?.generatedAt || "");
     const universalProjectionFresh =
       projection &&
-      (!jsonGeneration ||
+      (PLAYER_GROUP === "others" || !jsonGeneration ||
         (Number.isFinite(apiGeneration) && apiGeneration >= jsonGeneration));
     if (projection && !universalProjectionFresh)
       console.warn(
@@ -4029,9 +3957,10 @@ async function load() {
         (projection?.players || []).map((p) => [p.id, p]),
       ),
       previousPlayers = new Map((previous.players || []).map((p) => [p.id, p]));
+    const membershipPlayers = PLAYER_GROUP === "others" ? [] : staticPlayers;
     const playerCandidates = projection
-      ? [...new Map([...docs.players.players, ...(projection.players || []),...confirmedCourtWatchPlayers.values()].map(p => [p.id,p])).values()]
-      : [...new Map([...docs.players.players, ...(previous.players || [])].map(p => [p.id,p])).values()];
+      ? [...new Map([...membershipPlayers, ...(projection.players || []),...confirmedCourtWatchPlayers.values()].map(p => [p.id,p])).values()]
+      : [...new Map([...membershipPlayers, ...(previous.players || [])].map(p => [p.id,p])).values()];
     const visiblePlayers = playerCandidates
       .filter((p) => (!FORMER_PLAYERS.has(p.id) || p.userAdded) && !removedCourtWatchPlayers.has(p.id) &&
         (projection ? (projectedPlayers.has(p.id) || confirmedCourtWatchPlayers.has(p.id)) : Array.isArray(previous.players) ? previousPlayers.has(p.id) : true))
@@ -4100,11 +4029,12 @@ async function load() {
 
     if (selectionEpoch !== (state.playerSelectionEpoch || 0)) return;
     state.data = {
-      personalProjectionComplete: Boolean(projection),
+      group: PLAYER_GROUP,
+      personalProjectionComplete: Boolean(projection) || previous.personalProjectionComplete === true,
       players: visiblePlayers,
       tournaments: [
-        ...((universalProjectionFresh && projection?.tournaments) || docs.tournaments.tournaments),
-        ...(!universalProjectionFresh ? (projection ? (projection.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : cachedPersonalTournaments(previous, visiblePlayers)) : []),
+        ...((universalProjectionFresh && projection?.tournaments) || staticTournaments || previous.tournaments || []),
+        ...(!universalProjectionFresh && (projection || staticTournaments) ? (projection ? (projection.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : cachedPersonalTournaments(previous, visiblePlayers)) : []),
       ].filter((x) => visibleIds.has(x.playerId)),
       matches: matches.filter((x) => visibleIds.has(x.playerId)),
       agenda: mergeAgenda(agenda, matches).filter((x) =>
@@ -4121,8 +4051,8 @@ async function load() {
           ...[
             universalProjectionFresh && projection?.generatedAt,
             docs.status?.generatedAt,
-            docs.players.generatedAt,
-            docs.tournaments.generatedAt,
+            docs.players?.generatedAt,
+            docs.tournaments?.generatedAt,
           ]
             .map(Date.parse)
             .filter(Number.isFinite),

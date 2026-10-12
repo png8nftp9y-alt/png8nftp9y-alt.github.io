@@ -3253,6 +3253,32 @@ and trigger a fresh guarded deployment. Validation: verify-analysis-ui passed.
 - Sostituito il controllo testuale della chiamata agenda con una verifica eseguibile: incontri condivisi deduplicati, incontri distinti conservati. Nessun controllo disabilitato.
 
 
+## 2026-10-13 — Shared TCL and Altri data loading
+
+User requires identical application behavior; only the membership list differs.
+Remove `loadOthers` and its circuit-only match filter. Both groups now use
+`load`, API retries, static-data recovery, local cache, agenda merging and
+rendering. The private Others membership remains authoritative: public TCL
+players are never adopted, an empty Others list is valid, and a wrong-group
+response cannot replace its cached selection. Static matches are usable only
+for selected membership IDs. A valid API snapshot works even if public files
+are unavailable. Preserve the completeness marker when recovering a previously
+complete local projection; avoid duplicate cached tournaments.
+
+Remove refresh-error/retry and manifest-age delay banners for both groups.
+Existing data remains visible and technical failures stay in the console.
+The existing first-load unavailable state remains when no usable data exists.
+No dates are rewritten to imply fresher acquisition; no acquisition engine,
+D1 record, player identity, ranking or membership is changed.
+
+Replace the previous separate-loader tests with shared-loader regressions.
+The real-snapshot browser verifier now checks that every selected player's
+snapshot match is present, rather than rejecting FITP/ITF matches by circuit.
+Validation: JavaScript syntax checks, 30 loader/addition/calendar tests and
+the analysis UI contract check pass locally. Live authenticated snapshot and
+post-deploy verification remain pending; this change cannot supply matches
+absent from the server or resolve a server-side identity/history failure.
+
 ## Acquisition of metadata for every ITF tournament — 2026-10-12
 
 Process every unique tournament ID in current and historical ITF catalogues,
