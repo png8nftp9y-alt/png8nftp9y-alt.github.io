@@ -2951,3 +2951,12 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 
 - Job indicato dall’utente https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189047518/job/114618194510 : log conferma D1 verde, deploy Worker versione `0ea7d4d8-d99a-47e0-aeb4-ab4921399ef2` riuscito e parità API live verde alle 02:50. Questo run non certifica il recupero dei metadati/storico Pietro Sala.
 - Recupero mirato https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275715 , job `114619226949`: appena iniziato, checkout in corso all’unica lettura. Non ancora eseguito il passaggio di salvataggio metadati/proiezione match; nessun conteggio storico produttivo nuovo attestato. L’utente segnala gli altri run verdi, mantenuto distinto il recupero specifico ancora in corso. Nessun polling.
+
+
+## 12 ottobre 2026 — TCL e navigazione speculare con Altri
+
+- Richiesta: rinominare «Principali» in «TCL» e mantenere pagina/posizione durante il passaggio TCL ↔ Altri, in particolare Calendario senza ritorno alla Home.
+- Il cambio sezione conserva l’hash corrente e i parametri URL estranei al gruppo. Trasferisce al gruppo di destinazione mese Calendario, data/modalità Agenda, filtri sesso/categorie e scroll tramite il ripristino UI già presente. Le selezioni giocatore e i dati acquisiti restano separati per gruppo; la prima visita non eredita ID dell’altro elenco. Pulsanti e label accessibili ora usano TCL.
+- Validazione: regressioni bidirezionali sulle route Calendario/Agenda/Giocatori/Home, date, filtri e scroll, selezioni separate, primo accesso e storage indisponibile; sintassi Node e controlli di navigazione/cache esistenti. Pubblicazione/run da registrare dopo integrazione; nessun polling.
+
+- Asset JavaScript versionato in v3.html per caricare la nuova navigazione. 15 test di navigazione/cache e 2 test del contratto refresh passati, release guard passato. Il browser Shield locale non è avviabile perché manca l’eseguibile Chromium; il workflow Shield della PR rimane la verifica browser.
