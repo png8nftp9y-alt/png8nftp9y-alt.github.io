@@ -1,3 +1,9 @@
+## 2026-10-12 — Preserve native UUID case compatibility in entry batches
+The native-ID batch must retain the previous case-insensitive UUID identity semantics. Europe profile IDs are normalized to lowercase while source rows may retain uppercase or mixed-case UUID text. Apply case-insensitive equality only to Europe IDs; FITP cards and ITF IDs retain their exact indexed branch.
+Add an idempotent composite NOCASE lookup index for the UUID branch. No source records, memberships or tournament payloads are rewritten by the migration.
+Validation: SQLite native batch test includes a mixed-case UUID and different source/app names; native foreign-ID exclusion still passes. EXPLAIN QUERY PLAN uses the composite NOCASE index for the UUID lookup. npm run check exits 0, plus the final branched query test passes.
+Latest real-data browser result before this case adjustment: status200, 34 queries, 8/8 players, Home visible, no JS errors, zero visible withdrawn tournaments, zero concluded acceptance labels, zero unpublished FITP/ITF results. It reported 18 visible ITF tournaments and 2 missing ITF locations; those location/acquisition gaps remain unresolved and no complete lifetime history is claimed.
+
 ## 2026-10-12 — Version the corrected Others frontend asset
 The public v3.js now contains the neutral retry status and no red Others failure banner, verified by fetching the published asset. However, v3.html still referenced the old v3.js?v=202610120416 URL from before the later frontend corrections. Change the JS asset version so normal page loads request the corrected asset instead of reusing that browser cache key.
 Only the JS query version changes; Home/TCL shell and styles are preserved. No new polling or automatic refresh introduced.
