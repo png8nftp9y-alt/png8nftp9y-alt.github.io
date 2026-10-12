@@ -3362,3 +3362,5 @@ Load the real mergeKnownMatches helper and agendaKey in the isolated VM. Preserv
 
 ## 2026-10-13 — Observable bounded ITF metadata recovery
 Per user request, add per-tournament progress/errors/duration, atomic result checkpoints, stop after five consecutive unproductive reads or 15 minutes, retain acquired fields and full unresolved scope. Four shard runners and 25-minute job limits; artifacts retained after controlled failure. Only all-eight-shard merges can publish valid partial metadata and verify D1; incomplete acquisition remains failed. An exact-repository/name/SHA guarded one-off workflow replaces silent run 38318926365. Its unpublished in-memory fields may need reacquisition; persistent data is preserved. Twelve local tests and YAML/syntax/diff checks passed. Restart and remote acquisition/D1 completion pending runtime evidence.
+
+Global ITF metadata 2026-10-12T23:27:38.929Z: {"checked":1089,"acquired":0,"remaining":1087}. Existing metadata reused; only missing official factsheet fields acquired; unresolved records retained explicitly.
