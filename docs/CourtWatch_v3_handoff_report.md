@@ -3274,3 +3274,5 @@ Keep concurrency at one. Remove the workflow-file push trigger to avoid
 duplicating the current backfill. Validation: both YAML workflows parsed;
 dependency, inherited secrets, current catalogue checkout and concurrency checked.
 Production execution is verified separately through Actions.
+
+Global ITF metadata 2026-10-12T22:23:58.283Z: {"checked":1089,"acquired":0,"remaining":1087}. Existing metadata reused; only missing official factsheet fields acquired; unresolved records retained explicitly.
