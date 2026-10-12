@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Lista Altri verificata su dati reali: 8 righe, nessun errore
+
+Run richiesto dall’utente 38195295433: dopo il fix source-object, browser reale rende 8 righe su 8 attese, 1 richiesta API e zero errori JS. La lista vuota è risolta nel caso reale riprodotto. Test rosso soltanto per home:false: la verifica leggeva la visibilità subito dopo il click senza attendere l’evento hashchange, mentre lo Shield originale usa waitFor. Aggiunta attesa esplicita #homeView.active entro 5 secondi, senza modificare codice app o indebolire l’assert. Il prossimo run deve confermare anche Home; no polling.
+
 ## 12 ottobre 2026 — Correzione root cause integrata, nessun polling
 
 PR #142 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/142 integrata, merge efae2bb576b4055257674db73240ed6c32c97982. Corretto TypeError del circuito su source oggetto, verificato sul browser con i dati reali e riprodotto in regressione locale. Sette test mirati passati. Frontend aggiornato alla versione 202610120416; distribuzione automatica avviata dalla pubblicazione del merge. Nessuna lettura del nuovo run, nessuna dichiarazione di verifica live. TCL, Home, filtro PUC e dati personali conservati.
