@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {displayPlayerClub,displayPlayerName,personalPlayerMetadata,officialFitpClub} from '../lib/personal-player-metadata.mjs';
+import {displayPlayerName,personalPlayerMetadata,officialFitpClub} from '../lib/personal-player-metadata.mjs';
 test('uppercase source names become readable while existing mixed case is preserved',()=>{
  assert.equal(displayPlayerName('CAMILLA FRIGERIO'),'Camilla Frigerio');
  assert.equal(displayPlayerName('PAOLO BRAMBILLA'),'Paolo Brambilla');
@@ -76,18 +76,3 @@ test('real index builder carries source demographics and keeps them through late
  }finally{await fs.rm(root,{recursive:true,force:true})}
 });
 
-
-
-test('Cesano Maderno club removes orphan E for Natale and Zanaga in source and stored labels',async()=>{
- const {readFileSync}=await import('node:fs'),vm=await import('node:vm');
- const source=readFileSync(new URL('../../../v3.js',import.meta.url),'utf8'),ctx={};vm.createContext(ctx);
- vm.runInContext(source.slice(source.indexOf('function displayPlayerClub('),source.indexOf('function personalPlayerAffiliationHtml(')),ctx);
- const raw='ASSOCIAZIONE TENNIS CESANO MADERNO ASSOCIAZIONE SPORTIVA DILETTANTISTICA E RICREATIVA';
- for(const format of [displayPlayerClub,ctx.displayPlayerClub]){
-  for(const value of [raw,'Associazione Tennis Cesano Maderno E','Associazione Tennis Cesano Maderno e ricreativa'])
-   assert.equal(format(value),'Associazione Tennis Cesano Maderno');
-  assert.equal(format('Tennis e Padel'),'Tennis E Padel');
-  assert.equal(format('Circolo Ricreativo Agricolo'),'Circolo Ricreativo Agricolo');
-  assert.equal(format('Associazione Tennis Cesano Maderno'),'Associazione Tennis Cesano Maderno');
- }
-});

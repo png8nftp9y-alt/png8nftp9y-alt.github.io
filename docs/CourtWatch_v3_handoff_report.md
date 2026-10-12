@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Ripristino completo richiesto, validato
+
+Frontend v3.html/v3.js e tutti i moduli runtime API differenti ripristinati al commit 9a5cf6d89b0a6bab442c97877aca2c62c38c9d37 precedente al primo run problematico indicato, 38189047518. Dati D1 e acquisizioni conservati. Ritirate dal runtime le modifiche UI successive come richiesto per tornare alla versione precedente. Sintassi frontend e npm run check completo passati. Deploy e funzionamento live da verificare. Diagnosi 38192094749 registra snapshot canceled e 200 senza errori, ma non distingue il gruppo: nessuna root cause attestata. Report concorrente conservato durante risoluzione conflitto PR #134.
+
 ## 12 ottobre 2026 — Diagnosi runtime Altri dopo rollback inefficace
 
 Osservazione read-only di 65 secondi dei log Worker: solo percorsi API, status ed errori con email/ID oscurati. Nessuna registrazione header, cookie, query, body; nessuna modifica D1. Il rollback non ha risolto secondo l’utente: causa da accertare.
