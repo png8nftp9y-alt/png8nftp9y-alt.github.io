@@ -3251,3 +3251,15 @@ and trigger a fresh guarded deployment. Validation: verify-analysis-ui passed.
   https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38308789099
 
 - Sostituito il controllo testuale della chiamata agenda con una verifica eseguibile: incontri condivisi deduplicati, incontri distinti conservati. Nessun controllo disabilitato.
+
+
+## Acquisition of metadata for every ITF tournament — 2026-10-12
+
+Process every unique tournament ID in current and historical ITF catalogues,
+without player or group filtering. Reuse fields in saved archives before
+requesting missing club, address and official qualifying date.
+Run eight acquisition shards; publish valid results and an exact unresolved-field
+report. Do not invent missing dates or treat partial acquisition as complete.
+Limit only ITF metadata cache lifetime to one minute; no new app polling.
+Validation: three acquisition-policy tests and eight-shard merge fixture passed.
+Real acquisition status is reported separately by the workflow.

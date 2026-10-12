@@ -27,7 +27,7 @@ export function mergeTournamentPresentation(t,official={}){
 }
 export async function fetchTournamentPresentation(c,fetcher=fetch){
  const results=await Promise.allSettled((sources[c]||[]).map(async file=>{
-  const response=await fetcher(ROOT+'/'+file,{cf:{cacheEverything:true,cacheTtl:3600},signal:AbortSignal.timeout(3000)});
+  const response=await fetcher(ROOT+'/'+file,{cf:{cacheEverything:true,cacheTtl:file==='history/itf_official_metadata.json'?60:3600},signal:AbortSignal.timeout(3000)});
   if(!response.ok)return [];
   const data=await response.json(),rows=data.tournaments;
   return Array.isArray(rows)?rows:rows&&typeof rows==='object'?Object.entries(rows).map(([id,t])=>({...t,competitionId:id})):[];
@@ -42,7 +42,7 @@ export async function fetchTournamentPresentation(c,fetcher=fetch){
  }
  return map;
 }
-const loaders=Object.fromEntries(Object.keys(sources).map(c=>[c,sharedTournamentMetadata(()=>fetchTournamentPresentation(c))]));
+const loaders=Object.fromEntries(Object.keys(sources).map(c=>[c,sharedTournamentMetadata(()=>fetchTournamentPresentation(c),{ttlMs:c==='itf'?60000:300000})]));
 export async function enrichPersonalTournamentPresentation(tournaments){
  const needed=[...new Set(tournaments.map(circuit))].filter(c=>loaders[c]);
  const entries=await Promise.all(needed.map(async c=>[c,await loaders[c]()]));

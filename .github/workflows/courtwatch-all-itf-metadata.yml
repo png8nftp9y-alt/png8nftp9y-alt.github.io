@@ -1,0 +1,60 @@
+name: Court Watch all ITF tournament metadata acquisition
+on:
+  push:
+    branches: [main]
+    paths: ['src/v3/recover-all-itf-metadata.mjs', '.github/workflows/courtwatch-all-itf-metadata.yml']
+  workflow_dispatch:
+permissions: {contents: write}
+concurrency: {group: courtwatch-all-itf-metadata, cancel-in-progress: false}
+jobs:
+  acquire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: {shard: [0,1,2,3,4,5,6,7]}
+    env:
+      ITF_METADATA_SHARD: ${{ matrix.shard }}
+      ITF_METADATA_TOTAL: 8
+      ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL || vars.ITF_ACQUISITION_URL }}
+      ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test src/v3/recover-all-itf-metadata.test.mjs
+      - name: Reuse saved fields and acquire missing official factsheets
+        run: node src/v3/recover-all-itf-metadata.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-metadata-${{ matrix.shard }}
+          path: dist/v3/shards/itf-metadata/meta-${{ matrix.shard }}.json
+          if-no-files-found: error
+          retention-days: 3
+  publish:
+    needs: acquire
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: itf-metadata-*
+          merge-multiple: true
+          path: /tmp/itf-metadata
+      - run: node src/v3/recover-all-itf-metadata.mjs --merge
+      - name: Save acquired fields and exact missing-data report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add history/itf_official_metadata.json dist/v3/itf_tournament_metadata_diagnostics.json docs/CourtWatch_v3_handoff_report.md
+          git commit -m "Acquire metadata for all official ITF tournaments"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Require all targeted fields or expose unresolved tournament IDs
+        run: |
+          node --input-type=module -e "import fs from 'node:fs';const d=JSON.parse(fs.readFileSync('dist/v3/itf_tournament_metadata_diagnostics.json'));console.log(JSON.stringify(d));if(d.remaining.length)process.exit(1)"
