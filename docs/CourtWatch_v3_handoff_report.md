@@ -1,3 +1,9 @@
+## 2026-10-12 — Recover official historic ITF locations outside the current calendar
+The current-only metadata catalogue omits historic official events. The repository's official historic catalogue contains 845 tournaments with locations, including 77 absent from the 1,012-event current catalogue.
+Combine both official public catalogues in the shared ITF metadata cache, keeping current official values when overlapping and preserving available locations. Fetches run concurrently; a temporary failure of one catalogue does not discard the other's metadata. No guessed city/country values.
+Validation: historical-only, current-overlap, cache reuse and partial-source-failure test pass; personal projection test passes; npm run check exits 0.
+Latest actual real-data check before this metadata extension passed eight-player/Home/render/history rules and counted two missing ITF locations. Whether these exact two are supplied by the historic catalogue remains to be verified by the automatically triggered real-data check. Complete ITF acquisition coverage remains unconfirmed.
+
 ## 2026-10-12 — Preserve native UUID case compatibility in entry batches
 The native-ID batch must retain the previous case-insensitive UUID identity semantics. Europe profile IDs are normalized to lowercase while source rows may retain uppercase or mixed-case UUID text. Apply case-insensitive equality only to Europe IDs; FITP cards and ITF IDs retain their exact indexed branch.
 Add an idempotent composite NOCASE lookup index for the UUID branch. No source records, memberships or tournament payloads are rewritten by the migration.
