@@ -1,3 +1,8 @@
+## 2026-10-12 — Read-only source diagnosis for a disappeared personal tournament
+User reports a tournament disappeared after personal history eligibility changes. Public calendar confirms the event exists; absence from an older public draw cache alone cannot establish withdrawal or nonparticipation.
+Add a bounded SELECT-only diagnosis comparing the official source profile entry, withdrawal/alternate/draw flags, raw acquired draw presence and indexed participant presence for the public reference being investigated. It does not read memberships or account selections. Logs contain only booleans, with no names, IDs, dates, clubs, ranking values or tournament metadata payloads.
+Validation: extracted workflow JavaScript syntax passes; every D1 statement is guarded SELECT-only. Execution outcome is pending. No application eligibility rule or data record is changed by this diagnosis; no cause is asserted before the source comparison returns.
+
 ## 2026-10-12 — Final observed real snapshot and deployment verification
 After native-ID batching, UUID case compatibility and official historic metadata enrichment:
 - Real snapshot/browser run 38245882858 succeeded: HTTP200, 34 D1 adapter queries, 8 players, 164 source tournaments and 33 published Tennis Europe matches.

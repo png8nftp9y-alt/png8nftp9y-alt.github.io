@@ -1,0 +1,37 @@
+name: Court Watch tournament source read-only diagnosis
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-tournament-source-readonly.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Inspect official source evidence with SELECT only and boolean output
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          const base='https://api.cloudflare.com/client/v4/accounts/'+process.env.CLOUDFLARE_ACCOUNT_ID+'/d1/database';
+          const headers={Authorization:'Bearer '+process.env.CLOUDFLARE_API_TOKEN,'Content-Type':'application/json'};
+          async function cf(url,init={}){const r=await fetch(url,{...init,headers,signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('database_http_'+r.status);const d=await r.json();if(d.success===false)throw Error('database_request_failed');return d.result;}
+          const databases=await cf(base+'?name=courtwatch-app&per_page=100'),database=databases.find(d=>d.name==='courtwatch-app');if(!database)throw Error('database_missing');
+          async function query(sql,params){if(!/^SELECT\b/i.test(sql))throw Error('read_only_guard');const result=(await cf(base+'/'+(database.uuid||database.id)+'/query',{method:'POST',body:JSON.stringify({sql,params})}))[0];if(result.success===false)throw Error('select_failed');return result.results||[];}
+          const native='800698300',competition='J-J30-ITA-2026-002';
+          const profiles=await query("SELECT payload FROM opponent_entry_profiles WHERE circuit='itf' AND source_player_id=?",[native]);
+          const entries=profiles.flatMap(r=>JSON.parse(r.payload||'{}').tournaments||[]).filter(t=>String(t.competitionId||'').toUpperCase()===competition);
+          const confirmed=t=>t.drawConfirmed===true||/draw_confirmed|official_draw/i.test([t.calendarState,t.entryStatus].join(' '));
+          const withdrawn=t=>t.cancelled===true||/withdrawn|removed|excluded|cancelled|canceled|ritirat|annullat/i.test([t.status,t.entryStatus,t.tournamentStatus,t.acceptanceList].join(' '))||/^(W|WITHDRAWN)(?:-|$)/i.test(String(t.acceptanceCode||''));
+          const raw=await query("SELECT m.payload FROM matches m JOIN tournaments t ON t.id=m.tournament_id WHERE m.circuit='itf' AND t.source_tournament_id=? AND instr(m.payload,?)>0",[competition,'"'+native+'"']);
+          const evidence=raw.map(r=>JSON.parse(r.payload||'{}')).filter(m=>(m.teams||[]).some(team=>(team.players||[]).some(p=>String(p.id||p.playerId||'')===native)));
+          const indexed=await query("SELECT COUNT(DISTINCT m.id) AS count FROM match_participants p JOIN matches m ON m.id=p.match_id JOIN tournaments t ON t.id=m.tournament_id WHERE p.source_player_id=? AND m.circuit='itf' AND t.source_tournament_id=?",[native,competition]);
+          console.log('SOURCE_RULE_EVIDENCE='+JSON.stringify({sourceProfilePresent:profiles.length>0,sourceEntryPresent:entries.length>0,withdrawn:entries.some(withdrawn),alternateWithoutDraw:entries.some(t=>/^(A|ALTERNATE|ALTERNATES)$/i.test(String(t.acceptanceCode||t.acceptanceList||''))&&!confirmed(t)),drawConfirmed:entries.some(confirmed),rawDrawPresence:evidence.length>0,completedMatchEvidence:evidence.some(m=>Number.isInteger(m.winnerTeam)&&m.winnerTeam>=0),indexedDrawPresence:Number(indexed[0]?.count||0)>0}));
+          JS
