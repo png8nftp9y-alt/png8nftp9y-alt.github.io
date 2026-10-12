@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Test ripristinati per completare il rollback
+
+Run deploy 38192375299 fermato prima della distribuzione: quattro test della navigazione TCL successiva tentavano switchPlayerGroup assente nel JS precedente. Ripristinati player-list-group.test.mjs e Shield alla stessa versione 9a5cf6d dell’app. I due test di gruppo originali passano; nessun controllo bypassato. Il controllo completo locale precedente usava già questi test originali, mentre il repository conservava quelli successivi: discrepanza corretta. Deploy da rieseguire con checkout main come previsto dal workflow.
+
 ## 12 ottobre 2026 — Ripristino completo richiesto, validato
 
 Frontend v3.html/v3.js e tutti i moduli runtime API differenti ripristinati al commit 9a5cf6d89b0a6bab442c97877aca2c62c38c9d37 precedente al primo run problematico indicato, 38189047518. Dati D1 e acquisizioni conservati. Ritirate dal runtime le modifiche UI successive come richiesto per tornare alla versione precedente. Sintassi frontend e npm run check completo passati. Deploy e funzionamento live da verificare. Diagnosi 38192094749 registra snapshot canceled e 200 senza errori, ma non distingue il gruppo: nessuna root cause attestata. Report concorrente conservato durante risoluzione conflitto PR #134.
