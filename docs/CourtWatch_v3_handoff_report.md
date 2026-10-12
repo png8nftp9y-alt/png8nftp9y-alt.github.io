@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Diagnosi runtime Altri dopo rollback inefficace
+
+Osservazione read-only di 65 secondi dei log Worker: solo percorsi API, status ed errori con email/ID oscurati. Nessuna registrazione header, cookie, query, body; nessuna modifica D1. Il rollback non ha risolto secondo l’utente: causa da accertare.
+
 Warning: truncated output (original token count: 60300)
 Total output lines: 1388
 
