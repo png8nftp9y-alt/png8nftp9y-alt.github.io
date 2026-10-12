@@ -3,7 +3,7 @@ name: Court Watch Others real snapshot browser
 on:
   push:
     branches: [main]
-    paths: ['tools/verify-others-real-snapshot-browser.mjs', 'v3.js', '.github/workflows/courtwatch-others-real-snapshot-browser.yml']
+    paths: ['tools/verify-others-real-snapshot-browser.mjs', 'v3.js', 'cloudflare/app-api/src/index.js', 'cloudflare/app-api/lib/personal-*.mjs', '.github/workflows/courtwatch-others-real-snapshot-browser.yml']
   workflow_dispatch:
 permissions:
   contents: read

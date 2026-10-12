@@ -1,3 +1,8 @@
+## 2026-10-12 — Verify personal history rules and native-ID batches on the real snapshot
+The real-snapshot browser workflow previously triggered only on frontend/verifier changes, so the exact native-ID backend batch would not automatically receive this check. Add backend index and personal library paths.
+The browser check now records aggregate tournament/history counts and fails if visible concluded acceptance labels, visible withdrawals or unpublished FITP/ITF match results occur. ITF location gaps are counted for investigation, without logging player IDs, names, tournament details or profile metadata values. Existing eight-player/Home/no-JS-errors checks remain.
+Validation: verifier JavaScript syntax passes. The preceding full application checks passed for PR148; the enhanced real-data workflow is pending. This is a new verification step, not a claim of complete lifetime ITF coverage.
+
 ## 2026-10-12 — Exact native-ID batch for personal tournament entry profiles
 Further cause of incomplete projections: personal entry histories queried source name variants first and only then filtered an official ID. A name spelling difference could therefore omit an otherwise exactly associated source profile.
 All associated personal native IDs now load opponent_entry_profiles together in one indexed query. The subsequent projection uses these exact-ID rows without the name gate, retaining per-circuit identity checks, withdrawal state and official tournament metadata. Mapped missing profiles stay empty; no homonym fallback. Optional absent legacy table remains read-compatible, as before.
