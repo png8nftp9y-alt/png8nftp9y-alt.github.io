@@ -1,0 +1,8 @@
+import test from 'node:test';import assert from 'node:assert/strict';import vm from 'node:vm';import {readFileSync} from 'node:fs';
+test('personal ITF projection uses official location and dates while preserving withdrawal and draw evidence',async()=>{
+const src=readFileSync(new URL('../src/index.js',import.meta.url),'utf8');
+const row={circuit:'itf',source_player_id:'123',normalized_name:'TEST PLAYER',payload:JSON.stringify({tournaments:[{competitionId:'TEST-1',entryStatus:'withdrawn',acceptanceCode:'W',drawConfirmed:false,startDate:'',endDate:''}]})};
+const ctx={normalizeTennisEuropeName:x=>x,tennisEuropeNameVariants:x=>[x],tennisEuropeNameKey:x=>x,optionalRows:async()=>[row],selectOpponentEntryProfiles:x=>x,itfTournamentMetadata:async()=>new Map([['TEST-1',{location:'Official city, Country',startDate:'2026-01-01',endDate:'2026-01-07',tournamentName:'Official event',indoorOutdoor:'Outdoor'}]])};vm.createContext(ctx);vm.runInContext(src.slice(src.indexOf('async function opponentEntryTournaments'),src.indexOf('async function playerEntryTournaments')),ctx);
+const out=await ctx.opponentEntryTournaments({DB:{prepare:()=>({bind(){return this}})}},{profileId:'123',name:'TEST PLAYER',includePast:true,sourceCircuit:'itf',exactIdentity:true});
+assert.equal(out.length,1);assert.equal(out[0].location,'Official city, Country');assert.equal(out[0].startDate,'2026-01-01');assert.equal(out[0].entryStatus,'withdrawn');assert.equal(out[0].drawConfirmed,false);assert.equal(out[0].name,'Official event');
+});

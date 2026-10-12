@@ -552,6 +552,8 @@ function displayPlayerClub(value) {
  return String(value || '').replace(/\bassociazione\s+(?:culturale\s+(?:e\s+)?)?sportiva\s+dilettantistic[ao]\b/gi, '').replace(/\b(?:e\s+)?ricreativa\b/gi, "").replace(/\bdilettantistic[ao]\b/gi, '').replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi, '').replace(/\s+/g, ' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g, '').trim().replace(/(?:\s+e)+$/gi, '').toLocaleLowerCase('it-IT').replace(/(^|[\s’\u0027-])\p{L}/gu, letter => letter.toLocaleUpperCase('it-IT'));
 }
 function personalPlayerAffiliationHtml(player) {
+ const linkedClub=player?.membershipCard ? displayPlayerClub(player.club) : "";
+ if(linkedClub) return esc(linkedClub);
  const country=foreignPlayerCountry(player);
  return country ? nationalityHtml(country) : esc(displayPlayerClub(player.club) || 'Tesseramento da completare');
 }
@@ -2001,7 +2003,26 @@ function tournamentKey(t) {
       .replace(/[^A-Z0-9]+/g, "-");
   return `${identity}|${cityCountry(t.location)}|${circuit(t)}`;
 }
+function tournamentConcluded(t, today = iso(new Date())) {
+  const end = String(t?.endDate || t?.officialEndDate || t?.startDate || "").slice(0,10);
+  return (/^\d{4}-\d{2}-\d{2}$/.test(end) && end < today) || /^(finished|completed|concluso)$/i.test(String(t?.status || ""));
+}
+function tournamentCancelled(t) {
+  return t?.cancelled === true || t?.canceled === true || t?.source?.cancelled === true ||
+    /cancelled|canceled|annullat/i.test([t?.status,t?.tournamentStatus,t?.source?.status].filter(Boolean).join(" "));
+}
+function playerTournamentEligible(t) {
+  if (tournamentCancelled(t)) return false;
+  if (/withdrawn|removed|excluded|ritirat/i.test([t?.entryStatus,t?.status,t?.acceptanceList].join(" ")) || /^W(?:-|$)/i.test(String(t?.acceptanceCode || ""))) return false;
+  const confirmed = /draw_confirmed|official_draw/i.test([t?.calendarState,t?.entryStatus].join(" ")) || t?.drawConfirmed === true;
+  if (tournamentConcluded(t) && confirmed) return true;
+  const code = String(t?.acceptanceCode || t?.acceptanceList || t?.entryStatus || "").split("-")[0].toUpperCase();
+  if (tournamentConcluded(t) && /^(A|ALTERNATE|ALTERNATES)$/.test(code) && !confirmed) return false;
+  return active(t);
+}
+
 function effectiveAcceptanceLabel(entry) {
+  if (tournamentConcluded(entry)) return "";
   return /(?:draw_confirmed|official_draw)/i.test(`${entry?.calendarState || ""} ${entry?.entryStatus || ""}`) ? "" : entry?.calendarListLabel || "";
 }
 function groups(selectedOnly = true) {
@@ -2247,7 +2268,7 @@ function renderPlayers() {
       const n = (state.data.tournaments || []).filter(
           (t) => t.playerId === p.id && active(t),
         ).length,
-        club = foreignPlayerCountry(p) || displayPlayerClub(p.club) || "Tesseramento da completare",
+        club = (p.membershipCard && displayPlayerClub(p.club)) || foreignPlayerCountry(p) || displayPlayerClub(p.club) || "Tesseramento da completare",
         card = p.membershipCard ? ` · tessera ${p.membershipCard}` : "";
       return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${esc(club)}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
@@ -2887,7 +2908,7 @@ function renderProfile(id) {
     return;
   }
   const ts = (state.data.tournaments || []).filter(
-      (t) => t.playerId === id && active(t),
+      (t) => t.playerId === id && playerTournamentEligible(t),
     ),
     ms = (state.data.matches || []).filter((m) => m.playerId === id),
     keyOf = (x) =>
@@ -2897,6 +2918,7 @@ function renderProfile(id) {
     byTournament = new Map();
   for (const t of ts) byTournament.set(keyOf(t), { t, matches: [] });
   for (const m of ms) {
+    if ((state.data.tournaments || []).some(t => t.playerId === id && keyOf(t) === keyOf(m) && !playerTournamentEligible(t))) continue;
     const key = keyOf(m),
       group = byTournament.get(key) || {
         t: {
