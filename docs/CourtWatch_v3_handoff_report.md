@@ -1,3 +1,10 @@
+## 2026-10-12 — General personal tournament eligibility and source metadata
+Completed tournaments no longer show MD/Q/A acceptance badges. Player histories exclude cancelled events, withdrawn/removed entries and past alternates without official draw evidence; confirmed played events remain even when eliminated. These rules apply to every player and event.
+Linked FITP source metadata is read by exact membership card in one batched query, preserving circuit nationality while supplying club and FITP ranking. A verified FITP club is displayed even for foreign ITF nationality.
+Personal ITF entry projections retain status and draw evidence and enrich missing location, dates, surface and environment from the existing official ITF calendar, cached across requests.
+Validation: 12 focused tests pass for eligibility, exact-card metadata, official ITF projection, object source classifier, PUC exclusions, independent Others loader and identity query budget; Worker syntax check passes.
+Remaining limitation: ITF historic acquisition/index completeness is separate and remains under investigation. No claim of complete histories or production browser verification for these changes. No private profile values exported to Actions logs.
+
 ## 12 ottobre 2026 — Test reale Altri e Home completato con successo
 
 Su richiesta esplicita TEST CON DATI REALI È STATO RISOLTO, unica lettura finale del run https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38195575292: job 114637333969 completed/success, inclusi replay database e browser. Risultato log: 2026-10-12T02:23:48.3000756Z REAL_OTHERS_RENDER={"rows":8,"expected":8,"home":true,"requests":1,"errors":[]}. Confermati rendering dei giocatori e ritorno a Home; nessun errore JS. Test su browser Chromium CI e dati D1 reali, non sulla sessione Safari dell’utente, che resta da confermare dall’utente stesso. Nessun polling.

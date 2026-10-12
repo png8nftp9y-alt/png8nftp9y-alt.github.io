@@ -105,6 +105,13 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
  return{added:true,playerId:player.id,player,group,changed:statements.length>0};
 }
 
+export async function linkedFitpMetadata(db,players){
+ const cards=[...new Set(players.map(p=>String(p.membershipCard||'')).filter(v=>/^\d{6,12}$/.test(v)))];if(!cards.length)return players;
+ let rows;try{rows=(await db.prepare("SELECT official_id,payload FROM observed_players WHERE circuit='fitp' AND official_id IN (SELECT value FROM json_each(?)) UNION ALL SELECT official_id,payload FROM search_acquired_players WHERE circuit='fitp' AND official_id IN (SELECT value FROM json_each(?))").bind(JSON.stringify(cards),JSON.stringify(cards)).all()).results||[]}catch(e){if(/no such table/i.test(e.message))return players;throw e}
+ const metadata=new Map();for(const row of rows){const p=parse(row.payload),old=metadata.get(String(row.official_id))||{};metadata.set(String(row.official_id),{...old,...p,club:p.club||p.raw?.tennis_club_name||old.club||'',ranking:p.fitpRanking||p.ranking||old.ranking||''});}
+ return players.map(p=>{const acquired=metadata.get(String(p.membershipCard));if(!acquired)return p;return personalPlayerMetadata({...p,club:acquired.club||p.club},acquired);});
+}
+
 export async function personalPlayerAdditions(env,userId,group='main'){
  const rows=(await env.DB.prepare(`SELECT a.payload,o.payload AS observed_payload FROM user_app_player_additions a JOIN ${playerMembershipTable(group)} u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id LEFT JOIN observed_players o ON o.source_key=a.observed_source_key WHERE a.user_id=? AND ${playerMembershipGuard(group)} ORDER BY a.created_at,a.courtwatch_id`).bind(userId).all()).results||[];
  const acquired=rows.filter(row=>String(parse(row.payload).sourceKey||'').startsWith('acquired|')),metadata=new Map();for(let i=0;i<acquired.length;i+=40){const keys=acquired.slice(i,i+40).map(row=>parse(row.payload).sourceKey);try{for(const row of (await env.DB.prepare(`SELECT source_key,payload FROM search_acquired_players WHERE source_key IN (${keys.map(()=>'?').join(',')})`).bind(...keys).all()).results||[])metadata.set(row.source_key,parse(row.payload))}catch(error){if(!/no such table/i.test(error.message))throw error}}
@@ -114,6 +121,6 @@ export async function personalPlayerAdditions(env,userId,group='main'){
   const player=await hydratePersonalCircuitIdentity(env.DB,personalPlayerMetadata(p,metadata.get(p.sourceKey)||parse(row.observed_payload)),identities.get(p.sourceKey||p.id)||null);
   if(player.id&&player.name)players.push(player);
  }
- return players;
+ return linkedFitpMetadata(env.DB,players);
 }
 
