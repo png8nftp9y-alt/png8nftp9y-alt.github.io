@@ -2972,3 +2972,12 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Correzione e report pubblicati insieme; verifica deploy da attestare al relativo run. Nessun polling.
 
 - Ripristino integrato con PR #126 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/126 , merge `c7c690a82346a720dd6d7931171f352bb4bf66b2`. Nove test mirati finali passati. Run deploy urgente Worker https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190398001 (in_progress all’unica lettura); D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190398056 (pending); CRUD https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190398075 (in_progress); policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190397999 (completed). Nessuna nuova migrazione/import richiesta dal ripristino. Funzionamento live Altri ancora da confermare dopo deploy; nessun polling.
+
+
+## 12 ottobre 2026 — Ripresa TCL: verifica browser della navigazione speculare
+
+- Ripresa richiesta dall’utente dopo stop. Pubblicazione TCL già presente: Pages successivo 38189750273 verde sul commit bd2a65082ca3d4b7ad0781a7ab85be05f93b6795, policy incrementale 38189725635 verde. Il primo Pages 38189725021 è cancellato; nessun rilancio.
+- Shield PR #125, run 38189721853, fallito per timeout sul pulsante #homeOthers nascosto dopo il ritorno da Altri: il vecchio test presupponeva il ritorno alla Home, mentre ora la pagina resta Giocatori come richiesto. Release guard riuscito; fallimento non prova errore della nuova navigazione.
+- Aggiornato il flusso Shield per usare il pulsante della pagina corrente e verificare Giocatori ↔ Giocatori e Calendario ↔ Calendario bidirezionali, mese, filtro sesso, scroll non nullo, etichetta TCL e separazione dei giocatori. Nessun cambiamento API o dati; risultati della nuova esecuzione da registrare.
+
+- Sintassi Shield, quattro regressioni gruppo e diff passati. Installazione Chromium locale tentata per completare il controllo browser: download restituito non valido, browser non disponibile. Verifica E2E eseguita dal workflow Shield della nuova PR; non dichiarata passata prima del risultato.
