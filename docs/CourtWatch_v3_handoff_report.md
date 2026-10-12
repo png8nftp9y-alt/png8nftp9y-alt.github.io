@@ -1,3 +1,12 @@
+## 2026-10-12 — Final observed real snapshot and deployment verification
+After native-ID batching, UUID case compatibility and official historic metadata enrichment:
+- Real snapshot/browser run 38245882858 succeeded: HTTP200, 34 D1 adapter queries, 8 players, 164 source tournaments and 33 published Tennis Europe matches.
+- Browser rendered 8/8 players and Home with one snapshot request and no JavaScript errors.
+- The UI projection contained 18 visible ITF tournaments, zero missing ITF locations, zero concluded acceptance labels, zero eligible withdrawals and zero unpublished FITP/ITF match results.
+- Worker deployment 38245882867 succeeded, including source checks and protected-shell exception verification. Frontend Pages run 38245881831 succeeded.
+- Public v3.js was directly verified without the former red Others failure banner; HTML's JS asset version was bumped to request the corrected file.
+These results verify the observed acquired snapshot and general rule implementation, not complete lifetime ITF acquisition or the user's existing authenticated browser session. The earlier count of two location gaps is now zero in the observed snapshot.
+
 ## 2026-10-12 — Recover official historic ITF locations outside the current calendar
 The current-only metadata catalogue omits historic official events. The repository's official historic catalogue contains 845 tournaments with locations, including 77 absent from the 1,012-event current catalogue.
 Combine both official public catalogues in the shared ITF metadata cache, keeping current official values when overlapping and preserving available locations. Fetches run concurrently; a temporary failure of one catalogue does not discard the other's metadata. No guessed city/country values.
