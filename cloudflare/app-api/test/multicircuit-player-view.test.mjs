@@ -14,7 +14,7 @@ test('circuit identities use native links and reject conflicting IDs and foreign
  assert.deepEqual(playerCircuitIdentities({...player,membershipCard:'654321'}).map(p=>p.circuit),['tennis-europe','itf']);
  assert.deepEqual(playerCircuitIdentities({circuits:['fitp','itf'],circuitProfiles:[{circuit:'fitp',url:'https://evil.example/Pagina-Giocatore/?cardNumber=MTIzNDU2'}]}),[]);
 });
-test('search opponent and followed snapshot use all three circuits; only opponent limits the combined window',async()=>{
+test('profiles and tournament entries retain all circuits; public results remain Tennis Europe only',async()=>{
  const d=database({identityMapping:true}),fetchBefore=globalThis.fetch;
  globalThis.fetch=async()=>({ok:true,json:async()=>({tournaments:[]})});
  try{
@@ -43,9 +43,11 @@ test('search opponent and followed snapshot use all three circuits; only opponen
   const afterAddWrites=d.writes(),snapshot=await read('app-snapshot');
   assert.equal(snapshot.players[0].id,player.id);
   assert.equal(snapshot.tournaments.length,6);
-  assert.equal(snapshot.matches.length,3);
-  assert.ok(opponent.tournaments.filter(t=>t.historyKind==='past').every(t=>t.matches.length===1));
-  assert.ok(snapshot.tournaments.filter(t=>t.startDate<'2026-10-11').every(t=>t.calendarState==='draw_confirmed'));
+  assert.equal(snapshot.matches.length,1);
+  assert.ok(snapshot.matches.every(m=>m.circuit==='tennis-europe'));
+  assert.ok(opponent.tournaments.filter(t=>['fitp','itf'].includes(t.circuit)).every(t=>!t.matches?.length));
+  assert.ok(opponent.tournaments.filter(t=>t.historyKind==='past'&&t.circuit==='tennis-europe').every(t=>t.matches.length===1));
+  assert.ok(snapshot.tournaments.filter(t=>t.circuit==='tennis-europe'&&t.startDate<'2026-10-11').every(t=>t.calendarState==='draw_confirmed'));
   assert.deepEqual(new Set(snapshot.tournaments.map(t=>t.circuit)),new Set(ids.map(([c])=>c)));
   assert.ok(snapshot.tournaments.every(t=>t.competitionId!=='homonym'));
   assert.ok(opponent.tournaments.every(t=>snapshot.tournaments.some(s=>s.competitionId===t.competitionId&&s.circuit===t.circuit)));
