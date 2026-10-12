@@ -3002,3 +3002,10 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Nuovo esito E2E da verificare al relativo run; sintassi controllata prima della pubblicazione. Report nello stesso commit.
 
 - Correzione integrata con PR #129 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/129, merge f1b4dbc8ae72760dd71ce37457d4edb48f65f592. Sintassi e quattro regressioni di gruppo passate. Run letti una sola volta senza polling: CourtWatch Shield https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190856079 (in_progress); Court Watch global D1 incremental policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190856188 (success); Court Watch v3 FITP player entries https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190886889 (queued); Court Watch global D1 incremental policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190876534 (in_progress); pages build and deployment https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190875726 (in_progress). Nuovo esito E2E non ancora certificato.
+
+
+## 12 ottobre 2026 — TCL: ripristino scroll dopo il caricamento definitivo
+
+- Run 38190856079, job 114623106077 indicato dall’utente: timeout alla riga 163, verifica della posizione nel ritorno Calendario Altri → Calendario TCL. Il passaggio iniziale TCL → Altri e la conservazione di mese/filtro avevano superato i controlli precedenti.
+- Il vecchio ripristino avveniva una sola volta con il layout della cache; il caricamento definitivo poteva modificare il layout/scroll successivamente. Ripristino ora completato anche dopo il primo caricamento definitivo, una sola volta. Wheel, touchmove, pointerdown, keydown e cambio route cancellano il ripristino tardivo, evitando di sovrascrivere un’interazione dell’utente; i refresh successivi non lo riapplicano. Nessuna modifica al controllo E2E della posizione.
+- Asset JS aggiornato. Regressioni su cache → layout finale, refresh e input/cambio pagina, più test navigazione/calendario; esito del nuovo browser Shield da attestare. Report nello stesso commit.

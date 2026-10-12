@@ -153,6 +153,8 @@ let calendarHeightObserver = null,
   uiSelectionRestored =
     Array.isArray(restoredUi.selected),
   uiScrollRestored = false,
+  uiScrollRestoreFinalized = false,
+  uiScrollRestoreCancelled = false,
   calendarPlayerHoldTimer = null,
   suppressTournamentOpenUntil = 0,
   suppressPlayerFilterUntil = 0,
@@ -198,12 +200,15 @@ function saveUiState() {
     );
   } catch {}
 }
-function restoreUiScroll() {
-  if (uiScrollRestored) return;
+function restoreUiScroll(finalize = false) {
+  if (uiScrollRestoreCancelled || uiScrollRestoreFinalized || (uiScrollRestored && !finalize)) return;
   uiScrollRestored = true;
-  requestAnimationFrame(() =>
-    requestAnimationFrame(() => scrollTo(0, Number(restoredUi.scrollY) || 0)),
-  );
+  if (finalize) uiScrollRestoreFinalized = true;
+  const routeHash = location.hash;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (!uiScrollRestoreCancelled && location.hash === routeHash)
+      scrollTo(0, Number(restoredUi.scrollY) || 0);
+  }));
 }
 const fmt = (d) =>
   new Intl.DateTimeFormat("it-IT", {
@@ -3806,7 +3811,10 @@ function wire() {
       playerSearchInput.setAttribute("aria-expanded", "false");
     }
   });
+  for (const event of ["wheel", "touchmove", "pointerdown", "keydown"])
+    addEventListener(event, () => { uiScrollRestoreCancelled = true; }, { passive: true });
   addEventListener("hashchange", () => {
+    uiScrollRestoreCancelled = true;
     const now = Date.now(),
       nextRouteScrollKey = location.hash || "#home";
     routeScrollMemory.set(activeRouteScrollKey, {
@@ -4046,6 +4054,7 @@ async function load() {
     }
     console.error(e);
   } finally {
+    if (state.data) restoreUiScroll(true);
     loadRunning = false;
   }
 }
