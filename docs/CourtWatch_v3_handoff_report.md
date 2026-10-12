@@ -1,8 +1,6 @@
-## 12 ottobre 2026 — Ripristino frontend e API prima del primo errore segnalato
+## 12 ottobre 2026 — Ripristino completo richiesto, validato
 
-L’utente richiede il ripristino completo, non ulteriori correzioni. Ripristinati v3.html, v3.js e tutti i moduli runtime API modificati rispetto a 9a5cf6d89b0a6bab442c97877aca2c62c38c9d37, precedente al deploy 38189047518 indicato prima del problema. Ripristinati comando check e test metadata coerenti con quella versione. Dati D1 e acquisizioni preservati; gli aggiornamenti UI successivi sono ritirati dal runtime per tornare alla versione richiesta.
-
-Diagnosi read-only 38192094749: app-snapshot con esiti canceled e 200, nessuna eccezione o log errore; non prova il successo di Altri, perché il riepilogo non distingue il gruppo. Frontend annulla dopo 8 secondi e ritenta per 15: compatibile con timeout, causa non ancora dimostrata. Sintassi JS ripristinato passata; check completo Worker in corso. Nessuna promessa di risoluzione sul solo verde.
+Frontend v3.html/v3.js e tutti i moduli runtime API differenti ripristinati al commit 9a5cf6d89b0a6bab442c97877aca2c62c38c9d37 precedente al primo run problematico indicato, 38189047518. Dati D1 e acquisizioni conservati. Ritirate dal runtime le modifiche UI successive come richiesto per tornare alla versione precedente. Sintassi frontend e npm run check completo passati. Deploy e funzionamento live da verificare. Diagnosi 38192094749 registra snapshot canceled e 200 senza errori, ma non distingue il gruppo: nessuna root cause attestata. Report concorrente conservato durante risoluzione conflitto PR #134.
 
 ## 12 ottobre 2026 — Diagnosi runtime Altri dopo rollback inefficace
 
@@ -3035,3 +3033,14 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Rollback integrato PR #131 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/131, merge 89f74fcae09c4f8afb55dd9eff343ecea0c6a403. Deploy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38191576583, D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38191576586, CRUD https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38191576653. Lettura mirata job 114625257127: installazione completata, controlli Worker in corso, deploy non ancora eseguito; funzionamento live non attestato.
 
 - Log terminale deploy rollback, job 114625257127: tutti i controlli passati; Worker distribuito alle 03:23:08 Europe/Rome, versione 8c4934db-f6d4-44af-961d-3fe9be8d5d17. Controllo pubblico assenza errore Worker 1101 passato. Questo conferma la distribuzione del codice precedente, non il caricamento dei dati Altri nella sessione autenticata dell’utente.
+
+
+## 12 ottobre 2026 — Escludere dalla visualizzazione FITP i riferimenti ITF del PUC
+
+- Richiesta e chiarimento utente: il PUC cattura anche riferimenti ITF; possono restare acquisiti ma non devono essere mostrati in FITP. ITF visibile esclusivamente attraverso la sorgente ITF. Nessuna riclassificazione degli ID FITP come ITF e nessuna cancellazione di documenti.
+- Conferma nei dati acquisiti: catalogo e archivio FITP contengono nomi ITF (J200 Firenze, M15 Altamura/Foggia, M25 Trento, W35 San Gregorio, World Masters). Applicato filtro alla proiezione in memoria prima di ogni route: esclude record FITP con parola ITF nel nome/descrizione ufficiale e riferimenti collegati per ID torneo, anche se il nome manca su partita/iscrizione/agenda. Tornei, partite, agenda, risultati e iscrizioni filtrati insieme; record nativi ITF conservati anche con stesso ID/nome. Cache e fonti acquisite non vengono cancellate.
+- Asset JS versionato. Regressioni su PUC e riferimenti collegati, circuito ITF preservato, nomi nazionali, legacy, case/boundary, assenza di mutazione delle sorgenti e replay idempotente; esiti pubblicazione da registrare. Report nello stesso commit; nessun polling.
+
+- Lo stesso filtro è applicato allo storico avversario ricevuto separatamente dalla API; acquisizione PUC, pipeline ITF e archivi rimangono invariati. 17 regressioni mirate passate; release guard e sintassi controllati prima della pubblicazione.
+
+- Integrata PR #133 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/133, merge edeca6a5f1ab5585717dbf073c479c550d7d1fa8. Run rilevati una sola volta, senza polling: Court Watch global D1 incremental policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192294341 (success); CourtWatch Shield https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192294326 (in_progress); Court Watch global D1 incremental policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192301441 (in_progress); pages build and deployment https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192300835 (in_progress). Pubblicazione finale e Shield ancora da confermare all’esito dei run.
