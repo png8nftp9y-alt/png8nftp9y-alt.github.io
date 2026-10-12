@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-12T10:28:46.122Z",
+  "generatedAt": "2026-10-12T10:32:39.866Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,12 +8,12 @@
     "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
-    "declaredSections": 5,
+    "declaredSections": 6,
     "requestedSections": 4,
-    "acquiredSections": 1,
+    "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 1,
+    "resolvedSections": 2,
     "missingSections": 4,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
@@ -101,15 +101,15 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-PAN-2026-001",
-      "tournamentName": "J60 Panama",
+      "competitionId": "J-J60-HUN-2026-002",
+      "tournamentName": "J60 Mogyorod",
       "decision": "pending",
       "playersFound": [],
-      "declaredSections": 5,
-      "acquiredSections": 1,
+      "declaredSections": 6,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 1,
+      "resolvedSections": 2,
       "missingSections": 4,
       "sections": [
         {
@@ -141,6 +141,13 @@
           "status": "pending"
         },
         {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "acquired": false,
@@ -168,7 +175,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 34,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -198,6 +205,19 @@
               "error": "draw_not_published_or_incomplete",
               "failureType": "not_published_or_incomplete",
               "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 28,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
