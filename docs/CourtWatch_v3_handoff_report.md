@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Correzione root cause integrata, nessun polling
+
+PR #142 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/142 integrata, merge efae2bb576b4055257674db73240ed6c32c97982. Corretto TypeError del circuito su source oggetto, verificato sul browser con i dati reali e riprodotto in regressione locale. Sette test mirati passati. Frontend aggiornato alla versione 202610120416; distribuzione automatica avviata dalla pubblicazione del merge. Nessuna lettura del nuovo run, nessuna dichiarazione di verifica live. TCL, Home, filtro PUC e dati personali conservati.
+
 ## 12 ottobre 2026 — Root cause Altri verificata e correzione circuit/source
 
 Il browser sullo snapshot reale ha riprodotto il messaggio esatto: TypeError (x.sourceId || x.source || x.sourceName || x.circuit || "").toLowerCase is not a function, stack circuit → isPuc → withoutPucItfReferences → othersSnapshotData → loadOthers. Contratto API valido group others, 8 giocatori: non era un errore di autenticazione o assenza dati. I tornei ITF archiviati hanno source come oggetto {circuit,sourceId,...}; il vecchio classifier lo preferiva al circuit e lo trattava come stringa. Il percorso interrompeva la costruzione della lista prima di state.data, causando schermata vuota. Questo caso reale mancava ai fixture sintetici.
