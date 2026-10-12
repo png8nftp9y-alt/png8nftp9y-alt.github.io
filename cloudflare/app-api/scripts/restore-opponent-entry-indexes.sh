@@ -26,10 +26,13 @@ restore_itf(){
     gzip -t "$candidate"
     count="$(gzip -cd "$candidate" | jq -r '(.participants // []) | length')"
     echo "ITF opponent-entry candidate slot=$slot participants=$count"
-    if test "$count" -ge "$ITF_MIN_PERMANENT_PARTICIPANTS" && test "$count" -gt "$best_count"; then
+    if test "$count" -ge "$ITF_MIN_PERMANENT_PARTICIPANTS"; then
+      if ! get_object "itf/database/generations/$generation/itf_draw_target_db.json" "tmp/opponent-entries/itf-$slot-draws.json"; then continue; fi
+      if ! jq -e '.tournaments | type == "object"' "tmp/opponent-entries/itf-$slot-draws.json" >/dev/null; then continue; fi
       best_count="$count"
       best_candidate="$candidate"
       best_slot="$slot"
+      break # Newest valid complete generation owns current acceptance state.
     fi
   done
   if test -z "$best_candidate"; then
@@ -37,6 +40,7 @@ restore_itf(){
     exit 1
   fi
   cp "$best_candidate" tmp/opponent-entries/itf_participant_cache.json.gz
+  cp "tmp/opponent-entries/itf-$best_slot-draws.json" tmp/opponent-entries/itf_draw_target_db.json
   printf '%s' "$best_slot" > tmp/opponent-entries/itf-source-slot.txt
   echo "Selected ITF opponent-entry slot=$best_slot participants=$best_count"
 }

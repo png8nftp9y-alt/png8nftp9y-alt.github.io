@@ -1,3 +1,10 @@
+## 2026-10-12 — General ITF draw history in opponent entry indexes
+Cause: opponent entry profiles were assembled from acceptance participants only; official cached draw players were omitted. In addition, the restore routine chose the largest cache, allowing stale backup acceptance statuses to supersede current ones.
+The importer now includes every native ITF ID present in populated, nonfailed official cached draws, across all acquired tournaments. It deduplicates singles/doubles by player and competition, stores official draw confirmation and keeps explicit acceptance withdrawals excluded. No match scores are published by this path.
+The restore routine uses the newest validated complete ITF generation, falling back only when validation fails, and requires its companion official draw cache from the same generation. Existing completeness and incremental write guards remain.
+Validation: two generic unit tests pass; JS and shell syntax checks pass. Replay against the repository's real public official draw cache produces 41,502 distinct player/tournament entries across 512 tournaments and 13,175 native IDs, with no duplicate player/tournament entries.
+Limitation: these counts validate acquired cache coverage, not all tournaments ever played. Tournaments absent from the official acquired draw cache still require acquisition; no claim of definitive completeness or production verification yet.
+
 ## 2026-10-12 — General personal tournament eligibility and source metadata
 Completed tournaments no longer show MD/Q/A acceptance badges. Player histories exclude cancelled events, withdrawn/removed entries and past alternates without official draw evidence; confirmed played events remain even when eliminated. These rules apply to every player and event.
 Linked FITP source metadata is read by exact membership card in one batched query, preserving circuit nationality while supplying club and FITP ranking. A verified FITP club is displayed even for foreign ITF nationality.
