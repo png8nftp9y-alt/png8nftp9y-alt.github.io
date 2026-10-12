@@ -2912,6 +2912,16 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Verifica ufficiale della tessera esatta di Martina Busa al servizio FITP attuale riuscita: nome/cognome e suffisso tessera concordanti, Tennis Club Lecco e ranking 4.NC. La risposta non contiene né data né anno di nascita: il recupero della nascita di Busa resta irrisolto per assenza del dato nella scheda, non per il precedente blocco di autorizzazione. Nessuna data dedotta da categoria o statistiche.
 
 
+- Pubblicazione: PR #122 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/122 integrata, merge fc72dc68e273490f6d28a9e9a112a7ac835d059a. Unica lettura iniziale, senza polling: Court Watch global D1 incremental policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189047512 (in_progress); Court Watch Cloudflare app Worker hotfix https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189047640 (in_progress); Court Watch Cloudflare D1 and app API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189047518 (pending); pages build and deployment https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189047028 (queued). Esiti finali non ancora certificati.
+- Preview Vercel della PR respinta per limite giornaliero `api-deployments-free-per-day` (oltre 100 deploy). Nessun upgrade o rilancio; pubblicazione Cloudflare/GitHub Pages affidata ai run indicati.
+
+
+## 12 ottobre 2026 — Verifica cancellazione GitHub Pages segnalata dall’utente
+
+- Run https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189047028 effettivamente cancellato: build e upload artifact riusciti, annullata soltanto la fase deploy.
+- Run successivo https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189074048 concluso con successo sul commit 47f80680e0f9240edfbe8265fba75eebfea131e5. Verificato il file v3.js a quel commit: contiene la rimozione della sola parola ricreativa. La modifica è quindi inclusa nel deploy Pages riuscito; non occorre rilanciare il run annullato.
+- Unica lettura di stato, senza polling. Ulteriore aggiornamento Pages https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189119756 visto in_progress; policy incrementale https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189047512 verde. Worker 38189047640 visto in_progress, D1/API 38189047518 pending: esiti finali non attestati in questa verifica.
+
 ## Aggiornamento 12 ottobre 2026 — metadati Pietro Sala e storico ITF indicizzato
 
 - Ripresa richiesta utente: circolo, data di nascita, classifica FITP mancanti e tornei ITF incompleti. Verificato il job verde di associazione `38175095515`, job `114575703759`: mapping esatto completato, ma il conteggio storico per partecipanti risultava zero match/zero tornei.
