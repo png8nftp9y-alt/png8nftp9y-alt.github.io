@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Conserva TCL e ripristina esclusione ITF da PUC
+
+Ripristinato il filtro withoutPucItfReferences della PR #133, ritirato dal rollback frontend. TCL e navigazione speculare conservati. Esclusi soltanto riferimenti ITF presentati come FITP/PUC; dati nativi ITF mantenuti. Due regressioni PUC passate. Nessun’altra modifica alle pipeline o al database. Il blocco Altri resta da risolvere; test Shield con dati sintetici non provano il caricamento sul database di produzione. Diagnosi read-only avviata https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192925627. No polling.
+
 ## 12 ottobre 2026 — Ripristina TCL e verifica dati Altri
 
 L’utente conferma che il rollback generale ha tolto TCL senza risolvere Altri. Ripristinati v3.html/v3.js, regressioni gruppo e Shield dalla versione TCL 5b253504. Nessun altro rollback generale. Diagnosi backend: replay locale della route Others con adapter D1 strettamente SELECT-only sull’account esistente; nessuna richiesta autenticata contraffatta al servizio live, nessuna modifica database. Il riepilogo riporta solo tempi, quantità e messaggi oscurati, senza giocatori, cookie o snapshot personali. Verifica destinata a trovare il blocco reale, non a certificare il funzionamento dall’esito verde dei test. No polling.
