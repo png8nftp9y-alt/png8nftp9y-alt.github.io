@@ -2972,3 +2972,9 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Correzione e report pubblicati insieme; verifica deploy da attestare al relativo run. Nessun polling.
 
 - Ripristino integrato con PR #126 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/126 , merge `c7c690a82346a720dd6d7931171f352bb4bf66b2`. Nove test mirati finali passati. Run deploy urgente Worker https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190398001 (in_progress all’unica lettura); D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190398056 (pending); CRUD https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190398075 (in_progress); policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190397999 (completed). Nessuna nuova migrazione/import richiesta dal ripristino. Funzionamento live Altri ancora da confermare dopo deploy; nessun polling.
+
+
+## Deploy ripristino Altri bloccato dal contratto test — 12 ottobre 2026
+
+- Verifica puntuale del run inviato dall’utente https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38190398001 , job `114621725950`: fallimento prima di configurazione/deploy. 66 test su 67 passati nel gruppo finale; `multicircuit-player-view.test.mjs` pretendeva ancora 3 partite pubblicate (FITP, ITF, TE), mentre il nuovo contratto ne pubblica solo una TE. Nessun ripristino distribuito da questo run.
+- Aggiornato il test d’integrazione al requisito esplicito dell’utente: profili e tornei/iscrizioni per tutti e tre i circuiti restano disponibili; risultati pubblicati soltanto TE, nessuna partita FITP/ITF in snapshot/avversario. Non disabilitati controlli né ignorati errori di deploy. Test mirato e controllo completo rieseguiti prima del nuovo merge. Report e correzione del test nello stesso commit; nessun polling.
