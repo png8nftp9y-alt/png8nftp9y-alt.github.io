@@ -1,3 +1,11 @@
+## 2026-10-12 — Preserve withdrawals through draw/history merges and reduce Others snapshot work
+User still observed withdrawn tournaments, incomplete ITF history and the red Others load-failure line after the prior import succeeded.
+Verified merge defect: a prior draw confirmation could overwrite an incoming withdrawn entry, and the later history merge forced official_draw over current withdrawals. Explicit withdrawal/cancellation now has precedence in both merges for every circuit, including withdrawals with no W code.
+Removed the red Others failure banner as requested. A neutral status with Riprova remains, retaining last-good data and the actual error in console.
+FITP/ITF results remain unreleased. Snapshot now reads their officially indexed tournament presence in one batched native-ID query, without match payloads or opponent/score hydration. Every indexed tournament is retained, with official ITF metadata enrichment; published match history is limited to Tennis Europe. This reduces live query/subrequest work while preserving tournament histories and identity boundaries.
+Validation: npm run check passes on the clean current archive with these changes; SQLite test covers 320 matches across 8 tournaments, one query, deduplication and foreign-ID exclusion; general withdrawal tests cover FITP/TE/ITF and both merges; independent Others loader tests pass.
+Limits: this proves completeness over acquired/indexed sources, not all tournaments ever played. The reported live load failure's exact response has not been captured; query reduction addresses an avoidable cost but is not claimed as its verified sole cause. Production browser/data verification remains pending. No Git history exists in the local archive for Git-diff policy checks; CI performs those checks.
+
 ## 2026-10-12 — Fix source-check fixtures blocking ITF history deployment
 Run 38197564049 attempt failed at Check source before any Worker deployment or D1 import. The opponent-entry generator's test omitted the newly required official draw cache. Full validation additionally found two isolated calendar tests missing the new concluded-date helper.
 Updated the generator fixture with official cached draw presence and assertions on imported native ITF profile evidence; updated isolated calendar fixtures to load the date helper with a fixed test date.

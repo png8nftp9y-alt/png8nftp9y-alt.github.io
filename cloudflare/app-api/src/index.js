@@ -10,7 +10,8 @@ import {paginatedPlayerSearch,searchIdentityProfile} from '../lib/paginated-play
 import {resolveCircuitProfiles,circuitProfiles,playerCircuitIdentities} from '../lib/player-circuit-profiles.mjs';
 import {opponentTournamentWindow} from '../lib/opponent-tournament-window.mjs';
 import {otherCircuitOpponentHistory,boundedRows} from '../lib/opponent-canonical-history.mjs';
-import {mergePersonalLiveTournaments} from '../lib/personal-live-entry.mjs';
+import {mergePersonalLiveTournaments,mergePersonalHistoryTournament} from '../lib/personal-live-entry.mjs';
+import {personalUnreleasedTournamentHistory} from '../lib/personal-unreleased-tournaments.mjs';
 import {personalCircuitHistory} from '../lib/personal-tennis-europe-history.mjs';
 import {personalPlayerMetadata} from '../lib/personal-player-metadata.mjs';
 import {addCourtWatchPlayer,personalPlayerAdditions} from '../lib/courtwatch-player-additions.mjs';
@@ -163,11 +164,16 @@ async function protectedApp(request,env,path,url){
       const live=mergePersonalLiveTournaments(tournaments,entries.map(t=>({...t,playerName:player.name})),player.id);
       tournaments.splice(0,tournaments.length,...live);
     }
+    const unreleasedHistory=await personalUnreleasedTournamentHistory(env.DB,added);
+    const officialItf=unreleasedHistory.some(t=>t.circuit==='itf')?await itfTournamentMetadata():new Map();
+    const allHistory=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
+    for(const t of unreleasedHistory){const official=officialItf.get(String(t.competitionId||'').toUpperCase())||{};const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;allHistory.set(key,mergePersonalHistoryTournament({...t,location:t.location||official.location||'',startDate:t.startDate||official.startDate||'',endDate:t.endDate||official.endDate||''},allHistory.get(key)));}
+    tournaments.splice(0,tournaments.length,...allHistory.values());
     for(const player of added){
-      const history=await personalCircuitHistory(env.DB,player);
+      const history=await personalCircuitHistory(env.DB,player,{publishedCircuits:['tennis-europe']});
       const position=players.findIndex(p=>p.id===player.id);if(position>=0)players[position]=personalPlayerMetadata({...history.player,sourceCircuit:player.sourceCircuit});
       const tournamentMap=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
-      for(const t of history.tournaments){const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;tournamentMap.set(key,{...t,...tournamentMap.get(key),calendarState:t.calendarState,entryStatus:t.entryStatus,calendarListLabel:''});}
+      for(const t of history.tournaments){const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;tournamentMap.set(key,mergePersonalHistoryTournament(t,tournamentMap.get(key)));}
       tournaments.splice(0,tournaments.length,...tournamentMap.values());
       const matchMap=new Map(matches.map(m=>[`${m.playerId}|${m.matchId||m.id}`,m]));
       for(const m of history.matches)matchMap.set(`${m.playerId}|${m.matchId||m.id}`,{...matchMap.get(`${m.playerId}|${m.matchId||m.id}`),...m});

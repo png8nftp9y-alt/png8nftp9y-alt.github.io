@@ -3900,15 +3900,17 @@ async function loadOthers() {
       if (!uiSelectionRestored) { state.selected = new Set(cached.players.map(p => p.id)); uiSelectionRestored = true; }
       syncLabel(cached, true);
       renderIfDataChanged();
-    } else unavailableLabel();
-    const alert = $("dataAlert");
-    if (alert) {
-      alert.hidden = false;
-      alert.textContent = "Altri: caricamento non riuscito. ";
+    }
+    const alert = $("dataAlert"); if (alert) { alert.hidden = true; alert.textContent = ""; }
+    const status = $("syncStatus");
+    if (status) {
+      status.hidden = false;
+      status.className = "status";
+      status.textContent = cached?.personalProjectionComplete ? "Aggiornamento non riuscito. " : "Dati non disponibili. ";
       const retry = document.createElement("button");
       retry.type = "button"; retry.textContent = "Riprova";
       retry.onclick = () => loadOthers();
-      alert.append(retry);
+      status.append(retry);
     }
     console.error("others_snapshot_unavailable", error);
   } finally { loadRunning = false; }
