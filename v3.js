@@ -497,6 +497,20 @@ const circuit = (x) => {
       ? "itf"
       : "fitp";
 };
+function withoutPucItfReferences(data) {
+  if (!data) return data;
+  const fields = ["tournaments", "matches", "agenda", "results", "tournamentEntries"];
+  const isPuc = item => circuit(item) === "fitp";
+  const mentionsItf = item => /\bITF\b/i.test([item?.tournamentName, item?.name, item?.nome_torneo, item?.description, item?.descrizione].filter(Boolean).join(" "));
+  const ids = item => [item?.competitionId, item?.tournamentId, item?.tournamentKey].filter(Boolean).map(value => String(value).toUpperCase());
+  const blocked = new Set();
+  for (const field of fields) for (const item of data[field] || [])
+    if (isPuc(item) && mentionsItf(item)) ids(item).forEach(id => blocked.add(id));
+  const result = { ...data };
+  for (const field of fields) if (Array.isArray(data[field]))
+    result[field] = data[field].filter(item => !isPuc(item) || (!mentionsItf(item) && !ids(item).some(id => blocked.has(id))));
+  return result;
+}
 const circuitRank = (x) =>
   ({ itf: 0, "tennis-europe": 1, fitp: 2 })[circuit(x)] ?? 3;
 const acceptanceRank = (x) =>
@@ -2677,6 +2691,7 @@ function opponentHistoryMatchSectionsHtml(matches) {
   );
 }
 function renderOpponentHistory(data) {
+  data = withoutPucItfReferences(data);
   const badges=$("opponentCircuitProfiles");if(badges)badges.innerHTML=playerCircuitLinksHtml(data.circuitProfiles||[]);
   const tournaments = data.tournaments || [],
     body = $("opponentTournamentHistory");
@@ -3457,6 +3472,7 @@ renderProfile = function (id) {
   applyFilter();
 };
 function route() {
+  state.data = withoutPucItfReferences(state.data);
   const player = location.hash.match(/^#player\/(.+)$/),
     currentOpponent = location.hash.match(
       /^#opponent-profile\/([^/]+)\/([^/]+)\/([^/]+)$/,
