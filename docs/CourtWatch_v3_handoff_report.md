@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Screenshot conferma blocco Altri; riproduzione completa con dati reali
+
+Screenshot delle 04:04 mostra TCL presente, lista giocatori vuota e Caricamento. Verifica singola degli asset pubblici conferma HTML v202610120400 e JS con nuovo loadOthers: non è ancora verificata la versione caricata nella sessione Safari dell’utente. Nuova verifica CI esegue il vero JS/HTML su snapshot reale D1 via SELECT-only, intercettando soltanto la API locale nel browser di test. Conta richieste API, righe renderizzate, Home e cattura stack JS: copre l’avvio che i test delle sole funzioni non coprivano. Snapshot privato solo /tmp runner, senza upload, screenshots o stampa dei giocatori. No polling; esito da registrare.
+
 ## 12 ottobre 2026 — Caricamento Altri ricostruito e integrato
 
 PR #139 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/139 integrata, merge 865d9345900c8f1710693447a581bccad615eff2. Loader personale indipendente, cache dati/calendario v2, gruppo obbligatorio others, errore e retry espliciti; TCL/Home/PUC conservati. 14 test mirati passati. Run avviati: Court Watch global D1 incremental policy: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38194268492 · pages build and deployment: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38194267558. Nessun polling: esito distribuzione e funzionamento live non attestati.
