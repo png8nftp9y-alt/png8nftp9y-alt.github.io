@@ -153,8 +153,6 @@ let calendarHeightObserver = null,
   uiSelectionRestored =
     Array.isArray(restoredUi.selected),
   uiScrollRestored = false,
-  uiScrollRestoreFinalized = false,
-  uiScrollRestoreCancelled = false,
   calendarPlayerHoldTimer = null,
   suppressTournamentOpenUntil = 0,
   suppressPlayerFilterUntil = 0,
@@ -200,15 +198,12 @@ function saveUiState() {
     );
   } catch {}
 }
-function restoreUiScroll(finalize = false) {
-  if (uiScrollRestoreCancelled || uiScrollRestoreFinalized || (uiScrollRestored && !finalize)) return;
+function restoreUiScroll() {
+  if (uiScrollRestored) return;
   uiScrollRestored = true;
-  if (finalize) uiScrollRestoreFinalized = true;
-  const routeHash = location.hash;
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    if (!uiScrollRestoreCancelled && location.hash === routeHash)
-      scrollTo(0, Number(restoredUi.scrollY) || 0);
-  }));
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => scrollTo(0, Number(restoredUi.scrollY) || 0)),
+  );
 }
 const fmt = (d) =>
   new Intl.DateTimeFormat("it-IT", {
@@ -545,7 +540,7 @@ function personalNationalityHtml(player) {
  return country?nationalityHtml(country):'';
 }
 function displayPlayerClub(value) {
- return String(value || '').replace(/\bassociazione\s+(?:culturale\s+(?:e\s+)?)?sportiva\s+dilettantistic[ao]\b/gi, '').replace(/\b(?:e\s+)?ricreativa\b/gi, "").replace(/\bdilettantistic[ao]\b/gi, '').replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi, '').replace(/\s+/g, ' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g, '').trim().replace(/(?:\s+e)+$/gi, '').toLocaleLowerCase('it-IT').replace(/(^|[\s’\u0027-])\p{L}/gu, letter => letter.toLocaleUpperCase('it-IT'));
+ return String(value || '').replace(/\bassociazione\s+(?:culturale\s+(?:e\s+)?)?sportiva\s+dilettantistic[ao]\b/gi, '').replace(/\bdilettantistic[ao]\b/gi, '').replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi, '').replace(/\s+/g, ' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g, '').trim().toLocaleLowerCase('it-IT').replace(/(^|[\s’\u0027-])\p{L}/gu, letter => letter.toLocaleUpperCase('it-IT'));
 }
 function personalPlayerAffiliationHtml(player) {
  const country=foreignPlayerCountry(player);
@@ -3620,32 +3615,22 @@ function toggleDatePopover() {
   renderDatePopover();
   pop.hidden = false;
 }
-function switchPlayerGroup() {
-  saveUiState();
-  const target = new URL(location.href);
-  const targetGroup = PLAYER_GROUP === "main" ? "others" : "main";
-  if (targetGroup === "others") target.searchParams.set("group", "others");
-  else target.searchParams.delete("group");
-  // Transfer the view, dates and common filters; player selections belong to each group.
-  try {
-    const targetKey = "courtwatch-v3-ui-state-v1" + (targetGroup === "others" ? "-others" : "");
-    const current = JSON.parse(localStorage.getItem(UI_STATE_CACHE) || "{}");
-    const mirrored = JSON.parse(localStorage.getItem(targetKey) || "{}");
-    for (const key of ["agenda", "month", "agendaMode", "categoryFilters", "sexFilter", "scrollY"])
-      if (Object.prototype.hasOwnProperty.call(current, key)) mirrored[key] = current[key];
-    localStorage.setItem(targetKey, JSON.stringify(mirrored));
-  } catch {}
-  location.assign(target.href);
-}
 function wire() {
   if (PLAYER_GROUP === "others") {
     document.title = "Court Watch · Altri";
     $("activePlayerGroup").hidden = false;
   }
   document.querySelectorAll("[data-switch-player-group]").forEach(button => {
-    button.textContent = PLAYER_GROUP === "others" ? (button.id === "homeOthers" ? "Vai a TCL" : "TCL") : button.textContent;
-    button.setAttribute("aria-label", PLAYER_GROUP === "others" ? "Apri giocatori TCL" : "Apri altri giocatori");
-    button.onclick = switchPlayerGroup;
+    button.textContent = PLAYER_GROUP === "others" ? (button.id === "homeOthers" ? "Vai a Principali" : "Principali") : button.textContent;
+    button.setAttribute("aria-label", PLAYER_GROUP === "others" ? "Apri giocatori principali" : "Apri altri giocatori");
+    button.onclick = () => {
+      saveUiState();
+      const target = new URL(location.href);
+      if (PLAYER_GROUP === "main") target.searchParams.set("group", "others");
+      else target.searchParams.delete("group");
+      target.hash = "";
+      location.assign(target.href);
+    };
   });
   wirePlayersColumnHeight();
   $("addPlayer").onclick = openAddPlayerDialog;
@@ -3811,10 +3796,7 @@ function wire() {
       playerSearchInput.setAttribute("aria-expanded", "false");
     }
   });
-  for (const event of ["wheel", "touchmove", "pointerdown", "keydown"])
-    addEventListener(event, () => { uiScrollRestoreCancelled = true; }, { passive: true });
   addEventListener("hashchange", () => {
-    uiScrollRestoreCancelled = true;
     const now = Date.now(),
       nextRouteScrollKey = location.hash || "#home";
     routeScrollMemory.set(activeRouteScrollKey, {
@@ -4054,7 +4036,6 @@ async function load() {
     }
     console.error(e);
   } finally {
-    if (state.data) restoreUiScroll(true);
     loadRunning = false;
   }
 }

@@ -1,3 +1,9 @@
+## 12 ottobre 2026 — Ripristino frontend e API prima del primo errore segnalato
+
+L’utente richiede il ripristino completo, non ulteriori correzioni. Ripristinati v3.html, v3.js e tutti i moduli runtime API modificati rispetto a 9a5cf6d89b0a6bab442c97877aca2c62c38c9d37, precedente al deploy 38189047518 indicato prima del problema. Ripristinati comando check e test metadata coerenti con quella versione. Dati D1 e acquisizioni preservati; gli aggiornamenti UI successivi sono ritirati dal runtime per tornare alla versione richiesta.
+
+Diagnosi read-only 38192094749: app-snapshot con esiti canceled e 200, nessuna eccezione o log errore; non prova il successo di Altri, perché il riepilogo non distingue il gruppo. Frontend annulla dopo 8 secondi e ritenta per 15: compatibile con timeout, causa non ancora dimostrata. Sintassi JS ripristinato passata; check completo Worker in corso. Nessuna promessa di risoluzione sul solo verde.
+
 ## 12 ottobre 2026 — Diagnosi runtime Altri dopo rollback inefficace
 
 Osservazione read-only di 65 secondi dei log Worker: solo percorsi API, status ed errori con email/ID oscurati. Nessuna registrazione header, cookie, query, body; nessuna modifica D1. Il rollback non ha risolto secondo l’utente: causa da accertare.

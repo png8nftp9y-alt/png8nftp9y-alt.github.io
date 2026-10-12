@@ -8,22 +8,25 @@ const reverseScore=value=>String(value||'').split(/\s+/).map(set=>{const m=set.m
 async function personalHistory(db,player,circuit){
  const name=normalized(player.name),variants=[...new Set([name,name.split(' ').reverse().join(' ')])];
  if(!name)return {player,tournaments:[],matches:[]};
+ const native=playerCircuitIdentities(player).find(p=>p.circuit===circuit)?.profileId;
+ const identityWhere=native?'self.source_player_id=?':`lower(self.normalized_name) IN (${variants.map(()=>'?').join(',')})`,identityValues=native?[native]:variants;
  const sources=[];let last='';
  while(true){
-  const batch=await rows(db,`SELECT DISTINCT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM match_participants self JOIN matches m ON m.id=self.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE lower(self.normalized_name) IN (${variants.map(()=>'?').join(',')}) AND m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...variants,circuit,last]);
+  const batch=await rows(db,`SELECT DISTINCT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM match_participants self JOIN matches m ON m.id=self.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE ${identityWhere} AND m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...identityValues,circuit,last]);
   sources.push(...batch);if(batch.length<250)break;
   const next=batch.at(-1).match_id;if(next<=last)throw Error('personal_history_pagination_failed');last=next;
  }
  const participants=[];
  for(let i=0;i<sources.length;i+=40){const ids=sources.slice(i,i+40).map(x=>x.match_id);participants.push(...await rows(db,`SELECT match_id,source_player_id,display_name,normalized_name,nationality,team_index,is_winner,payload FROM match_participants WHERE match_id IN (${ids.map(()=>'?').join(',')}) ORDER BY match_id,team_index,participant_key`,ids));}
- const selfRows=participants.filter(p=>nameKey(p.normalized_name||p.display_name)===nameKey(player.name));
+ const isSelf=p=>native?String(p.source_player_id).toLowerCase()===native.toLowerCase():nameKey(p.normalized_name||p.display_name)===nameKey(player.name);
+ const selfRows=participants.filter(isSelf);
  const countries=[...new Set(selfRows.map(p=>String(p.nationality||'').toUpperCase()).filter(Boolean))];
  const country=String(player.nationality||'').toUpperCase();
- if(countries.length>1||country&&countries.some(c=>c!==country))throw Error('personal_history_identity_ambiguous');
+ if(!native&&(countries.length>1||country&&countries.some(c=>c!==country)))throw Error('personal_history_identity_ambiguous');
  const enriched={...player,nationality:country||countries[0]||''},tournaments=new Map(),matches=[];
  const byMatch=new Map();for(const p of participants){const list=byMatch.get(p.match_id)||[];list.push(p);byMatch.set(p.match_id,list);}
  for(const source of sources){
-  const raw=parsed(source.match_payload),t=parsed(source.tournament_payload),people=byMatch.get(source.match_id)||[],self=people.filter(p=>nameKey(p.normalized_name||p.display_name)===nameKey(player.name));
+  const raw=parsed(source.match_payload),t=parsed(source.tournament_payload),people=byMatch.get(source.match_id)||[],self=people.filter(isSelf);
   if(self.length!==1)throw Error('personal_history_identity_ambiguous');
   const own=self[0],partners=people.filter(p=>p.team_index===own.team_index&&p!==own),opponents=people.filter(p=>p.team_index!==own.team_index);
   const competitionId=raw.competitionId||t.competitionId||source.source_tournament_id||source.tournament_id;

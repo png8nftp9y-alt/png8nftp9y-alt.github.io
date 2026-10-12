@@ -44,18 +44,5 @@ export async function recoverPietroSalaFitpClubs(rows,{fetcher=fetch}={}){
   if(!p||playerNameKey([p.name,p.surname].join(' '))!=='PIETRO SALA'||!String(p.membershipCard||'').endsWith(card.slice(-3))||!String(p.tennis_club_name||'').trim())throw Error('pietro_sala_official_fitp_mismatch');
   profiles.set(card,p);
  }
- return rows.map(row=>{const p=profiles.get(row.official_id);if(row.circuit!=='fitp'||!p)return row;const original=typeof row.payload==='string'?JSON.parse(row.payload):row.payload||{};return {...row,payload:JSON.stringify({...original,club:p.tennis_club_name,ranking:p.ranking||original.ranking||'',...(cardBirth(row.official_id)),fitpClubEvidence:{endpoint:'https://dp-myfit-test-function-v2.azurewebsites.net/api/v1/tesserati/dettaglio/semplice',clubId:p.tennis_club_id,province:p.tennis_club_province}})};});
-}
-
-function cardBirth(card){return card==='4537099241'?{birthYear:2009,birthYearSource:'https://www.tennis-ticino.ch/document/quadri_regionali_2023_2024.pdf'}:{}}
-export async function savePietroSalaMetadata(query,beforeRows,enrichedRows){
- const key=r=>r.source_table+'|'+r.source_key;
- const wanted=r=>r.circuit==='fitp'&&r.official_id==='4537099241'&&['observed_players','search_acquired_players'].includes(r.source_table);
- const plan=buildIncrementalSyncPlan({current:beforeRows.filter(wanted),incoming:enrichedRows.filter(wanted),keyOf:key,sourceComplete:true});
- for(const {before,after}of plan.updates){
-  await query(`UPDATE ${after.source_table} SET payload=${sqlString(after.payload)} WHERE source_key=${sqlString(after.source_key)} AND official_id='4537099241' AND payload=${sqlString(before.payload)} AND payload IS NOT ${sqlString(after.payload)};`);
-  const check=await query(`SELECT payload FROM ${after.source_table} WHERE source_key=${sqlString(after.source_key)} AND official_id='4537099241'`);
-  if(check[0]?.payload!==after.payload)throw Error('pietro_sala_metadata_readback_failed');
- }
- return {changed:plan.updates.length};
+ return rows.map(row=>{const p=profiles.get(row.official_id);if(row.circuit!=='fitp'||!p)return row;const original=typeof row.payload==='string'?JSON.parse(row.payload):row.payload||{};return {...row,payload:JSON.stringify({...original,club:p.tennis_club_name,fitpClubEvidence:{endpoint:'https://dp-myfit-test-function-v2.azurewebsites.net/api/v1/tesserati/dettaglio/semplice',clubId:p.tennis_club_id,province:p.tennis_club_province}})};});
 }
