@@ -3212,3 +3212,21 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Esclusa la riga Cereghini contro Dirnbek solo quando esiste la coppia completa nello stesso slot ufficiale.
 - Manuali, risultati, altri slot e avversari diversi conservati. Regola valida anche per incontri futuri.
 - Nessuna cancellazione D1; la precedente correzione dei provvisori non risolveva questo caso.
+
+
+## Altri tournament parity with TCL — 2026-10-12
+
+Use exact circuit and tournament ID to recover official links, venue, address,
+location and court conditions from official catalogues and the TCL projection for every player group and recursive opponent profile.
+Apply the official qualifying start date to ITF/Europe calendar starts when available.
+Use the existing shared tournament page and Google Maps renderer; expose the same venue link in recursive opponent tournament cards. Version frontend and opponent caches so old cards are refreshed once.
+Preserve participation, withdrawal and acceptance evidence.
+
+Remove the TCL-only condition from ITF factsheet metadata acquisition and
+persistence in normal and retry acceptance acquisition. Reuse complete curated
+metadata for untracked tournaments instead of requesting the factsheet again.
+No new polling or database writes in app reads.
+
+Validation: Worker/acquisition syntax checks and six regression tests.
+Limits: missing factsheets still require successful acquisition; no estimated
+qualifying dates or invented venue names. Production checks follow in Actions.

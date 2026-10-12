@@ -2759,9 +2759,7 @@ function renderOpponentHistory(data) {
         .map(
           (tournament) => {
             const source = circuit(tournament),
-              home = tournament.sourceUrl || (source === "tennis-europe" && tournament.competitionId
-                ? `https://te.tournamentsoftware.com/tournament/${encodeURIComponent(tournament.competitionId)}`
-                : "");
+              home = tournamentOfficialUrl(tournament);
             const projectedTournament = (state.data?.tournaments || []).find(
                 (item) =>
                   String(item.competitionId || item.sourceTournamentId || "") ===
@@ -2773,7 +2771,7 @@ function renderOpponentHistory(data) {
             const entryLabel = !(tournament.matches || []).length && tournament.entryStatus
               ? `<p class="opponentTournamentEntry">${esc(source === "itf" && tournament.acceptanceCode ? `Iscritto · ${tournament.acceptanceCode}` : "Iscritto")}</p>`
               : "";
-            return `<section class="opponentHistoryTournament"><p class="opponentHistoryKind">${tournament.historyKind === "upcoming" ? "Prossimo torneo programmato" : "Torneo passato"}</p><header class="opponentHistoryTournamentHead"><h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header>${entryLabel}<div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [])}</div></section>`;
+            return `<section class="opponentHistoryTournament"><p class="opponentHistoryKind">${tournament.historyKind === "upcoming" ? "Prossimo torneo programmato" : "Torneo passato"}</p><header class="opponentHistoryTournamentHead"><h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header>${tournamentPlace(tournament) !== "Luogo da pubblicare" ? `<p>📍 <a class="tournamentMapsLink" href="${esc(tournamentMapsUrl(tournamentPlace(tournament)))}" target="_blank" rel="noopener">${esc(tournamentPlace(tournament))}</a></p>` : ""}${entryLabel}<div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [])}</div></section>`;
           },
         )
         .join("")
@@ -2782,7 +2780,7 @@ function renderOpponentHistory(data) {
 }
 function opponentHistoryKey(name, event = "", profileId = "") {
   const asOf = iso(new Date()),
-    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "latest-rankings-v3"].join("|");
+    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "latest-rankings-v4-tournament-metadata"].join("|");
   return { asOf, requestKey };
 }
 async function fetchOpponentHistory(name, event = "", profileId = "", refresh = false) {

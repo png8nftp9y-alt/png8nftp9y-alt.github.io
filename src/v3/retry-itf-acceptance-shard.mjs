@@ -126,22 +126,20 @@ for (const failure of doc.errors || []) {
       ),
       pageMeta = acceptance.pageMeta || {},
       acquiredMeta =
-        tracked &&
+        (tracked || !officialMetadata.tournaments?.[t.competitionId]?.qualificationStartDate || !officialMetadata.tournaments?.[t.competitionId]?.venueName || !officialMetadata.tournaments?.[t.competitionId]?.address) &&
         (!pageMeta.qualificationStartDate ||
           !pageMeta.venueName ||
           !pageMeta.address)
           ? await factsheetMeta(t)
           : {},
-      detectedMeta = tracked
-        ? {
+      detectedMeta = {
             qualificationStartDate:
               acquiredMeta.qualificationStartDate ||
               pageMeta.qualificationStartDate ||
               "",
             venueName: acquiredMeta.venueName || pageMeta.venueName || "",
             address: acquiredMeta.address || pageMeta.address || "",
-          }
-        : {},
+          },
       curatedMeta = officialMetadata.tournaments?.[t.competitionId] || {},
       meta = {
         qualificationStartDate:
@@ -153,7 +151,7 @@ for (const failure of doc.errors || []) {
       },
       qualificationStartDate = meta.qualificationStartDate || "",
       startDate = qualificationStartDate || t.startDate;
-    if (tracked && (meta.venueName || meta.address || meta.qualificationStartDate)) {
+    if (meta.venueName || meta.address || meta.qualificationStartDate) {
       const next = {
           competitionId: t.competitionId,
           ...meta,
