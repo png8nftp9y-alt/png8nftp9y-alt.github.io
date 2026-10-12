@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Ripristina TCL e verifica dati Altri
+
+L’utente conferma che il rollback generale ha tolto TCL senza risolvere Altri. Ripristinati v3.html/v3.js, regressioni gruppo e Shield dalla versione TCL 5b253504. Nessun altro rollback generale. Diagnosi backend: replay locale della route Others con adapter D1 strettamente SELECT-only sull’account esistente; nessuna richiesta autenticata contraffatta al servizio live, nessuna modifica database. Il riepilogo riporta solo tempi, quantità e messaggi oscurati, senza giocatori, cookie o snapshot personali. Verifica destinata a trovare il blocco reale, non a certificare il funzionamento dall’esito verde dei test. No polling.
+
 ## 12 ottobre 2026 — Deploy del ripristino rilanciato, nessun polling
 
 PR #135 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/135 integrata con merge 633de3499cde0a7daebb356ec6815d53dcbfd970; test originali di gruppo e Shield ripristinati. Rilanciato soltanto job deploy-worker 114627685377 del run https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192375299, che esegue checkout ref main. L’utente ribadisce no polling: nessuna ulteriore lettura dello stato del run, esito non attestato. Frontend già pubblicato; completamento API dipende dal rilancio.
