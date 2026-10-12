@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Blocco riprodotto nel browser completo
+
+Run indicato 38194775480: database risponde 200 con 8 giocatori/161 tornei/46 query, ma il browser resta senza state.data e mostra Altri caricamento non riuscito. Nessun pageerror perché il loader intercetta l’errore; la verifica precedente non catturava console.error. Aggiunto controllo del contratto JSON (gruppo e nomi campi, senza dati personali) e cattura del messaggio intercettato others_snapshot_unavailable. Il caso fallito è conservato per verifica della correzione. No polling.
+
 ## 12 ottobre 2026 — Screenshot conferma blocco Altri; riproduzione completa con dati reali
 
 Screenshot delle 04:04 mostra TCL presente, lista giocatori vuota e Caricamento. Verifica singola degli asset pubblici conferma HTML v202610120400 e JS con nuovo loadOthers: non è ancora verificata la versione caricata nella sessione Safari dell’utente. Nuova verifica CI esegue il vero JS/HTML su snapshot reale D1 via SELECT-only, intercettando soltanto la API locale nel browser di test. Conta richieste API, righe renderizzate, Home e cattura stack JS: copre l’avvio che i test delle sole funzioni non coprivano. Snapshot privato solo /tmp runner, senza upload, screenshots o stampa dei giocatori. No polling; esito da registrare.
