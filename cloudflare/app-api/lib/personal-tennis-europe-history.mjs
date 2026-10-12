@@ -1,3 +1,4 @@
+import {itfMatchScore} from '../../../src/v3/itf-match-participants.mjs';
 import {playerCircuitIdentities} from './player-circuit-profiles.mjs';
 const normalized=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
 const nameKey=value=>normalized(value).split(' ').sort().join(' ');
@@ -33,8 +34,9 @@ async function personalHistory(db,player,circuit){
   const tournament={...t,id:source.tournament_id,competitionId,name:t.name||t.tournamentName||raw.tournamentName||competitionId,circuit,playerId:player.id,playerName:player.name,calendarState:'draw_confirmed',entryStatus:'official_draw',calendarListLabel:'',startDate:t.startDate||t.officialStartDate||source.played_date,endDate:t.endDate||source.played_date};
   tournaments.set(source.tournament_id,tournament);
   const event=raw.event||raw.draw||'',double=partners.length>0||/^GD|^BD|DOUBLE/i.test(event);
-  const score=own.team_index===1?reverseScore(raw.score||raw.result):String(raw.score||raw.result||'');
-  const decided=own.is_winner!==null&&own.is_winner!==undefined;
+  const rawScore=circuit==='itf'?itfMatchScore(raw):String(raw.score||raw.result||'');
+  const score=own.team_index===1?reverseScore(rawScore):rawScore;
+  const decided=circuit==='itf'?Number.isInteger(raw.winnerTeam)&&raw.winnerTeam>=0:own.is_winner!==null&&own.is_winner!==undefined;
   matches.push({...raw,id:source.match_id,matchId:source.match_id,playerId:player.id,playerName:player.name,circuit,competitionId,tournamentName:tournament.name,location:tournament.location||'',surface:tournament.surface||'',environment:tournament.environment||tournament.indoorOutdoor||'',date:source.played_date,draw:event,event,matchType:double?'doubles':'singles',partner:partners.map(p=>p.display_name).join(' / '),partnerNationalities:partners.map(p=>p.nationality||''),partnerTeProfileIds:partners.map(p=>p.source_player_id||''),opponent:opponents.map(p=>p.display_name).join(' / '),opponentOptions:opponents.map(p=>p.display_name),opponentNationalities:opponents.map(p=>p.nationality||''),opponentTeProfileIds:opponents.map(p=>p.source_player_id||''),score,result:score,advances:decided?Boolean(own.is_winner):undefined});
  }
  return {player:enriched,tournaments:[...tournaments.values()],matches};

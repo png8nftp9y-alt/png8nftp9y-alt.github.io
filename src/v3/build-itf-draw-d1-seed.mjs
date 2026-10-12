@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
+import {itfParticipantSQL} from './itf-match-participants.mjs';
 import {documentRecord,documentSQL} from './itf-draw-document-d1.mjs';
 // D1_WRITE_POLICY: incremental
 // buildIncrementalSyncPlan contract: stable IDs, conditional UPSERTs, no archive DELETE.
@@ -47,6 +48,7 @@ for(const {row} of [...tasks.values()].sort((a,b)=>a.row.drawKey.localeCompare(b
 for(const row of [...tournamentMap.values()].sort((a,b)=>a.id.localeCompare(b.id)))statements.push(`INSERT INTO tournaments(id,circuit,source_tournament_id,start_date,end_date,payload) VALUES(${esc(row.id)},'itf',${esc(row.sourceTournamentId)},${esc(row.startDate)},${esc(row.endDate)},${payload(row)}) ON CONFLICT(id) DO UPDATE SET circuit=excluded.circuit,source_tournament_id=excluded.source_tournament_id,start_date=excluded.start_date,end_date=excluded.end_date,payload=excluded.payload WHERE ${different(['circuit','source_tournament_id','start_date','end_date','payload'])};`);
 const fresh=table=>`coalesce(json_extract(excluded.payload,'$._itfDrawObservedAt'),'') >= coalesce(json_extract(${table}.payload,'$._itfDrawObservedAt'),json_extract(${table}.payload,'$.sourceObservedAt'),'')`;
 for(const row of [...matchMap.values()].sort((a,b)=>a.id.localeCompare(b.id)))statements.push(`INSERT INTO matches(id,tournament_id,circuit,played_date,payload) VALUES(${esc(row.id)},${esc(row.tournamentId)},'itf',${esc(row.playedDate)},${payload(row)}) ON CONFLICT(id) DO UPDATE SET tournament_id=excluded.tournament_id,circuit=excluded.circuit,played_date=excluded.played_date,payload=excluded.payload WHERE (${different(['tournament_id','circuit','played_date','payload'])}) AND ${fresh('matches')};`);
+for(const row of [...matchMap.values()].sort((a,b)=>a.id.localeCompare(b.id)))statements.push(...itfParticipantSQL(row));
 for(const row of [...resultMap.values()].sort((a,b)=>a.id.localeCompare(b.id))){row._itfDrawObservedAt=tasks.get(row.competitionId+'|'+row.event).row.observedAt;statements.push(`INSERT INTO results(id,tournament_id,match_id,circuit,played_date,payload) VALUES(${esc(row.id)},${esc(row.tournamentId)},${esc(row.matchId)},'itf',${esc(row.playedDate)},${payload(row)}) ON CONFLICT(id) DO UPDATE SET tournament_id=excluded.tournament_id,match_id=excluded.match_id,circuit=excluded.circuit,played_date=excluded.played_date,payload=excluded.payload WHERE (${different(['tournament_id','match_id','circuit','played_date','payload'])}) AND ${fresh('results')};`)}
 const out='seed-itf-draws';await fs.rm(out,{recursive:true,force:true});await fs.mkdir(out,{recursive:true});
 let batch=[],bytes=0,sqlFiles=0;
