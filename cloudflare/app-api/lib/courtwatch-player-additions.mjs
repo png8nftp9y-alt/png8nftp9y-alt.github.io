@@ -1,4 +1,4 @@
-import {mappedPlayerId,storedIdentity} from './player-identity-lookup.mjs';
+import {mappedPlayerId,storedIdentity,storedIdentities} from './player-identity-lookup.mjs';
 import {playerCircuitIdentities} from './player-circuit-profiles.mjs';
 import {personalPlayerMetadata,officialFitpClub} from './personal-player-metadata.mjs';
 // D1_WRITE_POLICY: incremental
@@ -9,8 +9,8 @@ const nameKey=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f
 const failure=(message,status=400)=>Object.assign(new Error(message),{status});
 const parse=value=>{try{return JSON.parse(value||'{}')}catch{return{}}};
 
-export async function hydratePersonalCircuitIdentity(db,player){
- const identity=await storedIdentity(db,player.sourceKey||player.id);
+export async function hydratePersonalCircuitIdentity(db,player,identity=undefined){
+ if(identity===undefined)identity=await storedIdentity(db,player.sourceKey||player.id);
  const result=personalPlayerMetadata({...player,circuitProfiles:identity?.circuitProfiles||player.circuitProfiles||[]},identity||{});
  for(const link of playerCircuitIdentities(result)){
   if(link.circuit==='fitp')result.membershipCard=link.profileId;
@@ -108,9 +108,10 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
 export async function personalPlayerAdditions(env,userId,group='main'){
  const rows=(await env.DB.prepare(`SELECT a.payload,o.payload AS observed_payload FROM user_app_player_additions a JOIN ${playerMembershipTable(group)} u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id LEFT JOIN observed_players o ON o.source_key=a.observed_source_key WHERE a.user_id=? AND ${playerMembershipGuard(group)} ORDER BY a.created_at,a.courtwatch_id`).bind(userId).all()).results||[];
  const acquired=rows.filter(row=>String(parse(row.payload).sourceKey||'').startsWith('acquired|')),metadata=new Map();for(let i=0;i<acquired.length;i+=40){const keys=acquired.slice(i,i+40).map(row=>parse(row.payload).sourceKey);try{for(const row of (await env.DB.prepare(`SELECT source_key,payload FROM search_acquired_players WHERE source_key IN (${keys.map(()=>'?').join(',')})`).bind(...keys).all()).results||[])metadata.set(row.source_key,parse(row.payload))}catch(error){if(!/no such table/i.test(error.message))throw error}}
+ const identities=await storedIdentities(env.DB,rows.map(row=>{const p=parse(row.payload);return p.sourceKey||p.id}));
  const players=[];
  for(const row of rows){const p=parse(row.payload);
-  const player=await hydratePersonalCircuitIdentity(env.DB,personalPlayerMetadata(p,metadata.get(p.sourceKey)||parse(row.observed_payload)));
+  const player=await hydratePersonalCircuitIdentity(env.DB,personalPlayerMetadata(p,metadata.get(p.sourceKey)||parse(row.observed_payload)),identities.get(p.sourceKey||p.id)||null);
   if(player.id&&player.name)players.push(player);
  }
  return players;

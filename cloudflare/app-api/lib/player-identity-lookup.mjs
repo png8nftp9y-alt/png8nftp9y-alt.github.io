@@ -5,6 +5,20 @@ export async function storedIdentity(db,identity){
  const rows=await optional(db,'SELECT p.payload FROM player_identity_people p WHERE p.canonical_id IN (SELECT canonical_id FROM player_identity_people WHERE canonical_id=? AND NOT EXISTS(SELECT 1 FROM player_identity_aliases WHERE alias_id=player_identity_people.canonical_id) UNION SELECT COALESCE(a.canonical_id,l.canonical_id) FROM player_circuit_identities l LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE l.source_key=? UNION SELECT canonical_id FROM player_identity_aliases WHERE alias_id=?) AND EXISTS(SELECT 1 FROM player_circuit_identities live WHERE live.canonical_id=p.canonical_id) LIMIT 2',[identity,identity,identity]);
  if(rows.length!==1)return null;try{return JSON.parse(rows[0].payload)}catch{return null}
 }
+export async function storedIdentities(db,identities){
+ const result=new Map(),keys=[...new Set(identities.filter(Boolean))];
+ for(let offset=0;offset<keys.length;offset+=100){const batch=keys.slice(offset,offset+100);
+  const rows=await optional(db,`WITH requested AS (SELECT value AS lookup_key FROM json_each(?)),resolved AS (
+   SELECT k.lookup_key,COALESCE(a.canonical_id,l.canonical_id) AS canonical_id FROM requested k JOIN player_circuit_identities l ON l.source_key=k.lookup_key LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id
+   UNION SELECT k.lookup_key,a.canonical_id FROM requested k JOIN player_identity_aliases a ON a.alias_id=k.lookup_key
+   UNION SELECT k.lookup_key,p.canonical_id FROM requested k JOIN player_identity_people p ON p.canonical_id=k.lookup_key WHERE NOT EXISTS(SELECT 1 FROM player_identity_aliases a WHERE a.alias_id=k.lookup_key)
+  ) SELECT r.lookup_key,p.canonical_id,p.payload FROM resolved r JOIN player_identity_people p ON p.canonical_id=r.canonical_id
+  WHERE EXISTS(SELECT 1 FROM player_circuit_identities live WHERE live.canonical_id=p.canonical_id)`,[JSON.stringify(batch)]),byKey=new Map();
+  for(const row of rows){const people=byKey.get(row.lookup_key)||new Map();people.set(row.canonical_id,row.payload);byKey.set(row.lookup_key,people);}
+  for(const key of batch){const people=byKey.get(key);let person=null;if(people?.size===1)try{person=JSON.parse([...people.values()][0])}catch{}result.set(key,person);}
+ }
+ return result;
+}
 export async function mappedPlayerSearch(db,{tokens,seek,pageSize,encode,userId}){
  if(!await identityMapReady(db,{allowPending:Boolean(seek)}))return null;
  const where=tokens.map(()=>"p.name_key LIKE ?").join(' AND ')+(seek?' AND (p.name_key>? OR (p.name_key=? AND p.canonical_id>?))':'');
