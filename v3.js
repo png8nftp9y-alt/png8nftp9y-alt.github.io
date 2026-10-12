@@ -2283,7 +2283,7 @@ function renderPlayers() {
       const n = (state.data.tournaments || []).filter(
           (t) => t.playerId === p.id && active(t),
         ).length,
-        club = personalPlayerAffiliationHtml(p),
+        club = esc(displayPlayerClub(p.club) || "Tesseramento da completare"),
         card = p.membershipCard ? ` · tessera ${p.membershipCard}` : "";
       return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${club}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })

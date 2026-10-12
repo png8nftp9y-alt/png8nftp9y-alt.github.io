@@ -3202,3 +3202,5 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Run: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38306412303
 
 - Controllo completo Worker passato sul Mac usando python3 anche per i test che richiamano python.
+
+- Corretto elenco Giocatori: mostra circolo senza nazionalità. Nazionalità mantenuta soltanto nella pagina giocatore.
