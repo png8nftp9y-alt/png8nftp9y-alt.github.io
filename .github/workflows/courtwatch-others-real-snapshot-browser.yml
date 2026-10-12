@@ -1,0 +1,23 @@
+name: Court Watch Others real snapshot browser
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-others-real-snapshot-browser.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: node tools/replay-others-real-snapshot.mjs
+      - run: node tools/verify-others-real-snapshot-browser.mjs
