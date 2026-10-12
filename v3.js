@@ -482,20 +482,10 @@ const peopleHtml = (names, nationalities = [], rankings = [], designations = [])
     })
     .join("/");
 const circuit = (x) => {
-  const s = (
-    x.sourceId ||
-    x.source ||
-    x.sourceName ||
-    x.circuit ||
-    ""
-  ).toLowerCase();
-  return s.includes("tennis-europe") ||
-    s.includes("tennis europe") ||
-    s === "te"
-    ? "tennis-europe"
-    : s.includes("itf")
-      ? "itf"
-      : "fitp";
+  const item = x && typeof x === "object" ? x : {};
+  const legacySource = item.source && typeof item.source === "object" ? item.source.circuit : item.source;
+  const s = String(item.circuit || item.sourceCircuit || (typeof item.sourceId === "string" ? item.sourceId : "") || legacySource || item.sourceName || "").toLowerCase();
+  return s.includes("tennis-europe") || s.includes("tennis europe") || s === "te" ? "tennis-europe" : s.includes("itf") ? "itf" : "fitp";
 };
 function withoutPucItfReferences(data) {
   if (!data) return data;

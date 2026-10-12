@@ -1,3 +1,9 @@
+## 12 ottobre 2026 — Root cause Altri verificata e correzione circuit/source
+
+Il browser sullo snapshot reale ha riprodotto il messaggio esatto: TypeError (x.sourceId || x.source || x.sourceName || x.circuit || "").toLowerCase is not a function, stack circuit → isPuc → withoutPucItfReferences → othersSnapshotData → loadOthers. Contratto API valido group others, 8 giocatori: non era un errore di autenticazione o assenza dati. I tornei ITF archiviati hanno source come oggetto {circuit,sourceId,...}; il vecchio classifier lo preferiva al circuit e lo trattava come stringa. Il percorso interrompeva la costruzione della lista prima di state.data, causando schermata vuota. Questo caso reale mancava ai fixture sintetici.
+
+Correzione: circuit esplicito prioritario, source.circuit letto dagli oggetti, sourceId numerici ignorati nella classificazione, normalizzazione String e null-safe. Nessuna rimozione di giocatori/tornei. TCL, Home, filtro PUC e loader Altri indipendente conservati. Sette test mirati passati, includendo oggetto sorgente ITF reale, ID numerico, PUC/nativo, loader e rimozioni. Asset JS v202610120416. Test browser reale automatico su v3.js per prevenire regressioni; niente ulteriori letture di run per rispettare il nuovo richiamo esplicito no polling. Esito live non ancora attestato, correzione del TypeError verificata in test.
+
 ## 12 ottobre 2026 — Blocco riprodotto nel browser completo
 
 Run indicato 38194775480: database risponde 200 con 8 giocatori/161 tornei/46 query, ma il browser resta senza state.data e mostra Altri caricamento non riuscito. Nessun pageerror perché il loader intercetta l’errore; la verifica precedente non catturava console.error. Aggiunto controllo del contratto JSON (gruppo e nomi campi, senza dati personali) e cattura del messaggio intercettato others_snapshot_unavailable. Il caso fallito è conservato per verifica della correzione. No polling.
