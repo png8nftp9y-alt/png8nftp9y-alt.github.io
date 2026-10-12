@@ -555,7 +555,9 @@ function displayPlayerClub(value) {
 function personalPlayerAffiliationHtml(player) {
  const country=foreignPlayerCountry(player);
  const club=displayPlayerClub(player?.club);
- return (club ? esc(club) : country ? '' : 'Tesseramento da completare') + (country ? (club ? ' ·' : '') + nationalityHtml(country) : '');
+ if(player?.membershipCard && club)
+   return esc(club) + (country ? ' ·' + nationalityHtml(country) : '');
+ return country ? nationalityHtml(country) : esc(club || 'Tesseramento da completare');
 }
 function playerBirthLabel(player) {
   const raw = String(player?.birthDate || player?.dateOfBirth || "").slice(

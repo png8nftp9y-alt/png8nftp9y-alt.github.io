@@ -3192,3 +3192,13 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Sintassi e tre test mirati passati. Modifica locale, pubblicazione ancora da eseguire.
 - Run fonte: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38303621196
 - Run import: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38303833075
+
+
+## Correzione regressione affiliazione Sala
+- Run Worker 38306412303 fallito prima del deploy.
+- Circolo e nazionalità insieme per giocatori con tessera FITP.
+- Stranieri senza tessera FITP: conservata la sola nazionalità.
+- Doppio Cereghini invariato; controlli Worker richiesti prima del push.
+- Run: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38306412303
+
+- Controllo completo Worker passato sul Mac usando python3 anche per i test che richiamano python.
