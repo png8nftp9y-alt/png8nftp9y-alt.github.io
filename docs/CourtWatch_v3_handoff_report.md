@@ -3230,3 +3230,10 @@ No new polling or database writes in app reads.
 Validation: Worker/acquisition syntax checks and six regression tests.
 Limits: missing factsheets still require successful acquisition; no estimated
 qualifying dates or invented venue names. Production checks follow in Actions.
+
+
+## Deployment UI contract correction — 2026-10-12
+
+Align the agenda deduplication marker with the current loop variable m.
+Preserve the check and agenda behavior. Name the existing Worker check step
+and trigger a fresh guarded deployment. Validation: verify-analysis-ui passed.

@@ -87,7 +87,7 @@ assert.ok(hasApiSource("const targets=[...new Set(matches.flatMap"), 'match snap
 assert.ok(hasSource('https://te.tournamentsoftware.com/tournament/'), 'opponent tournament name must link to its official homepage');
 assert.ok(hasSource('bindParticipantNavigation($("profileContent"))'), 'profile and tournament pages must bind participant links');
 assert.ok(hasSource('opponentHistoryCourtWatch') && hasSource('bindParticipantNavigation(body)'), 'CourtWatch players in opponent history must open their full profile');
-assert.ok(hasSource('function dedupeAgendaMatches(') && hasSource('sameAgendaMatch(existing, match)'), 'agenda must deduplicate shared CourtWatch matches');
+assert.ok(hasSource('function dedupeAgendaMatches(') && hasSource('sameAgendaMatch(existing, m)'), 'agenda must deduplicate shared CourtWatch matches');
 assert.ok(hasSource('function agendaResultHtml(') && hasSource('Vincitore:'), 'shared CourtWatch match must name the winner');
 assert.ok(hasSource('courtWatchOpponent') && hasSource('opponentPlayerLink'), 'opponent styling must distinguish CourtWatch players');
 assert.ok(hasApiSource("profileKey=prefix+'ProfileIds'") && hasApiSource("dateKey=prefix+'RankingDates'"), 'API must expose opponent ranking identity and date');
