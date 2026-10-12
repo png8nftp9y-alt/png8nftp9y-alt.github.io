@@ -12,7 +12,7 @@ async function select(db,where,binds,limit=''){
  for(const pool of pools)try{rows.push(...((await db.prepare(`SELECT * FROM (${pool}) WHERE ${where} ORDER BY normalized_name,cursor_key ${limit}`).bind(...binds).all()).results||[]))}catch(e){if(!/no such table/i.test(e.message))throw e}
  return rows.sort(compare);
 }
-function result(r,linked){const p=payload(r);return{courtwatchId:r.circuit==='courtwatch'?r.official_id:linked.get(r.source_key)||'',sourceKey:r.circuit==='courtwatch'?'':r.source_key,identity:r.official_id||r.source_key,name:r.display_name,circuit:r.circuit,nationality:p.nationality||p.country||'',club:p.club||'',birthYear:p.birthYear||null,birthDate:p.birthDate||p.dateOfBirth||'',sex:p.sex||p.gender||'',ranking:r.circuit==='fitp'?p.ranking||'':'',sources:[r.circuit]}}
+function result(r,linked){const p=payload(r);return{courtwatchId:r.circuit==='courtwatch'?r.official_id:linked.get(r.source_key)||'',sourceKey:r.circuit==='courtwatch'?'':r.source_key,identity:r.official_id||r.source_key,name:r.display_name,circuit:r.circuit,nationality:p.nationality||p.country||'',club:p.club||'',birthYear:p.birthYear||null,sources:[r.circuit]}}
 const country=value=>({IT:'ITA',ITALY:'ITA',ITALIA:'ITA',CH:'SUI',SWITZERLAND:'SUI'}[String(value||'').toUpperCase()]||String(value||'').toUpperCase());
 const candidate=r=>({...payload(r),name:r.display_name,officialId:r.official_id||payload(r).officialId||''});
 function unify(members,linked){
@@ -28,7 +28,7 @@ function unify(members,linked){
  if(years.size>1||countries.size>1||[...identities.values()].some(ids=>ids.size>1))return rows;
  members.sort((a,b)=>Number(Boolean(linked.get(b.source_key)||b.circuit==='courtwatch'))-Number(Boolean(linked.get(a.source_key)||a.circuit==='courtwatch'))||Number(Boolean(officialPlayerUrl(b.circuit,candidate(b))))-Number(Boolean(officialPlayerUrl(a.circuit,candidate(a))))||Number(b.circuit==='tennis-europe')-Number(a.circuit==='tennis-europe'));
  const first={...result(members[0],linked),sources:[...new Set(rows.flatMap(r=>r.sources).filter(c=>c!=='courtwatch'))],sourceKeys:members.map(r=>r.source_key),circuitProfiles:[...profiles].map(([c,urls])=>({circuit:c,url:[...urls.values()][0]}))};
- for(const field of ['nationality','club','birthYear','birthDate','sex','ranking'])if(!first[field])first[field]=rows.find(r=>r[field])?.[field]||first[field];
+ for(const field of ['nationality','club','birthYear'])if(!first[field])first[field]=rows.find(r=>r[field])?.[field]||first[field];
  return [first];
 }
 export async function searchIdentityProfile(db,name,identity){

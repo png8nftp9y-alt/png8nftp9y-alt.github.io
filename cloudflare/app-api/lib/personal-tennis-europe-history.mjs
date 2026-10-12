@@ -1,4 +1,3 @@
-import {itfMatchScore} from '../../../src/v3/itf-match-participants.mjs';
 import {playerCircuitIdentities} from './player-circuit-profiles.mjs';
 const normalized=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
 const nameKey=value=>normalized(value).split(' ').sort().join(' ');
@@ -9,34 +8,30 @@ const reverseScore=value=>String(value||'').split(/\s+/).map(set=>{const m=set.m
 async function personalHistory(db,player,circuit){
  const name=normalized(player.name),variants=[...new Set([name,name.split(' ').reverse().join(' ')])];
  if(!name)return {player,tournaments:[],matches:[]};
- const native=playerCircuitIdentities(player).find(p=>p.circuit===circuit)?.profileId;
- const identityWhere=native?'self.source_player_id=?':`lower(self.normalized_name) IN (${variants.map(()=>'?').join(',')})`,identityValues=native?[native]:variants;
  const sources=[];let last='';
  while(true){
-  const batch=await rows(db,`SELECT DISTINCT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM match_participants self JOIN matches m ON m.id=self.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE ${identityWhere} AND m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...identityValues,circuit,last]);
+  const batch=await rows(db,`SELECT DISTINCT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM match_participants self JOIN matches m ON m.id=self.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE lower(self.normalized_name) IN (${variants.map(()=>'?').join(',')}) AND m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...variants,circuit,last]);
   sources.push(...batch);if(batch.length<250)break;
   const next=batch.at(-1).match_id;if(next<=last)throw Error('personal_history_pagination_failed');last=next;
  }
  const participants=[];
  for(let i=0;i<sources.length;i+=40){const ids=sources.slice(i,i+40).map(x=>x.match_id);participants.push(...await rows(db,`SELECT match_id,source_player_id,display_name,normalized_name,nationality,team_index,is_winner,payload FROM match_participants WHERE match_id IN (${ids.map(()=>'?').join(',')}) ORDER BY match_id,team_index,participant_key`,ids));}
- const isSelf=p=>native?String(p.source_player_id).toLowerCase()===native.toLowerCase():nameKey(p.normalized_name||p.display_name)===nameKey(player.name);
- const selfRows=participants.filter(isSelf);
+ const selfRows=participants.filter(p=>nameKey(p.normalized_name||p.display_name)===nameKey(player.name));
  const countries=[...new Set(selfRows.map(p=>String(p.nationality||'').toUpperCase()).filter(Boolean))];
  const country=String(player.nationality||'').toUpperCase();
- if(!native&&(countries.length>1||country&&countries.some(c=>c!==country)))throw Error('personal_history_identity_ambiguous');
+ if(countries.length>1||country&&countries.some(c=>c!==country))throw Error('personal_history_identity_ambiguous');
  const enriched={...player,nationality:country||countries[0]||''},tournaments=new Map(),matches=[];
  const byMatch=new Map();for(const p of participants){const list=byMatch.get(p.match_id)||[];list.push(p);byMatch.set(p.match_id,list);}
  for(const source of sources){
-  const raw=parsed(source.match_payload),t=parsed(source.tournament_payload),people=byMatch.get(source.match_id)||[],self=people.filter(isSelf);
+  const raw=parsed(source.match_payload),t=parsed(source.tournament_payload),people=byMatch.get(source.match_id)||[],self=people.filter(p=>nameKey(p.normalized_name||p.display_name)===nameKey(player.name));
   if(self.length!==1)throw Error('personal_history_identity_ambiguous');
   const own=self[0],partners=people.filter(p=>p.team_index===own.team_index&&p!==own),opponents=people.filter(p=>p.team_index!==own.team_index);
   const competitionId=raw.competitionId||t.competitionId||source.source_tournament_id||source.tournament_id;
   const tournament={...t,id:source.tournament_id,competitionId,name:t.name||t.tournamentName||raw.tournamentName||competitionId,circuit,playerId:player.id,playerName:player.name,calendarState:'draw_confirmed',entryStatus:'official_draw',calendarListLabel:'',startDate:t.startDate||t.officialStartDate||source.played_date,endDate:t.endDate||source.played_date};
   tournaments.set(source.tournament_id,tournament);
   const event=raw.event||raw.draw||'',double=partners.length>0||/^GD|^BD|DOUBLE/i.test(event);
-  const rawScore=circuit==='itf'?itfMatchScore(raw):String(raw.score||raw.result||'');
-  const score=own.team_index===1?reverseScore(rawScore):rawScore;
-  const decided=circuit==='itf'?Number.isInteger(raw.winnerTeam)&&raw.winnerTeam>=0:own.is_winner!==null&&own.is_winner!==undefined;
+  const score=own.team_index===1?reverseScore(raw.score||raw.result):String(raw.score||raw.result||'');
+  const decided=own.is_winner!==null&&own.is_winner!==undefined;
   matches.push({...raw,id:source.match_id,matchId:source.match_id,playerId:player.id,playerName:player.name,circuit,competitionId,tournamentName:tournament.name,location:tournament.location||'',surface:tournament.surface||'',environment:tournament.environment||tournament.indoorOutdoor||'',date:source.played_date,draw:event,event,matchType:double?'doubles':'singles',partner:partners.map(p=>p.display_name).join(' / '),partnerNationalities:partners.map(p=>p.nationality||''),partnerTeProfileIds:partners.map(p=>p.source_player_id||''),opponent:opponents.map(p=>p.display_name).join(' / '),opponentOptions:opponents.map(p=>p.display_name),opponentNationalities:opponents.map(p=>p.nationality||''),opponentTeProfileIds:opponents.map(p=>p.source_player_id||''),score,result:score,advances:decided?Boolean(own.is_winner):undefined});
  }
  return {player:enriched,tournaments:[...tournaments.values()],matches};
@@ -46,9 +41,9 @@ async function personalHistory(db,player,circuit){
 export async function personalTennisEuropeHistory(db,player){
  return player.sourceCircuit==='tennis-europe'?personalHistory(db,player,'tennis-europe'):{player,tournaments:[],matches:[]};
 }
-export async function personalCircuitHistory(db,player,{publishedCircuits=null}={}){
+export async function personalCircuitHistory(db,player){
  const circuits=playerCircuitIdentities(player).map(p=>p.circuit);
  if(!circuits.length&&['fitp','tennis-europe','itf'].includes(player.sourceCircuit))circuits.push(player.sourceCircuit);
- const histories=await Promise.all(circuits.filter(c=>!publishedCircuits||publishedCircuits.includes(c)).map(c=>personalHistory(db,player,c)));
+ const histories=await Promise.all(circuits.map(c=>personalHistory(db,player,c)));
  return {player:histories.reduce((p,h)=>({...p,...h.player}),player),tournaments:histories.flatMap(h=>h.tournaments),matches:histories.flatMap(h=>h.matches)};
 }

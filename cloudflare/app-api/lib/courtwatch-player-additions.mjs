@@ -18,7 +18,7 @@ export async function hydratePersonalCircuitIdentity(db,player){
   if(link.circuit==='tennis-europe')result.profileSync={...result.profileSync,tennisEurope:{...result.profileSync?.tennisEurope,profileId:link.profileId}};
  }
  result.circuits=[...new Set([...(result.circuits||[]),...playerCircuitIdentities(result).map(p=>p.circuit)])];
- return personalPlayerMetadata(result,identity||{});
+ return result;
 }
 
 export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpClub}={}){
