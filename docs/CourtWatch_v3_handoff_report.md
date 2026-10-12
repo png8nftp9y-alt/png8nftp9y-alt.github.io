@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Deploy del ripristino rilanciato, nessun polling
+
+PR #135 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/135 integrata con merge 633de3499cde0a7daebb356ec6815d53dcbfd970; test originali di gruppo e Shield ripristinati. Rilanciato soltanto job deploy-worker 114627685377 del run https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38192375299, che esegue checkout ref main. L’utente ribadisce no polling: nessuna ulteriore lettura dello stato del run, esito non attestato. Frontend già pubblicato; completamento API dipende dal rilancio.
+
 ## 12 ottobre 2026 — Test ripristinati per completare il rollback
 
 Run deploy 38192375299 fermato prima della distribuzione: quattro test della navigazione TCL successiva tentavano switchPlayerGroup assente nel JS precedente. Ripristinati player-list-group.test.mjs e Shield alla stessa versione 9a5cf6d dell’app. I due test di gruppo originali passano; nessun controllo bypassato. Il controllo completo locale precedente usava già questi test originali, mentre il repository conservava quelli successivi: discrepanza corretta. Deploy da rieseguire con checkout main come previsto dal workflow.
