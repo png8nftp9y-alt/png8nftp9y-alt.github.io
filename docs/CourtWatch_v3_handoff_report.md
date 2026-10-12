@@ -3025,3 +3025,8 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Rollback integrato PR #131 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/131, merge 89f74fcae09c4f8afb55dd9eff343ecea0c6a403. Deploy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38191576583, D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38191576586, CRUD https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38191576653. Lettura mirata job 114625257127: installazione completata, controlli Worker in corso, deploy non ancora eseguito; funzionamento live non attestato.
 
 - Log terminale deploy rollback, job 114625257127: tutti i controlli passati; Worker distribuito alle 03:23:08 Europe/Rome, versione 8c4934db-f6d4-44af-961d-3fe9be8d5d17. Controllo pubblico assenza errore Worker 1101 passato. Questo conferma la distribuzione del codice precedente, non il caricamento dei dati Altri nella sessione autenticata dell’utente.
+
+
+## 12 ottobre 2026 — Errore Altri persistente dopo rollback
+
+L’utente conferma che il rollback distribuito non risolve il caricamento. Osservazione read-only dei log Worker per 65 secondi: solo percorso /app/api/, stato ed errori oscurando email e ID; nessun header, cookie, body o query salvato. Nessuna modifica D1 o deploy applicativo. Esito da registrare; causa ancora non verificata.
