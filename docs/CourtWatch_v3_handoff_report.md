@@ -2953,6 +2953,7 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Recupero mirato https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189275715 , job `114619226949`: appena iniziato, checkout in corso all’unica lettura. Non ancora eseguito il passaggio di salvataggio metadati/proiezione match; nessun conteggio storico produttivo nuovo attestato. L’utente segnala gli altri run verdi, mantenuto distinto il recupero specifico ancora in corso. Nessun polling.
 
 
+
 ## 12 ottobre 2026 — TCL e navigazione speculare con Altri
 
 - Richiesta: rinominare «Principali» in «TCL» e mantenere pagina/posizione durante il passaggio TCL ↔ Altri, in particolare Calendario senza ritorno alla Home.
@@ -2962,3 +2963,10 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Asset JavaScript versionato in v3.html per caricare la nuova navigazione. 15 test di navigazione/cache e 2 test del contratto refresh passati, release guard passato. Il browser Shield locale non è avviabile perché manca l’eseguibile Chromium; il workflow Shield della PR rimane la verifica browser.
 
 - PR #125 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/125 integrata dopo risoluzione del conflitto con aggiornamenti concorrenti, mantenendo il report corrente. Merge d088efb3b98cfbfa9e86888cbe1b7ff4d8aeb77d. Unica lettura iniziale, senza polling: Court Watch global D1 incremental policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189725635 (in_progress); pages build and deployment https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189725021 (in_progress). Esiti deploy finali ancora non certificati.
+
+## Ripristino urgente sezione Altri — 12 ottobre 2026
+
+- Chiarimento dell’utente: caricamento continuo solo in Altri; TCL funziona. Limitata la correzione allo snapshot personale: non interroga né pubblica gli storici FITP/ITF, la cui parte risultati non è pronta. La proiezione di storico pubblicata copre soltanto Tennis Europe; un guasto a uno storico personale TE non può far fallire l’intero elenco Altri.
+- Le 33 partite/9 tornei del recupero Sala provenivano dai tabelloni ufficiali già archiviati in D1, inclusi punteggi delle squadre. Non da un motore risultati FITP/ITF completato. Il collegamento allo storico pubblico era prematuro: ripristinato il percorso di pubblicazione precedente, mantenendo i documenti e le relazioni acquisite internamente. Nessuna cancellazione.
+- Nessuna modifica al frontend TCL funzionante. Test sullo snapshot Altri e sull’assenza di query FITP/ITF nel percorso pubblico passati. La causa produttiva precisa resta da verificare tramite log/sessione: browser dell’agente fermo al login Cloudflare Access, nessuna sessione utente disponibile. Non dichiarata cancellazione dei dati senza evidenza.
+- Correzione e report pubblicati insieme; verifica deploy da attestare al relativo run. Nessun polling.

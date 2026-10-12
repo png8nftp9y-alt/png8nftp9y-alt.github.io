@@ -46,9 +46,9 @@ async function personalHistory(db,player,circuit){
 export async function personalTennisEuropeHistory(db,player){
  return player.sourceCircuit==='tennis-europe'?personalHistory(db,player,'tennis-europe'):{player,tournaments:[],matches:[]};
 }
-export async function personalCircuitHistory(db,player){
+export async function personalCircuitHistory(db,player,{publishedCircuits=null}={}){
  const circuits=playerCircuitIdentities(player).map(p=>p.circuit);
  if(!circuits.length&&['fitp','tennis-europe','itf'].includes(player.sourceCircuit))circuits.push(player.sourceCircuit);
- const histories=await Promise.all(circuits.map(c=>personalHistory(db,player,c)));
+ const histories=await Promise.all(circuits.filter(c=>!publishedCircuits||publishedCircuits.includes(c)).map(c=>personalHistory(db,player,c)));
  return {player:histories.reduce((p,h)=>({...p,...h.player}),player),tournaments:histories.flatMap(h=>h.tournaments),matches:histories.flatMap(h=>h.matches)};
 }
