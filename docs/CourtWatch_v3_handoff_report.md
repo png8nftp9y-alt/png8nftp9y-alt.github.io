@@ -2945,3 +2945,12 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Pubblicazione e run da registrare dopo integrazione; nessun polling.
 
 - Correzione integrata con PR #124 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/124, merge f17146eb44e7ffc083515049d053a5c7cded30b6. Unica lettura iniziale dei run, senza polling: Court Watch global D1 incremental policy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189393842 (in_progress); Court Watch Cloudflare app Worker hotfix https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189393837 (in_progress); Court Watch Cloudflare D1 and app API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189393849 (pending); pages build and deployment https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38189393289 (queued). Deploy finale non ancora certificato.
+
+
+## 12 ottobre 2026 — TCL e navigazione speculare con Altri
+
+- Richiesta: rinominare «Principali» in «TCL» e mantenere pagina/posizione durante il passaggio TCL ↔ Altri, in particolare Calendario senza ritorno alla Home.
+- Il cambio sezione conserva l’hash corrente e i parametri URL estranei al gruppo. Trasferisce al gruppo di destinazione mese Calendario, data/modalità Agenda, filtri sesso/categorie e scroll tramite il ripristino UI già presente. Le selezioni giocatore e i dati acquisiti restano separati per gruppo; la prima visita non eredita ID dell’altro elenco. Pulsanti e label accessibili ora usano TCL.
+- Validazione: regressioni bidirezionali sulle route Calendario/Agenda/Giocatori/Home, date, filtri e scroll, selezioni separate, primo accesso e storage indisponibile; sintassi Node e controlli di navigazione/cache esistenti. Pubblicazione/run da registrare dopo integrazione; nessun polling.
+
+- Asset JavaScript versionato in v3.html per caricare la nuova navigazione. 15 test di navigazione/cache e 2 test del contratto refresh passati, release guard passato. Il browser Shield locale non è avviabile perché manca l’eseguibile Chromium; il workflow Shield della PR rimane la verifica browser.

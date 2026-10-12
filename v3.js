@@ -3615,22 +3615,32 @@ function toggleDatePopover() {
   renderDatePopover();
   pop.hidden = false;
 }
+function switchPlayerGroup() {
+  saveUiState();
+  const target = new URL(location.href);
+  const targetGroup = PLAYER_GROUP === "main" ? "others" : "main";
+  if (targetGroup === "others") target.searchParams.set("group", "others");
+  else target.searchParams.delete("group");
+  // Transfer the view, dates and common filters; player selections belong to each group.
+  try {
+    const targetKey = "courtwatch-v3-ui-state-v1" + (targetGroup === "others" ? "-others" : "");
+    const current = JSON.parse(localStorage.getItem(UI_STATE_CACHE) || "{}");
+    const mirrored = JSON.parse(localStorage.getItem(targetKey) || "{}");
+    for (const key of ["agenda", "month", "agendaMode", "categoryFilters", "sexFilter", "scrollY"])
+      if (Object.prototype.hasOwnProperty.call(current, key)) mirrored[key] = current[key];
+    localStorage.setItem(targetKey, JSON.stringify(mirrored));
+  } catch {}
+  location.assign(target.href);
+}
 function wire() {
   if (PLAYER_GROUP === "others") {
     document.title = "Court Watch · Altri";
     $("activePlayerGroup").hidden = false;
   }
   document.querySelectorAll("[data-switch-player-group]").forEach(button => {
-    button.textContent = PLAYER_GROUP === "others" ? (button.id === "homeOthers" ? "Vai a Principali" : "Principali") : button.textContent;
-    button.setAttribute("aria-label", PLAYER_GROUP === "others" ? "Apri giocatori principali" : "Apri altri giocatori");
-    button.onclick = () => {
-      saveUiState();
-      const target = new URL(location.href);
-      if (PLAYER_GROUP === "main") target.searchParams.set("group", "others");
-      else target.searchParams.delete("group");
-      target.hash = "";
-      location.assign(target.href);
-    };
+    button.textContent = PLAYER_GROUP === "others" ? (button.id === "homeOthers" ? "Vai a TCL" : "TCL") : button.textContent;
+    button.setAttribute("aria-label", PLAYER_GROUP === "others" ? "Apri giocatori TCL" : "Apri altri giocatori");
+    button.onclick = switchPlayerGroup;
   });
   wirePlayersColumnHeight();
   $("addPlayer").onclick = openAddPlayerDialog;
