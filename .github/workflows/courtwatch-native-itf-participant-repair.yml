@@ -1,0 +1,32 @@
+name: Court Watch native ITF participant repair
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-native-itf-participant-repair.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-native-itf-participant-repair
+  cancel-in-progress: false
+  queue: max
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify exact-payload guarded repair
+        run: node --test src/v3/itf-native-participant-repair.test.mjs
+      - name: Resolve verified personal IDs through SELECT-only snapshot
+        run: node tools/replay-others-real-snapshot.mjs
+      - name: Backfill missing native participants from accepted official matches
+        run: node cloudflare/app-api/scripts/repair-personal-itf-participants.mjs
+      - name: Verify repaired snapshot without exposing profile values
+        run: node tools/replay-others-real-snapshot.mjs
