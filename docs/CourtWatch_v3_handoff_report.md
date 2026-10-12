@@ -3029,3 +3029,12 @@ Validazione: 33 controlli Shield browser passati con dati sintetici e API simula
 - Rollback integrato PR #131 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/131, merge 89f74fcae09c4f8afb55dd9eff343ecea0c6a403. Deploy https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38191576583, D1/API https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38191576586, CRUD https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38191576653. Lettura mirata job 114625257127: installazione completata, controlli Worker in corso, deploy non ancora eseguito; funzionamento live non attestato.
 
 - Log terminale deploy rollback, job 114625257127: tutti i controlli passati; Worker distribuito alle 03:23:08 Europe/Rome, versione 8c4934db-f6d4-44af-961d-3fe9be8d5d17. Controllo pubblico assenza errore Worker 1101 passato. Questo conferma la distribuzione del codice precedente, non il caricamento dei dati Altri nella sessione autenticata dell’utente.
+
+
+## 12 ottobre 2026 — Escludere dalla visualizzazione FITP i riferimenti ITF del PUC
+
+- Richiesta e chiarimento utente: il PUC cattura anche riferimenti ITF; possono restare acquisiti ma non devono essere mostrati in FITP. ITF visibile esclusivamente attraverso la sorgente ITF. Nessuna riclassificazione degli ID FITP come ITF e nessuna cancellazione di documenti.
+- Conferma nei dati acquisiti: catalogo e archivio FITP contengono nomi ITF (J200 Firenze, M15 Altamura/Foggia, M25 Trento, W35 San Gregorio, World Masters). Applicato filtro alla proiezione in memoria prima di ogni route: esclude record FITP con parola ITF nel nome/descrizione ufficiale e riferimenti collegati per ID torneo, anche se il nome manca su partita/iscrizione/agenda. Tornei, partite, agenda, risultati e iscrizioni filtrati insieme; record nativi ITF conservati anche con stesso ID/nome. Cache e fonti acquisite non vengono cancellate.
+- Asset JS versionato. Regressioni su PUC e riferimenti collegati, circuito ITF preservato, nomi nazionali, legacy, case/boundary, assenza di mutazione delle sorgenti e replay idempotente; esiti pubblicazione da registrare. Report nello stesso commit; nessun polling.
+
+- Lo stesso filtro è applicato allo storico avversario ricevuto separatamente dalla API; acquisizione PUC, pipeline ITF e archivi rimangono invariati. 17 regressioni mirate passate; release guard e sintassi controllati prima della pubblicazione.
