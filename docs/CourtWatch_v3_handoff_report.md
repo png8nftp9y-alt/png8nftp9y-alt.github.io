@@ -1,3 +1,7 @@
+## 12 ottobre 2026 — Caricamento Altri ricostruito e integrato
+
+PR #139 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/pull/139 integrata, merge 865d9345900c8f1710693447a581bccad615eff2. Loader personale indipendente, cache dati/calendario v2, gruppo obbligatorio others, errore e retry espliciti; TCL/Home/PUC conservati. 14 test mirati passati. Run avviati: Court Watch global D1 incremental policy: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38194268492 · pages build and deployment: https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38194267558. Nessun polling: esito distribuzione e funzionamento live non attestati.
+
 ## 12 ottobre 2026 — Altri ricostruito con caricamento indipendente
 
 Su richiesta esplicita di rifare Altri: nuova loadOthers separata da load TCL, basata solo sulla API privata con gruppo others verificato. Nessuna attesa dei dieci JSON statici TCL, nessun confronto con la loro generazione o fusione dei giocatori TCL. Questo rimuove una dipendenza errata verificata nel codice precedente: un JSON essenziale TCL mancante impediva di utilizzare perfino uno snapshot personale API valido. Non è ancora provato che fosse l’unica causa live.
