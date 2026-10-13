@@ -3253,6 +3253,41 @@ and trigger a fresh guarded deployment. Validation: verify-analysis-ui passed.
 - Sostituito il controllo testuale della chiamata agenda con una verifica eseguibile: incontri condivisi deduplicati, incontri distinti conservati. Nessun controllo disabilitato.
 
 
+## 2026-10-13 — Refresh keeps the current view and scroll before application startup
+
+The user reported a brief Home flash during refresh, followed by return to the
+original page and scroll. The static shell marked Home active before the async
+bootstrap could restore the requested route. Deferred scroll restoration also
+allowed a top-of-page frame before returning to the previous position.
+
+On pagehide, retain one temporary copy of the visible main view in sessionStorage,
+scoped to TCL/Altri and the exact path/query/hash. Include scroll, control values
+and runtime styles. Restore this preview from an inline shell script only for a
+real reload, with the matching asset version and route, before v3.js executes.
+Hide the static Home while a non-Home route is pending. Keep preview controls
+inactive until the live route is restored; then synchronously restore scroll and
+remove preview/pending markers. Explicit user scrolling cancels later automatic
+scroll restoration. Saved player filters and expanded sections survive rebuilding
+the live profile, preserving the visible layout as well as its scroll coordinate.
+
+Affected: v3.html, v3.js and shared Chromium regression script. This stores one
+temporary view per group in the current browser tab, capped at 1.5 million HTML
+characters plus styles; it creates no server HTML archive or D1 writes.
+
+Validation: existing 51 frontend/membership tests and analysis UI verification
+passed. Actual Chromium checks deliberately hold the v3.js response during reload
+and assert that the previous player/opponent content is already visible, Home is
+never painted, filters remain selected, and scroll differs by at most two pixels
+before and after startup. Both TCL and Altri and prior match-persistence/recursive
+opponent scenarios remain covered.
+
+Limitations: preview restoration requires a saved same-tab snapshot and available
+sessionStorage; a first visit or the first upgrade from older assets has none.
+Without it, the shell still avoids showing Home for another route and restores
+the page from the normal data cache. Live user-session deployment confirmation
+remains required. Browser refresh necessarily replaces the document; the preview
+maintains visual continuity while the application restores its interactive view.
+
 ## 2026-10-13 — Ready player and recursive opponent profiles without provisional pages
 
 The user confirmed stable refresh in TCL and Altri but reported zero matches on

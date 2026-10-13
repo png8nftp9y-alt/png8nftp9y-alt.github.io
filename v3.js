@@ -157,7 +157,7 @@ let calendarHeightObserver = null,
     Array.isArray(restoredUi.selected),
   uiScrollRestored = false,
   uiScrollRestoreFinalized = false,
-  uiScrollRestoreCancelled = false,
+  uiScrollRestoreCancelled = Boolean(window.courtWatchRefreshPreview?.cancelled),
   calendarPlayerHoldTimer = null,
   suppressTournamentOpenUntil = 0,
   suppressPlayerFilterUntil = 0,
@@ -196,6 +196,11 @@ function saveUiState() {
         sexFilter: state.sexFilter,
         scrollY: Math.max(0, Math.round(scrollY || 0)),
         profilePlayerId: profileFilterPlayerId,
+        profileCircuitFilter,
+        profileMatchTypeFilter,
+        profileOutcomeFilter,
+        profileTournamentStatusFilter,
+        profileYearFilter,
         openProfileTournamentKeys: [...openProfileTournamentKeys],
         tournamentPageKey,
         openTournamentPlayerKeys: [...openTournamentPlayerKeys],
@@ -208,10 +213,34 @@ function restoreUiScroll(finalize = false) {
   uiScrollRestored = true;
   if (finalize) uiScrollRestoreFinalized = true;
   const routeHash = location.hash;
+  scrollTo(0, Number(restoredUi.scrollY) || 0);
   requestAnimationFrame(() => requestAnimationFrame(() => {
     if (!uiScrollRestoreCancelled && location.hash === routeHash)
       scrollTo(0, Number(restoredUi.scrollY) || 0);
   }));
+}
+function saveRefreshView() {
+  saveUiState();
+  const key = "courtwatch-refresh-view-v1-" + PLAYER_GROUP;
+  try {
+    const view = document.querySelector("main.view.active");
+    if (!view || !state.data || window.courtWatchRefreshPreview || !view.getClientRects().length) return;
+    const clone = view.cloneNode(true);
+    const controls = view.querySelectorAll("input, select, textarea");
+    clone.querySelectorAll("input, select, textarea").forEach((control, index) => {
+      const original = controls[index];
+      if (control.tagName === "SELECT") [...control.options].forEach((option, i) => option.toggleAttribute("selected", original.options[i].selected));
+      else if (control.tagName === "TEXTAREA") control.textContent = original.value;
+      else {control.setAttribute("value", original.value); control.toggleAttribute("checked", original.checked);}
+    });
+    const html = clone.innerHTML;
+    if (html.length > 1500000) {sessionStorage.removeItem(key); return;}
+    sessionStorage.setItem(key, JSON.stringify({
+      version: "20261013-refresh-position", route: location.pathname + location.search + location.hash,
+      viewId: view.id, html, y: Math.max(0, scrollY || 0),
+      styles: [...document.head.querySelectorAll("style[id]")].map(style => ({id: style.id, css: style.textContent})),
+    }));
+  } catch {try {sessionStorage.removeItem(key);} catch {}}
 }
 const fmt = (d) =>
   new Intl.DateTimeFormat("it-IT", {
@@ -3484,9 +3513,9 @@ function renderTournament(key) {
   $("profileView").classList.add("active");
 }
 const renderProfileWithoutStats = renderProfile;
-let profileCircuitFilter = "all",
-  profileMatchTypeFilter = "all",
-  profileOutcomeFilter = "all",
+let profileCircuitFilter = ["all", "fitp", "tennis-europe", "itf"].includes(restoredUi.profileCircuitFilter) ? restoredUi.profileCircuitFilter : "all",
+  profileMatchTypeFilter = ["all", "singles", "doubles"].includes(restoredUi.profileMatchTypeFilter) ? restoredUi.profileMatchTypeFilter : "all",
+  profileOutcomeFilter = ["all", "win", "loss"].includes(restoredUi.profileOutcomeFilter) ? restoredUi.profileOutcomeFilter : "all",
   profileFilterPlayerId = String(restoredUi.profilePlayerId || "");
 let openProfileTournamentKeys = new Set(
   Array.isArray(restoredUi.openProfileTournamentKeys)
@@ -3772,6 +3801,12 @@ function route() {
       if (state.data) renderHome();
     }
   }
+  delete document.documentElement.dataset.cwRoutePending;
+  const preview = window.courtWatchRefreshPreview;
+  if (preview && preview.route === location.pathname + location.search + location.hash && !preview.cancelled)
+    scrollTo(0, preview.y);
+  delete document.documentElement.dataset.cwRefreshPreview;
+  delete window.courtWatchRefreshPreview;
 }
 function syncMonthFromAgenda() {
   state.month = new Date(
@@ -4081,7 +4116,7 @@ function wire() {
       requestAnimationFrame(() => scrollTo({ top: restoreY, behavior: "auto" })),
     );
   });
-  addEventListener("pagehide", saveUiState);
+  addEventListener("pagehide", saveRefreshView);
 }
 async function load() {
   if (loadRunning) return;
@@ -4312,9 +4347,9 @@ document.addEventListener("click", (event) => {
   openMatchAnalysis(button.dataset.matchAnalysis);
 });
 const renderProfileWithoutTournamentStatus = renderProfile;
-let profileTournamentStatusFilter = "all",
-  profileYearFilter = String(new Date().getFullYear()),
-  profileStatusPlayerId = "";
+let profileTournamentStatusFilter = ["all", "completed", "ongoing", "scheduled"].includes(restoredUi.profileTournamentStatusFilter) ? restoredUi.profileTournamentStatusFilter : "all",
+  profileYearFilter = /^(?:all|\d{4})$/.test(String(restoredUi.profileYearFilter || "")) ? String(restoredUi.profileYearFilter) : String(new Date().getFullYear()),
+  profileStatusPlayerId = String(restoredUi.profilePlayerId || "");
 renderProfile = function (id) {
   if (profileStatusPlayerId !== id) {
     profileTournamentStatusFilter = "all";

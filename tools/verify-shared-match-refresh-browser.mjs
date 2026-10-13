@@ -16,10 +16,18 @@ try {
     let offline = false, partial = false, empty = false, requests = 0, holdSnapshot = false, releaseSnapshot;
     let holdOpponent = false, releaseOpponent, opponentOffline = false, opponentPartial = false;
     const opponentRequests = new Map();
+    let holdAppScript = false, releaseAppScript;
     await page.addInitScript(() => {
       window.setInterval = () => 0;
       window.observedProfileCounts = [];
       window.observedEmptyOpponent = false;
+      window.observedHomeDuringRefresh = false;
+      const observeFrames = () => {
+        const home = document.querySelector('#homeView');
+        if (location.hash && home?.classList.contains('active') && getComputedStyle(home).display !== 'none') window.observedHomeDuringRefresh = true;
+        requestAnimationFrame(observeFrames);
+      };
+      requestAnimationFrame(observeFrames);
       new MutationObserver(() => {
         const stat = document.querySelector('#profileContent [data-stat="all"]');
         if (stat) window.observedProfileCounts.push(Number(stat.textContent));
@@ -42,7 +50,10 @@ try {
         return route.fulfill({json: {group, generatedAt: '2026-10-13T00:00:00Z', players: empty ? [] : [player], tournaments: empty ? [] : partial ? [{...tournament, entryStatus: 'withdrawn'}] : [tournament], matches: empty ? [] : partial ? [{...recent, score: '', result: ''}] : [old, recent, wrong, full, {...recent, id:"disabled-fitp", circuit:"fitp"}, {...recent, id:"disabled-itf", circuit:"itf"}]}});
       }
       if (url.pathname.endsWith('/session')) return route.fulfill({json: {user: {displayName: 'Fixture', role: 'admin'}}});
-      if (assets[name]) return route.fulfill({body: assets[name], contentType: name.endsWith('.html') ? 'text/html' : name.endsWith('.css') ? 'text/css' : 'application/javascript'});
+      if (assets[name]) {
+        if (name === 'v3.js' && holdAppScript) await new Promise(resolve => {releaseAppScript = resolve;});
+        return route.fulfill({body: assets[name], contentType: name.endsWith('.html') ? 'text/html' : name.endsWith('.css') ? 'text/css' : 'application/javascript'});
+      }
       return route.fulfill({json: {players: [], tournaments: [], matches: [], rankings: [], results: [], agenda: []}});
     });
     const target = `http://courtwatch.test/v3.html?group=${group}#player/${player.id}`;
@@ -148,7 +159,8 @@ try {
     await page.reload();
     await page.waitForFunction(() => loadRunning);
     assert.equal(await page.locator('[data-profile-loading]').count(), 0);
-    assert.equal(await page.locator('#profileContent [data-stat="all"]').count(), 0, `${group}: no provisional match counter while the snapshot is pending`);
+    const pendingStat = page.locator('#profileContent [data-stat="all"]');
+    if (await pendingStat.count()) assert.equal(await pendingStat.textContent(), '3', `${group}: a refresh preview must retain the last known count`);
     assert.equal(typeof releaseSnapshot, 'function');
     holdSnapshot = false; releaseSnapshot();
     await page.waitForFunction(() => state.data?.matches?.some(m => m.id === 'full-double'));
@@ -156,7 +168,59 @@ try {
     assert.equal(await page.locator('#profileContent .unifiedMatchRow').count(), 3);
     assert.equal(await page.evaluate(() => observedProfileCounts.includes(0)), false);
     assert.deepEqual(errors, []);
-    console.log(JSON.stringify({group, knownMatches: before.length, firstProfile: 'passed', delayedSnapshot: 'passed', newerPartialCache: 'passed', readyOpponentClick: 'passed', recursiveOpponent: 'passed', durableOpponentReload: 'passed', partialRefresh: 'passed', profileDouble: 'passed', cacheReload: 'passed', emptySnapshot: 'passed', europeOnly: 'passed', requests}));
+
+    // Preserve the actual visible profile and scroll before the app script even starts.
+    await page.locator('#profileMatchTypeFilter').selectOption('singles');
+    await page.evaluate(() => {
+      const body = document.querySelector('.profileTournamentMatches');
+      body.hidden = false;
+      openProfileTournamentKeys.add(body.closest('.profileTournament').dataset.profileTournament);
+      const style = document.createElement('style');
+      style.id = 'refresh-scroll-fixture'; style.textContent = '.profileTournamentMatches{min-height:1400px}';
+      document.head.append(style);
+    });
+    await page.mouse.wheel(0, 420);
+    await page.waitForFunction(() => scrollY >= 400);
+    const refreshY = await page.evaluate(() => scrollY);
+    assert.ok(refreshY >= 400);
+    holdAppScript = true;
+    await page.reload({waitUntil: 'commit'});
+    await page.waitForFunction(() => Boolean(window.courtWatchRefreshPreview));
+    assert.equal(await page.locator('#homeView').isVisible(), false);
+    assert.equal(await page.locator('#profileContent .unifiedMatchRow').count(), 3);
+    assert.equal(await page.locator('#profileMatchTypeFilter').inputValue(), 'singles');
+    assert.ok(Math.abs(await page.evaluate(() => scrollY) - refreshY) <= 2, `${group}: saved scroll must exist before v3.js starts`);
+    assert.equal(typeof releaseAppScript, 'function');
+    holdAppScript = false; releaseAppScript();
+    await page.waitForFunction(() => typeof state !== 'undefined' && Boolean(state.data) && !window.courtWatchRefreshPreview);
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    assert.ok(Math.abs(await page.evaluate(() => scrollY) - refreshY) <= 2, `${group}: app startup must keep the same scroll`);
+    assert.equal(await page.evaluate(() => observedHomeDuringRefresh), false);
+    assert.equal(await page.locator('#profileMatchTypeFilter').inputValue(), 'singles');
+    assert.deepEqual(errors, []);
+    await page.evaluate(() => openCurrentOpponent('fixture-opponent-a', 'Opponent A', 'GS14'));
+    await page.waitForFunction(() => document.querySelector('.opponentProfileHero h2')?.textContent === 'Opponent A');
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await page.evaluate(() => {
+      const style = document.createElement('style');
+      style.id = 'refresh-opponent-scroll-fixture'; style.textContent = '.opponentHistoryMatches{min-height:1400px}';
+      document.head.append(style);
+    });
+    await page.mouse.wheel(0, 420);
+    await page.waitForFunction(() => scrollY >= 400);
+    const opponentRefreshY = await page.evaluate(() => scrollY);
+    holdAppScript = true;
+    await page.reload({waitUntil: 'commit'});
+    await page.waitForFunction(() => Boolean(window.courtWatchRefreshPreview));
+    assert.equal(await page.locator('#opponentTournamentHistory .unifiedMatchRow').count(), 1);
+    assert.ok(Math.abs(await page.evaluate(() => scrollY) - opponentRefreshY) <= 2);
+    holdAppScript = false; releaseAppScript();
+    await page.waitForFunction(() => typeof state !== 'undefined' && Boolean(state.data) && !window.courtWatchRefreshPreview);
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    assert.ok(Math.abs(await page.evaluate(() => scrollY) - opponentRefreshY) <= 2);
+    assert.equal(await page.evaluate(() => observedHomeDuringRefresh), false);
+    assert.deepEqual(errors, []);
+    console.log(JSON.stringify({group, knownMatches: before.length, refreshPosition: 'passed', noHomeFlash: 'passed', firstProfile: 'passed', delayedSnapshot: 'passed', newerPartialCache: 'passed', readyOpponentClick: 'passed', recursiveOpponent: 'passed', durableOpponentReload: 'passed', partialRefresh: 'passed', profileDouble: 'passed', cacheReload: 'passed', emptySnapshot: 'passed', europeOnly: 'passed', requests}));
     await page.close();
   }
 } finally {await browser.close();}
