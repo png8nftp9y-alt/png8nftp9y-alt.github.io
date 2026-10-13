@@ -9,7 +9,7 @@ test('only genuinely new discoveries enter ordinary; rediscovery never requeues 
 });
 test('partial results leave ordinary once attempted, retain missing fields and individual check time',()=>{
  let s=reconcileMetadataQueue(null,cat(['J-NEW']),{},today,now,cat([]));s=applyMetadataBatch(s,{attempts:[{competitionId:'J-NEW',checkedAt:now,reason:'incapsula_blocked',error:'challenge'}]},now);s=reconcileMetadataQueue(s,cat(['J-NEW']),{'J-NEW':{venueName:'Club'}},today,now);
- assert.equal(s.tournaments['J-NEW'].status,'extraordinary');assert.deepEqual(s.tournaments['J-NEW'].missing,['address','qualificationStartDate']);assert.equal(s.tournaments['J-NEW'].checkedAt,now);assert.equal(metadataQueueStatus(s).extraordinary.missingFields,2);
+ assert.equal(s.tournaments['J-NEW'].status,'extraordinary');assert.deepEqual(s.tournaments['J-NEW'].missing,['qualificationStartDate']);assert.equal(s.tournaments['J-NEW'].checkedAt,now);assert.equal(metadataQueueStatus(s).extraordinary.missingFields,1);
 });
 test('eight per batch; rotation prevents unpublished factsheets starving later tournaments',()=>{
  let s=reconcileMetadataQueue(null,cat(Array.from({length:20},(_,i)=>'J-'+i)),{},today,now);const batch=selectMetadataBatch(s,'extraordinary');assert.equal(batch.length,8);s=applyMetadataBatch(s,{attempts:batch.map(t=>({competitionId:t.competitionId,checkedAt:now,reason:'factsheet_not_public'}))},now);assert.ok(selectMetadataBatch(s,'extraordinary').every(t=>!batch.some(b=>b.competitionId===t.competitionId)));
@@ -29,6 +29,16 @@ test('user-resolved Egyptian team finals stay resolved across discovery and in-f
  assert.equal(metadataQueueStatus(s).extraordinary.total,0);assert.equal(metadataQueueStatus(s).coverage.resolved,2);assert.equal(metadataQueueStatus(s).coverage.userResolved,2);
  s=applyMetadataBatch(s,{attempts:ids.map(competitionId=>({competitionId,checkedAt:now,reason:'factsheet_not_public'}))},now);
  s=reconcileMetadataQueue(s,cat(ids),{},today,now,cat([]));
- for(const id of ids){assert.equal(s.tournaments[id].status,'user_resolved');assert.equal(s.tournaments[id].resolvedByUser,true);assert.equal(s.tournaments[id].missing.length,3);}
+ for(const id of ids){assert.equal(s.tournaments[id].status,'user_resolved');assert.equal(s.tournaments[id].resolvedByUser,true);assert.equal(s.tournaments[id].missing.length,2);}
  assert.equal(selectMetadataBatch(s,'ordinary').length,0);assert.equal(selectMetadataBatch(s,'extraordinary').length,0);
+});
+
+test('foreign address-only gaps complete; Italian gaps stay queued across publication',()=>{
+ const catalogue={tournaments:[{...t('J-FOREIGN'),hostNationCode:'FRA'},{...t('J-ITALIAN'),hostNationCode:'ITA'}]},saved=Object.fromEntries(catalogue.tournaments.map(t=>[t.competitionId,{venueName:'Club',qualificationStartDate:'2026-10-30'}]));
+ let state=reconcileMetadataQueue(null,catalogue,{},today,now);
+ state=reconcileMetadataQueue(state,catalogue,saved,today,now);
+ assert.equal(state.tournaments['J-FOREIGN'].status,'complete');assert.deepEqual(state.tournaments['J-FOREIGN'].missing,[]);
+ assert.deepEqual(state.tournaments['J-ITALIAN'].missing,['address']);assert.deepEqual(selectMetadataBatch(state,'extraordinary').map(t=>t.competitionId),['J-ITALIAN']);
+ state=applyMetadataBatch(state,{attempts:[{competitionId:'J-FOREIGN',checkedAt:now}]},now);state=reconcileMetadataQueue(state,catalogue,saved,today,now);
+ assert.equal(state.tournaments['J-FOREIGN'].status,'complete');assert.equal(metadataQueueStatus(state).extraordinary.missingFields,1);
 });

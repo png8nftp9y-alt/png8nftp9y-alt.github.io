@@ -2,8 +2,9 @@ import fs from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 import {createRequire} from 'node:module';
 import {browserFactsheet} from './itf-metadata-browser.mjs';
-import {factsheetMeta,tournamentFactSheetMeta,TODAY} from './itf-common.mjs';
+import {factsheetMeta,tournamentFactSheetMeta,TODAY,countryFor} from './itf-common.mjs';
 const fields=['venueName','address','qualificationStartDate'];
+export const requiredMetadataFields=t=>fields.filter(f=>f!=='address'||countryFor(t)==='ITA'||/^(Italy|Italia)$/i.test(String(t?.hostNation||''))||/-ITA-/.test(String(t?.competitionId||'').toUpperCase()));
 const validDate=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s||''));
 export function futureMetadataTargets(catalogue,saved={},today=TODAY){
  return [...new Map((catalogue.tournaments||[]).map(t=>[String(t.competitionId||'').toUpperCase(),t])).values()].filter(t=>{
@@ -24,15 +25,15 @@ export async function recoverMetadata(targets,existing,acquire,options={}){
  const metadata={...existing},failures=[],unavailable=[];
  const unique=[...new Map(targets.map(t=>[String(t.competitionId||'').toUpperCase(),t])).values()].filter(t=>t.competitionId);
  let acquired=0,processed=0,consecutiveFailures=0,stoppedReason='';
- const started=Date.now(),missing=row=>fields.filter(f=>!row?.[f]||(f==='qualificationStartDate'&&!validDate(row[f])));
- const snapshot=()=>({metadata,acquired,checked:unique.length,processed,remaining:unique.map(t=>({competitionId:String(t.competitionId).toUpperCase(),missing:missing(metadata[String(t.competitionId).toUpperCase()])})).filter(x=>x.missing.length),failures,unavailable,stoppedReason});
+ const started=Date.now(),missing=(row,t)=>requiredMetadataFields(t).filter(f=>!row?.[f]||(f==='qualificationStartDate'&&!validDate(row[f])));
+ const snapshot=()=>({metadata,acquired,checked:unique.length,processed,remaining:unique.map(t=>({competitionId:String(t.competitionId).toUpperCase(),missing:missing(metadata[String(t.competitionId).toUpperCase()],t)})).filter(x=>x.missing.length),failures,unavailable,stoppedReason});
  await options.onCheckpoint?.(snapshot());
  for(const t of unique){
   if(options.maxElapsedMs&&Date.now()-started>=options.maxElapsedMs){stoppedReason='time_budget_exhausted';break;}
   const id=String(t.competitionId).toUpperCase(),previous=metadata[id]||{},begin=Date.now();
   await options.onProgress?.({phase:'start',competitionId:id,processed,total:unique.length,acquired});
   let status='reused',error='';
-  if(missing(previous).length){
+  if(missing(previous,t).length){
    let result={};
    try{result=await acquire(t)||{};}catch(e){error=String(e.message||'factsheet_acquisition_failed').split('\n')[0].slice(0,100);}
    const next={...previous};
@@ -99,7 +100,7 @@ async function collect(){
  const selected=targets.filter(t=>number(String(t.competitionId).toUpperCase())%total===shard);
  let context;
  let acquireSelected=acquire;
- if(process.env.ITF_METADATA_BROWSER==='1'&&selected.some(t=>fields.some(f=>!saved[String(t.competitionId).toUpperCase()]?.[f]))){
+ if(process.env.ITF_METADATA_BROWSER==='1'&&selected.some(t=>requiredMetadataFields(t).some(f=>!saved[String(t.competitionId).toUpperCase()]?.[f]))){
   const require=createRequire(new URL('../../infra/itf-acquirer/package.json',import.meta.url));
   const {chromium}=require('playwright');
   context=await chromium.launchPersistentContext('',{headless:true,locale:'en-GB',timezoneId:'Europe/Rome'});

@@ -23,7 +23,7 @@ test('dedicated factsheet endpoint and HTTP failures are observable',async()=>{
 test('recovery skips complete metadata, deduplicates IDs and retains valid partial results',async()=>{
  const targets=[{competitionId:'COMPLETE'},{competitionId:'NEW'},{competitionId:'NEW'},{competitionId:'BLOCKED'}],calls=[];
  const result=await recoverMetadata(targets,{COMPLETE:{venueName:'Club',address:'Address',qualificationStartDate:'2026-10-03'}},async t=>{calls.push(t.competitionId);if(t.competitionId==='BLOCKED')throw Error('blocked');return{venueName:'Official Club',address:'Official Address',qualificationStartDate:'2026-10-04'};});
- assert.deepEqual(new Set(calls),new Set(['NEW','BLOCKED']));assert.equal(result.checked,3);assert.equal(result.acquired,1);assert.equal(result.metadata.NEW.qualificationStartDate,'2026-10-04');assert.deepEqual(result.remaining,[{competitionId:'BLOCKED',missing:['venueName','address','qualificationStartDate']}]);
+ assert.deepEqual(new Set(calls),new Set(['NEW','BLOCKED']));assert.equal(result.checked,3);assert.equal(result.acquired,1);assert.equal(result.metadata.NEW.qualificationStartDate,'2026-10-04');assert.deepEqual(result.remaining,[{competitionId:'BLOCKED',missing:['venueName','qualificationStartDate']}]);
 });
 test('invalid qualifying dates stay missing and existing official club survives',async()=>{
  const result=await recoverMetadata([{competitionId:'PARTIAL'}],{PARTIAL:{venueName:'Existing Club'}},async()=>({address:'Address',qualificationStartDate:'unknown'}));
@@ -54,4 +54,10 @@ test('future scope excludes today, concluded events and already-started qualifyi
  assert.equal(enriched.tournaments[3].qualificationStartDate,'2026-10-17');
  assert.equal(enriched.tournaments[3].address,'Address');
  assert.equal(catalogue.tournaments[3].address,undefined);
+});
+
+test('address required only in Italy; foreign complete records are reused',async()=>{
+ const targets=[{competitionId:'J-FRA',hostNationCode:'FRA'},{competitionId:'J-ITA',sourceUrl:'https://www.itftennis.com/en/tournament/example/ita/2026/j-ita/'}],existing=Object.fromEntries(targets.map(t=>[t.competitionId,{venueName:'Club',qualificationStartDate:'2026-10-30'}])),calls=[];
+ const result=await recoverMetadata(targets,existing,async t=>{calls.push(t.competitionId);return{};});
+ assert.deepEqual(calls,['J-ITA']);assert.deepEqual(result.remaining,[{competitionId:'J-ITA',missing:['address']}]);
 });
