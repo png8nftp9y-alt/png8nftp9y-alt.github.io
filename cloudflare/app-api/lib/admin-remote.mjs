@@ -1,6 +1,6 @@
 const FILES = ['diagnostics.json', 'sync_status.json', 'itf_system_diagnostics.json',
   'source_itf_entries.json', 'tennis_europe_system_diagnostics.json',
-  'source_fitp_entries.json', 'itf_t1_queue_status.json', 'operational_status.json'];
+  'source_fitp_entries.json', 'itf_t1_queue_status.json', 'itf_metadata_queue_status.json', 'operational_status.json'];
 
 export async function loadAdminRemote({ primaryBase, fallbackBase, fetcher = fetch,
   cache = globalThis.caches?.default, now = Date.now(), timeoutMs = 12000 }) {
@@ -12,7 +12,7 @@ export async function loadAdminRemote({ primaryBase, fallbackBase, fetcher = fet
       cached = await cache?.match(key);
       cachedAt = Date.parse(cached?.headers.get('X-CourtWatch-Cached-At') || '');
     } catch {}
-    if (cached && file !== 'itf_t1_queue_status.json' && now - cachedAt < 300000) {
+    if (cached && !['itf_t1_queue_status.json','itf_metadata_queue_status.json'].includes(file) && now - cachedAt < 300000) {
       try { docs[file] = await cached.json(); return; } catch { cached = null; }
     }
     const errors = [];

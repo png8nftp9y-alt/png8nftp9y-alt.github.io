@@ -2,7 +2,8 @@ import fs from 'node:fs/promises';
 import {metadataRows,metadataPlan,metadataSQL,verifyMetadata} from './itf-metadata-d1.mjs';
 // D1_WRITE_POLICY: incremental; buildIncrementalSyncPlan, payload guards and verified readback.
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
-const rows=metadataRows(await Promise.all(['dist/v3/source_itf_history_tournaments.json','dist/v3/source_itf_tournaments.json'].map(read)),await read('history/itf_official_metadata.json'));
+let rows=metadataRows(await Promise.all(['dist/v3/source_itf_history_tournaments.json','dist/v3/source_itf_tournaments.json'].map(read)),await read('history/itf_official_metadata.json'));
+if(process.env.ITF_METADATA_RESULT_FILE){const result=await read(process.env.ITF_METADATA_RESULT_FILE),ids=new Set((result.attempts||[]).map(x=>x.competitionId));rows=rows.filter(x=>ids.has(x.sourceTournamentId));}
 const config=await read('cloudflare/app-api/wrangler.generated.jsonc'),db=config.d1_databases.find(x=>x.binding==='DB')?.database_id;
 const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
 if(!account||!token||!db)throw Error('ITF metadata D1 configuration missing');
