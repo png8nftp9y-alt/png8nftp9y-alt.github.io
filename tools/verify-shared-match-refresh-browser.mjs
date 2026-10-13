@@ -8,19 +8,19 @@ const full = {id: 'full-double', playerId: player.id, playerName: player.name, c
 const wrong = {...full, id: 'wrong-double', partner: '', opponent: full.partner};
 const old = {...full, id: 'old-single', date: '2026-01-03', event: 'GS14', matchType: 'singles', partner: '', opponent: 'Previous Opponent', score: '6-4 6-3', result: '6-4 6-3'};
 const recent = {...old, id: 'recent-single', date: '2026-10-12', opponent: 'Recent Opponent'};
-const browser = await chromium.launch({headless: true});
+const browser = await chromium.launch({headless: true, executablePath: process.env.COURTWATCH_TEST_CHROMIUM || undefined});
 try {
   for (const group of ['main', 'others']) {
     const page = await browser.newPage();
     const errors = []; page.on('pageerror', error => errors.push(String(error)));
-    let offline = false, partial = false, requests = 0;
+    let offline = false, partial = false, empty = false, requests = 0;
     await page.addInitScript(() => {window.setInterval = () => 0;});
     await page.route('**/*', async route => {
       const url = new URL(route.request().url()), name = url.pathname.split('/').pop();
       if (url.pathname.endsWith('/app-snapshot')) {
         requests++;
         if (offline) return route.fulfill({status: 503, json: {error: 'offline'}});
-        return route.fulfill({json: {group, generatedAt: '2026-10-13T00:00:00Z', players: [player], tournaments: partial ? [{...tournament, entryStatus: 'withdrawn'}] : [tournament], matches: partial ? [{...recent, score: '', result: ''}] : [old, recent, wrong, full]}});
+        return route.fulfill({json: {group, generatedAt: '2026-10-13T00:00:00Z', players: empty ? [] : [player], tournaments: empty ? [] : partial ? [{...tournament, entryStatus: 'withdrawn'}] : [tournament], matches: empty ? [] : partial ? [{...recent, score: '', result: ''}] : [old, recent, wrong, full, {...recent, id:"disabled-fitp", circuit:"fitp"}, {...recent, id:"disabled-itf", circuit:"itf"}]}});
       }
       if (url.pathname.endsWith('/session')) return route.fulfill({json: {user: {displayName: 'Fixture', role: 'admin'}}});
       if (assets[name]) return route.fulfill({body: assets[name], contentType: name.endsWith('.html') ? 'text/html' : name.endsWith('.css') ? 'text/css' : 'application/javascript'});
@@ -37,11 +37,15 @@ try {
     assert.deepEqual(await page.evaluate(() => state.data.matches.map(m => m.id).sort()), [...before].sort(), `${group}: partial refresh must preserve known history`);
     assert.equal(await page.evaluate(() => state.data.matches.find(m => m.id === 'recent-single').score), '6-4 6-3');
     assert.equal(await page.locator('#profileContent .unifiedMatchRow').count(), 3);
-    await page.evaluate(() => {
+    empty = true;
+    await page.evaluate(() => load());
+    assert.equal(await page.locator('#profileContent .unifiedMatchRow').count(), 3, `${group}: an empty snapshot must not erase the player profile`);
+    assert.equal(await page.evaluate(() => state.data.players.length), 1);
+    await page.evaluate(async () => {
       const original = Storage.prototype.setItem;
-      Storage.prototype.setItem = function(key, value) {if (key.includes('last-good')) throw Error('QuotaExceededError'); return original.call(this, key, value);};
-      localStorage.removeItem(LAST_GOOD_CACHE);
-      saveCachedData(state.data);
+      Storage.prototype.setItem = function(key, value) {if (key.includes('last-good') || key.includes('calendar-v1')) throw Error('QuotaExceededError'); return original.call(this, key, value);};
+      for (const storage of [localStorage, sessionStorage]) { storage.removeItem(LAST_GOOD_CACHE); storage.removeItem(CALENDAR_CACHE); }
+      await saveCachedData(state.data);
     });
     offline = true;
     await page.reload();
@@ -51,7 +55,7 @@ try {
     assert.equal(await page.locator('#syncStatus').isVisible(), false);
     assert.equal(await page.locator('#dataAlert').isVisible(), false);
     assert.deepEqual(errors, []);
-    console.log(JSON.stringify({group, knownMatches: before.length, partialRefresh: 'passed', profileDouble: 'passed', cacheReload: 'passed', requests}));
+    console.log(JSON.stringify({group, knownMatches: before.length, partialRefresh: 'passed', profileDouble: 'passed', cacheReload: 'passed', emptySnapshot: 'passed', europeOnly: 'passed', requests}));
     await page.close();
   }
 } finally {await browser.close();}

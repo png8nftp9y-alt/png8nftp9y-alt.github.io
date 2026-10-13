@@ -4,12 +4,12 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const source=readFileSync(new URL('../../v3.js',import.meta.url),'utf8');
 const mergeSource = source.slice(source.indexOf('function mergeKnownMatches('), source.indexOf('function clearDemographicFilters('));
-const restore=source.slice(source.indexOf('function restoreCachedProjectionBeforeFirstRender()'),source.indexOf('function saveCachedData(data)'));
+const restore=source.slice(source.indexOf('function applyCachedProjection('),source.indexOf('function saveCachedData(data)'));
 const filter=source.slice(source.indexOf('function renderFilters()'),source.indexOf('function matchTournament('));
 const readable=source.slice(source.indexOf('const readablePerson ='),source.indexOf('const IOC_REGION ='));
 test('cached personal players and tournaments exist before the first route without awaiting network',()=>{
  const saved={players:[{id:'c',name:'Camilla Frigerio'},{id:'p',name:'Paolo Brambilla'},{id:'r',name:'Riccardo Galbiati'}],tournaments:[{playerId:'c',name:'Cantù'},{playerId:'p',name:'Cantù'},{playerId:'r',name:'Cantù'}]};
- const ctx={cachedData:()=>saved,state:{data:null,selected:new Set(['c','p','r'])},uiSelectionRestored:true};
+ const ctx={validProjection:d=>d&&Array.isArray(d.players)&&Array.isArray(d.tournaments),cachedData:()=>saved,state:{data:null,selected:new Set(['c','p','r'])},uiSelectionRestored:true};
  vm.createContext(ctx);vm.runInContext(restore,ctx);
  assert.equal(ctx.restoreCachedProjectionBeforeFirstRender(),true);
  assert.equal(ctx.state.data.tournaments.length,3);assert.equal(ctx.state.selected.size,3);
@@ -20,13 +20,13 @@ test('cached personal players and tournaments exist before the first route witho
 test('restoring cache preserves deselect all and an explicit player subset',()=>{
  const saved={players:[{id:'a'},{id:'b'}],tournaments:[]};
  for(const selected of [[],['b']]){
-  const ctx={cachedData:()=>saved,state:{data:null,selected:new Set(selected)},uiSelectionRestored:true};
+  const ctx={validProjection:d=>d&&Array.isArray(d.players)&&Array.isArray(d.tournaments),cachedData:()=>saved,state:{data:null,selected:new Set(selected)},uiSelectionRestored:true};
   vm.createContext(ctx);vm.runInContext(restore,ctx);ctx.restoreCachedProjectionBeforeFirstRender();
   assert.deepEqual(Array.from(ctx.state.selected),selected);
  }
 });
 test('no cache does not create an empty fabricated projection',()=>{
- const ctx={cachedData:()=>null,state:{data:null,selected:new Set()},uiSelectionRestored:false};
+ const ctx={validProjection:d=>d&&Array.isArray(d.players)&&Array.isArray(d.tournaments),cachedData:()=>null,state:{data:null,selected:new Set()},uiSelectionRestored:false};
  vm.createContext(ctx);vm.runInContext(restore,ctx);
  assert.equal(ctx.restoreCachedProjectionBeforeFirstRender(),false);assert.equal(ctx.state.data,null);
 });
@@ -44,10 +44,10 @@ test('select-deselect calendar chips are alphabetical and keep the chosen IDs',(
  assert.deepEqual(players.map(p=>p.id),['r','p','c','a']);
 });
 
-const cacheSource=source.slice(source.indexOf('function cachedData()'),source.indexOf('function syncLabel('));
+const cacheSource=source.slice(source.indexOf('let durableProjectionFallback'),source.indexOf('function syncLabel('));
 function cacheContext(initial={},quota=Infinity) {
  const values=new Map(Object.entries(initial));
- const ctx={LAST_GOOD_CACHE:'full',CALENDAR_CACHE:'calendar',console:{warn(){}},Date,
+ const ctx={circuit:m=>m.circuit||"fitp",agendaKey:m=>`${m.playerId}|${m.matchId||m.id}`,Promise,validProjection:d=>d&&Array.isArray(d.players)&&Array.isArray(d.tournaments),LAST_GOOD_CACHE:'full',CALENDAR_CACHE:'calendar',console:{warn(){}},Date,
  iso:date=>date.toISOString().slice(0,10),add:(date,days)=>new Date(date.getTime()+days*86400000),
  state:{data:null,selected:new Set()},uiSelectionRestored:false,
  localStorage:{getItem:key=>values.get(key)||null,removeItem:key=>values.delete(key),
@@ -82,22 +82,36 @@ test('API failure fallback retains personal tournaments and omits removed player
 
 test('actual load with unavailable API keeps cached personal calendar after JSON refresh',async()=>{
  const {ctx}=cacheContext();
- Object.assign(ctx,{loadRunning:false,uiSelectionRestored:true,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),saveUiState(){},syncLabel(){},renderIfDataChanged(){},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,
+ Object.assign(ctx,{loadRunning:false,uiSelectionRestored:true,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),saveUiState(){},normalizeMatchProjection:x=>x,syncLabel(){},renderIfDataChanged(){},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,
  apiProjection:async()=>{throw Error('offline')},
  v3json:async name=>name==='players.json'?{players:[{id:'base'}]}:name==='tournaments.json'?{tournaments:[{playerId:'base',name:'Base'}]}:{}});
  ctx.state.data={players:[{id:'base'},{id:'new',userAdded:true}],tournaments:[{playerId:'new',name:'Cantù'}],matches:[]};
  const loader=source.slice(source.indexOf('async function load()'),source.indexOf('document.addEventListener("click", (event) => {',source.indexOf('async function load()')));
  ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);await ctx.load();
- assert.deepEqual(Array.from(ctx.state.data.tournaments,t=>t.name),['Base','Cantù']);
+ assert.deepEqual(Array.from(ctx.state.data.tournaments,t=>t.name).sort(),['Base','Cantù'].sort());
  assert.equal(ctx.cachedData().tournaments.some(t=>t.playerId==='new'),true);
 });
 
 test('quota fallback keeps all acquired historical matches across a page reload',()=>{
  const {ctx,values}=cacheContext({},4500);
- const old={id:'old',playerId:'a',date:'2026-01-01',score:'6-4 6-3'};
+ const old={id:'old',playerId:'a',circuit:'tennis-europe',date:'2026-01-01',score:'6-4 6-3'};
  ctx.saveCachedData({players:[{id:'a'}],tournaments:[],matches:[old],opponents:[{raw:'x'.repeat(10000)}],personalProjectionComplete:true});
  assert.equal(values.has('full'),false);
  assert.equal(ctx.cachedData().matches[0].id,'old');
  ctx.state.data=null;ctx.restoreCachedProjectionBeforeFirstRender();
  assert.equal(ctx.state.data.matches[0].score,'6-4 6-3');
+});
+
+test('a failed cache replacement never destroys the previous valid full snapshot',async()=>{
+ const previous={players:[{id:'a'}],tournaments:[],matches:[{id:'known',playerId:'a',circuit:'tennis-europe'}],cachedAt:1};
+ const serialized=JSON.stringify(previous),{ctx,values}=cacheContext({full:serialized},1);
+ await ctx.saveCachedData({...previous,matches:[...previous.matches,{id:'new',playerId:'a',circuit:'tennis-europe'}]});
+ assert.equal(values.get('full'),serialized);
+ assert.equal(values.has('calendar'),false);
+});
+test('compact cache stores Europe matches once and does not retain FITP/ITF results',()=>{
+ const {ctx}=cacheContext();
+ const rows=['tennis-europe','fitp','itf'].map((circuit,i)=>({id:String(i),playerId:'a',circuit}));
+ const snapshot=ctx.calendarCacheSnapshot({players:[{id:'a'}],tournaments:[],matches:rows,agenda:rows,results:rows},1);
+ assert.equal(snapshot.matches.length,1);assert.equal(snapshot.agenda.length,0);assert.equal(snapshot.results.length,1);
 });

@@ -13,7 +13,7 @@ function setup(group, projection, {cached = null, staticData = {}, staticOffline
     PLAYER_GROUP: group, state: {data: null, selected: new Set(), playerSelectionEpoch: 0},
     loadRunning: false, uiSelectionRestored: false,
     removedCourtWatchPlayers: new Set(), confirmedCourtWatchPlayers: new Map(), FORMER_PLAYERS: new Set(),
-    console: {warn() {}, error() {}}, Date, Map, Set, Promise,
+    console: {warn() {}, error() {}}, Date, Map, Set, Promise, circuit: m => m.circuit || "fitp", normalizeMatchProjection: data => ({...data, matches: data.matches.filter(m => m.circuit === "tennis-europe"), results: (data.results || []).filter(m => m.circuit === "tennis-europe")}),
     apiProjection: async () => {requests++; if (projection instanceof Error) throw projection; return projection;},
     v3json: async name => {if (staticOffline) throw Error('JSON offline'); return staticData[name] || {};},
     cachedData: () => cached, saveCachedData: data => {saved = data;},
@@ -27,12 +27,12 @@ function setup(group, projection, {cached = null, staticData = {}, staticOffline
   return {ctx, nodes, saved: () => saved, requests: () => requests, unavailable: () => unavailable};
 }
 const player = {id: 'a', name: 'Europe Player', userAdded: true};
-const matches = ['tennis-europe', 'fitp', 'itf'].map((circuit, i) => ({id: `m${i}`, playerId: 'a', circuit, date: '2026-10-01'}));
+const matches = ['tennis-europe', 'tennis-europe', 'tennis-europe'].map((circuit, i) => ({id: `m${i}`, playerId: 'a', circuit, date: '2026-10-01'}));
 for (const group of ['main', 'others']) {
-  test(`${group}: identical loader keeps every circuit and works without static files`, async () => {
+  test(`${group}: identical loader keeps acquired Europe matches and works without static files`, async () => {
     const c = setup(group, {group, players: [player], tournaments: [{playerId: 'a'}], matches}, {staticOffline: true});
     await c.ctx.load();
-    assert.deepEqual(Array.from(c.ctx.state.data.matches, m => m.circuit), ['tennis-europe', 'fitp', 'itf']);
+    assert.deepEqual(Array.from(c.ctx.state.data.matches, m => m.circuit), ['tennis-europe', 'tennis-europe', 'tennis-europe']);
     assert.equal(c.ctx.state.data.agenda.length, 3);
     assert.equal(c.ctx.state.data.tournaments.length, 1);
     assert.equal(c.saved().group, group);
@@ -124,3 +124,36 @@ test('one slow snapshot request is allowed to complete without an abort-and-rest
   await ctx.apiProjection();
   assert.deepEqual(calls, [{url: '/snapshot', timeout: 45000}]);
 });
+
+for (const group of ['main', 'others']) {
+  test(`${group}: an empty refresh cannot erase known players, tournaments or Europe matches`, async () => {
+    const snapshot = {group, players: [player], tournaments: [{playerId:'a', competitionId:'known'}], matches};
+    const c = setup(group, snapshot);
+    await c.ctx.load();
+    snapshot.players=[];snapshot.tournaments=[];snapshot.matches=[];
+    await c.ctx.load();
+    assert.equal(c.ctx.state.data.players.length,1);
+    assert.equal(c.ctx.state.data.tournaments.length,1);
+    assert.equal(c.ctx.state.data.matches.length,3);
+    assert.equal(c.ctx.state.selected.has('a'),true);
+  });
+  test(`${group}: unenabled FITP and ITF rows are ignored from API, static files and cache`, async () => {
+    const mixed=['tennis-europe','fitp','itf'].map((circuit,i)=>({id:`mixed-${i}`,playerId:'a',circuit,date:'2026-01-01'}));
+    const c=setup(group,{group,players:[player],tournaments:[],matches:mixed},{cached:{players:[player],tournaments:[],matches:mixed,personalProjectionComplete:true},staticData:{'matches.json':{matches:mixed},'results.json':{results:mixed}}});
+    await c.ctx.load();
+    assert.deepEqual(Array.from(c.ctx.state.data.matches,m=>m.circuit),['tennis-europe']);
+    assert.deepEqual(Array.from(c.ctx.state.data.agenda,m=>m.circuit),['tennis-europe']);
+    assert.deepEqual(Array.from(c.ctx.state.data.results,m=>m.circuit),['tennis-europe']);
+  });
+}
+
+for (const group of ['main','others']) {
+  test(`${group}: complete membership restores missing player records but applies confirmed removals`,async()=>{
+    const snapshot={group,membershipIds:['a'],players:[player],tournaments:[{playerId:'a',competitionId:'known'}],matches};
+    const c=setup(group,snapshot);await c.ctx.load();
+    snapshot.players=[];snapshot.matches=[];snapshot.tournaments=[];
+    await c.ctx.load();assert.equal(c.ctx.state.data.players.length,1);assert.equal(c.ctx.state.data.matches.length,3);
+    snapshot.membershipIds=[];
+    await c.ctx.load();assert.equal(c.ctx.state.data.players.length,0);assert.equal(c.ctx.state.data.matches.length,0);
+  });
+}

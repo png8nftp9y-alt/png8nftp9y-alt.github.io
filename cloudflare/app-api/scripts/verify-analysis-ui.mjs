@@ -35,11 +35,11 @@ assert.ok(hasSource('function tournamentSurfaceLabel(') && hasSource('[place,cou
 assert.ok(hasSource('m.opponentDesignations||m.opponentEntryTypes||m.opponentSeeds') && hasSource('participantDesignation(m,"player")'), 'all match views must normalize seed, WC and Q aliases');
 assert.ok(hasSource('const projection=await projectionPromise'), 'the UI must wait for the authoritative projection instead of flickering to a partial fallback');
 assert.ok(hasSource('retained=projected?.tennisEuropeRankings||projected?.tennisEuropeRanking?projected:previousPlayers.get(player.id)'), 'last known Tennis Europe rankings must survive a temporary projection gap');
-const retentionContext = vm.createContext({agendaKey: match => `${match.playerId}|${match.matchId || match.id}`});
+const retentionContext = vm.createContext({circuit: match => match.circuit || "fitp", agendaKey: match => `${match.playerId}|${match.matchId || match.id}`});
 vm.runInContext(source.slice(source.indexOf('function mergeKnownMatches('), source.indexOf('function clearDemographicFilters(')), retentionContext);
 const retainedMatches = retentionContext.mergeKnownMatches(
-  [{playerId: 'a', id: 'historical', date: '2026-01-01', score: '6-4 6-3'}, {playerId: 'a', id: 'current', score: '6-2 6-2'}],
-  [{playerId: 'a', id: 'current', score: ''}],
+  [{playerId: 'a', circuit: 'tennis-europe', id: 'historical', date: '2026-01-01', score: '6-4 6-3'}, {playerId: 'a', circuit: 'tennis-europe', id: 'current', score: '6-2 6-2'}],
+  [{playerId: 'a', circuit: 'tennis-europe', id: 'current', score: ''}],
 );
 assert.equal(retainedMatches.length, 2, 'acquired matches must survive a partial projection without an age cutoff');
 assert.equal(retainedMatches.find(match => match.id === 'current').score, '6-2 6-2', 'partial score fields must not erase known results');

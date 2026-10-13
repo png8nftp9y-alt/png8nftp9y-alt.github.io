@@ -187,7 +187,7 @@ function saveUiState() {
       JSON.stringify({
         agenda: iso(state.agenda),
         month: `${state.month.getFullYear()}-${String(state.month.getMonth() + 1).padStart(2, "0")}`,
-        selected: [...state.selected],
+        selected: state.data && uiSelectionRestored ? [...state.selected] : restoredUi.selected,
         agendaMode: state.agendaMode,
         categoryFilters: [...state.categoryFilters],
         sexFilter: state.sexFilter,
@@ -817,23 +817,25 @@ async function apiProjection() {
   // the cached projection stays visible while it completes.
   return fetchProjection(APP_API, 45000);
 }
-function cachedData() {
-  try {
-    const full = JSON.parse(localStorage.getItem(LAST_GOOD_CACHE) || "null");
-    const calendar = JSON.parse(localStorage.getItem(CALENDAR_CACHE) || "null");
-    const valid = data => data && Array.isArray(data.players) && Array.isArray(data.tournaments);
-    if (valid(calendar) && (!valid(full) || calendar.cachedAt > (full.cachedAt || 0))) return calendar;
-    return valid(full) ? full : valid(calendar) ? calendar : null;
-  } catch {
-    try {
-      const calendar = JSON.parse(localStorage.getItem(CALENDAR_CACHE) || "null");
-      return calendar && Array.isArray(calendar.players) && Array.isArray(calendar.tournaments) ? calendar : null;
-    } catch { return null; }
-  }
+let durableProjectionFallback = null;
+let projectionWriteQueue = Promise.resolve();
+function validProjection(data) {
+  return data && Array.isArray(data.players) && Array.isArray(data.tournaments);
 }
-function restoreCachedProjectionBeforeFirstRender() {
-  const saved = cachedData();
-  if (!saved) return false;
+function cachedData() {
+  const candidates = [durableProjectionFallback];
+  for (const storageName of ["localStorage", "sessionStorage"]) {
+    try {
+      const storage = storageName === "localStorage" ? localStorage : sessionStorage;
+      for (const key of [LAST_GOOD_CACHE, CALENDAR_CACHE]) {
+        try { candidates.push(JSON.parse(storage.getItem(key) || "null")); } catch {}
+      }
+    } catch {}
+  }
+  return candidates.filter(validProjection).sort((a, b) => (b.cachedAt || 0) - (a.cachedAt || 0))[0] || null;
+}
+function applyCachedProjection(saved) {
+  if (!validProjection(saved)) return false;
   state.data = saved;
   if (!uiSelectionRestored) {
     saved.players.forEach(player => state.selected.add(player.id));
@@ -844,37 +846,85 @@ function restoreCachedProjectionBeforeFirstRender() {
   }
   return true;
 }
+function restoreCachedProjectionBeforeFirstRender() {
+  return applyCachedProjection(cachedData());
+}
 function calendarCacheSnapshot(data, cachedAt) {
+  // Store the match history once; agenda rows already in it are rebuilt on restore.
+  const matches = (data.matches || []).filter(match => circuit(match) === "tennis-europe");
+  const keys = new Set(matches.map(agendaKey));
   return {
-    players: data.players,
-    tournaments: data.tournaments,
-    matches: data.matches || [],
-    agenda: data.agenda || [],
-    results: [], opponents: [], tournamentEntries: [],
-    generatedAt: data.generatedAt,
-    personalProjectionComplete: data.personalProjectionComplete,
-    cachedAt,
+    group: data.group,
+    players: data.players, tournaments: data.tournaments, matches,
+    agenda: (data.agenda || []).filter(match => circuit(match) === "tennis-europe" && !keys.has(agendaKey(match))),
+    results: (data.results || []).filter(match => circuit(match) === "tennis-europe"),
+    opponents: [], tournamentEntries: [], generatedAt: data.generatedAt,
+    personalProjectionComplete: data.personalProjectionComplete, cachedAt,
   };
 }
-function saveCachedData(data) {
-  const cachedAt = Date.now();
-  const calendar = JSON.stringify(calendarCacheSnapshot(data, cachedAt));
-  try {
-    localStorage.setItem(CALENDAR_CACHE, calendar);
-  } catch (error) {
-    // The old full history may occupy the quota needed by the current calendar.
+function openProjectionDatabase() {
+  if (typeof indexedDB === "undefined") return Promise.resolve(null);
+  return new Promise(resolve => {
+    let done = false;
+    const finish = db => { if (done) { db?.close(); return; } done = true; clearTimeout(timer); resolve(db); };
+    const timer = setTimeout(() => finish(null), 1500);
     try {
-      localStorage.removeItem(LAST_GOOD_CACHE);
-      localStorage.setItem(CALENDAR_CACHE, calendar);
-    } catch (retryError) {
-      console.warn("Cache calendario Court Watch non disponibile", retryError);
-    }
-  }
+      const request = indexedDB.open("courtwatch-projections-v1", 1);
+      request.onupgradeneeded = () => {
+        if (!request.result.objectStoreNames.contains("snapshots")) request.result.createObjectStore("snapshots");
+      };
+      request.onsuccess = () => finish(request.result);
+      request.onerror = request.onblocked = () => finish(null);
+    } catch { finish(null); }
+  });
+}
+async function writeDurableProjection(data) {
+  const db = await openProjectionDatabase();
+  if (!db) return false;
+  return new Promise(resolve => {
+    try {
+      const transaction = db.transaction("snapshots", "readwrite");
+      transaction.objectStore("snapshots").put(data, LAST_GOOD_CACHE);
+      transaction.oncomplete = () => { db.close(); resolve(true); };
+      transaction.onerror = transaction.onabort = () => { db.close(); resolve(false); };
+    } catch { db.close(); resolve(false); }
+  });
+}
+async function readDurableProjection() {
+  const db = await openProjectionDatabase();
+  if (!db) return null;
+  return new Promise(resolve => {
+    try {
+      const request = db.transaction("snapshots", "readonly").objectStore("snapshots").get(LAST_GOOD_CACHE);
+      request.onsuccess = () => { db.close(); resolve(validProjection(request.result) ? request.result : null); };
+      request.onerror = () => { db.close(); resolve(null); };
+    } catch { db.close(); resolve(null); }
+  });
+}
+async function restoreDurableProjection() {
+  const saved = await readDurableProjection();
+  const current = cachedData();
+  if (!saved || (current && (current.cachedAt || 0) >= (saved.cachedAt || 0))) return false;
+  durableProjectionFallback = saved;
+  return applyCachedProjection(saved);
+}
+function saveCachedData(data) {
+  const snapshot = calendarCacheSnapshot(data, Date.now());
+  durableProjectionFallback = snapshot;
+  const serialized = JSON.stringify(snapshot);
+  try { sessionStorage.setItem(CALENDAR_CACHE, serialized); } catch {}
   try {
-    localStorage.setItem(LAST_GOOD_CACHE, JSON.stringify({...data, cachedAt}));
+    localStorage.setItem(CALENDAR_CACHE, serialized);
+    // Retire the duplicated full cache only after the replacement is committed.
+    localStorage.removeItem(LAST_GOOD_CACHE);
   } catch (error) {
-    console.warn("Storico locale non salvato; calendario conservato separatamente", error);
+    console.warn("Cache locale piena: conservo la copia precedente e uso l’archivio persistente", error);
   }
+  projectionWriteQueue = projectionWriteQueue.then(() => writeDurableProjection(snapshot)).catch(error => {
+    console.warn("Archivio locale non disponibile", error);
+    return false;
+  });
+  return projectionWriteQueue;
 }
 function cachedPersonalTournaments(previous, visiblePlayers) {
   const personalIds = new Set(visiblePlayers.filter(player => player.userAdded).map(player => player.id));
@@ -1432,6 +1482,7 @@ function mergeAgenda(agenda, matches) {
 function mergeKnownMatches(...sources) {
   const matches = new Map();
   for (const rows of sources) for (const match of rows || []) {
+    if (circuit(match) !== "tennis-europe") continue;
     const key = agendaKey(match), previous = matches.get(key) || {};
     // A partial response cannot erase already acquired score/participant fields.
     const update = Object.fromEntries(Object.entries(match).filter(([, value]) =>
@@ -1802,7 +1853,7 @@ function dedupeAgendaMatches(items) {
 }
 function canonicalPlayerMatches(items) {
   const players = new Map();
-  for (const match of items || []) {
+  for (const match of (items || []).filter(match => circuit(match) === "tennis-europe")) {
     const rows = players.get(match.playerId) || [];
     rows.push(match);
     players.set(match.playerId, rows);
@@ -1814,7 +1865,8 @@ function normalizeMatchProjection(data) {
   if (!data) return data;
   const matches = canonicalPlayerMatches(data.matches || []);
   return { ...data, matches,
-    agenda: canonicalPlayerMatches(mergeAgenda(data.agenda || [], matches)) };
+    agenda: canonicalPlayerMatches(mergeAgenda(data.agenda || [], matches)),
+    results: (data.results || []).filter(match => circuit(match) === "tennis-europe") };
 }
 function agendaMatchRows(matches) {
   const groups = [];
@@ -2739,6 +2791,7 @@ function opponentHistoryMatchSectionsHtml(matches) {
 }
 function renderOpponentHistory(data) {
   data = withoutPucItfReferences(data);
+  data = {...data, tournaments: (data.tournaments || []).map(tournament => ({...tournament, matches: (tournament.matches || []).filter(match => circuit({...match, circuit: match.circuit || circuit(tournament)}) === "tennis-europe")}))};
   const badges=$("opponentCircuitProfiles");if(badges)badges.innerHTML=playerCircuitLinksHtml(data.circuitProfiles||[]);
   const tournaments = data.tournaments || [],
     body = $("opponentTournamentHistory");
@@ -3983,12 +4036,14 @@ async function load() {
       ),
       previousPlayers = new Map((previous.players || []).map((p) => [p.id, p]));
     const membershipPlayers = PLAYER_GROUP === "others" ? [] : staticPlayers;
+    const verifiedMembership = Array.isArray(projection?.membershipIds)
+      ? new Set(projection.membershipIds) : null;
     const playerCandidates = projection
-      ? [...new Map([...membershipPlayers, ...(projection.players || []),...confirmedCourtWatchPlayers.values()].map(p => [p.id,p])).values()]
+      ? [...new Map([...membershipPlayers, ...(previous.players || []), ...(projection.players || []),...confirmedCourtWatchPlayers.values()].map(p => [p.id,p])).values()]
       : [...new Map([...membershipPlayers, ...(previous.players || [])].map(p => [p.id,p])).values()];
     const visiblePlayers = playerCandidates
       .filter((p) => (!FORMER_PLAYERS.has(p.id) || p.userAdded) && !removedCourtWatchPlayers.has(p.id) &&
-        (projection ? (projectedPlayers.has(p.id) || confirmedCourtWatchPlayers.has(p.id)) : Array.isArray(previous.players) ? previousPlayers.has(p.id) : true))
+        (projection ? (projectedPlayers.has(p.id) || (previousPlayers.has(p.id) && (!verifiedMembership || verifiedMembership.has(p.id))) || confirmedCourtWatchPlayers.has(p.id)) : Array.isArray(previous.players) ? previousPlayers.has(p.id) : true))
       .map((player) => {
         const projected = projectedPlayers.get(player.id),
           retained =
@@ -4040,10 +4095,11 @@ async function load() {
       group: PLAYER_GROUP,
       personalProjectionComplete: Boolean(projection) || previous.personalProjectionComplete === true,
       players: visiblePlayers,
-      tournaments: [
+      tournaments: [...new Map([
+        ...(previous.tournaments || []),
         ...((universalProjectionFresh && projection?.tournaments) || staticTournaments || previous.tournaments || []),
         ...(!universalProjectionFresh && (projection || staticTournaments) ? (projection ? (projection.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : cachedPersonalTournaments(previous, visiblePlayers)) : []),
-      ].filter((x) => visibleIds.has(x.playerId)),
+      ].map(t => [[t.playerId, t.circuit || t.sourceId || "", t.competitionId || t.id || t.name].join("|"), t])).values()].filter((x) => visibleIds.has(x.playerId)),
       matches: matches.filter((x) => visibleIds.has(x.playerId)),
       agenda: mergeAgenda(agenda, matches).filter((x) =>
         visibleIds.has(x.playerId),
@@ -4068,7 +4124,8 @@ async function load() {
         ),
       ).toISOString(),
     };
-    saveCachedData(state.data);
+    state.data = normalizeMatchProjection(state.data);
+    await saveCachedData(state.data);
     if (!uiSelectionRestored) {
       state.data.players.forEach((p) => state.selected.add(p.id));
       uiSelectionRestored = true;
@@ -4382,19 +4439,23 @@ renderProfile = function (id) {
     };
   applyTournamentStatus();
 };
-restoreCachedProjectionBeforeFirstRender();
-wire();
-wireAccount();
-route();
-if (state.data) {
-  renderedDataSignature = renderDataSignature(state.data);
-  syncLabel(state.data, true);
-  restoreUiScroll();
+async function startCourtWatch() {
+  const immediate = restoreCachedProjectionBeforeFirstRender();
+  wire();
+  wireAccount();
+  if (!immediate) await restoreDurableProjection();
+  route();
+  if (state.data) {
+    renderedDataSignature = renderDataSignature(state.data);
+    syncLabel(state.data, true);
+    restoreUiScroll();
+  }
+  if (immediate && await restoreDurableProjection()) renderIfDataChanged();
+  load();
+  loadAccount();
+  refreshMatchAnalysisStatus();
+  setInterval(() => {
+    if (!/^#opponent(?:-profile)?\//.test(location.hash)) load();
+  }, 30000);
 }
-load();
-loadAccount();
-refreshMatchAnalysisStatus();
-setInterval(() => {
-  if (!/^#opponent(?:-profile)?\//.test(location.hash)) load();
-}, 30000);
-
+startCourtWatch();

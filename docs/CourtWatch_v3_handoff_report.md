@@ -3253,6 +3253,47 @@ and trigger a fresh guarded deployment. Validation: verify-analysis-ui passed.
 - Sostituito il controllo testuale della chiamata agenda con una verifica eseguibile: incontri condivisi deduplicati, incontri distinti conservati. Nessun controllo disabilitato.
 
 
+## 2026-10-13 — Europe-only history survives empty snapshots and cache quota failures
+
+The user reported that every player profile became empty after refresh in both
+TCL and Altri, despite the previous checks passing. Only Tennis Europe matches
+are currently authorized for use; FITP and ITF match acquisition is outside this
+UI release.
+
+Keep known players and tournament context when the snapshot is incomplete,
+instead of dropping the player and then discarding all related matches. The
+private snapshot now returns independently verified membership IDs: a confirmed
+removal is respected, while missing player projection rows cannot masquerade as
+removals. Failed membership reads fail the request rather than report an empty
+membership. This read does not modify acquisition records or the database.
+
+Replace duplicated full-history Web Storage writes with one compact Europe-only
+projection and a serialized IndexedDB copy, using the existing group-scoped key.
+Never delete the previous valid cache to make space for a write that may fail.
+Restore IndexedDB before the first route when synchronous caches are unavailable;
+preserve saved selection during bootstrap. Normalize cached and fresh matches,
+agenda, results and opponent match history to Tennis Europe; other circuits'
+player metadata and tournament metadata remain available.
+
+Affected: v3.js, v3.html asset version, Worker snapshot and membership helper,
+frontend regression tests, analysis UI verification and browser verification
+workflow. The shared Chromium test now checks both groups through partial and
+empty API snapshots, rejects FITP/ITF match fixtures, and reloads with API 503
+after both Web Storage cache writes are forced to fail and their cache entries
+are removed. Three Europe profile rows survive through actual IndexedDB restore;
+Cereghini's resolved doubles row remains the single canonical row.
+
+Validation: 50 frontend/membership tests passed; existing Worker API, acquired
+association and player-addition tests passed; analysis UI checks passed; actual
+headless Chromium refresh/reload scenarios passed for both TCL and Altri.
+The patch will also run the shared browser checks in Actions.
+
+Limitations: this proves the supplied browser scenarios, not a deployed signed-in
+user session. Production verification is still required after applying and
+deploying the patch. No cache can recover matches that were never acquired or
+already lost before this installation; browser storage explicitly cleared by
+the user must be repopulated by the server. No FITP/ITF acquisition data is deleted.
+
 ## 2026-10-13 — Preserve acquired matches across refresh and every player view
 
 The previous green browser check rendered a captured D1 response; it did not

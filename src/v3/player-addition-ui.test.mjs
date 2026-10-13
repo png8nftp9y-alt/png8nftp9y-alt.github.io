@@ -9,7 +9,7 @@ const loader=source.slice(source.indexOf('async function load()'),source.indexOf
 function context(response){
  const root={querySelector:()=>null,append(){this.error=true}},button={textContent:'Aggiungi giocatore',disabled:false,isConnected:true,closest:()=>root};
  const state={data:{players:[],tournaments:[]},selected:new Set()},opened=[],calls=[];
- const context=vm.createContext({console,Headers,Map,Set,Promise,Date,setTimeout,clearTimeout,state,PRIVATE_API:'/app/api',removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),playerRemovalMode:false,
+ const context=vm.createContext({console,Headers,Map,Set,Promise,Date,setTimeout,clearTimeout,circuit:m=>m.circuit||"fitp",state,PRIVATE_API:'/app/api',removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),playerRemovalMode:false,
   agendaKey:m=>`${m.playerId}|${m.matchId||m.id}`,privateApiOptions:x=>x,history:{state:{},replaceState(_s,_t,hash){context.location.hash=hash}},route(){opened.push(decodeURIComponent(context.location.hash.slice('#player/'.length)))},location:{hash:'#opponent-profile/101/Test'},document:{getElementById:()=>null,createElement:()=>({dataset:{},setAttribute(){}})},$:()=>root,
   apiProjection:async()=>({players:[{id:'cw-test',name:'Test Player',userAdded:true}],tournaments:[{playerId:'cw-test',competitionId:'cantu',name:'Cantù'}],matches:[]}),
   fetch:async(url,options)=>{calls.push({url,options});return response},saveUiState(){},saveCachedData(){},renderHome(){},openProfile:id=>opened.push(id),load(){},
@@ -35,11 +35,11 @@ test('simultaneous clicks send one request, and navigation during save is respec
  await first;assert.equal(c.state.data.players.length,1);assert.equal(c.opened.length,0);
 });
 test('normal reload retains a D1-added player absent from static JSON and their stored entries',async()=>{
- const person={id:'cw-test',name:'Test Player',userAdded:true},ctx={console,Map,Set,Promise,Date,state:{data:{players:[],tournaments:[]},selected:new Set()},loadRunning:false,uiSelectionRestored:true,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),cachedData:()=>null,saveCachedData(){},saveUiState(){},syncLabel(){},renderIfDataChanged(){},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,iso:d=>d.toISOString().slice(0,10),add:(d,n)=>new Date(+d+n*86400000),
+ const person={id:'cw-test',name:'Test Player',userAdded:true},ctx={console,Map,Set,Promise,Date,circuit:m=>m.circuit||"fitp",normalizeMatchProjection:x=>x,state:{data:{players:[],tournaments:[]},selected:new Set()},loadRunning:false,uiSelectionRestored:true,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),cachedData:()=>null,saveCachedData(){},saveUiState(){},syncLabel(){},renderIfDataChanged(){},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,iso:d=>d.toISOString().slice(0,10),add:(d,n)=>new Date(+d+n*86400000),
   apiProjection:async()=>({generatedAt:'2026-10-01T00:00:00Z',players:[{id:'static-player',name:'Static Player'},person],tournaments:[{playerId:person.id,competitionId:'J30',circuit:'itf'}],matches:[]}),
   v3json:async name=>name==='players.json'?{generatedAt:'2026-10-06T00:00:00Z',players:[{id:'static-player',name:'Static Player'}]}:name==='tournaments.json'?{generatedAt:'2026-10-06T00:00:00Z',tournaments:[]}:{} };
  vm.createContext(ctx);ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);await ctx.load();
- assert.equal(ctx.state.data.players.some(p=>p.id===person.id),true);assert.equal(ctx.state.data.tournaments.some(t=>t.playerId===person.id),true);
+ assert.equal(ctx.state.data.players.some(p=>p.id===person.id),true);assert.equal(ctx.state.data.tournaments.some(t=>t.playerId===person.id),true);assert.equal(ctx.state.data.personalProjectionComplete,true);
 });
 
 test('addition does not promote or cache a player before their full snapshot arrives',async()=>{
@@ -54,7 +54,7 @@ test('addition does not promote or cache a player before their full snapshot arr
 test('cold reload discards a partial old cache and first renders all personal tournaments together',async()=>{
  const person={id:'cw-test',name:'Test Player',userAdded:true},renders=[],partial={players:[person],tournaments:[]};
  let release;
- const ctx={console,Map,Set,Promise,Date,state:{data:null,selected:new Set()},loadRunning:false,uiSelectionRestored:false,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),cachedData:()=>partial,saveCachedData(){},saveUiState(){},syncLabel(){},renderIfDataChanged(){renders.push(ctx.state.data.tournaments.length)},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,iso:d=>d.toISOString().slice(0,10),add:(d,n)=>new Date(+d+n*86400000),
+ const ctx={console,Map,Set,Promise,Date,circuit:m=>m.circuit||"fitp",normalizeMatchProjection:x=>x,state:{data:null,selected:new Set()},loadRunning:false,uiSelectionRestored:false,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),cachedData:()=>partial,saveCachedData(){},saveUiState(){},syncLabel(){},renderIfDataChanged(){renders.push(ctx.state.data.tournaments.length)},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,iso:d=>d.toISOString().slice(0,10),add:(d,n)=>new Date(+d+n*86400000),
  apiProjection:()=>new Promise(resolve=>release=resolve),
  v3json:async name=>name==='players.json'?{players:[{id:'base',name:'Base'}]}:name==='tournaments.json'?{tournaments:[]}:{}};
  vm.createContext(ctx);ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);const loading=ctx.load();

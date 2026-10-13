@@ -39,3 +39,11 @@ test('a scored row or a different scheduled slot is never removed as a false dou
   assert.equal(data.matches.length,2);
  }
 });
+
+test('all shared views normalize legacy mixed-circuit caches to Europe only',()=>{
+ const te={...full,id:'te'},fitp={...full,id:'fitp',circuit:'fitp'},itf={...full,id:'itf',circuit:'itf'};
+ const data=context.normalizeMatchProjection({matches:[te,fitp,itf],agenda:[te,fitp,itf],results:[te,fitp,itf]});
+ assert.deepEqual(Array.from(data.matches,m=>m.id),['te']);
+ assert.deepEqual(Array.from(data.agenda,m=>m.id),['te']);
+ assert.deepEqual(Array.from(data.results,m=>m.id),['te']);
+});
