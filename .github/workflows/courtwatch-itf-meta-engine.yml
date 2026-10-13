@@ -1,0 +1,114 @@
+name: Court Watch ITF Meta engine
+run-name: ITF Meta ${{ inputs.mode || 'extraordinary' }}
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-itf-meta-engine.yml']
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [ordinary, extraordinary]
+        default: extraordinary
+  workflow_call:
+    inputs:
+      mode:
+        type: string
+        default: ordinary
+  schedule:
+    - cron: '*/5 * * * *'
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: courtwatch-itf-meta-engine
+  cancel-in-progress: false
+  queue: max
+jobs:
+  batch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    outputs:
+      count: ${{ steps.select.outputs.count }}
+      cleanup: ${{ steps.select.outputs.cleanup }}
+    env:
+      ITF_META_MODE: ${{ inputs.mode || 'extraordinary' }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - id: select
+        run: node src/v3/run-itf-metadata-engine.mjs --select
+      - if: steps.select.outputs.count == '0' && steps.select.outputs.ordinary_count != '0'
+        name: Resume interrupted discovery batch
+        run: gh workflow run courtwatch-itf-meta-engine.yml --ref main -f mode=ordinary
+      - if: steps.select.outputs.count == '0' && inputs.mode == 'ordinary' && steps.select.outputs.extraordinary_count != '0'
+        name: Start existing extraordinary queue
+        run: gh workflow run courtwatch-itf-meta-engine.yml --ref main -f mode=extraordinary
+      - if: steps.select.outputs.count != '0'
+        name: Install official ITF browser
+        run: |
+          npm install --prefix infra/itf-acquirer --omit=dev
+          infra/itf-acquirer/node_modules/.bin/playwright install --with-deps chromium
+      - if: steps.select.outputs.count != '0'
+        run: node src/v3/run-itf-metadata-engine.mjs --acquire
+      - if: always() && steps.select.outputs.count != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: itf-meta-result
+          path: /tmp/itf-meta-result.json
+          if-no-files-found: error
+          retention-days: 3
+  publish:
+    needs: batch
+    if: needs.batch.outputs.count != '0' || needs.batch.outputs.cleanup == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: courtwatch-itf-meta-state
+      cancel-in-progress: false
+      queue: max
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      GH_TOKEN: ${{ github.token }}
+      ITF_META_MODE: ${{ inputs.mode || 'extraordinary' }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - if: needs.batch.outputs.count != '0'
+        uses: actions/download-artifact@v4
+        with: {name: itf-meta-result, path: /tmp}
+      - if: needs.batch.outputs.count != '0'
+        name: Configure existing D1 database
+        working-directory: cloudflare/app-api
+        run: node scripts/configure-d1.mjs
+      - id: publish
+        name: Persist queue and partial metadata against latest discovery
+        run: |
+          git config user.name courtwatch-bot
+          git config user.email courtwatch-bot@users.noreply.github.com
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset --hard origin/main
+            if [ -f /tmp/itf-meta-result.json ]; then
+              node src/v3/run-itf-metadata-engine.mjs --publish
+              ITF_METADATA_RESULT_FILE=/tmp/itf-meta-result.json node src/v3/sync-itf-metadata-d1.mjs
+            else
+              node src/v3/run-itf-metadata-engine.mjs --bootstrap
+            fi
+            git add history/itf_metadata_queue.json history/itf_official_metadata.json dist/v3/itf_metadata_queue_status.json dist/v3/source_itf_tournaments.json docs/CourtWatch_v3_handoff_report.md
+            git commit -m "ITF Meta: persist acquired fields and pending queue" || exit 0
+            git push origin HEAD:main && exit 0
+          done
+          exit 1
+      - if: steps.publish.outputs.ordinary_count != '0' && steps.publish.outputs.ordinary_count != ''
+        name: Continue remaining new tournaments
+        run: gh workflow run courtwatch-itf-meta-engine.yml --ref main -f mode=ordinary
+      - if: steps.publish.outputs.extraordinary_count != '0' && steps.publish.outputs.extraordinary_count != ''
+        name: Continue extraordinary immediately until queue is zero
+        run: gh workflow run courtwatch-itf-meta-engine.yml --ref main -f mode=extraordinary

@@ -1,8 +1,5 @@
 name: Court Watch future ITF tournament metadata acquisition
 on:
-  workflow_run:
-    workflows: ['Court Watch ITF metadata live extraction probe']
-    types: [completed]
   workflow_dispatch:
   workflow_call:
 permissions: {contents: write}
@@ -98,4 +95,3 @@ jobs:
       - name: Require all targeted fields or expose unresolved tournament IDs
         run: |
           node --input-type=module -e "import fs from 'node:fs';const d=JSON.parse(fs.readFileSync('dist/v3/itf_tournament_metadata_diagnostics.json'));console.log(JSON.stringify(d));if(d.remaining.length)process.exit(1)"
-

@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '37 */6 * * *'
 
-permissions: {contents: write}
+permissions: {contents: write, actions: write}
 concurrency: {group: courtwatch-v3-itf-map,cancel-in-progress: false}
 jobs:
   shard:
@@ -23,6 +23,9 @@ jobs:
         with: {name: 'itf-tournaments-${{ matrix.region }}', path: 'dist/v3/shards/itf/tournaments-${{ matrix.region }}.json'}
   publish:
     needs: shard
+    concurrency: {group: courtwatch-itf-meta-state, cancel-in-progress: false, queue: max}
+    outputs:
+      new_count: ${{ steps.publish.outputs.new_count }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -33,7 +36,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with: {path: dist/v3/shards/itf, merge-multiple: true}
       - run: node src/v3/merge-itf-tournament-shards.mjs
-      - name: Publish atomically
+      - id: publish
+        name: Publish atomically
         run: |
           set -euo pipefail
           git config user.name courtwatch-bot
@@ -42,9 +46,11 @@ jobs:
           cp dist/v3/source_itf_tournaments_audit.json /tmp/itf-map-audit.json
           for attempt in 1 2 3; do
             git fetch origin main; git reset --hard origin/main
+            cp dist/v3/source_itf_tournaments.json /tmp/itf-map-previous.json
             cp /tmp/itf-map.json dist/v3/source_itf_tournaments.json
             cp /tmp/itf-map-audit.json dist/v3/source_itf_tournaments_audit.json
-            git add dist/v3/source_itf_tournaments*.json
+            node src/v3/run-itf-metadata-engine.mjs --discovery
+            git add dist/v3/source_itf_tournaments*.json history/itf_metadata_queue.json dist/v3/itf_metadata_queue_status.json docs/CourtWatch_v3_handoff_report.md
             git commit -m 'Publish validated ITF global tournament map' || exit 0
             git push origin HEAD:main && exit 0
           done
@@ -52,5 +58,7 @@ jobs:
 
   metadata:
     needs: publish
-    uses: ./.github/workflows/courtwatch-all-itf-metadata.yml
+    if: needs.publish.outputs.new_count != '0' && needs.publish.outputs.new_count != ''
+    uses: ./.github/workflows/courtwatch-itf-meta-engine.yml
+    with: {mode: ordinary}
     secrets: inherit
