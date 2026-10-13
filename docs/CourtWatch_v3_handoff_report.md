@@ -3538,3 +3538,5 @@ ITF Meta extraordinary 2026-10-13T02:45:41.220Z: attempted 8, acquired 0, ordina
 2026-10-13 ITF Meta checkout performance: run 38337399258 acquired first eight targets in 20 seconds (02:36:21–02:36:41 UTC), but publisher checkout began 02:36:48 UTC and remained in progress at 02:44:54 UTC. Both engine jobs now shallow-checkout only required code, two metadata archives, two catalogues, queue diagnostic and report. Subsequent publish fetch uses depth=1. Browser, selection, official D1 sync and continuation behavior unchanged. Validation: workflow YAML parsed; both checkout sparse paths cover every runner/D1 dependency, full-history depth removed, shallow publication fetch checked. Existing running job retains old workflow; next workflow push/run uses optimized version.
 
 ITF Meta extraordinary 2026-10-13T02:55:30.345Z: attempted 8, acquired 2, ordinary 0, extraordinary 132. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-13T02:56:56.685Z: attempted 8, acquired 7, ordinary 0, extraordinary 127. Partial metadata preserved; official D1 sync follows.
