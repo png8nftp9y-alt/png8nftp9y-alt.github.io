@@ -23,3 +23,12 @@ test('unattempted ordinary IDs survive a time budget; concurrent newly discovere
 test('metadata diagnostic escapes tournament names/errors and matches draw table columns',()=>{
  const esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;');let s=reconcileMetadataQueue(null,cat(['J-X']),{},today,now);s.tournaments['J-X'].tournamentName='<script>';const html=renderMetadataQueue(metadataQueueStatus(s),esc,()=> 'ora');assert.ok(html.includes('&lt;script>'));assert.ok(!html.includes('<script>'));for(const h of ['Presi','Mancanti','Perché mancano','Controllo','Ordinario','Straordinario'])assert.ok(html.includes(h));
 });
+
+test('user-resolved Egyptian team finals stay resolved across discovery and in-flight publication',()=>{
+ const ids=['J-GC-EGY-07A-2026','J-GC-EGY-03A-2026'];let s=reconcileMetadataQueue(null,cat(ids),{},today,now);
+ assert.equal(metadataQueueStatus(s).extraordinary.total,0);assert.equal(metadataQueueStatus(s).coverage.resolved,2);assert.equal(metadataQueueStatus(s).coverage.userResolved,2);
+ s=applyMetadataBatch(s,{attempts:ids.map(competitionId=>({competitionId,checkedAt:now,reason:'factsheet_not_public'}))},now);
+ s=reconcileMetadataQueue(s,cat(ids),{},today,now,cat([]));
+ for(const id of ids){assert.equal(s.tournaments[id].status,'user_resolved');assert.equal(s.tournaments[id].resolvedByUser,true);assert.equal(s.tournaments[id].missing.length,3);}
+ assert.equal(selectMetadataBatch(s,'ordinary').length,0);assert.equal(selectMetadataBatch(s,'extraordinary').length,0);
+});
