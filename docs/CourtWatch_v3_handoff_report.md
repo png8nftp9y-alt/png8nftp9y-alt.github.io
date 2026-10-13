@@ -1,3 +1,5 @@
+2026-10-13 — D1 consumption audit requested: one-off/manual read-only workflow queries existing Cloudflare analytics, compares seven UTC days, collects redacted 1d/7d query insights; explicit token-permission diagnostics. No SQL D1, creation, migrations, deploy or acquisition changes. Validation: node --check passed. Live audit pending. User requests cause and recurrence assessment before optimization.
+
 2026-10-13 — Persist zero ITF Meta queues after Junior Finals user resolution: 216 resolved, including 3 user-resolved. No acquired metadata erased; historical attempts retained. Discovery/in-flight publications use durable override.
 
 2026-10-13 — User-resolved Junior Finals J-JM-CHN-2026-001: persistent override excludes future metadata attempts and survives in-flight publication. Shared user-resolved queue logic already tested. No facts invented; queue projection reconciles on next publication.
