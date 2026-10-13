@@ -1,0 +1,42 @@
+name: Court Watch D1 read audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-d1-read-audit.yml'
+      - 'cloudflare/app-api/scripts/audit-d1-reads.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-read-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout: cloudflare/app-api
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --ignore-scripts
+      - name: Read existing database analytics only
+        run: node scripts/audit-d1-reads.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: d1-read-audit
+          path: cloudflare/app-api/audit-output/d1-read-audit.json
+          retention-days: 7
+          if-no-files-found: error
