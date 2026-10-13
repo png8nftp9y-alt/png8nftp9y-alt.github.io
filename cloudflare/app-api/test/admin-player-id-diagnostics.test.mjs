@@ -35,8 +35,8 @@ test('pending mapping is visible and diagnostics refresh only on page load',asyn
   const html=renderPlayerIdDiagnostics(await loadPlayerIdDiagnostics(d.db));assert.match(html,/1 fonti in attesa/);assert.match(html,/Aggiorna conteggi/);assert.doesNotMatch(html,/<script|http-equiv|Same Name/);
  }finally{d.close()}
  const source=readFileSync(new URL('../src/index.js',import.meta.url),'utf8');
- assert.match(source,/view==='diagnostica'\?renderPlayerIdDiagnostics/);
- assert.ok(source.includes("${view==='diagnostica'?'':'<meta http-equiv=\"refresh\" content=\"300\">'}"));
+ assert.match(source,/view==='id'\?renderPlayerIdDiagnostics/);
+ assert.ok(source.includes("${['diagnostica','id'].includes(view)?'':'<meta http-equiv=\"refresh\" content=\"300\">'}"));
 });
 
 test('manual refresh submits a GET and each read sees current D1 rather than a retained snapshot',async()=>{
@@ -46,8 +46,8 @@ test('manual refresh submits a GET and each read sees current D1 rather than a r
   assert.equal(before.find(r=>r.circuit==='tennis-europe').missing,24);
   assert.ok(Number.isFinite(Date.parse(before.checkedAt)));
   const html=renderPlayerIdDiagnostics(before);
-  assert.match(html,/<form method="get" action="\/admin\/diagnostica#id-circuiti"><button type="submit"/);
-  assert.doesNotMatch(html,/<a href="\/admin\/diagnostica#id-circuiti">Aggiorna conteggi/);
+  assert.match(html,/<form method="get" action="\/admin\/id#id-circuiti"><button type="submit"/);
+  assert.doesNotMatch(html,/<a href="\/admin\/id#id-circuiti">Aggiorna conteggi/);
   assert.match(html,/<time datetime="[^" ]+">/);
   for(let i=1;i<=24;i++)d.execute('UPDATE player_circuit_identities SET official_id=? WHERE source_key=?',[String(i).padStart(8,'0')+'-1234-1234-1234-123456789abc','e'+i]);
   const writes=d.writes(),after=await loadPlayerIdDiagnostics(d.db);
