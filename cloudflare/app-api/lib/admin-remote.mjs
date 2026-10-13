@@ -2,10 +2,18 @@ const FILES = ['diagnostics.json', 'sync_status.json', 'itf_system_diagnostics.j
   'source_itf_entries.json', 'tennis_europe_system_diagnostics.json',
   'source_fitp_entries.json', 'itf_t1_queue_status.json', 'itf_tournament_metadata_diagnostics.json', 'itf_metadata_queue_status.json', 'operational_status.json'];
 
+export const ADMIN_REMOTE_FILES_BY_VIEW = {
+  diagnostica: ['diagnostics.json', 'sync_status.json', 'itf_system_diagnostics.json',
+    'source_itf_entries.json', 'tennis_europe_system_diagnostics.json',
+    'source_fitp_entries.json', 'operational_status.json'],
+  itf: ['itf_t1_queue_status.json', 'itf_metadata_queue_status.json'],
+  cloudflare: [], id: [], utenti: [],
+};
+
 export async function loadAdminRemote({ primaryBase, fallbackBase, fetcher = fetch,
-  cache = globalThis.caches?.default, now = Date.now(), timeoutMs = 12000 }) {
+  cache = globalThis.caches?.default, now = Date.now(), timeoutMs = 12000, files = FILES }) {
   const failures = [], stale = [], docs = {};
-  await Promise.all(FILES.map(async file => {
+  await Promise.all(files.map(async file => {
     const key = new Request(`${primaryBase}/${file}`);
     let cached = null, cachedAt = 0;
     try {

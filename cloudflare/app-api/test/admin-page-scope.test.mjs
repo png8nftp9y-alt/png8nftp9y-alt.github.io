@@ -1,0 +1,50 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import worker from '../src/index.js';
+import {playerIdDiagnosticsSql} from '../lib/admin-player-id-diagnostics.mjs';
+
+const docs=Object.fromEntries(['itf_t1_queue_status.json','itf_metadata_queue_status.json'].map(file=>[file,JSON.parse(readFileSync(new URL('../../../dist/v3/'+file,import.meta.url)))]));
+async function open(view,{remoteFailure=false}={}) {
+  const sql=[],objects=[],urls=[];
+  const db={prepare(query){sql.push(query);return{bind(){return this},async first(){return query.includes('generations')?{status:'green',counts_json:'{}'}:{n:0}},async all(){return{success:true,results:query===playerIdDiagnosticsSql?['fitp','tennis-europe','itf'].map(circuit=>({circuit,ids:0,players:0,missing:0})):[]}}}}};
+  const archive={async get(key){objects.push(key);return{async json(){return{}}}}};
+  const previousFetch=globalThis.fetch;
+  globalThis.fetch=async url=>{urls.push(String(url));return remoteFailure?new Response('',{status:503}):Response.json(docs[String(url).split('/').at(-1)]||{});};
+  try{
+    const response=await worker.fetch(new Request('https://example.test/admin/'+view,{headers:{Authorization:'Basic '+btoa('admin:test-only')}}),{ADMIN_TOKEN:'test-only',DB:db,ARCHIVE:archive});
+    assert.equal(response.status,200);
+    return{sql,objects,urls,html:await response.text()};
+  }finally{globalThis.fetch=previousFetch;}
+}
+test('Cloudflare reads only its R2 usage snapshot, including during a remote outage',async()=>{
+  const r=await open('cloudflare',{remoteFailure:true});
+  assert.deepEqual(r.sql,[]);assert.deepEqual(r.urls,[]);
+  assert.deepEqual(r.objects,['monitoring/cloudflare-usage/current.json']);
+  assert.match(r.html,/<h2>Consumi Cloudflare<\/h2>/);
+  assert.doesNotMatch(r.html,/<div class="admin-page page-(?:diagnostica|id|itf|utenti)">/);
+});
+test('ITF reads exactly the two current draw and metadata reports, without D1 or R2',async()=>{
+  const r=await open('itf');
+  assert.deepEqual(r.sql,[]);assert.deepEqual(r.objects,[]);
+  assert.deepEqual(r.urls.map(url=>url.split('/').at(-1)).sort(),Object.keys(docs).sort());
+  assert.match(r.html,/Completezza tabelloni ITF/);assert.match(r.html,/metadati/i);
+});
+test('Users keeps device and override controls but performs no remote or R2 reads',async()=>{
+  const r=await open('utenti',{remoteFailure:true});
+  assert.equal(r.sql.length,4);assert.deepEqual(r.urls,[]);assert.deepEqual(r.objects,[]);
+  assert.ok(r.sql.every(query=>/app_users|user_player_profiles|app_user_devices|manual_overrides/.test(query)));
+  assert.match(r.html,/action="\/admin\/override"/);assert.match(r.html,/Dispositivi connessi/);
+});
+test('ID is independent of remote diagnostics and backup availability',async()=>{
+  const r=await open('id',{remoteFailure:true});
+  assert.ok(r.sql.includes(playerIdDiagnosticsSql));assert.deepEqual(r.urls,[]);assert.deepEqual(r.objects,[]);
+  assert.ok(!r.sql.some(query=>/SELECT \* FROM generations|FROM app_user_devices|FROM manual_overrides|FROM app_players ORDER BY seq/.test(query)));
+  assert.match(r.html,/action="\/admin\/id#id-circuiti"/);
+});
+test('Diagnostics retains all requested controls, reads only three current R2 pointers and excludes ITF queues',async()=>{
+  const r=await open('diagnostica');
+  assert.equal(r.sql.length,13);assert.equal(r.objects.length,3);assert.ok(r.objects.every(key=>key.endsWith('/pointers/current.json')));
+  assert.equal(r.urls.length,7);assert.ok(!r.urls.some(url=>/itf_.*(?:queue_status|metadata_diagnostics)/.test(url)));
+  for(const heading of ['D1 operativo','Copertura','Motori','Workflow e watchdog','Diagnostica applicativa','Conteggi D1','R2 backup'])assert.ok(r.html.includes('<h2>'+heading+'</h2>'));
+});
