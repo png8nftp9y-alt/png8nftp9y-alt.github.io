@@ -3497,3 +3497,5 @@ Validation: 26 passing tests covering queues, fair rotation, partial results, fu
 Activation authorized by user 2026-10-13. Reconciled current main admin changes: preserved separate ID page and existing metadata source fetch, replaced legacy rendered metadata panel with ordinary/extraordinary live queue. All 26 tests rerun after conflict resolution.
 
 2026-10-13 ITF Meta: J-GC-EGY-07A-2026 and J-GC-EGY-03A-2026 user-resolved per explicit instruction. Preserve actual missing fields; permanent ID rule excludes both from new discovery and in-flight result retries. Seven queue tests passed, including late unavailable result and rediscovery. Queue now 134 extraordinary, 59 resolved (2 manual). Run 38337399258 in progress; no extra run triggered.
+
+ITF Meta extraordinary 2026-10-13T02:45:41.220Z: attempted 8, acquired 0, ordinary 0, extraordinary 134. Partial metadata preserved; official D1 sync follows.
