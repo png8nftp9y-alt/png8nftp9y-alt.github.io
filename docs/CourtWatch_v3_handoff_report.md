@@ -3253,6 +3253,63 @@ and trigger a fresh guarded deployment. Validation: verify-analysis-ui passed.
 - Sostituito il controllo testuale della chiamata agenda con una verifica eseguibile: incontri condivisi deduplicati, incontri distinti conservati. Nessun controllo disabilitato.
 
 
+## 2026-10-13 — Ready player and recursive opponent profiles without provisional pages
+
+The user confirmed stable refresh in TCL and Altri but reported zero matches on
+first opening. They rejected a loading placeholder and asked for the same ready
+page behavior for opponents and opponents of opponents. Existing D1 history is
+already available: this change does not introduce duplicated server profiles,
+HTML archives, database migrations, or additional history writes to D1.
+
+Bootstrap now restores the durable player projection and durable opponent cache
+before routing, including when Web Storage exists. Merge known Europe matches
+from an older durable snapshot into a newer partial cache without resurrecting
+players excluded by the newer membership. Start the API update in background.
+An initially empty player projection is not rendered as an authoritative zero:
+keep the current view until the first successful snapshot is available. A direct
+player URL follows the same gate. No "Caricamento partite" placeholder is added.
+
+Prepare opponent links as they become visible, using IntersectionObserver and
+the existing two-request background queue. Hover, focus and touch retain their
+intent prefetch. Clicks share requests already in flight; when there is no saved
+profile, navigation keeps the current complete page until the response is ready.
+Prepared opponents open directly, without a second identical API request.
+The same navigation/preparation path applies to recursively linked opponents,
+direct opponent URLs, legacy match routes, and monitored-player redirects.
+Pending click navigation checks its epoch and original route before navigating.
+
+Upgrade the existing IndexedDB database to version 2, preserving the snapshots
+store and adding an opponents store capped at 200 projections, pruned oldest
+first. Reuse historical opponent projections across daily ranking-key changes;
+fresh API data can still update them. Partial opponent snapshots retain known
+tournaments/matches and nonempty profile fields. Web Storage keeps its existing
+small cache; IndexedDB restoration is independent of those entries. These copies
+occupy device storage, not Cloudflare storage. Visible prefetch can anticipate
+additional API/D1 reads compared with hover-only loading; it never recursively
+fetches every unseen opponent. No server history-write savings are claimed.
+
+Affected: v3.js, v3.html asset version, calendar startup tests, shared Chromium
+regression script and analysis UI verification. Replace obsolete textual startup
+ordering assumptions with a bootstrap execution test that proves durable data is
+restored before routing while a deliberately unresolved API request runs.
+
+Validation: 51 frontend/membership tests and analysis UI checks passed. Actual
+headless Chromium scenarios passed for both TCL and Altri: first DOM counters
+never show provisional zero; an older complete IndexedDB snapshot defeats a
+newer partial Web Storage snapshot; delayed API leaves the existing view intact;
+an opponent click shares one pending prefetch; recursive opponent opens ready;
+opponent reload works with Web Storage entries removed, an old-day key and API
+503; incomplete opponent responses retain acquired matches. Prior empty-snapshot,
+partial-refresh, Europe-only and corrected Cereghini doubles checks remain active.
+
+Limitations: these are executable browser fixtures, not an authenticated live
+user session. Production confirmation is required after deployment. A never-seen
+profile on a new device still needs a network response; instantaneous navigation
+cannot be guaranteed before that response. While it is pending, the old view is
+kept rather than showing an empty new profile. Cached data remain visible during
+background updates and may precede the latest ranking refresh. Explicit browser
+storage clearing or pruning beyond 200 opponent projections requires a new read.
+
 ## 2026-10-13 — Europe-only history survives empty snapshots and cache quota failures
 
 The user reported that every player profile became empty after refresh in both
