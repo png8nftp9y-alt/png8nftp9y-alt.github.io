@@ -4374,3 +4374,5 @@ ITF Meta extraordinary 2026-10-13T10:22:27.321Z: attempted 8, acquired 0, ordina
 ITF Meta extraordinary 2026-10-13T10:23:39.272Z: attempted 8, acquired 0, ordinary 0, extraordinary 49. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-10-13T10:24:56.494Z: attempted 8, acquired 0, ordinary 0, extraordinary 49. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-13T10:25:49.712Z: attempted 8, acquired 0, ordinary 0, extraordinary 49. Partial metadata preserved; official D1 sync follows.
