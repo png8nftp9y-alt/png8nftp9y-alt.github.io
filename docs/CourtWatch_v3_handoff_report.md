@@ -5424,3 +5424,5 @@ ITF Meta extraordinary 2026-10-13T20:10:20.160Z: attempted 8, acquired 0, ordina
 2026-10-13 — ITF Meta: user explicitly authorized main publication. Address required only for Italian tournaments; shared queue/recovery policy updated, optional stored addresses preserved. 23 tests passed (queue, recovery, browser, D1), including Italian gaps and concurrent foreign publication. Latest queue reconciled without overwriting attempt counters; extraordinary 1 tournaments, 2 fields.
 
 ITF Meta extraordinary 2026-10-13T20:12:50.473Z: attempted 8, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-13T20:13:54.545Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
