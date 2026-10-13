@@ -1,3 +1,5 @@
+2026-10-13 — User-resolved Junior Finals J-JM-CHN-2026-001: persistent override excludes future metadata attempts and survives in-flight publication. Shared user-resolved queue logic already tested. No facts invented; queue projection reconciles on next publication.
+
 ## 2026-10-13 — Uniform group navigation labels
 Use “Vai a Altri” and “Vai a TCL” on every group-switch button in Home, Giocatori, Calendario and Agenda. The shared runtime updater sets the same visible and accessible label in either direction; initial HTML labels agree before startup. Update the JavaScript asset version so clients receive the labels.
 Validation: JavaScript syntax, diff whitespace, all four static button labels, and the actual shared updater with both groups checked successfully. Navigation and data loading are unchanged. Deployed visual verification remains pending application and deployment.
