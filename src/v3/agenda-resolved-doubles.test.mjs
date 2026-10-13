@@ -47,3 +47,23 @@ test('all shared views normalize legacy mixed-circuit caches to Europe only',()=
  assert.deepEqual(Array.from(data.agenda,m=>m.id),['te']);
  assert.deepEqual(Array.from(data.results,m=>m.id),['te']);
 });
+
+// Screenshot replay: stale Court 2 #5 and completed Court 3 #5 are the same round.
+test('13 October Marsa false Cereghini row is removed across changed courts and cached-only projections',()=>{
+ const correct={...full,matchType:'doubles',court:'Court 3',courtMatchNumber:5,score:'6-0 7-5',result:'6-0 7-5'};
+ const stale={...full,id:'wrong',partner:'',opponent:'Ivona Dirnbek',opponentOptions:['Ivona Dirnbek'],matchType:'singles',court:'Court 2',courtMatchNumber:5};
+ const tomorrow={...correct,id:'tomorrow',date:'2026-10-14',round:'Quarter final',opponent:'Vittoria Fredduzzi / Lucilla Lolli',score:'',result:''};
+ const single={...full,id:'single',event:'GS14 - Girls Singles 14 Main Draw',partner:'',opponent:'Stasiya Pavlova',score:'6-2 6-0'};
+ for(const rows of [[stale,correct,tomorrow,single],[correct,stale,tomorrow,single]]){
+  const projection=context.normalizeMatchProjection({matches:rows,agenda:rows});
+  for(const field of ['matches','agenda']) assert.deepEqual(Array.from(projection[field],m=>m.id),['complete','tomorrow','single']);
+ }
+ const cached=context.normalizeMatchProjection({matches:[stale],agenda:[stale]});
+ assert.equal(cached.matches.length,0);assert.equal(cached.agenda.length,0);
+});
+test('one-off Marsa repair preserves other dates, players, tournaments, rounds, manual and scored matches',()=>{
+ const stale={...full,id:'wrong',partner:'',opponent:'Ivona Dirnbek',court:'Court 2',courtMatchNumber:5};
+ for(const change of [{date:'2026-10-14'},{playerId:'another-player'},{competitionId:'another-event'},{round:'Quarter final'},{event:'GS14'},{opponent:'Another Opponent'},{partner:'Another Partner'},{manual:true},{score:'6-4'},{result:'W/O'},{opponentPending:true}]){
+  assert.equal(context.canonicalPlayerMatches([{...stale,...change}]).length,1,JSON.stringify(change));
+ }
+});

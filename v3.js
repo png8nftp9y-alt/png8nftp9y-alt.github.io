@@ -1935,7 +1935,17 @@ function dedupeAgendaMatches(items) {
     const wrong = !match.manual && !match.partner && !match.score && !match.result &&
       circuit(match) === 'tennis-europe' && doubles(match) && op.length === 1 && key &&
       complete.some(full => full.playerId === match.playerId && slot(full) === key && name(full.partner) === op[0]);
-    if (wrong) continue;
+    // Confirmed obsolete Marsa row: the completed double moved from Court 2 to Court 3.
+    // Keep this repair scoped to the owner's reported 13 October occurrence.
+    const obsoleteCereghiniRow = !match.manual && !match.partner && !match.score && !match.result &&
+      circuit(match) === 'tennis-europe' && match.playerId === 'virginia-cereghini' &&
+      String(match.competitionId || '').toLowerCase() === '04da84af-89e2-4623-aee5-eb00e7e6c90c' &&
+      String(match.date || '').replaceAll('-', '') === '20261013' &&
+      /\bgd14\b/i.test([match.event, match.draw].join(' ')) &&
+      name(match.round) === 'round of 16' && !match.opponentPending &&
+      name(match.court).replace(/^(court|campo)\s*/, '') === '2' && agendaCourtMatchNumber(match) === 5 &&
+      op.length === 1 && /^(?:ivona dirnbek)(?: dirnbek)?$/.test(op[0]);
+    if (wrong || obsoleteCereghiniRow) continue;
     if (!unique.some(existing => sameAgendaMatch(existing, match))) unique.push(match);
   }
   return unique;

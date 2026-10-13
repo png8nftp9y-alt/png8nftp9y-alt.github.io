@@ -5532,3 +5532,13 @@ ITF Meta extraordinary 2026-10-13T20:39:46.237Z: attempted 1, acquired 0, ordina
 
 ## 2026-10-13 — Admin: letture salvate
 ID e Diagnostica conservano ultima lettura fino ad aggiornamento manuale. Data del controllo visibile; nessun ricalcolo alle aperture successive. Preparazione iniziale ID in background; autenticazione preservata. Validazione: 251 test Worker passati prima della pubblicazione; verifica live dopo deploy.
+
+## 2026-10-13 — Cereghini: riga obsoleta Marsa del 13 ottobre
+
+Schermate: falso GD14 R16 Cereghini contro Dirnbek, Court 2 #5; doppio corretto
+concluso 6-0 7-5, Court 3 #5. Il precedente confronto sul campo conservava
+la riga falsa. Rimossa nella proiezione condivisa Agenda/giocatore e cache
+solo quella riga senza compagna/risultato del 13 ottobre, torneo
+04DA84AF-89E2-4623-AEE5-EB00E7E6C90C. Doppi del 14 ottobre conservati.
+Nessuna modifica D1 o motori. Asset versionato. Validazione: 41 regressioni
+passate, sintassi JS e contratto UI verificati. Verifica live dopo deploy.
