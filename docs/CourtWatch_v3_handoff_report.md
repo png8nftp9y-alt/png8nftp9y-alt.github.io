@@ -3479,3 +3479,13 @@ Validation: 11 browser/parser/recovery/scope tests pass under both TZ=UTC and TZ
 Existing D1 evidence (run 38320984266, publish job 115050148769): targeted=1089, verified=1089, inserts=223, updates=866. Those are core calendar records, not proof of 1089 complete factsheets; acquisition acquired=0 in that older historical-first run. This scope change does not delete those records.
 
 Future ITF factsheet metadata 2026-10-13T01:38:21.851Z: {"checked":193,"acquired":74,"remaining":136}. Only not-started tournaments targeted (known qualifying dates take precedence); archived metadata preserved; discovery catalogue enriched; unresolved fields explicit.
+
+## 2026-10-13 — Admin navigation: Cloudflare, ID and ITF
+
+Reason: reorganize Admin into dedicated operational areas. Removed the Profili, Database, Fallimenti and Backup navigation entries and their page markup. Kept Utenti and its device/override controls. Registered the new /admin/cloudflare, /admin/id and /admin/itf authenticated routes. Cloudflare contains usage counters; ID contains the existing circuit identity, source coverage and blocked-import diagnostics, with its refresh form targeting /admin/id. ID and Diagnostica refresh manually. ITF contains draw completeness (ordinary and extraordinary queues) and the published tournament metadata report, including checked/acquired/remaining counters, missing fields, acquisition errors and unavailable factsheets. Metadata values are HTML-escaped and missing per-tournament timestamps remain explicitly unavailable rather than inheriting a global timestamp.
+
+Diagnostica retains D1 operativo, Copertura, Motori, Workflow e watchdog, Diagnostica applicativa, Conteggi D1 and R2 backup. Cloudflare usage is no longer appended globally. Admin remote loading includes itf_tournament_metadata_diagnostics.json and bypasses the warm cache for both draw and metadata reports, retaining named stale/unavailable-source diagnostics. No schema migration, D1 writes, acquisition changes or workflow changes.
+
+Validation: full cloudflare/app-api npm run check passed; all five admin-remote tests passed, including fallback, warm-cache bypass and unavailable sources. Rendered all five authenticated Admin GET routes with fixture data; verified visible sections, removed menu entries, ID refresh destination, metadata HTML escaping, and 401 for unauthenticated access. git diff --check passed.
+
+Limitations: this patch presents the currently published metadata diagnostic format; it does not implement the separately requested metadata ordinary/extraordinary acquisition engine. Deployment and live Admin verification follow application of the patch.
