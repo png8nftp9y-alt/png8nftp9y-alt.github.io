@@ -15,7 +15,22 @@ test('cached personal players and tournaments exist before the first route witho
  assert.equal(ctx.state.data.tournaments.length,3);assert.equal(ctx.state.selected.size,3);
  const boot=source.slice(source.lastIndexOf('restoreCachedProjectionBeforeFirstRender();'));
  assert.ok(boot.indexOf('restoreCachedProjectionBeforeFirstRender();')<boot.indexOf('route();'));
- assert.ok(boot.indexOf('route();')<boot.indexOf('load();'));
+ assert.ok(boot.indexOf('restoreDurableProjection()')<boot.indexOf('route();'));
+});
+test('bootstrap restores durable player and opponent data before routing without awaiting the API',async()=>{
+ const calls=[],state={data:{players:[{id:'a'}],tournaments:[],matches:[]}};
+ const ctx={state,restoreCachedProjectionBeforeFirstRender:()=>calls.push('web'),wire:()=>{},wireAccount:()=>{},
+ restoreDurableProjection:async()=>{state.data.matches=[{id:'saved'}];calls.push('durable-player');},
+ restoreDurableOpponents:async()=>calls.push('durable-opponent'),load:()=>{calls.push('api-start');return new Promise(()=>{});},
+ route:()=>{assert.equal(state.data.matches[0].id,'saved');calls.push('route');},renderDataSignature:()=>'',syncLabel:()=>{},restoreUiScroll:()=>{},
+ loadAccount:()=>{},refreshMatchAnalysisStatus:()=>{},setInterval:()=>{}};
+ vm.createContext(ctx);
+ const boot=source.slice(source.indexOf('async function startCourtWatch()'),source.lastIndexOf('startCourtWatch();'));
+ vm.runInContext(boot+'\nglobalThis.testBoot=startCourtWatch();',ctx);
+ await ctx.testBoot;
+ assert.ok(calls.indexOf('durable-player')<calls.indexOf('route'));
+ assert.ok(calls.indexOf('durable-opponent')<calls.indexOf('route'));
+ assert.ok(calls.includes('api-start'));
 });
 test('restoring cache preserves deselect all and an explicit player subset',()=>{
  const saved={players:[{id:'a'},{id:'b'}],tournaments:[]};

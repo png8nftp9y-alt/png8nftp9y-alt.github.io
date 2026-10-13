@@ -122,6 +122,7 @@ const CATEGORY_VALUES = ["U10", "U12", "U14", "U16", "U18", "O18"],
       : [];
 const state = {
   data: null,
+  initialMatchProjectionPending: true,
   month: restoredMonth,
   agenda: restoredAgenda,
   agendaMode:
@@ -136,6 +137,8 @@ const state = {
   pickerMonth: restoredAgenda.getMonth(),
 };
 let calendarHeightObserver = null,
+  initialProjectionRequest = null,
+  profileNavigationEpoch = 0,
   loadRunning = false,
   renderedDataSignature = "",
   activeOpponentRouteKey = "",
@@ -869,9 +872,13 @@ function openProjectionDatabase() {
     const finish = db => { if (done) { db?.close(); return; } done = true; clearTimeout(timer); resolve(db); };
     const timer = setTimeout(() => finish(null), 1500);
     try {
-      const request = indexedDB.open("courtwatch-projections-v1", 1);
+      const request = indexedDB.open("courtwatch-projections-v1", 2);
       request.onupgradeneeded = () => {
         if (!request.result.objectStoreNames.contains("snapshots")) request.result.createObjectStore("snapshots");
+        if (!request.result.objectStoreNames.contains("opponents")) {
+          const store = request.result.createObjectStore("opponents");
+          store.createIndex("cachedAt", "cachedAt");
+        }
       };
       request.onsuccess = () => finish(request.result);
       request.onerror = request.onblocked = () => finish(null);
@@ -904,9 +911,16 @@ async function readDurableProjection() {
 async function restoreDurableProjection() {
   const saved = await readDurableProjection();
   const current = cachedData();
-  if (!saved || (current && (current.cachedAt || 0) >= (saved.cachedAt || 0))) return false;
-  durableProjectionFallback = saved;
-  return applyCachedProjection(saved);
+  if (!saved) return false;
+  const newer = current && (current.cachedAt || 0) >= (saved.cachedAt || 0) ? current : saved;
+  const older = newer === current ? saved : current;
+  const ids = new Set(newer.players.map(player => player.id));
+  // A newer partial cache must not erase history from the durable copy.
+  // Keep the newer membership so a removed player is never resurrected.
+  const restored = {...newer,
+    matches: mergeKnownMatches(older?.matches, newer.matches).filter(match => ids.has(match.playerId))};
+  durableProjectionFallback = restored;
+  return applyCachedProjection(restored);
 }
 function saveCachedData(data) {
   const snapshot = calendarCacheSnapshot(data, Date.now());
@@ -925,6 +939,45 @@ function saveCachedData(data) {
     return false;
   });
   return projectionWriteQueue;
+}
+function durableOpponentKey(name, event = "", profileId = "") {
+  return [String(profileId || ""), readablePerson(name), event || ""].join("|");
+}
+async function saveDurableOpponent(name, event, profileId, requestKey, data) {
+  const db = await openProjectionDatabase();
+  if (!db) return false;
+  return new Promise(resolve => {
+    try {
+      const transaction = db.transaction("opponents", "readwrite"), store = transaction.objectStore("opponents");
+      store.put({requestKey, data, cachedAt: Date.now()}, durableOpponentKey(name, event, profileId));
+      const count = store.count();
+      count.onsuccess = () => {
+        let excess = count.result - 200;
+        if (excess <= 0) return;
+        const cursor = store.index("cachedAt").openCursor();
+        cursor.onsuccess = () => {if (cursor.result && excess-- > 0) {cursor.result.delete(); cursor.result.continue();}};
+      };
+      transaction.oncomplete = () => {db.close(); resolve(true);};
+      transaction.onerror = transaction.onabort = () => {db.close(); resolve(false);};
+    } catch {db.close(); resolve(false);}
+  });
+}
+async function restoreDurableOpponents() {
+  const db = await openProjectionDatabase();
+  if (!db) return;
+  await new Promise(resolve => {
+    try {
+      const request = db.transaction("opponents", "readonly").objectStore("opponents").getAll();
+      request.onsuccess = () => {
+        for (const entry of request.result || []) {
+          if (entry.requestKey && entry.data && !opponentHistoryCache.has(entry.requestKey))
+            opponentHistoryCache.set(entry.requestKey, entry.data);
+        }
+        db.close(); resolve();
+      };
+      request.onerror = () => {db.close(); resolve();};
+    } catch {db.close(); resolve();}
+  });
 }
 function cachedPersonalTournaments(previous, visiblePlayers) {
   const personalIds = new Set(visiblePlayers.filter(player => player.userAdded).map(player => player.id));
@@ -2607,11 +2660,22 @@ function renderIfDataChanged() {
   route();
   return true;
 }
-function openProfile(id) {
+async function openProfile(id) {
+  const epoch = ++profileNavigationEpoch, previousHash = location.hash;
+  if (state.initialMatchProjectionPending && !state.data?.matches?.some(match => match.playerId === id))
+    await (initialProjectionRequest || load());
+  if (epoch !== profileNavigationEpoch || location.hash !== previousHash || (state.initialMatchProjectionPending && !state.data?.matches?.some(match => match.playerId === id))) return;
   location.hash = "player/" + encodeURIComponent(id);
 }
-function openCurrentOpponent(profileId, name, event = "") {
+async function openCurrentOpponent(profileId, name, event = "") {
   const identity = profileId || readablePerson(name);
+  const monitored = monitoredOpponentPlayer(identity);
+  if (monitored) return openProfile(monitored.id);
+  const epoch = ++profileNavigationEpoch, previousHash = location.hash;
+  if (!preparedOpponentHistory(name, event, identity)) {
+    try {await fetchOpponentHistory(name, event, identity);} catch {return;}
+  }
+  if (epoch !== profileNavigationEpoch || location.hash !== previousHash) return;
   location.hash =
     "opponent-profile/" +
     encodeURIComponent(identity) +
@@ -2629,6 +2693,15 @@ function bindParticipantNavigation(root) {
       }),
   );
   const opponentLinks = [...root.querySelectorAll("[data-open-current-opponent]")];
+  if (root.courtWatchOpponentObserver) root.courtWatchOpponentObserver.disconnect();
+  const observer = typeof IntersectionObserver === "function" ? new IntersectionObserver(entries => {
+    for (const entry of entries) if (entry.isIntersecting) {
+      const element = entry.target;
+      queueOpponentPreload(element.dataset.opponentName, element.dataset.opponentEvent || "", element.dataset.openCurrentOpponent || "");
+      observer.unobserve(element);
+    }
+  }) : null;
+  root.courtWatchOpponentObserver = observer;
   opponentLinks.forEach(
     (element) => {
       const preload = () =>
@@ -2640,6 +2713,7 @@ function bindParticipantNavigation(root) {
       element.addEventListener("pointerenter", preload, { once: true });
       element.addEventListener("focus", preload, { once: true });
       element.addEventListener("touchstart", preload, { once: true, passive: true });
+      observer?.observe(element);
       (element.onclick = (event) => {
         event.stopPropagation();
         openCurrentOpponent(
@@ -2842,6 +2916,33 @@ function opponentHistoryKey(name, event = "", profileId = "") {
     requestKey = [profileId || "", readablePerson(name), asOf, event || "", "latest-rankings-v4-tournament-metadata"].join("|");
   return { asOf, requestKey };
 }
+function preparedOpponentHistory(name, event = "", profileId = "") {
+  const {requestKey} = opponentHistoryKey(name, event, profileId);
+  const exact = opponentHistoryCache.get(requestKey) || savedActiveOpponent(requestKey);
+  if (exact) return exact;
+  // Historical match evidence remains valid after the daily ranking key changes.
+  const prefix = [profileId || "", readablePerson(name)].join("|") + "|";
+  for (const [key, data] of [...opponentHistoryCache.entries()].reverse()) {
+    if (key.startsWith(prefix) && key.split("|")[3] === (event || "")) return data;
+  }
+  return null;
+}
+function mergeOpponentHistory(previous, next) {
+  if (!previous) return next;
+  const tournaments = new Map();
+  for (const tournament of [...(previous.tournaments || []), ...(next.tournaments || [])]) {
+    const key = [circuit(tournament), tournament.competitionId || tournament.id || tournament.name, tournament.startDate || ""].join("|");
+    const known = tournaments.get(key), matches = new Map();
+    for (const match of [...(known?.matches || []), ...(tournament.matches || [])]) {
+      const matchKey = match.matchId || match.id || [match.date, match.event, match.round, JSON.stringify(match.opponents || [])].join("|");
+      const update = Object.fromEntries(Object.entries(match).filter(([, value]) => value !== "" && value !== null && value !== undefined && (!Array.isArray(value) || value.length)));
+      matches.set(matchKey, {...matches.get(matchKey), ...update});
+    }
+    tournaments.set(key, {...known, ...tournament, matches: [...matches.values()]});
+  }
+  const profileUpdate = Object.fromEntries(Object.entries(next.profile || {}).filter(([, value]) => value !== "" && value !== null && value !== undefined));
+  return {...previous, ...next, profile: {...previous.profile, ...profileUpdate}, tournaments: [...tournaments.values()]};
+}
 async function fetchOpponentHistory(name, event = "", profileId = "", refresh = false) {
   const { asOf, requestKey } = opponentHistoryKey(name, event, profileId);
   if (!refresh && opponentHistoryCache.has(requestKey))
@@ -2862,7 +2963,9 @@ async function fetchOpponentHistory(name, event = "", profileId = "", refresh = 
       privateApiOptions({ cache: "no-store", signal: controller.signal }),
     ).then(async (response) => {
     if (!response.ok) throw Error("opponent history");
-    const data = await response.json();
+    const incoming = await response.json();
+    if (!Array.isArray(incoming.tournaments)) throw Error("opponent history incomplete");
+    const data = mergeOpponentHistory(preparedOpponentHistory(name, event, profileId), incoming);
     opponentHistoryCache.set(requestKey, data);
     saveEntries(
       OPPONENT_HISTORY_CACHE,
@@ -2870,6 +2973,7 @@ async function fetchOpponentHistory(name, event = "", profileId = "", refresh = 
       localStorage,
       20,
     );
+      await saveDurableOpponent(name, event, profileId, requestKey, data);
       return data;
     }).finally(() => {
       clearTimeout(timer);
@@ -2914,12 +3018,10 @@ async function loadOpponentHistory(name, event = "", profileId = "") {
   const body = $("opponentTournamentHistory"),
     routeKey = activeOpponentRouteKey,
     { requestKey } = opponentHistoryKey(name, event, profileId),
-    cached = opponentHistoryCache.get(requestKey) || savedActiveOpponent(requestKey);
-  if (cached && !opponentHistoryCache.has(requestKey))
-    opponentHistoryCache.set(requestKey, cached);
+    cached = preparedOpponentHistory(name, event, profileId);
   if (cached) renderOpponentHistory(cached);
   try {
-    const data = await fetchOpponentHistory(name, event, profileId, Boolean(cached));
+    const data = await fetchOpponentHistory(name, event, profileId);
     if (activeOpponentRouteKey === routeKey) {
       saveActiveOpponent(requestKey, data);
       renderOpponentHistory(data);
@@ -2933,15 +3035,14 @@ async function loadOpponentHistory(name, event = "", profileId = "") {
     );
   }
 }
-function renderOpponentFromMatch(identity, matchId, index, role = "opponent") {
+function opponentFromMatchDetails(identity, matchId, index, role = "opponent") {
   const sources = [...(state.data.matches || []), ...(state.data.agenda || [])],
     match =
       sources.find(
         (row) => String(row.matchId || row.id || "") === String(matchId),
       ) || null;
   if (!match) {
-    location.hash = "";
-    return;
+    return null;
   }
   const partner = role === "partner",
     names = partner
@@ -2954,17 +3055,25 @@ function renderOpponentFromMatch(identity, matchId, index, role = "opponent") {
       ? (match.partnerNationalities || [])[index] || ""
       : (match.opponentNationalities || [match.opponentNationality || ""])[index] || "",
     event = match.event || match.draw || "";
-  renderOpponentProfile(identity, name, event, nationality);
+  return {identity, name, event, nationality};
+}
+function renderOpponentFromMatch(identity, matchId, index, role = "opponent") {
+  const details = opponentFromMatchDetails(identity, matchId, index, role);
+  if (!details) {location.hash = ""; return;}
+  renderOpponentProfile(details.identity, details.name, details.event, details.nationality);
+}
+function monitoredOpponentPlayer(identity) {
+  return (state.data?.players || []).find(player =>
+    [player.id,player.sourceKey,player.sourcePlayerId,player.worldTennisId,player.membershipCard,player.profileSync?.tennisEurope?.profileId].filter(Boolean).map(String).includes(String(identity)));
 }
 function renderOpponentProfile(identity, name, event = "", initialNationality = "") {
-  const monitored = (state.data?.players || []).find(player =>
-    [player.id,player.sourceKey,player.sourcePlayerId,player.worldTennisId,player.membershipCard,player.profileSync?.tennisEurope?.profileId].filter(Boolean).map(String).includes(String(identity)));
+  const monitored = monitoredOpponentPlayer(identity);
   if (monitored) { history.replaceState(history.state,'',(location.href||'').split('#')[0]+'#player/'+encodeURIComponent(monitored.id));route();return; }
   const routeKey = [identity, readablePerson(name), event].join("|");
   if (activeOpponentRouteKey === routeKey && $("profileView").classList.contains("active") && $("opponentTournamentHistory")) return;
   activeOpponentRouteKey = routeKey;
   const { requestKey } = opponentHistoryKey(name, event, identity),
-    prepared = opponentHistoryCache.get(requestKey) || savedActiveOpponent(requestKey),
+    prepared = preparedOpponentHistory(name, event, identity),
     flag = nationalityHtml(initialNationality || prepared?.profile?.nationality),
     follow = $("removeProfilePlayer");
   follow.hidden = false;
@@ -2982,7 +3091,6 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
     addCourtWatchPlayerFromUi({identity,name}, event.currentTarget);
   });
   if (prepared) {
-    opponentHistoryCache.set(requestKey, prepared);
     renderOpponentHistory(prepared);
   }
   loadOpponentHistory(name, event, identity);
@@ -3585,6 +3693,33 @@ function route() {
     playerSearch = location.hash.match(/^#player-search\/(.+)$/),
     tournament = location.hash.match(/^#tournament\/(.+)$/),
     primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
+  const requestedHash = location.hash;
+  if (player && (!state.data || (state.initialMatchProjectionPending &&
+      !state.data.matches.some(match => match.playerId === decodeURIComponent(player[1]))))) {
+    Promise.resolve(initialProjectionRequest || load()).then(() => {
+      if (location.hash === requestedHash && !state.initialMatchProjectionPending) route();
+    });
+    return;
+  }
+  if (currentOpponent) {
+    const identity = decodeURIComponent(currentOpponent[1]), name = decodeURIComponent(currentOpponent[2]), event = decodeURIComponent(currentOpponent[3]) === "-" ? "" : decodeURIComponent(currentOpponent[3]);
+    if (!monitoredOpponentPlayer(identity) && !preparedOpponentHistory(name, event, identity)) {
+      fetchOpponentHistory(name, event, identity).then(() => {if (location.hash === requestedHash) route();}).catch(() => {});
+      return;
+    }
+  }
+  if (opponent || legacyOpponent) {
+    const match = opponent || legacyOpponent;
+    const details = opponentFromMatchDetails(decodeURIComponent(match[opponent ? 2 : 1]), decodeURIComponent(match[opponent ? 3 : 2]), Number(match[opponent ? 4 : 3]), opponent ? match[1] : "opponent");
+    if (!details && state.initialMatchProjectionPending) {
+      Promise.resolve(initialProjectionRequest || load()).then(() => {if (location.hash === requestedHash && !state.initialMatchProjectionPending) route();});
+      return;
+    }
+    if (details && !monitoredOpponentPlayer(details.identity) && !preparedOpponentHistory(details.name, details.event, details.identity)) {
+      fetchOpponentHistory(details.name, details.event, details.identity).then(() => {if (location.hash === requestedHash) route();}).catch(() => {});
+      return;
+    }
+  }
   const isHomeRoute = !location.hash;
   $("quickSectionNav").hidden = isHomeRoute;
   $("homeOthers").hidden = !isHomeRoute;
@@ -4125,6 +4260,10 @@ async function load() {
       ).toISOString(),
     };
     state.data = normalizeMatchProjection(state.data);
+    if (projection && state.initialMatchProjectionPending) {
+      state.initialMatchProjectionPending = false;
+      renderedDataSignature = "";
+    }
     await saveCachedData(state.data);
     if (!uiSelectionRestored) {
       state.data.players.forEach((p) => state.selected.add(p.id));
@@ -4440,18 +4579,17 @@ renderProfile = function (id) {
   applyTournamentStatus();
 };
 async function startCourtWatch() {
-  const immediate = restoreCachedProjectionBeforeFirstRender();
+  restoreCachedProjectionBeforeFirstRender();
   wire();
   wireAccount();
-  if (!immediate) await restoreDurableProjection();
+  await Promise.all([restoreDurableProjection(), restoreDurableOpponents()]);
+  initialProjectionRequest = load();
   route();
   if (state.data) {
     renderedDataSignature = renderDataSignature(state.data);
     syncLabel(state.data, true);
     restoreUiScroll();
   }
-  if (immediate && await restoreDurableProjection()) renderIfDataChanged();
-  load();
   loadAccount();
   refreshMatchAnalysisStatus();
   setInterval(() => {
