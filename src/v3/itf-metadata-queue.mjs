@@ -1,5 +1,5 @@
 import {futureMetadataTargets,requiredMetadataFields} from './recover-all-itf-metadata.mjs';
-export const USER_RESOLVED_METADATA_IDS=new Set(['J-GC-EGY-07A-2026','J-GC-EGY-03A-2026']);
+export const USER_RESOLVED_METADATA_IDS=new Set(['J-GC-EGY-07A-2026','J-GC-EGY-03A-2026','J-JM-CHN-2026-001']);
 export const FIELDS=['venueName','address','qualificationStartDate'];
 export const missingMetadata=row=>requiredMetadataFields(row).filter(f=>!String(row?.[f]||'').trim()||(f==='qualificationStartDate'&&!/^\d{4}-\d{2}-\d{2}$/.test(row[f])));
 export function reconcileMetadataQueue(state,catalogue,saved,today,now,previous=catalogue){
