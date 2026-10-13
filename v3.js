@@ -3978,8 +3978,8 @@ function updatePlayerGroupControls() {
   document.title = PLAYER_GROUP === "others" ? "Court Watch · Altri" : "Court Watch";
   $("activePlayerGroup").hidden = PLAYER_GROUP !== "others";
   document.querySelectorAll("[data-switch-player-group]").forEach(button => {
-    button.textContent = button.id === "homeOthers" ? (PLAYER_GROUP === "others" ? "Vai a TCL" : "Vai a Altri") : (PLAYER_GROUP === "others" ? "TCL" : "Altri");
-    button.setAttribute("aria-label", PLAYER_GROUP === "others" ? "Apri giocatori TCL" : "Apri altri giocatori");
+    button.textContent = PLAYER_GROUP === "others" ? "Vai a TCL" : "Vai a Altri";
+    button.setAttribute("aria-label", button.textContent);
     button.onclick = switchPlayerGroup;
   });
 }
