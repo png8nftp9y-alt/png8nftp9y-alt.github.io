@@ -37,7 +37,7 @@ test('TCL and Altri keep the current page, dates, filters and scroll without cop
   for(const key of ['month','agenda','agendaMode','categoryFilters','sexFilter','scrollY'])assert.deepEqual(saved[key],current[key]);
   assert.deepEqual(saved.selected,['target-player']);assert.equal(saved.profilePlayerId,'target');
   const scrolls=[];ctx.restoredUi=saved;ctx.uiScrollRestored=false;ctx.uiScrollRestoreFinalized=false;ctx.uiScrollRestoreCancelled=false;ctx.requestAnimationFrame=fn=>fn();ctx.scrollTo=(x,y)=>scrolls.push(y);
-  vm.runInContext(source.slice(source.indexOf('function restoreUiScroll('),source.indexOf('const fmt =')),ctx);ctx.restoreUiScroll();assert.deepEqual(scrolls,[640]);
+  vm.runInContext(source.slice(source.indexOf('function restoreUiScroll('),source.indexOf('const fmt =')),ctx);ctx.restoreUiScroll();assert.deepEqual(scrolls,[640,640]);
  }
 });
 test('first visit to the mirrored group keeps default player selection and switching still works without storage',()=>{
@@ -51,19 +51,19 @@ test('first visit to the mirrored group keeps default player selection and switc
 });
 
 
-test('startup restores scroll after both cache and final layout; refresh never replays it',()=>{
+test('startup restores scroll immediately and after layout in each phase; refresh never replays it',()=>{
  const frames=[],scrolls=[],ctx={uiScrollRestored:false,uiScrollRestoreFinalized:false,uiScrollRestoreCancelled:false,restoredUi:{scrollY:80},location:{hash:'#calendar'},requestAnimationFrame:fn=>frames.push(fn),scrollTo:(x,y)=>scrolls.push(y)};
  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function restoreUiScroll('),source.indexOf('const fmt =')),ctx);
  const flush=()=>{while(frames.length)frames.shift()()};
- ctx.restoreUiScroll();flush();assert.deepEqual(scrolls,[80]);
- ctx.restoreUiScroll(true);flush();assert.deepEqual(scrolls,[80,80]);
- ctx.restoreUiScroll(true);flush();assert.deepEqual(scrolls,[80,80]);
+ ctx.restoreUiScroll();assert.deepEqual(scrolls,[80]);flush();assert.deepEqual(scrolls,[80,80]);
+ ctx.restoreUiScroll(true);flush();assert.deepEqual(scrolls,[80,80,80,80]);
+ ctx.restoreUiScroll(true);flush();assert.deepEqual(scrolls,[80,80,80,80]);
 });
 test('late restoration cannot override user input or a changed route',()=>{
  for(const action of ['input','route']){
   const frames=[],scrolls=[],ctx={uiScrollRestored:false,uiScrollRestoreFinalized:false,uiScrollRestoreCancelled:false,restoredUi:{scrollY:80},location:{hash:'#calendar'},requestAnimationFrame:fn=>frames.push(fn),scrollTo:(x,y)=>scrolls.push(y)};
-  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function restoreUiScroll('),source.indexOf('const fmt =')),ctx);ctx.restoreUiScroll(true);
+  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function restoreUiScroll('),source.indexOf('const fmt =')),ctx);ctx.restoreUiScroll(true);assert.deepEqual(scrolls,[80]);
   if(action==='input')ctx.uiScrollRestoreCancelled=true;else ctx.location.hash='#players';
-  while(frames.length)frames.shift()();assert.deepEqual(scrolls,[]);
+  while(frames.length)frames.shift()();assert.deepEqual(scrolls,[80]);
  }
 });
