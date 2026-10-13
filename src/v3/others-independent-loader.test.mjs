@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const source = readFileSync(new URL('../../v3.js', import.meta.url), 'utf8');
 const mergeSource = source.slice(source.indexOf('function mergeKnownMatches('), source.indexOf('function clearDemographicFilters('));
-const loader = source.slice(source.indexOf('async function load()'), source.indexOf('document.addEventListener("click", (event) => {', source.indexOf('async function load()')));
+const loader = source.slice(source.indexOf('async function load('), source.indexOf('document.addEventListener("click", (event) => {', source.indexOf('async function load(')));
 const label = source.slice(source.indexOf('function syncLabel('), source.indexOf('function unavailableLabel('));
 function setup(group, projection, {cached = null, staticData = {}, staticOffline = false} = {}) {
   let saved, requests = 0, unavailable = 0;

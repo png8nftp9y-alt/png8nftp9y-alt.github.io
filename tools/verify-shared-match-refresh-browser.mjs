@@ -17,14 +17,20 @@ try {
     let holdOpponent = false, releaseOpponent, opponentOffline = false, opponentPartial = false;
     const opponentRequests = new Map();
     let holdAppScript = false, releaseAppScript;
+    let holdGroupSnapshot = false, releaseGroupSnapshot, failGroupSnapshot = false;
+    const targetGroup = group === 'main' ? 'others' : 'main';
+    const targetPlayer = {id: 'fixture-' + targetGroup, name: 'Destination ' + targetGroup, userAdded: true};
     await page.addInitScript(() => {
       window.setInterval = () => 0;
       window.observedProfileCounts = [];
       window.observedEmptyOpponent = false;
       window.observedHomeDuringRefresh = false;
+      window.observedBlankGroupFrame = false;
+      window.documentIdentity = Math.random();
       const observeFrames = () => {
         const home = document.querySelector('#homeView');
         if (location.hash && home?.classList.contains('active') && getComputedStyle(home).display !== 'none') window.observedHomeDuringRefresh = true;
+        if (typeof state !== 'undefined' && state.data && ![...document.querySelectorAll('main.view.active')].some(view => view.getClientRects().length)) window.observedBlankGroupFrame = true;
         requestAnimationFrame(observeFrames);
       };
       requestAnimationFrame(observeFrames);
@@ -45,6 +51,12 @@ try {
       }
       if (url.pathname.endsWith('/app-snapshot')) {
         requests++;
+        const requestedGroup = route.request().headers()['x-courtwatch-group'] || 'main';
+        if (requestedGroup !== group) {
+          if (holdGroupSnapshot) await new Promise(resolve => {releaseGroupSnapshot = resolve;});
+          if (failGroupSnapshot) return route.fulfill({status: 503, json: {error: 'offline'}});
+          return route.fulfill({json: {group: requestedGroup, players: [targetPlayer], tournaments: [{...tournament, playerId: targetPlayer.id}], matches: [{...old, playerId: targetPlayer.id, id: 'destination-match'}]}});
+        }
         if (holdSnapshot) await new Promise(resolve => {releaseSnapshot = resolve;});
         if (offline) return route.fulfill({status: 503, json: {error: 'offline'}});
         return route.fulfill({json: {group, generatedAt: '2026-10-13T00:00:00Z', players: empty ? [] : [player], tournaments: empty ? [] : partial ? [{...tournament, entryStatus: 'withdrawn'}] : [tournament], matches: empty ? [] : partial ? [{...recent, score: '', result: ''}] : [old, recent, wrong, full, {...recent, id:"disabled-fitp", circuit:"fitp"}, {...recent, id:"disabled-itf", circuit:"itf"}]}});
@@ -220,7 +232,61 @@ try {
     assert.ok(Math.abs(await page.evaluate(() => scrollY) - opponentRefreshY) <= 2);
     assert.equal(await page.evaluate(() => observedHomeDuringRefresh), false);
     assert.deepEqual(errors, []);
-    console.log(JSON.stringify({group, knownMatches: before.length, refreshPosition: 'passed', noHomeFlash: 'passed', firstProfile: 'passed', delayedSnapshot: 'passed', newerPartialCache: 'passed', readyOpponentClick: 'passed', recursiveOpponent: 'passed', durableOpponentReload: 'passed', partialRefresh: 'passed', profileDouble: 'passed', cacheReload: 'passed', emptySnapshot: 'passed', europeOnly: 'passed', requests}));
+    // Cross both groups in the same document, including a failed first request.
+    offline = false; opponentOffline = false;
+    await page.evaluate(() => {location.hash = '#players';});
+    await page.locator('#playersView.active').waitFor();
+    const documentIdentity = await page.evaluate(() => documentIdentity);
+    await page.evaluate(() => {state.selected.clear(); saveUiState();});
+    failGroupSnapshot = true;
+    await page.evaluate(() => switchPlayerGroup());
+    assert.equal(await page.evaluate(() => PLAYER_GROUP), group);
+    assert.equal(await page.locator('#playersList .playerRow').count(), 1);
+    assert.equal(await page.evaluate(() => documentIdentity), documentIdentity);
+    failGroupSnapshot = false; holdGroupSnapshot = true;
+    const destinationRequest = page.waitForRequest(request => request.url().includes('/app-snapshot') && request.headers()['x-courtwatch-group'] === targetGroup);
+    await page.locator('#playersView [data-switch-player-group]').click();
+    await destinationRequest;
+    assert.equal(await page.evaluate(() => PLAYER_GROUP), group);
+    assert.equal(await page.locator('#playersList .playerRow').count(), 1);
+    assert.equal(typeof releaseGroupSnapshot, 'function');
+    holdGroupSnapshot = false; releaseGroupSnapshot();
+    await page.waitForFunction(expected => PLAYER_GROUP === expected && !groupSwitchRunning, targetGroup);
+    assert.deepEqual(await page.evaluate(() => state.data.players.map(player => player.id)), [targetPlayer.id]);
+    assert.deepEqual(await page.evaluate(() => [...state.selected]), [targetPlayer.id]);
+    assert.equal(await page.evaluate(() => documentIdentity), documentIdentity);
+    await page.locator('#playersView [data-switch-player-group]').click();
+    await page.waitForFunction(expected => PLAYER_GROUP === expected && !groupSwitchRunning, group);
+    assert.deepEqual(await page.evaluate(() => state.data.players.map(player => player.id)), [player.id]);
+    assert.equal(await page.evaluate(() => state.selected.size), 0, `${group}: deselect-all must remain scoped to the original list`);
+    await page.evaluate(() => history.back());
+    await page.waitForFunction(expected => PLAYER_GROUP === expected && !groupSwitchRunning, targetGroup);
+    assert.deepEqual(await page.evaluate(() => state.data.players.map(player => player.id)), [targetPlayer.id]);
+    await page.evaluate(() => history.forward());
+    await page.waitForFunction(expected => PLAYER_GROUP === expected && !groupSwitchRunning, group);
+    assert.equal(await page.evaluate(() => state.selected.size), 0);
+    assert.equal(await page.evaluate(() => documentIdentity), documentIdentity);
+    assert.equal(await page.evaluate(() => observedBlankGroupFrame), false);
+    assert.deepEqual(errors, []);
+    await page.evaluate(id => openProfile(id), player.id);
+    await page.locator('#profileContent [data-stat="all"]').waitFor();
+    await page.evaluate(({targetGroup, targetId}) => {
+      const target = new URL(location.href);
+      if (targetGroup === 'others') target.searchParams.set('group', 'others'); else target.searchParams.delete('group');
+      target.hash = '#player/' + targetId;
+      history.pushState(null, '', target);
+      dispatchEvent(new PopStateEvent('popstate'));
+      dispatchEvent(new HashChangeEvent('hashchange'));
+    }, {targetGroup, targetId: targetPlayer.id});
+    await page.waitForFunction(expected => PLAYER_GROUP === expected && !groupSwitchRunning, targetGroup);
+    assert.equal(await page.evaluate(() => location.hash), '#player/' + targetPlayer.id);
+    assert.equal(await page.locator('#profileContent .profileHero h2').textContent(), targetPlayer.name);
+    await page.evaluate(() => history.back());
+    await page.waitForFunction(expected => PLAYER_GROUP === expected && !groupSwitchRunning, group);
+    await page.waitForFunction(id => location.hash === '#player/' + id, player.id);
+    assert.equal(await page.locator('#profileContent .profileHero h2').textContent(), player.name);
+    assert.equal(await page.evaluate(() => observedBlankGroupFrame), false);
+    console.log(JSON.stringify({group, knownMatches: before.length, seamlessGroupSwitch: 'passed', scopedSelections: 'passed', groupHistory: 'passed', refreshPosition: 'passed', noHomeFlash: 'passed', firstProfile: 'passed', delayedSnapshot: 'passed', newerPartialCache: 'passed', readyOpponentClick: 'passed', recursiveOpponent: 'passed', durableOpponentReload: 'passed', partialRefresh: 'passed', profileDouble: 'passed', cacheReload: 'passed', emptySnapshot: 'passed', europeOnly: 'passed', requests}));
     await page.close();
   }
 } finally {await browser.close();}

@@ -3269,6 +3269,57 @@ and trigger a fresh guarded deployment. Validation: verify-analysis-ui passed.
 - Sostituito il controllo testuale della chiamata agenda con una verifica eseguibile: incontri condivisi deduplicati, incontri distinti conservati. Nessun controllo disabilitato.
 
 
+## 2026-10-13 — TCL/Altri switch without document replacement or white frames
+
+Patch refreshed against the latest main after the user's apply check rejected
+the calendar-startup test hunk. Preserve the current test file and reapply only
+the loader extraction change and queued-write regression. Verify the complete
+replacement patch on a clean checkout; no ITF history/data files are included.
+Original file bytes are verified against GitHub Git blob hashes to prevent
+end-of-file context mismatches in the replacement patch.
+The replacement applies cleanly and passes all 52 tests and analysis checks.
+Browser scenarios passed for the functional change earlier; rerunning them for
+this packaging revision is blocked by the current local Chromium environment
+(process singleton socket permission), not a test assertion. No UI behavior
+changed in this revision. CI retains the complete Chromium verification.
+
+The user reported a white interval when switching between TCL and Altri. The
+previous switch used location.assign, replacing the document and waiting for
+the target section's async bootstrap. Keep the current complete view while
+preparing the destination, then switch lists inside the same document.
+
+Use the destination's group-scoped Web Storage/IndexedDB projection when valid,
+otherwise request its verified snapshot with an explicit group header. Reuse
+the existing loaded static documents. Commit only after target data are ready;
+invalidate/abort an older source snapshot load and await its completion before
+changing group state. Restore destination selections and keep shared dates and
+filters. Clear source-only removal/confirmation markers. Update group controls
+and the URL through history.pushState; popstate restores the appropriate group
+for Back/Forward. A failed first target request leaves the source view and group
+unchanged. Player additions/removal dialogs block a simultaneous list switch.
+
+Loader completion is now shared with concurrent callers and supports a prepared
+snapshot/document set. Pin every queued IndexedDB write to its original group
+key so switching cannot redirect a delayed source write into the target cache.
+Cached destination views may update from the API in background. No additional
+D1 history writes, database migrations, or new server archives are introduced;
+an uncached destination still needs a read before switching.
+
+Affected: v3.js, v3.html asset version, three loader test extraction anchors and
+the shared Chromium regression script. Add a queued-write scope test and real
+browser group transitions with distinct player IDs. Tests deliberately fail and
+hold an uncached target snapshot; the source remains visible until success.
+
+Validation: 52 frontend/membership tests and analysis UI checks passed. Chromium
+passes TCL-to-Altri and Altri-to-TCL, retained document identity (no reload), no
+blank frame, destination membership, scoped deselect-all, Back/Forward and failed
+request retention. Prior first-profile, recursive-opponent, Europe-only, refresh
+preview and exact-scroll scenarios remain active for both groups.
+
+Limitations: first preparation of an uncached group depends on the network and
+keeps the current view during that wait. Cached lists may precede a background
+membership update. Live production user-session confirmation remains required.
+
 ## 2026-10-13 — Refresh keeps the current view and scroll before application startup
 
 The user reported a brief Home flash during refresh, followed by return to the

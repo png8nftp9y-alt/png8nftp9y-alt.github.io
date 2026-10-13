@@ -6,11 +6,11 @@ const V3 = "https://png8nftp9y-alt.github.io/dist/v3/";
 // statSpans[0].hidden=profileOutcomeFilter!=='all'
 const PRIVATE_API = location.origin + "/app/api";
 const APP_API = PRIVATE_API + "/app-snapshot";
-const PLAYER_GROUP = /(?:^|[?&])group=others(?:&|$)/.test(location.search || "") ? "others" : "main";
-const GROUP_CACHE_SUFFIX = PLAYER_GROUP === "others" ? "-others" : "";
-const LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1" + GROUP_CACHE_SUFFIX + (PLAYER_GROUP === "others" ? "-v2" : "");
-const CALENDAR_CACHE = "courtwatch-v3-calendar-v1" + GROUP_CACHE_SUFFIX + (PLAYER_GROUP === "others" ? "-v2" : "");
-const UI_STATE_CACHE = "courtwatch-v3-ui-state-v1" + GROUP_CACHE_SUFFIX;
+let PLAYER_GROUP = /(?:^|[?&])group=others(?:&|$)/.test(location.search || "") ? "others" : "main";
+let GROUP_CACHE_SUFFIX = PLAYER_GROUP === "others" ? "-others" : "";
+let LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1" + GROUP_CACHE_SUFFIX + (PLAYER_GROUP === "others" ? "-v2" : "");
+let CALENDAR_CACHE = "courtwatch-v3-calendar-v1" + GROUP_CACHE_SUFFIX + (PLAYER_GROUP === "others" ? "-v2" : "");
+let UI_STATE_CACHE = "courtwatch-v3-ui-state-v1" + GROUP_CACHE_SUFFIX;
 const DEVICE_ID_CACHE = "courtwatch-device-id-v1";
 const PLAYER_RANKING_CACHE = "courtwatch-player-rankings-v1";
 const OPPONENT_HISTORY_CACHE = "courtwatch-opponent-history-v3";
@@ -33,11 +33,11 @@ function courtWatchDeviceId() {
     return "";
   }
 }
-function privateApiOptions(options = {}) {
+function privateApiOptions(options = {}, group = PLAYER_GROUP) {
   const id = courtWatchDeviceId(),
     headers = new Headers(options.headers || {});
   if (id) headers.set("X-CourtWatch-Device", id);
-  if (PLAYER_GROUP === "others") headers.set("X-CourtWatch-Group", "others");
+  headers.set("X-CourtWatch-Group", group);
   return { ...options, headers };
 }
 
@@ -105,7 +105,7 @@ function saveActiveOpponent(requestKey, data) {
     localStorage.setItem(ACTIVE_OPPONENT_CACHE, JSON.stringify({ requestKey, data }));
   } catch {}
 }
-const restoredUi = savedUiState(),
+let restoredUi = savedUiState(),
   restoredMonth = /^\d{4}-\d{2}$/.test(restoredUi.month)
     ? new Date(restoredUi.month + "-01T12:00:00")
     : new Date(),
@@ -138,6 +138,10 @@ const state = {
 };
 let calendarHeightObserver = null,
   initialProjectionRequest = null,
+  activeLoadCompletion = Promise.resolve(),
+  activeProjectionController = null,
+  lastLoadedDocuments = null,
+  groupSwitchRunning = false,
   profileNavigationEpoch = 0,
   loadRunning = false,
   renderedDataSignature = "",
@@ -817,9 +821,10 @@ async function v3json(path) {
     clearTimeout(timer);
   }
 }
-async function fetchProjection(url, timeoutMs) {
+async function fetchProjection(url, timeoutMs, group = PLAYER_GROUP) {
   const controller = new AbortController(),
     timer = setTimeout(() => controller.abort(), timeoutMs);
+  if (group === PLAYER_GROUP) activeProjectionController = controller;
   try {
     const response = await fetch(
       url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(),
@@ -828,7 +833,7 @@ async function fetchProjection(url, timeoutMs) {
         mode: "cors",
         credentials: "same-origin",
         signal: controller.signal,
-      }),
+      }, group),
     );
     if (!response.ok) throw Error("API Court Watch non disponibile: " + response.status);
     const data = await response.json();
@@ -838,10 +843,11 @@ async function fetchProjection(url, timeoutMs) {
       !Array.isArray(data.matches)
     )
       throw Error("Proiezione API incompleta");
-    if (PLAYER_GROUP === "others" && data.group !== "others") throw Error("Sezione Altri non ancora disponibile");
+    if ((data.group && data.group !== group) || (group === "others" && data.group !== group)) throw Error("Sezione richiesta non ancora disponibile");
     return data;
   } finally {
     clearTimeout(timer);
+    if (activeProjectionController === controller) activeProjectionController = null;
   }
 }
 async function apiProjection() {
@@ -914,24 +920,24 @@ function openProjectionDatabase() {
     } catch { finish(null); }
   });
 }
-async function writeDurableProjection(data) {
+async function writeDurableProjection(data, key = LAST_GOOD_CACHE) {
   const db = await openProjectionDatabase();
   if (!db) return false;
   return new Promise(resolve => {
     try {
       const transaction = db.transaction("snapshots", "readwrite");
-      transaction.objectStore("snapshots").put(data, LAST_GOOD_CACHE);
+      transaction.objectStore("snapshots").put(data, key);
       transaction.oncomplete = () => { db.close(); resolve(true); };
       transaction.onerror = transaction.onabort = () => { db.close(); resolve(false); };
     } catch { db.close(); resolve(false); }
   });
 }
-async function readDurableProjection() {
+async function readDurableProjection(key = LAST_GOOD_CACHE) {
   const db = await openProjectionDatabase();
   if (!db) return null;
   return new Promise(resolve => {
     try {
-      const request = db.transaction("snapshots", "readonly").objectStore("snapshots").get(LAST_GOOD_CACHE);
+      const request = db.transaction("snapshots", "readonly").objectStore("snapshots").get(key);
       request.onsuccess = () => { db.close(); resolve(validProjection(request.result) ? request.result : null); };
       request.onerror = () => { db.close(); resolve(null); };
     } catch { db.close(); resolve(null); }
@@ -953,6 +959,7 @@ async function restoreDurableProjection() {
 }
 function saveCachedData(data) {
   const snapshot = calendarCacheSnapshot(data, Date.now());
+  const cacheKey = LAST_GOOD_CACHE;
   durableProjectionFallback = snapshot;
   const serialized = JSON.stringify(snapshot);
   try { sessionStorage.setItem(CALENDAR_CACHE, serialized); } catch {}
@@ -963,7 +970,7 @@ function saveCachedData(data) {
   } catch (error) {
     console.warn("Cache locale piena: conservo la copia precedente e uso l’archivio persistente", error);
   }
-  projectionWriteQueue = projectionWriteQueue.then(() => writeDurableProjection(snapshot)).catch(error => {
+  projectionWriteQueue = projectionWriteQueue.then(() => writeDurableProjection(snapshot, cacheKey)).catch(error => {
     console.warn("Archivio locale non disponibile", error);
     return false;
   });
@@ -3708,6 +3715,8 @@ renderProfile = function (id) {
   applyFilter();
 };
 function route() {
+  const requestedGroup = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
+  if (groupSwitchRunning && requestedGroup !== PLAYER_GROUP) return;
   state.data = normalizeMatchProjection(withoutPucItfReferences(state.data));
   const player = location.hash.match(/^#player\/(.+)$/),
     currentOpponent = location.hash.match(
@@ -3906,9 +3915,15 @@ function toggleDatePopover() {
   pop.hidden = false;
 }
 function switchPlayerGroup() {
+  return changePlayerGroup(PLAYER_GROUP === "main" ? "others" : "main");
+}
+async function changePlayerGroup(targetGroup, fromHistory = false) {
+  if (targetGroup === PLAYER_GROUP || groupSwitchRunning || playerAdditionsInFlight.size || document.getElementById('playerRemovalDialog')) return;
+  groupSwitchRunning = true;
   saveUiState();
+  if (!fromHistory) saveRefreshView();
   const target = new URL(location.href);
-  const targetGroup = PLAYER_GROUP === "main" ? "others" : "main";
+  const requestedHash = location.hash, previousY = scrollY;
   if (targetGroup === "others") target.searchParams.set("group", "others");
   else target.searchParams.delete("group");
   // Transfer the view, dates and common filters; player selections belong to each group.
@@ -3917,20 +3932,62 @@ function switchPlayerGroup() {
     const current = JSON.parse(localStorage.getItem(UI_STATE_CACHE) || "{}");
     const mirrored = JSON.parse(localStorage.getItem(targetKey) || "{}");
     for (const key of ["agenda", "month", "agendaMode", "categoryFilters", "sexFilter", "scrollY"])
-      if (Object.prototype.hasOwnProperty.call(current, key)) mirrored[key] = current[key];
+      if ((!fromHistory || key !== "scrollY") && Object.prototype.hasOwnProperty.call(current, key)) mirrored[key] = current[key];
     localStorage.setItem(targetKey, JSON.stringify(mirrored));
   } catch {}
-  location.assign(target.href);
+  try {
+    const suffix = targetGroup === "others" ? "-others-v2" : "", candidates = [];
+    for (const storage of [localStorage, sessionStorage]) for (const key of ["courtwatch-v3-last-good-v1" + suffix, "courtwatch-v3-calendar-v1" + suffix]) {
+      try {candidates.push(JSON.parse(storage.getItem(key) || "null"));} catch {}
+    }
+    candidates.push(await readDurableProjection("courtwatch-v3-last-good-v1" + suffix));
+    const saved = candidates.filter(data => validProjection(data) && data.personalProjectionComplete === true && (!data.group || data.group === targetGroup)).sort((a, b) => (b.cachedAt || 0) - (a.cachedAt || 0))[0];
+    const ids = new Set((saved?.players || []).map(player => player.id));
+    const cached = saved ? {...saved, group: targetGroup, matches: mergeKnownMatches(...candidates.filter(validProjection).map(data => data.matches)).filter(match => ids.has(match.playerId))} : null;
+    const projection = cached || await fetchProjection(APP_API, 45000, targetGroup);
+    if (location.hash !== requestedHash) return;
+    state.playerSelectionEpoch = (state.playerSelectionEpoch || 0) + 1;
+    activeProjectionController?.abort();
+    await activeLoadCompletion;
+    if (location.hash !== requestedHash) return;
+    PLAYER_GROUP = targetGroup;
+    GROUP_CACHE_SUFFIX = targetGroup === "others" ? "-others" : "";
+    LAST_GOOD_CACHE = "courtwatch-v3-last-good-v1" + suffix;
+    CALENDAR_CACHE = "courtwatch-v3-calendar-v1" + suffix;
+    UI_STATE_CACHE = "courtwatch-v3-ui-state-v1" + GROUP_CACHE_SUFFIX;
+    restoredUi = savedUiState();
+    state.data = cached;
+    durableProjectionFallback = cached;
+    state.selected = new Set(Array.isArray(restoredUi.selected) ? restoredUi.selected : projection.players.map(player => player.id));
+    uiSelectionRestored = true;
+    uiScrollRestoreCancelled = true;
+    removedCourtWatchPlayers.clear(); confirmedCourtWatchPlayers.clear();
+    renderedDataSignature = "";
+    if (!fromHistory) history.pushState(null, "", target.href);
+    initialProjectionRequest = load(projection, lastLoadedDocuments);
+    await initialProjectionRequest;
+    updatePlayerGroupControls();
+    scrollTo(0, fromHistory ? Number(restoredUi.scrollY) || 0 : previousY);
+    activeRouteScrollKey = location.hash || "#home";
+    saveUiState();
+    if (cached) load();
+  } catch (error) {console.warn("Cambio sezione non disponibile; conservo la pagina corrente", error);}
+  finally {groupSwitchRunning = false;}
 }
-function wire() {
-  if (PLAYER_GROUP === "others") {
-    document.title = "Court Watch · Altri";
-    $("activePlayerGroup").hidden = false;
-  }
+function updatePlayerGroupControls() {
+  document.title = PLAYER_GROUP === "others" ? "Court Watch · Altri" : "Court Watch";
+  $("activePlayerGroup").hidden = PLAYER_GROUP !== "others";
   document.querySelectorAll("[data-switch-player-group]").forEach(button => {
-    button.textContent = PLAYER_GROUP === "others" ? (button.id === "homeOthers" ? "Vai a TCL" : "TCL") : button.textContent;
+    button.textContent = button.id === "homeOthers" ? (PLAYER_GROUP === "others" ? "Vai a TCL" : "Vai a Altri") : (PLAYER_GROUP === "others" ? "TCL" : "Altri");
     button.setAttribute("aria-label", PLAYER_GROUP === "others" ? "Apri giocatori TCL" : "Apri altri giocatori");
     button.onclick = switchPlayerGroup;
+  });
+}
+function wire() {
+  updatePlayerGroupControls();
+  addEventListener("popstate", () => {
+    const group = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
+    if (group !== PLAYER_GROUP) changePlayerGroup(group, true);
   });
   wirePlayersColumnHeight();
   $("addPlayer").onclick = openAddPlayerDialog;
@@ -4100,6 +4157,11 @@ function wire() {
     addEventListener(event, () => { uiScrollRestoreCancelled = true; }, { passive: true });
   addEventListener("hashchange", () => {
     uiScrollRestoreCancelled = true;
+    const requestedGroup = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
+    if (requestedGroup !== PLAYER_GROUP) {
+      if (!groupSwitchRunning) changePlayerGroup(requestedGroup, true);
+      return;
+    }
     const now = Date.now(),
       nextRouteScrollKey = location.hash || "#home";
     routeScrollMemory.set(activeRouteScrollKey, {
@@ -4118,8 +4180,10 @@ function wire() {
   });
   addEventListener("pagehide", saveRefreshView);
 }
-async function load() {
-  if (loadRunning) return;
+async function load(preparedProjection = null, preparedDocuments = null) {
+  if (loadRunning) return activeLoadCompletion;
+  let finishLoad;
+  activeLoadCompletion = new Promise(resolve => {finishLoad = resolve;});
   const selectionEpoch = state.playerSelectionEpoch || 0;
   const immediate = !state.data && cachedData();
   if (immediate?.personalProjectionComplete === true) {
@@ -4163,11 +4227,11 @@ async function load() {
       "diagnostics.json",
       "manual_matches.json",
     ];
-    const projectionPromise = apiProjection().catch((error) => {
+    const projectionPromise = (preparedProjection ? Promise.resolve(preparedProjection) : apiProjection()).catch((error) => {
       console.warn("Fallback JSON Court Watch attivo", error);
       return null;
     });
-    const settled = await Promise.allSettled(files.map(v3json));
+    const settled = preparedDocuments ? names.map(name => ({status: "fulfilled", value: preparedDocuments[name]})) : await Promise.allSettled(files.map(v3json));
     const docs = Object.fromEntries(
       names.map((name, i) => [
         name,
@@ -4175,6 +4239,7 @@ async function load() {
       ]),
     );
     const previous = state.data || cachedData() || {};
+    lastLoadedDocuments = docs;
     const projection = await projectionPromise;
     // Only membership is group-specific. Data loading, merging and rendering are shared.
     if (projection && PLAYER_GROUP === "others" && projection.group !== "others")
@@ -4337,6 +4402,7 @@ async function load() {
   } finally {
     if (state.data) restoreUiScroll(true);
     loadRunning = false;
+    finishLoad();
   }
 }
 document.addEventListener("click", (event) => {

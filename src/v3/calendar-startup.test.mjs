@@ -101,7 +101,7 @@ test('actual load with unavailable API keeps cached personal calendar after JSON
  apiProjection:async()=>{throw Error('offline')},
  v3json:async name=>name==='players.json'?{players:[{id:'base'}]}:name==='tournaments.json'?{tournaments:[{playerId:'base',name:'Base'}]}:{}});
  ctx.state.data={players:[{id:'base'},{id:'new',userAdded:true}],tournaments:[{playerId:'new',name:'Cantù'}],matches:[]};
- const loader=source.slice(source.indexOf('async function load()'),source.indexOf('document.addEventListener("click", (event) => {',source.indexOf('async function load()')));
+ const loader=source.slice(source.indexOf('async function load('),source.indexOf('document.addEventListener("click", (event) => {',source.indexOf('async function load(')));
  ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);await ctx.load();
  assert.deepEqual(Array.from(ctx.state.data.tournaments,t=>t.name).sort(),['Base','Cantù'].sort());
  assert.equal(ctx.cachedData().tournaments.some(t=>t.playerId==='new'),true);
@@ -129,4 +129,13 @@ test('compact cache stores Europe matches once and does not retain FITP/ITF resu
  const rows=['tennis-europe','fitp','itf'].map((circuit,i)=>({id:String(i),playerId:'a',circuit}));
  const snapshot=ctx.calendarCacheSnapshot({players:[{id:'a'}],tournaments:[],matches:rows,agenda:rows,results:rows},1);
  assert.equal(snapshot.matches.length,1);assert.equal(snapshot.agenda.length,0);assert.equal(snapshot.results.length,1);
+});
+
+test('queued projection writes keep the original group key after a group switch',async()=>{
+ const {ctx}=cacheContext(),writes=[];
+ ctx.writeDurableProjection=async(data,key)=>{writes.push({group:data.group,key});return true;};
+ const saved=ctx.saveCachedData({group:'main',players:[{id:'a'}],tournaments:[],matches:[]});
+ ctx.LAST_GOOD_CACHE='other-group';
+ await saved;
+ assert.deepEqual(writes,[{group:'main',key:'full'}]);
 });

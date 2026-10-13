@@ -5,7 +5,7 @@ import {readFileSync} from 'node:fs';
 const source=readFileSync(new URL('../../v3.js',import.meta.url),'utf8');
 const mergeSource = source.slice(source.indexOf('function mergeKnownMatches('), source.indexOf('function clearDemographicFilters('));
 const addition=source.slice(source.indexOf('const playerAdditionsInFlight ='),source.indexOf('function openPlayerSearchResult'));
-const loader=source.slice(source.indexOf('async function load()'),source.indexOf('document.addEventListener("click", (event) => {',source.indexOf('async function load()')));
+const loader=source.slice(source.indexOf('async function load('),source.indexOf('document.addEventListener("click", (event) => {',source.indexOf('async function load(')));
 function context(response){
  const root={querySelector:()=>null,append(){this.error=true}},button={textContent:'Aggiungi giocatore',disabled:false,isConnected:true,closest:()=>root};
  const state={data:{players:[],tournaments:[]},selected:new Set()},opened=[],calls=[];
