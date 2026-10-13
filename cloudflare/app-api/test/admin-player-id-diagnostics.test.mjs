@@ -23,6 +23,23 @@ test('malformed and synthetic official IDs remain missing',async()=>{
   const rows=await loadPlayerIdDiagnostics(d.db);assert.ok(rows.every(r=>r.ids===0&&r.missing===2));
  }finally{d.close()}
 });
+test('one aggregate read preserves canonical counts and source-only IDs without multiplying aliases',async()=>{
+ const d=database({identityMapping:true});try{
+  add(d,'f1','person1','fitp','123456');add(d,'f2','person1','fitp','654321');
+  d.execute("INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES('f1','fitp','','SAME NAME','Same Name','{}')");
+  d.execute("INSERT INTO search_acquired_players VALUES('unmapped','itf','800123456','SOURCE ONLY','Source Only','{}')");
+  const queries=[],db={prepare(sql){queries.push(sql);return d.db.prepare(sql)}};
+  const writes=d.writes(),rows=await loadPlayerIdDiagnostics(db);
+  assert.equal(d.writes(),writes);assert.equal(queries.length,2);
+  assert.equal(queries.filter(sql=>sql.includes('WITH RECURSIVE')).length,1);
+  assert.deepEqual(rows.map(({circuit,ids,players,missing})=>({circuit,ids,players,missing})),[
+   {circuit:'fitp',ids:2,players:1,missing:0},{circuit:'tennis-europe',ids:0,players:0,missing:0},{circuit:'itf',ids:0,players:0,missing:0},
+  ]);
+  const fitp=rows.coverage.find(row=>row.circuit==='fitp'),itf=rows.coverage.find(row=>row.circuit==='itf');
+  assert.equal(fitp.source_records,2);assert.equal(fitp.records_with_circuit_id,2);
+  assert.equal(itf.source_records,1);assert.equal(itf.records_with_circuit_id,1);assert.equal(itf.distinct_official_ids,1);
+ }finally{d.close()}
+});
 test('empty valid mapping counts zero while missing schema and read failures show unavailable',async()=>{
  const d=database({identityMapping:true});try{assert.ok((await loadPlayerIdDiagnostics(d.db)).every(r=>r.ids===0&&r.missing===0));}finally{d.close()}
  const old=database();try{assert.equal(await loadPlayerIdDiagnostics(old.db),null);}finally{old.close()}

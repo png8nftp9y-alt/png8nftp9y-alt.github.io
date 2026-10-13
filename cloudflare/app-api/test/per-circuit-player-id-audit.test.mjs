@@ -5,8 +5,9 @@ import {database} from './search-sqlite-fixture.mjs';
 import {syncPlayerIdentities} from '../scripts/sync-player-identities.mjs';
 import {perCircuitPlayerIdAuditSql,perCircuitPlayerIdAuditResult} from '../lib/per-circuit-player-id-audit.mjs';
 import {allPlayerIdAuditSql,allPlayerIdAuditResult} from '../lib/all-player-id-audit.mjs';
+import {playerIdDiagnosticsSql} from '../lib/admin-player-id-diagnostics.mjs';
 const guid='22cc93f0-672e-41ee-85f1-561829ed9315';
-function fixture(){const d=database({identityMapping:true});d.execute('CREATE TABLE manual_overrides(id TEXT,entity_type TEXT,entity_id TEXT,action TEXT,payload TEXT,active INTEGER)');return d;}
+function fixture(){return database({identityMapping:true});}
 function add(d,key,circuit,id,name='Same Player'){d.execute('INSERT INTO search_acquired_players VALUES(?,?,?,?,?,?)',[key,circuit,id,name.toUpperCase(),name,JSON.stringify({name,birthYear:2014,nationality:'GER'})]);}
 async function audit(d){return perCircuitPlayerIdAuditResult(await d.query(perCircuitPlayerIdAuditSql));}
 test('D1_TEST_INITIAL_IMPORT D1_TEST_REAL_DELTAS_ONLY: one player in three circuits needs all three circuit IDs, even when the old audit is green',async()=>{
@@ -46,7 +47,9 @@ test('per-circuit SQL compiles with the D1 compound SELECT limit of three',async
  const d=fixture();try{
   const schema=(await d.query("SELECT sql FROM sqlite_master WHERE type='table' AND sql IS NOT NULL")).map(r=>r.sql).join(';');
   const code="import sqlite3,json,sys\np=json.load(sys.stdin);c=sqlite3.connect(':memory:');c.executescript(p['schema']);c.setlimit(sqlite3.SQLITE_LIMIT_COMPOUND_SELECT,3);c.execute(p['sql']).fetchall()\n";
-  const r=spawnSync('python3',['-c',code],{encoding:'utf8',input:JSON.stringify({schema,sql:perCircuitPlayerIdAuditSql})});assert.equal(r.status,0,r.stderr);
+  for(const sql of [perCircuitPlayerIdAuditSql,playerIdDiagnosticsSql]){
+   const r=spawnSync('python3',['-c',code],{encoding:'utf8',input:JSON.stringify({schema,sql})});assert.equal(r.status,0,r.stderr);
+  }
  }finally{d.close()}
 });
 test('empty or incomplete circuit results cannot certify full per-circuit coverage',()=>{
