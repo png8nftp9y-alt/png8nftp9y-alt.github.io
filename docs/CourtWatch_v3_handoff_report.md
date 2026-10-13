@@ -3366,3 +3366,16 @@ Per user request, add per-tournament progress/errors/duration, atomic result che
 Global ITF metadata 2026-10-12T23:27:38.929Z: {"checked":1089,"acquired":0,"remaining":1087}. Existing metadata reused; only missing official factsheet fields acquired; unresolved records retained explicitly.
 
 Global ITF metadata 2026-10-13T01:09:31.794Z: {"checked":1089,"acquired":0,"remaining":1087}. Existing metadata reused; only missing official factsheet fields acquired; unresolved records retained explicitly.
+
+
+## 2026-10-13 — Future-only factsheets in the discovery cycle
+
+User scope: retrieve official factsheet fields only for tournaments not yet started, without player filtering. Calendar discovery already covers the rolling past-240/future-730-day window via five regional GetCalendar shards every six hours; the API provides basic metadata and official URLs, not the public rendered factsheet fields. The reusable metadata job already follows successful discovery publication.
+
+Changes: recovery now targets only the current discovery catalogue with main startDate strictly after TODAY (Europe/Rome), excluding tournaments whose known qualifying date is today or earlier. Unknown qualifying dates remain provisional future candidates; no qualifying date is invented. Historical metadata remains stored. Discovery merging reuses the official metadata registry; successful recovery also enriches source_itf_tournaments.json in the same cycle before verified D1 sync. Complete fields are reused; missing fields alone cause page reads. The scope log and diagnostics explicitly identify not_started_itf_tournaments. No external server is required: Chromium runs on GitHub Actions.
+
+Observed official example: J100 Balma main draw 19–24 October 2026, qualifying first day 17 October 2026, venue Ligue Occitanie de Tennis, address 5 avenue Suzanne Lenglen, Balma, 31130, France. The parser now stops the address at Venue Telephone and parses date-only English dates in UTC to avoid timezone day shifts. A verified historical redirect with no Fact Sheet link is recorded as source unavailable, not a technical failure; historical pages are excluded from the recovery scope.
+
+Validation: 11 browser/parser/recovery/scope tests pass under both TZ=UTC and TZ=Europe/Rome; merge module syntax checked. The new live probe reads only Balma from the Actions runner, validates all three fields, and triggers the future recovery only on probe success. Actions live result and future coverage are pending at this code commit. Existing five-failure stop, progress events, per-record checkpoints and time bounds remain. A published future event may lack a factsheet or one of its fields; diagnostics retain exact unresolved IDs and never fabricate completeness.
+
+Existing D1 evidence (run 38320984266, publish job 115050148769): targeted=1089, verified=1089, inserts=223, updates=866. Those are core calendar records, not proof of 1089 complete factsheets; acquisition acquired=0 in that older historical-first run. This scope change does not delete those records.

@@ -9,7 +9,10 @@ export async function browserFactsheet(context,t){
   let text=await page.locator('body').innerText({timeout:5000});
   if(blocked(text))throw Error('factsheet_browser_security_challenge');
   if(!/Venue Name:|Venue Address:|First day of Singles Qualifying:/i.test(text)){
+   await page.locator('#ga__tournament-name').waitFor({state:'visible',timeout:10000});
    const link=page.getByRole('link',{name:/^fact\s*sheet$/i}).first();
+   const current=page.url(),heading=(await page.locator('#ga__tournament-name').innerText()).trim();
+   if(!await link.count()&&current.startsWith(url)&&/\/draws-and-results\/?$/.test(new URL(current).pathname)&&t.tournamentName&&heading.toLowerCase()===t.tournamentName.trim().toLowerCase())return {_factsheetStatus:'not_public',_factsheetSourceUrl:current};
    if(await link.count()&&await link.isVisible())await link.click({timeout:5000});
    await page.waitForFunction(()=>/Venue Name:|Venue Address:|First day of Singles Qualifying:/i.test(document.body?.innerText||''),null,{timeout:10000}).catch(()=>{});
    text=await page.locator('body').innerText({timeout:5000});
@@ -20,3 +23,4 @@ export async function browserFactsheet(context,t){
   return metadata;
  }finally{await page.close();}
 }
+

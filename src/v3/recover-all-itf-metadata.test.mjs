@@ -2,6 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {recoverMetadata} from './recover-all-itf-metadata.mjs';
 import {acquire} from './recover-all-itf-metadata.mjs';
+test('unpublished historical factsheets do not prevent later available fields from being acquired',async()=>{
+ const targets=Array.from({length:8},(_,i)=>({competitionId:'J-'+i}));
+ const r=await recoverMetadata(targets,{},async t=>t.competitionId==='J-7'?{venueName:'Official Club',address:'Official Address',qualificationStartDate:'2026-10-17'}:{_factsheetStatus:'not_public',_factsheetSourceUrl:'https://www.itftennis.com/historic'},{maxConsecutiveFailures:5});
+ assert.equal(r.processed,8);assert.equal(r.acquired,1);assert.equal(r.stoppedReason,'');assert.equal(r.failures.length,0);assert.equal(r.unavailable.length,7);assert.equal(r.remaining.length,7);
+});
 test('progress/checkpoints preserve acquired fields and stop repeated useless reads',async()=>{
  const targets=Array.from({length:12},(_,i)=>({competitionId:'J-'+i})),events=[],saved=[],calls=[];
  const r=await recoverMetadata(targets,{},async t=>{calls.push(t.competitionId);if(t.competitionId==='J-0')return{venueName:'Official Club'};throw Error('timeout');},{maxConsecutiveFailures:5,onProgress:p=>events.push(p),onCheckpoint:p=>saved.push(JSON.parse(JSON.stringify(p)))});
@@ -29,4 +34,24 @@ test('existing tournament archives contribute saved fields without player filter
  const {storedMetadata}=await import('./recover-all-itf-metadata.mjs');
  const rows=storedMetadata({relations:[{competitionId:'J-TEST',venueName:'Club',qualificationStartDate:'2026-10-01'}],tournaments:{'J-OTHER':{address:'Address',qualificationStartDate:'not a date'}}});
  assert.equal(rows['J-TEST'].venueName,'Club');assert.equal(rows['J-OTHER'].address,'Address');assert.equal(rows['J-OTHER'].qualificationStartDate,undefined);
+});
+
+
+test('future scope excludes today, concluded events and already-started qualifying',async()=>{
+ const {futureMetadataTargets,enrichTournamentMetadata}=await import('./recover-all-itf-metadata.mjs');
+ const catalogue={tournaments:[
+  {competitionId:'J-PAST',startDate:'2026-10-12'},
+  {competitionId:'J-TODAY',startDate:'2026-10-13'},
+  {competitionId:'J-QUAL',startDate:'2026-10-19'},
+  {competitionId:'J-FUTURE',startDate:'2026-10-19'},
+  {competitionId:'J-FUTURE',startDate:'2026-10-19'},
+  {competitionId:'J-UNKNOWN'}
+ ]};
+ const saved={'J-QUAL':{qualificationStartDate:'2026-10-13'},'J-FUTURE':{qualificationStartDate:'2026-10-17',venueName:'Club',address:'Address'},'J-PAST':{venueName:'Archive'}};
+ assert.deepEqual(futureMetadataTargets(catalogue,saved,'2026-10-13').map(t=>t.competitionId),['J-FUTURE']);
+ const enriched=enrichTournamentMetadata(catalogue,saved);
+ assert.equal(enriched.tournaments[0].venueName,'Archive');
+ assert.equal(enriched.tournaments[3].qualificationStartDate,'2026-10-17');
+ assert.equal(enriched.tournaments[3].address,'Address');
+ assert.equal(catalogue.tournaments[3].address,undefined);
 });

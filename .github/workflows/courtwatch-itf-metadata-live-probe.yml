@@ -1,0 +1,29 @@
+name: Court Watch ITF metadata live extraction probe
+on:
+  push:
+    branches: [main]
+    paths: ['src/v3/probe-itf-metadata-browser.mjs']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify observed factsheet formatting and unavailable-page distinction
+        run: node --test src/v3/itf-metadata-browser.test.mjs src/v3/recover-all-itf-metadata.test.mjs
+      - name: Install browser
+        run: |
+          npm install --prefix infra/itf-acquirer --omit=dev
+          infra/itf-acquirer/node_modules/.bin/playwright install --with-deps chromium
+      - name: Read the actual future Balma factsheet
+        run: node src/v3/probe-itf-metadata-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-metadata-live-probe
+          path: dist/v3/audits/itf-metadata-live-probe.json
+          retention-days: 30
