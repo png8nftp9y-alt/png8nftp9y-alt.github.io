@@ -36,7 +36,20 @@ jobs:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 0}
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /src/v3/
+            /infra/itf-acquirer/
+            /cloudflare/app-api/
+            /history/itf_metadata_queue.json
+            /history/itf_official_metadata.json
+            /dist/v3/source_itf_tournaments.json
+            /dist/v3/source_itf_history_tournaments.json
+            /dist/v3/itf_metadata_queue_status.json
+            /docs/CourtWatch_v3_handoff_report.md
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - id: select
@@ -77,7 +90,20 @@ jobs:
       ITF_META_MODE: ${{ inputs.mode || 'extraordinary' }}
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 0}
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /src/v3/
+            /infra/itf-acquirer/
+            /cloudflare/app-api/
+            /history/itf_metadata_queue.json
+            /history/itf_official_metadata.json
+            /dist/v3/source_itf_tournaments.json
+            /dist/v3/source_itf_history_tournaments.json
+            /dist/v3/itf_metadata_queue_status.json
+            /docs/CourtWatch_v3_handoff_report.md
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - if: needs.batch.outputs.count != '0'
@@ -93,7 +119,7 @@ jobs:
           git config user.name courtwatch-bot
           git config user.email courtwatch-bot@users.noreply.github.com
           for attempt in 1 2 3; do
-            git fetch origin main
+            git fetch --depth=1 origin main
             git reset --hard origin/main
             if [ -f /tmp/itf-meta-result.json ]; then
               node src/v3/run-itf-metadata-engine.mjs --publish
