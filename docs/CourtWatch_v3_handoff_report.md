@@ -1,3 +1,5 @@
+2026-10-13 — Persist zero ITF Meta queues after Junior Finals user resolution: 216 resolved, including 3 user-resolved. No acquired metadata erased; historical attempts retained. Discovery/in-flight publications use durable override.
+
 2026-10-13 — User-resolved Junior Finals J-JM-CHN-2026-001: persistent override excludes future metadata attempts and survives in-flight publication. Shared user-resolved queue logic already tested. No facts invented; queue projection reconciles on next publication.
 
 ## 2026-10-13 — Uniform group navigation labels
