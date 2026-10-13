@@ -38,13 +38,13 @@ test('Users keeps device and override controls but performs no remote or R2 read
 });
 test('ID is independent of remote diagnostics and backup availability',async()=>{
   const r=await open('id',{remoteFailure:true});
-  assert.ok(r.sql.includes(playerIdDiagnosticsSql));assert.deepEqual(r.urls,[]);assert.deepEqual(r.objects,[]);
+  assert.ok(r.sql.includes(playerIdDiagnosticsSql));assert.deepEqual(r.urls,[]);assert.deepEqual(r.objects,['monitoring/admin-pages/id/current.json']);
   assert.ok(!r.sql.some(query=>/SELECT \* FROM generations|FROM app_user_devices|FROM manual_overrides|FROM app_players ORDER BY seq/.test(query)));
   assert.match(r.html,/action="\/admin\/id#id-circuiti"/);
 });
 test('Diagnostics retains all requested controls, reads only three current R2 pointers and excludes ITF queues',async()=>{
   const r=await open('diagnostica');
-  assert.equal(r.sql.length,13);assert.equal(r.objects.length,3);assert.ok(r.objects.every(key=>key.endsWith('/pointers/current.json')));
+  assert.equal(r.sql.length,13);assert.equal(r.objects.length,4);assert.ok(r.objects.slice(1).every(key=>key.endsWith('/pointers/current.json')));
   assert.equal(r.urls.length,7);assert.ok(!r.urls.some(url=>/itf_.*(?:queue_status|metadata_diagnostics)/.test(url)));
   for(const heading of ['D1 operativo','Copertura','Motori','Workflow e watchdog','Diagnostica applicativa','Conteggi D1','R2 backup'])assert.ok(r.html.includes('<h2>'+heading+'</h2>'));
 });

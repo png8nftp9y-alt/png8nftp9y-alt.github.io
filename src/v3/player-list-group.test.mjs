@@ -14,24 +14,28 @@ test('Main and Others use separate player/calendar/filter caches and the same de
  for(const key of ['LAST_GOOD_CACHE','CALENDAR_CACHE','UI_STATE_CACHE'])assert.notEqual(main.read(key),other.read(key));
  assert.equal(main.read('LAST_GOOD_CACHE'),'courtwatch-v3-last-good-v1');
  assert.equal(main.read('DEVICE_ID_CACHE'),other.read('DEVICE_ID_CACHE'));
- assert.equal(main.read('privateApiOptions().headers.get("X-CourtWatch-Group")'),null);
+ assert.equal(main.read('privateApiOptions().headers.get("X-CourtWatch-Group")'),'main');
  assert.equal(other.read('privateApiOptions().headers.get("X-CourtWatch-Group")'),'others');
 });
 test('Others refuses a main snapshot, including during staggered deployment',async()=>{
  const {c}=groupContext('others');
  vm.runInContext(source.slice(source.indexOf('async function fetchProjection('),source.indexOf('async function apiProjection(')),c);
- await assert.rejects(c.fetchProjection('https://courtwatch.example/app/api/app-snapshot',100),/Sezione Altri non ancora disponibile/);
+ await assert.rejects(c.fetchProjection('https://courtwatch.example/app/api/app-snapshot',100),/Sezione richiesta non ancora disponibile/);
 });
 
 
 const switchSource=source.slice(source.indexOf('function switchPlayerGroup()'),source.indexOf('function wire()'));
-test('TCL and Altri keep the current page, dates, filters and scroll without copying player selections',()=>{
+function configureGroupSwitch(ctx){
+ ctx.location.hash=new URL(ctx.location.href).hash;
+ Object.assign(ctx,{groupSwitchRunning:false,playerAdditionsInFlight:new Set(),document:{getElementById:()=>null,querySelectorAll:()=>[]},$:()=>({}),saveRefreshView(){},sessionStorage:{getItem:()=>null},readDurableProjection:async()=>null,validProjection:data=>Boolean(data?.players),mergeKnownMatches:(...arrays)=>arrays.flat(),APP_API:'https://courtwatch.example/app/api/app-snapshot',state:{},activeProjectionController:null,activeLoadCompletion:Promise.resolve(),durableProjectionFallback:null,uiSelectionRestored:false,uiScrollRestoreCancelled:false,removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),renderedDataSignature:'',lastLoadedDocuments:{},scrollY:640,scrollTo(){},fetchProjection:async(_url,_timeout,group)=>({group,players:[{id:'target-player'}],matches:[],personalProjectionComplete:true}),load:async projection=>{ctx.state.data=projection},savedUiState(){try{return JSON.parse(ctx.localStorage.getItem(ctx.UI_STATE_CACHE)||'{}')}catch{return{}}},console:{warn(...args){throw Error('Switch failed: '+args.join(' '))}}});
+}
+test('TCL and Altri keep the current page, dates, filters and scroll without copying player selections',async()=>{
  for(const group of ['main','others'])for(const hash of ['#calendar','#agenda','#players','']){
   const from='courtwatch-v3-ui-state-v1'+(group==='others'?'-others':''),to='courtwatch-v3-ui-state-v1'+(group==='main'?'-others':'');
   const current={month:'2027-02',agenda:'2027-02-17',agendaMode:'chronological',categoryFilters:['U14'],sexFilter:'F',scrollY:640,selected:['source-player']};
   const values=new Map([[to,JSON.stringify({selected:['target-player'],profilePlayerId:'target'})]]),assigned=[];
   const ctx={PLAYER_GROUP:group,UI_STATE_CACHE:from,URL,location:{href:'https://courtwatch.example/v3.html?keep=1'+(group==='others'?'&group=others':'')+hash,assign:url=>assigned.push(url)},saveUiState:()=>values.set(from,JSON.stringify(current)),localStorage:{getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)}};
-  vm.createContext(ctx);vm.runInContext(switchSource,ctx);ctx.switchPlayerGroup();
+  configureGroupSwitch(ctx);ctx.history={pushState:(_state,_title,url)=>assigned.push(url)};vm.createContext(ctx);vm.runInContext(switchSource,ctx);await ctx.switchPlayerGroup();
   const target=new URL(assigned[0]),saved=JSON.parse(values.get(to));
   assert.equal(target.hash,hash);assert.equal(target.searchParams.get('keep'),'1');assert.equal(target.searchParams.get('group'),group==='main'?'others':null);
   for(const key of ['month','agenda','agendaMode','categoryFilters','sexFilter','scrollY'])assert.deepEqual(saved[key],current[key]);
@@ -40,14 +44,14 @@ test('TCL and Altri keep the current page, dates, filters and scroll without cop
   vm.runInContext(source.slice(source.indexOf('function restoreUiScroll('),source.indexOf('const fmt =')),ctx);ctx.restoreUiScroll();assert.deepEqual(scrolls,[640,640]);
  }
 });
-test('first visit to the mirrored group keeps default player selection and switching still works without storage',()=>{
+test('first visit to the mirrored group keeps default player selection and switching still works without storage',async()=>{
  for(const unavailable of [false,true]){
   const values=new Map(),assigned=[];
   const ctx={PLAYER_GROUP:'main',UI_STATE_CACHE:'courtwatch-v3-ui-state-v1',URL,location:{href:'https://courtwatch.example/v3.html#calendar',assign:url=>assigned.push(url)},saveUiState(){values.set('courtwatch-v3-ui-state-v1',JSON.stringify({scrollY:300,selected:['source']}))},localStorage:{getItem:key=>{if(unavailable)throw Error('storage denied');return values.get(key)||null},setItem:(key,value)=>values.set(key,value)}};
-  vm.createContext(ctx);vm.runInContext(switchSource,ctx);ctx.switchPlayerGroup();assert.equal(new URL(assigned[0]).hash,'#calendar');
+  configureGroupSwitch(ctx);ctx.history={pushState:(_state,_title,url)=>assigned.push(url)};vm.createContext(ctx);vm.runInContext(switchSource,ctx);await ctx.switchPlayerGroup();assert.equal(new URL(assigned[0]).hash,'#calendar');
   if(!unavailable)assert.equal('selected' in JSON.parse(values.get('courtwatch-v3-ui-state-v1-others')),false);
  }
- assert.ok(source.includes('"Vai a TCL" : "TCL"'));assert.ok(!source.includes('Vai a Principali'));
+ assert.ok(source.includes('"Vai a TCL" : "Vai a Altri"'));assert.ok(!source.includes('Vai a Principali'));
 });
 
 

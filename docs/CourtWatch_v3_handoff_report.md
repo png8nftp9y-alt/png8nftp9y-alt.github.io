@@ -5529,3 +5529,6 @@ ITF Meta extraordinary 2026-10-13T20:37:43.268Z: attempted 1, acquired 0, ordina
 ITF Meta extraordinary 2026-10-13T20:38:41.072Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-10-13T20:39:46.237Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+## 2026-10-13 — Admin: letture salvate
+ID e Diagnostica conservano ultima lettura fino ad aggiornamento manuale. Data del controllo visibile; nessun ricalcolo alle aperture successive. Preparazione iniziale ID in background; autenticazione preservata. Validazione: 251 test Worker passati prima della pubblicazione; verifica live dopo deploy.
