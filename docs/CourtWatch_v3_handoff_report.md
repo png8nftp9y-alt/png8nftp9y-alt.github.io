@@ -5542,3 +5542,7 @@ solo quella riga senza compagna/risultato del 13 ottobre, torneo
 04DA84AF-89E2-4623-AEE5-EB00E7E6C90C. Doppi del 14 ottobre conservati.
 Nessuna modifica D1 o motori. Asset versionato. Validazione: 41 regressioni
 passate, sintassi JS e contratto UI verificati. Verifica live dopo deploy.
+
+## 2026-10-13 — Display match scores from the winner perspective
+Use the shared matchResultText formatter in Agenda, player/tournament rows and opponent history to show the winning player/team on the left of every set. Reverse scores only for an explicitly known loss (advances, or won for opponent history); preserve chronological set order, tie-break annotations, match tie-break brackets and retirement/walkover text. Remove the separate opponent reversal to prevent double inversion. Existing win/loss colors and stored scores remain unchanged; no D1 reads or writes added. Update the frontend asset version.
+Validation: three targeted tests cover wins, losses, three-set matches, tie-breaks, match tie-breaks, retirement, walkover, unknown results, immutable source data, single opponent inversion and retained Agenda/player/tournament outcome classes. JavaScript syntax and patch whitespace checks pass. Live visual verification requires application and deployment.

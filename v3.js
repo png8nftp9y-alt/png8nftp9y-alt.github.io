@@ -2785,7 +2785,11 @@ function incompleteCompletedScore(value, status, decided = false) {
   return Math.max(left, right) < 2;
 }
 function matchResultText(match) {
-  const value = readableText(match?.result || match?.score || "");
+  const playerScore = readableText(match?.result || match?.score || ""),
+    lost = typeof match?.advances === "boolean" ? !match.advances : match?.won === false,
+    value = lost
+      ? playerScore.replace(/(\d+(?:\(\d+\))?)\s*([-–])\s*(\d+(?:\(\d+\))?)/g, "$3$2$1")
+      : playerScore;
   const evidence = [match?.status, match?.reason, match?.resultStatus, match?.scoreStatus, match?.retirementReason, match?.retirementStatus, match?.resultDetail, match?.resultType, match?.completedBy, match?.notes, value].filter(Boolean).join(" ");
   const retired = Boolean(match?.retired || match?.retirement || /retir|withdraw|abandon|ritir|\bret\.?\b/i.test(evidence) || incompleteCompletedScore(value, match?.status, typeof match?.advances === "boolean" || typeof match?.won === "boolean"));
   return value + (retired && !/\brit\.?\b/i.test(value) ? " Rit." : "");
@@ -2860,11 +2864,7 @@ function opponentHistoryPersonHtml(person, event = "") {
   return `<span class="opponentHistoryPerson">${name}${participantDesignationHtml(person.designation)}${nationalityHtml(person.nationality)}${opponentHistoryRanking(person) ? ` <span class="opponentHistoryRanking">${esc(opponentHistoryRanking(person))}</span>` : ""}</span>`;
 }
 function opponentHistoryResultText(match) {
-  const result = matchResultText(match);
-  // History scores are oriented to the viewed player; display the winner first.
-  return match.won === false
-    ? result.replace(/(\d+(?:\(\d+\))?)-(\d+(?:\(\d+\))?)/g, "$2-$1")
-    : result;
+  return matchResultText(match);
 }
 function opponentHistoryMatchRowHtml(match, contextMatches = []) {
   const opponents = (match.opponents || [])
