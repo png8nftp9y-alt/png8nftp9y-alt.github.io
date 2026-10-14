@@ -4210,7 +4210,62 @@ function wire() {
   });
   addEventListener("pagehide", saveRefreshView);
 }
+// Refresh only known recent Europe matches. Full profiles continue independently.
+const knownResultUpdates = new Map();
+const knownResultRequests = new Map();
+function applyKnownResultUpdates(data, group = PLAYER_GROUP) {
+  const updates = knownResultUpdates.get(group);
+  if (!updates || !data) return data;
+  const nameKey = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim().split(' ').sort().join(' ');
+  const patch = match => {
+    const update = !match.manual && circuit(match) === 'tennis-europe' && updates.get(match.matchId || match.id);
+    if (!update) return match;
+    const own = update.participants.filter(p => nameKey(p.name) === nameKey(match.playerName));
+    const team = Number.isInteger(match.teamIndex) ? match.teamIndex : own.length === 1 ? own[0].teamIndex : null;
+    if (team !== 0 && team !== 1) return match;
+    const confirmed = update.winnerTeamIndex === 0 || update.winnerTeamIndex === 1;
+    const score = update.winnerTeamIndex === 1 ? update.score.replace(/(\d+(?:\(\d+\))?)\s*([-–])\s*(\d+(?:\(\d+\))?)/g, '$3$2$1') : update.score;
+    const result = {...match, status: update.status, score, result: score, scorePerspective: 'winner', outcomeConfirmed: confirmed};
+    delete result.advances; delete result.won;
+    if (confirmed) result.advances = result.won = team === update.winnerTeamIndex;
+    return result;
+  };
+  return {...data, matches: (data.matches || []).map(patch), agenda: (data.agenda || []).map(patch)};
+}
+function refreshKnownMatchResults() {
+  const group = PLAYER_GROUP, epoch = state.playerSelectionEpoch || 0;
+  if (knownResultRequests.has(group)) return knownResultRequests.get(group);
+  const today = new Date().toISOString().slice(0,10), now = Date.parse(today);
+  const matchDate = m => Date.parse(String(m.date || '').replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3'));
+  const matchIds = [...new Set((state.data?.matches || []).filter(m => {
+    const date = matchDate(m);
+    return !m.manual && circuit(m) === 'tennis-europe' && Math.abs(date - now) <= 7 * 86400000;
+  }).sort((a,b) => Math.abs(matchDate(a) - now) - Math.abs(matchDate(b) - now)).map(m => m.matchId || m.id).filter(id => typeof id === 'string' && id.startsWith('te|') && id.length <= 240))].slice(0,80);
+  if (!matchIds.length) return Promise.resolve();
+  const controller = new AbortController(), timer = setTimeout(() => controller.abort(), 15000);
+  const request = (async () => {
+    try {
+      const response = await fetch(PRIVATE_API + '/known-match-results', privateApiOptions({method:'POST', cache:'no-store', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body:JSON.stringify({matchIds}), signal:controller.signal}, group));
+      if (!response.ok) throw Error('Risultati Europe: ' + response.status);
+      const data = await response.json();
+      if (group !== PLAYER_GROUP || epoch !== (state.playerSelectionEpoch || 0) || data.group !== group || !Array.isArray(data.matches)) return;
+      const updates = knownResultUpdates.get(group) || new Map();
+      for (const match of data.matches) if (matchIds.includes(match.matchId) && Array.isArray(match.participants)) updates.set(match.matchId, match);
+      knownResultUpdates.set(group, updates);
+      const hash = location.hash, y = typeof scrollY === 'number' ? scrollY : null;
+      state.data = applyKnownResultUpdates(state.data, group);
+      renderIfDataChanged();
+      if (y !== null && location.hash === hash) scrollTo({top:y, behavior:'auto'});
+      Promise.resolve(saveCachedData(state.data)).catch(error => console.warn('Archivio locale non disponibile', error));
+    } catch (error) { console.warn('Aggiornamento risultati Europe non disponibile', error); }
+    finally { clearTimeout(timer); knownResultRequests.delete(group); }
+  })();
+  knownResultRequests.set(group, request);
+  return request;
+}
+
 async function load(preparedProjection = null, preparedDocuments = null) {
+  refreshKnownMatchResults();
   if (loadRunning) return activeLoadCompletion;
   let finishLoad;
   activeLoadCompletion = new Promise(resolve => {finishLoad = resolve;});
@@ -4380,7 +4435,7 @@ async function load(preparedProjection = null, preparedDocuments = null) {
           ),
         ).toISOString(),
       };
-      state.data = normalizeMatchProjection(state.data);
+      state.data = normalizeMatchProjection(applyKnownResultUpdates(state.data));
       if (projection && state.initialMatchProjectionPending) {
         state.initialMatchProjectionPending = false;
         renderedDataSignature = "";

@@ -24,11 +24,30 @@ function setup(group, projection, {cached = null, staticData = {}, staticOffline
     renderIfDataChanged() {}, restoreUiScroll() {}, unavailableLabel: () => unavailable++,
     $: id => nodes[id] || {},
   };
-  vm.createContext(ctx); vm.runInContext(agendaSource + mergeSource + label + loader, ctx);
+  ctx.refreshKnownMatchResults=()=>{};ctx.applyKnownResultUpdates=x=>x;vm.createContext(ctx); vm.runInContext(agendaSource + mergeSource + label + loader, ctx);
   return {ctx, nodes, saved: () => saved, requests: () => requests, unavailable: () => unavailable};
 }
 const player = {id: 'a', name: 'Europe Player', userAdded: true};
 const matches = ['tennis-europe', 'tennis-europe', 'tennis-europe'].map((circuit, i) => ({id: `m${i}`, playerId: 'a', circuit, date: '2026-10-01'}));
+for (const group of ['main','others']) test(`${group}: actual load paints lightweight results while full API is still pending`,async()=>{
+  const id='te|event|date|single', scheduled={...matches[0],id,matchId:id,playerName:'Europe Player',teamIndex:0,status:'scheduled',date:new Date().toISOString().slice(0,10)};
+  const cached={group,personalProjectionComplete:true,players:[player],tournaments:[],matches:[scheduled],agenda:[scheduled]};
+  const projection={group,membershipIds:[player.id],players:[player],tournaments:[],matches:[scheduled]};
+  const c=setup(group,projection,{cached});
+  let releaseSnapshot,releaseResults;
+  c.ctx.state.data=cached;c.ctx.location={hash:'#agenda'};
+  Object.assign(c.ctx,{AbortController,setTimeout,clearTimeout,PRIVATE_API:'/app/api',privateApiOptions:x=>x,
+    fetch:()=>new Promise(resolve=>releaseResults=resolve),
+    apiProjection:()=>new Promise(resolve=>releaseSnapshot=resolve)});
+  vm.runInContext(source.slice(source.indexOf('const knownResultUpdates ='),source.indexOf('async function load(')),c.ctx);
+  const paints=[];c.ctx.renderIfDataChanged=()=>paints.push(c.ctx.state.data.agenda[0]?.score);
+  const loading=c.ctx.load();
+  releaseResults({ok:true,json:async()=>({group,matches:[{matchId:id,status:'completed',score:'6-0 6-3',winnerTeamIndex:0,participants:[]}]})});
+  await c.ctx.refreshKnownMatchResults();
+  assert.ok(paints.includes('6-0 6-3'));assert.equal(c.ctx.loadRunning,true);
+  releaseSnapshot(projection);await loading;
+  assert.equal(c.ctx.state.data.matches[0].score,'6-0 6-3');assert.equal(c.ctx.state.data.agenda[0].advances,true);
+});
 for (const group of ['main', 'others']) {
   test(`${group}: a fresh win renders before secondary JSON and durable cache complete`, async () => {
     const scheduled = {...matches[0], status: 'scheduled', date: '2026-10-14'};
@@ -178,7 +197,7 @@ for (const group of ['main', 'others']) {
 }
 test('one slow snapshot request is allowed to complete without an abort-and-restart cycle', async () => {
   const calls = [], ctx = {APP_API: '/snapshot', fetchProjection: async (url, timeout) => {calls.push({url, timeout}); return {matches: []};}};
-  vm.createContext(ctx);
+  ctx.refreshKnownMatchResults=()=>{};ctx.applyKnownResultUpdates=x=>x;vm.createContext(ctx);
   vm.runInContext(source.slice(source.indexOf('async function apiProjection()'), source.indexOf('function cachedData()')), ctx);
   await ctx.apiProjection();
   assert.deepEqual(calls, [{url: '/snapshot', timeout: 45000}]);

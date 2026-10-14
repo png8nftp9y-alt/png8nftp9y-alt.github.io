@@ -102,7 +102,7 @@ test('actual load with unavailable API keeps cached personal calendar after JSON
  v3json:async name=>name==='players.json'?{players:[{id:'base'}]}:name==='tournaments.json'?{tournaments:[{playerId:'base',name:'Base'}]}:{}});
  ctx.state.data={players:[{id:'base'},{id:'new',userAdded:true}],tournaments:[{playerId:'new',name:'Cantù'}],matches:[]};
  const loader=source.slice(source.indexOf('async function load('),source.indexOf('document.addEventListener("click", (event) => {',source.indexOf('async function load(')));
- ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);await ctx.load();
+ ctx.refreshKnownMatchResults=()=>{};ctx.applyKnownResultUpdates=x=>x;ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);await ctx.load();
  assert.deepEqual(Array.from(ctx.state.data.tournaments,t=>t.name).sort(),['Base','Cantù'].sort());
  assert.equal(ctx.cachedData().tournaments.some(t=>t.playerId==='new'),true);
 });

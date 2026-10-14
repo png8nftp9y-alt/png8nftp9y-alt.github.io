@@ -38,7 +38,7 @@ test('normal reload retains a D1-added player absent from static JSON and their 
  const person={id:'cw-test',name:'Test Player',userAdded:true},ctx={console,Map,Set,Promise,Date,circuit:m=>m.circuit||"fitp",normalizeMatchProjection:x=>x,state:{data:{players:[],tournaments:[]},selected:new Set()},loadRunning:false,uiSelectionRestored:true,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),cachedData:()=>null,saveCachedData(){},saveUiState(){},syncLabel(){},renderIfDataChanged(){},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,iso:d=>d.toISOString().slice(0,10),add:(d,n)=>new Date(+d+n*86400000),
   apiProjection:async()=>({generatedAt:'2026-10-01T00:00:00Z',players:[{id:'static-player',name:'Static Player'},person],tournaments:[{playerId:person.id,competitionId:'J30',circuit:'itf'}],matches:[]}),
   v3json:async name=>name==='players.json'?{generatedAt:'2026-10-06T00:00:00Z',players:[{id:'static-player',name:'Static Player'}]}:name==='tournaments.json'?{generatedAt:'2026-10-06T00:00:00Z',tournaments:[]}:{} };
- vm.createContext(ctx);ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);await ctx.load();
+ ctx.refreshKnownMatchResults=()=>{};ctx.applyKnownResultUpdates=x=>x;vm.createContext(ctx);ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);await ctx.load();
  assert.equal(ctx.state.data.players.some(p=>p.id===person.id),true);assert.equal(ctx.state.data.tournaments.some(t=>t.playerId===person.id),true);assert.equal(ctx.state.data.personalProjectionComplete,true);
 });
 
@@ -57,7 +57,7 @@ test('cold reload discards a partial old cache and first renders all personal to
  const ctx={console,Map,Set,Promise,Date,circuit:m=>m.circuit||"fitp",normalizeMatchProjection:x=>x,state:{data:null,selected:new Set()},loadRunning:false,uiSelectionRestored:false,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),cachedData:()=>partial,saveCachedData(){},saveUiState(){},syncLabel(){},renderIfDataChanged(){renders.push(ctx.state.data.tournaments.length)},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,iso:d=>d.toISOString().slice(0,10),add:(d,n)=>new Date(+d+n*86400000),
  apiProjection:()=>new Promise(resolve=>release=resolve),
  v3json:async name=>name==='players.json'?{players:[{id:'base',name:'Base'}]}:name==='tournaments.json'?{tournaments:[]}:{}};
- vm.createContext(ctx);ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);const loading=ctx.load();
+ ctx.refreshKnownMatchResults=()=>{};ctx.applyKnownResultUpdates=x=>x;vm.createContext(ctx);ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);const loading=ctx.load();
  assert.equal(renders.length,0);
  release({generatedAt:'2026-10-07T21:00:00Z',players:[person],tournaments:[{playerId:person.id,name:'Cantù'}],matches:[]});
  await loading;assert.ok(renders.length>0);assert.ok(renders.every(count=>count===1));assert.equal(ctx.state.data.personalProjectionComplete,true);
@@ -66,13 +66,13 @@ test('calendar order uses canonical player names even when entry names use surna
  const readable=source.slice(source.indexOf('const readablePerson ='),source.indexOf('const IOC_REGION ='));
  const group=source.slice(source.indexOf('function tournamentConcluded('),source.indexOf('function renderCalendar('));
  const ctx={state:{data:{players:[{id:'c',name:'Camilla Frigerio'},{id:'p',name:'Paolo Brambilla'},{id:'r',name:'Riccardo Galbiati'}],tournaments:[{playerId:'r',playerName:'GALBIATI RICCARDO',competitionId:'cantu'},{playerId:'p',playerName:'BRAMBILLA PAOLO',competitionId:'cantu'},{playerId:'c',playerName:'FRIGERIO CAMILLA',competitionId:'cantu'}]},selected:new Set(['c','p','r'])},readableText:x=>String(x||''),active:()=>true,tournamentKey:t=>t.competitionId,circuitRank:()=>0};
- ctx.iso=()=> '2026-10-12';vm.createContext(ctx);vm.runInContext(readable+group,ctx);
+ ctx.iso=()=> '2026-10-12';ctx.refreshKnownMatchResults=()=>{};ctx.applyKnownResultUpdates=x=>x;vm.createContext(ctx);vm.runInContext(readable+group,ctx);
  assert.deepEqual(Array.from(ctx.groups()[0].players),['Camilla Frigerio','Paolo Brambilla','Riccardo Galbiati']);
 });
 
 test('calendar hides acceptance only for confirmed participant, leaving another player live',()=>{
  const helper=source.slice(source.indexOf('function tournamentConcluded('),source.indexOf('function groups('));
- const ctx={iso:()=> '2026-10-12'};vm.createContext(ctx);vm.runInContext(helper,ctx);
+ const ctx={iso:()=> '2026-10-12'};ctx.refreshKnownMatchResults=()=>{};ctx.applyKnownResultUpdates=x=>x;vm.createContext(ctx);vm.runInContext(helper,ctx);
  assert.equal(ctx.effectiveAcceptanceLabel({calendarListLabel:'MD-3',calendarState:'draw_confirmed'}),'');
  assert.equal(ctx.effectiveAcceptanceLabel({calendarListLabel:'Q-4',entryStatus:'official_draw'}),'');
  assert.equal(ctx.effectiveAcceptanceLabel({calendarListLabel:'MD-3',drawUrl:'https://example.org/draw'}),'MD-3');
@@ -96,7 +96,7 @@ test('protected app with external base navigates after addition on its own origi
 
 test('mixed-case source surnames are readable in search, observed list and player hero',()=>{
  const readable=source.slice(source.indexOf('const readablePerson ='),source.indexOf('const IOC_REGION ='));
- const ctx={readableText:x=>String(x||'')};vm.createContext(ctx);vm.runInContext(readable,ctx);
+ const ctx={readableText:x=>String(x||'')};ctx.refreshKnownMatchResults=()=>{};ctx.applyKnownResultUpdates=x=>x;vm.createContext(ctx);vm.runInContext(readable,ctx);
  assert.equal(vm.runInContext('readablePerson("Anna PIZZI")',ctx),'Anna Pizzi');
  assert.equal(vm.runInContext('readablePerson("Anna ARGINELLI")',ctx),'Anna Arginelli');
  assert.equal(vm.runInContext('readablePerson("Anna McDonald")',ctx),'Anna McDonald');
