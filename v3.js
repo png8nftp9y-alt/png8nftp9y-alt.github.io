@@ -2877,13 +2877,20 @@ function opponentHistoryMatchRowHtml(match, contextMatches = []) {
         : readableText(match.status || "Programmato");
   return `<div class="opponentHistoryMatch unifiedMatchRow"><span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(match.date) || "data da pubblicare")}</time><span class="matchRoundFull">${esc(fullMatchRoundLabel(match, contextMatches))}</span></span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span class="opponentHistoryMatchup">${matchup}</span></span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
 }
-function groupedMatchSections(matches, rowHtml, doublesKey) {
+function doublesPartnerGroupKey(names) {
+  // Group participants by plain names; rendered links, flags and rankings can differ per match.
+  return (names || []).map(name => readablePerson(name).normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('it-IT').replace(/\s+/g, ' ').trim())
+    .filter(Boolean).sort().join('|');
+}
+function groupedMatchSections(matches, rowHtml, doublesKey, doublesIdentity = doublesKey) {
   const singles = matches.filter((match) => !doublesKey(match)),
     doubles = new Map();
   for (const match of matches.filter(doublesKey)) {
-    const key = doublesKey(match) || "__double__",
-      group = doubles.get(key) || [];
-    group.push(match);
+    const label = doublesKey(match) || "__double__",
+      key = doublesIdentity(match) || label,
+      group = doubles.get(key) || {label, rows: []};
+    group.rows.push(match);
     doubles.set(key, group);
   }
   const sections = [];
@@ -2891,7 +2898,7 @@ function groupedMatchSections(matches, rowHtml, doublesKey) {
     sections.push(
       `<section class="matchTypeSection singlesMatches"><h5 class="matchTypeHeading">Singolare</h5>${singles.map(rowHtml).join("")}</section>`,
     );
-  for (const [partner, rows] of doubles)
+  for (const {label: partner, rows} of doubles.values())
     sections.push(
       `<section class="matchTypeSection doublesMatches"><h5 class="matchTypeHeading">Doppio${partner === "__double__" ? "" : ` con ${partner}`}</h5>${rows.map(rowHtml).join("")}</section>`,
     );
@@ -2907,6 +2914,7 @@ function opponentHistoryMatchSectionsHtml(matches) {
             .map((person) => opponentHistoryPersonHtml(person, match.event || ""))
             .join(" / ")
         : "",
+    (match) => doublesPartnerGroupKey((match.partners || []).map(person => person.name)),
   );
 }
 function renderOpponentHistory(data) {
@@ -3239,6 +3247,7 @@ function matchHistorySectionsHtml(matches) {
           ? partnerHtml(match)
           : "__double__"
         : "",
+    (match) => doublesPartnerGroupKey(String(match.partner || '').split(/\s*\/\s*/)),
   );
 }
 function tournamentOfficialUrl(t) {

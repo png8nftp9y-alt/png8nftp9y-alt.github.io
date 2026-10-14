@@ -5550,3 +5550,16 @@ Use the shared matchResultText formatter in Agenda, player/tournament rows and o
 Validation: three targeted tests cover wins, losses, three-set matches, tie-breaks, match tie-breaks, retirement, walkover, unknown results, immutable source data, single opponent inversion and retained Agenda/player/tournament outcome classes. JavaScript syntax and patch whitespace checks pass. Live visual verification requires application and deployment.
 
 ITF discovery 2026-10-13T23:11:47.916Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-10-14 — Doppi raggruppati per compagna e verifica ranking Europe
+
+Il raggruppamento usava HTML con ranking, bandiere e link come chiave: Dirnbek
+con ranking e senza ranking producevano sezioni diverse. Chiave separata dai
+contenuti mostrati, basata sui nomi normalizzati dei partner. Una sola sezione
+per compagna in pagina giocatore, torneo e storico avversario; righe e risultati
+restano invariati. Test CI aggiunto e asset versionato. Validazione: 45 test,
+sintassi JS e contratto UI passati. Verifica live dopo deploy.
+Ranking: run 38479400467 verde, pubblicazione 54224 del 13 ottobre acquisita
+e verificata in D1: B14 1892, G14 1708, B16 3633, G16 3230. Deploy concluso
+14 ottobre 01:27 Europe/Rome. Nessun rilancio o modifica al motore ranking.
+https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38479400467
