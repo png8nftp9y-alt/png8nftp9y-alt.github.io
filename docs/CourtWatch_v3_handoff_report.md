@@ -5592,3 +5592,10 @@ ID, valore del ranking, credenziale o dettaglio torneo. Nessuna scrittura D1.
 Workflow automatico al push dei file diagnostici e avvio manuale disponibili.
 Validazione locale: sintassi Node, YAML e controllo dei guard SELECT.
 Risultato D1 ancora da acquisire: nessuna causa dichiarata verificata.
+
+
+### 2026-10-14 — Urgent bounded measurement of real personal-history D1 read costs
+
+The owner needs an immediate answer about consumption and Cloudflare quotas, with no polling. Added an on-demand/one-off push diagnostic workflow and script outside the app-api deployment paths, so measuring does not trigger another general D1 import/deploy. The script uses the existing scoped token, executes optimized history reads for a bounded sample of at most eight stored personal additions with current identity hydration, and compares at most one nonempty result per audited query family against its previous SQL shape. It records actual `meta.rows_read`, zero writes and exact result parity, never names, native IDs, raw SQL, payloads or credentials. A 120-query/10-million accumulated-read guard prevents repeated diagnostic loops (the last individual query can cross the read guard). This comparison includes the now-installed indexes on both query versions, so it isolates query-shape benefits on the current database rather than reconstructing the previous schema.
+
+Also attempts read-only Workers subscription metadata and account-wide D1 daily usage for the current calendar month. If Billing read permission is unavailable the actual subscription/renewal headroom remains unverified. Calendar month totals are explicitly not assumed to equal the subscription renewal window. Cloudflare official pricing distinguishes Free hard daily limits from Paid monthly included allowances plus usage charges. Validation: Node syntax and read-only query guard reviewed; no application, acquisition, deployment or schedule changes. Results pending the single diagnostic run; no polling scheduled.
