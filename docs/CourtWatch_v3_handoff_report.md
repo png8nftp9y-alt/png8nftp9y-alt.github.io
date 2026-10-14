@@ -5642,3 +5642,12 @@ localmente. Ripresa dell’intero check richiesta prima di pubblicare la
 correzione ranking già applicata; nessuna modifica ai dati D1.
 
 ITF discovery 2026-10-14T05:24:43.963Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+### 2026-10-14 — Keep unplayed personal matches neutral instead of lost
+
+The owner reported Arginelli's still-unplayed match as lost in the player page. Reproduced the current projection with a scheduled match, empty score, no winner IDs and both participant `is_winner` values zero: the API returned `advances:false`. The importer deliberately writes zero for every participant when no winner is known; the history projection incorrectly treated any non-null flag as a decided outcome.
+
+Changed personal history outcome derivation to require exactly one confirmed winning team. Scheduled/live matches with no winning team and contradictory winner flags remain undecided; confirmed winners, losers, walkovers and doubles derive the outcome from team membership. Set `outcomeConfirmed` explicitly and clear inherited `won`/`advances` for undecided projections. Frontend `mergeKnownMatches` respects explicit `outcomeConfirmed:false` by removing a cached outcome, while ordinary partial responses still preserve previously acquired fields. This prevents an old false loss from surviving the corrected API response. No historical match is hidden or removed, no SQL/index or D1 acquisition behavior changes, and the read optimization remains intact.
+
+Validation: regression tests for Tennis Europe, FITP and ITF cover scheduled/live neutrality, confirmed wins/losses, conflicting winners, doubles with the winning partner, walkovers, zero projection writes and all returned matches. Frontend test proves explicit neutrality clears cached losses and normal partial responses preserve acquired results. Existing 270/280-match, alias association, pagination and indexed read-budget tests pass; JavaScript syntax and diff whitespace checked. Full app-api checks are run before publication. Production deployment remains automatic after publication; no run-status polling is performed.

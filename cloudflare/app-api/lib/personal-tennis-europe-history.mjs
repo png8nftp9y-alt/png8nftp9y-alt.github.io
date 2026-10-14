@@ -82,8 +82,11 @@ async function personalHistory(db,player,circuit){
   tournaments.set(source.tournament_id,tournament);
   const event=raw.event||raw.draw||'',double=partners.length>0||/^GD|^BD|DOUBLE/i.test(event);
   const score=own.team_index===1?reverseScore(raw.score||raw.result):String(raw.score||raw.result||'');
-  const decided=own.is_winner!==null&&own.is_winner!==undefined;
-  matches.push({...raw,id:source.match_id,matchId:source.match_id,playerId:player.id,playerName:player.name,circuit,competitionId,tournamentName:tournament.name,location:tournament.location||'',surface:tournament.surface||'',environment:tournament.environment||tournament.indoorOutdoor||'',date:source.played_date,draw:event,event,matchType:double?'doubles':'singles',partner:partners.map(p=>p.display_name).join(' / '),partnerNationalities:partners.map(p=>p.nationality||''),partnerTeProfileIds:partners.map(p=>p.source_player_id||''),opponent:opponents.map(p=>p.display_name).join(' / '),opponentOptions:opponents.map(p=>p.display_name),opponentNationalities:opponents.map(p=>p.nationality||''),opponentTeProfileIds:opponents.map(p=>p.source_player_id||''),score,result:score,advances:decided?Boolean(own.is_winner):undefined});
+  // Zero is also the default for participants in unplayed matches. An
+  // outcome exists only when exactly one team has a confirmed winner.
+  const winningTeams=new Set(people.filter(p=>Number(p.is_winner)===1).map(p=>p.team_index));
+  const advances=winningTeams.size===1?winningTeams.has(own.team_index):undefined;
+  matches.push({...raw,id:source.match_id,matchId:source.match_id,playerId:player.id,playerName:player.name,circuit,competitionId,tournamentName:tournament.name,location:tournament.location||'',surface:tournament.surface||'',environment:tournament.environment||tournament.indoorOutdoor||'',date:source.played_date,draw:event,event,matchType:double?'doubles':'singles',partner:partners.map(p=>p.display_name).join(' / '),partnerNationalities:partners.map(p=>p.nationality||''),partnerTeProfileIds:partners.map(p=>p.source_player_id||''),opponent:opponents.map(p=>p.display_name).join(' / '),opponentOptions:opponents.map(p=>p.display_name),opponentNationalities:opponents.map(p=>p.nationality||''),opponentTeProfileIds:opponents.map(p=>p.source_player_id||''),score,result:score,outcomeConfirmed:winningTeams.size===1,won:advances,advances});
  }
  return {player:enriched,tournaments:[...tournaments.values()],matches};
 }
