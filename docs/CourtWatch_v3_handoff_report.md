@@ -5640,3 +5640,5 @@ alias e della riparazione partecipanti ITF; gli stessi controlli SQL restano
 attivi. Errori di avvio riportati con assert.ifError. Nove test mirati passati
 localmente. Ripresa dell’intero check richiesta prima di pubblicare la
 correzione ranking già applicata; nessuna modifica ai dati D1.
+
+ITF discovery 2026-10-14T05:24:43.963Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
