@@ -15,3 +15,20 @@ export function fitpSubscriptionDates(entry={}) {
 export function mergeFitpSubscriptionDates(previous={},incoming={}) {
  return fitpSubscriptionDates({subscriptionDates:[...fitpSubscriptionDates(previous),...fitpSubscriptionDates(incoming)]});
 }
+
+// Keep each category tied to its own date; never pair aggregated dates/draws.
+export function fitpSubscriptionRegistrations(entry={}) {
+ const rows=Array.isArray(entry.subscriptionRegistrations)?entry.subscriptionRegistrations:
+  entry.draw?[{category:entry.draw,subscriptionDate:entry.subscriptionDate||entry.SubscriptionDate}]:[];
+ const unique=new Map();
+ for(const row of rows){
+  const category=String(row.category||row.draw||'').trim();
+  if(!category)continue;
+  const date=fitpSubscriptionDates({subscriptionDate:row.subscriptionDate||row.date||row.SubscriptionDate})[0]||'';
+  unique.set(JSON.stringify([category,date]),{category,subscriptionDate:date});
+ }
+ return [...unique.values()].sort((a,b)=>a.category.localeCompare(b.category,'it')||a.subscriptionDate.localeCompare(b.subscriptionDate));
+}
+export function mergeFitpSubscriptionRegistrations(previous={},incoming={}) {
+ return fitpSubscriptionRegistrations({subscriptionRegistrations:[...fitpSubscriptionRegistrations(previous),...fitpSubscriptionRegistrations(incoming)]});
+}

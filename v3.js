@@ -3423,6 +3423,12 @@ function tournamentSurfaceLabel(t, includeNameDuplicates = false) {
 
 function fitpTournamentSubscriptionHtml(entry = {}) {
   if (circuit(entry) !== "fitp") return "";
+  const registrations = Array.isArray(entry.subscriptionRegistrations) ? entry.subscriptionRegistrations : [];
+  const pairs = [...new Map(registrations.filter(row => row && String(row.category || "").trim()).map(row => {
+    const category = String(row.category).trim(), date = /^20\d{2}-\d{2}-\d{2}$/.test(String(row.subscriptionDate || "")) ? row.subscriptionDate : "";
+    return [JSON.stringify([category,date]), {category,date}];
+  })).values()];
+  if (pairs.length) return `<span class="fitpSubscriptionDate">${pairs.map(({category,date}) => `${esc(category)} · ${date ? `<time datetime="${esc(date)}">${esc(displayDate(date))}</time>` : "Data iscrizione non disponibile"}`).join("; ")}</span>`;
   const dates = [...new Set([
     ...(Array.isArray(entry.subscriptionDates) ? entry.subscriptionDates : []),
     entry.subscriptionDate,

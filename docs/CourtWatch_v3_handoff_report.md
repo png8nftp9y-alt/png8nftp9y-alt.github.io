@@ -5694,3 +5694,10 @@ Costi e limiti: nessuna nuova tabella, migrazione o scrittura D1; nessuna nuova 
 
 ## 2026-10-14 — Test presentazione avversari
 Aggiornato il test esistente per caricare i nuovi helper del renderer e fornire date e giorno di riferimento espliciti. Mantiene le verifiche dei collegamenti ufficiali e Google Maps per tutti i circuiti. Validazione: 79 test mirati passati. Nessuna modifica al codice applicativo; deploy da completare.
+
+## 2026-10-14 — Categoria e data iscrizione FITP
+Conservato ogni abbinamento categoria PUC–data nelle proiezioni e
+nei profili nativi. Mostrato solo nella pagina torneo, accanto a Iscritto.
+Nessun abbinamento inventato tra date aggregate e categorie.
+Nessuna nuova query D1 alla visualizzazione. 19 test mirati superati.
+Le categorie saranno pubblicate dal successivo run FITP iscrizioni.
