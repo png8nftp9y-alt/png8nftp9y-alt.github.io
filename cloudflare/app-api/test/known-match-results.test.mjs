@@ -3,15 +3,15 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
-import {knownMatchResults} from '../../cloudflare/app-api/lib/known-match-results.mjs';
-const source=readFileSync(new URL('../../v3.js',import.meta.url),'utf8');
+import {knownMatchResults} from '../lib/known-match-results.mjs';
+const source=readFileSync(new URL('../../../v3.js',import.meta.url),'utf8');
 const light=source.slice(source.indexOf('const knownResultUpdates ='),source.indexOf('async function load('));
 const id='te|tournament|20261014|GS14|R16|78-49';
 const participants=[{id:'78',name:'Virginia CEREGHINI',teamIndex:0,winner:true},{id:'49',name:'Nina BUSUTTIL',teamIndex:1,winner:false}];
 const update={matchId:id,status:'completed',score:'6-0 6-3',winnerTeamIndex:0,participants};
 const match={id:'te-app:owner|'+id,matchId:id,playerId:'owner',playerName:'Virginia Cereghini',circuit:'tennis-europe',date:new Date().toISOString().slice(0,10),status:'scheduled'};
 test('Worker route keeps authentication, revoked-device and origin checks before reading results',async()=>{
- const worker=readFileSync(new URL('../../cloudflare/app-api/src/index.js',import.meta.url),'utf8');
+ const worker=readFileSync(new URL('../src/index.js',import.meta.url),'utf8');
  let reads=0,user={id:'owner'},revoked=false;
  const ctx={accessUser:async()=>user,recordDevice:async()=>({revoked}),playerListGroup:x=>x,playerMembershipTable:()=>'',playerMembershipGuard:()=>'',
  privateJson:(data,status=200)=>({data,status}),knownMatchResults:async()=>{reads++;return [update]}};
@@ -66,7 +66,7 @@ test('one indexed SQLite query returns only requested public Europe results and 
  let queries=0;
  const db={prepare(sql){return {bind(...values){return {async all(){queries++;
   const python=`import sqlite3,json,sys\np=json.load(sys.stdin);c=sqlite3.connect(':memory:');c.row_factory=sqlite3.Row\nc.executescript(p['schema'])\nc.execute("INSERT INTO tournaments(id,circuit,source_tournament_id,payload) VALUES('t','tennis-europe','t','{}')")\nc.execute("INSERT INTO matches(id,tournament_id,circuit,played_date,payload) VALUES(?, 't','tennis-europe','2026-10-14',?)",(p['id'],json.dumps({'status':'completed','score':'6-0 6-3'})))\nfor x in p['participants']:c.execute("INSERT INTO match_participants(match_id,participant_key,source_player_id,display_name,normalized_name,team_index,is_winner,payload) VALUES(?,?,?,?,?,?,?,'{}')",(p['id'],x['id'],x['id'],x['name'],x['name'],x['teamIndex'],int(x['winner'])))\nbefore=c.total_changes\nrows=[dict(x) for x in c.execute(p['sql'],p['values'])]\nassert c.total_changes==before\nplan=[list(x) for x in c.execute('EXPLAIN QUERY PLAN '+p['sql'],p['values'])]\nprint(json.dumps({'results':rows,'plan':plan}))`;
-  const schema=['0001_universal_schema.sql','0006_tennis_europe_oop.sql'].map(n=>readFileSync(new URL('../../cloudflare/app-api/migrations/'+n,import.meta.url),'utf8')).join('\n');
+  const schema=['0001_universal_schema.sql','0006_tennis_europe_oop.sql'].map(n=>readFileSync(new URL('../migrations/'+n,import.meta.url),'utf8')).join('\n');
   const r=spawnSync('python3',['-c',python],{encoding:'utf8',input:JSON.stringify({sql,values,schema,id,participants})});assert.equal(r.status,0,r.stderr);
   const result=JSON.parse(r.stdout);assert.ok(result.plan.some(row=>/SEARCH m USING INDEX/.test(row[3])));return result;
  }}}}}};

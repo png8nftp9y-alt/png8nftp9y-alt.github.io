@@ -5671,3 +5671,6 @@ Budget: al massimo 80 ID univoci già noti, entro sette giorni dalla data corren
 Validazione: 62 test mirati passati su loader reale con full API mantenuta in attesa, risposta rapida, risposta completa successiva obsoleta, persistenza, gruppi, cambio selezione, punteggi, doppi, esiti neutrali, autenticazione, revoca e Origin. SQL eseguito su SQLite con le migrazioni reali, piano di lettura per indice e zero scritture della SELECT verificati. Controlli sintattici frontend/Worker e git diff --check. Il nuovo test è incluso nel check Worker.
 
 Limiti: non anticipa l'acquisizione della fonte ufficiale in D1. Non scopre partite ancora assenti dalla cache, affidate al full snapshot; al primo accesso su un dispositivo senza dati locali resta necessario scaricare il profilo. Nessuna promessa di tempo zero: occorre verificare la latenza reale dopo il deploy autenticato. Profili avversario aperti mantengono la politica di rendering esistente e non vengono ricaricati da questo endpoint.
+
+## 2026-10-14 — Collocazione test risultati rapidi
+Spostato known-match-results.test.mjs nei test backend e aggiornato il comando check. Il controllo D1 classificava le INSERT della fixture SQLite come scritture applicative. Regola D1 invariata. Validazione: sette test mirati passati; nessuna modifica funzionale.
