@@ -1,0 +1,38 @@
+name: Court Watch D1 personal read cost
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'src/v3/audit-d1-personal-read-cost.mjs'
+      - '.github/workflows/courtwatch-d1-personal-cost.yml'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-personal-read-cost
+  cancel-in-progress: false
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: |
+            src/v3
+            cloudflare/app-api/lib
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Measure bounded real D1 query reads and usage
+        run: node src/v3/audit-d1-personal-read-cost.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: d1-personal-cost
+          path: audit-output/d1-personal-cost.json
+          retention-days: 7
