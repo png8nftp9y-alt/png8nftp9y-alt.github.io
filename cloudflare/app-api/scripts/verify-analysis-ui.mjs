@@ -1,10 +1,12 @@
 import vm from 'node:vm';
+import {tennisEuropeNativeId} from '../lib/opponent-linked-identity.mjs';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const source = await readFile(fileURLToPath(new URL('../../../v3.js', import.meta.url)), 'utf8');
 const apiSource = await readFile(fileURLToPath(new URL('../src/index.js', import.meta.url)), 'utf8');
+const opponentSources = await readFile(fileURLToPath(new URL('../lib/opponent-europe-sources.mjs', import.meta.url)), 'utf8');
 const html = await readFile(fileURLToPath(new URL('../../../v3.html', import.meta.url)), 'utf8');
 const canonical = value => String(value).replace(/\s+/g, '').replace(/"/g, "'");
 const hasSource = marker => canonical(source).includes(canonical(marker));
@@ -65,8 +67,11 @@ assert.ok(hasSource('matchup = `vs ${opponents || "Avversario da definire"}`') &
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
 assert.ok(hasApiSource('universalOpponentHistory') && hasApiSource('opponentEntryTournaments') && hasApiSource('opponent_entry_profiles'), 'opponent profiles must merge Tennis Europe history with FITP and ITF tournament entries');
 assert.ok(hasSource('opponentTournamentEntry') && hasSource('tournament.acceptanceCode') && hasSource('sourceDot ${esc(source)}'), 'opponent profiles must distinguish entry-only FITP and ITF tournaments without inventing matches');
-assert.ok(hasSource('&profileId=') && hasApiSource('WHERE self.normalized_name IN') && !hasApiSource('WHERE self.source_player_id=?'), 'opponent match history must use exact normalized name variants because draw-local player IDs are reused');
-assert.ok(hasApiSource('tennisEuropeNameVariants') && hasApiSource('self.normalized_name IN') && hasApiSource('targetNameKey'), 'opponent history must join exact name/surname inversions without using draw-local IDs');
+assert.equal(tennisEuropeNativeId('78'), '', 'draw-local numeric IDs cannot identify a Europe person');
+assert.equal(tennisEuropeNativeId('12345678-1234-1234-1234-123456789ABC'), '12345678-1234-1234-1234-123456789abc', 'official GUIDs must be normalized');
+assert.ok(hasSource('&profileId=') && hasApiSource('opponentEuropeSources') && hasApiSource('opponentSelfParticipant'), 'opponent history must use the ID-aware source and participant resolver');
+assert.ok(opponentSources.includes('verifiedParticipantAliases') && opponentSources.includes('aliases.has(JSON.stringify([participant.match_id,participant.participant_key]))'), 'draw-local aliases require verified canonical evidence for the exact participant');
+assert.ok(opponentSources.includes('source_player_id IN') && opponentSources.includes('normalized_name IN') && opponentSources.includes('candidateSql=native'), 'official ID seeks are primary; exact names are only the missing-ID fallback');
 assert.ok(hasSource('const asOf = iso(new Date())') && !hasSource('&excludeMatchId='), 'opponent profile must always load through today without excluding the clicked match');
 assert.ok(hasApiSource('tennisEuropePerspectiveScore(rawScore,self?.team_index)') && hasSource('opponentHistoryRoundLabel'), 'opponent study rows must orient scores to the viewed player and show full rounds');
 assert.ok(!hasApiSource('tennisEuropePerspectiveScore(rawScore,winnerTeam)') && !source.includes('Aggiornato al'), 'opponent scores must never be forced into the winner perspective and profile must not show an updated-at label');
@@ -107,7 +112,7 @@ assert.equal(agendaContext.dedupeAgendaMatches([{...sharedMatch,playerId:'one'},
 assert.ok(hasSource('function agendaResultHtml(') && hasSource('Vincitore:'), 'shared CourtWatch match must name the winner');
 assert.ok(hasSource('courtWatchOpponent') && hasSource('opponentPlayerLink'), 'opponent styling must distinguish CourtWatch players');
 assert.ok(hasApiSource("profileKey=prefix+'ProfileIds'") && hasApiSource("dateKey=prefix+'RankingDates'"), 'API must expose opponent ranking identity and date');
-assert.ok(hasApiSource('stableProfileId?await optionalRows') && hasApiSource('profileRows=profileById.length?profileById:await optionalRows') && hasApiSource('profile,tournaments:') && hasSource('profileRanking.textContent'), 'opponent header must reject draw-local numeric IDs and use dated ranking history by exact name');
+assert.ok(hasApiSource('stableProfileId?await optionalRows') && hasApiSource('profileRows=stableProfileId?profileById:await optionalRows') && hasApiSource('profile,tournaments:') && hasSource('profileRanking.textContent'), 'opponent header must reject draw-local numeric IDs and keep a known official ID without a same-name fallback');
 assert.ok(hasApiSource('surface:tournament.surface') && hasApiSource('environment:tournament.environment') && hasSource('tournamentSurfaceLabel(tournament)'), 'opponent tournaments must expose their own surface and environment');
 assert.ok(hasApiSource('tennisEuropeTournamentMetadata()') && hasApiSource('officialTournament.surface') && hasApiSource('officialTournament.indoorOutdoor'), 'opponent tournaments must recover official conditions outside the CourtWatch projection');
 assert.ok(hasSource('[data-home-route]') && hasSource('primaryView = location.hash.match') && hasSource('${primaryView}View'), 'home must route to dedicated players, calendar and agenda pages');

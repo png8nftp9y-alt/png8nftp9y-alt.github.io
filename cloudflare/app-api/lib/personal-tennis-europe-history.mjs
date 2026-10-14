@@ -15,7 +15,7 @@ async function participantSourceKey(circuit,participant) {
  const hash=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('').slice(0,24);
  return 'acquired|'+circuit+'|name:'+hash;
 }
-async function verifiedParticipantAliases(db,player,circuit,native,variants) {
+export async function verifiedParticipantAliases(db,player,circuit,native,variants) {
  const aliases=new Set();
  if(!native)return aliases;
  const candidateNames=[...new Set(variants.flatMap(v=>[v,v.toUpperCase()]))];

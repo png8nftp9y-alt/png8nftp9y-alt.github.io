@@ -5,6 +5,8 @@ import {readFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
+import {opponentEuropeSources,opponentSelfParticipant} from '../lib/opponent-europe-sources.mjs';
+import {tennisEuropeNativeId} from '../lib/opponent-linked-identity.mjs';
 import {opponentTournamentWindow} from '../lib/opponent-tournament-window.mjs';
 
 const worker=readFileSync(new URL('../src/index.js',import.meta.url),'utf8');
@@ -81,7 +83,7 @@ test('SQLite Europe history through the real API assembler renders current and p
    }}
   };
   const future={id:'future',competitionId:'future',circuit:'tennis-europe',startDate:'2026-10-21',endDate:'2026-10-25',matches:[]};
-  const ctx={Map,Set,Date,Intl,console,opponentTournamentWindow,
+  const ctx={Map,Set,Date,Intl,console,opponentTournamentWindow,opponentEuropeSources,opponentSelfParticipant,tennisEuropeNativeId,linkedOpponentIdentity:async()=>null,
    tennisEuropeTournamentMetadata:async()=>new Map(),searchIdentityProfile:async()=>({name:'Test Person',sourcePlayerId:'profile-test',sourceCircuit:'tennis-europe'}),playerCircuitIdentities:()=>[],
    playerEntryTournaments:async()=>[future],otherCircuitOpponentHistory:async()=>[],resolveCircuitProfiles:async()=>new Map(),circuitProfiles:()=>[],enrichPersonalTournamentPresentation:async x=>x,
    currentTennisEuropePlayerRanking:async()=>({rankings:[]}),currentRankingCategoryAllowed:()=>true};
