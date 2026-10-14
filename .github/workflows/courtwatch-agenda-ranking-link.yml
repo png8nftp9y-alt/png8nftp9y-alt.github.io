@@ -1,0 +1,26 @@
+name: Court Watch Agenda ranking link diagnosis
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare/app-api/scripts/inspect-agenda-ranking-link.mjs'
+      - '.github/workflows/courtwatch-agenda-ranking-link.yml'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-agenda-ranking-link-diagnosis
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Compare real rankings and today matches without writes
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+        run: node cloudflare/app-api/scripts/inspect-agenda-ranking-link.mjs

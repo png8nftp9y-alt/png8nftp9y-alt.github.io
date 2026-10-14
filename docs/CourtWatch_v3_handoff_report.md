@@ -5578,3 +5578,17 @@ Changed `personal-unreleased-tournaments.mjs` to drive native FITP/ITF tournamen
 Validation: root `npm run check` and the full app-api `npm run check` passed. A new SQLite regression test uses the actual universal/participant schema, the deployed circuit/tournament index and 12,000 matches/24,000 participants; it compares exact old/new query results, including native/alias overlap and a local alias, asserts indexed searches without broad participant/match scans and guards work budgets. Observed VM instruction counts were aliases 143,700 -> 10,600; native history 197,100 -> 11,800; native tournament history 8,708,400 -> 5,300. These are synthetic fixture instruction counts, NOT measured production D1 rows-read savings. Existing 270/280-match pagination tests, doubles, all three circuits, canonical alias association, unrelated homonyms and zero history writes pass. Workflow now runs read-only EXPLAIN QUERY PLAN probes on the actual production D1 and rejects broad scans without reading player histories or printing player details.
 
 Remaining limitation: repeated snapshots still execute these cheaper queries. No history cache was introduced because correct invalidation must cover matches, participants, identity associations and tournament metadata across all import/edit paths. Real savings must be measured after deploy with D1 Insights, on a comparable request window; the daily counter includes pre-deploy traffic. Deploy/migration/live-plan verification will be confirmed by the new general Cloudflare workflow run.
+
+## 2026-10-14 — Verifica reale ranking Agenda Cereghini/Arginelli
+
+Il proprietario richiede la causa reale del ranking diverso in Agenda: la
+precedente spiegazione sul collegamento mancante era un’inferenza, non un
+riscontro D1. Accesso diretto al Worker bloccato dal browser di questa sessione;
+nessuna credenziale D1 locale. Preparata verifica SELECT sul Worker reale con
+adapter D1 HTTP: proiezioni TCL e Altri, classifiche correnti, storico per nome
+normalizzato e snapshot della classifica per ciascun incontro di oggi.
+Output limitato a conteggi, booleani, categorie e date; nessun nome completo,
+ID, valore del ranking, credenziale o dettaglio torneo. Nessuna scrittura D1.
+Workflow automatico al push dei file diagnostici e avvio manuale disponibili.
+Validazione locale: sintassi Node, YAML e controllo dei guard SELECT.
+Risultato D1 ancora da acquisire: nessuna causa dichiarata verificata.
