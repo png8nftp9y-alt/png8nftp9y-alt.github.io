@@ -3399,6 +3399,16 @@ function tournamentSurfaceLabel(t, includeNameDuplicates = false) {
   return parts.join(" · ");
 }
 
+function fitpTournamentSubscriptionHtml(entry = {}) {
+  if (circuit(entry) !== "fitp") return "";
+  const dates = [...new Set([
+    ...(Array.isArray(entry.subscriptionDates) ? entry.subscriptionDates : []),
+    entry.subscriptionDate,
+  ].filter(value => /^20\d{2}-\d{2}-\d{2}$/.test(String(value || ""))))].sort();
+  if (!dates.length) return '<span class="fitpSubscriptionDate">Data iscrizione non disponibile</span>';
+  return `<span class="fitpSubscriptionDate">${dates.map(date => `<time datetime="${esc(date)}">${esc(displayDate(date))}</time>`).join(" · ")}</span>`;
+}
+
 function renderTournament(key) {
   $("removeProfilePlayer").hidden = true;
   const t = groups(false).find((x) => tournamentKey(x) === key);
@@ -3485,7 +3495,8 @@ function renderTournament(key) {
               ? playerRecord?.ranking
               : "";
       const matchRows = matchHistorySectionsHtml(rows);
-      return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}"><button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button><span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
+      const playerHeading = `<button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button>`;
+      return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}">${playerHeading}<span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}${source === "fitp" ? ` · ${fitpTournamentSubscriptionHtml({...group.entry, circuit:source})}` : ""}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
     })
     .join("");
   const officialUrl = tournamentOfficialUrl(t),

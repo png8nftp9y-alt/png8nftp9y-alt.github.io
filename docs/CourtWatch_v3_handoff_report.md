@@ -5674,3 +5674,8 @@ Limiti: non anticipa l'acquisizione della fonte ufficiale in D1. Non scopre part
 
 ## 2026-10-14 — Collocazione test risultati rapidi
 Spostato known-match-results.test.mjs nei test backend e aggiornato il comando check. Il controllo D1 classificava le INSERT della fixture SQLite come scritture applicative. Regola D1 invariata. Validazione: sette test mirati passati; nessuna modifica funzionale.
+
+## 2026-10-14 — Data iscrizione FITP
+Conservate le date PUC già acquisite e mostrate solo nella pagina torneo,
+accanto a Iscritto. Nessuna nuova query D1 alla visualizzazione.
+Date multiple deduplicate. Cinque test dedicati superati.

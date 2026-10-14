@@ -1,3 +1,4 @@
+import {fitpSubscriptionDates} from './fitp-subscription-dates.mjs';
 import fs from "node:fs/promises";
 const NOW = new Date().toISOString();
 const COVERAGE_FROM = "2025-12-18";
@@ -82,6 +83,7 @@ function entry(row) {
     acceptanceLastUpdated: row.acceptanceLastUpdated || "",
     acceptanceListPublished: row.acceptanceListPublished || false,
     entryStatus: row.entryStatus || "",
+    ...(c === "fitp" ? {subscriptionDates: fitpSubscriptionDates(row)} : {}),
   };
 }
 function toTournament(e) {
@@ -132,6 +134,7 @@ function toTournament(e) {
     acceptanceLastUpdated: e.acceptanceLastUpdated,
     acceptanceListPublished: e.acceptanceListPublished,
     entryStatus: e.entryStatus,
+    ...(e.circuit === "fitp" ? {subscriptionDates: e.subscriptionDates || []} : {}),
   };
 }
 function ageHours(iso) {
