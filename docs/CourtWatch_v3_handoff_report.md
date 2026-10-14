@@ -5679,3 +5679,15 @@ Spostato known-match-results.test.mjs nei test backend e aggiornato il comando c
 Conservate le date PUC già acquisite e mostrate solo nella pagina torneo,
 accanto a Iscritto. Nessuna nuova query D1 alla visualizzazione.
 Date multiple deduplicate. Cinque test dedicati superati.
+
+## 2026-10-14 — Avversari: match Europe e torneo in corso
+
+Problema: lo storico tennisEuropeOpponentHistory non marcava circuito su tornei e match. Il frontend interpretava i record senza circuito come FITP e scartava tutte le partite Europe. La query escludeva anche i tornei ancora in corso e opponentTournamentWindow selezionava soltanto tre passati più un futuro.
+
+Correzione: il lettore API restituisce circuit=tennis-europe e prospettiva del punteggio espliciti, include gli incontri fino alla data richiesta anche se il torneo non è concluso e usa le date strutturate del torneo D1 come fallback. Esiti ricavati dalla squadra vincente confermata: incontri senza vincitore restano neutrali, anche nel doppio. La finestra mostra i tre tornei conclusi più recenti e un solo torneo aggiuntivo: quello in corso, oppure il futuro più vicino se nessuno è in corso. Il torneo è in corso anche nei giorni di inizio e fine. Ritirati/cancellati esclusi dallo slot corrente/futuro. Entry e storico si uniscono senza duplicare match né sovrascrivere date note con campi vuoti.
+
+Frontend v3.js: stessa selezione applicata anche alle proiezioni avversario già salvate; gli storici Europe legacy senza etichetta circuito vengono riconosciuti prima del filtro. Match FITP/ITF restano esclusi, i relativi tornei e iscrizioni rimangono disponibili. Etichette e titolo aggiornati con Torneo in corso. Revisione della chiave cache per acquisire la risposta corretta anche se il browser ha già salvato una risposta odierna vuota. Una risposta che conferma assenza di esito elimina il precedente colore di sconfitta. Aggiornata revisione script in v3.html e incluso nuovo test nel check Worker.
+
+Validazione: 73 test mirati passati. Nuovo test attraversa SQL SQLite con le migrazioni reali, assemblatore API avversario e rendering frontend: tre tornei conclusi più corrente, singolo perso con vincitore a sinistra, doppio programmato neutro e nessuna partita di domani anticipata. Verificati cache legacy, esclusione partite FITP/ITF, futuro quando manca il corrente, confini delle date, deduplicazione, parità delle selezioni frontend/backend e regressioni loader/punteggi/prefetch. verify-analysis-ui verde; controlli sintattici frontend/Worker e diff whitespace passati.
+
+Costi e limiti: nessuna nuova tabella, migrazione o scrittura D1; nessuna nuova famiglia di query. Restano lettura limitata a 250 incontri, cinque tornei di provenienza e batch esistenti; includendo il torneo corrente può variare il numero di righe effettivamente restituite. Dati assenti dalla fonte/D1 non vengono inventati e la pagina mostra meno di quattro tornei se non disponibili. Verifica visiva autenticata da completare dopo il deploy.

@@ -2886,7 +2886,7 @@ function opponentHistoryMatchRowHtml(match, contextMatches = []) {
       match.status === "completed" || match.retired || match.score
         ? opponentHistoryResultText(match) || "—"
         : readableText(match.status || "Programmato");
-  return `<div class="opponentHistoryMatch unifiedMatchRow"><span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(match.date) || "data da pubblicare")}</time><span class="matchRoundFull">${esc(fullMatchRoundLabel(match, contextMatches))}</span></span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span class="opponentHistoryMatchup">${matchup}</span></span><strong class="${match.won ? "win" : "loss"}">${esc(outcome)}</strong></div>`;
+  return `<div class="opponentHistoryMatch unifiedMatchRow"><span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(match.date) || "data da pubblicare")}</time><span class="matchRoundFull">${esc(fullMatchRoundLabel(match, contextMatches))}</span></span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span class="opponentHistoryMatchup">${matchup}</span></span><strong class="${match.won === true ? "win" : match.won === false ? "loss" : ""}">${esc(outcome)}</strong></div>`;
 }
 function doublesPartnerGroupKey(names) {
   // Group participants by plain names; rendered links, flags and rankings can differ per match.
@@ -2928,9 +2928,29 @@ function opponentHistoryMatchSectionsHtml(matches) {
     (match) => doublesPartnerGroupKey((match.partners || []).map(person => person.name)),
   );
 }
-function renderOpponentHistory(data) {
+function opponentTournamentWindow(tournaments,today){
+ const key=t=>(t.circuit||'tennis-europe')+'|'+String(t.competitionId||t.id||'').toUpperCase(),unique=new Map();
+ for(const t of tournaments){
+  const k=key(t),old=unique.get(k),fields=Object.fromEntries(Object.entries(t).filter(([,v])=>v!==''&&v!==null&&v!==undefined)),matches=new Map();
+  for(const m of [...(old?.matches||[]),...(t.matches||[])])matches.set(m.matchId||m.id||JSON.stringify(m),m);
+  unique.set(k,{...old,...fields,circuit:t.circuit||old?.circuit||'tennis-europe',matches:[...matches.values()]});
+ }
+ const all=[...unique.values()],valid=t=>/^\d{4}-\d{2}-\d{2}$/.test(String(t.startDate||'')),end=t=>String(t.endDate||t.startDate).slice(0,10);
+ const past=all.filter(t=>valid(t)&&end(t)<today).sort((a,b)=>end(b).localeCompare(end(a))||key(a).localeCompare(key(b))).slice(0,3).map(t=>({...t,historyKind:'past'}));
+ const eligible=all.filter(t=>valid(t)&&!['W','WITHDRAWN','CANCELLED','CANCELED'].includes(String(t.acceptanceCode||'').toUpperCase())&&!/withdraw|ritirat|cancel/i.test(String(t.entryStatus||'')));
+ const current=eligible.filter(t=>t.startDate<=today&&end(t)>=today).sort((a,b)=>String(b.startDate).localeCompare(String(a.startDate))||key(a).localeCompare(key(b)));
+ const future=eligible.filter(t=>t.startDate>today).sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))||key(a).localeCompare(key(b)));
+ const selected=current[0]||future[0];
+ return[...(selected?[{...selected,historyKind:current.length?'current':'upcoming'}]:[]),...past];
+}
+function opponentHistoryProjection(data) {
+  // Legacy unlabelled tournament histories were produced by the Europe reader.
+  data = {...data, tournaments: (data.tournaments || []).map(t => ({...t, circuit: t.circuit || t.sourceCircuit || 'tennis-europe'}))};
   data = withoutPucItfReferences(data);
-  data = {...data, tournaments: (data.tournaments || []).map(tournament => ({...tournament, matches: (tournament.matches || []).filter(match => circuit({...match, circuit: match.circuit || circuit(tournament)}) === "tennis-europe")}))};
+  return {...data, tournaments: opponentTournamentWindow(data.tournaments.map(t => ({...t, matches: (t.matches || []).filter(m => circuit({...m, circuit: m.circuit || circuit(t)}) === 'tennis-europe')})), iso(new Date()))};
+}
+function renderOpponentHistory(data) {
+  data = opponentHistoryProjection(data);
   const badges=$("opponentCircuitProfiles");if(badges)badges.innerHTML=playerCircuitLinksHtml(data.circuitProfiles||[]);
   const tournaments = data.tournaments || [],
     body = $("opponentTournamentHistory");
@@ -2969,7 +2989,7 @@ function renderOpponentHistory(data) {
             const entryLabel = !(tournament.matches || []).length && tournament.entryStatus
               ? `<p class="opponentTournamentEntry">${esc(source === "itf" && tournament.acceptanceCode ? `Iscritto · ${tournament.acceptanceCode}` : "Iscritto")}</p>`
               : "";
-            return `<section class="opponentHistoryTournament"><p class="opponentHistoryKind">${tournament.historyKind === "upcoming" ? "Prossimo torneo programmato" : "Torneo passato"}</p><header class="opponentHistoryTournamentHead"><h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header>${tournamentPlace(tournament) !== "Luogo da pubblicare" ? `<p>📍 <a class="tournamentMapsLink" href="${esc(tournamentMapsUrl(tournamentPlace(tournament)))}" target="_blank" rel="noopener">${esc(tournamentPlace(tournament))}</a></p>` : ""}${entryLabel}<div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [])}</div></section>`;
+            return `<section class="opponentHistoryTournament"><p class="opponentHistoryKind">${tournament.historyKind === "current" ? "Torneo in corso" : tournament.historyKind === "upcoming" ? "Prossimo torneo programmato" : "Torneo passato"}</p><header class="opponentHistoryTournamentHead"><h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header>${tournamentPlace(tournament) !== "Luogo da pubblicare" ? `<p>📍 <a class="tournamentMapsLink" href="${esc(tournamentMapsUrl(tournamentPlace(tournament)))}" target="_blank" rel="noopener">${esc(tournamentPlace(tournament))}</a></p>` : ""}${entryLabel}<div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [])}</div></section>`;
           },
         )
         .join("")
@@ -2978,7 +2998,7 @@ function renderOpponentHistory(data) {
 }
 function opponentHistoryKey(name, event = "", profileId = "") {
   const asOf = iso(new Date()),
-    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "latest-rankings-v4-tournament-metadata"].join("|");
+    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "latest-rankings-v5-live-europe"].join("|");
   return { asOf, requestKey };
 }
 function preparedOpponentHistory(name, event = "", profileId = "") {
@@ -3001,7 +3021,9 @@ function mergeOpponentHistory(previous, next) {
     for (const match of [...(known?.matches || []), ...(tournament.matches || [])]) {
       const matchKey = match.matchId || match.id || [match.date, match.event, match.round, JSON.stringify(match.opponents || [])].join("|");
       const update = Object.fromEntries(Object.entries(match).filter(([, value]) => value !== "" && value !== null && value !== undefined && (!Array.isArray(value) || value.length)));
-      matches.set(matchKey, {...matches.get(matchKey), ...update});
+      const merged = {...matches.get(matchKey), ...update};
+      if (match.outcomeConfirmed === false) {delete merged.won; delete merged.advances;}
+      matches.set(matchKey, merged);
     }
     tournaments.set(key, {...known, ...tournament, matches: [...matches.values()]});
   }
@@ -3148,7 +3170,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   follow.title = "Aggiungi giocatore";
   follow.setAttribute("aria-label", "Aggiungi giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentCircuitProfiles" class="playerCircuitProfiles"></span><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Tre tornei passati e prossimo programmato</h3></div><div id="opponentTournamentHistory"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Aggiungi giocatore</button></p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentCircuitProfiles" class="playerCircuitProfiles"></span><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Tre tornei passati e uno in corso o futuro</h3></div><div id="opponentTournamentHistory"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Aggiungi giocatore</button></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
   $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", (event) => {
