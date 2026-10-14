@@ -19,9 +19,11 @@ async function verifiedParticipantAliases(db,player,circuit,native,variants) {
  const aliases=new Set();
  if(!native)return aliases;
  const candidateNames=[...new Set(variants.flatMap(v=>[v,v.toUpperCase()]))];
+ // Unary + keeps the pagination cursor out of index selection: SQLite must
+ // select by the name first rather than traverse the global participant PK.
  const candidates=[];let lastMatch='',lastParticipant='';
  while(true){
-  const batch=await rows(db,`SELECT p.match_id,p.participant_key,p.source_player_id,p.display_name,p.normalized_name,p.nationality,p.payload FROM match_participants p JOIN matches m ON m.id=p.match_id WHERE p.normalized_name IN (${candidateNames.map(()=>'?').join(',')}) AND m.circuit=? AND (p.match_id,p.participant_key)>(?,?) ORDER BY p.match_id,p.participant_key LIMIT 250`,[...candidateNames,circuit,lastMatch,lastParticipant]);
+  const batch=await rows(db,`SELECT p.match_id,p.participant_key,p.source_player_id,p.display_name,p.normalized_name,p.nationality,p.payload FROM match_participants p CROSS JOIN matches m ON m.id=p.match_id WHERE p.normalized_name IN (${candidateNames.map(()=>'?').join(',')}) AND m.circuit=? AND (+p.match_id,p.participant_key)>(?,?) ORDER BY p.match_id,p.participant_key LIMIT 250`,[...candidateNames,circuit,lastMatch,lastParticipant]);
   candidates.push(...batch);if(batch.length<250)break;
   const end=batch.at(-1);lastMatch=end.match_id;lastParticipant=end.participant_key;
  }
@@ -50,10 +52,15 @@ async function personalHistory(db,player,circuit){
  const native=playerCircuitIdentities(player).find(p=>p.circuit===circuit)?.profileId;
  const aliases=await verifiedParticipantAliases(db,player,circuit,native,variants);
  const aliasMatches=[...new Set([...aliases].map(key=>JSON.parse(key)[0]))];
- const identityWhere=native?'(self.source_player_id=? OR self.match_id IN (SELECT value FROM json_each(?)))':`lower(self.normalized_name) IN (${variants.map(()=>'?').join(',')})`,identityValues=native?[native,JSON.stringify(aliasMatches)]:variants;
+ // Build the small set of this player's match IDs before joining payloads.
+ // UNION removes native/alias overlap without an OR that can scan all matches.
  const sources=[];let last='';
  while(true){
-  const batch=await rows(db,`SELECT DISTINCT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM match_participants self JOIN matches m ON m.id=self.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE ${identityWhere} AND m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...identityValues,circuit,last]);
+  const candidates=native
+   ? 'SELECT match_id FROM match_participants WHERE source_player_id=? AND match_id>? UNION SELECT value AS match_id FROM json_each(?) WHERE value>?'
+   : `SELECT DISTINCT match_id FROM match_participants WHERE lower(normalized_name) IN (${variants.map(()=>'?').join(',')}) AND match_id>?`;
+  const values=native?[native,last,JSON.stringify(aliasMatches),last]:[...variants,last];
+  const batch=await rows(db,`WITH candidate_matches AS MATERIALIZED (${candidates}) SELECT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM candidate_matches ids CROSS JOIN matches m ON m.id=ids.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...values,circuit,last]);
   sources.push(...batch);if(batch.length<250)break;
   const next=batch.at(-1).match_id;if(next<=last)throw Error('personal_history_pagination_failed');last=next;
  }
