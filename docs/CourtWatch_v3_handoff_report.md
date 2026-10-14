@@ -5657,3 +5657,5 @@ The existing loader showed restored data while awaiting ten static JSON files an
 Validation: 61 targeted tests pass, including blocked JSON/IndexedDB updates in both groups, immediate win rendering, unchanged scroll/date/filter/selection, cancelled group requests, historical retention, Cereghini doubles and score orientation. Analysis UI check, JavaScript syntax and diff whitespace pass. Existing loader test now uses the production agenda merger; cold reload assertions require every publication to contain complete tournaments rather than a single renderer invocation. Local Chromium is unavailable, so the existing CI browser suite and signed-in deployed visual check remain pending deployment. This removes frontend waiting; acquisition frequency and API response time remain unchanged.
 
 ITF discovery 2026-10-14T12:25:22.462Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-10-14T17:44:44.325Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
