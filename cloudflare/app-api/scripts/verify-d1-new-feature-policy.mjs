@@ -109,6 +109,27 @@ for (const file of affected) {
 
   const source = readFileSync(file, "utf8");
 
+  // Guarded read-only clients cannot mutate D1; require their transport regression tests.
+  if (source.includes("D1_READ_ONLY: guarded")) {
+    const trusted = file === "cloudflare/app-api/lib/read-only-d1-client.mjs"
+      ? source.includes("assertReadOnlyQuery(sql)")
+      : /import\s*\{openReadOnlyD1\}\s*from ['"]\.\.\/lib\/read-only-d1-client\.mjs['"]/.test(source);
+    const stem = basename(file, extname(file));
+    const testFile = tests.find(path => basename(path).startsWith(stem + ".test."));
+    if (!trusted || !testFile) {
+      failures.push(`${file}: read-only transport or test missing`);
+      continue;
+    }
+    const testSource = readFileSync(testFile,"utf8");
+    if (!testSource.includes("D1_TEST_READ_ONLY_TRANSPORT") || !testSource.includes("D1_TEST_MUTATIONS_REJECTED")) {
+      failures.push(`${testFile}: read-only guard regressions missing`);
+      continue;
+    }
+    if (spawnSync(process.execPath,["--test",testFile],{stdio:"inherit"}).status !== 0)
+      failures.push(`${testFile}: read-only guard regressions failed`);
+    continue;
+  }
+
   if (!source.includes("D1_WRITE_POLICY: incremental")) {
     failures.push(`${file}: manca "D1_WRITE_POLICY: incremental"`);
   }

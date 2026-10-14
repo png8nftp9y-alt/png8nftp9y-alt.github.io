@@ -1,3 +1,4 @@
+# D1_WRITE_POLICY: incremental
 name: Court Watch Tennis Europe rankings
 # Certification trigger: 2026-09-11
 on:
@@ -9,6 +10,8 @@ on:
     paths:
       - 'cloudflare/app-api/scripts/sync-tennis-europe-rankings.mjs'
       - '.github/workflows/courtwatch-tennis-europe-rankings.yml'
+      - 'cloudflare/app-api/scripts/export-all-app-ranking-input.mjs'
+      - 'cloudflare/app-api/lib/all-app-ranking-input.mjs'
 permissions:
   contents: read
 concurrency:
@@ -30,20 +33,11 @@ jobs:
         with: {node-version: '22'}
       - run: npm install
       - run: node scripts/configure-d1.mjs
-      - name: Read Tennis Europe matches
-        run: |
-          read_ok=0
-          for attempt in 1 2 3 4 5 6 7 8; do
-            if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --command "SELECT payload FROM app_matches WHERE lower(COALESCE(json_extract(payload,'$.circuit'),json_extract(payload,'$.sourceId'),json_extract(payload,'$.source'),json_extract(payload,'$.sourceName'),'')) LIKE '%tennis%europe%'" --json > te-ranking-matches.pending.json; then
-              mv te-ranking-matches.pending.json te-ranking-matches.json
-              read_ok=1
-              break
-            fi
-            rm -f te-ranking-matches.pending.json
-            sleep $((attempt * 5))
-          done
-          test "$read_ok" -eq 1
+      - name: Read all selected app players and their Tennis Europe matches
+        run: node scripts/export-all-app-ranking-input.mjs
       - name: Acquire official rankings
+        env:
+          TE_REQUIRE_APP_EXPORT: '1'
         run: node scripts/sync-tennis-europe-rankings.mjs
       - name: Import history and immutable match rankings
         run: |
@@ -67,3 +61,8 @@ jobs:
         run: |
           npm run check
           npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
+
+      - name: Verify actual Agenda ranking links after import
+        env:
+          CW_REQUIRE_COMPLETE: '1'
+        run: node scripts/inspect-agenda-ranking-link.mjs

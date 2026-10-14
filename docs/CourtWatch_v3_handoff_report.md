@@ -5604,3 +5604,39 @@ Also attempts read-only Workers subscription metadata and account-wide D1 daily 
 ### 2026-10-14 — Fix bound parameter adapter in urgent D1 diagnostic
 
 The first bounded measurement collected account-wide calendar-month usage (19,094,851,709 reads / 9,575,813 writes), but the diagnostic REST adapter passed its first bind argument as the params object instead of the full parameter array and received HTTP 400 during identity hydration. Fixed the adapter to preserve all variadic bound values as an array; no production Worker change. Subscription read returned HTTP 403, so billing renewal period and actual plan remain unverified. Node syntax rechecked. Retry is a one-off diagnostic, not polling.
+
+
+## 2026-10-14 — Ranking Europe per tutti i giocatori selezionati
+
+Diagnosi reale 38495834531: ranking del 13 ottobre disponibile per entrambi;
+Cereghini ha snapshot su due incontri, Arginelli ha ranking corrente ma nessuna
+copia preparata o snapshot sul suo incontro. L’importatore usava solo i 23
+giocatori del registry pubblico, senza le aggiunte private.
+L’export di input ora legge le proiezioni reali di ogni account attivo, nei gruppi
+TCL e Altri, include giocatori aggiunti e incontri acquisiti dinamicamente.
+Un export incompleto blocca l’import corrente; i merge conservano le identità
+statiche e gli upsert rimangono condizionati alle differenze effettive.
+La risposta app completa le classifiche mancanti da storico D1 indicizzato,
+in piccoli batch e senza scritture: nuove aggiunte e incontri non aspettano
+il run settimanale. Oggi/futuro usa l’ultima pubblicazione; passato usa solo
+pubblicazioni non successive alla partita e conserva snapshot storici validi.
+I nomi ambigui rimangono senza classifica invece di attribuire il primo omonimo.
+Categorie correnti rispettano il limite d’età. Nessun polling introdotto.
+Client diagnostico D1 condiviso protetto da guard SQL e privo di run/batch di
+scrittura. Il controllo globale riconosce questa modalità solo con trasporto
+protetto e test associati che rifiutano le mutazioni prima della richiesta.
+Validazione: npm run check completo passato; 13 nuove regressioni mirate,
+compresi batch di lettura, zero scritture, storico, ambiguities, sorgenti
+incomplete e delta delle aggiunte. Il workflow ranking verifica anche i
+collegamenti reali dopo import/deploy. Esito produzione da verificare dopo push.
+
+
+## 2026-10-14 — Compatibilità Python 3 dei controlli locali
+
+Il controllo del proprietario Mac si è fermato prima del commit perché un test
+SQLite avviava python (status null) invece di python3. Corrette le quattro
+chiamate rimaste nei test dello storico nativo, dei profili personali, degli
+alias e della riparazione partecipanti ITF; gli stessi controlli SQL restano
+attivi. Errori di avvio riportati con assert.ifError. Nove test mirati passati
+localmente. Ripresa dell’intero check richiesta prima di pubblicare la
+correzione ranking già applicata; nessuna modifica ai dati D1.

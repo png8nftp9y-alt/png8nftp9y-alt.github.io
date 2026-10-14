@@ -7,5 +7,5 @@ d.executescript("CREATE TABLE matches(id TEXT PRIMARY KEY,circuit TEXT,payload T
 d.execute("INSERT INTO matches VALUES('match-test','itf',?)",(x['payload'],));before=d.total_changes;d.executescript(x['sql']);first=d.total_changes-before;before=d.total_changes;d.executescript(x['sql']);second=d.total_changes-before
 d.execute("DELETE FROM match_participants");d.execute("UPDATE matches SET payload='changed accepted source'");before=d.total_changes;d.executescript(x['sql']);stale=d.total_changes-before
 print(json.dumps({'first':first,'second':second,'stale':stale}))
-`;const r=spawnSync('python',['-c',py],{input:JSON.stringify({payload,sql}),encoding:'utf8'});assert.equal(r.status,0,r.stderr);assert.deepEqual(JSON.parse(r.stdout),{first:2,second:0,stale:0});
+`;const r=spawnSync('python3',['-c',py],{input:JSON.stringify({payload,sql}),encoding:'utf8'});assert.ifError(r.error);assert.equal(r.status,0,r.stderr);assert.deepEqual(JSON.parse(r.stdout),{first:2,second:0,stale:0});
 });

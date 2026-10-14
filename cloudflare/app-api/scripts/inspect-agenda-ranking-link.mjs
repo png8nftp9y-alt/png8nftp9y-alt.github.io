@@ -1,24 +1,11 @@
 // Read-only comparison of the real main/Others projections. Log only counts and booleans.
 import worker from '../src/index.js';
 import {readFile} from 'node:fs/promises';
-const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
-if(!account||!token)throw Error('diagnostic_credentials_missing');
-async function cf(path,body){
- const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database${path}`,{
-  method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},
-  ...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(30000)});
- const data=await r.json();if(!r.ok||!data.success)throw Error('diagnostic_d1_request_failed');return data.result;
-}
-const database=(await cf('?name=courtwatch-app&per_page=100')).find(d=>d.name==='courtwatch-app');
-if(!database)throw Error('diagnostic_database_missing');
+// D1_READ_ONLY: guarded
+import {openReadOnlyD1} from '../lib/read-only-d1-client.mjs';
+const client=await openReadOnlyD1(),DB=client.db;
 let queries=0;
-async function query(sql,params=[]){
- if(!/^\s*(SELECT|WITH)\b/i.test(sql)||/\b(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b/i.test(sql))throw Error('diagnostic_read_only_guard');
- queries++;
- const data=await cf(`/${database.uuid||database.id}/query`,{sql,params});
- if(!data.every(r=>r.success))throw Error('diagnostic_query_failed');return data[0]?.results||[];
-}
-const DB={prepare(sql){const statement={bind(...params){return{all:async()=>({results:await query(sql,params)}),first:async()=>(await query(sql,params))[0]||null}},all:async()=>({results:await query(sql)}),first:async()=>(await query(sql))[0]||null};return statement}};
+const query=(...args)=>{queries++;return client.query(...args)};
 const code=await readFile(new URL('../src/index.js',import.meta.url),'utf8');
 const email=code.match(/email:\s*['"]([^'"]+)['"]/)?.[1];if(!email)throw Error('diagnostic_account_unresolved');
 async function api(path,group){
@@ -63,3 +50,5 @@ for(const group of ['main','others']){
 }
 console.log('AGENDA_RANKING_LINK_DIAGNOSIS='+JSON.stringify({checkedAt:new Date().toISOString(),date,queries,cases}));
 if(!cases.some(c=>c.caseNumber===1&&c.playersFound)||!cases.some(c=>c.caseNumber===2&&c.playersFound))throw Error('diagnostic_missing_target_player');
+
+if(process.env.CW_REQUIRE_COMPLETE==='1'&&cases.some(c=>c.profiles.some(p=>p.matches.some(m=>m.currentRankingForMatchCategoryExists&&!m.hasDisplayedPlayerRanking))))throw Error('agenda_current_rank_missing');

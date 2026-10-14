@@ -9,6 +9,6 @@ for i in range(320):
 for i in range(8):d.execute("INSERT INTO tournaments VALUES(?,?,?)",('t'+str(i),'ITF-'+str(i),json.dumps({'name':'Official '+str(i)})))
 d.execute("INSERT INTO matches VALUES('foreign','other','itf')");d.execute("INSERT INTO match_participants VALUES('foreign','800000099')");d.execute("INSERT INTO tournaments VALUES('other','OTHER','{}')")
 d.row_factory=sqlite3.Row;print(json.dumps([dict(r) for r in d.execute(x['sql'],[x['params']])]))
-`;const r=spawnSync('python',['-c',py],{input:JSON.stringify({sql,params}),encoding:'utf8'});assert.equal(r.status,0,r.stderr);return{results:JSON.parse(r.stdout)};}}}}}};
+`;const r=spawnSync('python3',['-c',py],{input:JSON.stringify({sql,params}),encoding:'utf8'});assert.ifError(r.error);assert.equal(r.status,0,r.stderr);return{results:JSON.parse(r.stdout)};}}}}}};
 const out=await personalUnreleasedTournamentHistory(DB,[{id:'owned',sourceCircuit:'itf',sourcePlayerId:'800000001'}]);assert.equal(calls,1);assert.equal(out.length,8);assert.ok(out.every(t=>t.playerId==='owned'&&t.calendarState==='draw_confirmed'));assert.equal(out.some(t=>t.competitionId==='OTHER'),false);
 });
