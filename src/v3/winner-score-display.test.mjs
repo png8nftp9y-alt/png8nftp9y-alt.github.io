@@ -44,6 +44,37 @@ test('opponent scores use the same formatter exactly once', () => {
   assert.equal(context.opponentHistoryResultText({ score: '6-1 6-1', won: true }), '6-1 6-1');
 });
 
+test('TE acquired app scores already oriented by the real generator are not reversed again', () => {
+  const generator = readFileSync(new URL('../../cloudflare/app-api/scripts/generate-tennis-europe-app-candidates.mjs', import.meta.url), 'utf8');
+  const formatter = generator.split('\n').find(line => line.startsWith('const winnerFirstScore='));
+  assert.ok(formatter, 'production TE score formatter found');
+  const normalize = vm.runInNewContext(formatter + '\nwinnerFirstScore');
+  for (const winnerTeamIndex of [0, 1]) {
+    const rawScore = winnerTeamIndex === 0 ? '6-1 6-1' : '1-6 1-6';
+    const score = normalize(rawScore, winnerTeamIndex);
+    for (const teamIndex of [0, 1]) {
+      const match = { id: 'te-app:virginia-cereghini|acquired', playerId: 'virginia-cereghini',
+        winnerTeamIndex, teamIndex, advances: teamIndex === winnerTeamIndex, score, result: score, round: 'Final' };
+      assert.equal(context.matchResultText(match), '6-1 6-1');
+      const row = context.matchHistoryRowHtml(match);
+      assert.match(row, /6-1 6-1/);
+      assert.match(row, new RegExp(`class="result ${match.advances ? 'win' : 'loss'}"`));
+    }
+  }
+});
+
+test('personal history with winner team metadata retains player-perspective reversal', () => {
+  const match = { id: 'te-match:acquired', score: '1-6 1-6', advances: false, winnerTeamIndex: 0, teamIndex: 1 };
+  assert.equal(context.matchResultText(match), '6-1 6-1');
+  assert.equal(context.matchResultText({ ...match, id: 'te-app:legacy', scorePerspective: 'player' }), '6-1 6-1');
+  assert.equal(context.matchResultText({ ...match, score: '6-1 6-1', scorePerspective: 'winner' }), '6-1 6-1');
+});
+
+test('already normalized app retirement scores remain winner-first even when loser was leading', () => {
+  const match = { id: 'te-app:virginia-cereghini|retirement', result: '1-4', advances: false, winnerTeamIndex: 0, retired: true };
+  assert.equal(context.matchResultText(match), '1-4 Rit.');
+});
+
 test('agenda and player/tournament rows retain win/loss colors with winner-first scores', () => {
   for (const advances of [true, false]) {
     const match = { result: advances ? '6-1 6-1' : '1-6 1-6', advances, round: 'Final' };

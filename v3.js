@@ -2787,7 +2787,11 @@ function incompleteCompletedScore(value, status, decided = false) {
 function matchResultText(match) {
   const playerScore = readableText(match?.result || match?.score || ""),
     lost = typeof match?.advances === "boolean" ? !match.advances : match?.won === false,
-    value = lost
+    // The TE app projection already normalizes scores to the winner. Personal
+    // and opponent history still return scores from the viewed player's side.
+    winnerFirst = match?.scorePerspective === "winner" ||
+      (!match?.scorePerspective && /^te-app:/.test(String(match?.id || "")) && Number.isInteger(match?.winnerTeamIndex)),
+    value = lost && !winnerFirst
       ? playerScore.replace(/(\d+(?:\(\d+\))?)\s*([-–])\s*(\d+(?:\(\d+\))?)/g, "$3$2$1")
       : playerScore;
   const evidence = [match?.status, match?.reason, match?.resultStatus, match?.scoreStatus, match?.retirementReason, match?.retirementStatus, match?.resultDetail, match?.resultType, match?.completedBy, match?.notes, value].filter(Boolean).join(" ");

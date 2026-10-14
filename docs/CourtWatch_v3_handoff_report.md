@@ -5563,3 +5563,7 @@ Ranking: run 38479400467 verde, pubblicazione 54224 del 13 ottobre acquisita
 e verificata in D1: B14 1892, G14 1708, B16 3633, G16 3230. Deploy concluso
 14 ottobre 01:27 Europe/Rome. Nessun rilancio o modifica al motore ranking.
 https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/38479400467
+
+## 2026-10-14 — Preserve already winner-oriented Tennis Europe scores
+The first winner-left frontend patch reversed every loss, but generate-tennis-europe-app-candidates already stores te-app rows in winner perspective. This double reversal explains loser-left display for that acquired projection. Recognize its te-app ID and integer winnerTeamIndex contract; honor explicit scorePerspective when supplied. Continue reversing losses for player-oriented personal/opponent history. No data, colors, membership or D1 behavior changes. Frontend asset version updated.
+Validation: 47 targeted tests pass (score rendering, acquired generator normalization, personal history, retirement, Cereghini doubles, group loaders and startup caches); syntax and whitespace checks pass. The regression exercises the actual acquisition formatter for both winner/team indices and checks the player row outcome class. Live Cereghini page remains behind Cloudflare Access login in the available browser, so deployment and signed-in visual verification remain pending. D1 run 38470587283 attempt 2 succeeded; this frontend fix does not resolve the recurring 7500 database errors.
