@@ -85,6 +85,8 @@ jobs:
       - name: Apply D1 migrations
         if: github.event_name != 'workflow_run'
         run: npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+      - name: Verify personal-history indexed read plans
+        run: node scripts/verify-personal-history-read-plans.mjs
       - name: Restore current observed-player indexes from R2
         if: env.D1_SKIP_OBSERVED != '1'
         run: bash scripts/restore-observed-indexes.sh
