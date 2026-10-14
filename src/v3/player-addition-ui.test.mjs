@@ -60,7 +60,7 @@ test('cold reload discards a partial old cache and first renders all personal to
  vm.createContext(ctx);ctx.PLAYER_GROUP='main';vm.runInContext(mergeSource+loader,ctx);const loading=ctx.load();
  assert.equal(renders.length,0);
  release({generatedAt:'2026-10-07T21:00:00Z',players:[person],tournaments:[{playerId:person.id,name:'Cantù'}],matches:[]});
- await loading;assert.deepEqual(renders,[1]);assert.equal(ctx.state.data.personalProjectionComplete,true);
+ await loading;assert.ok(renders.length>0);assert.ok(renders.every(count=>count===1));assert.equal(ctx.state.data.personalProjectionComplete,true);
 });
 test('calendar order uses canonical player names even when entry names use surname first',()=>{
  const readable=source.slice(source.indexOf('const readablePerson ='),source.indexOf('const IOC_REGION ='));

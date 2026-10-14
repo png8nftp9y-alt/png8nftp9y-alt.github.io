@@ -4257,9 +4257,159 @@ async function load(preparedProjection = null, preparedDocuments = null) {
       "diagnostics.json",
       "manual_matches.json",
     ];
+    function publishProjection(projection, docs, settled) {
+      if (selectionEpoch !== (state.playerSelectionEpoch || 0)) return;
+      const viewHash = typeof location === "undefined" ? null : location.hash,
+        viewY = state.data && typeof scrollY === "number" ? scrollY : null;
+      const previous = state.data || cachedData() || {};
+      // Only membership is group-specific. Data loading, merging and rendering are shared.
+      if (projection && PLAYER_GROUP === "others" && projection.group !== "others")
+        throw Error("Snapshot del gruppo errato");
+      const staticPlayers = Array.isArray(docs.players?.players) ? docs.players.players : [];
+      const staticTournaments = Array.isArray(docs.tournaments?.tournaments) ? docs.tournaments.tournaments : null;
+      if (!projection && PLAYER_GROUP === "others" && previous.personalProjectionComplete !== true)
+        throw Error("Elenco personale non disponibile");
+      if (!projection && PLAYER_GROUP === "main" && (!staticPlayers.length || !staticTournaments))
+        throw Error("Dati essenziali non disponibili");
+      const jsonGeneration = Math.max(
+          ...[docs.players?.generatedAt, docs.tournaments?.generatedAt]
+            .map(Date.parse)
+            .filter(Number.isFinite),
+          0,
+        ),
+        apiGeneration = Date.parse(projection?.generatedAt || "");
+      const universalProjectionFresh =
+        projection &&
+        (PLAYER_GROUP === "others" || !jsonGeneration ||
+          (Number.isFinite(apiGeneration) && apiGeneration >= jsonGeneration));
+      if (projection && !universalProjectionFresh)
+        console.warn(
+          "Indice universale D1 in sincronizzazione: uso temporaneo dei JSON per giocatori e tornei; i match di circuito restano dalla API",
+        );
+      for (const player of projection?.players || []) confirmedCourtWatchPlayers.delete(player.id);
+      const projectedPlayers = new Map(
+          (projection?.players || []).map((p) => [p.id, p]),
+        ),
+        previousPlayers = new Map((previous.players || []).map((p) => [p.id, p]));
+      const membershipPlayers = PLAYER_GROUP === "others" ? [] : staticPlayers;
+      const verifiedMembership = Array.isArray(projection?.membershipIds)
+        ? new Set(projection.membershipIds) : null;
+      const playerCandidates = projection
+        ? [...new Map([...membershipPlayers, ...(previous.players || []), ...(projection.players || []),...confirmedCourtWatchPlayers.values()].map(p => [p.id,p])).values()]
+        : [...new Map([...membershipPlayers, ...(previous.players || [])].map(p => [p.id,p])).values()];
+      const visiblePlayers = playerCandidates
+        .filter((p) => (!FORMER_PLAYERS.has(p.id) || p.userAdded) && !removedCourtWatchPlayers.has(p.id) &&
+          (projection ? (projectedPlayers.has(p.id) || (previousPlayers.has(p.id) && (!verifiedMembership || verifiedMembership.has(p.id))) || confirmedCourtWatchPlayers.has(p.id)) : Array.isArray(previous.players) ? previousPlayers.has(p.id) : true))
+        .map((player) => {
+          const projected = projectedPlayers.get(player.id),
+            retained =
+              projected?.tennisEuropeRankings || projected?.tennisEuropeRanking
+                ? projected
+                : previousPlayers.get(player.id);
+          return retained?.tennisEuropeRankings || retained?.tennisEuropeRanking
+            ? {
+                ...player,
+                tennisEuropeRanking:
+                  retained.tennisEuropeRanking || retained.ranking,
+                tennisEuropeRankings: retained.tennisEuropeRankings,
+                tennisEuropeRankingDates: retained.tennisEuropeRankingDates,
+              }
+            : player;
+        });
+      const visibleIds = new Set(visiblePlayers.map((p) => p.id));
+      const projectedMatches = Array.isArray(projection?.matches)
+          ? projection.matches
+          : [],
+        jsonMatches = Array.isArray(docs.matches?.matches)
+          ? docs.matches.matches
+          : [],
+        previousMatches = Array.isArray(previous.matches) ? previous.matches : [],
+        manualMatches = Array.isArray(docs.manual?.matches)
+          ? docs.manual.matches
+          : [],
+        matches = mergeKnownMatches(previousMatches, jsonMatches, projectedMatches, manualMatches);
+      const agenda = Array.isArray(docs.agenda?.agenda)
+        ? docs.agenda.agenda
+        : previous.agenda || [];
+      const results = Array.isArray(docs.results?.results)
+        ? docs.results.results
+        : previous.results || [];
+      const opponents = Array.isArray(docs.opponents?.opponents)
+        ? docs.opponents.opponents
+        : previous.opponents || [];
+      const tournamentEntries = Array.isArray(docs.entries?.tournamentEntries)
+        ? docs.entries.tournamentEntries
+        : previous.tournamentEntries || [];
+      const optionalFailures = settled
+        .slice(2)
+        .filter((x) => x.status === "rejected").length;
+      const diagnostics = docs.diagnostics ||
+        previous.diagnostics || { overall: "yellow", items: [] };
+
+      if (selectionEpoch !== (state.playerSelectionEpoch || 0)) return;
+      state.data = {
+        group: PLAYER_GROUP,
+        personalProjectionComplete: Boolean(projection) || previous.personalProjectionComplete === true,
+        players: visiblePlayers,
+        tournaments: [...new Map([
+          ...(previous.tournaments || []),
+          ...((universalProjectionFresh && projection?.tournaments) || staticTournaments || previous.tournaments || []),
+          ...(!universalProjectionFresh && (projection || staticTournaments) ? (projection ? (projection.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : cachedPersonalTournaments(previous, visiblePlayers)) : []),
+        ].map(t => [[t.playerId, t.circuit || t.sourceId || "", t.competitionId || t.id || t.name].join("|"), t])).values()].filter((x) => visibleIds.has(x.playerId)),
+        matches: matches.filter((x) => visibleIds.has(x.playerId)),
+        agenda: mergeAgenda(agenda, matches).filter((x) =>
+          visibleIds.has(x.playerId),
+        ),
+        results: results.filter((x) => visibleIds.has(x.playerId)),
+        opponents,
+        tournamentEntries: tournamentEntries.filter((x) =>
+          visibleIds.has(x.playerId),
+        ),
+        diagnostics,
+        generatedAt: new Date(
+          Math.max(
+            ...[
+              universalProjectionFresh && projection?.generatedAt,
+              docs.status?.generatedAt,
+              docs.players?.generatedAt,
+              docs.tournaments?.generatedAt,
+            ]
+              .map(Date.parse)
+              .filter(Number.isFinite),
+            Date.parse(previous.generatedAt || "") || 0,
+          ),
+        ).toISOString(),
+      };
+      state.data = normalizeMatchProjection(state.data);
+      if (projection && state.initialMatchProjectionPending) {
+        state.initialMatchProjectionPending = false;
+        renderedDataSignature = "";
+      }
+      if (!uiSelectionRestored) {
+        state.data.players.forEach((p) => state.selected.add(p.id));
+        uiSelectionRestored = true;
+      } else
+        state.selected = new Set(
+          [...state.selected].filter((id) =>
+            state.data.players.some((p) => p.id === id),
+          ),
+        );
+      syncLabel(state.data, optionalFailures > 0);
+      renderIfDataChanged();
+      if (viewY !== null && viewHash !== null && location.hash === viewHash && typeof scrollTo === "function")
+        scrollTo({top: viewY, behavior: "auto"});
+      Promise.resolve(saveCachedData(state.data)).catch(error => console.warn("Archivio locale non disponibile", error));
+    }
     const projectionPromise = (preparedProjection ? Promise.resolve(preparedProjection) : apiProjection()).catch((error) => {
       console.warn("Fallback JSON Court Watch attivo", error);
       return null;
+    }).then(projection => {
+      if (projection) {
+        // Fresh API data must not wait for secondary JSON or local persistence.
+        try { publishProjection(projection, typeof lastLoadedDocuments === "object" && lastLoadedDocuments || {}, []); }
+        catch (error) { console.warn("Aggiornamento immediato non disponibile", error); }
+      }
+      return projection;
     });
     const settled = preparedDocuments ? names.map(name => ({status: "fulfilled", value: preparedDocuments[name]})) : await Promise.allSettled(files.map(v3json));
     const docs = Object.fromEntries(
@@ -4268,144 +4418,9 @@ async function load(preparedProjection = null, preparedDocuments = null) {
         settled[i].status === "fulfilled" ? settled[i].value : null,
       ]),
     );
-    const previous = state.data || cachedData() || {};
     lastLoadedDocuments = docs;
     const projection = await projectionPromise;
-    // Only membership is group-specific. Data loading, merging and rendering are shared.
-    if (projection && PLAYER_GROUP === "others" && projection.group !== "others")
-      throw Error("Snapshot del gruppo errato");
-    const staticPlayers = Array.isArray(docs.players?.players) ? docs.players.players : [];
-    const staticTournaments = Array.isArray(docs.tournaments?.tournaments) ? docs.tournaments.tournaments : null;
-    if (!projection && PLAYER_GROUP === "others" && previous.personalProjectionComplete !== true)
-      throw Error("Elenco personale non disponibile");
-    if (!projection && PLAYER_GROUP === "main" && (!staticPlayers.length || !staticTournaments))
-      throw Error("Dati essenziali non disponibili");
-    const jsonGeneration = Math.max(
-        ...[docs.players?.generatedAt, docs.tournaments?.generatedAt]
-          .map(Date.parse)
-          .filter(Number.isFinite),
-        0,
-      ),
-      apiGeneration = Date.parse(projection?.generatedAt || "");
-    const universalProjectionFresh =
-      projection &&
-      (PLAYER_GROUP === "others" || !jsonGeneration ||
-        (Number.isFinite(apiGeneration) && apiGeneration >= jsonGeneration));
-    if (projection && !universalProjectionFresh)
-      console.warn(
-        "Indice universale D1 in sincronizzazione: uso temporaneo dei JSON per giocatori e tornei; i match di circuito restano dalla API",
-      );
-    for (const player of projection?.players || []) confirmedCourtWatchPlayers.delete(player.id);
-    const projectedPlayers = new Map(
-        (projection?.players || []).map((p) => [p.id, p]),
-      ),
-      previousPlayers = new Map((previous.players || []).map((p) => [p.id, p]));
-    const membershipPlayers = PLAYER_GROUP === "others" ? [] : staticPlayers;
-    const verifiedMembership = Array.isArray(projection?.membershipIds)
-      ? new Set(projection.membershipIds) : null;
-    const playerCandidates = projection
-      ? [...new Map([...membershipPlayers, ...(previous.players || []), ...(projection.players || []),...confirmedCourtWatchPlayers.values()].map(p => [p.id,p])).values()]
-      : [...new Map([...membershipPlayers, ...(previous.players || [])].map(p => [p.id,p])).values()];
-    const visiblePlayers = playerCandidates
-      .filter((p) => (!FORMER_PLAYERS.has(p.id) || p.userAdded) && !removedCourtWatchPlayers.has(p.id) &&
-        (projection ? (projectedPlayers.has(p.id) || (previousPlayers.has(p.id) && (!verifiedMembership || verifiedMembership.has(p.id))) || confirmedCourtWatchPlayers.has(p.id)) : Array.isArray(previous.players) ? previousPlayers.has(p.id) : true))
-      .map((player) => {
-        const projected = projectedPlayers.get(player.id),
-          retained =
-            projected?.tennisEuropeRankings || projected?.tennisEuropeRanking
-              ? projected
-              : previousPlayers.get(player.id);
-        return retained?.tennisEuropeRankings || retained?.tennisEuropeRanking
-          ? {
-              ...player,
-              tennisEuropeRanking:
-                retained.tennisEuropeRanking || retained.ranking,
-              tennisEuropeRankings: retained.tennisEuropeRankings,
-              tennisEuropeRankingDates: retained.tennisEuropeRankingDates,
-            }
-          : player;
-      });
-    const visibleIds = new Set(visiblePlayers.map((p) => p.id));
-    const projectedMatches = Array.isArray(projection?.matches)
-        ? projection.matches
-        : [],
-      jsonMatches = Array.isArray(docs.matches?.matches)
-        ? docs.matches.matches
-        : [],
-      previousMatches = Array.isArray(previous.matches) ? previous.matches : [],
-      manualMatches = Array.isArray(docs.manual?.matches)
-        ? docs.manual.matches
-        : [],
-      matches = mergeKnownMatches(previousMatches, jsonMatches, projectedMatches, manualMatches);
-    const agenda = Array.isArray(docs.agenda?.agenda)
-      ? docs.agenda.agenda
-      : previous.agenda || [];
-    const results = Array.isArray(docs.results?.results)
-      ? docs.results.results
-      : previous.results || [];
-    const opponents = Array.isArray(docs.opponents?.opponents)
-      ? docs.opponents.opponents
-      : previous.opponents || [];
-    const tournamentEntries = Array.isArray(docs.entries?.tournamentEntries)
-      ? docs.entries.tournamentEntries
-      : previous.tournamentEntries || [];
-    const optionalFailures = settled
-      .slice(2)
-      .filter((x) => x.status === "rejected").length;
-    const diagnostics = docs.diagnostics ||
-      previous.diagnostics || { overall: "yellow", items: [] };
-
-    if (selectionEpoch !== (state.playerSelectionEpoch || 0)) return;
-    state.data = {
-      group: PLAYER_GROUP,
-      personalProjectionComplete: Boolean(projection) || previous.personalProjectionComplete === true,
-      players: visiblePlayers,
-      tournaments: [...new Map([
-        ...(previous.tournaments || []),
-        ...((universalProjectionFresh && projection?.tournaments) || staticTournaments || previous.tournaments || []),
-        ...(!universalProjectionFresh && (projection || staticTournaments) ? (projection ? (projection.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : cachedPersonalTournaments(previous, visiblePlayers)) : []),
-      ].map(t => [[t.playerId, t.circuit || t.sourceId || "", t.competitionId || t.id || t.name].join("|"), t])).values()].filter((x) => visibleIds.has(x.playerId)),
-      matches: matches.filter((x) => visibleIds.has(x.playerId)),
-      agenda: mergeAgenda(agenda, matches).filter((x) =>
-        visibleIds.has(x.playerId),
-      ),
-      results: results.filter((x) => visibleIds.has(x.playerId)),
-      opponents,
-      tournamentEntries: tournamentEntries.filter((x) =>
-        visibleIds.has(x.playerId),
-      ),
-      diagnostics,
-      generatedAt: new Date(
-        Math.max(
-          ...[
-            universalProjectionFresh && projection?.generatedAt,
-            docs.status?.generatedAt,
-            docs.players?.generatedAt,
-            docs.tournaments?.generatedAt,
-          ]
-            .map(Date.parse)
-            .filter(Number.isFinite),
-          Date.parse(previous.generatedAt || "") || 0,
-        ),
-      ).toISOString(),
-    };
-    state.data = normalizeMatchProjection(state.data);
-    if (projection && state.initialMatchProjectionPending) {
-      state.initialMatchProjectionPending = false;
-      renderedDataSignature = "";
-    }
-    await saveCachedData(state.data);
-    if (!uiSelectionRestored) {
-      state.data.players.forEach((p) => state.selected.add(p.id));
-      uiSelectionRestored = true;
-    } else
-      state.selected = new Set(
-        [...state.selected].filter((id) =>
-          state.data.players.some((p) => p.id === id),
-        ),
-      );
-    syncLabel(state.data, optionalFailures > 0);
-    renderIfDataChanged();
+    publishProjection(projection, docs, settled);
   } catch (e) {
     if (selectionEpoch !== (state.playerSelectionEpoch || 0)) return;
     const fallback = state.data || cachedData();

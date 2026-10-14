@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const source = readFileSync(new URL('../../v3.js', import.meta.url), 'utf8');
 const mergeSource = source.slice(source.indexOf('function mergeKnownMatches('), source.indexOf('function clearDemographicFilters('));
+const agendaSource = source.slice(source.indexOf('function mergeAgenda('), source.indexOf('function mergeKnownMatches('));
 const loader = source.slice(source.indexOf('async function load('), source.indexOf('document.addEventListener("click", (event) => {', source.indexOf('async function load(')));
 const label = source.slice(source.indexOf('function syncLabel('), source.indexOf('function unavailableLabel('));
 function setup(group, projection, {cached = null, staticData = {}, staticOffline = false} = {}) {
@@ -23,11 +24,69 @@ function setup(group, projection, {cached = null, staticData = {}, staticOffline
     renderIfDataChanged() {}, restoreUiScroll() {}, unavailableLabel: () => unavailable++,
     $: id => nodes[id] || {},
   };
-  vm.createContext(ctx); vm.runInContext(mergeSource + label + loader, ctx);
+  vm.createContext(ctx); vm.runInContext(agendaSource + mergeSource + label + loader, ctx);
   return {ctx, nodes, saved: () => saved, requests: () => requests, unavailable: () => unavailable};
 }
 const player = {id: 'a', name: 'Europe Player', userAdded: true};
 const matches = ['tennis-europe', 'tennis-europe', 'tennis-europe'].map((circuit, i) => ({id: `m${i}`, playerId: 'a', circuit, date: '2026-10-01'}));
+for (const group of ['main', 'others']) {
+  test(`${group}: a fresh win renders before secondary JSON and durable cache complete`, async () => {
+    const scheduled = {...matches[0], status: 'scheduled', date: '2026-10-14'};
+    const completed = {...scheduled, status: 'completed', score: '6-0 6-3', result: '6-0 6-3', advances: true};
+    const cached = {group, personalProjectionComplete: true, players: [player], tournaments: [{playerId: player.id}], matches: [scheduled], agenda: [scheduled]};
+    const c = setup(group, {group, membershipIds: [player.id], players: [player], tournaments: [{playerId: player.id}], matches: [completed]}, {cached});
+    let releaseFiles, releaseCache;
+    const files = new Promise(resolve => {releaseFiles = resolve;});
+    const cache = new Promise(resolve => {releaseCache = resolve;});
+    let filesReady = false, cacheReady = false;
+    const renders = [];
+    c.ctx.v3json = async () => {await files; return {};};
+    c.ctx.saveCachedData = () => cache;
+    c.ctx.location = {hash: '#agenda'};
+    c.ctx.state.data = cached; // Startup has already restored the visible copy.
+    c.ctx.scrollY = 840;
+    c.ctx.scrollTo = ({top}) => {c.ctx.scrollY = top;};
+    c.ctx.renderIfDataChanged = () => {
+      renders.push({score: c.ctx.state.data.agenda[0]?.score, filesReady, cacheReady});
+      c.ctx.scrollY = 0; // Simulate layout clamping during a DOM replacement.
+    };
+    c.ctx.state.selected = new Set([player.id]);
+    c.ctx.state.sexFilter = 'F';
+    c.ctx.state.agendaDate = new Date('2026-10-14T12:00:00Z');
+    const loading = c.ctx.load();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.ok(renders.some(r => r.score === '6-0 6-3' && !r.filesReady && !r.cacheReady));
+    assert.equal(c.ctx.state.data.matches.length, 1);
+    assert.equal(c.requests(), 1);
+    assert.deepEqual(Array.from(c.ctx.state.selected), [player.id]);
+    assert.equal(c.ctx.state.sexFilter, 'F');
+    assert.equal(c.ctx.state.agendaDate.toISOString(), '2026-10-14T12:00:00.000Z');
+    assert.equal(c.ctx.scrollY, 840);
+    assert.equal(c.ctx.location.hash, '#agenda');
+    filesReady = true; releaseFiles();
+    await loading; // A still-pending durable write must not keep the loader busy.
+    assert.equal(c.ctx.loadRunning, false);
+    assert.equal(cacheReady, false);
+    assert.equal(c.ctx.state.data.agenda[0].score, '6-0 6-3');
+    assert.equal(c.ctx.state.data.agenda.length, 1);
+    assert.equal(c.ctx.scrollY, 840);
+    cacheReady = true; releaseCache();
+  });
+}
+
+test('a cancelled group request cannot publish its early API result', async () => {
+  const cached = {group: 'main', personalProjectionComplete: true, players: [player], tournaments: [], matches};
+  const c = setup('main', null, {cached});
+  let release;
+  c.ctx.apiProjection = () => new Promise(resolve => {release = resolve;});
+  const loading = c.ctx.load();
+  c.ctx.state.playerSelectionEpoch = 1;
+  release({group: 'main', players: [{id: 'foreign'}], tournaments: [], matches: []});
+  await loading;
+  assert.deepEqual(Array.from(c.ctx.state.data.players, p => p.id), [player.id]);
+  assert.equal(c.ctx.state.data.matches.length, matches.length);
+});
+
 for (const group of ['main', 'others']) {
   test(`${group}: identical loader keeps acquired Europe matches and works without static files`, async () => {
     const c = setup(group, {group, players: [player], tournaments: [{playerId: 'a'}], matches}, {staticOffline: true});
