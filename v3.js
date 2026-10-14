@@ -1577,7 +1577,14 @@ function mergeKnownMatches(...sources) {
     const update = Object.fromEntries(Object.entries(match).filter(([, value]) =>
       value !== undefined && value !== null && value !== "" &&
       (!Array.isArray(value) || value.length > 0)));
-    matches.set(key, { ...previous, ...update });
+    const merged = { ...previous, ...update };
+    // The API explicitly checked the participants: no winning team exists yet.
+    // Clear an obsolete cached loss without treating partial responses as resets.
+    if (match.outcomeConfirmed === false) {
+      delete merged.advances;
+      delete merged.won;
+    }
+    matches.set(key, merged);
   }
   return [...matches.values()];
 }
