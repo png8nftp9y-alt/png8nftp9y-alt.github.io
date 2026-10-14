@@ -38,7 +38,7 @@ const db={prepare(sql){const bound=params=>({all:async()=>{
   if(!same)throw Error('Concurrent change or history result mismatch: '+result.kind);
  }
  return {results:result.rows};
- },first:async()=> (await query(sql,params)).rows[0]||null});return {...bound([]),bind:bound};}};
+ },first:async()=> (await query(sql,params)).rows[0]||null});return {...bound([]),bind:(...params)=>bound(params)};}};
 try{
  const candidates=(await query('SELECT DISTINCT payload FROM user_app_player_additions ORDER BY payload LIMIT 8')).rows;
  const players=[];
