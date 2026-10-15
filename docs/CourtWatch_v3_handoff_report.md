@@ -5785,3 +5785,11 @@ ITF discovery 2026-10-15T12:09:28.268Z: 0 newly discovered future tournaments; M
 ITF discovery 2026-10-15T17:23:41.306Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-15T21:49:34.369Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 16 ottobre 2026 — Intestazione tornei nella pagina avversario
+
+Richiesta: rimuovere il luogo del torneo dalla pagina avversario, allineare PROGRAMMATO/CONCLUSO alla sinistra del nome e rendere gialla l'intera intestazione dei tornei in corso, come nella pagina giocatore.
+
+Correzione v3.js: eliminata la riga luogo/collegamento Maps dal solo renderer avversario; etichetta e titolo riuniti nel gruppo flex opponentTournamentTitle dentro la stessa intestazione. Il gruppo resta unito anche quando date e badge dei tabelloni vanno a capo. Superficie, ambiente, link ufficiale, eventi, date e incontri conservati. v3.css: la regola gialla precedente non aveva !important ed era superata dalle vecchie intestazioni grigie; ora la regola specifica del torneo in corso impone #ffe98a e rimuove i bordi grigi con la stessa priorità. Revisione JS/CSS aggiornata in v3.html.
+
+Validazione: 10 test passati, inclusi renderer con rimozione luogo per tutti i circuiti, etichetta CONCLUSO prima del titolo, parità della selezione frontend/Worker, partite e raggruppamenti. Adeguato il conteggio sezioni del test Europe alla classe ongoingTournament introdotta dalla precedente modifica; rimosso il vecchio obbligo testuale Torneo in corso. Parsing JavaScript, verify-analysis-ui e git diff --check passati. Nessuna modifica alla selezione dei tornei o alla pipeline; nessuna lettura/scrittura D1 o R2 aggiunta. Rendering visivo autenticato da confermare dopo la pubblicazione.

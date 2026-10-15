@@ -487,4 +487,7 @@ button.brand:focus-visible{outline:2px solid var(--blue);outline-offset:4px;bord
 /* FITP registration dates belong to the individual player entry. */
 .fitpSubscriptionDate{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
 .completedTournamentLabel{display:inline-flex;align-items:center;border-radius:999px;background:#452063;color:#fff!important;font-size:11px!important;font-weight:800;line-height:1;padding:7px 10px;letter-spacing:.04em}
-.opponentHistoryKind{margin:0 0 8px}.opponentHistoryKind[hidden]{display:none}.opponentHistoryTournament.ongoingTournament>.opponentHistoryTournamentHead{background:#ffe98a;border:0}
+.opponentTournamentTitle{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto}
+.opponentTournamentTitle>h4{min-width:0;white-space:normal;overflow-wrap:anywhere}
+.opponentTournamentTitle>.scheduledTournamentLabel,.opponentTournamentTitle>.completedTournamentLabel{flex-shrink:0}
+.opponentHistoryTournament.ongoingTournament>.opponentHistoryTournamentHead{background:#ffe98a!important;border:0!important}

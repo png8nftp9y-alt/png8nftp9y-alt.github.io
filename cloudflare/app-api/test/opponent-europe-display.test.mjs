@@ -36,7 +36,7 @@ test('browser and Worker use identical tournament selection, including cached hi
  const data=v.ctx.opponentHistoryProjection({tournaments:rows});
  assert.deepEqual(Array.from(data.tournaments,t=>t.id),['current','p4','p3','p2']);
  assert.equal(data.tournaments[1].matches.length,1);assert.equal(data.tournaments[1].circuit,'tennis-europe');
- v.ctx.renderOpponentHistory({tournaments:rows});assert.equal((v.html().match(/class="opponentHistoryTournament"/g)||[]).length,4);assert.ok(v.html().includes('Torneo in corso'));
+ v.ctx.renderOpponentHistory({tournaments:rows});assert.equal((v.html().match(/class="opponentHistoryTournament(?: ongoingTournament)?"/g)||[]).length,4);assert.ok(v.html().includes('class="opponentHistoryTournament ongoingTournament"'));assert.ok(!v.html().includes('Torneo in corso'));
 });
 test('legacy Europe matches survive rendering; FITP and ITF matches remain excluded',()=>{
  const v=view(),base={startDate:'2026-10-01',endDate:'2026-10-07'},match={score:'2-6 3-6',status:'completed',won:false,opponents:[{name:'Other'}]};
