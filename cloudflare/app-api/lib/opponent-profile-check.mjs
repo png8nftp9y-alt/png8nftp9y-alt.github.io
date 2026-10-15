@@ -18,8 +18,8 @@ export async function checkOpponentProfiles({worker,client,email,names,asOf}) {
   const started=performance.now();
   try {
    const response=await worker.fetch(new Request(url,{headers:{'Cf-Access-Authenticated-User-Email':email}}),{DB:db},{});
-   const body=await response.json(),complete=response.ok&&Array.isArray(body.tournaments);
-   cases.push({case:index+1,status:response.status,complete,elapsedMs:Math.round(performance.now()-started),queries,identityMapped:canonical.length===1,nativeIdentityUnique:native.length===1,tournaments:complete?body.tournaments.length:0,matches:complete?body.tournaments.reduce((n,t)=>n+(t.matches||[]).length,0):0});
+   const body=await response.json(),valid=response.ok&&Array.isArray(body.tournaments),resolved=canonical.length===1||native.length===1||Boolean(body.profile?.profile_id)||(valid&&body.tournaments.length>0),complete=valid&&resolved;
+   cases.push({case:index+1,status:response.status,complete,resolved,elapsedMs:Math.round(performance.now()-started),queries,identityMapped:canonical.length===1,nativeIdentityUnique:native.length===1,tournaments:valid?body.tournaments.length:0,matches:valid?body.tournaments.reduce((n,t)=>n+(t.matches||[]).length,0):0,...(!complete?{error:!response.ok?'http_error':!valid?'invalid_response':'profile_not_identified'}:{})});
   } catch {
    cases.push({case:index+1,status:null,complete:false,elapsedMs:Math.round(performance.now()-started),queries,error:'request_failed'});
   }

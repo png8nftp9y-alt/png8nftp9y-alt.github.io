@@ -24,3 +24,21 @@ test('guard prevents a Worker replay from writing and ambiguous native IDs are n
  const report=await checkOpponentProfiles({worker,client,email:'private@example.test',names:['First Person'],asOf:'2026-10-14'});
  assert.equal(report.complete,false);assert.equal(report.cases[0].error,'request_failed');assert.equal(writes,0);
 });
+
+test('HTTP 200 with an empty unidentified profile cannot certify the named opponent',async()=>{
+ const report=await checkOpponentProfiles({worker:{fetch:async()=>Response.json({tournaments:[]})},client:{query:async()=>[]},email:'private@example.test',names:['Unknown Opponent'],asOf:'2026-10-15'});
+ assert.equal(report.cases[0].status,200);
+ assert.equal(report.cases[0].resolved,false);
+ assert.equal(report.cases[0].error,'profile_not_identified');
+ assert.equal(report.complete,false);
+});
+
+test('a uniquely mapped profile can legitimately have no tournament history',async()=>{
+ const client={query:async sql=>sql.includes('p.canonical_id FROM player_identity_people')?[{canonical_id:'person:test'}]:[]};
+ const worker={fetch:async request=>{
+  assert.equal(new URL(request.url).searchParams.get('profileId'),'person:test');
+  return Response.json({tournaments:[]});
+ }};
+ const report=await checkOpponentProfiles({worker,client,email:'private@example.test',names:['Known Opponent'],asOf:'2026-10-15'});
+ assert.equal(report.cases[0].resolved,true);assert.equal(report.complete,true);
+});
