@@ -2962,6 +2962,13 @@ function opponentHistoryProjection(data) {
   data = withoutPucItfReferences(data);
   return {...data, tournaments: opponentTournamentWindow(data.tournaments.map(t => ({...t, matches: (t.matches || []).filter(m => circuit({...m, circuit: m.circuit || circuit(t)}) === 'tennis-europe')})), iso(new Date()))};
 }
+function opponentTournamentStatusHtml(tournament) {
+  if (tournament.historyKind === "upcoming")
+    return '<span class="scheduledTournamentLabel">PROGRAMMATO</span>';
+  if (tournament.historyKind === "current")
+    return '';
+  return '<span class="completedTournamentLabel">CONCLUSO</span>';
+}
 function renderOpponentHistory(data) {
   data = opponentHistoryProjection(data);
   const badges=$("opponentCircuitProfiles");if(badges)badges.innerHTML=playerCircuitLinksHtml(data.circuitProfiles||[]);
@@ -3002,7 +3009,7 @@ function renderOpponentHistory(data) {
             const entryLabel = !(tournament.matches || []).length && tournament.entryStatus
               ? `<p class="opponentTournamentEntry">${esc(source === "itf" && tournament.acceptanceCode ? `Iscritto · ${tournament.acceptanceCode}` : "Iscritto")}</p>`
               : "";
-            return `<section class="opponentHistoryTournament"><p class="opponentHistoryKind">${tournament.historyKind === "current" ? "Torneo in corso" : tournament.historyKind === "upcoming" ? "Prossimo torneo programmato" : "Torneo passato"}</p><header class="opponentHistoryTournamentHead"><h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header>${tournamentPlace(tournament) !== "Luogo da pubblicare" ? `<p>📍 <a class="tournamentMapsLink" href="${esc(tournamentMapsUrl(tournamentPlace(tournament)))}" target="_blank" rel="noopener">${esc(tournamentPlace(tournament))}</a></p>` : ""}${entryLabel}<div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [])}</div></section>`;
+            return `<section class="opponentHistoryTournament${tournament.historyKind === "current" ? " ongoingTournament" : ""}"><p class="opponentHistoryKind"${tournament.historyKind === "current" ? " hidden" : ""}>${opponentTournamentStatusHtml(tournament)}</p><header class="opponentHistoryTournamentHead"><h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header>${tournamentPlace(tournament) !== "Luogo da pubblicare" ? `<p>📍 <a class="tournamentMapsLink" href="${esc(tournamentMapsUrl(tournamentPlace(tournament)))}" target="_blank" rel="noopener">${esc(tournamentPlace(tournament))}</a></p>` : ""}${entryLabel}<div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [])}</div></section>`;
           },
         )
         .join("")
@@ -3190,7 +3197,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   follow.title = "Aggiungi giocatore";
   follow.setAttribute("aria-label", "Aggiungi giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentCircuitProfiles" class="playerCircuitProfiles"></span><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Tre tornei passati e uno in corso o futuro</h3></div><div id="opponentTournamentHistory"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Aggiungi giocatore</button></p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentCircuitProfiles" class="playerCircuitProfiles"></span><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Tornei</h3></div><div id="opponentTournamentHistory"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Aggiungi giocatore</button></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
   $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", (event) => {
