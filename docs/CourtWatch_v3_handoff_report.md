@@ -5779,3 +5779,5 @@ Limiti: questa modifica corregge la scelta e la presentazione della storia dispo
 Rimosso il titolo descrittivo sui tre passati e uno corrente/futuro: la sezione si chiama Tornei. Futuri con badge rosso PROGRAMMATO; in corso con intestazione gialla #ffe98a come pagina giocatore, senza pallino e senza etichetta testuale; conclusi con CONCLUSO bianco su viola scuro. Modificati v3.js, v3.css e revisione asset v3.html. Selezione tornei, partite e pipeline invariati. Validazione: parsing JavaScript, controllo dei tre stati e intestazione, verifica UI completa e diff senza errori. Verifica visiva dopo deploy ancora necessaria.
 
 ITF discovery 2026-10-15T05:10:44.076Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-10-15T12:09:28.268Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
