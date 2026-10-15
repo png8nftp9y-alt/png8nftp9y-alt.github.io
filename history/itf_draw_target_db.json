@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-10-15T21:37:56.462Z",
+  "generatedAt": "2026-10-15T21:42:49.399Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
@@ -774088,13 +774088,13 @@
       "startDate": "2026-10-13",
       "endDate": "2026-10-18",
       "decision": "pending",
-      "checkedAt": "2026-10-15T21:37:56.462Z",
+      "checkedAt": "2026-10-15T21:42:49.399Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 4,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 4,
-      "missingSections": 2,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -774208,14 +774208,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 2,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -775281,6 +775281,40 @@
             "complete": true,
             "taskId": "J-J60-CAN-2026-006__G-D-M-KO",
             "storedAt": "2026-10-15T20:24:54.045Z"
+          }
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800763038",
+              "name": "Advay Singh",
+              "givenName": "Advay",
+              "familyName": "Singh",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/advay-singh/800763038/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800767397",
+              "name": "Noah Vinbaytel",
+              "givenName": "Noah",
+              "familyName": "Vinbaytel",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/noah-vinbaytel/800767397/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-15T21:42:49.399Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-CAN-2026-006__B-S-M-KO",
+            "storedAt": "2026-10-15T21:42:49.399Z"
           }
         }
       }
