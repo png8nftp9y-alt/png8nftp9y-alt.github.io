@@ -44,7 +44,7 @@ for(const circuit of ['tennis-europe','fitp','itf']){
 test('an explicitly unconfirmed outcome clears a cached loss; partial responses preserve confirmed results',()=>{
  const source=readFileSync(new URL('../../../v3.js',import.meta.url),'utf8');
  const context={Map,circuit:()=> 'tennis-europe',agendaKey:m=>m.id};vm.createContext(context);
- vm.runInContext(source.slice(source.indexOf('function mergeKnownMatches('),source.indexOf('function clearDemographicFilters(')),context);
+ vm.runInContext(source.slice(source.indexOf('function agendaKey('),source.indexOf('function clearDemographicFilters(')),context);
  const previous={id:'m',advances:false,won:false,score:''};
  const neutral=context.mergeKnownMatches([previous],[{id:'m',status:'scheduled',outcomeConfirmed:false}])[0];
  assert.equal(neutral.advances,undefined);assert.equal(neutral.won,undefined);

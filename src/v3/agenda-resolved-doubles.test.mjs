@@ -67,3 +67,35 @@ test('one-off Marsa repair preserves other dates, players, tournaments, rounds, 
   assert.equal(context.canonicalPlayerMatches([{...stale,...change}]).length,1,JSON.stringify(change));
  }
 });
+
+// Screenshot: Cernat, Buzau, 25 September; placeholder plus completed semifinal.
+const cernatFull={id:'cernat-completed',matchId:'official-result',playerId:'cernat',competitionId:'buzau-2026',date:'2026-09-25',event:'GS12 - Girls Singles 12 Main Draw',round:'Semi final',circuit:'tennis-europe',opponent:'Niya Prodanova',score:'6-2 6-1',result:'6-2 6-1',advances:false};
+const cernatPending={...cernatFull,id:'cernat-provisional',matchId:'old-schedule',opponent:'Avversario da definire',opponentPending:true,score:'',result:'scheduled'};
+test('Cernat completed semifinal replaces obsolete singles schedule across caches and shared projections',()=>{
+ for(const rows of [[cernatPending,cernatFull],[cernatFull,cernatPending]]){
+  assert.deepEqual(Array.from(context.mergeAgenda([],rows),m=>m.id),['cernat-completed']);
+  assert.deepEqual(Array.from(context.mergeKnownMatches(rows),m=>m.id),['cernat-completed']);
+  const projection=context.normalizeMatchProjection({matches:rows,agenda:rows});
+  for(const field of ['matches','agenda'])assert.deepEqual(Array.from(projection[field],m=>m.id),['cernat-completed']);
+ }
+});
+test('unresolved singles remain visible without evidence that the same match has been resolved',()=>{
+ assert.equal(context.mergeAgenda([],[cernatPending]).length,1);
+ for(const change of [{manual:true},{score:'6-4'},{result:'W/O'},{playerId:'another'},{competitionId:'another'},{date:'2026-09-26'},{date:''},{round:'Quarter final'},{round:''},{event:'GS12 Qualifying'},{event:''},{event:'GD12 - Girls Doubles 12 Main Draw',matchType:'doubles',partner:'Partner'},{circuit:'fitp'}]){
+  assert.equal(context.mergeAgenda([],[{...cernatPending,...change},cernatFull]).length,2,JSON.stringify(change));
+ }
+});
+test('all player history sections reconcile a provisional singles match before rendering',()=>{
+ const local={...context,groupedMatchSections:matches=>matches,matchHistoryRowHtml(){},matchMeta:()=>({isDouble:false}),doublesPartnerGroupKey:()=>''};vm.createContext(local);
+ vm.runInContext(source.slice(source.indexOf('function matchHistorySectionsHtml('),source.indexOf('function tournamentOfficialUrl(')),local);
+ assert.deepEqual(Array.from(local.matchHistorySectionsHtml([cernatPending,cernatFull]),m=>m.id),['cernat-completed']);
+});
+
+test('opponent page replaces the Cernat placeholder using the actual opponents-array payload',()=>{
+ const local={...context,groupedMatchSections:matches=>matches};vm.createContext(local);
+ vm.runInContext(source.slice(source.indexOf('function opponentHistoryMatchSectionsHtml('),source.indexOf('function opponentTournamentWindow(')),local);
+ const pending={date:'2026-09-25',event:'GS12',round:'Semi final',status:'scheduled',opponents:[],partners:[]};
+ const completed={...pending,status:'completed',score:'6-2 6-1',opponents:[{name:'Niya Prodanova'}]};
+ assert.deepEqual(Array.from(local.opponentHistoryMatchSectionsHtml([pending,completed])),[completed]);
+ assert.deepEqual(Array.from(local.opponentHistoryMatchSectionsHtml([pending])),[pending]);
+});

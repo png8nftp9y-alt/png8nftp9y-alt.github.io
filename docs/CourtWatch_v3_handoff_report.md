@@ -5739,3 +5739,11 @@ Difetto frontend confermato: una risposta ripristinata dalla cache persistente p
 Diagnosi read-only: aggiunti nome pubblico, date e conteggio restituito per ciascun torneo. Soltanto per tornei Europe vuoti non futuri, una lettura condivisa dell'inventario e aggregati circoscritti al torneo distinguono archivio senza match, date mancanti, soli match futuri e candidati nominali non proiettati. Le corrispondenze nominali sono indizi diagnostici, non prova d'identità: non associano alcun incontro. Nessun identificatore personale o payload nei log; nessuna modifica D1. Queste query aggiuntive appartengono esclusivamente al workflow diagnostico, non alla pagina.
 
 Validazione: 12 test mirati passati e verify-analysis-ui verde. Regressioni su cache persistente vuota, vecchia chiave, cambio della proiezione, richieste concorrenti, fallimento con conservazione dei match, limite prefetch e copertura per torneo. npm run check completo Worker passato (exit 0); git diff --check passato. Limiti: questa correzione non acquisisce partite mancanti nell'archivio e non dimostra la completezza di ogni avversaria. Nuova diagnosi D1 e verifica autenticata da completare dopo la pubblicazione dell'utente.
+
+## 2026-10-15 — Partite provvisorie sostituite da incontri completi
+Riconciliate righe Tennis Europe con stesso giocatore, torneo, data,
+categoria e turno. Corretto il duplicato Cernat/Buzau del 25 settembre.
+Applicato a cache, agenda, storico giocatore, torneo e avversario.
+Conservate partite senza controparte, righe manuali e risultati.
+Nessuna nuova query o scrittura D1. 71 test superati.
+Verifica visiva del profilo autenticato da effettuare dopo deploy.

@@ -1558,15 +1558,17 @@ function mergeAgenda(agenda, matches) {
   const token = value => String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
   const doubles = m => m.matchType === 'doubles' || /doubles|doppio|\b[bg]d\d*/i.test(m.event || m.draw || '') || Boolean(m.partner);
   const resolved = m => !m.opponentPending && Boolean(String(m.opponent || '').trim()) && !/da definire/i.test(m.opponent);
+  const pendingValue = value => !token(value) || /^(scheduled|programmat[oa]|not started|pending|da disputare)$/.test(token(value));
   return rows.filter(m => {
-    if (m.manual || !doubles(m) || resolved(m)) return true;
-    return !rows.some(other => other !== m && doubles(other) && resolved(other) &&
-      m.playerId === other.playerId && token(m.competitionId) && token(m.competitionId) === token(other.competitionId) &&
-      token(m.date).replaceAll('-', '') === token(other.date).replaceAll('-', '') &&
+    if (m.manual || resolved(m) || !pendingValue(m.result) || !pendingValue(m.score)) return true;
+    return !rows.some(other => other !== m && resolved(other) &&
+      circuit(m) === 'tennis-europe' && circuit(other) === circuit(m) &&
+      doubles(m) === doubles(other) && m.playerId && m.playerId === other.playerId &&
+      token(m.competitionId) && token(m.competitionId) === token(other.competitionId) &&
+      token(m.date) && token(m.date).replaceAll('-', '') === token(other.date).replaceAll('-', '') &&
       token(m.event || m.draw) && token(m.event || m.draw) === token(other.event || other.draw) &&
       token(m.round) && token(m.round) === token(other.round) &&
-      (!m.partner || !other.partner || token(m.partner) === token(other.partner)) &&
-      !m.result && !m.score);
+      (!m.partner || !other.partner || token(m.partner) === token(other.partner)));
   });
 }
 function mergeKnownMatches(...sources) {
@@ -1587,7 +1589,7 @@ function mergeKnownMatches(...sources) {
     }
     matches.set(key, merged);
   }
-  return [...matches.values()];
+  return mergeAgenda([], [...matches.values()]);
 }
 function clearDemographicFilters() {
   state.categoryFilters.clear();
@@ -2917,6 +2919,14 @@ function groupedMatchSections(matches, rowHtml, doublesKey, doublesIdentity = do
   return sections.join("");
 }
 function opponentHistoryMatchSectionsHtml(matches) {
+  // This renderer receives one player's matches within one tournament.
+  const scoped = matches.map((match,index) => ({...match,
+    id:`history-${index}`,matchId:`history-${index}`,historyIndex:index,
+    circuit:'tennis-europe',playerId:'current-profile',competitionId:'current-tournament',
+    opponent:(match.opponents || []).map(person=>person.name).filter(Boolean).join(' / '),
+    partner:(match.partners || []).map(person=>person.name).filter(Boolean).join(' / '),
+  }));
+  matches = mergeAgenda([],scoped).map(match=>matches[match.historyIndex]);
   return groupedMatchSections(
     matches,
     (match) => opponentHistoryMatchRowHtml(match, matches),
@@ -3279,6 +3289,7 @@ function matchHistoryRowHtml(m, contextMatches = []) {
   return `<div class="opponentHistoryMatch unifiedMatchRow matchWithAnalysis">${matchAnalysisButton(m)}<span class="opponentHistoryRound unifiedMatchMeta"><time>${esc(displayDate(m.date) || "data da pubblicare")}</time><span class="matchRoundFull">${esc(round)}</span></span><span class="opponentHistoryOpponent unifiedMatchOpponent"><span>${opponentHtml(m, x)}</span></span><strong class="result ${outcome}">${result ? esc(result) : ""}</strong></div>`;
 }
 function matchHistorySectionsHtml(matches) {
+  matches = mergeAgenda([], matches);
   return groupedMatchSections(
     matches,
     (match) => matchHistoryRowHtml(match, matches),

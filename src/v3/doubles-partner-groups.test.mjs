@@ -8,7 +8,9 @@ const ctx={readableText:v=>String(v||'').trim(),matchMeta:m=>({isDouble:m.matchT
  matchHistoryRowHtml:m=>`<div class="row">${m.id}:${m.score||''}</div>`,
  opponentHistoryPersonHtml:p=>`<button data-id="${p.profileId||'pending'}">${p.name}${p.ranking?' n°'+p.ranking:''}</button>`,
  opponentHistoryMatchRowHtml:m=>`<div class="row">${m.id}:${m.score||''}</div>`};
+ctx.circuit=m=>m.circuit;
 vm.createContext(ctx);
+vm.runInContext(source.slice(source.indexOf('function agendaKey('),source.indexOf('function mergeKnownMatches(')),ctx);
 vm.runInContext(source.slice(source.indexOf('const readablePerson ='),source.indexOf('const IOC_REGION =')),ctx);
 vm.runInContext(source.slice(source.indexOf('function doublesPartnerGroupKey('),source.indexOf('function renderOpponentHistory(')),ctx);
 vm.runInContext(source.slice(source.indexOf('function matchHistorySectionsHtml('),source.indexOf('function tournamentOfficialUrl(')),ctx);
