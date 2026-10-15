@@ -15,6 +15,7 @@ const card=value=>String(value||'').replace(/\D+/g,'');
 const iso=value=>{const match=String(value||'').match(/^(20\d{2}-\d{2}-\d{2})/);return match?match[1]:''};
 const esc=value=>`'${String(value??'').replaceAll("'","''")}'`;
 const stable=value=>Array.isArray(value)?value.map(stable):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).filter(([key])=>!['fetchedAt','observedAt','generatedAt','lastSeenAt'].includes(key)).map(([key,item])=>[key,stable(item)])):value;
+async function desiredState(){
 const fitp=await readGz('fitp_participant_cache.json.gz'),itf=await readGz('itf_participant_cache.json.gz'),te=await readGz('tennis_europe_participant_cache.json.gz'),profiles=new Map();
 function add(circuit,officialId,name,tournament){const displayName=clean(name),normalizedName=norm(displayName);if(!normalizedName)return;const id=clean(officialId)||`name:${normalizedName}`,key=`${circuit}|${id}`,profile=profiles.get(key)||{circuit,sourcePlayerId:id,normalizedName,displayName,tournaments:new Map()};const tournamentKey=String(tournament.competitionId||'').toUpperCase();if(tournamentKey){const previous=profile.tournaments.get(tournamentKey);profile.tournaments.set(tournamentKey,circuit==='fitp'?{...tournament,subscriptionDates:mergeFitpSubscriptionDates(previous,tournament),subscriptionRegistrations:mergeFitpSubscriptionRegistrations(previous,tournament)}:tournament);}profiles.set(key,profile)}
 for(const snapshot of Object.values(fitp.tournaments||{})){const startDate=iso(snapshot.startDate),endDate=iso(snapshot.endDate);if(endDate&&endDate<FROM)continue;const tournament={competitionId:String(snapshot.competitionId||'').toUpperCase(),name:snapshot.tournamentName||'Torneo FITP',location:snapshot.location||'',venueName:snapshot.venueName||'',address:snapshot.address||'',startDate,endDate,sourceUrl:snapshot.sourceUrl||'',entryStatus:'iscritto'};for(const player of snapshot.participants||[])add('fitp',card(player.membershipCard),player.full1||player.full2,{...tournament,draw:player.draw||'',ranking:player.ranking||'',subscriptionDates:fitpSubscriptionDates(player),subscriptionRegistrations:fitpSubscriptionRegistrations(player)})}
@@ -26,8 +27,21 @@ for(const entry of cachedItfDrawEntries(officialDraws,{from:FROM})){
 }
 for(const snapshot of Object.values(te.tournaments||{})){const startDate=iso(snapshot.startDate),endDate=iso(snapshot.endDate);if(endDate&&endDate<FROM)continue;const tournament={competitionId:String(snapshot.competitionId||'').toUpperCase(),name:snapshot.tournamentName||'Torneo Tennis Europe',location:snapshot.location||'',startDate,endDate,sourceUrl:snapshot.acceptanceListUrl||'',entryStatus:'confirmed_on_acceptance_list'};for(const player of snapshot.participants||[])add('tennis-europe',player.participantId,player.playerName,{...tournament,acceptanceCode:player.code||'',acceptancePosition:player.position??null,event:player.event||''})}
 const tournamentOrder=(a,b)=>String(b.startDate).localeCompare(String(a.startDate))||String(a.competitionId||"").localeCompare(String(b.competitionId||""))||JSON.stringify(stable(a)).localeCompare(JSON.stringify(stable(b)));const rows=[...profiles.values()].map(profile=>({...profile,tournaments:[...profile.tournaments.values()].sort(tournamentOrder)})).sort((a,b)=>a.circuit.localeCompare(b.circuit)||a.sourcePlayerId.localeCompare(b.sourcePlayerId));
+return {rows,complete:te.status==='tennis_europe_participant_cache_complete'&&['fitp','itf','tennis-europe'].every(c=>rows.some(r=>r.circuit===c))};
+}
+const preparedPath='tmp/opponent-entry-desired.json';
+const fromPrepared=process.argv.includes('--from-prepared');
+const {rows,complete}=fromPrepared?JSON.parse(await fs.readFile(preparedPath,'utf8')):await desiredState();
+if(!complete||!Array.isArray(rows)||!['fitp','itf','tennis-europe'].every(c=>rows.some(r=>r.circuit===c)))throw Error('Opponent entry source incomplete');
+const desiredHash=crypto.createHash('sha256').update(JSON.stringify({version:'native-aliases-v1',rows:stable(rows)})).digest('hex');
+if(fromPrepared){const saved=JSON.parse(await fs.readFile(preparedPath,'utf8'));if(saved.hash!==desiredHash)throw Error('Prepared opponent entry state checksum mismatch');}
+if(process.argv.includes('--prepare')){
+ await fs.mkdir('tmp',{recursive:true});await fs.writeFile(preparedPath,JSON.stringify({rows,complete,hash:desiredHash}));
+ await fs.rm(OUTPUT,{recursive:true,force:true});await fs.mkdir(OUTPUT,{recursive:true});await fs.writeFile(`${OUTPUT}/hash.txt`,desiredHash+'\n');
+ console.log(JSON.stringify({status:'opponent_entry_prepared',profiles:rows.length,hash:desiredHash}));
+ process.exit(0);
+}
 const remote=JSON.parse(await fs.readFile('tmp/opponent-entry-remote.json','utf8')).rows||[],sql=['PRAGMA foreign_keys=ON;'],now=new Date().toISOString();
-const complete=te.status==='tennis_europe_participant_cache_complete'&&['fitp','itf','tennis-europe'].every(c=>rows.some(r=>r.circuit===c));
 const aliases=retainedNativeNameAliases(remote,rows,{sourceComplete:complete});
 const current=remote.map(r=>({circuit:r.circuit,sourcePlayerId:r.source_player_id,normalizedName:r.normalized_name,displayName:r.display_name,payload:r.payload}));
 const incoming=rows.map(r=>({circuit:r.circuit,sourcePlayerId:r.sourcePlayerId,normalizedName:r.normalizedName,displayName:r.displayName,payload:JSON.stringify({circuit:r.circuit,sourcePlayerId:r.sourcePlayerId,normalizedName:r.normalizedName,displayName:r.displayName,tournaments:r.tournaments})}));
@@ -38,7 +52,7 @@ const inserted=plan.inserts.length,changed=plan.updates.length,deleted=plan.dele
 console.log(JSON.stringify({status:'opponent_entry_delta_checked',remoteProfiles:remote.length,desiredProfiles:rows.length,retainedLegacyAliases:aliases.length,fitp:rows.filter(r=>r.circuit==='fitp').length,itf:rows.filter(r=>r.circuit==='itf').length,inserted,changed,deleted,delta,riskyDelta:deleted,maxDelta:Number.isFinite(maxDelta)?maxDelta:null}));
 for(const row of [...plan.inserts,...plan.updates.map(u=>u.after)])sql.push(`INSERT INTO opponent_entry_profiles(circuit,source_player_id,normalized_name,display_name,payload,updated_at) VALUES(${esc(row.circuit)},${esc(row.sourcePlayerId)},${esc(row.normalizedName)},${esc(row.displayName)},${esc(row.payload)},${esc(now)}) ON CONFLICT(circuit,source_player_id) DO UPDATE SET normalized_name=excluded.normalized_name,display_name=excluded.display_name,payload=excluded.payload,updated_at=excluded.updated_at WHERE normalized_name IS NOT excluded.normalized_name OR display_name IS NOT excluded.display_name OR payload IS NOT excluded.payload;`);
 for(const row of plan.deletes)sql.push(`DELETE FROM opponent_entry_profiles WHERE circuit=${esc(row.circuit)} AND source_player_id=${esc(row.sourcePlayerId)};`);
-const hash=crypto.createHash('sha256').update(JSON.stringify({version:'native-aliases-v1',rows:stable(rows)})).digest('hex');
+const hash=desiredHash;
 sql.push(`INSERT INTO app_state(key,value,updated_at) VALUES('opponentEntryHash',${esc(hash)},${esc(now)}) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at WHERE value IS NOT excluded.value;`);
 await fs.rm(OUTPUT,{recursive:true,force:true});await fs.mkdir(OUTPUT,{recursive:true});await fs.writeFile(`${OUTPUT}/hash.txt`,hash+'\n');const chunk=400;for(let start=0,index=0;start<sql.length;start+=chunk,index++)await fs.writeFile(`${OUTPUT}/${String(index).padStart(3,'0')}.sql`,sql.slice(start,start+chunk).join('\n')+'\n');
 console.log(JSON.stringify({status:'opponent_entry_profiles_ready',profiles:rows.length,fitp:rows.filter(row=>row.circuit==='fitp').length,itf:rows.filter(row=>row.circuit==='itf').length,inserted,changed,deleted,delta,maxDelta:Number.isFinite(maxDelta)?maxDelta:null,hash}));

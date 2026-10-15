@@ -136,8 +136,7 @@ jobs:
           fi
       - name: Build and import opponent tournament entries
         run: |
-          node scripts/export-opponent-entry-state.mjs
-          node scripts/generate-opponent-entry-seed.mjs
+          node scripts/generate-opponent-entry-seed.mjs --prepare
           LOCAL_ENTRY_HASH=$(tr -d '\r\n' < seed-opponent-entries/hash.txt)
           npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --json \
             --command "SELECT value FROM app_state WHERE key='opponentEntryHash'" > remote-opponent-entry-hash.json
@@ -145,6 +144,8 @@ jobs:
           if [ -n "$REMOTE_ENTRY_HASH" ] && [ "$LOCAL_ENTRY_HASH" = "$REMOTE_ENTRY_HASH" ]; then
             echo "OPPONENT_ENTRY_IMPORT_SKIPPED unchanged=$LOCAL_ENTRY_HASH rows_written=0"
           else
+            node scripts/export-opponent-entry-state.mjs
+            node scripts/generate-opponent-entry-seed.mjs --from-prepared
             for sql_file in seed-opponent-entries/*.sql; do
               echo "Importing $sql_file"
               npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"

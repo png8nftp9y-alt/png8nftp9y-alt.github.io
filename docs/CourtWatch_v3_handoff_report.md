@@ -5793,3 +5793,17 @@ Richiesta: rimuovere il luogo del torneo dalla pagina avversario, allineare PROG
 Correzione v3.js: eliminata la riga luogo/collegamento Maps dal solo renderer avversario; etichetta e titolo riuniti nel gruppo flex opponentTournamentTitle dentro la stessa intestazione. Il gruppo resta unito anche quando date e badge dei tabelloni vanno a capo. Superficie, ambiente, link ufficiale, eventi, date e incontri conservati. v3.css: la regola gialla precedente non aveva !important ed era superata dalle vecchie intestazioni grigie; ora la regola specifica del torneo in corso impone #ffe98a e rimuove i bordi grigi con la stessa priorità. Revisione JS/CSS aggiornata in v3.html.
 
 Validazione: 10 test passati, inclusi renderer con rimozione luogo per tutti i circuiti, etichetta CONCLUSO prima del titolo, parità della selezione frontend/Worker, partite e raggruppamenti. Adeguato il conteggio sezioni del test Europe alla classe ongoingTournament introdotta dalla precedente modifica; rimosso il vecchio obbligo testuale Torneo in corso. Parsing JavaScript, verify-analysis-ui e git diff --check passati. Nessuna modifica alla selezione dei tornei o alla pipeline; nessuna lettura/scrittura D1 o R2 aggiunta. Rendering visivo autenticato da confermare dopo la pubblicazione.
+## 2026-10-15 — Ottimizzazione import profili avversari D1
+Controllo hash anticipato: dati invariati saltano export e confronto profili.
+Dati cambiati usano paginazione per chiave, senza OFFSET.
+Righe preparate riutilizzate con verifica checksum.
+Preservati pianificatore, cancellazioni, alias storici e guardie completezza.
+Nessuna modifica a UI/API, frequenze, risultati o OOP.
+Suite API completa superata. Test SQLite: stessi 120000 profili e ordine,
+circa 65% di istruzioni VM in meno; dato distinto dalle letture reali D1.
+Risparmio complessivo in produzione da verificare dopo deploy.
+
+## 2026-10-16 — Test stato tornei avversario
+Aggiornato il conteggio per includere la classe ongoingTournament.
+Verificati indicatore corrente e tre etichette CONCLUSO, senza vecchio testo.
+Quattro test dello storico avversario superati. Nessuna modifica all'app.
