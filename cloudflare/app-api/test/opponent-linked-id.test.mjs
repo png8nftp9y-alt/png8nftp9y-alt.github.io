@@ -46,7 +46,7 @@ test('real opponent API joins native matches and verified local aliases, keeps h
    d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES(?,?,?,?,?,?,?)',[key,id,'DIRNBEK IVONA','tennis-europe',guid,'IVONA DIRNBEK',person.name]);
   }
   d.execute('CREATE TABLE opponent_entry_profiles(circuit TEXT,source_player_id TEXT,normalized_name TEXT,payload TEXT)');
-  for(const [id,n] of [[native,'Correct Upcoming'],[otherNative,'Wrong Upcoming']])d.execute('INSERT INTO opponent_entry_profiles VALUES(?,?,?,?)',['tennis-europe',id,'old spelling',JSON.stringify({tournaments:[{competitionId:id,name:n,startDate:'2026-10-20',endDate:'2026-10-25'}]})]);
+  for(const [id,n] of [[native,'Correct Upcoming'],[otherNative,'Wrong Upcoming']])d.execute('INSERT INTO opponent_entry_profiles VALUES(?,?,?,?)',['tennis-europe',id,'old spelling',JSON.stringify({tournaments:[{competitionId:id,name:n,startDate:'2026-10-20',endDate:'2026-10-25'},...[8,9,10].map(day=>({competitionId:id+'-entry-'+day,name:'Acceptance only '+day,startDate:'2026-10-'+String(day).padStart(2,'0'),endDate:'2026-10-'+String(day).padStart(2,'0')}))]})]);
   for(const [mid,id,name,payload] of [['native-match',native,'New Spelling',{}],['local-match','78',person.name,raw],['wrong-native',otherNative,person.name,{}],['wrong-local','78',person.name,otherRaw]]){
    const tid='t-'+mid;
    d.execute('INSERT INTO tournaments VALUES(?,?,?,?,?,?)',[tid,'tennis-europe',tid,'2026-10-01','2026-10-07',JSON.stringify({name:tid,startDate:'2026-10-01',endDate:'2026-10-07'})]);
@@ -64,6 +64,9 @@ test('real opponent API joins native matches and verified local aliases, keeps h
   assert.ok(!body.profile?.ranking);
   assert.ok(matches.every(m=>m.opponents[0].profileId===otherNative&&m.opponents[0].ranking===30&&m.opponents[0].rankingDate==='2026-10-01'));
   assert.ok(body.tournaments.some(t=>t.name==='Correct Upcoming'));
+  assert.equal(body.tournaments.filter(t=>t.historyKind==='past').length,2);
+  assert.ok(body.tournaments.filter(t=>t.historyKind==='past').every(t=>t.matches.length>0));
+  assert.ok(!body.tournaments.some(t=>t.name.startsWith('Acceptance only')));
   assert.ok(!body.tournaments.some(t=>t.name==='Wrong Upcoming'));
   assert.ok(!calls.some(sql=>/FROM observed_players|FROM search_acquired_players/.test(sql)),calls.join('\n'));
   assert.ok(!calls.some(sql=>/FROM opponent_entry_profiles WHERE normalized_name/.test(sql)));

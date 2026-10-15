@@ -17,6 +17,13 @@ async function tournamentCoverage(query,tournaments,name,asOf,inventory) {
  return details;
 }
 
+// Names locate diagnostic candidates only, never authorize identity links.
+async function namedPastCoverage(query,name,asOf) {
+ const n=normalizePlayerName(name),variants=[...new Set([n,n.toLowerCase(),n.split(' ').reverse().join(' '),n.split(' ').reverse().join(' ').toLowerCase()])];
+ const rows=await query(`SELECT json_extract(t.payload,'$.name') AS name,json_extract(t.payload,'$.tournamentName') AS tournamentName,t.start_date,t.end_date,COUNT(DISTINCT m.id) AS matches FROM match_participants p CROSS JOIN matches m ON m.id=p.match_id CROSS JOIN tournaments t ON t.id=m.tournament_id WHERE p.normalized_name IN (${variants.map(()=>'?').join(',')}) AND m.circuit='tennis-europe' AND m.played_date<=? AND COALESCE(NULLIF(t.end_date,''),t.start_date)<? GROUP BY m.tournament_id ORDER BY MAX(m.played_date) DESC,m.tournament_id LIMIT 5`,[...variants,asOf,asOf]);
+ return rows.filter(r=>Number(r.matches)>0).map(r=>({name:r.name||r.tournamentName||'',startDate:r.start_date||'',endDate:r.end_date||'',matches:Number(r.matches)}));
+}
+
 // A backend replay against D1, not a browser or the deployed Worker runtime.
 // The wrapper rejects every write. Results expose case numbers, public tournament
 // labels and coverage counts, without person/account identifiers or payloads.
@@ -35,9 +42,9 @@ export async function checkOpponentProfiles({worker,client,email,names,asOf}) {
   const started=performance.now();
   try {
    const response=await worker.fetch(new Request(url,{headers:{'Cf-Access-Authenticated-User-Email':email}}),{DB:db},{});
-   const body=await response.json(),valid=response.ok&&Array.isArray(body.tournaments),resolved=canonical.length===1||native.length===1||Boolean(body.profile?.profile_id)||(valid&&body.tournaments.length>0),complete=valid&&resolved;
-   const elapsedMs=Math.round(performance.now()-started),tournamentDetails=valid?await tournamentCoverage(query,body.tournaments,name,asOf,inventory):[];
-   cases.push({case:index+1,status:response.status,complete,resolved,elapsedMs,queries,identityMapped:canonical.length===1,nativeIdentityUnique:native.length===1,tournaments:valid?body.tournaments.length:0,matches:valid?body.tournaments.reduce((n,t)=>n+(t.matches||[]).length,0):0,tournamentDetails,...(!complete?{error:!response.ok?'http_error':!valid?'invalid_response':'profile_not_identified'}:{})});
+   const body=await response.json(),valid=response.ok&&Array.isArray(body.tournaments),resolved=canonical.length===1||native.length===1||Boolean(body.profile?.profile_id)||(valid&&body.tournaments.length>0),pastEurope=valid?body.tournaments.filter(t=>(t.circuit||'tennis-europe')==='tennis-europe'&&(t.historyKind==='past'||String(t.endDate||t.startDate||'')&&String(t.endDate||t.startDate)<asOf)):[],emptyPastEurope=pastEurope.filter(t=>!(t.matches||[]).length),complete=valid&&resolved&&!emptyPastEurope.length;
+   const elapsedMs=Math.round(performance.now()-started),tournamentDetails=valid?await tournamentCoverage(query,body.tournaments,name,asOf,inventory):[],namedPastCandidates=valid?await namedPastCoverage(query,name,asOf):[];
+   cases.push({case:index+1,status:response.status,complete,resolved,elapsedMs,queries,identityMapped:canonical.length===1,nativeIdentityUnique:native.length===1,tournaments:valid?body.tournaments.length:0,matches:valid?body.tournaments.reduce((n,t)=>n+(t.matches||[]).length,0):0,tournamentDetails,namedPastCandidates,pastEuropeTournaments:pastEurope.length,emptyPastEuropeTournaments:emptyPastEurope.length,...(!complete?{error:!response.ok?'http_error':!valid?'invalid_response':!resolved?'profile_not_identified':'past_europe_without_matches'}:{})});
   } catch {
    cases.push({case:index+1,status:null,complete:false,elapsedMs:Math.round(performance.now()-started),queries,error:'request_failed'});
   }

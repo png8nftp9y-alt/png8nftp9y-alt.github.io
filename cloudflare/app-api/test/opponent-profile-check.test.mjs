@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {database} from './search-sqlite-fixture.mjs';
 import {checkOpponentProfiles} from '../lib/opponent-profile-check.mjs';
 
 test('checks every case once, keeps failures red and emits no names, identities or account',async()=>{
@@ -57,9 +58,36 @@ test('empty Europe tournaments distinguish missing acquisition from unprojected 
   {id:'future',name:'Future',circuit:'tennis-europe',startDate:'2026-11-01',matches:[]}
  ]})};
  const report=await checkOpponentProfiles({worker,client,email:'private@example.test',names:['Known Opponent'],asOf:'2026-10-15'});
+ assert.equal(report.complete,false);assert.equal(report.cases[0].error,'past_europe_without_matches');
+ assert.equal(report.cases[0].emptyPastEuropeTournaments,2);
  const details=report.cases[0].tournamentDetails;
  assert.equal(details[0].evidence,'matches_not_acquired');
  assert.equal(details[1].evidence,'named_candidates_not_projected');assert.equal(details[1].namedDatedCandidates,2);
  assert.equal(details[2].evidence,undefined);assert.equal(catalogReads,1);assert.equal(aggregates,2);
  assert.ok(!JSON.stringify(details).includes('person:test'));
+});
+
+test('current and upcoming empty entries are legitimate but all displayed past Europe tournaments must have matches',async()=>{
+ const client={query:async sql=>sql.includes('p.canonical_id FROM player_identity_people')?[{canonical_id:'person:test'}]:[]};
+ const tournaments=[{circuit:'tennis-europe',historyKind:'current',startDate:'2026-10-12',endDate:'2026-10-18',matches:[]},{circuit:'tennis-europe',historyKind:'upcoming',startDate:'2026-10-20',matches:[]},{circuit:'tennis-europe',historyKind:'past',startDate:'2026-09-01',endDate:'2026-09-07',matches:[{matchId:'m'}]}];
+ const report=await checkOpponentProfiles({worker:{fetch:async()=>Response.json({tournaments})},client,email:'private@example.test',names:['Known Opponent'],asOf:'2026-10-15'});
+ assert.equal(report.complete,true);assert.equal(report.cases[0].pastEuropeTournaments,1);assert.equal(report.cases[0].emptyPastEuropeTournaments,0);
+});
+
+test('archive coverage uses actual SQL and keeps nominal candidates separate from identified history',async()=>{
+ const d=database();
+ try {
+  d.execute('INSERT INTO tournaments VALUES(?,?,?,?,?,?)',['private-t','tennis-europe','private-competition','2026-09-01','2026-09-07',JSON.stringify({name:'Public Tournament'})]);
+  d.execute('INSERT INTO matches VALUES(?,?,?,?,?)',['private-match','private-t','tennis-europe','2026-09-03','{}']);
+  d.execute('INSERT INTO match_participants VALUES(?,?,?,?,?,?,?,?,?)',['private-match','private-person','private-local','Known Opponent','known opponent','ITA',0,0,'{}']);
+  let calls=0;
+  const client={query:async(sql,params)=>{
+   if(sql.includes('COUNT(DISTINCT m.id)')){calls++;return d.execute(sql,params);}
+   return sql.includes('p.canonical_id FROM player_identity_people')?[{canonical_id:'private-canonical'}]:[];
+  }};
+  const report=await checkOpponentProfiles({worker:{fetch:async()=>Response.json({tournaments:[]})},client,email:'private@example.test',names:['Known Opponent'],asOf:'2026-10-15'});
+  assert.equal(calls,1);assert.equal(report.cases[0].tournaments,0);
+  assert.deepEqual(report.cases[0].namedPastCandidates,[{name:'Public Tournament',startDate:'2026-09-01',endDate:'2026-09-07',matches:1}]);
+  assert.ok(!JSON.stringify(report).includes('private-'));
+ } finally {d.close();}
 });
