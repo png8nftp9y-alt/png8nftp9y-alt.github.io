@@ -6,6 +6,8 @@ on:
     paths:
       - '.github/workflows/courtwatch-cloudflare-full-cost-audit.yml'
       - '.github/scripts/cloudflare-full-cost-audit.mjs'
+      - 'cloudflare/app-api/lib/cloudflare-storage-usage.mjs'
+      - 'cloudflare/app-api/test/cloudflare-storage-usage.test.mjs'
 permissions:
   contents: read
 concurrency:
@@ -25,5 +27,7 @@ jobs:
       CLOUDFLARE_BILLING_DAY: '15'
     steps:
       - uses: actions/checkout@v4
+      - name: Verify storage and counter metrics
+        run: node --test cloudflare/app-api/test/cloudflare-storage-usage.test.mjs
       - name: Read Cloudflare account usage
         run: node .github/scripts/cloudflare-full-cost-audit.mjs
