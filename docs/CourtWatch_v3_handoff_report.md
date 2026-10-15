@@ -5747,3 +5747,12 @@ Applicato a cache, agenda, storico giocatore, torneo e avversario.
 Conservate partite senza controparte, righe manuali e risultati.
 Nessuna nuova query o scrittura D1. 71 test superati.
 Verifica visiva del profilo autenticato da effettuare dopo deploy.
+
+## 2026-10-15 — R2 Europe live: contenuto stabile e controllo sempre aggiornato
+Motivo: ogni acquisizione cambiava generatedAt e causava pubblicazione e rotazione R2 anche senza variazioni sportive. Il publisher confronta ora un SHA-256 canonico dell'intero snapshot, escludendo soltanto generatedAt alla radice. Ogni campo di OOP, risultati, giocatori, designazioni, tornei, contatori ed evaluatedOn resta nel confronto. Nessuna decisione si basa sul solo contatore delle transizioni.
+Componenti: helper contenuto/freschezza, publisher e restore live, restore usato dall'importazione D1, test e workflow live. Se il contenuto è invariato si aggiorna soltanto lastCheckedAt nel puntatore current, conservando generazione e backup. I restore verificano prima SHA-256 dei byte originali e poi la firma del contenuto prima di ripristinare generatedAt con l'ultimo controllo. Le acquisizioni ufficiali, gli artifact del ciclo, il confronto delle transizioni e la catena agenda D1 mantengono frequenza e trigger esistenti.
+Validazione: test Node con AWS simulato e script bash reali verificano una scrittura nel ciclo invariato contro cinque a rotazione completa, pubblicazione delle variazioni, lettura live/D1 aggiornata e rifiuto di byte corrotti; controllati sintassi bash e diff. Il primo ciclo dopo l'installazione pubblica una generazione con la nuova firma. Nessun deploy effettuato da questa sessione.
+Limiti: risparmio quattro scritture per ciclo invariato (massimo teorico 11.904 in 31 giorni a 96 cicli/giorno), esclusi costi accessori e variazioni reali. Restano letture di integrità, pruning e backup. FITP, ITF, monitor A/B e frequenze non modificati. La data nel file immutabile R2 identifica la generazione; puntatore, artifact e copie ripristinate conservano la freschezza dell'acquisizione. Verifica live dopo applicazione e run riuscito ancora necessaria.
+
+## 2026-10-15 — Compatibilità test R2 live su Mac
+Il test verifica jq, sha256sum e python3. Se mancanti sul Mac, salta solo l'integrazione; su GitHub resta obbligatoria. Test del contenuto e della freschezza sempre eseguiti. Verificati integrazione Linux e comportamento senza dipendenze. Nessuna modifica al funzionamento produttivo.

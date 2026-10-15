@@ -15,6 +15,9 @@ restore_one(){
   aws_r2 s3 cp "s3://$R2_BUCKET/$prefix/generations/$generation/$name" "$output" --only-show-errors
   test "$(sha256sum "$output"|cut -d' ' -f1)" = "$expected"
   jq -e '.status=="green"' "$output" >/dev/null
+  if test "$prefix" = "tennis-europe/oop-live"; then
+    node ../../src/v3/tennis-europe-oop-r2-content.mjs refresh "$output" "$work/current.json"
+  fi
   rm -rf "$work"
   echo "Restored $pointer generation $generation."
 }

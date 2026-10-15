@@ -11,6 +11,8 @@ on:
       - 'src/v3/compare-tennis-europe-oop-live.mjs'
       - 'src/v3/project-tennis-europe-courtwatch-matches.mjs'
       - 'src/v3/tennis-europe-oop-r2.sh'
+      - 'src/v3/tennis-europe-oop-r2-content.mjs'
+      - 'src/v3/tennis-europe-oop-r2-content.test.mjs'
       - '.github/workflows/courtwatch-tennis-europe-oop-live.yml'
 permissions:
   actions: read
@@ -27,6 +29,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Verify live R2 content policy
+        run: node --test src/v3/tennis-europe-oop-r2-content.test.mjs
       - name: Configure private R2 snapshot storage
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}

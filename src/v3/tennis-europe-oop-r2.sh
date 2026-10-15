@@ -15,6 +15,7 @@ restore(){
   aws_r2 s3 cp "s3://$R2_BUCKET/$PREFIX/generations/$generation/tennis_europe_oop_live.json" dist/v3/previous-tennis-europe-oop/tennis_europe_oop_live.json --only-show-errors
   test "$(sha256sum dist/v3/previous-tennis-europe-oop/tennis_europe_oop_live.json|cut -d' ' -f1)" = "$(jq -r .files.snapshot.sha256 "$work/current.json")"
   jq -e '.status=="green"' dist/v3/previous-tennis-europe-oop/tennis_europe_oop_live.json >/dev/null
+  node src/v3/tennis-europe-oop-r2-content.mjs refresh dist/v3/previous-tennis-europe-oop/tennis_europe_oop_live.json "$work/current.json"
   rm -rf "$work"
   echo "Restored verified Europe OOP live generation $generation."
 }
@@ -22,11 +23,22 @@ publish(){
   work="$(mktemp -d)"
   jq -e '.status=="green"' "$CURRENT" >/dev/null
   jq -e '.status=="green"' "$TRANSITIONS" >/dev/null
+  content_hash="$(node src/v3/tennis-europe-oop-r2-content.mjs hash "$CURRENT")"
+  checked_at="$(jq -er .generatedAt "$CURRENT")"
+  if pointer current "$work/current.json"; then
+    if test "$(jq -r '.contentSha256 // empty' "$work/current.json")" = "$content_hash"; then
+      jq --arg checkedAt "$checked_at" '.lastCheckedAt=$checkedAt' "$work/current.json" > "$work/checked.json"
+      aws_r2 s3 cp "$work/checked.json" "s3://$R2_BUCKET/$PREFIX/pointers/current.json" --only-show-errors
+      prune
+      rm -rf "$work"
+      echo 'Europe OOP content unchanged; live check recorded with one pointer write.'
+      return
+    fi
+  fi
   snapshot_hash="$(sha256sum "$CURRENT"|cut -d' ' -f1)"
   transitions_hash="$(sha256sum "$TRANSITIONS"|cut -d' ' -f1)"
   generation="$(printf '%s\n%s\n' "$snapshot_hash" "$transitions_hash"|sha256sum|cut -d' ' -f1)"
-  jq -n --arg generation "$generation" --arg snapshot "$snapshot_hash" --arg transitions "$transitions_hash" --arg createdAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '{schemaVersion:1,generation:$generation,createdAt:$createdAt,files:{snapshot:{name:"tennis_europe_oop_live.json",sha256:$snapshot},transitions:{name:"tennis_europe_oop_live_transitions.json",sha256:$transitions}}}' > "$work/new.json"
-  if pointer current "$work/current.json"; then current_generation="$(jq -r .generation "$work/current.json")"; if test "$current_generation" = "$generation"; then prune; rm -rf "$work"; echo 'Europe OOP live snapshot unchanged; R2 not rewritten.'; return; fi; fi
+  jq -n --arg content "$content_hash" --arg checkedAt "$checked_at" --arg generation "$generation" --arg snapshot "$snapshot_hash" --arg transitions "$transitions_hash" --arg createdAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '{schemaVersion:1,generation:$generation,createdAt:$createdAt,contentSha256:$content,lastCheckedAt:$checkedAt,files:{snapshot:{name:"tennis_europe_oop_live.json",sha256:$snapshot},transitions:{name:"tennis_europe_oop_live_transitions.json",sha256:$transitions}}}' > "$work/new.json"
   aws_r2 s3 cp "$CURRENT" "s3://$R2_BUCKET/$PREFIX/generations/$generation/tennis_europe_oop_live.json" --only-show-errors
   aws_r2 s3 cp "$TRANSITIONS" "s3://$R2_BUCKET/$PREFIX/generations/$generation/tennis_europe_oop_live_transitions.json" --only-show-errors
   aws_r2 s3 cp "s3://$R2_BUCKET/$PREFIX/generations/$generation/tennis_europe_oop_live.json" "$work/snapshot.json" --only-show-errors
