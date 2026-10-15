@@ -54,7 +54,7 @@ test('promoting an opponent replaces its route so Back returns to the originatin
  const root={querySelector:()=>null},button={textContent:'Aggiungi giocatore',isConnected:false,closest:()=>root};
  const c={Map,location:{hash:stack.at(-1)},history:{state:{},replaceState(_s,_t,hash){stack[stack.length-1]=hash;c.location.hash=hash}},state:{data:{players:[],tournaments:[],matches:[]},selected:new Set()},PRIVATE_API:'api',privateApiOptions:v=>v,fetch:async()=>({ok:true,json:async()=>({added:true,player,playerId:player.id})}),apiProjection:async()=>({players:[player],tournaments:[],matches:[]}),removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),saveUiState(){},saveCachedData(){},playerRemovalMode:false,document:{getElementById:()=>null},renderHome(){},route(){},load(){},encodeURIComponent};
  c.agendaKey = match => `${match.playerId}|${match.matchId || match.id}`;
- const mergeSource = source.slice(source.indexOf('function mergeKnownMatches('), source.indexOf('function clearDemographicFilters('));
+ const mergeSource = source.slice(source.indexOf('function agendaKey('), source.indexOf('function clearDemographicFilters('));
  vm.createContext(c);vm.runInContext(mergeSource + source.slice(source.indexOf('const playerAdditionsInFlight ='),source.indexOf('function openAddPlayerDialog(')),c);
  await c.addCourtWatchPlayerFromUi({identity:'profile-milana',name:player.name},button);
  assert.equal(stack.length,2);assert.equal(stack.pop(),'#player/cw-milana');assert.equal(stack.at(-1),'#calendar');

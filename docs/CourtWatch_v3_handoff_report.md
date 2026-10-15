@@ -5756,3 +5756,9 @@ Limiti: risparmio quattro scritture per ciclo invariato (massimo teorico 11.904 
 
 ## 2026-10-15 — Compatibilità test R2 live su Mac
 Il test verifica jq, sha256sum e python3. Se mancanti sul Mac, salta solo l'integrazione; su GitHub resta obbligatoria. Test del contenuto e della freschezza sempre eseguiti. Verificati integrazione Linux e comportamento senza dipendenze. Nessuna modifica al funzionamento produttivo.
+
+## 2026-10-15 — Correzione controlli deploy
+Aggiornati i test VM per caricare mergeAgenda insieme alle funzioni
+che ora la utilizzano. Riparato il blocco del run 38666570318.
+Suite completa app-api superata nella preparazione.
+Nessuna modifica ai dati o al comportamento dell'app.
