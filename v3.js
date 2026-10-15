@@ -148,6 +148,7 @@ let calendarHeightObserver = null,
   activeOpponentRouteKey = "",
   opponentHistoryCache = new Map(savedEntries(OPPONENT_HISTORY_CACHE)),
   opponentHistoryRequests = new Map(),
+  opponentHistoryValidated = new Map(),
   opponentPrefetchQueue = [],
   opponentPrefetchQueued = new Set(),
   opponentPrefetchActive = 0,
@@ -2998,7 +2999,7 @@ function renderOpponentHistory(data) {
 }
 function opponentHistoryKey(name, event = "", profileId = "") {
   const asOf = iso(new Date()),
-    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "latest-rankings-v5-live-europe"].join("|");
+    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "linked-ids-v6-live-europe"].join("|");
   return { asOf, requestKey };
 }
 function preparedOpponentHistory(name, event = "", profileId = "") {
@@ -3030,9 +3031,15 @@ function mergeOpponentHistory(previous, next) {
   const profileUpdate = Object.fromEntries(Object.entries(next.profile || {}).filter(([, value]) => value !== "" && value !== null && value !== undefined));
   return {...previous, ...next, profile: {...previous.profile, ...profileUpdate}, tournaments: [...tournaments.values()]};
 }
+function opponentHistoryEpoch() {
+  return String(state.data?.generatedAt || "") + "|" + String(state.data?.schemaVersion || "");
+}
+function opponentHistoryIsFresh(requestKey) {
+  return opponentHistoryCache.has(requestKey) && opponentHistoryValidated.get(requestKey) === opponentHistoryEpoch();
+}
 async function fetchOpponentHistory(name, event = "", profileId = "", refresh = false) {
-  const { asOf, requestKey } = opponentHistoryKey(name, event, profileId);
-  if (!refresh && opponentHistoryCache.has(requestKey))
+  const { asOf, requestKey } = opponentHistoryKey(name, event, profileId), epoch = opponentHistoryEpoch();
+  if (!refresh && opponentHistoryIsFresh(requestKey))
     return opponentHistoryCache.get(requestKey);
   if (!opponentHistoryRequests.has(requestKey)) {
     const controller = new AbortController(),
@@ -3054,6 +3061,7 @@ async function fetchOpponentHistory(name, event = "", profileId = "", refresh = 
     if (!Array.isArray(incoming.tournaments)) throw Error("opponent history incomplete");
     const data = mergeOpponentHistory(preparedOpponentHistory(name, event, profileId), incoming);
     opponentHistoryCache.set(requestKey, data);
+    opponentHistoryValidated.set(requestKey, epoch);
     saveEntries(
       OPPONENT_HISTORY_CACHE,
       opponentHistoryCache,
@@ -3078,7 +3086,7 @@ function runOpponentPrefetchQueue() {
     const item = opponentPrefetchQueue.shift(),
       { requestKey } = opponentHistoryKey(item.name, item.event, item.profileId);
     opponentPrefetchQueued.delete(requestKey);
-    if (opponentHistoryCache.has(requestKey)) continue;
+    if (opponentHistoryIsFresh(requestKey)) continue;
     opponentPrefetchActive++;
     fetchOpponentHistory(item.name, item.event, item.profileId)
       .catch(() => {})
@@ -3092,7 +3100,7 @@ function queueOpponentPreload(name, event = "", profileId = "") {
   if (!readablePerson(name)) return;
   const { requestKey } = opponentHistoryKey(name, event, profileId);
   if (
-    opponentHistoryCache.has(requestKey) ||
+    opponentHistoryIsFresh(requestKey) ||
     opponentHistoryRequests.has(requestKey) ||
     opponentPrefetchQueued.has(requestKey)
   )
