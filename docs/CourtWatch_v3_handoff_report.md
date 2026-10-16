@@ -5846,3 +5846,5 @@ Rimosso il vincolo tra apertura profilo e presenza di partite durante il caricam
 Componenti: v3.js, v3.html, player-addition-ui.test.mjs e report. Validazione: 68 test aggiunta/loader/startup passati, inclusi apertura senza partite e senza conferma transitoria, route con dati disponibili, esclusione giocatore rimosso, stato pendente/completo, ripristino cache e rendering di risposta vuota; verifica UI completa e parsing JS passati. Limite: correzione dello stato mostrato durante l'attesa; non accelera la richiesta server né certifica che tornei mancanti siano presenti in D1. Verifica sul giocatore specifico in produzione ancora necessaria.
 
 ITF discovery 2026-10-16T05:03:40.769Z: 1 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-10-16T05:04:27.101Z: attempted 1, acquired 1, ordinary 0, extraordinary 0. Partial metadata preserved; official D1 sync follows.
