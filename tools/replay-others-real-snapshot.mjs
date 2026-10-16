@@ -1,5 +1,7 @@
 import worker from '../cloudflare/app-api/src/index.js';
 import fs from 'node:fs/promises';
+const snapshotPath=process.env.COURTWATCH_OTHERS_SNAPSHOT_PATH||'/tmp/courtwatch-others-snapshot.json';
+await fs.rm(snapshotPath,{force:true});
 const source=await fs.readFile('cloudflare/app-api/src/index.js','utf8');
 const email=source.match(/email:\s*['"]([^'"]+)['"]/)[1];
 const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
@@ -11,5 +13,6 @@ const list=await cf(base+'?name=courtwatch-app&per_page=100'),db=(Array.isArray(
 let queries=0;
 async function select(sql,params){if(!/^\s*(SELECT|WITH)\b/i.test(sql))throw Error('read_only_guard');const start=Date.now();const result=(await cf(base+'/'+(db.uuid||db.id)+'/query',{method:'POST',body:JSON.stringify({sql,params})}))[0];queries++;console.log(JSON.stringify({query:queries,table:sql.match(/\bFROM\s+([\w]+)/i)?.[1]||'select',ms:Date.now()-start,rows:result.results?.length||0}));if(result.success===false)throw Error(clean(result.error));return result}
 const DB={prepare(sql){let params=[];const statement={bind(...values){params=values;return statement},async all(){return select(sql,params)},async first(){return(await select(sql,params)).results?.[0]||null},run(){throw Error('read_only_guard')}};return statement},batch(){throw Error('read_only_guard')}};
-const start=Date.now();let result;try{const response=await worker.fetch(new Request('https://local.invalid/app/api/app-snapshot',{headers:{'Cf-Access-Authenticated-User-Email':email,'X-CourtWatch-Group':'others'}}),{DB},{});const body=await response.json();if(response.status===200)await fs.writeFile('/tmp/courtwatch-others-snapshot.json',JSON.stringify(body));result={status:response.status,ms:Date.now()-start,queries,players:body.players?.length,tournaments:body.tournaments?.length,matches:body.matches?.length,error:body.error||''};}catch(e){result={status:'diagnostic_failed',ms:Date.now()-start,queries,error:clean(e.message)}}
+const start=Date.now();let result;try{const response=await worker.fetch(new Request('https://local.invalid/app/api/app-snapshot',{headers:{'Cf-Access-Authenticated-User-Email':email,'X-CourtWatch-Group':'others'}}),{DB},{});const body=await response.json();if(response.status===200)await fs.writeFile(snapshotPath,JSON.stringify(body));result={status:response.status,ms:Date.now()-start,queries,players:body.players?.length,tournaments:body.tournaments?.length,matches:body.matches?.length,error:body.error||''};}catch(e){result={status:'diagnostic_failed',ms:Date.now()-start,queries,error:clean(e.message)}}
 console.log('OTHERS_READ_ONLY_RESULT='+JSON.stringify(result));
+if(result.status!==200)process.exitCode=1;
