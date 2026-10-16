@@ -88,9 +88,11 @@ test('home player without matches opens immediately even after the transient con
 test('profile route renders an available player without waiting for matches',()=>{
  const start=source.indexOf('  if (player && (!state.data'),end=source.indexOf('  if (currentOpponent)',start);
  const ctx={state:{data:{players:[{id:'new'}],matches:[]},initialMatchProjectionPending:true},removedCourtWatchPlayers:new Set(),player:['#player/new','new'],location:{hash:'#player/new'},requestedHash:'#player/new',initialProjectionRequest:new Promise(()=>{}),load(){throw Error('must not load')},route(){},Promise,decodeURIComponent};
- vm.createContext(ctx);const helper=source.slice(source.indexOf('function hasAvailablePlayerProfile('),source.indexOf('async function openProfile('));
+ vm.createContext(ctx);const helper=source.slice(source.indexOf('function shouldKeepPlayerRefreshPreview('),source.indexOf('async function openProfile('));
  vm.runInContext(helper+'function checkRoute(){'+source.slice(start,end)+'return "render";} ',ctx);
  assert.equal(ctx.checkRoute(),'render');
+ ctx.location.pathname='/v3.html';ctx.location.search='';ctx.window={courtWatchRefreshPreview:{route:'/v3.html#player/new'}};assert.equal(ctx.checkRoute(),undefined);
+ delete ctx.window.courtWatchRefreshPreview;assert.equal(ctx.checkRoute(),'render');
  ctx.state.data.players=[];assert.equal(ctx.checkRoute(),undefined);
 });
 test('cold reload discards a partial old cache and first renders all personal tournaments together',async()=>{
@@ -157,4 +159,14 @@ test('new player never reports no tournaments while enrichment or restored parti
  const signature=source.slice(source.indexOf('function renderDataSignature('),source.indexOf('function renderIfDataChanged('));
  c.context.iso=d=>d.toISOString().slice(0,10);vm.runInContext(signature,c.context);
  assert.notEqual(c.context.renderDataSignature({...c.state.data,personalProjectionComplete:false}),c.context.renderDataSignature({...c.state.data,personalProjectionComplete:true}),'finished empty response must repaint the pending view');
+});
+
+test('refresh keeps the saved profile until match projection is ready without blocking new home links',()=>{
+ const ctx={state:{initialMatchProjectionPending:true,data:{players:[{id:'new'}],matches:[]}},location:{pathname:'/v3.html',search:'?group=others',hash:'#player/new'},window:{courtWatchRefreshPreview:{route:'/v3.html?group=others#player/new'}}};
+ vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function shouldKeepPlayerRefreshPreview('),source.indexOf('function hasAvailablePlayerProfile(')),ctx);
+ assert.equal(ctx.shouldKeepPlayerRefreshPreview('new'),true);
+ ctx.state.data.matches=[{playerId:'new'}];assert.equal(ctx.shouldKeepPlayerRefreshPreview('new'),false);
+ ctx.state.data.matches=[];ctx.state.initialMatchProjectionPending=false;assert.equal(ctx.shouldKeepPlayerRefreshPreview('new'),false);
+ ctx.state.initialMatchProjectionPending=true;ctx.location.hash='#players';assert.equal(ctx.shouldKeepPlayerRefreshPreview('new'),false);
+ ctx.location.hash='#player/new';delete ctx.window.courtWatchRefreshPreview;assert.equal(ctx.shouldKeepPlayerRefreshPreview('new'),false);
 });

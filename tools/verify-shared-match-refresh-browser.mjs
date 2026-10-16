@@ -286,6 +286,18 @@ try {
     await page.waitForFunction(id => location.hash === '#player/' + id, player.id);
     assert.equal(await page.locator('#profileContent .profileHero h2').textContent(), player.name);
     assert.equal(await page.evaluate(() => observedBlankGroupFrame), false);
+    // A new member is clickable from Home even before any match is available.
+    await page.evaluate(() => {
+      state.data.players.push({id: 'new-home-member', name: 'New Home Member', userAdded: true});
+      state.initialMatchProjectionPending = true;
+      confirmedCourtWatchPlayers.clear();
+      initialProjectionRequest = new Promise(() => {});
+      location.hash = '#players';
+    });
+    await page.locator('#playersView.active [data-profile="new-home-member"]').click();
+    await page.waitForFunction(() => location.hash === '#player/new-home-member');
+    assert.equal(await page.locator('#profileContent .profileHero h2').textContent(), 'New Home Member');
+    assert.deepEqual(errors, []);
     console.log(JSON.stringify({group, knownMatches: before.length, seamlessGroupSwitch: 'passed', scopedSelections: 'passed', groupHistory: 'passed', refreshPosition: 'passed', noHomeFlash: 'passed', firstProfile: 'passed', delayedSnapshot: 'passed', newerPartialCache: 'passed', readyOpponentClick: 'passed', recursiveOpponent: 'passed', durableOpponentReload: 'passed', partialRefresh: 'passed', profileDouble: 'passed', cacheReload: 'passed', emptySnapshot: 'passed', europeOnly: 'passed', requests}));
     await page.close();
   }

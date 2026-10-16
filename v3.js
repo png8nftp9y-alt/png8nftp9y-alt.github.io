@@ -2739,6 +2739,12 @@ function renderIfDataChanged() {
   route();
   return true;
 }
+function shouldKeepPlayerRefreshPreview(id) {
+  const preview = typeof window === "undefined" ? null : window.courtWatchRefreshPreview;
+  return Boolean(state.initialMatchProjectionPending && preview &&
+    preview.route === location.pathname + location.search + location.hash &&
+    !state.data?.matches?.some(match => match.playerId === id));
+}
 function hasAvailablePlayerProfile(id) {
   return !removedCourtWatchPlayers.has(id) && Boolean(state.data?.players?.some(player => player.id === id));
 }
@@ -3868,9 +3874,9 @@ function route() {
     primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
   const requestedHash = location.hash;
   if (player && (!state.data || (state.initialMatchProjectionPending &&
-      !hasAvailablePlayerProfile(decodeURIComponent(player[1]))))) {
+      (!hasAvailablePlayerProfile(decodeURIComponent(player[1])) || shouldKeepPlayerRefreshPreview(decodeURIComponent(player[1])))))) {
     Promise.resolve(initialProjectionRequest || load()).then(() => {
-      if (location.hash === requestedHash && (!state.initialMatchProjectionPending || hasAvailablePlayerProfile(decodeURIComponent(player[1])))) route();
+      if (location.hash === requestedHash && (!state.initialMatchProjectionPending || (hasAvailablePlayerProfile(decodeURIComponent(player[1])) && !shouldKeepPlayerRefreshPreview(decodeURIComponent(player[1]))))) route();
     });
     return;
   }
