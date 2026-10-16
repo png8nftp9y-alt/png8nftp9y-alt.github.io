@@ -11,6 +11,6 @@ test('personal header shows only foreign nationality and never adds a sex label'
  assert.equal(context.personalPlayerAffiliationHtml({nationality:'SUI'}),'flag:SUI');
  assert.equal(context.personalPlayerAffiliationHtml({name:'Pietro Sala',membershipCard:'4537099241',nationality:'ITA',club:'CT Decimomannu'}),'Ct Decimomannu ·flag:SUI');
  assert.equal(context.foreignPlayerCountry({name:'Pietro Sala',membershipCard:'999',nationality:'ITA'}),'');
- assert.ok(source.includes('</span></div><p>${personalPlayerAffiliationHtml(p)}'));
+ assert.ok(source.includes('[personalPlayerAffiliationHtml(p), playerBirthLabel(p)'));
  assert.equal(source.includes('</span></div>${personalNationalityHtml(p)}<p>'),false);
 });
