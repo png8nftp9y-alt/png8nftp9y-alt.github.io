@@ -204,9 +204,17 @@ jobs:
           path: dist/v3/shards/itf/draw-tasks/*.json.gz
           if-no-files-found: error
           retention-days: 7
-  review:
+  persist-d1:
     needs: [queue, acquire]
-    if: always() && needs.queue.result == 'success' && needs.queue.outputs.tournaments != '0'
+    if: always() && needs.queue.result == 'success' && needs.queue.outputs.tasks != '0'
+    uses: ./.github/workflows/courtwatch-itf-draw-d1-sync.yml
+    with:
+      run_id: ${{ format('{0}', github.run_id) }}
+      require_artifacts: true
+    secrets: inherit
+  review:
+    needs: [queue, acquire, persist-d1]
+    if: always() && needs.queue.result == 'success' && needs.queue.outputs.tournaments != '0' && (needs.queue.outputs.tasks == '0' || needs.persist-d1.result == 'success')
     concurrency: {group: courtwatch-v3-itf-publish,cancel-in-progress: false,queue: max}
     runs-on: ubuntu-latest
     timeout-minutes: 13

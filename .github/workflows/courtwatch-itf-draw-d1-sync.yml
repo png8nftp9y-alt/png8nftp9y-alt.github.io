@@ -1,8 +1,16 @@
 name: Court Watch ITF acquired draws D1 sync
 on:
+  workflow_call:
+    inputs:
+      run_id:
+        required: true
+        type: string
+      require_artifacts:
+        required: false
+        type: boolean
+        default: false
   workflow_run:
     workflows:
-      - Court Watch v3 ITF T-1 complete draws
       - Court Watch ITF T-1 artifact persistence recovery
       - Court Watch ITF Hanko qualification recovery
     types: [completed]
@@ -37,6 +45,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_RUN_ID: ${{ inputs.run_id || github.event.workflow_run.id }}
+          REQUIRE_DRAW_ARTIFACTS: ${{ inputs.require_artifacts || false }}
         run: |
           set -euo pipefail
           if [ -z "$SOURCE_RUN_ID" ]; then
@@ -53,6 +62,10 @@ jobs:
           if find /tmp/itf-run-draws -name '*.json.gz' -type f | grep -q .; then
             echo "has_draws=true" >> "$GITHUB_OUTPUT"
           else
+            if [ "$REQUIRE_DRAW_ARTIFACTS" = true ]; then
+              echo "Required acquisition artifacts missing: D1 persistence cannot be certified."
+              exit 1
+            fi
             echo "has_draws=false" >> "$GITHUB_OUTPUT"
             echo "NO_DRAW_ARTIFACTS: no D1 coverage claim; inspect source run $SOURCE_RUN_ID if acquisition was expected."
           fi
