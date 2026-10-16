@@ -7,9 +7,9 @@ const mergeSource = source.slice(source.indexOf('function agendaKey('), source.i
 const addition=source.slice(source.indexOf('const playerAdditionsInFlight ='),source.indexOf('function openPlayerSearchResult'));
 const loader=source.slice(source.indexOf('async function load('),source.indexOf('document.addEventListener("click", (event) => {',source.indexOf('async function load(')));
 function context(response){
- const root={querySelector:()=>null,append(){this.error=true}},button={textContent:'Aggiungi giocatore',disabled:false,isConnected:true,closest:()=>root};
+ const root={querySelector:()=>null,append(node){if(Object.hasOwn(node.dataset||{},'playerAddError'))this.error=true;else this.notice=true}},button={textContent:'Aggiungi giocatore',disabled:false,isConnected:true,closest:()=>root};
  const state={data:{players:[],tournaments:[]},selected:new Set()},opened=[],calls=[];
- const context=vm.createContext({console,Headers,Map,Set,Promise,Date,setTimeout,clearTimeout,circuit:m=>m.circuit||"fitp",state,PRIVATE_API:'/app/api',removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),playerRemovalMode:false,
+ const context=vm.createContext({console,Headers,Map,Set,Promise,Date,setTimeout,clearTimeout,PLAYER_GROUP:'main',loadRunning:false,activeLoadCompletion:Promise.resolve(),circuit:m=>m.circuit||"fitp",state,PRIVATE_API:'/app/api',removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),playerRemovalMode:false,
   agendaKey:m=>`${m.playerId}|${m.matchId||m.id}`,privateApiOptions:x=>x,history:{state:{},replaceState(_s,_t,hash){context.location.hash=hash}},route(){opened.push(decodeURIComponent(context.location.hash.slice('#player/'.length)))},location:{hash:'#opponent-profile/101/Test'},document:{getElementById:()=>null,createElement:()=>({dataset:{},setAttribute(){}})},$:()=>root,
   apiProjection:async()=>({players:[{id:'cw-test',name:'Test Player',userAdded:true}],tournaments:[{playerId:'cw-test',competitionId:'cantu',name:'Cantù'}],matches:[]}),
   fetch:async(url,options)=>{calls.push({url,options});return response},saveUiState(){},saveCachedData(){},renderHome(){},openProfile:id=>opened.push(id),load(){},
@@ -19,7 +19,7 @@ function context(response){
 test('confirmed POST changes opponent into a selected Court Watch player and opens player page',async()=>{
  const player={id:'cw-test',name:'Test Player',userAdded:true},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})});
  await c.context.addCourtWatchPlayerFromUi({identity:'101',name:'Test Player'},c.button);
- assert.equal(c.calls[0].options.method,'POST');assert.equal(c.state.data.players[0].id,player.id);assert.equal(c.state.selected.has(player.id),true);assert.deepEqual(c.opened,[player.id]);assert.equal(c.button.disabled,false);assert.equal(c.state.data.tournaments[0].competitionId,'cantu');assert.equal(c.state.data.personalProjectionComplete,true);
+ assert.equal(c.calls[0].options.method,'POST');assert.equal(c.state.data.players[0].id,player.id);assert.equal(c.state.selected.has(player.id),true);assert.deepEqual(c.opened,[player.id]);assert.equal(c.button.disabled,false);assert.equal(c.state.data.tournaments.length,0);assert.equal(c.state.data.personalProjectionComplete,false);
 });
 test('failed POST never promotes player and leaves a retryable button',async()=>{
  const c=context({ok:false,json:async()=>({error:'player_not_found'})});
@@ -30,6 +30,7 @@ test('simultaneous clicks send one request, and navigation during save is respec
  let release;const response=new Promise(resolve=>release=resolve),c=context(null);
  c.context.fetch=async()=>{c.calls.push('POST');return response};
  const first=c.context.addCourtWatchPlayerFromUi({identity:'101'},c.button);
+ assert.equal(c.state.data.players.length,0,'unconfirmed POST must not add membership');
  await c.context.addCourtWatchPlayerFromUi({identity:'101'},c.button);assert.equal(c.calls.length,1);
  c.context.location.hash='#calendar';release({ok:true,json:async()=>({added:true,playerId:'cw-test',player:{id:'cw-test',name:'Test Player'}})});
  await first;assert.equal(c.state.data.players.length,1);assert.equal(c.opened.length,0);
@@ -42,14 +43,46 @@ test('normal reload retains a D1-added player absent from static JSON and their 
  assert.equal(ctx.state.data.players.some(p=>p.id===person.id),true);assert.equal(ctx.state.data.tournaments.some(t=>t.playerId===person.id),true);assert.equal(ctx.state.data.personalProjectionComplete,true);
 });
 
-test('addition does not promote or cache a player before their full snapshot arrives',async()=>{
+test('confirmed membership opens and caches immediately while enrichment is still pending',async()=>{
  const player={id:'cw-test',name:'Test Player',club:'Tennis Club Lecco'},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})});
- let release,started;const began=new Promise(resolve=>started=resolve);
- c.context.apiProjection=()=>{started();return new Promise(resolve=>release=resolve)};
- const operation=c.context.addCourtWatchPlayerFromUi({identity:'101'},c.button);
- await began;assert.equal(c.state.data.players.length,0);assert.equal(c.opened.length,0);
- release({players:[player],tournaments:[{playerId:player.id,name:'Cantù',competitionId:'cantu'}],matches:[]});
- await operation;assert.equal(c.state.data.tournaments[0].name,'Cantù');assert.equal(c.state.data.players[0].club,'Tennis Club Lecco');
+ let release,refreshes=0,saved=0;
+ c.context.load=()=>{refreshes++;return new Promise(resolve=>release=resolve)};
+ c.context.saveCachedData=()=>{saved++};
+ c.state.data.matches=[{id:'known',playerId:'other',circuit:'tennis-europe',score:'6-4 6-3'}];
+ await c.context.addCourtWatchPlayerFromUi({identity:'101'},c.button);
+ assert.equal(c.state.data.players[0].club,'Tennis Club Lecco');assert.deepEqual(c.opened,[player.id]);assert.equal(saved,1);assert.equal(refreshes,1);assert.equal(c.state.data.matches[0].id,'known');
+ assert.equal(c.button.textContent,'Apri giocatore');assert.equal(c.button.disabled,false);
+ release();
+});
+test('Others addition is immediately interactive without a blocking projection request',async()=>{
+ const player={id:'cw-test',name:'Test Player'},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})});c.context.PLAYER_GROUP='others';let refreshed=0;
+ c.context.apiProjection=()=>{throw Error('blocking projection must not run')};c.context.load=async()=>{refreshed++};
+ await c.context.addCourtWatchPlayerFromUi({identity:'101'},c.button);
+ assert.equal(c.state.data.players[0].id,player.id);assert.equal(c.state.selected.has(player.id),true);assert.equal(refreshed,1);assert.deepEqual(c.opened,[player.id]);
+});
+test('shared profile button keeps its new remove action and label after addition',async()=>{
+ const player={id:'cw-test',name:'Test Player'},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})});let removed='';
+ const start=source.indexOf('  const remove = $("removeProfilePlayer");'),end=source.indexOf('  if (profileFilterPlayerId',start);
+ c.button.setAttribute=()=>{};c.context.$=id=>id==='removeProfilePlayer'?c.button:c.root;c.context.requestPlayerRemoval=id=>{removed=id};
+ vm.runInContext('function activateRemoval(id){'+source.slice(start,end)+'}',c.context);
+ c.context.route=()=>c.context.activateRemoval(player.id);
+ await c.context.addCourtWatchPlayerFromUi({identity:'101'},c.button);
+ assert.equal(c.button.textContent,'Rimuovi giocatore');assert.equal(c.button.disabled,false);c.button.onclick();assert.equal(removed,player.id);
+});
+test('background refresh waits for an older load, coalesces additions, and respects group switches',async()=>{
+ const c=context(null);let release,refreshes=0;c.context.loadRunning=true;c.context.activeLoadCompletion=new Promise(resolve=>release=resolve);c.context.load=async()=>{refreshes++};
+ c.state.playerSelectionEpoch=1;const old=c.context.refreshAfterPlayerAddition(1,'main');
+ c.state.playerSelectionEpoch=2;const latest=c.context.refreshAfterPlayerAddition(2,'main');
+ assert.equal(refreshes,0);release();await Promise.all([old,latest]);assert.equal(refreshes,1);
+ c.context.loadRunning=false;c.context.PLAYER_GROUP='others';await c.context.refreshAfterPlayerAddition(2,'main');assert.equal(refreshes,1);
+});
+test('confirmed new player can open before initial match projection without weakening other players guard',async()=>{
+ const c=context(null);c.context.profileNavigationEpoch=0;c.state.initialMatchProjectionPending=true;c.state.data.matches=[];c.context.confirmedCourtWatchPlayers.set('new',{id:'new'});
+ let release;c.context.initialProjectionRequest=new Promise(resolve=>release=resolve);
+ const start=source.indexOf('async function openProfile('),end=source.indexOf('async function openCurrentOpponent(',start);vm.runInContext(source.slice(start,end),c.context);
+ await c.context.openProfile('new');assert.equal(c.context.location.hash,'player/new');
+ c.context.location.hash='#players';const opening=c.context.openProfile('other');assert.equal(c.context.location.hash,'#players');release();await opening;assert.equal(c.context.location.hash,'#players');
+ const routeStart=source.indexOf('if (player && (!state.data'),routeEnd=source.indexOf('if (currentOpponent)',routeStart);assert.ok(source.slice(routeStart,routeEnd).includes('!confirmedCourtWatchPlayers.has(decodeURIComponent(player[1]))'));
 });
 test('cold reload discards a partial old cache and first renders all personal tournaments together',async()=>{
  const person={id:'cw-test',name:'Test Player',userAdded:true},renders=[],partial={players:[person],tournaments:[]};
@@ -80,7 +113,7 @@ test('calendar hides acceptance only for confirmed participant, leaving another 
 
 test('confirmed durable addition remains successful when snapshot refresh fails',async()=>{
  const player={id:'cw-test',name:'Test Player'},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})});
- c.context.apiProjection=async()=>{throw Error('snapshot unavailable')};
+ c.context.load=async()=>{throw Error('snapshot unavailable')};
  await c.context.addCourtWatchPlayerFromUi({identity:'101',name:'Test Player'},c.button);
  assert.equal(c.state.data.players[0].id,player.id);assert.equal(c.state.selected.has(player.id),true);assert.equal(c.state.data.personalProjectionComplete,false);assert.deepEqual(c.opened,[player.id]);assert.equal(c.button.disabled,false);
 });

@@ -2514,10 +2514,17 @@ function playerCircuitLinksHtml(profiles=[]) {
   }).join('');
 }
 const playerAdditionsInFlight = new Map();
+async function refreshAfterPlayerAddition(epoch, group) {
+  if (loadRunning) await activeLoadCompletion;
+  if (epoch !== state.playerSelectionEpoch || group !== PLAYER_GROUP) return;
+  await load();
+}
+
 async function addCourtWatchPlayerFromUi(result, button) {
   const key = result.sourceKey || result.courtwatchId || result.identity;
   if (!key || playerAdditionsInFlight.has(key)) return;
-  const original = button.textContent, routeHash = location.hash;
+  const original = button.textContent, routeHash = location.hash, additionGroup = PLAYER_GROUP;
+  let addedPlayerId = '';
   const root = button.closest('dialog') || button.parentElement || $('profileContent');
   root.querySelector('[data-player-add-error]')?.remove();
   button.disabled = true;
@@ -2534,23 +2541,16 @@ async function addCourtWatchPlayerFromUi(result, button) {
       throw Error(data.error || 'player_addition_not_confirmed');
     if (!state.data) state.data = {players:[],tournaments:[],matches:[]};
     state.playerSelectionEpoch = (state.playerSelectionEpoch || 0) + 1;
-    let projection, projectionReady = true;
-    try {
-      projection = await apiProjection();
-      const confirmedPlayer = projection.players.find(p => p.id === data.playerId);
-      if (!confirmedPlayer) throw Error('player_snapshot_not_ready');
-      data.player = confirmedPlayer;
-    } catch (error) {
-      // POST already confirmed durable membership; a view refresh cannot undo it.
-      projectionReady = false;
-      projection = {players:[...(state.data.players || []).filter(p => p.id !== data.playerId),data.player],tournaments:state.data.tournaments || [],matches:state.data.matches || []};
-    }
-    state.data = {...state.data,players:projection.players,tournaments:projection.tournaments,matches:mergeKnownMatches(state.data.matches || [], projection.matches),personalProjectionComplete:projectionReady};
+    // Durable POST confirmation is sufficient to make membership usable.
+    // Keep the existing projection while its enrichment refreshes in background.
+    state.data = {...state.data, personalProjectionComplete:false};
+    addedPlayerId = data.playerId;
     removedCourtWatchPlayers.delete(data.playerId);
     confirmedCourtWatchPlayers.set(data.playerId,data.player);
     state.data.players = [...(state.data.players || []).filter(p => p.id !== data.playerId),data.player];
     state.selected.add(data.playerId);
-    saveUiState();saveCachedData(state.data);
+    saveUiState();
+    Promise.resolve(saveCachedData(state.data)).catch(error => console.warn("Archivio locale non disponibile", error));
     playerRemovalMode = false;
     const dialog = document.getElementById('addPlayerDialog');
     if (dialog && dialog === root) { dialog.close();dialog.remove(); }
@@ -2562,13 +2562,16 @@ async function addCourtWatchPlayerFromUi(result, button) {
         activeRouteScrollKey=target;route();saveUiState();
       } else openProfile(data.playerId);
     }
-    if (!projectionReady && location.hash === '#player/'+encodeURIComponent(data.playerId)) {
+    if (location.hash === '#player/'+encodeURIComponent(data.playerId)) {
       const notice = document.createElement('p');notice.setAttribute('role','status');
       notice.textContent = 'Giocatore aggiunto. Tornei e dati della pagina in aggiornamento.';
       $('profileContent').append(notice);
     }
-    // The same load path preserves personal players and refreshes stored entries.
-    load();
+    // A load started before this POST has an obsolete selection epoch.
+    // Let it finish, then fetch once for the latest confirmed membership.
+    refreshAfterPlayerAddition(state.playerSelectionEpoch, additionGroup).catch(error => {
+      console.warn('player_addition_refresh_failed', error);
+    });
   })();
   playerAdditionsInFlight.set(key,operation);
   try { await operation; }
@@ -2592,7 +2595,13 @@ async function addCourtWatchPlayerFromUi(result, button) {
     }
   } finally {
     playerAdditionsInFlight.delete(key);
-    if (button.isConnected) {button.disabled=false;button.textContent=original;}
+    if (button.isConnected && button.textContent === 'Aggiunta…') {
+      button.disabled = false;
+      if (addedPlayerId) {
+        button.textContent = 'Apri giocatore';
+        button.onclick = () => openProfile(addedPlayerId);
+      } else button.textContent = original;
+    }
   }
 }
 function openAddPlayerDialog() {
@@ -2736,9 +2745,9 @@ function renderIfDataChanged() {
 }
 async function openProfile(id) {
   const epoch = ++profileNavigationEpoch, previousHash = location.hash;
-  if (state.initialMatchProjectionPending && !state.data?.matches?.some(match => match.playerId === id))
+  if (state.initialMatchProjectionPending && !confirmedCourtWatchPlayers.has(id) && !state.data?.matches?.some(match => match.playerId === id))
     await (initialProjectionRequest || load());
-  if (epoch !== profileNavigationEpoch || location.hash !== previousHash || (state.initialMatchProjectionPending && !state.data?.matches?.some(match => match.playerId === id))) return;
+  if (epoch !== profileNavigationEpoch || location.hash !== previousHash || (state.initialMatchProjectionPending && !confirmedCourtWatchPlayers.has(id) && !state.data?.matches?.some(match => match.playerId === id))) return;
   location.hash = "player/" + encodeURIComponent(id);
 }
 async function openCurrentOpponent(profileId, name, event = "") {
@@ -3647,6 +3656,7 @@ let openProfileTournamentKeys = new Set(
 renderProfile = function (id) {
   const remove = $("removeProfilePlayer");
   remove.hidden = false;
+  remove.disabled = false;
   remove.onclick = () => requestPlayerRemoval(id);
   remove.textContent = "Rimuovi giocatore";
   remove.title = "Rimuovi giocatore";
@@ -3848,6 +3858,7 @@ function route() {
     primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
   const requestedHash = location.hash;
   if (player && (!state.data || (state.initialMatchProjectionPending &&
+      !confirmedCourtWatchPlayers.has(decodeURIComponent(player[1])) &&
       !state.data.matches.some(match => match.playerId === decodeURIComponent(player[1]))))) {
     Promise.resolve(initialProjectionRequest || load()).then(() => {
       if (location.hash === requestedHash && !state.initialMatchProjectionPending) route();
