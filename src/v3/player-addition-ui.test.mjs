@@ -76,13 +76,22 @@ test('background refresh waits for an older load, coalesces additions, and respe
  assert.equal(refreshes,0);release();await Promise.all([old,latest]);assert.equal(refreshes,1);
  c.context.loadRunning=false;c.context.PLAYER_GROUP='others';await c.context.refreshAfterPlayerAddition(2,'main');assert.equal(refreshes,1);
 });
-test('confirmed new player can open before initial match projection without weakening other players guard',async()=>{
- const c=context(null);c.context.profileNavigationEpoch=0;c.state.initialMatchProjectionPending=true;c.state.data.matches=[];c.context.confirmedCourtWatchPlayers.set('new',{id:'new'});
+test('home player without matches opens immediately even after the transient confirmation is gone',async()=>{
+ const c=context(null);c.context.profileNavigationEpoch=0;c.state.initialMatchProjectionPending=true;c.state.data.matches=[];c.state.data.players=[{id:'new',userAdded:true}];
  let release;c.context.initialProjectionRequest=new Promise(resolve=>release=resolve);
- const start=source.indexOf('async function openProfile('),end=source.indexOf('async function openCurrentOpponent(',start);vm.runInContext(source.slice(start,end),c.context);
+ const start=source.indexOf('function hasAvailablePlayerProfile('),end=source.indexOf('async function openCurrentOpponent(',start);vm.runInContext(source.slice(start,end),c.context);
+ assert.equal(c.context.confirmedCourtWatchPlayers.size,0);
  await c.context.openProfile('new');assert.equal(c.context.location.hash,'player/new');
  c.context.location.hash='#players';const opening=c.context.openProfile('other');assert.equal(c.context.location.hash,'#players');release();await opening;assert.equal(c.context.location.hash,'#players');
- const routeStart=source.indexOf('if (player && (!state.data'),routeEnd=source.indexOf('if (currentOpponent)',routeStart);assert.ok(source.slice(routeStart,routeEnd).includes('!confirmedCourtWatchPlayers.has(decodeURIComponent(player[1]))'));
+ c.context.removedCourtWatchPlayers.add('new');await c.context.openProfile('new');assert.equal(c.context.location.hash,'#players');
+});
+test('profile route renders an available player without waiting for matches',()=>{
+ const start=source.indexOf('  if (player && (!state.data'),end=source.indexOf('  if (currentOpponent)',start);
+ const ctx={state:{data:{players:[{id:'new'}],matches:[]},initialMatchProjectionPending:true},removedCourtWatchPlayers:new Set(),player:['#player/new','new'],location:{hash:'#player/new'},requestedHash:'#player/new',initialProjectionRequest:new Promise(()=>{}),load(){throw Error('must not load')},route(){},Promise,decodeURIComponent};
+ vm.createContext(ctx);const helper=source.slice(source.indexOf('function hasAvailablePlayerProfile('),source.indexOf('async function openProfile('));
+ vm.runInContext(helper+'function checkRoute(){'+source.slice(start,end)+'return "render";} ',ctx);
+ assert.equal(ctx.checkRoute(),'render');
+ ctx.state.data.players=[];assert.equal(ctx.checkRoute(),undefined);
 });
 test('cold reload discards a partial old cache and first renders all personal tournaments together',async()=>{
  const person={id:'cw-test',name:'Test Player',userAdded:true},renders=[],partial={players:[person],tournaments:[]};
@@ -134,4 +143,18 @@ test('mixed-case source surnames are readable in search, observed list and playe
  assert.equal(vm.runInContext('readablePerson("Anna ARGINELLI")',ctx),'Anna Arginelli');
  assert.equal(vm.runInContext('readablePerson("Anna McDonald")',ctx),'Anna McDonald');
  assert.ok(source.includes('<h2>${esc(readablePerson(p.name))}</h2>'));
+});
+
+test('new player never reports no tournaments while enrichment or restored partial cache is pending',()=>{
+ const c=context(null),start=source.indexOf('function playerTournamentsEmptyHtml('),end=source.indexOf('function renderProfile(id)',start);
+ vm.runInContext(source.slice(start,end),c.context);
+ c.state.data.players=[{id:'new',userAdded:true}];c.state.data.personalProjectionComplete=false;
+ assert.match(c.context.playerTournamentsEmptyHtml('new'),/role="status"/);
+ assert.doesNotMatch(c.context.playerTournamentsEmptyHtml('new'),/Nessun torneo/);
+ c.state.data.personalProjectionComplete=true;c.context.confirmedCourtWatchPlayers.set('new',{});
+ assert.doesNotMatch(c.context.playerTournamentsEmptyHtml('new'),/Nessun torneo/);
+ c.context.confirmedCourtWatchPlayers.delete('new');assert.match(c.context.playerTournamentsEmptyHtml('new'),/Nessun torneo/);
+ const signature=source.slice(source.indexOf('function renderDataSignature('),source.indexOf('function renderIfDataChanged('));
+ c.context.iso=d=>d.toISOString().slice(0,10);vm.runInContext(signature,c.context);
+ assert.notEqual(c.context.renderDataSignature({...c.state.data,personalProjectionComplete:false}),c.context.renderDataSignature({...c.state.data,personalProjectionComplete:true}),'finished empty response must repaint the pending view');
 });

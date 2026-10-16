@@ -2562,11 +2562,6 @@ async function addCourtWatchPlayerFromUi(result, button) {
         activeRouteScrollKey=target;route();saveUiState();
       } else openProfile(data.playerId);
     }
-    if (location.hash === '#player/'+encodeURIComponent(data.playerId)) {
-      const notice = document.createElement('p');notice.setAttribute('role','status');
-      notice.textContent = 'Giocatore aggiunto. Tornei e dati della pagina in aggiornamento.';
-      $('profileContent').append(notice);
-    }
     // A load started before this POST has an obsolete selection epoch.
     // Let it finish, then fetch once for the latest confirmed membership.
     refreshAfterPlayerAddition(state.playerSelectionEpoch, additionGroup).catch(error => {
@@ -2710,6 +2705,7 @@ function renderDataSignature(data) {
   return JSON.stringify(
     {
       today: iso(new Date()),
+      personalProjectionComplete: data?.personalProjectionComplete,
       players: data?.players || [],
       tournaments: data?.tournaments || [],
       matches: data?.matches || [],
@@ -2743,11 +2739,13 @@ function renderIfDataChanged() {
   route();
   return true;
 }
+function hasAvailablePlayerProfile(id) {
+  return !removedCourtWatchPlayers.has(id) && Boolean(state.data?.players?.some(player => player.id === id));
+}
 async function openProfile(id) {
   const epoch = ++profileNavigationEpoch, previousHash = location.hash;
-  if (state.initialMatchProjectionPending && !confirmedCourtWatchPlayers.has(id) && !state.data?.matches?.some(match => match.playerId === id))
-    await (initialProjectionRequest || load());
-  if (epoch !== profileNavigationEpoch || location.hash !== previousHash || (state.initialMatchProjectionPending && !confirmedCourtWatchPlayers.has(id) && !state.data?.matches?.some(match => match.playerId === id))) return;
+  if (!hasAvailablePlayerProfile(id)) await (initialProjectionRequest || load());
+  if (epoch !== profileNavigationEpoch || location.hash !== previousHash || !hasAvailablePlayerProfile(id)) return;
   location.hash = "player/" + encodeURIComponent(id);
 }
 async function openCurrentOpponent(profileId, name, event = "") {
@@ -3240,6 +3238,14 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   }
   loadOpponentHistory(name, event, identity);
 }
+function playerTournamentsEmptyHtml(playerId) {
+  const pending = confirmedCourtWatchPlayers.has(playerId) ||
+    (state.data?.personalProjectionComplete === false &&
+      state.data?.players?.some(player => player.id === playerId && player.userAdded));
+  return pending
+    ? '<div class="empty" role="status">Giocatore aggiunto. Tornei e partite in aggiornamento.</div>'
+    : '<div class="empty">Nessun torneo pubblicato.</div>';
+}
 function renderProfile(id) {
   activeOpponentRouteKey = "";
   const p = state.data.players.find((x) => x.id === id);
@@ -3307,7 +3313,7 @@ function renderProfile(id) {
     })
     .join("");
   $("profileContent").innerHTML =
-    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><div class="playerNameWithCircuits"><h2>${esc(readablePerson(p.name))}</h2><span class="playerCircuitProfiles">${playerCircuitLinksHtml(p.circuitProfiles||[])}</span></div><p>${[personalPlayerAffiliationHtml(p), playerBirthLabel(p) ? esc(playerBirthLabel(p)) : ""].filter(Boolean).join(" · ")}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
+    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><div class="playerNameWithCircuits"><h2>${esc(readablePerson(p.name))}</h2><span class="playerCircuitProfiles">${playerCircuitLinksHtml(p.circuitProfiles||[])}</span></div><p>${[personalPlayerAffiliationHtml(p), playerBirthLabel(p) ? esc(playerBirthLabel(p)) : ""].filter(Boolean).join(" · ")}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || playerTournamentsEmptyHtml(id)}</div>`;
   loadCurrentPlayerRanking(p);
   $("profileContent")
     .querySelectorAll("[data-open-tournament]")
@@ -3862,10 +3868,9 @@ function route() {
     primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
   const requestedHash = location.hash;
   if (player && (!state.data || (state.initialMatchProjectionPending &&
-      !confirmedCourtWatchPlayers.has(decodeURIComponent(player[1])) &&
-      !state.data.matches.some(match => match.playerId === decodeURIComponent(player[1]))))) {
+      !hasAvailablePlayerProfile(decodeURIComponent(player[1]))))) {
     Promise.resolve(initialProjectionRequest || load()).then(() => {
-      if (location.hash === requestedHash && !state.initialMatchProjectionPending) route();
+      if (location.hash === requestedHash && (!state.initialMatchProjectionPending || hasAvailablePlayerProfile(decodeURIComponent(player[1])))) route();
     });
     return;
   }
