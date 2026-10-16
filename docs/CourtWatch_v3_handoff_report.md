@@ -5872,3 +5872,10 @@ Il run browser 38893433645 sul commit 099b8f787e falliva leggendo Virginia Cereg
 Componenti: tools/verify-shared-match-refresh-browser.mjs e report. Validazione preparazione: sostituzione univoca sul sorgente corrente, parsing JS e sintassi installatore. Il controllo browser completo viene eseguito dall'installatore prima di commit e push; Chromium locale non avviabile nell'ambiente di preparazione per restrizione socket. Il run originale ha superato il precedente controllo conteggio 3 contro 0 nel gruppo main, senza arrivare al gruppo others.
 
 ITF discovery 2026-10-16T21:45:30.571Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-10-16 — Ripresa verifica storage ITF senza nuovi download R2
+
+- Run 38892502169: inventario congelato a 892 tornei (879 completi, 13 cancellati), 5061 tabelloni attesi. Selezione fermata sui due G-S-Q-KO già esclusi esplicitamente dall’utente l’8 ottobre: J-J200-TUR-2026-002 e J-J30-ALG-2026-004. D1 non era stato letto.
+- Nuova ripresa usa esclusivamente gli artefatti di quel run: valida perimetro, identità e hash dei 5059 documenti selezionati e applica soltanto quelle due esclusioni. Nessun nuovo download R2, nessuna acquisizione ITF, nessuna scrittura D1. Documenti mancanti/extra/duplicati e qualsiasi mancanza diversa bloccano la ripresa.
+- Verifica D1 integrale tramite verificatore esistente; artefatti e riepilogo conservano le due esclusioni e il perimetro congelato. Non certifica il periodo completo né i due tabelloni esclusi. Avvio al push del nuovo workflow o manualmente.
+- Validazione: test di ripresa, parità e contenuto documenti; applicazione del preparatore ai veri artefatti scaricati e verificati con SHA256 del ZIP; sintassi JS/YAML. Lettura D1 reale da eseguire tramite workflow con secret esistenti.
