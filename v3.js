@@ -582,6 +582,17 @@ function foreignPlayerCountry(player) {
  const country=confirmedSala ? 'SUI' : String(player?.nationality||player?.country||'').trim().toUpperCase();
  return !country||['IT','ITA','ITALIA','ITALY'].includes(country)?'':country;
 }
+function foreignPlayerCountryLabel(player) {
+  const raw = foreignPlayerCountry({...player, nationality: player?.nationality || player?.country || player?.countryCode || player?.nationalityCode || ''});
+  if (!raw) return '';
+  const region = countryFlagCode(raw).toUpperCase();
+  if (region === 'IT') return '';
+  if (region) {
+    try { return new Intl.DisplayNames(['it'], {type: 'region'}).of(region) || raw; }
+    catch {}
+  }
+  return raw;
+}
 function personalNationalityHtml(player) {
  const country=foreignPlayerCountry(player);
  return country?nationalityHtml(country):'';
@@ -2471,8 +2482,9 @@ function renderPlayers() {
           (t) => t.playerId === p.id && active(t),
         ).length,
         club = esc(displayPlayerClub(p.club) || (playerHasFitpMembership(p) ? "Tesseramento da completare" : "")),
-        card = p.membershipCard ? ` · tessera ${p.membershipCard}` : "";
-      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${club}${esc(card)}${club || card ? " · " : ""}${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
+        card = p.membershipCard ? `tessera ${p.membershipCard}` : "",
+        nation = esc(foreignPlayerCountryLabel(p));
+      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${[club, esc(card), nation, n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"].filter(Boolean).join(" · ")}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
     .join("") || '<div class="empty">Nessun giocatore. Premi + per aggiungerne uno.</div>';
   document.querySelectorAll("[data-profile]").forEach(
