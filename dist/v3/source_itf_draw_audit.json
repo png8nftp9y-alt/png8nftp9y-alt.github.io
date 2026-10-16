@@ -1,21 +1,21 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-16T01:01:14.274Z",
+  "generatedAt": "2026-10-16T01:24:21.439Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
-    "declaredSections": 0,
-    "requestedSections": 0,
-    "acquiredSections": 0,
+    "pendingTournaments": 0,
+    "declaredSections": 6,
+    "requestedSections": 1,
+    "acquiredSections": 6,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 0,
+    "resolvedSections": 6,
     "missingSections": 0,
-    "newSectionsCached": 0,
+    "newSectionsCached": 1,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
@@ -25,11 +25,11 @@
     "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 480,
+    "globalCompleteTournaments": 481,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 61,
+    "globalPendingTotal": 60,
     "globalPendingTechnical": 33,
-    "globalPendingPublication": 28,
+    "globalPendingPublication": 27,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -78,7 +78,6 @@
       "J-J100-MEX-2026-001",
       "J-J100-RSA-2026-001",
       "J-J100-SWE-2026-002",
-      "J-J60-CAN-2026-006",
       "J-J100-FRA-2026-002",
       "J-J200-BOL-2026-002",
       "J-J200-EGY-2026-002",
@@ -98,18 +97,140 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-TPE-2026-001",
-      "tournamentName": "J60 Nantou",
-      "decision": "pending",
+      "competitionId": "J-J60-CAN-2026-006",
+      "tournamentName": "J60 Victoria",
+      "decision": "complete",
       "playersFound": [],
-      "declaredSections": 0,
-      "acquiredSections": 0,
+      "declaredSections": 6,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 0,
+      "resolvedSections": 6,
       "missingSections": 0,
-      "sections": [],
-      "families": [],
+      "sections": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        }
+      ],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 2,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 20,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 6,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 16,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 26,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        }
+      ],
       "eventFailure": null
     }
   ]
