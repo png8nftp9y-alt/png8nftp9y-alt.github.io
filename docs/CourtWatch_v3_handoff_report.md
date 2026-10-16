@@ -5864,3 +5864,5 @@ Il run browser 38831861507 sul commit 27d7d164e6 falliva con conteggio 0 invece 
 Componenti: v3.js, revisione asset v3.html, player-addition-ui.test.mjs, verify-shared-match-refresh-browser.mjs e report. Test browser mantiene intatta la verifica 3 contro 0 e aggiunge in entrambi i gruppi il clic reale su un nuovo giocatore senza partite durante una richiesta pendente. Validazione locale: 69 test aggiunta/loader/startup passati, verifica UI completa, parsing e diff. Limite: esecuzione Chromium locale impedita dall'ambiente (socket Operation not permitted); il test browser completo deve passare sul Mac o in GitHub Actions. Nessuna modifica a D1/R2 o ai motori. Nel run originale policy D1 verde e Pages build verde, deploy annullato.
 
 ITF discovery 2026-10-16T11:58:26.458Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-10-16T17:00:49.473Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
