@@ -5816,3 +5816,11 @@ Validazione: sintassi JavaScript, casi di rendering FITP/Europe/ITF/misti e cach
 Allineata la verifica HTML alla presenza della data di nascita.
 Mantenute le verifiche funzionali di nazionalità e affiliazione.
 Test dedicato superato. Nessuna modifica al codice dell'app o ai dati.
+
+## 2026-10-16 — Iscrizioni future cancellate e cache della pagina
+
+- Causa verificata: publishProjection univa sempre previous.tournaments alla lista nuova. Una iscrizione FITP rimossa continuava quindi a comparire. FITP run 38825033770, job 116730387312: completato senza errori; Scozzafava/Brescia assente da source_fitp_entries.json e tournament_entries.json aggiornati.
+- Correzione frontend condivisa TCL/Altri: una lista completa datata almeno quanto la copia locale sostituisce le iscrizioni future dei giocatori coperti da quella fonte. La lista vuota valida recepisce i ritiri. I JSON TCL non cancellano iscrizioni personali per cui non sono autorevoli.
+- Conservati tornei passati/in corso e senza data; conservata la copia precedente se fonte fallita, non datata, più vecchia, parziale o senza lista tornei. Aggiornata versione JS per il browser. Nessuna query D1 aggiuntiva.
+- Validazione: test del loader reale via VM per entrambi i gruppi, cancellazione e nuova iscrizione confermata, storico/in corso, fallback, fonte obsoleta/parziale e ambito TCL/personale; calendar-startup e check completo app-api; node --check v3.js e git diff --check.
+- Limiti: verifica del comportamento frontend in test, non della sessione privata dopo pubblicazione. La rimozione per assenza riguarda iscrizioni future; lo storico non viene eliminato per assenza dalla lista corrente. Non modificati acquisizione FITP o backend.

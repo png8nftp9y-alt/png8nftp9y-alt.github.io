@@ -4474,13 +4474,31 @@ async function load(preparedProjection = null, preparedDocuments = null) {
       const diagnostics = docs.diagnostics ||
         previous.diagnostics || { overall: "yellow", items: [] };
 
+      // A successful full list replaces future registrations, including removals.
+      // Keep past tournaments and cache-only players when their source is unavailable.
+      const previousGeneration = Date.parse(previous.generatedAt || "") || 0;
+      const freshApiTournaments = Array.isArray(projection?.tournaments) &&
+        projection.partial !== true && projection.complete !== false &&
+        Number.isFinite(apiGeneration) && apiGeneration >= previousGeneration;
+      const staticGeneration = Date.parse(docs.tournaments?.generatedAt || "");
+      const freshStaticTournaments = PLAYER_GROUP === "main" && staticPlayers.length > 0 &&
+        staticTournaments !== null && docs.tournaments.partial !== true &&
+        docs.tournaments.complete !== false && Number.isFinite(staticGeneration) &&
+        staticGeneration >= previousGeneration;
+      const today = iso(new Date());
+      const retainedTournaments = (previous.tournaments || []).filter(t => {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(t.startDate || "") || t.startDate <= today) return true;
+        if (universalProjectionFresh && freshApiTournaments && projectedPlayers.has(t.playerId)) return false;
+        if (!universalProjectionFresh && freshApiTournaments && projectedPlayers.get(t.playerId)?.userAdded) return false;
+        return !(freshStaticTournaments && staticPlayers.some(p => p.id === t.playerId && !p.userAdded));
+      });
       if (selectionEpoch !== (state.playerSelectionEpoch || 0)) return;
       state.data = {
         group: PLAYER_GROUP,
         personalProjectionComplete: Boolean(projection) || previous.personalProjectionComplete === true,
         players: visiblePlayers,
         tournaments: [...new Map([
-          ...(previous.tournaments || []),
+          ...retainedTournaments,
           ...((universalProjectionFresh && projection?.tournaments) || staticTournaments || previous.tournaments || []),
           ...(!universalProjectionFresh && (projection || staticTournaments) ? (projection ? (projection.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : cachedPersonalTournaments(previous, visiblePlayers)) : []),
         ].map(t => [[t.playerId, t.circuit || t.sourceId || "", t.competitionId || t.id || t.name].join("|"), t])).values()].filter((x) => visibleIds.has(x.playerId)),
