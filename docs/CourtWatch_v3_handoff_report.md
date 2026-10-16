@@ -5807,3 +5807,7 @@ Risparmio complessivo in produzione da verificare dopo deploy.
 Aggiornato il conteggio per includere la classe ongoingTournament.
 Verificati indicatore corrente e tre etichette CONCLUSO, senza vecchio testo.
 Quattro test dello storico avversario superati. Nessuna modifica all'app.
+
+## 2026-10-16 — Tesseramento da completare riservato ai giocatori FITP
+Motivo: la lista e la pagina giocatore mostravano il fallback Tesseramento da completare anche per profili esclusivamente Europe/ITF privi di circolo. Ora il fallback richiede evidenza FITP: tessera, circuito di origine esplicito, profilo FITP associato o sourceKey FITP. La sola configurazione circuits non prova un tesseramento e non attiva il messaggio. Conservati circoli disponibili, nazionalità e giocatori con profili misti FITP/Europe/ITF. Eliminati separatori iniziali quando l'affiliazione è vuota. La correzione è condivisa da TCL e Altri, senza nuove letture o scritture D1/R2. File: v3.js, revisione script v3.html, report.
+Validazione: sintassi JavaScript, casi di rendering FITP/Europe/ITF/misti e cache legacy, verifica UI completa, diff e applicabilità patch. Limiti: verifica sul profilo privato dopo pubblicazione ancora necessaria; nessuna correzione delle identità o dei tesseramenti in database.

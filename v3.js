@@ -589,12 +589,18 @@ function personalNationalityHtml(player) {
 function displayPlayerClub(value) {
  return String(value || '').replace(/\bassociazione\s+(?:culturale\s+(?:e\s+)?)?sportiva\s+dilettantistic[ao]\b/gi, '').replace(/\b(?:e\s+)?ricreativa\b/gi, "").replace(/\bdilettantistic[ao]\b/gi, '').replace(/\ba\s*\.\s*s\s*\.\s*d\b\.?|\basd\b/gi, '').replace(/\s+/g, ' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g, '').trim().replace(/(?:\s+e)+$/gi, '').toLocaleLowerCase('it-IT').replace(/(^|[\s’\u0027-])\p{L}/gu, letter => letter.toLocaleUpperCase('it-IT'));
 }
+function playerHasFitpMembership(player) {
+  return Boolean(String(player?.membershipCard || '').trim()) ||
+    [player?.sourceCircuit, player?.circuit].some(value => String(value || '').trim().toLowerCase() === 'fitp') ||
+    (player?.circuitProfiles || []).some(profile => String(profile.circuit || '').trim().toLowerCase() === 'fitp') ||
+    /^fitp[:|/]/i.test(String(player?.sourceKey || ''));
+}
 function personalPlayerAffiliationHtml(player) {
  const country=foreignPlayerCountry(player);
  const club=displayPlayerClub(player?.club);
  if(player?.membershipCard && club)
    return esc(club) + (country ? ' ·' + nationalityHtml(country) : '');
- return country ? nationalityHtml(country) : esc(club || 'Tesseramento da completare');
+ return country ? nationalityHtml(country) : esc(club || (playerHasFitpMembership(player) ? 'Tesseramento da completare' : ''));
 }
 function playerBirthLabel(player) {
   const raw = String(player?.birthDate || player?.dateOfBirth || "").slice(
@@ -2464,9 +2470,9 @@ function renderPlayers() {
       const n = (state.data.tournaments || []).filter(
           (t) => t.playerId === p.id && active(t),
         ).length,
-        club = esc(displayPlayerClub(p.club) || "Tesseramento da completare"),
+        club = esc(displayPlayerClub(p.club) || (playerHasFitpMembership(p) ? "Tesseramento da completare" : "")),
         card = p.membershipCard ? ` · tessera ${p.membershipCard}` : "";
-      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${club}${esc(card)} · ${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
+      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${club}${esc(card)}${club || card ? " · " : ""}${n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
     .join("") || '<div class="empty">Nessun giocatore. Premi + per aggiungerne uno.</div>';
   document.querySelectorAll("[data-profile]").forEach(
@@ -3276,7 +3282,7 @@ function renderProfile(id) {
     })
     .join("");
   $("profileContent").innerHTML =
-    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><div class="playerNameWithCircuits"><h2>${esc(readablePerson(p.name))}</h2><span class="playerCircuitProfiles">${playerCircuitLinksHtml(p.circuitProfiles||[])}</span></div><p>${personalPlayerAffiliationHtml(p)}${playerBirthLabel(p) ? " · " + esc(playerBirthLabel(p)) : " "}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
+    `<div class="card profileHero"><div class="avatar big">${initials(p.name)}</div><div><div class="playerNameWithCircuits"><h2>${esc(readablePerson(p.name))}</h2><span class="playerCircuitProfiles">${playerCircuitLinksHtml(p.circuitProfiles||[])}</span></div><p>${[personalPlayerAffiliationHtml(p), playerBirthLabel(p) ? esc(playerBirthLabel(p)) : ""].filter(Boolean).join(" · ")}${p.membershipCard ? " · tessera " + esc(p.membershipCard) : ""}${playerRankingSummary(p)}</p></div></div><div class="card profileTournamentList"><div class="cardHead"><h3>Tornei</h3><span>${byTournament.size}</span></div>${sections || '<div class="empty">Nessun torneo pubblicato.</div>'}</div>`;
   loadCurrentPlayerRanking(p);
   $("profileContent")
     .querySelectorAll("[data-open-tournament]")
