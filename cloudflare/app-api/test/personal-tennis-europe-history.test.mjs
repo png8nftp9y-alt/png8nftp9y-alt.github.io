@@ -53,6 +53,10 @@ test('promoting an opponent replaces its route so Back returns to the originatin
  const stack=['#calendar','#opponent-profile/profile-milana/Milana%20Shein/GS14'];
  const root={querySelector:()=>null},button={textContent:'Aggiungi giocatore',isConnected:false,closest:()=>root};
  const c={Map,location:{hash:stack.at(-1)},history:{state:{},replaceState(_s,_t,hash){stack[stack.length-1]=hash;c.location.hash=hash}},state:{data:{players:[],tournaments:[],matches:[]},selected:new Set()},PRIVATE_API:'api',privateApiOptions:v=>v,fetch:async()=>({ok:true,json:async()=>({added:true,player,playerId:player.id})}),apiProjection:async()=>({players:[player],tournaments:[],matches:[]}),removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),saveUiState(){},saveCachedData(){},playerRemovalMode:false,document:{getElementById:()=>null},renderHome(){},route(){},load(){},encodeURIComponent};
+ let refreshes=0;const notices=[];
+ Object.assign(c,{PLAYER_GROUP:'main',loadRunning:false,activeRouteScrollKey:'',
+  $:()=>({append:node=>notices.push(node)}),load:async()=>{refreshes++;}});
+ c.document.createElement=()=>({setAttribute(){},textContent:''});
  c.agendaKey = match => `${match.playerId}|${match.matchId || match.id}`;
  const mergeSource = source.slice(source.indexOf('function agendaKey('), source.indexOf('function clearDemographicFilters('));
  vm.createContext(c);vm.runInContext(mergeSource + source.slice(source.indexOf('const playerAdditionsInFlight ='),source.indexOf('function openAddPlayerDialog(')),c);

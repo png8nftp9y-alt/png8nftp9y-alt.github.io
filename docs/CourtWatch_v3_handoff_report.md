@@ -5848,3 +5848,6 @@ Componenti: v3.js, v3.html, player-addition-ui.test.mjs e report. Validazione: 6
 ITF discovery 2026-10-16T05:03:40.769Z: 1 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-10-16T05:04:27.101Z: attempted 1, acquired 1, ordinary 0, extraordinary 0. Partial metadata preserved; official D1 sync follows.
+
+## 2026-10-16 — Correzione fixture aggiunta giocatore
+Run D1 38831500122 e Worker 38831500095 bloccati da PLAYER_GROUP assente nella VM del test di navigazione. Aggiornati gruppo, stato caricamento e nodi simulati per l'avviso. Test dedicato e npm run check completo superati. Nessuna modifica applicativa o alle query D1.
