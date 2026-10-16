@@ -31,7 +31,7 @@ test('partial identical chunks can resume; conflicting chunks or metadata forbid
  assert.throws(()=>assertNoConflict(record,record,[],[{chunk_index:0,content:'wrong'}]),/no overwrite/);
  assert.throws(()=>assertNoConflict(record,record,[{content_sha256:record.sha256,chunk_count:99}],[]),/no overwrite/);
 });
-test('real SQLite import is idempotent and preserves newer version and existing content',async()=>{
+test('D1_TEST_INITIAL_IMPORT / D1_TEST_IDENTICAL_ZERO_WRITES / D1_TEST_REAL_DELTAS_ONLY: SQLite import preserves newer version and existing content',async()=>{
  const schema=(await fs.readFile('cloudflare/app-api/migrations/0025_itf_draw_documents.sql','utf8'))+(await fs.readFile('cloudflare/app-api/migrations/0026_itf_unverified_draw_archive.sql','utf8'));
  const newer=documentRecord({...doc,generatedAt:'2026-10-08T00:00:00Z',players:[{name:'NEW'}]});
  const payload={schema,newSQL:documentSQL(newer).join('\n'),repairSQL:documentSQL(record).join('\n'),oldSha:record.sha256,newSha:newer.sha256};
@@ -47,7 +47,7 @@ print(json.dumps({'header':header,'chunks':chunks}))
 `],{input:JSON.stringify(payload),encoding:'utf8'});
  assert.equal(result.status,0,result.stderr);const actual=JSON.parse(result.stdout);assert.equal(verifyDocument(record,actual.header,actual.chunks),true);
 });
-test('repair scope is exactly the 51 failed keys; additional exceptions cannot be waived',()=>{
+test('D1_TEST_INCOMPLETE_SOURCE_GUARD: scope is exactly 51 failed keys; additional exceptions cannot be waived',()=>{
  const documents=Array.from({length:5059},(_,i)=>({drawKey:'J-J100-ALG-2026-'+String(i).padStart(3,'0')+'|B-S-Q-KO'}));
  const scope={resumedFromRun:38892502169,wanted:documents,userExcludedDraws:['J-J200-TUR-2026-002|G-S-Q-KO','J-J30-ALG-2026-004|G-S-Q-KO'].map(drawKey=>({drawKey}))};
  const failed={status:'failed',expectedDocuments:5059,verifiedDocuments:5008,missingOrCorrupt:documents.slice(0,51).map(d=>({drawKey:d.drawKey,error:'Missing D1 document: '+d.drawKey}))};

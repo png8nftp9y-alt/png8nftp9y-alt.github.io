@@ -1,3 +1,4 @@
+# D1_WRITE_POLICY: incremental
 name: Court Watch ITF repair 51 versions and verify 5059
 on:
   push:
@@ -29,7 +30,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Test incremental repair and automatic persistence guards
-        run: node --test src/v3/itf-storage-51-repair.test.mjs src/v3/itf-automatic-d1-persistence.test.mjs
+        run: node --test src/v3/repair-itf-storage-51.test.mjs cloudflare/app-api/test/itf-automatic-d1-persistence.test.mjs
       - name: Restore original verified R2 source selection
         uses: actions/download-artifact@v4
         with:

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-const read=name=>readFileSync(new URL('../../.github/workflows/'+name,import.meta.url),'utf8');
+const read=name=>readFileSync(new URL('../../../.github/workflows/'+name,import.meta.url),'utf8');
 const pipeline=read('courtwatch-v3-itf-t-minus-one.yml');
 const sync=read('courtwatch-itf-draw-d1-sync.yml');
 const review=pipeline.slice(pipeline.indexOf('  review:\n'),pipeline.indexOf('  continue-ordinary:\n'));
