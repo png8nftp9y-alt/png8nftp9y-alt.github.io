@@ -5866,3 +5866,7 @@ Componenti: v3.js, revisione asset v3.html, player-addition-ui.test.mjs, verify-
 ITF discovery 2026-10-16T11:58:26.458Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-16T17:00:49.473Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-10-16 — Attesa del titolo nel test clic nuovo giocatore
+Il run browser 38893433645 sul commit 099b8f787e falliva leggendo Virginia Cereghini invece di New Home Member subito dopo il cambio hash. Il cambio hash avviene prima dell'evento di navigazione e non prova che il renderer abbia aggiornato il DOM. Il test attende ora sia la URL del nuovo giocatore sia il titolo corrispondente prima dell'asserzione, mantenendo il timeout e tutte le verifiche precedenti; una mancata apertura continua a fallire. Nessuna modifica al comportamento applicativo, D1/R2 o motori.
+Componenti: tools/verify-shared-match-refresh-browser.mjs e report. Validazione preparazione: sostituzione univoca sul sorgente corrente, parsing JS e sintassi installatore. Il controllo browser completo viene eseguito dall'installatore prima di commit e push; Chromium locale non avviabile nell'ambiente di preparazione per restrizione socket. Il run originale ha superato il precedente controllo conteggio 3 contro 0 nel gruppo main, senza arrivare al gruppo others.
