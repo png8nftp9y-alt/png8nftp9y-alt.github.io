@@ -5851,3 +5851,10 @@ ITF Meta ordinary 2026-10-16T05:04:27.101Z: attempted 1, acquired 1, ordinary 0,
 
 ## 2026-10-16 — Correzione fixture aggiunta giocatore
 Run D1 38831500122 e Worker 38831500095 bloccati da PLAYER_GROUP assente nella VM del test di navigazione. Aggiornati gruppo, stato caricamento e nodi simulati per l'avviso. Test dedicato e npm run check completo superati. Nessuna modifica applicativa o alle query D1.
+
+## 2026-10-16 — Verifica puntuale storage ITF corrente
+
+- Aggiunto workflow di sola lettura: congela lo scope corrente dei tornei risolti nell’inventario R2, verifica checksum dell’archivio e dei documenti live, quindi ricostruisce e confronta il contenuto integrale dei documenti D1 con gli hash attesi. Riutilizza i verificatori esistenti senza importazioni o modifiche D1/R2.
+- Scope dinamico verificato e congelato, senza il precedente vincolo storico a 863 tornei. Zero tornei o documenti bloccano la certificazione. Tornei pendenti/futuri restano esplicitamente esclusi.
+- Artefatti includono confronto delle vecchie pendenze con inventario corrente e conteggi dei documenti attesi/verificati. Avvio al push del solo workflow e manuale. Nessun deploy applicazione e nessuna acquisizione dal sito ITF.
+- Validazione locale: parsing YAML, sintassi JavaScript degli step e test esistenti di selezione/parità documenti. Il risultato storage reale dipende dall’esecuzione su GitHub con i secret già configurati; non certificato localmente.
