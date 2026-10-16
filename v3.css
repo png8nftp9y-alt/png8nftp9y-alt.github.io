@@ -491,3 +491,25 @@ button.brand:focus-visible{outline:2px solid var(--blue);outline-offset:4px;bord
 .opponentTournamentTitle>h4{min-width:0;white-space:normal;overflow-wrap:anywhere}
 .opponentTournamentTitle>.scheduledTournamentLabel,.opponentTournamentTitle>.completedTournamentLabel{flex-shrink:0}
 .opponentHistoryTournament.ongoingTournament>.opponentHistoryTournamentHead{background:#ffe98a!important;border:0!important}
+
+/* Agenda: fit complete labels and names inside each match at every card width. */
+.agendaMatchRow,.agendaMatchRow.matches-1,.agendaMatchRow.matches-2,.agendaMatchRow.matches-3{grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));min-width:0;max-width:100%}
+.agendaMatchRow .agendaItem,.agendaMatchRow .agendaItem.agendaLongCourt{grid-template-columns:minmax(0,132px) minmax(0,1fr);column-gap:16px;min-width:0;max-width:100%;height:auto;align-items:start}
+.agendaWhen{display:flex;flex-direction:column;align-self:start;height:auto;min-width:0;max-width:100%;gap:6px}
+.agendaWhenDetails{min-width:0;max-width:100%;gap:6px}
+.agendaRoundLabels{min-width:0;max-width:100%;flex-wrap:wrap!important;white-space:normal}
+.agendaWhen .roundCode,.agendaRoundLabels .drawCode{width:auto;min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.agendaWhen .agendaCourtField,.agendaWhen .agendaRestLabel,.agendaWhen .agendaCourtMatch,.agendaWhen time,.agendaWhen .agendaRestLabel>span,.agendaWhen .agendaCourtMatch>span{min-width:0;max-width:100%;white-space:normal!important;overflow:visible!important;text-overflow:clip;overflow-wrap:anywhere;word-break:normal}
+.agendaMatchBody,.agendaMatchBody .agendaTitle{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.agendaMatchBody .inlinePlayerLink,.agendaMatchBody .opponentPlayerLink,.agendaPartnerName{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.agendaTournamentHead,.agendaChronologicalTournament{min-width:0;flex-wrap:wrap;align-items:flex-start}
+.agendaTournamentHead>div:first-child,.agendaChronologicalTournament>div:first-child{flex:1 1 16rem;min-width:0;max-width:100%}
+.agendaTournamentHead h3,.agendaTournamentHead h3 button,.agendaTournamentHead h3 span,.agendaChronologicalTournament button,.agendaChronologicalTournament>div>span{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.agendaTournamentBadges{min-width:0;max-width:100%}
+.agendaTournamentBadges .tournamentConditions,.agendaChronologicalTournament small{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+@media(max-width:420px){.agendaMatchRow .agendaItem,.agendaMatchRow .agendaItem.agendaLongCourt{grid-template-columns:minmax(0,118px) minmax(0,1fr);column-gap:12px}}
+/* Keep date navigation inside the agenda card when the header wraps. */
+.agendaHead{flex-wrap:wrap;gap:12px}
+.agendaHead>div:first-child{min-width:0;max-width:100%}
+.agendaHead .agendaNav{flex:0 1 390px;min-width:0;max-width:100%;width:390px}
+@media(max-width:650px){.agendaHead .agendaNav{flex-basis:100%;width:100%;grid-template-columns:30px 30px minmax(0,1fr) 30px 30px}.agendaNav>.btn{grid-row:1;min-width:0}.agendaNav>.btn.icon{width:30px;padding-inline:0}.agendaNav #agendaToday{grid-column:3}.agendaNav #agendaGoToday{grid-column:3;grid-row:2}.agendaNav #nextAgenda{grid-column:4}.agendaNav #nextAgendaMonth{grid-column:5}}
