@@ -3075,7 +3075,11 @@ function mergeOpponentHistory(previous, next) {
     tournaments.set(key, {...known, ...tournament, matches: [...matches.values()]});
   }
   const profileUpdate = Object.fromEntries(Object.entries(next.profile || {}).filter(([, value]) => value !== "" && value !== null && value !== undefined));
-  return {...previous, ...next, profile: {...previous.profile, ...profileUpdate}, tournaments: [...tournaments.values()]};
+  // An explicit missing current rank is authoritative, unlike an omitted field.
+  if (next.profile && Object.hasOwn(next.profile, "ranking"))
+    profileUpdate.ranking = next.profile.ranking;
+  const profile = next.profile === null ? null : {...previous.profile, ...profileUpdate};
+  return {...previous, ...next, profile, tournaments: [...tournaments.values()]};
 }
 function opponentHistoryEpoch() {
   return String(state.data?.generatedAt || "") + "|" + String(state.data?.schemaVersion || "");

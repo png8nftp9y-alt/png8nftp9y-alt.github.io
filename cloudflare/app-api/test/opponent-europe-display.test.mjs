@@ -51,6 +51,23 @@ test('fresh neutral outcome clears an obsolete loss in persisted opponent matche
  const t={id:'T',circuit:'tennis-europe',startDate:'2026-10-12'},old={...t,matches:[{matchId:'m',status:'scheduled',won:false}]},fresh={...t,matches:[{matchId:'m',status:'scheduled',outcomeConfirmed:false}]};
  assert.equal(v.ctx.mergeOpponentHistory({tournaments:[old]},{tournaments:[fresh]}).tournaments[0].matches[0].won,undefined);
 });
+test('fresh missing current rank clears the cached header without removing historical match rankings',()=>{
+ const v=view();vm.runInContext(slice(source,'function mergeOpponentHistory(','async function fetchOpponentHistory('),v.ctx);
+ const match={matchId:'m',score:'6-2 6-3',status:'completed',opponents:[{name:'Other',ranking:12,rankingDate:'2026-09-01'}]};
+ const previous={profile:{ranking:80,category:'G14',ranking_date:'2026-10-06',nationality:'ITA'},tournaments:[{id:'T',startDate:'2026-09-01',endDate:'2026-09-07',matches:[match]}]};
+ v.ctx.renderOpponentHistory(previous);assert.equal(v.nodes.opponentProfileRanking.hidden,false);
+ for(const profile of [{ranking:null},null]){
+  const merged=v.ctx.mergeOpponentHistory(previous,{profile,tournaments:[]});
+  v.ctx.renderOpponentHistory(merged);
+  assert.equal(v.nodes.opponentProfileRanking.hidden,true);assert.equal(v.nodes.opponentProfileRanking.textContent,'');
+  assert.equal(merged.tournaments[0].matches[0].opponents[0].ranking,12);
+  assert.equal(merged.tournaments[0].matches[0].opponents[0].rankingDate,'2026-09-01');
+ }
+ const updated=v.ctx.mergeOpponentHistory(previous,{profile:{ranking:55,ranking_date:'2026-10-13'},tournaments:[]});
+ v.ctx.renderOpponentHistory(updated);assert.equal(v.nodes.opponentProfileRanking.hidden,false);assert.ok(v.nodes.opponentProfileRanking.textContent.includes('n°55 TE U14'));
+ assert.equal(updated.profile.nationality,'ITA');
+ assert.equal(v.ctx.mergeOpponentHistory(previous,{tournaments:[]}).profile.ranking,80);
+});
 test('SQLite Europe history through the real API assembler renders current and past matches',async()=>{
  const directory=mkdtempSync(join(tmpdir(),'cw-opponent-europe-')),file=join(directory,'db.sqlite');
  const run=body=>{
