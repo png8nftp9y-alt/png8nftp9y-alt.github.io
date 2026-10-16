@@ -113,8 +113,8 @@ export async function linkedFitpMetadata(db,players){
  return players.map(p=>{const acquired=metadata.get(String(p.membershipCard));if(!acquired)return p;return personalPlayerMetadata({...p,club:acquired.club||p.club},acquired);});
 }
 
-export async function personalPlayerAdditions(env,userId,group='main'){
- const rows=(await env.DB.prepare(`SELECT a.payload,o.payload AS observed_payload FROM user_app_player_additions a JOIN ${playerMembershipTable(group)} u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id LEFT JOIN observed_players o ON o.source_key=a.observed_source_key WHERE a.user_id=? AND ${playerMembershipGuard(group)} ORDER BY a.created_at,a.courtwatch_id`).bind(userId).all()).results||[];
+export async function personalPlayerAdditions(env,userId,group='main',playerId=''){
+ const rows=(await env.DB.prepare(`SELECT a.payload,o.payload AS observed_payload FROM user_app_player_additions a JOIN ${playerMembershipTable(group)} u ON u.user_id=a.user_id AND u.courtwatch_id=a.courtwatch_id LEFT JOIN observed_players o ON o.source_key=a.observed_source_key WHERE a.user_id=? AND ${playerMembershipGuard(group)}${playerId?' AND a.courtwatch_id=?':''} ORDER BY a.created_at,a.courtwatch_id`).bind(userId,...(playerId?[playerId]:[])).all()).results||[];
  const acquired=rows.filter(row=>String(parse(row.payload).sourceKey||'').startsWith('acquired|')),metadata=new Map();for(let i=0;i<acquired.length;i+=40){const keys=acquired.slice(i,i+40).map(row=>parse(row.payload).sourceKey);try{for(const row of await readD1Rows(env.DB,`SELECT source_key,payload FROM search_acquired_players WHERE source_key IN (${keys.map(()=>'?').join(',')})`,keys))metadata.set(row.source_key,parse(row.payload))}catch(error){if(!/no such table/i.test(error.message))throw error}}
  const identities=await storedIdentities(env.DB,rows.map(row=>{const p=parse(row.payload);return p.sourceKey||p.id}));
  const players=[];

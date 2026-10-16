@@ -915,7 +915,7 @@ function calendarCacheSnapshot(data, cachedAt) {
     agenda: (data.agenda || []).filter(match => circuit(match) === "tennis-europe" && !keys.has(agendaKey(match))),
     results: (data.results || []).filter(match => circuit(match) === "tennis-europe"),
     opponents: [], tournamentEntries: [], generatedAt: data.generatedAt,
-    personalProjectionComplete: data.personalProjectionComplete, cachedAt,
+    personalProjectionComplete: data.personalProjectionComplete, personalEnrichedPlayerIds:data.personalEnrichedPlayerIds, cachedAt,
   };
 }
 function openProjectionDatabase() {
@@ -2514,10 +2514,42 @@ function playerCircuitLinksHtml(profiles=[]) {
   }).join('');
 }
 const playerAdditionsInFlight = new Map();
-async function refreshAfterPlayerAddition(epoch, group) {
-  if (loadRunning) await activeLoadCompletion;
-  if (epoch !== state.playerSelectionEpoch || group !== PLAYER_GROUP) return;
-  await load();
+const addedPlayerRefreshes = new Map();
+async function refreshAfterPlayerAddition(epoch, group, playerId) {
+  if (!playerId || group !== PLAYER_GROUP) return;
+  const key = group + '|' + playerId, token = {};
+  addedPlayerRefreshes.set(key, token);
+  try {
+    let data = await fetchProjection(PRIVATE_API + '/app-snapshot?playerId=' + encodeURIComponent(playerId), 45000, group);
+    // During rollout an older Worker can still return its full authorized snapshot.
+    if (data.playerId === undefined) data = {...data,playerId,
+      players:data.players.filter(p => p.id === playerId),
+      tournaments:data.tournaments.filter(t => t.playerId === playerId),
+      matches:data.matches.filter(m => m.playerId === playerId)};
+    if (group !== PLAYER_GROUP || addedPlayerRefreshes.get(key) !== token ||
+        removedCourtWatchPlayers.has(playerId) || !state.data?.players?.some(p => p.id === playerId)) return;
+    if (data.playerId !== playerId || data.group !== group ||
+        data.players.length !== 1 || data.players[0].id !== playerId ||
+        data.tournaments.some(t => t.playerId !== playerId) || data.matches.some(m => m.playerId !== playerId))
+      throw Error('Snapshot del giocatore errato');
+    const previous = state.data, today = iso(new Date());
+    const retained = (previous.tournaments || []).filter(t => t.playerId !== playerId ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(t.startDate || '') || t.startDate <= today);
+    const tournaments = [...new Map([...retained, ...data.tournaments].map(t =>
+      [[t.playerId,t.circuit,t.competitionId || t.id].join('|'),t])).values()];
+    const hash = location.hash, y = typeof scrollY === 'number' ? scrollY : null;
+    state.data = normalizeMatchProjection(applyKnownResultUpdates({...previous,
+      players: previous.players.map(p => p.id === playerId ? {...p,...data.players[0]} : p),
+      tournaments, matches: mergeKnownMatches(previous.matches || [], data.matches),
+      personalEnrichedPlayerIds: [...new Set([...(previous.personalEnrichedPlayerIds || []),playerId])],
+    }, group));
+    confirmedCourtWatchPlayers.delete(playerId);
+    renderIfDataChanged();
+    if (y !== null && location.hash === hash) scrollTo({top:y,behavior:'auto'});
+    Promise.resolve(saveCachedData(state.data)).catch(error => console.warn('Archivio locale non disponibile', error));
+  } finally {
+    if (addedPlayerRefreshes.get(key) === token) addedPlayerRefreshes.delete(key);
+  }
 }
 
 async function addCourtWatchPlayerFromUi(result, button) {
@@ -2543,7 +2575,8 @@ async function addCourtWatchPlayerFromUi(result, button) {
     state.playerSelectionEpoch = (state.playerSelectionEpoch || 0) + 1;
     // Durable POST confirmation is sufficient to make membership usable.
     // Keep the existing projection while its enrichment refreshes in background.
-    state.data = {...state.data, personalProjectionComplete:false};
+    state.data = {...state.data, personalProjectionComplete:false,
+      personalEnrichedPlayerIds:(state.data.personalEnrichedPlayerIds || []).filter(id => id !== data.playerId)};
     addedPlayerId = data.playerId;
     removedCourtWatchPlayers.delete(data.playerId);
     confirmedCourtWatchPlayers.set(data.playerId,data.player);
@@ -2562,9 +2595,9 @@ async function addCourtWatchPlayerFromUi(result, button) {
         activeRouteScrollKey=target;route();saveUiState();
       } else openProfile(data.playerId);
     }
-    // A load started before this POST has an obsolete selection epoch.
-    // Let it finish, then fetch once for the latest confirmed membership.
-    refreshAfterPlayerAddition(state.playerSelectionEpoch, additionGroup).catch(error => {
+    // An older full load cannot overwrite this selection epoch.
+    // Enrich only this player immediately, without waiting for that load.
+    refreshAfterPlayerAddition(state.playerSelectionEpoch, additionGroup, data.playerId).catch(error => {
       console.warn('player_addition_refresh_failed', error);
     });
   })();
@@ -3245,9 +3278,10 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   loadOpponentHistory(name, event, identity);
 }
 function playerTournamentsEmptyHtml(playerId) {
-  const pending = confirmedCourtWatchPlayers.has(playerId) ||
+  const pending = !state.data?.personalEnrichedPlayerIds?.includes(playerId) &&
+    (confirmedCourtWatchPlayers.has(playerId) ||
     (state.data?.personalProjectionComplete === false &&
-      state.data?.players?.some(player => player.id === playerId && player.userAdded));
+      state.data?.players?.some(player => player.id === playerId && player.userAdded)));
   return pending
     ? '<div class="empty" role="status">Giocatore aggiunto. Tornei e partite in aggiornamento.</div>'
     : '<div class="empty">Nessun torneo pubblicato.</div>';

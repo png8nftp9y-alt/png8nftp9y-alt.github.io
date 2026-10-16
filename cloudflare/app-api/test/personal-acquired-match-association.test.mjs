@@ -52,6 +52,11 @@ test('all 270 local-ID TE matches and both other circuits attach, same-name loca
    const snapshot=await response.json();
    assert.equal(snapshot.matches.length,272);
    assert.ok(snapshot.matches.every(m=>m.playerId===player.id&&m.matchId!=='wrong'));
+   const scopedResponse=await worker.fetch(new Request('https://example.test/app/api/app-snapshot?playerId='+encodeURIComponent(player.id),{headers:{'Cf-Access-Authenticated-User-Email':'federico181099@gmail.com','X-CourtWatch-Group':'others'}}),{DB:d.db});
+   assert.equal(scopedResponse.status,200);const scoped=await scopedResponse.json();
+   assert.deepEqual(scoped.matches,snapshot.matches);assert.deepEqual(scoped.tournaments,snapshot.tournaments);
+   assert.equal(scoped.playerId,player.id);
+
   }finally{globalThis.fetch=originalFetch;}
 
  }finally{d.close()}

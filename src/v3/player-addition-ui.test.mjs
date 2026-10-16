@@ -9,7 +9,7 @@ const loader=source.slice(source.indexOf('async function load('),source.indexOf(
 function context(response){
  const root={querySelector:()=>null,append(node){if(Object.hasOwn(node.dataset||{},'playerAddError'))this.error=true;else this.notice=true}},button={textContent:'Aggiungi giocatore',disabled:false,isConnected:true,closest:()=>root};
  const state={data:{players:[],tournaments:[]},selected:new Set()},opened=[],calls=[];
- const context=vm.createContext({console,Headers,Map,Set,Promise,Date,setTimeout,clearTimeout,PLAYER_GROUP:'main',loadRunning:false,activeLoadCompletion:Promise.resolve(),circuit:m=>m.circuit||"fitp",state,PRIVATE_API:'/app/api',removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),playerRemovalMode:false,
+ const context=vm.createContext({console,Headers,Map,Set,Promise,Date,setTimeout,clearTimeout,PLAYER_GROUP:'main',loadRunning:false,activeLoadCompletion:Promise.resolve(),circuit:m=>m.circuit||"fitp",state,PRIVATE_API:'/app/api',fetchProjection:()=>new Promise(()=>{}),iso:()=> '2026-10-17',normalizeMatchProjection:x=>x,applyKnownResultUpdates:x=>x,renderIfDataChanged(){},removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),playerRemovalMode:false,
   agendaKey:m=>`${m.playerId}|${m.matchId||m.id}`,privateApiOptions:x=>x,history:{state:{},replaceState(_s,_t,hash){context.location.hash=hash}},route(){opened.push(decodeURIComponent(context.location.hash.slice('#player/'.length)))},location:{hash:'#opponent-profile/101/Test'},document:{getElementById:()=>null,createElement:()=>({dataset:{},setAttribute(){}})},$:()=>root,
   apiProjection:async()=>({players:[{id:'cw-test',name:'Test Player',userAdded:true}],tournaments:[{playerId:'cw-test',competitionId:'cantu',name:'Cantù'}],matches:[]}),
   fetch:async(url,options)=>{calls.push({url,options});return response},saveUiState(){},saveCachedData(){},renderHome(){},openProfile:id=>opened.push(id),load(){},
@@ -46,17 +46,17 @@ test('normal reload retains a D1-added player absent from static JSON and their 
 test('confirmed membership opens and caches immediately while enrichment is still pending',async()=>{
  const player={id:'cw-test',name:'Test Player',club:'Tennis Club Lecco'},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})});
  let release,refreshes=0,saved=0;
- c.context.load=()=>{refreshes++;return new Promise(resolve=>release=resolve)};
+ c.context.fetchProjection=()=>{refreshes++;return new Promise(resolve=>release=resolve)};
  c.context.saveCachedData=()=>{saved++};
  c.state.data.matches=[{id:'known',playerId:'other',circuit:'tennis-europe',score:'6-4 6-3'}];
  await c.context.addCourtWatchPlayerFromUi({identity:'101'},c.button);
  assert.equal(c.state.data.players[0].club,'Tennis Club Lecco');assert.deepEqual(c.opened,[player.id]);assert.equal(saved,1);assert.equal(refreshes,1);assert.equal(c.state.data.matches[0].id,'known');
  assert.equal(c.button.textContent,'Apri giocatore');assert.equal(c.button.disabled,false);
- release();
+ release({playerId:player.id,group:'main',players:[player],tournaments:[],matches:[]});
 });
 test('Others addition is immediately interactive without a blocking projection request',async()=>{
  const player={id:'cw-test',name:'Test Player'},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})});c.context.PLAYER_GROUP='others';let refreshed=0;
- c.context.apiProjection=()=>{throw Error('blocking projection must not run')};c.context.load=async()=>{refreshed++};
+ c.context.apiProjection=()=>{throw Error('blocking projection must not run')};c.context.fetchProjection=()=>{refreshed++;return new Promise(()=>{})};
  await c.context.addCourtWatchPlayerFromUi({identity:'101'},c.button);
  assert.equal(c.state.data.players[0].id,player.id);assert.equal(c.state.selected.has(player.id),true);assert.equal(refreshed,1);assert.deepEqual(c.opened,[player.id]);
 });
@@ -69,12 +69,44 @@ test('shared profile button keeps its new remove action and label after addition
  await c.context.addCourtWatchPlayerFromUi({identity:'101'},c.button);
  assert.equal(c.button.textContent,'Rimuovi giocatore');assert.equal(c.button.disabled,false);c.button.onclick();assert.equal(removed,player.id);
 });
-test('background refresh waits for an older load, coalesces additions, and respects group switches',async()=>{
- const c=context(null);let release,refreshes=0;c.context.loadRunning=true;c.context.activeLoadCompletion=new Promise(resolve=>release=resolve);c.context.load=async()=>{refreshes++};
- c.state.playerSelectionEpoch=1;const old=c.context.refreshAfterPlayerAddition(1,'main');
- c.state.playerSelectionEpoch=2;const latest=c.context.refreshAfterPlayerAddition(2,'main');
- assert.equal(refreshes,0);release();await Promise.all([old,latest]);assert.equal(refreshes,1);
- c.context.loadRunning=false;c.context.PLAYER_GROUP='others';await c.context.refreshAfterPlayerAddition(2,'main');assert.equal(refreshes,1);
+test('targeted enrichment starts during an older full load and ignores late replies after removal or group switch',async()=>{
+ for(const changed of ['removed','group']){
+  const c=context(null),player={id:'cw-test',userAdded:true};c.state.data.players=[player];c.context.loadRunning=true;
+  c.context.activeLoadCompletion=new Promise(()=>{});let release,url;
+  c.context.load=()=>{throw Error('full reload must not run')};
+  c.context.fetchProjection=(value)=>{url=value;return new Promise(resolve=>release=resolve)};
+  const request=c.context.refreshAfterPlayerAddition(1,'main',player.id);
+  assert.ok(url.endsWith('/app-snapshot?playerId=cw-test'));
+  if(changed==='removed')c.context.removedCourtWatchPlayers.add(player.id);else c.context.PLAYER_GROUP='others';
+  release({group:'main',playerId:player.id,players:[player],tournaments:[{playerId:player.id}],matches:[]});await request;
+  assert.equal(c.state.data.tournaments.length,0);
+ }
+});
+test('targeted snapshots preserve other players and history, accept empty entries and reject another player',async()=>{
+ const c=context(null),player={id:'cw-test',userAdded:true};
+ c.state.data.players=[player,{id:'other'}];c.state.data.matches=[{id:'old-match',playerId:'cw-test',circuit:'tennis-europe'},{id:'other-match',playerId:'other',circuit:'tennis-europe'}];
+ c.state.data.tournaments=[{id:'past',playerId:player.id,startDate:'2026-09-01'},{id:'withdrawn',playerId:player.id,startDate:'2026-11-01'},{id:'other',playerId:'other'}];
+ c.context.fetchProjection=async()=>({group:'main',playerId:player.id,players:[{...player,club:'Club'}],tournaments:[],matches:[]});
+ await c.context.refreshAfterPlayerAddition(1,'main',player.id);
+ assert.equal(c.state.data.players[0].club,'Club');assert.equal(c.state.data.players[1].id,'other');
+ assert.deepEqual(Array.from(c.state.data.tournaments,t=>t.id),['past','other']);assert.equal(c.state.data.matches.length,2);
+ assert.ok(c.state.data.personalEnrichedPlayerIds.includes(player.id));
+ c.context.fetchProjection=async()=>({group:'main',playerId:player.id,players:[{id:'foreign'}],tournaments:[],matches:[]});
+ await assert.rejects(c.context.refreshAfterPlayerAddition(2,'main',player.id),/Snapshot del giocatore errato/);
+});
+test('older Worker response is scoped locally during rollout and an enriched empty player stops showing pending',async()=>{
+ const c=context(null);c.state.data.players=[{id:'a',userAdded:true},{id:'b'}];c.state.data.personalProjectionComplete=false;
+ c.context.fetchProjection=async()=>({group:'main',players:[{id:'a'},{id:'b'}],tournaments:[{playerId:'b',id:'foreign'}],matches:[]});
+ await c.context.refreshAfterPlayerAddition(1,'main','a');assert.equal(c.state.data.tournaments.length,0);assert.ok(c.state.data.personalEnrichedPlayerIds.includes('a'));
+ const start=source.indexOf('function playerTournamentsEmptyHtml('),end=source.indexOf('function renderProfile(id)',start);vm.runInContext(source.slice(start,end),c.context);
+ assert.ok(c.context.playerTournamentsEmptyHtml('a').includes('Nessun torneo pubblicato'));
+});
+test('concurrent added players merge independently and a newer request for the same player wins',async()=>{
+ const c=context(null);c.state.data.players=[{id:'a'},{id:'b'}];const pending=[];
+ c.context.fetchProjection=url=>new Promise(resolve=>pending.push({url,resolve}));
+ const a=c.context.refreshAfterPlayerAddition(1,'main','a'),b=c.context.refreshAfterPlayerAddition(2,'main','b'),fresh=c.context.refreshAfterPlayerAddition(3,'main','a');
+ for(const [i,id,label] of [[1,'b','B'],[2,'a','fresh'],[0,'a','old']])pending[i].resolve({group:'main',playerId:id,players:[{id,club:label}],tournaments:[{id,playerId:id}],matches:[]});
+ await Promise.all([a,b,fresh]);assert.equal(c.state.data.players.find(p=>p.id==='a').club,'fresh');assert.equal(c.state.data.players.find(p=>p.id==='b').club,'B');assert.equal(c.state.data.tournaments.length,2);
 });
 test('home player without matches opens immediately even after the transient confirmation is gone',async()=>{
  const c=context(null);c.context.profileNavigationEpoch=0;c.state.initialMatchProjectionPending=true;c.state.data.matches=[];c.state.data.players=[{id:'new',userAdded:true}];
@@ -124,7 +156,7 @@ test('calendar hides acceptance only for confirmed participant, leaving another 
 
 test('confirmed durable addition remains successful when snapshot refresh fails',async()=>{
  const player={id:'cw-test',name:'Test Player'},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})});
- c.context.load=async()=>{throw Error('snapshot unavailable')};
+ c.context.fetchProjection=async()=>{throw Error('snapshot unavailable')};
  await c.context.addCourtWatchPlayerFromUi({identity:'101',name:'Test Player'},c.button);
  assert.equal(c.state.data.players[0].id,player.id);assert.equal(c.state.selected.has(player.id),true);assert.equal(c.state.data.personalProjectionComplete,false);assert.deepEqual(c.opened,[player.id]);assert.equal(c.button.disabled,false);
 });
