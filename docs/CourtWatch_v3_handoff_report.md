@@ -5955,3 +5955,9 @@ Validazione: 80 test Node passati; nuovo browser test touch Chromium con base es
 - La fixture carica la vera validUiState e fornisce window per lo storage. Corretti i test delle preferenze TCL/Altri; comportamento app invariato.
 
 ITF discovery 2026-10-17T16:00:36.798Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-10-17 — Ripristino ricerca mobile dopo integrazione diagnostica
+- Run 39038568570, commit 1767a4e7b6: i due test ricerca fallivano con recordPlayerLoadTiming non definita nel contesto VM. Le prove browser successive erano saltate e non certificavano il funzionamento mobile.
+- Verifica aggiuntiva: la sostituzione del blocco ricerca aveva perso timeout 12 secondi, segnale di cancellazione del chiamante e controllo results introdotti dal fix mobile. Ripristinato il trasporto precedente mantenendo la misura diagnostica e la pulizia del timer/listener in finally; caricata la vera funzione diagnostica nella fixture, senza stub che nascondano il difetto.
+- Prevenzione: i test mobile-interactions e ui-state-validation entrano nel check standard app-api. Aggiornata la revisione JS per distribuire il ripristino.
+- Validazione: riprodotti 2 fallimenti su 8 prima della correzione; dopo, 35 test mirati passano, inclusi ricerca, stato UI, aggiunta e cambio gruppo. Parsing JS verificato. Il check completo resta richiesto prima del commit e le prove browser Chromium/WebKit saranno certificate dal nuovo run mobile. Nessuna nuova query, scrittura o modifica ai dati D1. Questa correzione non costituisce prova che il problema del tasto Altri su un telefono reale sia risolto.

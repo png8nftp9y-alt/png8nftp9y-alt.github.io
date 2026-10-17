@@ -2548,12 +2548,24 @@ function renderPlayers() {
     },
   );
 }
-async function searchPlayerPage(query,cursor='') {
+async function searchPlayerPage(query, cursor = '', signal) {
   const started=Date.now();let response;
-  try{
-    response=await fetch(`${PRIVATE_API}/player-search?q=${encodeURIComponent(query)}${cursor?'&cursor='+encodeURIComponent(cursor):''}`,privateApiOptions({cache:'no-store'}));
-    if(!response.ok)throw Error('player search');return await response.json();
-  }finally{recordPlayerLoadTiming('search_http',started,response)}
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  if (signal?.aborted) abort();
+  signal?.addEventListener('abort', abort, {once:true});
+  const timer = setTimeout(abort, 12000);
+  try {
+    response = await fetch(`${PRIVATE_API}/player-search?q=${encodeURIComponent(query)}${cursor?'&cursor='+encodeURIComponent(cursor):''}`,
+      privateApiOptions({cache:'no-store', signal:controller.signal}));
+    if (!response.ok) throw Error('player search');
+    const data = await response.json();
+    if (!Array.isArray(data.results)) throw Error('player search incomplete');
+    return data;
+  } finally {
+    clearTimeout(timer); signal?.removeEventListener('abort', abort);
+    recordPlayerLoadTiming('search_http',started,response);
+  }
 }
 async function searchPlayers(query, signal) {return (await searchPlayerPage(query, '', signal)).results;}
 function playerCircuitLinksHtml(profiles=[]) {

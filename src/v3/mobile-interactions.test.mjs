@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const source=readFileSync(new URL('../../v3.js',import.meta.url),'utf8');
-const search=source.slice(source.indexOf('async function searchPlayerPage('),source.indexOf('function playerCircuitLinksHtml('));
+const search=source.slice(source.indexOf('function recordPlayerLoadTiming('),source.indexOf('async function fetchProjection('))+source.slice(source.indexOf('async function searchPlayerPage('),source.indexOf('function playerCircuitLinksHtml('));
 function searchContext(fetch){const ctx={AbortController,setTimeout:(fn)=>setTimeout(fn,15),clearTimeout,PRIVATE_API:'/api',privateApiOptions:x=>x,fetch};vm.createContext(ctx);vm.runInContext(search,ctx);return ctx;}
 test('a stalled search aborts and can be retried rather than staying pending',async()=>{
  let stalled=true,aborted=false;
