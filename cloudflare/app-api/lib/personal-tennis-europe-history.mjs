@@ -23,10 +23,13 @@ export async function verifiedParticipantAliases(db,player,circuit,native,varian
  // select by the name first rather than traverse the global participant PK.
  const candidates=[];let lastMatch='',lastParticipant='';
  while(true){
-  const batch=await rows(db,`SELECT p.match_id,p.participant_key,p.source_player_id,p.display_name,p.normalized_name,p.nationality,p.payload FROM match_participants p CROSS JOIN matches m ON m.id=p.match_id WHERE p.normalized_name IN (${candidateNames.map(()=>'?').join(',')}) AND m.circuit=? AND (+p.match_id,p.participant_key)>(?,?) ORDER BY p.match_id,p.participant_key LIMIT 250`,[...candidateNames,circuit,lastMatch,lastParticipant]);
+  const batch=await rows(db,`SELECT p.match_id,p.participant_key,p.source_player_id,p.display_name,p.normalized_name,p.nationality,p.payload FROM match_participants p CROSS JOIN matches m ON m.id=p.match_id WHERE p.normalized_name IN (${candidateNames.map(()=>'?').join(',')}) AND (p.source_player_id IS NULL OR p.source_player_id<>?) AND m.circuit=? AND (+p.match_id,p.participant_key)>(?,?) ORDER BY p.match_id,p.participant_key LIMIT 250`,[...candidateNames,native,circuit,lastMatch,lastParticipant]);
   candidates.push(...batch);if(batch.length<250)break;
   const end=batch.at(-1);lastMatch=end.match_id;lastParticipant=end.participant_key;
  }
+ // Exact native rows are already read by the indexed history query below.
+ // Only draw-local or differently cased IDs need canonical alias verification.
+ if(!candidates.length)return aliases;
  const keyed=await Promise.all(candidates.map(async p=>({p,key:await participantSourceKey(circuit,p)})));
  const people=await storedIdentities(db,[player.sourceKey,player.canonicalId,player.id,...keyed.map(x=>x.key)]);
  const targetIds=new Set([player.canonicalId,...[player.sourceKey,player.id].map(k=>people.get(k)?.canonicalId)].filter(Boolean));
@@ -65,7 +68,11 @@ async function personalHistory(db,player,circuit){
   const next=batch.at(-1).match_id;if(next<=last)throw Error('personal_history_pagination_failed');last=next;
  }
  const participants=[];
- for(let i=0;i<sources.length;i+=40){const ids=sources.slice(i,i+40).map(x=>x.match_id);participants.push(...await rows(db,`SELECT match_id,participant_key,source_player_id,display_name,normalized_name,nationality,team_index,is_winner,payload FROM match_participants WHERE match_id IN (${ids.map(()=>'?').join(',')}) ORDER BY match_id,team_index,participant_key`,ids));}
+ // At most four independent participant pages in flight; flatten in source order.
+ for(let offset=0;offset<sources.length;offset+=160){
+  const pages=[];for(let i=offset;i<Math.min(offset+160,sources.length);i+=40){const ids=sources.slice(i,i+40).map(x=>x.match_id);pages.push(rows(db,`SELECT match_id,participant_key,source_player_id,display_name,normalized_name,nationality,team_index,is_winner,payload FROM match_participants WHERE match_id IN (${ids.map(()=>'?').join(',')}) ORDER BY match_id,team_index,participant_key`,ids));}
+  participants.push(...(await Promise.all(pages)).flat());
+ }
  const isSelf=p=>native?(String(p.source_player_id).toLowerCase()===native.toLowerCase()||aliases.has(JSON.stringify([p.match_id,p.participant_key]))):nameKey(p.normalized_name||p.display_name)===nameKey(player.name);
  const selfRows=participants.filter(isSelf);
  const countries=[...new Set(selfRows.map(p=>String(p.nationality||'').toUpperCase()).filter(Boolean))];

@@ -8,9 +8,10 @@ const nameKey=name=>normalizePlayerName(name).split(' ').sort().join(' ');
 const payload=row=>{try{return JSON.parse(row.payload||'{}')}catch{return {}}};
 const pools=[...['observed_players','search_acquired_players'].map((table,i)=>`SELECT source_key,circuit,official_id,display_name,normalized_name,payload,'${i?'s:':'o:'}'||source_key AS cursor_key FROM ${table}${i?" a WHERE NOT EXISTS(SELECT 1 FROM observed_players o WHERE o.circuit=a.circuit AND o.official_id<>'' AND o.official_id=a.official_id)":''}`),"SELECT id AS source_key,'courtwatch' AS circuit,id AS official_id,json_extract(payload,'$.name') AS display_name,UPPER(json_extract(payload,'$.name')) AS normalized_name,payload,'c:'||id AS cursor_key FROM app_players"];
 async function select(db,where,binds,limit=''){
- const rows=[];
- for(const pool of pools)try{rows.push(...((await db.prepare(`SELECT * FROM (${pool}) WHERE ${where} ORDER BY normalized_name,cursor_key ${limit}`).bind(...binds).all()).results||[]))}catch(e){if(!/no such table/i.test(e.message))throw e}
- return rows.sort(compare);
+ const groups=await Promise.all(pools.map(async pool=>{
+  try{return((await db.prepare(`SELECT * FROM (${pool}) WHERE ${where} ORDER BY normalized_name,cursor_key ${limit}`).bind(...binds).all()).results||[])}catch(e){if(!/no such table/i.test(e.message))throw e;return []}
+ }));
+ return groups.flat().sort(compare);
 }
 function result(r,linked){const p=payload(r);return{courtwatchId:r.circuit==='courtwatch'?r.official_id:linked.get(r.source_key)||'',sourceKey:r.circuit==='courtwatch'?'':r.source_key,identity:r.official_id||r.source_key,name:r.display_name,circuit:r.circuit,nationality:p.nationality||p.country||'',club:p.club||'',birthYear:p.birthYear||null,sources:[r.circuit]}}
 const country=value=>({IT:'ITA',ITALY:'ITA',ITALIA:'ITA',CH:'SUI',SWITZERLAND:'SUI'}[String(value||'').toUpperCase()]||String(value||'').toUpperCase());

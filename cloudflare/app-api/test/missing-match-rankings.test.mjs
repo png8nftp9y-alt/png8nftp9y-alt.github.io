@@ -26,3 +26,24 @@ test('ambiguous names, absent latest rank and aged-out current categories are no
   await completeAppRankings(d.db,players,[],dates,'2026-10-14');for(const p of players)assert.equal(p.tennisEuropeRankings,undefined);
  }finally{d.close()}
 });
+
+test('ranking matching reads each fetched name once while preserving date and normal/reversed row precedence',async()=>{
+ let reads=0,queries=0;
+ const rows=[];
+ for(let i=0;i<12;i++)for(let week=0;week<100;week++){
+  const name='opponent person '+i,row={profile_id:'profile-'+i,category:'G14',ranking:100+i,ranking_date:week?'2026-08-01':'2026-09-01'};
+  Object.defineProperty(row,'normalized_name',{get(){reads++;return name}});rows.push(row);
+ }
+ const matches=Array.from({length:12},(_,i)=>({circuit:'tennis-europe',event:'GS14',date:'2026-09-02',opponent:'Opponent Person '+i}));
+ const db={prepare(){return{bind(){return{all:async()=>{queries++;return{results:rows}}}}}}};
+ await completeAppRankings(db,[],matches,{G14:'2026-10-13'},'2026-10-14');
+ assert.equal(queries,1);assert.equal(reads,rows.length);
+ assert.deepEqual(matches.map(m=>m.opponentTeRankings[0]),Array.from({length:12},(_,i)=>100+i));
+ assert.ok(matches.every(m=>m.opponentTeRankingDates[0]==='2026-09-01'));
+ // Preserve supplied row order across two name variants, even when a later
+ // query page/variant contains a more recent date for that same identity.
+ const mixed=[{profile_id:'same',normalized_name:'player case',category:'G14',ranking_date:'2026-08-01',ranking:91},{profile_id:'same',normalized_name:'case player',category:'G14',ranking_date:'2026-09-01',ranking:12}];
+ const pending={circuit:'tennis-europe',event:'GS14',date:'2026-09-02',opponent:'Case Player'};
+ await completeAppRankings({prepare(){return{bind(){return{all:async()=>({results:mixed})}}}}},[],[pending],{G14:'2026-10-13'},'2026-10-14');
+ assert.equal(pending.opponentTeRankings[0],91);assert.equal(pending.opponentTeRankingDates[0],'2026-08-01');
+});

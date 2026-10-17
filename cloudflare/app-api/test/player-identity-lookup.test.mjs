@@ -12,3 +12,16 @@ test('profile batches probe only requested source/alias keys with one JSON bind'
 test('known profiles stay available while new unrelated identities await synchronization',async()=>{const d=database({identityMapping:true});try{seed(d);d.execute('INSERT INTO player_identity_pending_sources(source_table,source_key) VALUES(?,?)',['search_acquired_players','unrelated']);const player={id:'alias'};assert.equal((await mappedProfiles(d.db,[player])).get(player)[0].circuit,'fitp');assert.equal((await mappedProfiles(d.db,[{id:'unknown'}])).size,0);}finally{d.close()}});
 test('orphan old canonical rows do not conflict with redirected aliases; contradictory keys stay ambiguous',async()=>{const d=database({identityMapping:true});try{seed(d,'new','source','old');d.execute('INSERT INTO player_identity_people VALUES(?,?,?)',['old','PERSON TEST','{"canonicalId":"old"}']);assert.equal((await storedIdentity(d.db,'old')).canonicalId,'new');seed(d,'other','other-source','other-alias');assert.equal((await mappedProfiles(d.db,[{id:'old',sourceKey:'other-source'}])).size,0);}finally{d.close()}});
 test('personal Europe history uses the normalized-name expression index, preserving mixed case',async()=>{const d=database({identityMapping:true});try{d.execute('CREATE INDEX match_participants_lower_name_match ON match_participants(lower(normalized_name),match_id)');d.execute('INSERT INTO matches(id,tournament_id,circuit,payload) VALUES(?,?,?,?)',['m','t','tennis-europe','{}']);d.execute('INSERT INTO match_participants(match_id,participant_key,display_name,normalized_name,team_index,payload) VALUES(?,?,?,?,?,?)',['m','p','Test Person','Test Person',0,'{}']);const sql="SELECT DISTINCT m.id FROM match_participants self JOIN matches m ON m.id=self.match_id WHERE lower(self.normalized_name) IN (?,?) AND m.circuit='tennis-europe' AND m.id>? ORDER BY m.id LIMIT 250",values=['test person','person test',''];assert.equal(d.execute(sql,values).length,1);const plan=d.execute('EXPLAIN QUERY PLAN '+sql,values).map(r=>r.detail);assert.ok(plan.some(p=>/SEARCH self USING (?:COVERING )?INDEX match_participants_lower_name_match/.test(p)),plan.join('\n'));assert.ok(!plan.some(p=>/SCAN self/.test(p)),plan.join('\n'));}finally{d.close()}});
+
+test('canonical search reads personal membership while matching rows are pending', {timeout:1000}, async()=>{
+ let release,overlap=false;
+ const db={prepare(sql){return {bind(){return {all:async()=>{
+  if(sql.includes('SELECT status FROM player_identity_sync'))return {results:[{status:'ready'}]};
+  if(sql.includes('SELECT p.payload,p.name_key'))return new Promise(resolve=>{release=()=>resolve({results:[{payload:JSON.stringify({canonicalId:'person:one',name:'Case Player'}),normalized_name:'CASE PLAYER',cursor_key:'person:one'}]})});
+  if(sql.includes('SELECT a.canonical_id,u.courtwatch_id')){overlap=Boolean(release);release?.();return {results:[{canonical_id:'person:one',courtwatch_id:'cw-owned'}]};}
+  throw Error(sql);
+ }}}}}};
+ const {mappedPlayerSearch}=await import('../lib/player-identity-lookup.mjs');
+ const found=await mappedPlayerSearch(db,{tokens:['CASE'],pageSize:60,encode:()=>'',userId:'owner'});
+ assert.equal(overlap,true);assert.equal(found.results[0].courtwatchId,'cw-owned');assert.equal(found.results[0].name,'Case Player');
+});

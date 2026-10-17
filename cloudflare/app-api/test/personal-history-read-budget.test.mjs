@@ -68,3 +68,34 @@ test('three costly history queries preserve exact rows and seek player indexes o
  }
  assert.ok(results.every(([before,after])=>after.steps<before.steps/5),'production circuit/tournament index must not turn player history into broad traversal');
 });
+
+import {database} from './search-sqlite-fixture.mjs';
+test('native-ID history skips redundant canonical alias reads and loads participant pages with bounded concurrency', {timeout:5000}, async()=>{
+ const d=database({identityMapping:true});
+ try{
+  const native='12345678-1234-1234-1234-123456789abc',player={id:'cw-native',name:'Case Player',sourceCircuit:'tennis-europe',profileSync:{tennisEurope:{profileId:native}}};
+  const statements=["INSERT INTO tournaments VALUES('t','tennis-europe','t','2026-01-01','2026-01-01','{}');"];
+  for(let i=0;i<100;i++){
+   const id='m'+String(i).padStart(3,'0');
+   statements.push(`INSERT INTO matches VALUES('${id}','t','tennis-europe','2026-01-01','{"event":"BS14","score":"6-1 6-2"}');`);
+   statements.push(`INSERT INTO match_participants VALUES('${id}','self','${native}','Case Player','case player','ITA',0,1,'{}');`);
+   statements.push(`INSERT INTO match_participants VALUES('${id}','other','other','Other Player','other player','ITA',1,0,'{}');`);
+  }
+  await d.query(statements.join('\n'));
+  let aliasLookups=0,active=0,maximum=0;const releases=[];
+  function wrap(s,sql){return new Proxy(s,{get(t,k){const v=t[k];if(k==='bind')return(...args)=>wrap(v.apply(t,args),sql);
+   if(k==='all')return async(...args)=>{
+    if(sql.includes('WITH requested AS'))aliasLookups++;
+    if(sql.includes('FROM match_participants WHERE match_id IN')){
+     active++;maximum=Math.max(maximum,active);
+     return new Promise((resolve,reject)=>{releases.push(()=>Promise.resolve(v.apply(t,args)).then(resolve,reject).finally(()=>active--));if(releases.length===3)for(const release of releases)release()});
+    }return v.apply(t,args);
+   };return typeof v==='function'?v.bind(t):v;}})}
+  const db={prepare:sql=>wrap(d.db.prepare(sql),sql)},before=d.writes();
+  const result=await personalCircuitHistory(db,player);
+  assert.equal(result.matches.length,100);assert.equal(result.tournaments.length,1);
+  assert.deepEqual(result.matches.map(m=>m.matchId),Array.from({length:100},(_,i)=>'m'+String(i).padStart(3,'0')));
+  assert.ok(result.matches.every(m=>m.advances&&m.score==='6-1 6-2'));
+  assert.equal(aliasLookups,0);assert.equal(maximum,3);assert.ok(maximum<=4);assert.equal(d.writes(),before);
+ }finally{d.close()}
+});

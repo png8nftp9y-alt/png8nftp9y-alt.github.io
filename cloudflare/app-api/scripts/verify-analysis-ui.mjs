@@ -78,7 +78,8 @@ assert.ok(!hasApiSource('tennisEuropePerspectiveScore(rawScore,winnerTeam)') && 
 assert.ok(hasSource('data-follow-opponent>Aggiungi giocatore') && hasSource('opponentTournamentDateLabel'), 'opponent history must show follow prompt and tournament dates');
 assert.ok(hasApiSource('tennis_europe_match_ranking_snapshots WHERE match_id IN') && hasApiSource('snapshotFor(player,row.match_id)'), 'opponent-of-opponent rankings must use frozen match snapshots');
 assert.ok(hasSource('opponentHistoryPersonLink') && hasSource('openCurrentOpponent(') && hasSource('#opponent-profile'), 'every non-CourtWatch participant must support recursive profile navigation');
-assert.ok(hasSource('preloadOpponentHistory(') && hasSource('opponentHistoryRequests = new Map()') && hasSource('pointerenter') && !hasSource('requestIdleCallback'), 'clickable opponent profiles must use targeted prefetch and share in-flight requests without a request storm');
+const opponentPrefetchSetup=source.slice(source.indexOf('function bindParticipantNavigation('),source.indexOf('function incompleteCompletedScore(',source.indexOf('function bindParticipantNavigation(')))+source.slice(source.indexOf('function preloadOpponentHistory('),source.indexOf('async function loadOpponentHistory(',source.indexOf('function preloadOpponentHistory(')));
+assert.ok(hasSource('preloadOpponentHistory(') && hasSource('opponentHistoryRequests = new Map()') && hasSource('pointerenter') && !opponentPrefetchSetup.includes('requestIdleCallback'), 'clickable opponent profiles must use targeted prefetch and share in-flight requests without a request storm');
 assert.ok(hasSource('opponentPrefetchActive<2') && hasSource('savedEntries(OPPONENT_HISTORY_CACHE)') && hasSource('queueOpponentPreload('), 'opponent pages must use at most two intent-triggered background requests and persistent cache');
 const startup = canonical(source.slice(source.lastIndexOf('restoreCachedProjectionBeforeFirstRender();')));
 const startupSteps = ['restoreCachedProjectionBeforeFirstRender();', 'wire();', 'wireAccount();', 'await Promise.all([restoreDurableProjection(),restoreDurableOpponents()]);', 'initialProjectionRequest=load();', 'route();'].map(step => startup.indexOf(canonical(step)));
@@ -122,7 +123,7 @@ assert.ok(hasSource('function groupedMatchSections(') && hasSource('matchTypeHea
 assert.ok(hasSource('function fullMatchRoundLabel(') && hasSource('Qualification round ${Math.max') && hasSource('matchRoundFull'), 'all match pages must use full round labels and ordinal qualification rounds');
 assert.ok(hasSource('/bonus\\s*draw/i.test(source)') && hasSource('Bonus ${value}'), 'bonus draws must prefix the complete round label');
 assert.ok(!hasSource('<span class="matchType">${matchType}</span>'), 'grouped match rows must not repeat the match type');
-assert.ok((html.match(/data-switch-player-group/g) || []).length === 4 && hasSource('X-CourtWatch-Group') && hasSource('GROUP_CACHE_SUFFIX'), 'Altri must share routes with a scoped persistent player list and caches');
+assert.ok((html.match(/<button\b[^>]*\bdata-switch-player-group(?:\s|>)/g) || []).length === 4 && hasSource('X-CourtWatch-Group') && hasSource('GROUP_CACHE_SUFFIX'), 'Altri must share routes with a scoped persistent player list and caches');
 assert.ok(hasSource('Acceptance list: '), 'scheduled Tennis Europe tournaments must label the acceptance list');
 assert.ok(hasSource('querySelectorAll(".unifiedMatchRow")') && hasSource('class="result ${outcome}"') && hasSource('$("brandHome").onclick'), 'tournament counters must read unified rows and the brand must return home');
 assert.ok(!hasSource('$("resetHome")') && hasSource('String(a.startDate || "").localeCompare'), 'home label must be absent and weekly tournaments must be ordered');

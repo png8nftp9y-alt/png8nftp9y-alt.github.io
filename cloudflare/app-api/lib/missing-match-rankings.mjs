@@ -24,8 +24,13 @@ export async function completeAppRankings(db,players,matches,latestDates,today=n
  if(!targets.length)return;
  const names=[...new Set(targets.flatMap(t=>variants(t.name)))],rows=[];
  for(let i=0;i<names.length;i+=80){const batch=names.slice(i,i+80);rows.push(...((await db.prepare('SELECT profile_id,normalized_name,nationality,category,ranking,ranking_date FROM tennis_europe_ranking_history WHERE normalized_name IN (SELECT value FROM json_each(?)) ORDER BY ranking_date DESC').bind(JSON.stringify(batch)).all()).results||[]));}
+ // Index the fetched rows once. Keep original positions so normal/reversed
+ // names and multiple query pages retain exactly the existing precedence.
+ const indexed=new Map();
+ rows.forEach((row,index)=>{const key=JSON.stringify([row.category,row.normalized_name]),group=indexed.get(key)||[];group.push({row,index});indexed.set(key,group)});
  for(const target of targets){
-  let eligible=rows.filter(r=>variants(target.name).includes(r.normalized_name)&&r.category===target.category&&r.ranking_date<=target.date&&(!target.current||r.ranking_date===latestDates[target.category]));
+  const candidates=variants(target.name).flatMap(name=>indexed.get(JSON.stringify([target.category,name]))||[]).sort((a,b)=>a.index-b.index);
+  let eligible=candidates.map(item=>item.row).filter(r=>r.ranking_date<=target.date&&(!target.current||r.ranking_date===latestDates[target.category]));
   if(target.profileId&&eligible.some(r=>r.profile_id.toLowerCase()===String(target.profileId).toLowerCase()))eligible=eligible.filter(r=>r.profile_id.toLowerCase()===String(target.profileId).toLowerCase());
   if(new Set(eligible.map(r=>r.profile_id)).size!==1)continue;
   const row=eligible[0];if(!row)continue;

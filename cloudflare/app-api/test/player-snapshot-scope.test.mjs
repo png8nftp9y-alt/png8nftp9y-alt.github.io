@@ -84,3 +84,21 @@ test('scoped public presentation loads before match history finishes and final o
   assert.equal(d.writes(),before);
  }finally{globalThis.fetch=original;d.close()}
 });
+
+test('scoped ranking reads overlap history and a ranking outage still preserves the player snapshot', {timeout:5000}, async()=>{
+ const d=database({identityMapping:true}),original=globalThis.fetch;globalThis.fetch=async()=>({ok:true,json:async()=>({tournaments:[]})});
+ try{seed(d,1);const before=d.writes();
+  for(const fail of [false,true]){
+   let releaseHistory,startedHistory,overlap=false;const historyStarted=new Promise(resolve=>{startedHistory=resolve});
+   function wrap(s,sql){return new Proxy(s,{get(t,k){const v=t[k];if(k==='bind')return(...args)=>wrap(v.apply(t,args),sql);
+    if(k==='all')return async(...args)=>{
+     if(sql.includes('WITH candidate_matches AS MATERIALIZED'))return new Promise((resolve,reject)=>{releaseHistory=()=>Promise.resolve(v.apply(t,args)).then(resolve,reject);startedHistory()});
+     if(sql.includes('FROM tennis_europe_current_player_rankings')){await historyStarted;overlap=true;releaseHistory();if(fail)throw Error('injected_ranking_outage');}
+     return v.apply(t,args);
+    };return typeof v==='function'?v.bind(t):v;}})}
+   const db={prepare:sql=>wrap(d.db.prepare(sql),sql),batch:s=>d.db.batch(s)};
+   const response=await request(db,'others','cw-target-0');assert.equal(response.status,200);
+   const result=await response.json();assert.equal(result.players[0].id,'cw-target-0');assert.equal(result.matches.length,1);assert.equal(overlap,true);
+  }assert.equal(d.writes(),before);
+ }finally{globalThis.fetch=original;d.close()}
+});
