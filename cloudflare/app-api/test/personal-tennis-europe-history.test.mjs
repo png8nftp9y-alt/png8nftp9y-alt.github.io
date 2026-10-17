@@ -59,7 +59,7 @@ test('promoting an opponent replaces its route so Back returns to the originatin
  c.document.createElement=()=>({setAttribute(){},textContent:''});
  c.agendaKey = match => `${match.playerId}|${match.matchId || match.id}`;
  const mergeSource = source.slice(source.indexOf('function agendaKey('), source.indexOf('function clearDemographicFilters('));
- vm.createContext(c);vm.runInContext(mergeSource + source.slice(source.indexOf('const playerAdditionsInFlight ='),source.indexOf('function openAddPlayerDialog(')),c);
+ vm.createContext(c);vm.runInContext(mergeSource + source.slice(source.indexOf('function recordPlayerLoadTiming('),source.indexOf('async function fetchProjection(')) + source.slice(source.indexOf('const playerAdditionsInFlight ='),source.indexOf('function openAddPlayerDialog(')),c);
  await c.addCourtWatchPlayerFromUi({identity:'profile-milana',name:player.name},button);
  assert.equal(stack.length,2);assert.equal(stack.pop(),'#player/cw-milana');assert.equal(stack.at(-1),'#calendar');
  assert.ok(source.includes("if (monitored) { history.replaceState(history.state,''"));

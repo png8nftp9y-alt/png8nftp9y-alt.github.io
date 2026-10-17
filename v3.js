@@ -853,7 +853,15 @@ async function v3json(path) {
     clearTimeout(timer);
   }
 }
+function recordPlayerLoadTiming(stage,started,response=null){
+  try {
+    const value=response?.headers?.get?.('Server-Timing') || '';
+    console.info('courtwatch_player_timing '+JSON.stringify({stage,elapsedMs:Math.max(0,Date.now()-started),status:response?.status??null,serverTiming:value}));
+  } catch {} // Diagnostics must never interrupt a player operation.
+}
 async function fetchProjection(url, timeoutMs, group = PLAYER_GROUP) {
+  const timingStarted=Date.now(),timingEnabled=/[?&]playerId=/.test(url);
+  let timingResponse;
   const controller = new AbortController(),
     timer = setTimeout(() => controller.abort(), timeoutMs);
   if (group === PLAYER_GROUP) activeProjectionController = controller;
@@ -867,6 +875,7 @@ async function fetchProjection(url, timeoutMs, group = PLAYER_GROUP) {
         signal: controller.signal,
       }, group),
     );
+    timingResponse=response;
     if (!response.ok) throw Error("API Court Watch non disponibile: " + response.status);
     const data = await response.json();
     if (
@@ -878,6 +887,7 @@ async function fetchProjection(url, timeoutMs, group = PLAYER_GROUP) {
     if ((data.group && data.group !== group) || (group === "others" && data.group !== group)) throw Error("Sezione richiesta non ancora disponibile");
     return data;
   } finally {
+    if(timingEnabled)recordPlayerLoadTiming('snapshot_http',timingStarted,timingResponse);
     clearTimeout(timer);
     if (activeProjectionController === controller) activeProjectionController = null;
   }
@@ -2538,22 +2548,12 @@ function renderPlayers() {
     },
   );
 }
-async function searchPlayerPage(query, cursor = '', signal) {
-  const controller = new AbortController();
-  const abort = () => controller.abort();
-  if (signal?.aborted) abort();
-  signal?.addEventListener('abort', abort, {once:true});
-  const timer = setTimeout(abort, 12000);
-  try {
-    const response = await fetch(`${PRIVATE_API}/player-search?q=${encodeURIComponent(query)}${cursor?'&cursor='+encodeURIComponent(cursor):''}`,
-      privateApiOptions({cache:'no-store', signal:controller.signal}));
-    if (!response.ok) throw Error('player search');
-    const data = await response.json();
-    if (!Array.isArray(data.results)) throw Error('player search incomplete');
-    return data;
-  } finally {
-    clearTimeout(timer); signal?.removeEventListener('abort', abort);
-  }
+async function searchPlayerPage(query,cursor='') {
+  const started=Date.now();let response;
+  try{
+    response=await fetch(`${PRIVATE_API}/player-search?q=${encodeURIComponent(query)}${cursor?'&cursor='+encodeURIComponent(cursor):''}`,privateApiOptions({cache:'no-store'}));
+    if(!response.ok)throw Error('player search');return await response.json();
+  }finally{recordPlayerLoadTiming('search_http',started,response)}
 }
 async function searchPlayers(query, signal) {return (await searchPlayerPage(query, '', signal)).results;}
 function playerCircuitLinksHtml(profiles=[]) {
@@ -2582,6 +2582,7 @@ async function refreshAfterPlayerAddition(epoch, group, playerId) {
         data.players.length !== 1 || data.players[0].id !== playerId ||
         data.tournaments.some(t => t.playerId !== playerId) || data.matches.some(m => m.playerId !== playerId))
       throw Error('Snapshot del giocatore errato');
+    const renderStarted=Date.now();
     const previous = state.data, today = iso(new Date());
     const retained = (previous.tournaments || []).filter(t => t.playerId !== playerId ||
       !/^\d{4}-\d{2}-\d{2}$/.test(t.startDate || '') || t.startDate <= today);
@@ -2595,6 +2596,7 @@ async function refreshAfterPlayerAddition(epoch, group, playerId) {
     }, group));
     confirmedCourtWatchPlayers.delete(playerId);
     renderIfDataChanged();
+    recordPlayerLoadTiming('snapshot_render',renderStarted);
     if (y !== null && location.hash === hash) scrollTo({top:y,behavior:'auto'});
     Promise.resolve(saveCachedData(state.data)).catch(error => console.warn('Archivio locale non disponibile', error));
   } finally {
@@ -2612,6 +2614,7 @@ async function addCourtWatchPlayerFromUi(result, button) {
   button.disabled = true;
   button.textContent = 'Aggiunta…';
   const operation = (async () => {
+    const saveStarted=Date.now();
     const response = await fetch(`${PRIVATE_API}/courtwatch-player`, privateApiOptions({
       method:'POST',credentials:'same-origin',cache:'no-store',
       headers:{'Content-Type':'application/json'},body:JSON.stringify(result),
@@ -2621,6 +2624,8 @@ async function addCourtWatchPlayerFromUi(result, button) {
     try { data = await response.json(); } catch { throw Error('player_response_invalid'); }
     if (!response.ok || data.added !== true || !data.player?.id || data.playerId !== data.player.id)
       throw Error(data.error || 'player_addition_not_confirmed');
+    recordPlayerLoadTiming('addition_http',saveStarted,response);
+    const renderStarted=Date.now();
     if (!state.data) state.data = {players:[],tournaments:[],matches:[]};
     state.playerSelectionEpoch = (state.playerSelectionEpoch || 0) + 1;
     // Durable POST confirmation is sufficient to make membership usable.
@@ -2645,6 +2650,7 @@ async function addCourtWatchPlayerFromUi(result, button) {
         activeRouteScrollKey=target;route();saveUiState();
       } else openProfile(data.playerId);
     }
+    recordPlayerLoadTiming('addition_render',renderStarted);
     // An older full load cannot overwrite this selection epoch.
     // Enrich only this player immediately, without waiting for that load.
     refreshAfterPlayerAddition(state.playerSelectionEpoch, additionGroup, data.playerId).catch(error => {

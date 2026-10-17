@@ -1,3 +1,4 @@
+import {playerLoadTiming} from '../lib/player-load-timing.mjs';
 import {storageUsageMetric,r2UsageRows} from '../lib/cloudflare-storage-usage.mjs';
 import {linkedOpponentIdentity,tennisEuropeNativeId} from '../lib/opponent-linked-identity.mjs';
 import {opponentEuropeSources,opponentSelfParticipant} from '../lib/opponent-europe-sources.mjs';
@@ -151,12 +152,12 @@ function deviceLabel(userAgent){const ua=String(userAgent||'');const browser=/Ed
 function deviceId(request){const value=String(request.headers.get('X-CourtWatch-Device')||'').trim();return/^[A-Za-z0-9_-]{16,96}$/.test(value)?value:''}
 async function recordDevice(request,env,user,path){const id=deviceId(request);if(!id||user.id!==ACCESS_OWNER.id)return{tracked:false};try{const existing=await env.DB.prepare('SELECT status,last_seen,user_agent FROM app_user_devices WHERE user_id=? AND device_id=?').bind(user.id,id).first();if(existing?.status==='revoked')return{tracked:true,revoked:true};const now=new Date().toISOString(),ua=String(request.headers.get('User-Agent')||'').slice(0,500),currentPath=String(path||'').slice(0,160),label=deviceLabel(ua),lastSeen=Date.parse(existing?.last_seen||'');if(existing&&existing.user_agent===ua&&Number.isFinite(lastSeen)&&Date.now()-lastSeen<10*60*1000)return{tracked:true,revoked:false};await env.DB.prepare("INSERT INTO app_user_devices(user_id,device_id,label,user_agent,first_seen,last_seen,last_path,status,revoked_at) VALUES(?,?,?,?,?,?,?,'active',NULL) ON CONFLICT(user_id,device_id) DO UPDATE SET label=excluded.label,user_agent=excluded.user_agent,last_seen=excluded.last_seen,last_path=excluded.last_path").bind(user.id,id,label,ua,now,now,currentPath).run();return{tracked:true,revoked:false}}catch(error){if(missingOptionalTable(error))return{tracked:false};console.error('device_tracking_failed',error);return{tracked:false}}}
 async function revokeDevice(request,env){const form=await request.formData(),id=String(form.get('deviceId')||'').trim();if(!/^[A-Za-z0-9_-]{16,96}$/.test(id))return new Response('Dispositivo non valido',{status:400,headers:adminHeaders});try{await env.DB.prepare("UPDATE app_user_devices SET status='revoked',revoked_at=? WHERE user_id=? AND device_id=?").bind(new Date().toISOString(),ACCESS_OWNER.id,id).run()}catch(error){if(missingOptionalTable(error))return new Response('Registro dispositivi non ancora disponibile',{status:503,headers:adminHeaders});throw error}return Response.redirect(new URL('/admin/utenti',request.url),303)}
-async function protectedApp(request,env,path,url){
+async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
   // Cloudflare Access authorizes /app before the request reaches this Worker.
   // Keep the application shell independent from D1 so maintenance imports cannot make page loading fail.
   if(path==='/app'){try{const response=await fetch(PUBLIC_APP+'?protected='+Date.now(),{cache:'no-store',headers:{'User-Agent':'courtwatch-protected-app','Cache-Control':'no-cache'}});if(!response.ok)throw new Error('public_app_http_'+response.status);let html=await response.text();html=html.replace('<head>','<head><base href="https://png8nftp9y-alt.github.io/">');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Frame-Options':'DENY','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin'}})}catch(error){console.error('protected_app_shell_unavailable',error);return new Response('Applicazione temporaneamente non disponibile',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}})}}
-  const user=await accessUser(request,env);if(!user)return privateJson({error:'access_authentication_required'},401);
-  const device=await recordDevice(request,env,user,path);if(device.revoked)return privateJson({error:'device_revoked'},403);
+  const user=await timing.measure('authentication',()=>accessUser(request,env));if(!user)return privateJson({error:'access_authentication_required'},401);
+  const device=await timing.measure('device',()=>recordDevice(request,env,user,path));if(device.revoked)return privateJson({error:'device_revoked'},403);
   const apiPath=path.replace(/^\/app(?:-api|\/api)/,'');
   let group;try{group=playerListGroup(request.headers.get('X-CourtWatch-Group')||'main')}catch(error){return privateJson({error:error.message},400)}
   const membership=playerMembershipTable(group);
@@ -165,7 +166,7 @@ async function protectedApp(request,env,path,url){
     if(request.method==='POST'){
       if(request.headers.get('Origin')&&request.headers.get('Origin')!==url.origin)return privateJson({error:'origin_not_allowed'},403);
       const body=await request.json().catch(()=>null);
-      try{return privateJson(await addCourtWatchPlayer(env,user,{...body,group}))}catch(error){console.error('add_courtwatch_player_failed',error);return privateJson({error:missingOptionalTable(error)?'player_addition_initializing':error.message},missingOptionalTable(error)?503:error.status||500)}
+      try{return privateJson(await timing.measure('addition',()=>addCourtWatchPlayer(env,user,{...body,group},{measure:timing.measure})))}catch(error){console.error('add_courtwatch_player_failed',error);return privateJson({error:missingOptionalTable(error)?'player_addition_initializing':error.message},missingOptionalTable(error)?503:error.status||500)}
     }
     if(request.method!=='DELETE')return privateJson({error:'method_not_allowed'},405);
     const playerId=String(url.searchParams.get('playerId')||'').trim();
@@ -182,7 +183,7 @@ async function protectedApp(request,env,path,url){
   if(apiPath==='/session'&&request.method==='GET')return privateJson({user:{id:user.id,email:user.email,displayName:user.display_name,role:user.role}});
   if(apiPath==='/opponent-profile'&&request.method==='GET'){const profileId=String(url.searchParams.get('profileId')||'').trim().slice(0,160),name=String(url.searchParams.get('name')||'').trim().slice(0,160),asOf=String(url.searchParams.get('asOf')||'').trim(),excludeMatchId=String(url.searchParams.get('excludeMatchId')||'').trim().slice(0,240),event=String(url.searchParams.get('event')||'').trim().slice(0,80);if(!name&&!profileId)return privateJson({error:'opponent_required'},400);return privateJson(await universalOpponentHistory(env,{profileId,name,asOf,excludeMatchId,event}))}
   if(apiPath==='/player-ranking'&&request.method==='GET'){const playerId=String(url.searchParams.get('playerId')||'').trim().slice(0,120),name=String(url.searchParams.get('name')||'').trim().slice(0,160);if(!playerId&&!name)return privateJson({error:'player_required'},400);return privateJson(await currentTennisEuropePlayerRanking(env,{playerId,name}))}
-  if(apiPath==='/player-search'&&request.method==='GET'){const query=String(url.searchParams.get('q')||'').trim().slice(0,100);try{return privateJson({query,...(query.length>=2?await searchPlayers(env,query,user.id,url.searchParams.get('cursor')||''):{results:[],nextCursor:null})})}catch(error){if(error.status===400)return privateJson({error:error.message},400);throw error}}
+  if(apiPath==='/player-search'&&request.method==='GET'){const query=String(url.searchParams.get('q')||'').trim().slice(0,100);try{return privateJson({query,...(query.length>=2?await timing.measure('search',()=>searchPlayers(env,query,user.id,url.searchParams.get('cursor')||'')):{results:[],nextCursor:null})})}catch(error){if(error.status===400)return privateJson({error:error.message},400);throw error}}
   if(apiPath==='/known-match-results'&&request.method==='POST'){
     if(request.headers.get('Origin')&&request.headers.get('Origin')!==url.origin)return privateJson({error:'origin_not_allowed'},403);
     const body=await request.json().catch(()=>null);
@@ -190,25 +191,25 @@ async function protectedApp(request,env,path,url){
   }
   if(apiPath==='/app-snapshot'&&request.method==='GET'){const playerId=url.searchParams.get('playerId')||'';
     if(url.searchParams.has('playerId')&&(!playerId||playerId.length>160))return privateJson({error:'invalid_player'},400);
-    const membershipIds=await appSnapshotMembership(env.DB,memberSelection,user.id);
+    const membershipIds=await timing.measure('membership',()=>appSnapshotMembership(env.DB,memberSelection,user.id));
     if(playerId&&!membershipIds.includes(playerId))return privateJson({error:'player_not_in_your_list'},404);
     const selection=memberSelection+(playerId?' AND courtwatch_id=?':''),selectionBinds=[user.id,...(playerId?[playerId]:[])];
-    const[players,tournaments,matches,manifest,overrides]=await Promise.all([all(env,'app_players',`WHERE id IN (${selection}) ORDER BY seq`,selectionBinds),all(env,'app_tournaments',`WHERE player_id IN (${selection}) ORDER BY seq`,selectionBinds),all(env,'app_matches',`WHERE player_id IN (${selection}) ORDER BY seq`,selectionBinds),env.DB.prepare("SELECT * FROM generations WHERE id='current'").first(),optionalRows(env.DB.prepare("SELECT entity_type,entity_id,action,payload FROM manual_overrides WHERE active=1 AND NOT (entity_type='player' AND ?='main' AND EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=? AND r.courtwatch_id=manual_overrides.entity_id)) ORDER BY updated_at").bind(group,user.id))]);let added=[];try{added=await personalPlayerAdditions(env,user.id,group,playerId)}catch(error){if(!missingOptionalTable(error))throw error}
+    const[players,tournaments,matches,manifest,overrides]=await timing.measure('base',()=>Promise.all([all(env,'app_players',`WHERE id IN (${selection}) ORDER BY seq`,selectionBinds),all(env,'app_tournaments',`WHERE player_id IN (${selection}) ORDER BY seq`,selectionBinds),all(env,'app_matches',`WHERE player_id IN (${selection}) ORDER BY seq`,selectionBinds),env.DB.prepare("SELECT * FROM generations WHERE id='current'").first(),optionalRows(env.DB.prepare("SELECT entity_type,entity_id,action,payload FROM manual_overrides WHERE active=1 AND NOT (entity_type='player' AND ?='main' AND EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=? AND r.courtwatch_id=manual_overrides.entity_id)) ORDER BY updated_at").bind(group,user.id))]));let added=[];try{added=await timing.measure('identity',()=>personalPlayerAdditions(env,user.id,group,playerId))}catch(error){if(!missingOptionalTable(error))throw error}
     const playerMap=new Map(players.map(player=>[player.id,player]));for(const player of added)playerMap.set(player.id,{...playerMap.get(player.id),...player});players.splice(0,players.length,...playerMap.values());
-    const presentation=playerId?tournamentPresentationContext():null;
+    const presentation=playerId?tournamentPresentationContext(undefined,timing.measure):null;
     const prepare=rows=>{presentation.prepare(rows);return rows};
     const scopedData=playerId?await Promise.all([
-      exactPersonalEntryProfiles(env.DB,added).then(profiles=>Promise.all(added.filter(p=>p.sourceKey).map(async player=>{
+      timing.measure('entries',()=>exactPersonalEntryProfiles(env.DB,added).then(profiles=>Promise.all(added.filter(p=>p.sourceKey).map(async player=>{
         const entries=await playerEntryTournaments(env,player,{entryRows:profiles.get(player.id)});
         return [player.id,prepare(entries)];
-      }))),
-      personalUnreleasedTournamentHistory(env.DB,added).then(async rows=>{
+      })))),
+      timing.measure('native_tournaments',()=>personalUnreleasedTournamentHistory(env.DB,added).then(async rows=>{
         prepare(rows);
         return [rows,rows.some(t=>t.circuit==='itf')?await itfTournamentMetadata():new Map()];
-      }),
-      Promise.all(added.map(async player=>{
+      })),
+      timing.measure('match_history',()=>Promise.all(added.map(async player=>{
         const history=await personalCircuitHistory(env.DB,player);prepare(history.tournaments);return history;
-      }))
+      })))
     ]):null;
     // All branches read independently, but preserve the established merge order.
     const entryProfiles=scopedData?null:await exactPersonalEntryProfiles(env.DB,added);
@@ -233,8 +234,8 @@ async function protectedApp(request,env,path,url){
       for(const m of history.matches)matchMap.set(`${m.playerId}|${m.matchId||m.id}`,{...matchMap.get(`${m.playerId}|${m.matchId||m.id}`),...m});
       matches.splice(0,matches.length,...matchMap.values());
     }
-    tournaments.splice(0,tournaments.length,...await (presentation?presentation.enrich(tournaments):enrichPersonalTournamentPresentation(tournaments)));
-    try{await applyPreparedTennisEuropeRankings(env,players,matches,[...new Set(players.map(p=>p.id))])}catch(error){console.error('prepared_tennis_europe_projection_failed',error)}const linkedProfiles=await resolveCircuitProfiles(env.DB,players);for(const player of players)player.circuitProfiles=linkedProfiles.get(player)||[];const selectedIds=new Set(players.map(p=>p.id));const scoped=(rows,field)=>(playerId||group==='others')?rows.filter(row=>selectedIds.has(row[field])):rows;return privateJson({group,...(playerId?{playerId}:{}),membershipIds,generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players:scoped(applyOverrides(players,overrides,'player'),'id'),tournaments:scoped(applyOverrides(tournaments,overrides,'tournament'),'playerId'),matches})}
+    tournaments.splice(0,tournaments.length,...await timing.measure('presentation_wait',()=>(presentation?presentation.enrich(tournaments):enrichPersonalTournamentPresentation(tournaments))));
+    try{await timing.measure('rankings',()=>applyPreparedTennisEuropeRankings(env,players,matches,[...new Set(players.map(p=>p.id))]))}catch(error){console.error('prepared_tennis_europe_projection_failed',error)}const linkedProfiles=await timing.measure('profile_links',()=>resolveCircuitProfiles(env.DB,players));for(const player of players)player.circuitProfiles=linkedProfiles.get(player)||[];const selectedIds=new Set(players.map(p=>p.id));const scoped=(rows,field)=>(playerId||group==='others')?rows.filter(row=>selectedIds.has(row[field])):rows;return privateJson({group,...(playerId?{playerId}:{}),membershipIds,generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players:scoped(applyOverrides(players,overrides,'player'),'id'),tournaments:scoped(applyOverrides(tournaments,overrides,'tournament'),'playerId'),matches})}
   if(apiPath==='/match-analysis-status'&&request.method==='GET'){const rows=await optionalRows(env.DB.prepare('SELECT match_key,updated_at FROM user_match_analyses WHERE user_id=? ORDER BY updated_at DESC').bind(user.id));return privateJson({matches:rows.map(row=>({matchKey:row.match_key,updatedAt:row.updated_at}))})}
   if(apiPath==='/match-analysis'){const matchKey=String(url.searchParams.get('matchKey')||'').trim().slice(0,240);if(request.method==='GET'){if(!matchKey)return privateJson({error:'match_key_required'},400);const row=await env.DB.prepare('SELECT match_key,analysis,updated_at FROM user_match_analyses WHERE user_id=? AND match_key=?').bind(user.id,matchKey).first();return privateJson(row?{matchKey:row.match_key,analysis:row.analysis,updatedAt:row.updated_at}:{matchKey,analysis:'',updatedAt:null})}if(request.method==='PUT'){const body=await request.json().catch(()=>null),key=String(body?.matchKey||'').trim().slice(0,240),analysis=String(body?.analysis||'').trim();if(!key||!analysis||analysis.length>20000)return privateJson({error:'invalid_analysis'},400);const now=new Date().toISOString();await env.DB.prepare('INSERT INTO user_match_analyses(user_id,match_key,analysis,updated_at) VALUES(?,?,?,?) ON CONFLICT(user_id,match_key) DO UPDATE SET analysis=excluded.analysis,updated_at=excluded.updated_at').bind(user.id,key,analysis,now).run();return privateJson({matchKey:key,analysis,updatedAt:now})}if(request.method==='DELETE'){if(!matchKey)return privateJson({error:'match_key_required'},400);await env.DB.prepare('DELETE FROM user_match_analyses WHERE user_id=? AND match_key=?').bind(user.id,matchKey).run();return privateJson({success:true,matchKey})}return privateJson({error:'method_not_allowed'},405)}
   return privateJson({error:'not_found'},404)
@@ -370,7 +371,11 @@ export default{
     try{
       if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
       const url=new URL(request.url),path=url.pathname.replace(/\/$/,'');
-      if(path==='/app'||path.startsWith('/app-api/')||path.startsWith('/app/api/'))return await protectedApp(request,env,path,url);
+      if(path==='/app'||path.startsWith('/app-api/')||path.startsWith('/app/api/')){
+        const api=path.replace(/^\/app(?:-api|\/api)/,''),enabled=(request.method==='GET'&&(api==='/player-search'||api==='/app-snapshot'&&url.searchParams.has('playerId')))||(request.method==='POST'&&api==='/courtwatch-player');
+        const timing=playerLoadTiming(enabled);
+        return timing.response(await timing.measure('total',()=>protectedApp(request,env,path,url,timing)));
+      }
       if(path==='/admin'||path.startsWith('/admin/')||path==='/admin/query-export'||path==='/admin/override'||path==='/admin/override/undo'||path==='/admin/r2'||path==='/admin/r2/object'){if(!env.ADMIN_TOKEN)return new Response('Admin non configurata',{status:503,headers:adminHeaders});if(!adminAuthorized(request,env))return new Response('Autenticazione richiesta',{status:401,headers:{...adminHeaders,'WWW-Authenticate':'Basic realm="Court Watch Admin", charset="UTF-8"'}});if(path==='/admin'&&request.method==='GET')return Response.redirect(new URL('/admin/diagnostica',request.url),302);if(['/admin/diagnostica','/admin/cloudflare','/admin/id','/admin/itf','/admin/utenti'].includes(path)&&request.method==='GET'){const view=path.split('/')[2];if(view!=='id'&&ctx?.waitUntil){const idRequest=new Request(new URL('/admin/id',request.url));ctx.waitUntil(prepareSavedIdPage(request,env,()=>adminPage(idRequest,env)).catch(()=>null));}return new Response(await savedAdminPage(request,env,view,()=>adminPage(request,env)),{headers:adminHeaders});}if(path==='/admin/query-export'&&request.method==='GET')return adminQueryExport(request,env);if(path==='/admin/r2'&&request.method==='GET')return adminR2Page(request,env);if(path==='/admin/r2/object'&&request.method==='GET')return adminR2Object(request,env);if(path==='/admin/override'&&request.method==='POST')return writeOverride(request,env,false);if(path==='/admin/override/undo'&&request.method==='POST')return writeOverride(request,env,true);if(path==='/admin/device/revoke'&&request.method==='POST')return revokeDevice(request,env);return new Response('Metodo non consentito',{status:405,headers:adminHeaders})}
       if(path==='/v1/match-analysis-status'&&request.method==='GET'){const rows=await optionalRows(env.DB.prepare('SELECT match_key,updated_at FROM match_analyses ORDER BY updated_at DESC'));return json({matches:rows.map(row=>({matchKey:row.match_key,updatedAt:row.updated_at}))})}
       if(path==='/v1/match-analysis'){

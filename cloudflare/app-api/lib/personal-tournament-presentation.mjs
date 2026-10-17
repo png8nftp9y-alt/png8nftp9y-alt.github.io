@@ -49,10 +49,10 @@ export async function fetchTournamentPresentation(c,fetcher=fetch){
 const loaders=Object.fromEntries(Object.keys(sources).map(c=>[c,sharedTournamentMetadata(()=>fetchTournamentPresentation(c),{ttlMs:c==='itf'?60000:300000})]));
 // Request-local promises keep one catalogue load per circuit, including empty results.
 // Preparing only starts public metadata reads; tournament precedence stays at merge time.
-export function tournamentPresentationContext(catalogues=loaders){
+export function tournamentPresentationContext(catalogues=loaders,measure=(_stage,operation)=>operation()){
  const pending=new Map();
  const prepare=tournaments=>{
-  for(const c of new Set(tournaments.map(circuit)))if(catalogues[c]&&!pending.has(c))pending.set(c,catalogues[c]());
+  for(const c of new Set(tournaments.map(circuit)))if(catalogues[c]&&!pending.has(c))pending.set(c,measure('catalogue_'+c,()=>catalogues[c]()));
  };
  return {prepare,async enrich(tournaments){
   prepare(tournaments);

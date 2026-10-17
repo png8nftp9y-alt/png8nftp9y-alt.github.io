@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
+import {playerLoadTiming} from '../lib/player-load-timing.mjs';
 import {knownMatchResults} from '../lib/known-match-results.mjs';
 const source=readFileSync(new URL('../../../v3.js',import.meta.url),'utf8');
 const light=source.slice(source.indexOf('const knownResultUpdates ='),source.indexOf('async function load('));
@@ -13,7 +14,7 @@ const match={id:'te-app:owner|'+id,matchId:id,playerId:'owner',playerName:'Virgi
 test('Worker route keeps authentication, revoked-device and origin checks before reading results',async()=>{
  const worker=readFileSync(new URL('../src/index.js',import.meta.url),'utf8');
  let reads=0,user={id:'owner'},revoked=false;
- const ctx={accessUser:async()=>user,recordDevice:async()=>({revoked}),playerListGroup:x=>x,playerMembershipTable:()=>'',playerMembershipGuard:()=>'',
+ const ctx={playerLoadTiming,accessUser:async()=>user,recordDevice:async()=>({revoked}),playerListGroup:x=>x,playerMembershipTable:()=>'',playerMembershipGuard:()=>'',
  privateJson:(data,status=200)=>({data,status}),knownMatchResults:async()=>{reads++;return [update]}};
  vm.createContext(ctx);vm.runInContext(worker.slice(worker.indexOf('async function protectedApp('),worker.indexOf('function age(')),ctx);
  const url=new URL('https://courtwatch.test/app/api/known-match-results');

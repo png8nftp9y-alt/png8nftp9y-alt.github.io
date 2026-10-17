@@ -22,7 +22,7 @@ export async function hydratePersonalCircuitIdentity(db,player,identity=undefine
  return result;
 }
 
-export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpClub}={}){
+export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpClub,measure=(_stage,operation)=>operation()}={}){
  const group=playerListGroup(body?.group??'main'),membership=playerMembershipTable(group);
  let sourceKey=String(body?.sourceKey||'').trim(),courtwatchId=String(body?.courtwatchId||'').trim(),identity=String(body?.identity||'').trim(),name=String(body?.name||'').trim();
  if((!sourceKey&&!courtwatchId&&!identity)||sourceKey.length>240||courtwatchId.length>160||identity.length>160||name.length>160)throw failure('invalid_player');
@@ -94,7 +94,7 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
  if(previous&&previous.courtwatch_id!==player.id){if(mapped){player.id=previous.courtwatch_id;[linked,removed]=await Promise.all([env.DB.prepare(`SELECT courtwatch_id FROM ${membership} WHERE user_id=? AND courtwatch_id=?`).bind(user.id,player.id).first(),group==='main'?env.DB.prepare('SELECT courtwatch_id FROM user_app_player_removals WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first():null]);}else throw failure('player_identity_conflict',409);}
  if(!player.club&&previous)player.club=personalPlayerMetadata(parse(previous.payload)).club||'';
  if(player.membershipCard&&!player.club){
-  try{player.club=await fetchClub(player.membershipCard)||''}catch{player.club=''}
+  try{player.club=await measure('official_fitp_club',()=>fetchClub(player.membershipCard))||''}catch{player.club=''}
  }
  player=personalPlayerMetadata(player);
  const incoming={courtwatch_id:player.id,observed_source_key:observedSourceKey,payload:JSON.stringify(player)};
@@ -103,7 +103,7 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
  if(plan.inserts.length||plan.updates.length)statements.push(env.DB.prepare('INSERT INTO user_app_player_additions(user_id,courtwatch_id,observed_source_key,payload,created_at) VALUES(?,?,?,?,?) ON CONFLICT(user_id,courtwatch_id) DO UPDATE SET payload=excluded.payload WHERE user_app_player_additions.payload<>excluded.payload').bind(user.id,player.id,observedSourceKey,incoming.payload,now));
  if(!linked)statements.push(env.DB.prepare(`INSERT INTO ${membership}(user_id,courtwatch_id,created_at) VALUES(?,?,?) ON CONFLICT(user_id,courtwatch_id) DO NOTHING`).bind(user.id,player.id,now));
  if(removed)statements.push(env.DB.prepare('DELETE FROM user_app_player_removals WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id));
- if(statements.length)await env.DB.batch(statements);
+ if(statements.length)await measure('membership_write',()=>env.DB.batch(statements));
  return{added:true,playerId:player.id,player,group,changed:statements.length>0};
 }
 

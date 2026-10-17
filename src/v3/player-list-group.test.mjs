@@ -19,13 +19,14 @@ test('Main and Others use separate player/calendar/filter caches and the same de
 });
 test('Others refuses a main snapshot, including during staggered deployment',async()=>{
  const {c}=groupContext('others');
- vm.runInContext(source.slice(source.indexOf('async function fetchProjection('),source.indexOf('async function apiProjection(')),c);
+ vm.runInContext(source.slice(source.indexOf('function recordPlayerLoadTiming('),source.indexOf('async function fetchProjection('))+source.slice(source.indexOf('async function fetchProjection('),source.indexOf('async function apiProjection(')),c);
  await assert.rejects(c.fetchProjection('https://courtwatch.example/app/api/app-snapshot',100),/Sezione richiesta non ancora disponibile/);
 });
 
 
-const switchSource=source.slice(source.indexOf('function switchPlayerGroup()'),source.indexOf('function wire()'));
+const switchSource=source.slice(source.indexOf('function validUiState('),source.indexOf('function savedUiState('))+source.slice(source.indexOf('function switchPlayerGroup()'),source.indexOf('function wire()'));
 function configureGroupSwitch(ctx){
+ ctx.window=ctx;
  ctx.location.hash=new URL(ctx.location.href).hash;
  Object.assign(ctx,{groupSwitchRunning:false,playerAdditionsInFlight:new Set(),document:{getElementById:()=>null,querySelectorAll:()=>[]},$:()=>({}),saveRefreshView(){},sessionStorage:{getItem:()=>null},readDurableProjection:async()=>null,validProjection:data=>Boolean(data?.players),mergeKnownMatches:(...arrays)=>arrays.flat(),APP_API:'https://courtwatch.example/app/api/app-snapshot',state:{},activeProjectionController:null,activeLoadCompletion:Promise.resolve(),durableProjectionFallback:null,uiSelectionRestored:false,uiScrollRestoreCancelled:false,removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),renderedDataSignature:'',lastLoadedDocuments:{},scrollY:640,scrollTo(){},fetchProjection:async(_url,_timeout,group)=>({group,players:[{id:'target-player'}],matches:[],personalProjectionComplete:true}),load:async projection=>{ctx.state.data=projection},savedUiState(){try{return JSON.parse(ctx.localStorage.getItem(ctx.UI_STATE_CACHE)||'{}')}catch{return{}}},console:{warn(...args){throw Error('Switch failed: '+args.join(' '))}}});
 }

@@ -21,6 +21,7 @@ test('scoped snapshot returns the exact full-snapshot player, entries and match 
   for(const group of ['main','others']){
    const fullCounter=counted(d.db),fullResponse=await request(fullCounter.db,group);assert.equal(fullResponse.status,200);const full=await fullResponse.json();
    const scopedCounter=counted(d.db),scopedResponse=await request(scopedCounter.db,group,'cw-target-1');assert.equal(scopedResponse.status,200);const scoped=await scopedResponse.json();
+   assert.match(scopedResponse.headers.get('Server-Timing'),/total;dur=\d/);assert.match(scopedResponse.headers.get('Server-Timing'),/match_history;dur=\d/);assert.equal(fullResponse.headers.get('Server-Timing'),null);
    assert.equal(scoped.playerId,'cw-target-1');assert.equal(scoped.group,group);
    for(const [key,field] of [['players','id'],['tournaments','playerId'],['matches','playerId']])assert.deepEqual(scoped[key],full[key].filter(r=>r[field]==='cw-target-1'),key);
    assert.equal(scoped.matches.length,1);assert.equal(scoped.tournaments.length,1);
