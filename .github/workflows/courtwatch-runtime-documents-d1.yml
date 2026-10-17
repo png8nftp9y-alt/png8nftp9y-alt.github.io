@@ -1,6 +1,29 @@
 name: Court Watch runtime documents D1 import and verification
 # D1_WRITE_POLICY: incremental
 on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_run:
+    workflows:
+      - Court Watch v3 FITP provincial primary
+      - Court Watch v3 FITP player entries
+      - Court Watch v3 Tennis Europe tournament map
+      - Court Watch v3 Tennis Europe live entries
+      - Court Watch Tennis Europe agenda D1
+      - Court Watch v3 ITF global tournament map
+      - Court Watch v3 ITF acceptance discovery 42d
+      - Court Watch v3 ITF known labels fast
+      - Court Watch v3 ITF acceptance safety 120d
+      - Court Watch v3 ITF complete backfill
+      - Court Watch ITF Meta engine
+      - Court Watch future ITF tournament metadata acquisition
+      - Court Watch v3 ITF T-1 complete draws
+      - Court Watch ITF T-1 extraordinary concluded recovery
+      - Court Watch ITF T-1 artifact persistence recovery
+      - Court Watch v3 results engine
+      - Court Watch v3 order of play engine
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
   push:
     branches: [main]
@@ -16,24 +39,34 @@ concurrency:
   queue: max
 jobs:
   verify-storage:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 0}
+        with: {ref: main, fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Test immutable import and complete-source gate
-        run: node --test cloudflare/app-api/test/runtime-document-plan.test.mjs
+        run: node --test cloudflare/app-api/test/runtime-document-plan.test.mjs cloudflare/app-api/test/runtime-document-reader.test.mjs cloudflare/app-api/test/d1-single-source.test.mjs cloudflare/app-api/test/runtime-source-order.test.mjs
       - name: Persist complete runtime documents and verify full content in D1
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: node cloudflare/app-api/scripts/sync-runtime-documents-d1.mjs
+      - name: Verify authenticated D1-only readers with external requests blocked
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node cloudflare/app-api/scripts/verify-runtime-d1-read-path.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: runtime-documents-d1-verification
-          path: dist/v3/audits/runtime-documents-d1.json
+          path: |
+            dist/v3/audits/runtime-documents-d1.json
+            dist/v3/audits/runtime-d1-read-path.json
           if-no-files-found: error
           retention-days: 30

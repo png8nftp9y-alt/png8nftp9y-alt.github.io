@@ -52,6 +52,7 @@ jobs:
       run:
         working-directory: cloudflare/app-api
     env:
+      GITHUB_TOKEN: ${{ github.token }}
       # D1_WRITE_POLICY: incremental
       # A newly synchronized player must rebuild the observed index once; routine runs keep the no-op path.
       D1_SKIP_OBSERVED: ${{ ((github.event_name == 'workflow_dispatch' && inputs.full_refresh) || (github.event_name == 'push' && (github.event.head_commit.message == 'Sync official Court Watch players' || startsWith(github.event.head_commit.message, 'Repair D1 observed index')))) && '0' || '1' }}
@@ -61,7 +62,7 @@ jobs:
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main}
+        with: {ref: main, fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Configure private R2 reads
@@ -80,6 +81,8 @@ jobs:
       - name: Create or reuse Court Watch D1
         id: d1
         run: npm run configure
+      - name: Verify D1 runtime content before the early Worker deployment
+        run: node scripts/sync-runtime-documents-d1.mjs
       - name: Deploy read-compatible Worker before database maintenance
         run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
       - name: Apply D1 migrations
@@ -162,6 +165,8 @@ jobs:
       - name: Verify D1 parity with universal and Europe OOP manifests
         if: steps.import.outputs.changed == 'true'
         run: npm run verify
+      - name: Verify fresh D1 runtime release before deployment
+        run: node scripts/sync-runtime-documents-d1.mjs
       - name: Validate Worker API
         run: npx wrangler deploy --dry-run --config wrangler.generated.jsonc
       - name: Deploy Worker API

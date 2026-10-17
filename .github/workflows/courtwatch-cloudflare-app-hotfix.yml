@@ -9,13 +9,17 @@ on:
       - 'cloudflare/app-api/lib/**'
       - 'cloudflare/app-api/test/**'
       - '.github/workflows/courtwatch-cloudflare-app-hotfix.yml'
+      - 'v3.js'
+      - 'v3.css'
+      - 'v3.html'
 
 permissions:
   contents: read
 
 concurrency:
-  group: courtwatch-app-worker-hotfix
-  cancel-in-progress: true
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
 
 jobs:
   deploy-worker:
@@ -25,12 +29,13 @@ jobs:
       run:
         working-directory: cloudflare/app-api
     env:
+      GITHUB_TOKEN: ${{ github.token }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main}
+        with: {ref: main, fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: npm install
@@ -42,6 +47,8 @@ jobs:
       - name: Verify generated archive binding before deploy
         run: |
           node --input-type=module -e "import fs from 'node:fs'; const c=JSON.parse(fs.readFileSync('wrangler.generated.jsonc','utf8')); if(!c.r2_buckets?.some(b=>b.binding==='ARCHIVE' && b.bucket_name===process.env.R2_BUCKET)) throw Error('Missing ARCHIVE binding; deploy blocked');"
+      - name: Verify fresh D1 runtime release before deployment
+        run: node scripts/sync-runtime-documents-d1.mjs
       - name: Deploy Worker only
         run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
       - name: Verify protected app no Worker exception

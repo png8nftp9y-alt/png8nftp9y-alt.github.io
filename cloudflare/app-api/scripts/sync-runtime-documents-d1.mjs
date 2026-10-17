@@ -1,3 +1,4 @@
+import {assertRuntimeSourceOrder} from '../lib/runtime-source-order.mjs';
 // D1_WRITE_POLICY: incremental; buildIncrementalSyncPlan in runtime-document-plan.mjs.
 import fs from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
@@ -19,7 +20,14 @@ const documents=[];
 // Validate the ENTIRE scope before creating schema or writing content.
 for(const path of RUNTIME_DOCUMENT_FILES)documents.push(encodeDocument(path,JSON.parse(await fs.readFile(root+path,'utf8'))));
 const previous=(await query("SELECT value FROM app_state WHERE key='runtimeDocumentRelease'"))[0]?.value||null;
-if(previous){const old=JSON.parse(previous);if(old.sourceCommit!==sourceCommit){try{execFileSync('git',['merge-base','--is-ancestor',old.sourceCommit,sourceCommit],{cwd:root,stdio:'pipe'});}catch{throw Error('Runtime source is older or ancestry unavailable; publication blocked');}}}
+if(previous)await assertRuntimeSourceOrder(JSON.parse(previous).sourceCommit,sourceCommit,{
+ local:(old,current)=>{execFileSync('git',['merge-base','--is-ancestor',old,current],{cwd:root,stdio:'pipe'});return true;},
+ compare:async(old,current)=>{
+  const repository=process.env.GITHUB_REPOSITORY;if(!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repository||'')||![old,current].every(x=>/^[a-f0-9]{40}$/.test(x)))throw Error('runtime_source_ancestry_unavailable');
+  const response=await fetch(`https://api.github.com/repos/${repository}/compare/${old}...${current}`,{headers:{Accept:'application/vnd.github+json',...(process.env.GITHUB_TOKEN?{Authorization:'Bearer '+process.env.GITHUB_TOKEN}:{})},signal:AbortSignal.timeout(30000)});
+  if(!response.ok)throw Error('runtime_source_comparison_failed:'+response.status);return(await response.json()).status;
+ }
+});
 await query('CREATE TABLE IF NOT EXISTS runtime_document_chunks(path TEXT NOT NULL,content_hash TEXT NOT NULL,seq INTEGER NOT NULL,data TEXT NOT NULL,PRIMARY KEY(path,content_hash,seq)) WITHOUT ROWID');
 const plan=releasePlan(documents,sourceCommit,previous);
 let insertedVersions=0,unchangedVersions=0;

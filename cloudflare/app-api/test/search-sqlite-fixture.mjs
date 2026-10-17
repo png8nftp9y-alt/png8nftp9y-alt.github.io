@@ -1,3 +1,4 @@
+import {RUNTIME_DOCUMENT_FILES,encodeDocument,versionStatements,releasePlan} from '../lib/runtime-document-plan.mjs';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {mkdtempSync,readFileSync,rmSync} from 'node:fs';
@@ -10,9 +11,18 @@ export function database({identityMapping=false}={}){
  if(identityMapping)names.push('0029_player_circuit_identities.sql','0030_player_profile_recovery.sql','0032_identity_semantic_update_queue.sql','0017_tennis_europe_ranking_history.sql','0033_profile_native_evidence.sql');
  run({schema:names.map(n=>readFileSync(new URL('../migrations/'+n,import.meta.url),'utf8')).join('\n')});
  if(identityMapping)run({schema:'CREATE TABLE user_app_players(user_id TEXT NOT NULL,courtwatch_id TEXT NOT NULL,created_at TEXT NOT NULL,PRIMARY KEY(user_id,courtwatch_id));'});
+ const docs=RUNTIME_DOCUMENT_FILES.map(path=>encodeDocument(path,{status:'fixture_complete',players:[{id:'fixture'}],tournaments:[{competitionId:'FIXTURE'}]}));
+ const release=releasePlan(docs,'fixture');
+ run({schema:'CREATE TABLE runtime_document_chunks(path TEXT,content_hash TEXT,seq INTEGER,data TEXT,PRIMARY KEY(path,content_hash,seq)) WITHOUT ROWID;'+docs.flatMap(d=>versionStatements(d,null)).join('\n')+release.sql.join('\n')});
  let writes=0;const execute=(sql,values=[])=>{const r=run({statements:[{sql,values}]});writes+=r.writes;return r.rows};
  const db={prepare(sql){return {sql,values:[],bind(...values){return {sql,values,all:async()=>({results:execute(sql,values)}),first:async()=>execute(sql,values)[0]||null}},all:async()=>({results:execute(sql)}),first:async()=>execute(sql)[0]||null}},batch:async statements=>{const result=run({statements});writes+=result.writes;return result}};
  // Split only statement boundaries; semicolons inside quoted source payloads are preserved.
  const query=async sql=>{const statements=sql.match(/(?:[^';]|'(?:''|[^'])*')+;?/g).filter(x=>x.trim()).map(x=>({sql:x.replace(/;$/,''),values:[]}));const r=run({statements});writes+=r.writes;return r.rows};
- return {db,execute,query,writes:()=>writes,close:()=>rmSync(directory,{recursive:true,force:true})};
+ let currentRelease=release.value;
+ const publishRuntimeDocuments=overrides=>{
+  const next=docs.map(d=>overrides[d.path]?encodeDocument(d.path,overrides[d.path]):d);
+  for(const d of next)if(overrides[d.path])for(const sql of versionStatements(d,null))execute(sql);
+  const plan=releasePlan(next,'fixture',currentRelease);for(const sql of plan.sql)execute(sql);if(plan.changed)currentRelease=plan.value;
+ };
+ return {db,execute,query,publishRuntimeDocuments,writes:()=>writes,close:()=>rmSync(directory,{recursive:true,force:true})};
 }

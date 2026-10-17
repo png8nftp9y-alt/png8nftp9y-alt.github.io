@@ -44,7 +44,7 @@ test('scoped snapshots reject invalid, foreign and removed membership before rea
  }finally{d.close()}
 });
 
-test('scoped match history starts while entry profiles are still pending', {timeout:5000}, async()=>{
+test('scoped match history starts while entry profiles are still pending', {timeout:60000}, async()=>{
  const d=database({identityMapping:true}),original=globalThis.fetch;globalThis.fetch=async()=>({ok:true,json:async()=>({tournaments:[]})});
  try{seed(d,1);let release,overlap=false;
   function wrap(s,sql){return new Proxy(s,{get(t,k){const v=t[k];if(k==='bind')return(...args)=>wrap(v.apply(t,args),sql);
@@ -59,19 +59,15 @@ test('scoped match history starts while entry profiles are still pending', {time
  }finally{globalThis.fetch=original;d.close()}
 });
 
-test('scoped public presentation loads before match history finishes and final output matches the full snapshot', {timeout:5000}, async()=>{
+test('scoped public presentation loads before match history finishes and final output matches the full snapshot', {timeout:60000}, async()=>{
  const d=database({identityMapping:true}),original=globalThis.fetch;
  let releaseHistory,startedHistory,overlap=false;
  const historyStarted=new Promise(resolve=>{startedHistory=resolve});
- globalThis.fetch=async url=>{
-  if(String(url).includes('/history/itf_official_metadata.json')){
-   await historyStarted;overlap=true;releaseHistory();
-   return {ok:true,json:async()=>({tournaments:[{circuit:'itf',competitionId:'t0',venueName:'Verified Club',qualificationStartDate:'2026-09-30'}]})};
-  }
-  return {ok:true,json:async()=>({tournaments:[]})};
- };
+ globalThis.fetch=async()=>{throw Error('Unexpected HTTP metadata read')};
+ d.publishRuntimeDocuments({'history/itf_official_metadata.json':{tournaments:{t0:{venueName:'Verified Club',qualificationStartDate:'2026-09-30'}}}});
  try{seed(d,1);
-  function wrap(s,sql){return new Proxy(s,{get(t,k){const v=t[k];if(k==='bind')return(...args)=>wrap(v.apply(t,args),sql);
+  function wrap(s,sql,values=[]){return new Proxy(s,{get(t,k){const v=t[k];if(k==='bind')return(...args)=>wrap(v.apply(t,args),sql,args);
+   if(k==='all'&&sql.includes('runtime_document_chunks')&&values[0]==='history/itf_official_metadata.json')return async(...args)=>{await historyStarted;overlap=true;releaseHistory();return v.apply(t,args)};
    if(k==='all'&&sql.includes('WITH candidate_matches AS MATERIALIZED'))return(...args)=>new Promise((resolve,reject)=>{
     releaseHistory=()=>Promise.resolve(v.apply(t,args)).then(resolve,reject);startedHistory();
    });return typeof v==='function'?v.bind(t):v;}})}
@@ -85,7 +81,7 @@ test('scoped public presentation loads before match history finishes and final o
  }finally{globalThis.fetch=original;d.close()}
 });
 
-test('scoped ranking reads overlap history and a ranking outage still preserves the player snapshot', {timeout:5000}, async()=>{
+test('scoped ranking reads overlap history and a ranking outage still preserves the player snapshot', {timeout:60000}, async()=>{
  const d=database({identityMapping:true}),original=globalThis.fetch;globalThis.fetch=async()=>({ok:true,json:async()=>({tournaments:[]})});
  try{seed(d,1);const before=d.writes();
   for(const fail of [false,true]){

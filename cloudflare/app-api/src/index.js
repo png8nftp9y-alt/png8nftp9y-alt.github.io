@@ -1,3 +1,4 @@
+import {runtimeDocumentReader,FRONTEND_DOCUMENTS} from '../lib/runtime-document-reader.mjs';
 import {playerLoadTiming} from '../lib/player-load-timing.mjs';
 import {storageUsageMetric,r2UsageRows} from '../lib/cloudflare-storage-usage.mjs';
 import {linkedOpponentIdentity,tennisEuropeNativeId} from '../lib/opponent-linked-identity.mjs';
@@ -84,18 +85,12 @@ async function currentTennisEuropePlayerRanking(env,{playerId,name,identity=null
 async function searchPlayers(env,query,userId,cursor=''){return paginatedPlayerSearch(env.DB,query,userId,cursor)}
 const incompleteCompletedScore=(value,status,decided=false)=>{const sets=String(value||'').match(/\d+(?:\(\d+\))?-\d+(?:\(\d+\))?/g)||[];if(!sets.length)return false;let left=0,right=0;for(const set of sets){const points=set.match(/^(\d+)(?:\(\d+\))?-(\d+)/);if(!points)continue;const a=Number(points[1]),b=Number(points[2]),high=Math.max(a,b),low=Math.min(a,b),completeSet=high>=6&&(high-low>=2||(high===7&&low===6));if(!completeSet)continue;a>b?left++:right++}return Math.max(left,right)<2};
 const tennisEuropePerspectiveScore=(value,teamIndex)=>{const score=String(value||'').trim();if(teamIndex!==1||!score||/^(?:W\/O|WO)$/i.test(score))return score;return score.split(/\s+/).map(set=>{const match=set.match(/^(\d+)(?:\((\d+)\))?-(\d+)(?:\((\d+)\))?$/);return match?`${match[3]}${match[4]?`(${match[4]})`:''}-${match[1]}${match[2]?`(${match[2]})`:''}`:set}).join(' ')};
-const itfTournamentMetadata=sharedTournamentMetadata(async()=>{
- const results=await Promise.allSettled(['source_itf_history_tournaments.json','source_itf_tournaments.json'].map(async file=>{
-  const response=await fetch(`${PUBLIC_DATA}/${file}`,{cf:{cacheEverything:true,cacheTtl:3600},signal:AbortSignal.timeout(3000)});
-  if(!response.ok)return [];
-  const data=await response.json();return data.tournaments||[];
- }));
- const metadata=new Map();
- for(const result of results)if(result.status==='fulfilled')for(const t of result.value){const id=String(t.competitionId||'').toUpperCase();if(!id)continue;const previous=metadata.get(id)||{};metadata.set(id,{...previous,...t,location:t.location||previous.location||''});}
- return metadata;
-});
-const tennisEuropeTournamentMetadata=sharedTournamentMetadata(async()=>{const response=await fetch(`${PUBLIC_DATA}/source_tennis_europe_tournaments_sharded.json`,{cf:{cacheEverything:true,cacheTtl:3600},signal:AbortSignal.timeout(3000)});if(!response.ok)return new Map();const data=await response.json(),rows=Array.isArray(data?.tournaments)?data.tournaments:[];return new Map(rows.map(row=>[String(row.competitionId||row.sourceTournamentId||'').toLowerCase(),row]).filter(([id])=>id));});
-async function opponentEntryTournaments(env,{profileId,name,asOf,includePast=false,sourceCircuit='',exactIdentity=false,exactRows=null}){const normalized=normalizeTennisEuropeName(name),variants=tennisEuropeNameVariants(normalized),targetKey=tennisEuropeNameKey(normalized),cutoff=includePast?'0000-01-01':/^\d{4}-\d{2}-\d{2}$/.test(asOf)?asOf:new Date().toISOString().slice(0,10);if(!variants.length)return[];const rows=exactRows||await optionalRows(env.DB.prepare(`SELECT circuit,source_player_id,normalized_name,payload FROM opponent_entry_profiles WHERE normalized_name IN (${variants.map(()=>'?').join(',')})`).bind(...variants)),safe=rows.filter(row=>(!sourceCircuit||row.circuit===sourceCircuit)&&(exactRows!==null||tennisEuropeNameKey(row.normalized_name)===targetKey)),byCircuit=new Map();for(const row of safe){const list=byCircuit.get(row.circuit)||[];list.push(row);byCircuit.set(row.circuit,list)}const selected=selectOpponentEntryProfiles(safe,profileId).filter(row=>!exactIdentity||String(row.source_player_id).toLowerCase()===String(profileId).toLowerCase());const officialItf=selected.some(row=>row.circuit==='itf')?await itfTournamentMetadata():new Map();const tournaments=[];for(const row of selected){let profile={};try{profile=JSON.parse(row.payload||'{}')}catch{}for(const observedTournament of profile.tournaments||[]){const official=row.circuit==='itf'?officialItf.get(String(observedTournament.competitionId||'').toUpperCase())||{}:{};const tournament={...official,...observedTournament,startDate:observedTournament.startDate||official.startDate||'',endDate:observedTournament.endDate||official.endDate||'',location:observedTournament.location||official.location||'',surface:observedTournament.surface||official.surface||'',environment:observedTournament.environment||official.indoorOutdoor||''};const startDate=String(tournament.startDate||''),endDate=String(tournament.endDate||startDate);if(endDate&&endDate<cutoff)continue;tournaments.push({...tournament,id:`entry:${row.circuit}:${tournament.competitionId}`,circuit:row.circuit,competitionId:tournament.competitionId||'',name:tournament.name||tournament.tournamentName||`Torneo ${String(row.circuit).toUpperCase()}`,location:tournament.location||'',venueName:tournament.venueName||'',address:tournament.address||'',startDate,endDate,sourceUrl:tournament.sourceUrl||'',entryStatus:tournament.entryStatus||'iscritto',acceptanceCode:tournament.acceptanceCode||'',acceptancePosition:tournament.acceptancePosition??null,event:tournament.event||tournament.draw||'',matches:[]})}}return tournaments}
+async function itfTournamentMetadata(env){
+ const rows=(await Promise.all(['source_itf_history_tournaments.json','source_itf_tournaments.json'].map(file=>env.RUNTIME_DOCUMENTS.get('dist/v3/'+file)))).flatMap(doc=>doc.tournaments||[]);
+ const metadata=new Map();for(const t of rows){const id=String(t.competitionId||'').toUpperCase();if(id)metadata.set(id,{...metadata.get(id),...t});}return metadata;
+}
+async function tennisEuropeTournamentMetadata(env){const data=await env.RUNTIME_DOCUMENTS.get('dist/v3/source_tennis_europe_tournaments_sharded.json');return new Map((data.tournaments||[]).map(row=>[String(row.competitionId||row.sourceTournamentId||'').toLowerCase(),row]));}
+async function opponentEntryTournaments(env,{profileId,name,asOf,includePast=false,sourceCircuit='',exactIdentity=false,exactRows=null}){const normalized=normalizeTennisEuropeName(name),variants=tennisEuropeNameVariants(normalized),targetKey=tennisEuropeNameKey(normalized),cutoff=includePast?'0000-01-01':/^\d{4}-\d{2}-\d{2}$/.test(asOf)?asOf:new Date().toISOString().slice(0,10);if(!variants.length)return[];const rows=exactRows||await optionalRows(env.DB.prepare(`SELECT circuit,source_player_id,normalized_name,payload FROM opponent_entry_profiles WHERE normalized_name IN (${variants.map(()=>'?').join(',')})`).bind(...variants)),safe=rows.filter(row=>(!sourceCircuit||row.circuit===sourceCircuit)&&(exactRows!==null||tennisEuropeNameKey(row.normalized_name)===targetKey)),byCircuit=new Map();for(const row of safe){const list=byCircuit.get(row.circuit)||[];list.push(row);byCircuit.set(row.circuit,list)}const selected=selectOpponentEntryProfiles(safe,profileId).filter(row=>!exactIdentity||String(row.source_player_id).toLowerCase()===String(profileId).toLowerCase());const officialItf=selected.some(row=>row.circuit==='itf')?await itfTournamentMetadata(env):new Map();const tournaments=[];for(const row of selected){let profile={};try{profile=JSON.parse(row.payload||'{}')}catch{}for(const observedTournament of profile.tournaments||[]){const official=row.circuit==='itf'?officialItf.get(String(observedTournament.competitionId||'').toUpperCase())||{}:{};const tournament={...official,...observedTournament,startDate:observedTournament.startDate||official.startDate||'',endDate:observedTournament.endDate||official.endDate||'',location:observedTournament.location||official.location||'',surface:observedTournament.surface||official.surface||'',environment:observedTournament.environment||official.indoorOutdoor||''};const startDate=String(tournament.startDate||''),endDate=String(tournament.endDate||startDate);if(endDate&&endDate<cutoff)continue;tournaments.push({...tournament,id:`entry:${row.circuit}:${tournament.competitionId}`,circuit:row.circuit,competitionId:tournament.competitionId||'',name:tournament.name||tournament.tournamentName||`Torneo ${String(row.circuit).toUpperCase()}`,location:tournament.location||'',venueName:tournament.venueName||'',address:tournament.address||'',startDate,endDate,sourceUrl:tournament.sourceUrl||'',entryStatus:tournament.entryStatus||'iscritto',acceptanceCode:tournament.acceptanceCode||'',acceptancePosition:tournament.acceptancePosition??null,event:tournament.event||tournament.draw||'',matches:[]})}}return tournaments}
 async function playerEntryTournaments(env,player,options={}){
  const linked=playerCircuitIdentities(player),requests=linked.length?linked:[{circuit:player.sourceCircuit||'',profileId:player.sourcePlayerId||options.profileId}];
  const ownKey=player.id||player.canonicalId||player.sourceKey||'opponent',entryRows=options.entryRows??(linked.length?(await exactPersonalEntryProfiles(env.DB,[{...player,id:ownKey}])).get(ownKey)||[]:null);
@@ -108,7 +103,7 @@ async function tennisEuropeOpponentHistory(env,{profileId,name,asOf,excludeMatch
   const selection=await opponentEuropeSources(env.DB,{profileId:officialId,name,identity,asOf:cutoff,excludeMatchId}),source=selection.rows,selected=[],tournamentIds=new Set();
   for(const row of source){if(!tournamentIds.has(row.tournament_id)){if(tournamentIds.size>=5)continue;tournamentIds.add(row.tournament_id)}selected.push(row)}
   if(!selected.length)return{asOf:cutoff,profile,tournaments:[],form:{wins:0,losses:0,matches:0}};
-  const ids=[...new Set(selected.map(row=>row.match_id))],marks=ids.map(()=>'?').join(','),[participants,rankingSnapshots,officialTournamentMetadata]=await Promise.all([boundedRows(env.DB,'SELECT match_id,participant_key,source_player_id,display_name,normalized_name,nationality,team_index,is_winner,payload FROM match_participants WHERE match_id IN ($MARKS) ORDER BY match_id,team_index,participant_key',ids),boundedRows(env.DB,'SELECT match_id,profile_id,category,ranking,ranking_date FROM tennis_europe_match_ranking_snapshots WHERE match_id IN ($MARKS) AND ranking IS NOT NULL',ids),tennisEuropeTournamentMetadata()]),profileKey=value=>String(value||'').toLowerCase().replace(/^.*\//,'').replace(/[^a-z0-9]/g,''),snapshotFor=(player,matchId)=>{const raw=String(player.source_player_id||''),id=profileKey(raw);if(!(/[a-z]/i.test(raw)||raw.length>10))return null;return rankingSnapshots.find(row=>row.match_id===matchId&&id&&profileKey(row.profile_id)===id)||null},byMatch=new Map();
+  const ids=[...new Set(selected.map(row=>row.match_id))],marks=ids.map(()=>'?').join(','),[participants,rankingSnapshots,officialTournamentMetadata]=await Promise.all([boundedRows(env.DB,'SELECT match_id,participant_key,source_player_id,display_name,normalized_name,nationality,team_index,is_winner,payload FROM match_participants WHERE match_id IN ($MARKS) ORDER BY match_id,team_index,participant_key',ids),boundedRows(env.DB,'SELECT match_id,profile_id,category,ranking,ranking_date FROM tennis_europe_match_ranking_snapshots WHERE match_id IN ($MARKS) AND ranking IS NOT NULL',ids),tennisEuropeTournamentMetadata(env)]),profileKey=value=>String(value||'').toLowerCase().replace(/^.*\//,'').replace(/[^a-z0-9]/g,''),snapshotFor=(player,matchId)=>{const raw=String(player.source_player_id||''),id=profileKey(raw);if(!(/[a-z]/i.test(raw)||raw.length>10))return null;return rankingSnapshots.find(row=>row.match_id===matchId&&id&&profileKey(row.profile_id)===id)||null},byMatch=new Map();
   for(const player of participants){const list=byMatch.get(player.match_id)||[];list.push(player);byMatch.set(player.match_id,list)}
   const rankingPeople=participants.filter(player=>!opponentSelfParticipant(player,selection,name)),participantIds=[...new Set(rankingPeople.flatMap(player=>{const id=tennisEuropeNativeId(player.source_player_id);return id?[id,id.toUpperCase()]:[]}))],participantNames=[...new Set(rankingPeople.filter(player=>!tennisEuropeNativeId(player.source_player_id)).flatMap(player=>tennisEuropeNameVariants(player.normalized_name)).filter(Boolean))],nameKey=value=>tennisEuropeNameKey(value);
   const [idHistory,nameHistory]=await Promise.all([participantIds.length?boundedRows(env.DB,'SELECT profile_id,normalized_name,nationality,category,ranking,ranking_date FROM tennis_europe_ranking_history WHERE profile_id IN ($MARKS) AND ranking_date<=? ORDER BY ranking_date DESC',participantIds,[cutoff]):[],participantNames.length?boundedRows(env.DB,'SELECT profile_id,normalized_name,nationality,category,ranking,ranking_date FROM tennis_europe_ranking_history WHERE normalized_name IN ($MARKS) AND ranking_date<=? ORDER BY ranking_date DESC',participantNames,[cutoff]):[]]);
@@ -130,17 +125,17 @@ async function universalOpponentHistory(env,options){
  if(exact.length===1){let payload={};try{payload=JSON.parse(exact[0].payload)}catch{}Object.assign(person,payload,{name:options.name,sourceCircuit:exact[0].circuit,officialId:exact[0].official_id,circuits:[exact[0].circuit]});}
  else if(history.profile?.profile_id){person.circuits=['tennis-europe'];person.profileSync={tennisEurope:{profileId:history.profile.profile_id}};}
  if(identity)Object.assign(person,identity,{name:options.name});
- const profiles=await resolveCircuitProfiles(env.DB,[person]),tournaments=opponentTournamentWindow(await enrichPersonalTournamentPresentation([...entries,...history.tournaments,...other]),asOf);
+ const profiles=await resolveCircuitProfiles(env.DB,[person]),tournaments=opponentTournamentWindow(await enrichPersonalTournamentPresentation([...entries,...history.tournaments,...other],env.RUNTIME_DOCUMENTS),asOf);
  const current=await currentTennisEuropePlayerRanking(env,{playerId:person.canonicalId||person.id||options.profileId,name:person.name,identity:person});
  const currentProfile=current.rankings.find(row=>currentRankingCategoryAllowed(row.category,person));
  return{...history,profile:currentProfile?{...history.profile,...currentProfile}:history.profile?{...history.profile,ranking:null}:null,asOf,tournaments,circuitProfiles:[...new Map([...(profiles.get(person)||circuitProfiles(person)),...(identity?.circuitProfiles||[])].map(p=>[p.circuit,p])).values()],sources:[...new Set(tournaments.map(t=>t.circuit||'tennis-europe'))]};
 }
 function adminAuthorized(request,env){if(!env.ADMIN_TOKEN)return false;const value=request.headers.get('authorization')||'';if(!value.startsWith('Basic '))return false;try{const decoded=atob(value.slice(6)),i=decoded.indexOf(':');return i>=0&&decoded.slice(i+1)===env.ADMIN_TOKEN}catch{return false}}
 const adminHeaders={'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Frame-Options':'DENY','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'"};
-const PUBLIC_DATA='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.github.io/main/dist/v3';
+const PUBLIC_DATA='https://stored-documents.invalid/dist/v3';
 
 // UI revision 215 is documented in the canonical handoff report.
-const PUBLIC_APP='https://png8nftp9y-alt.github.io/v3.html';
+
 const WORKFLOWS=[
   ['FITP','courtwatch-v3-fitp-entries.yml'],
   ['Tennis Europe','courtwatch-v3-tennis-europe-live.yml'],
@@ -160,13 +155,17 @@ async function revokeDevice(request,env){const form=await request.formData(),id=
 async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
   // Cloudflare Access authorizes /app before the request reaches this Worker.
   // Keep the application shell independent from D1 so maintenance imports cannot make page loading fail.
-  if(path==='/app'){try{const response=await fetch(PUBLIC_APP+'?protected='+Date.now(),{cache:'no-store',headers:{'User-Agent':'courtwatch-protected-app','Cache-Control':'no-cache'}});if(!response.ok)throw new Error('public_app_http_'+response.status);let html=await response.text();html=html.replace('<head>','<head><base href="https://png8nftp9y-alt.github.io/">');return new Response(html,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Frame-Options':'DENY','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin'}})}catch(error){console.error('protected_app_shell_unavailable',error);return new Response('Applicazione temporaneamente non disponibile',{status:503,headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}})}}
+  if(path==='/app'){const assetUrl=new URL('/v3.html',request.url);const response=await env.ASSETS.fetch(new Request(assetUrl));if(!response.ok)return new Response('Applicazione temporaneamente non disponibile',{status:503});return new Response(await response.text(),{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Frame-Options':'DENY','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin'}});}
   const user=await timing.measure('authentication',()=>accessUser(request,env));if(!user)return privateJson({error:'access_authentication_required'},401);
   const device=await timing.measure('device',()=>recordDevice(request,env,user,path));if(device.revoked)return privateJson({error:'device_revoked'},403);
   const apiPath=path.replace(/^\/app(?:-api|\/api)/,'');
   let group;try{group=playerListGroup(request.headers.get('X-CourtWatch-Group')||'main')}catch(error){return privateJson({error:error.message},400)}
   const membership=playerMembershipTable(group);
   const memberSelection=`SELECT courtwatch_id FROM ${membership} u WHERE user_id=? AND ${playerMembershipGuard(group)}`;
+  if(apiPath.startsWith('/documents/')&&request.method==='GET'){
+    const name=apiPath.slice('/documents/'.length);if(!FRONTEND_DOCUMENTS.has(name))return privateJson({error:'document_not_allowed'},404);
+    return privateJson(await env.RUNTIME_DOCUMENTS.get('dist/v3/'+name));
+  }
   if(apiPath==='/courtwatch-player'){
     if(request.method==='POST'){
       if(request.headers.get('Origin')&&request.headers.get('Origin')!==url.origin)return privateJson({error:'origin_not_allowed'},403);
@@ -204,7 +203,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
       timing.measure('identity',()=>personalPlayerAdditions(env,user.id,group,playerId)).catch(error=>{if(!missingOptionalTable(error))throw error;return []})
     ]);
     const playerMap=new Map(players.map(player=>[player.id,player]));for(const player of added)playerMap.set(player.id,{...playerMap.get(player.id),...player});players.splice(0,players.length,...playerMap.values());
-    const presentation=playerId?tournamentPresentationContext(undefined,timing.measure):null;
+    const presentation=playerId?tournamentPresentationContext(undefined,timing.measure,env.RUNTIME_DOCUMENTS):null;
     const prepare=rows=>{presentation.prepare(rows);return rows};
     const scopedData=playerId?await Promise.all([
       timing.measure('entries',()=>exactPersonalEntryProfiles(env.DB,added).then(profiles=>Promise.all(added.filter(p=>p.sourceKey).map(async player=>{
@@ -213,7 +212,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
       })))),
       timing.measure('native_tournaments',()=>personalUnreleasedTournamentHistory(env.DB,added).then(async rows=>{
         prepare(rows);
-        return [rows,rows.some(t=>t.circuit==='itf')?await itfTournamentMetadata():new Map()];
+        return [rows,rows.some(t=>t.circuit==='itf')?await itfTournamentMetadata(env):new Map()];
       })),
       timing.measure('match_history',()=>Promise.all(added.map(async player=>{
         const history=await personalCircuitHistory(env.DB,player);prepare(history.tournaments);return history;
@@ -229,7 +228,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
       tournaments.splice(0,tournaments.length,...live);
     }
     const unreleasedHistory=scopedData?scopedData[1][0]:await personalUnreleasedTournamentHistory(env.DB,added);
-    const officialItf=scopedData?scopedData[1][1]:unreleasedHistory.some(t=>t.circuit==='itf')?await itfTournamentMetadata():new Map();
+    const officialItf=scopedData?scopedData[1][1]:unreleasedHistory.some(t=>t.circuit==='itf')?await itfTournamentMetadata(env):new Map();
     const allHistory=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
     for(const t of unreleasedHistory){const official=officialItf.get(String(t.competitionId||'').toUpperCase())||{};const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;allHistory.set(key,mergePersonalHistoryTournament({...t,location:t.location||official.location||'',startDate:t.startDate||official.startDate||'',endDate:t.endDate||official.endDate||''},allHistory.get(key)));}
     tournaments.splice(0,tournaments.length,...allHistory.values());
@@ -243,7 +242,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
       for(const m of history.matches)matchMap.set(`${m.playerId}|${m.matchId||m.id}`,{...matchMap.get(`${m.playerId}|${m.matchId||m.id}`),...m});
       matches.splice(0,matches.length,...matchMap.values());
     }
-    tournaments.splice(0,tournaments.length,...await timing.measure('presentation_wait',()=>(presentation?presentation.enrich(tournaments):enrichPersonalTournamentPresentation(tournaments))));
+    tournaments.splice(0,tournaments.length,...await timing.measure('presentation_wait',()=>(presentation?presentation.enrich(tournaments):enrichPersonalTournamentPresentation(tournaments,env.RUNTIME_DOCUMENTS))));
     const rankPlayers=async()=>{try{await timing.measure('rankings',()=>applyPreparedTennisEuropeRankings(env,players,matches,[...new Set(players.map(p=>p.id))],scopedData?.[3]))}catch(error){console.error('prepared_tennis_europe_projection_failed',error)}};
     const [,linkedProfiles]=await Promise.all([rankPlayers(),timing.measure('profile_links',()=>resolveCircuitProfiles(env.DB,players))]);for(const player of players)player.circuitProfiles=linkedProfiles.get(player)||[];const selectedIds=new Set(players.map(p=>p.id));const scoped=(rows,field)=>(playerId||group==='others')?rows.filter(row=>selectedIds.has(row[field])):rows;return privateJson({group,...(playerId?{playerId}:{}),membershipIds,generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players:scoped(applyOverrides(players,overrides,'player'),'id'),tournaments:scoped(applyOverrides(tournaments,overrides,'tournament'),'playerId'),matches})}
   if(apiPath==='/match-analysis-status'&&request.method==='GET'){const rows=await optionalRows(env.DB.prepare('SELECT match_key,updated_at FROM user_match_analyses WHERE user_id=? ORDER BY updated_at DESC').bind(user.id));return privateJson({matches:rows.map(row=>({matchKey:row.match_key,updatedAt:row.updated_at}))})}
@@ -252,7 +251,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
 }
 function age(value){const ms=Date.now()-Date.parse(value||'');if(!Number.isFinite(ms))return'—';const minutes=Math.max(0,Math.round(ms/60000));return minutes<60?minutes+' min fa':minutes<1440?Math.round(minutes/60)+' h fa':Math.round(minutes/1440)+' g fa'}
 function tone(status){const value=String(status||'').toLowerCase();return value==='success'||value==='green'||value.includes('complete')||value.includes('built')?'ok':value==='failure'||value==='cancelled'||value==='red'||value.includes('error')?'bad':'warn'}
-async function adminRemote(view){return loadAdminRemote({primaryBase:PUBLIC_DATA,fallbackBase:'https://png8nftp9y-alt.github.io/dist/v3',files:ADMIN_REMOTE_FILES_BY_VIEW[view]||[],timeoutMs:4000})}
+async function adminRemote(view,env){return loadAdminRemote({primaryBase:PUBLIC_DATA,files:ADMIN_REMOTE_FILES_BY_VIEW[view]||[],cache:null,fetcher:async url=>({ok:true,json:()=>env.RUNTIME_DOCUMENTS.get(new URL(url).pathname.slice(1))})})}
 function engineRow(label,status,generatedAt,detail,url=''){const title=url?`<a href="${esc(url)}" rel="noreferrer">${esc(label)}</a>`:esc(label);return `<tr><td><b>${title}</b></td><td><span class="pill ${tone(status)}">${esc(status||'non disponibile')}</span></td><td>${esc(age(generatedAt))}</td><td class="muted">${esc(detail||'—')}</td></tr>`}
 const QUERY_TABLES={
   observed_players:{label:'Profili osservati',from:'observed_players',select:'*',search:'payload',fields:{display_name:'Nome',circuit:'Circuito',official_id:'ID ufficiale',monitored:'Monitorato',observations:'Osservazioni',last_observed_at:'Ultima osservazione'}},
@@ -310,7 +309,7 @@ async function adminPage(request,env,ctx){
     userView?(async()=>{try{return{rows:(await env.DB.prepare("SELECT device_id,label,first_seen,last_seen,last_path,status,revoked_at FROM app_user_devices WHERE user_id=? ORDER BY CASE status WHEN 'active' THEN 0 ELSE 1 END,last_seen DESC").bind(ACCESS_OWNER.id).all()).results||[],warning:''}}catch(error){console.error('admin_devices_read_failed',error);return{rows:[],warning:'Registro dispositivi in inizializzazione'}}})():{rows:[],warning:''},
     userView?optionalRows(env.DB.prepare("SELECT id,entity_type,entity_id,action,payload,created_at,updated_at FROM manual_overrides WHERE active=1 ORDER BY updated_at DESC LIMIT 50")):[],
     diagnosticView&&env.ARCHIVE?Promise.all(['fitp/cache','tennis-europe/cache','itf/database'].map(async prefix=>{try{const object=await env.ARCHIVE.get(prefix+'/pointers/current.json');if(!object)return 0;await object.json();return 1}catch{return 0}})).then(values=>values.reduce((sum,value)=>sum+value,0)):0,
-    adminRemote(view),
+    adminRemote(view,env),
   ]);
   const generationCounts=(()=>{try{return JSON.parse(generation?.counts_json||'{}')}catch{return{}}})();
   const counts={...Object.fromEntries(countRows),observed_players:Number(generationCounts.observedPlayers||0)},presenceByCircuit=Object.fromEntries((presenceResult.results||[]).map(row=>[row.circuit,row]));
@@ -378,7 +377,9 @@ function appSnapshot(players,tournaments,entries,schedules,manifest){
 }
 export default{
   async fetch(request,env,ctx){
+    env={...env,RUNTIME_DOCUMENTS:runtimeDocumentReader(env.DB)};
     try{
+      if(['/v3.js','/v3.css'].includes(new URL(request.url).pathname))return env.ASSETS.fetch(request);
       if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
       const url=new URL(request.url),path=url.pathname.replace(/\/$/,'');
       if(path==='/app'||path.startsWith('/app-api/')||path.startsWith('/app/api/')){

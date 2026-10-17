@@ -1,4 +1,4 @@
-const V3 = "https://png8nftp9y-alt.github.io/dist/v3/";
+const V3 = location.origin + "/app/api/documents/";
 // Release contracts: location.origin+'/app/api' and background refresh outside opponent profiles.
 // Functional-shield contracts retained across formatting:
 // ${agendaDrawCodeHtml(m,itemTournament)}</div><${whenTag} class="agendaWhenDetails
@@ -842,11 +842,12 @@ async function v3json(path) {
   const controller = new AbortController(),
     timer = setTimeout(() => controller.abort(), 12000);
   try {
-    const r = await fetch(V3 + path, {
+    const r = await fetch(V3 + path, privateApiOptions({
       cache: "no-cache",
       mode: "cors",
       signal: controller.signal,
-    });
+      credentials: "same-origin",
+    }, PLAYER_GROUP));
     if (!r.ok) throw Error("File v3 mancante: " + path);
     return await r.json();
   } finally {

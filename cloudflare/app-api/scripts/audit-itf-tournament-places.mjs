@@ -24,7 +24,7 @@ async function main(){
  for(;;){const batch=await client.query("SELECT id,source_tournament_id,payload FROM tournaments WHERE circuit='itf' AND id>? ORDER BY id LIMIT 100",[cursor]);if(!batch.length)break;rows.push(...batch);cursor=batch.at(-1).id;}
  if(!rows.length)throw Error('No ITF rows; cannot certify an empty audit');
  const sources=[];
- const presentation=await fetchTournamentPresentation('itf',async url=>{const rel=new URL(url).pathname.split('/main/')[1];if(!rel)throw Error('Unexpected metadata path');const data=JSON.parse(await fs.readFile(rel,'utf8'));sources.push(rel);return {ok:true,json:async()=>data};});
+ const presentation=await fetchTournamentPresentation('itf',async url=>{const rel=new URL(url).pathname.slice(1);if(!rel)throw Error('Unexpected metadata path');const data=JSON.parse(await fs.readFile(rel,'utf8'));sources.push(rel);return {ok:true,json:async()=>data};});
  if(sources.length!==4)throw Error('Incomplete source coverage; audit refused');
  const today=new Date().toLocaleDateString('en-CA',{timeZone:'Europe/Rome'}),report=auditPlaces(rows,presentation,today);
  await fs.mkdir('dist/v3/audits',{recursive:true});await fs.writeFile('dist/v3/audits/itf-tournament-places.json',JSON.stringify(report,null,2)+'\n');

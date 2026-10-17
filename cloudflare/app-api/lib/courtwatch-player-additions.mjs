@@ -1,7 +1,7 @@
 import {readD1Rows} from './d1-read-retry.mjs';
 import {mappedPlayerId,storedIdentity,storedIdentities} from './player-identity-lookup.mjs';
 import {playerCircuitIdentities} from './player-circuit-profiles.mjs';
-import {personalPlayerMetadata,officialFitpClub} from './personal-player-metadata.mjs';
+import {personalPlayerMetadata} from './personal-player-metadata.mjs';
 // D1_WRITE_POLICY: incremental
 import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
 import {playerListGroup,playerMembershipTable,playerMembershipGuard} from './player-list-group.mjs';
@@ -22,7 +22,7 @@ export async function hydratePersonalCircuitIdentity(db,player,identity=undefine
  return result;
 }
 
-export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpClub,measure=(_stage,operation)=>operation()}={}){
+export async function addCourtWatchPlayer(env,user,body,{fetchClub=async()=>'',measure=(_stage,operation)=>operation()}={}){
  const group=playerListGroup(body?.group??'main'),membership=playerMembershipTable(group);
  let sourceKey=String(body?.sourceKey||'').trim(),courtwatchId=String(body?.courtwatchId||'').trim(),identity=String(body?.identity||'').trim(),name=String(body?.name||'').trim();
  if((!sourceKey&&!courtwatchId&&!identity)||sourceKey.length>240||courtwatchId.length>160||identity.length>160||name.length>160)throw failure('invalid_player');

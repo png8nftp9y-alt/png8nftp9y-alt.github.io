@@ -107,7 +107,7 @@ test('SQLite Europe history through the real API assembler renders current and p
    currentTennisEuropePlayerRanking:async()=>({rankings:[]}),currentRankingCategoryAllowed:()=>true};
   vm.createContext(ctx);
   vm.runInContext(slice(worker,'function missingOptionalTable(','async function enrichTennisEuropeRankings(')+
-   slice(worker,'const incompleteCompletedScore=','const itfTournamentMetadata=')+
+   slice(worker,'const incompleteCompletedScore=','async function itfTournamentMetadata(')+
    slice(readFileSync(new URL('../lib/opponent-canonical-history.mjs',import.meta.url),'utf8'),'export async function boundedRows(','export async function otherCircuitOpponentHistory(').replace('export ','')+
    slice(worker,'async function tennisEuropeOpponentHistory(','function adminAuthorized('),ctx);
   const data=await ctx.universalOpponentHistory({DB:db},{name:'Test Person',profileId:'profile-test',asOf:today});
