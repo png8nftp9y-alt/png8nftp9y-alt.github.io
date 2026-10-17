@@ -1247,12 +1247,10 @@ function pendingOpponentHtml(m) {
     : "Avversario da definire";
 }
 function courtWatchPlayerByName(name) {
-  const wanted = readablePerson(name);
+  const wanted = readablePerson(name), compareNames = new Intl.Collator("it", {sensitivity: "base"}).compare;
   return (state.data?.players || []).find(
     (player) =>
-      readablePerson(player.name).localeCompare(wanted, "it", {
-        sensitivity: "base",
-      }) === 0,
+      compareNames(readablePerson(player.name), wanted) === 0,
   );
 }
 function participantLinkHtml(m, role, name, index, content, courtWatchClass = "") {
@@ -1743,8 +1741,9 @@ function applyDemographicSelection() {
   );
 }
 function renderFilters() {
+  const compareNames = new Intl.Collator("it", {sensitivity: "base"}).compare;
   const all = [...(state.data.players || [])].sort((a, b) =>
-      readablePerson(a.name).localeCompare(readablePerson(b.name), "it", {sensitivity: "base"}),
+      compareNames(readablePerson(a.name), readablePerson(b.name)),
     ),
     eligibleIds = new Set(calendarEligiblePlayers().map((player) => player.id));
   $("calendarSex").value = state.sexFilter;
@@ -1849,6 +1848,22 @@ function wireAgendaFilters() {
       menu.querySelector("summary").focus();
     }
   });
+}
+function createMatchTournamentResolver(tournaments = groups(false)) {
+  const byId = new Map(), byName = new Map(), missingIdByName = new Map();
+  const rememberFirst = (map, key, value) => {if (!map.has(key)) map.set(key, value);};
+  tournaments.forEach((tournament, index) => {
+    const source = circuit(tournament), nameKey = JSON.stringify([source, readableText(tournament.name)]), entry = {tournament, index};
+    rememberFirst(byName, nameKey, entry);
+    if (tournament.competitionId) rememberFirst(byId, JSON.stringify([source, String(tournament.competitionId)]), entry);
+    else rememberFirst(missingIdByName, nameKey, entry);
+  });
+  return (match) => {
+    const source = circuit(match), nameKey = JSON.stringify([source, readableText(match.tournamentName)]);
+    if (!match.competitionId) return byName.get(nameKey)?.tournament;
+    const exact = byId.get(JSON.stringify([source, String(match.competitionId)])), fallback = missingIdByName.get(nameKey);
+    return (!exact || (fallback && fallback.index < exact.index) ? fallback : exact)?.tournament;
+  };
 }
 function matchTournament(m) {
   return groups(false).find(
@@ -2159,7 +2174,8 @@ function renderWeeklyAgenda() {
     );
 }
 function renderAgenda() {
-  const key = iso(state.agenda),
+  const resolveTournament = createMatchTournamentResolver(),
+    key = iso(state.agenda),
     items = dedupeAgendaMatches(
       (state.data.agenda || []).filter(
         (m) => m.date === key && state.selected.has(m.playerId),
@@ -2169,11 +2185,11 @@ function renderAgenda() {
   $("agendaToday").textContent =
     key === iso(new Date()) ? "Oggi" : agendaBtnFmt(state.agenda);
   $("agendaGoToday").hidden = key === iso(new Date());
-  renderWeeklyAgenda();
+  if (!$("weeklyAgendaPanel").hidden) renderWeeklyAgenda();
   if ($("agendaMode")) $("agendaMode").value = state.agendaMode;
   const groups = new Map();
   for (const m of items) {
-    const tournament = matchTournament(m),
+    const tournament = resolveTournament(m),
       identity = [
         circuit(m),
         m.competitionId ||
@@ -2241,16 +2257,16 @@ function renderAgenda() {
                 [
                   circuit(m),
                   m.competitionId ||
-                    matchTournament(m)?.competitionId ||
+                    resolveTournament(m)?.competitionId ||
                     m.tournamentName ||
-                    matchTournament(m)?.name,
+                    resolveTournament(m)?.name,
                 ].join("|"),
               ),
             ),
             mixedChronological = isChronological && identities.size > 1,
             blockTournament =
               tournament ||
-              (!mixedChronological ? matchTournament(sample) : null),
+              (!mixedChronological ? resolveTournament(sample) : null),
             tKey = blockTournament ? tournamentKey(blockTournament) : "",
             name = tournamentDisplayName(
               blockTournament,
@@ -2289,7 +2305,7 @@ function renderAgenda() {
                       whenAttrs = oopUrl
                         ? ` href="${esc(oopUrl)}" target="_blank" rel="noopener" aria-label="Apri l'ordine di gioco ufficiale di ${esc(readableText(m.tournamentName || "questo torneo"))} per il ${esc(displayDate(m.date))}"`
                         : "",
-                      itemTournament = matchTournament(m),
+                      itemTournament = resolveTournament(m),
                       itemTKey = itemTournament
                         ? tournamentKey(itemTournament)
                         : "",
@@ -2354,10 +2370,13 @@ function effectiveAcceptanceLabel(entry) {
 }
 function groups(selectedOnly = true) {
   const map = new Map();
+  const compareNames = new Intl.Collator("it", {sensitivity: "base"}).compare;
+  const players = new Map();
+  for (const player of state.data.players || []) if (!players.has(player.id)) players.set(player.id, player);
   for (const t of state.data.tournaments || []) {
     if ((selectedOnly && !state.selected.has(t.playerId)) || !active(t))
       continue;
-    const entry = {...t, calendarListLabel: effectiveAcceptanceLabel(t), playerName: readablePerson(state.data.players?.find(p => p.id === t.playerId)?.name || t.playerName || "")};
+    const entry = {...t, calendarListLabel: effectiveAcceptanceLabel(t), playerName: readablePerson(players.get(t.playerId)?.name || t.playerName || "")};
     const key = tournamentKey(t),
       g = map.get(key) || {
         ...t,
@@ -2373,7 +2392,7 @@ function groups(selectedOnly = true) {
   }
   for (const g of map.values()) {
     g.people.sort((a, b) =>
-      readablePerson(a.playerName).localeCompare(readablePerson(b.playerName), "it", {sensitivity: "base"}),
+      compareNames(readablePerson(a.playerName), readablePerson(b.playerName)),
     );
     g.players = g.people.map((t) =>
       t.calendarListLabel
@@ -2489,9 +2508,9 @@ function renderCalendar() {
       (x.onclick = () => {
         state.agenda = new Date(x.dataset.date + "T12:00:00");
         syncMonthFromAgenda();
-        renderSynchronizedDates();
+        saveUiState();
+        routeScrollMemory.delete("#agenda");
         location.hash = "agenda";
-        requestAnimationFrame(() => scrollTo({ top: 0, behavior: "smooth" }));
       }),
   );
   document.querySelectorAll(".tourBand[data-tournament]").forEach(
@@ -2587,15 +2606,18 @@ function togglePlayerRemovalMode() {
 }
 
 function renderPlayers() {
+  const compareNames = new Intl.Collator("it", {sensitivity: "base"}).compare;
+  const tournamentCounts = new Map();
+  for (const tournament of state.data.tournaments || []) {
+    if (active(tournament)) tournamentCounts.set(tournament.playerId, (tournamentCounts.get(tournament.playerId) || 0) + 1);
+  }
   const ps = [...(state.data.players || [])].sort((a, b) =>
-    readablePerson(a.name).localeCompare(readablePerson(b.name), "it", {sensitivity: "base"}),
+    compareNames(readablePerson(a.name), readablePerson(b.name)),
   );
   $("playerTotal").textContent = ps.length;
   $("playersList").innerHTML = ps
     .map((p) => {
-      const n = (state.data.tournaments || []).filter(
-          (t) => t.playerId === p.id && active(t),
-        ).length,
+      const n = tournamentCounts.get(p.id) || 0,
         club = esc(displayPlayerClub(p.club) || (playerHasFitpMembership(p) ? "Tesseramento da completare" : "")),
         card = p.membershipCard ? `tessera ${p.membershipCard}` : "",
         nation = esc(foreignPlayerCountryLabel(p));
@@ -2875,10 +2897,11 @@ function renderDiagnostics() {
     `<div class="diagLights">${items.length ? items.map((x) => `<div class="diagLight ${esc(x.status)}"><span aria-hidden="true">${statusEmoji(x.status)}</span><b>${esc(x.label)}</b></div>`).join("") : `<div class="diagLight ${esc(overall)}"><span aria-hidden="true">${statusEmoji(overall)}</span><b>Motore V3</b></div>`}</div>`;
 }
 function renderHome() {
-  renderFilters();
-  renderAgenda();
-  renderCalendar();
-  renderPlayers();
+  const section = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
+  if (section === "agenda" || section === "calendar") renderFilters();
+  if (section === "agenda") renderAgenda();
+  else if (section === "calendar") renderCalendar();
+  else if (section === "players") renderPlayers();
   renderDiagnostics();
 }
 function renderDataSignature(data) {
@@ -4159,8 +4182,7 @@ function moveBothToMonth(year, month) {
 }
 function renderSynchronizedDates() {
   saveUiState();
-  renderAgenda();
-  renderCalendar();
+  renderHome();
 }
 function renderDatePopover() {
   const pop = $("datePopover"),
@@ -4438,6 +4460,7 @@ function wire() {
   $("weeklyAgendaToggle").onclick = () => {
     const panel = $("weeklyAgendaPanel"),
       opening = panel.hidden;
+    if (opening && state.data) renderWeeklyAgenda();
     panel.hidden = !opening;
     $("weeklyAgendaToggle").setAttribute("aria-expanded", String(opening));
   };

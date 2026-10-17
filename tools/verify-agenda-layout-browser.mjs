@@ -25,14 +25,40 @@ try{
   });
   await page.goto('http://courtwatch.test/v3.html?group='+group+'#agenda');
   await page.waitForFunction(()=>typeof state!=='undefined'&&state.data?.players?.some(p=>p.id==='layout-a')&&!loadRunning);
-  // Exercise the actual date link, shared dropdown filters and reload persistence.
+  // Exercise date links, selective rendering, filters and reload persistence.
   for(const width of [320,390,1280]){
+  await page.evaluate(()=>{
+   window.navigationRenderCalls={};
+   for(const name of ['renderAgenda','renderCalendar','renderPlayers','groups']){
+    const original=window[name];
+    window[name]=function(...args){navigationRenderCalls[name]=(navigationRenderCalls[name]||0)+1;return original.apply(this,args);};
+   }
+  });
    await page.setViewportSize({width,height:1000});
    await page.evaluate(()=>{state.month=new Date(2026,8,1,12);location.hash='calendar';renderHome();});
+   await page.locator('#calendarView.active').waitFor();
+   await page.evaluate(()=>{navigationRenderCalls={};});
    await page.locator('.calDay[data-date="2026-09-21"]').click();
    await page.waitForFunction(()=>location.hash==='#agenda'&&document.querySelector('#agendaView.active'));
    assert.equal(await page.evaluate(()=>iso(state.agenda)),'2026-09-21');
    assert.equal(await page.locator('#dailyAgenda .agendaItem').count(),3);
+   assert.deepEqual(await page.evaluate(()=>navigationRenderCalls),{renderAgenda:1,groups:1},'day click must render Agenda once without rebuilding Calendar, Players or per-match tournament groups');
+   await page.locator('#weeklyAgendaToggle').click();
+   assert.equal(await page.locator('#weeklyAgendaContent .weeklyTournament').count(),1);
+   await page.locator('#weeklyAgendaToggle').click();
+   await page.locator('#agendaDemographicFilter summary').click();
+   await page.evaluate(()=>{navigationRenderCalls={};});
+   await page.locator('#quickSectionNav [data-home-route="players"]').click();
+   await page.locator('#playersView.active').waitFor();
+   assert.deepEqual(await page.evaluate(()=>navigationRenderCalls),{renderPlayers:1},'Players navigation must not rebuild hidden Agenda or Calendar');
+   await page.evaluate(()=>{navigationRenderCalls={};});
+   await page.locator('#brandHome').click();
+   await page.locator('#homeView.active').waitFor();
+   assert.deepEqual(await page.evaluate(()=>navigationRenderCalls),{},'Home launcher must not rebuild hidden data sections');
+   await page.locator('#homeView [data-home-route="calendar"]').click();
+   await page.locator('#calendarView.active').waitFor();
+   await page.locator('.calDay[data-date="2026-09-21"]').click();
+   await page.locator('#agendaView.active').waitFor();
    await page.locator('#agendaDemographicFilter summary').click();
    await page.locator('#agendaDemographicFilter [value="U14"]').check();
    await page.locator('#agendaSex').selectOption('F');

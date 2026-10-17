@@ -7,6 +7,41 @@ const mergeSource = source.slice(source.indexOf('function agendaKey('), source.i
 const restore=source.slice(source.indexOf('function applyCachedProjection('),source.indexOf('function saveCachedData(data)'));
 const filter=source.slice(source.indexOf('function renderFilters()'),source.indexOf('function matchTournament('));
 const readable=source.slice(source.indexOf('const readablePerson ='),source.indexOf('const IOC_REGION ='));
+test('navigation renders only the requested section, including date and selection updates',()=>{
+ const calls=[],ctx={location:{hash:''},saveUiState:()=>calls.push('save')};
+ for(const name of ['renderFilters','renderAgenda','renderCalendar','renderPlayers','renderDiagnostics'])ctx[name]=()=>calls.push(name);
+ vm.createContext(ctx);
+ vm.runInContext(source.slice(source.indexOf('function renderHome()'),source.indexOf('function renderDataSignature(')),ctx);
+ for(const [hash,expected] of [
+  ['#agenda',['renderFilters','renderAgenda','renderDiagnostics']],
+  ['#calendar',['renderFilters','renderCalendar','renderDiagnostics']],
+  ['#players',['renderPlayers','renderDiagnostics']],
+  ['', ['renderDiagnostics']],
+ ]){ctx.location.hash=hash;calls.length=0;ctx.renderHome();assert.deepEqual(calls,expected,hash||'home');}
+ vm.runInContext(source.slice(source.indexOf('function renderSynchronizedDates()'),source.indexOf('function renderDatePopover(')),ctx);
+ ctx.location.hash='#agenda';calls.length=0;ctx.renderSynchronizedDates();
+ assert.deepEqual(calls,['save','renderFilters','renderAgenda','renderDiagnostics']);
+});
+test('render-local tournament index preserves exact IDs, circuit boundaries, first-match and missing-ID fallback semantics',()=>{
+ const rows=[
+  {name:'Shared',circuit:'fitp',competitionId:'7'},
+  {name:'Shared',circuit:'tennis-europe'},
+  {name:'Shared',circuit:'tennis-europe',competitionId:7},
+  {name:'Second',circuit:'tennis-europe',competitionId:'7'},
+  {name:'Shared',circuit:'itf',competitionId:'7'},
+  {name:'No ID',circuit:'tennis-europe'},
+ ];
+ const ctx={circuit:m=>m.circuit||'fitp',readableText:x=>String(x||''),groups:()=>rows};vm.createContext(ctx);
+ vm.runInContext(source.slice(source.indexOf('function createMatchTournamentResolver('),source.indexOf('function matchTournament(')),ctx);
+ const resolve=ctx.createMatchTournamentResolver();
+ for(const circuit of ['fitp','tennis-europe','itf'])for(const competitionId of [undefined,'',0,7,'7','absent'])for(const tournamentName of ['Shared','Second','No ID','Missing']){
+  const m={circuit,competitionId,tournamentName};
+  const expected=rows.find(t=>t.circuit===m.circuit&&(m.competitionId&&t.competitionId?String(m.competitionId)===String(t.competitionId):t.name===m.tournamentName));
+  assert.equal(resolve(m),expected,JSON.stringify(m));
+ }
+ const updated=[{name:'Updated',circuit:'tennis-europe',competitionId:'7'}];
+ assert.equal(ctx.createMatchTournamentResolver(updated)({circuit:'tennis-europe',competitionId:'7'}),updated[0]);
+});
 test('cached personal players and tournaments exist before the first route without awaiting network',()=>{
  const saved={players:[{id:'c',name:'Camilla Frigerio'},{id:'p',name:'Paolo Brambilla'},{id:'r',name:'Riccardo Galbiati'}],tournaments:[{playerId:'c',name:'Cantù'},{playerId:'p',name:'Cantù'},{playerId:'r',name:'Cantù'}]};
  const ctx={validProjection:d=>d&&Array.isArray(d.players)&&Array.isArray(d.tournaments),cachedData:()=>saved,state:{data:null,selected:new Set(['c','p','r'])},uiSelectionRestored:true};
