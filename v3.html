@@ -5,7 +5,7 @@
       if (location.hostname === "png8nftp9y-alt.github.io")
         location.replace(
           "https://courtwatch-app-api.ckrk9ggvrb.workers.dev/app" +
-            location.hash,
+            location.search + location.hash,
         );
     </script>
     <meta charset="utf-8" />
@@ -23,7 +23,7 @@
     <link rel="preload" as="fetch" href="https://png8nftp9y-alt.github.io/dist/v3/tournament_entries.json" crossorigin="anonymous" />
     <link rel="preload" as="fetch" href="https://png8nftp9y-alt.github.io/dist/v3/results.json" crossorigin="anonymous" />
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=20261017-agenda-no-overflow" />
+    <link rel="stylesheet" href="v3.css?v=20261017-mobile-complete" />
   </head>
   <body>
     <div class="shell">
@@ -250,7 +250,7 @@
                 <form id="playerSearchForm" class="playerSearchForm" role="search" autocomplete="off">
                   <label class="srOnly" for="playerSearchInput">Cerca qualsiasi giocatore</label>
                   <input id="playerSearchInput" type="search" minlength="2" placeholder="Cerca giocatore…" aria-label="Cerca qualsiasi giocatore" aria-controls="playerSearchSuggestions" aria-expanded="false" />
-                  <div id="playerSearchSuggestions" class="playerSearchSuggestions" role="listbox" hidden></div>
+                  <div id="playerSearchSuggestions" class="playerSearchSuggestions" role="region" aria-label="Risultati ricerca giocatori" hidden></div>
                 </form>
               </div>
               <div id="playersList" class="playersList"></div>
@@ -304,7 +304,7 @@
         } catch {}
       })();
     </script>
-    <script src="v3.js?v=20261017-agenda-court-once"></script>
+    <script src="v3.js?v=20261017-mobile-complete"></script>
   </body>
 </html>
 

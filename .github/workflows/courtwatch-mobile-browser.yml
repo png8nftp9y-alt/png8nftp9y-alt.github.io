@@ -1,0 +1,23 @@
+name: Court Watch mobile browser
+on:
+  push:
+    branches: [main]
+    paths: ['v3.js', 'v3.css', 'v3.html', 'src/v3/mobile-interactions.test.mjs', 'tools/verify-mobile-browser.mjs', '.github/workflows/courtwatch-mobile-browser.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --no-package-lock
+      - run: npx playwright install --with-deps chromium webkit
+      - run: node --test src/v3/mobile-interactions.test.mjs
+      - run: node tools/verify-mobile-browser.mjs
+      - run: node tools/verify-mobile-browser.mjs
+        env:
+          COURTWATCH_MOBILE_BROWSER: webkit

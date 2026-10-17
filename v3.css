@@ -513,3 +513,56 @@ button.brand:focus-visible{outline:2px solid var(--blue);outline-offset:4px;bord
 .agendaHead>div:first-child{min-width:0;max-width:100%}
 .agendaHead .agendaNav{flex:0 1 390px;min-width:0;max-width:100%;width:390px}
 @media(max-width:650px){.agendaHead .agendaNav{flex-basis:100%;width:100%;grid-template-columns:30px 30px minmax(0,1fr) 30px 30px}.agendaNav>.btn{grid-row:1;min-width:0}.agendaNav>.btn.icon{width:30px;padding-inline:0}.agendaNav #agendaToday{grid-column:3}.agendaNav #agendaGoToday{grid-column:3;grid-row:2}.agendaNav #nextAgenda{grid-column:4}.agendaNav #nextAgendaMonth{grid-column:5}}
+
+/* Mobile navigation, touch controls, search and complete match lineups. */
+.playersCard{overflow:visible}
+.playersCardHead{border-radius:12px 12px 0 0}
+.playerRow[role="link"]{cursor:pointer}
+.playerRow[role="link"]:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+button,a,[role="link"],summary{touch-action:manipulation}
+#addPlayerDialog{width:min(620px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain}
+#addPlayerDialog form{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}
+#addPlayerDialog form label{flex-basis:100%}
+#addPlayerDialog input{flex:1 1 180px;min-width:0;max-width:100%}
+.playerSearchSuggestion>span,.playerSearchResult>span{min-width:0;overflow-wrap:anywhere}
+.playerSearchSuggestion,.playerSearchResult{white-space:normal;flex-wrap:wrap}
+@media(max-width:700px){
+  input,select,textarea{font-size:16px!important}
+  .top{grid-template-columns:minmax(0,1fr) auto;gap:10px;padding-right:0;align-items:center}
+  .top .brand{min-width:0}.brand h1{font-size:17px}
+  .top .accountControl{position:relative;grid-column:2;grid-row:1;right:auto;top:auto;transform:none;width:44px}
+  .accountAvatar{width:44px;height:44px}
+  .top #quickSectionNav{grid-column:1/-1;grid-row:2;justify-self:center;gap:12px}
+  .quickSectionNav button{width:44px;height:44px}
+  .top #homeOthers{grid-column:1/-1;grid-row:2;min-height:44px}
+  .top .status{grid-column:1/-1}
+  .view,.card,.cardHead,.profileHero>div,.tournamentHero>div,.opponentProfileHero>div{min-width:0;max-width:100%}
+  .cardHead,.calendarHead,.demographicFilters,.opponentHistoryTournamentHead,.opponentTournamentTitle{flex-wrap:wrap}
+  .demographicFilters{min-width:0;gap:8px}
+  .demographicFilters>label{flex-wrap:wrap}
+  .demographicFilters .playersHeaderAction{min-height:44px}
+  .calendarHead #toggleAll{white-space:normal}
+  .tourBand strong,.tourBand .calPlayerName{min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .tourBand{min-height:32px}.bands{grid-auto-rows:minmax(32px,auto)}
+  .calDay{min-height:36px;height:auto}
+  .playerSearchForm{width:100%;min-width:0}
+  .playerSearchForm input{min-height:44px}
+  .playerSearchSuggestions{position:static;width:100%;max-height:min(360px,45dvh);margin-top:6px;overscroll-behavior:contain}
+  .playerSearchSuggestion,.playerSearchResult{min-height:48px}
+  .playersCardHead .playersHeaderAction,.playersCardHead .btn,.profileMatchFilter select{min-height:44px}
+  .profileHero,.opponentProfileHero{flex-wrap:wrap}
+  .profileHero h2,.opponentProfileHero h2,.tournamentHero h2,.listItem h4{overflow-wrap:anywhere}
+  .opponentHistoryTournamentHead{white-space:normal}
+  .opponentHistoryTournamentHead h4{white-space:normal;overflow-wrap:anywhere}
+  .opponentHistoryMatch{grid-template-columns:minmax(0,1fr) max-content!important;align-items:start!important;white-space:normal;overflow:visible!important;row-gap:8px!important}
+  .opponentHistoryRound,.unifiedMatchMeta{grid-column:1!important;grid-row:1;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere}
+  .opponentHistoryMatch>strong{grid-column:2!important;grid-row:1;max-width:100%;white-space:normal!important;overflow-wrap:anywhere}
+  .opponentHistoryOpponent,.unifiedMatchOpponent{grid-column:1/-1!important;grid-row:2;min-width:0!important;white-space:normal!important;overflow:visible!important}
+  .opponentHistoryMatches .opponentHistoryMatchup,.unifiedMatchOpponent>span:last-child{white-space:normal!important;overflow:visible!important;text-overflow:clip;overflow-wrap:anywhere}
+  .opponentHistoryMatchup .opponentHistoryPerson,.opponentHistoryPerson,.opponentHistoryCourtWatch,.unifiedMatchRow .opponentName,.unifiedMatchRow .inlinePlayerLink{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+  .opponentHistoryPerson{display:inline;line-height:1.8}
+  .opponentHistoryCourtWatch{display:inline;text-align:left}
+  .opponentHistoryPerson b{white-space:normal;overflow-wrap:anywhere}
+  .unifiedMatchRow>.matchAnalysisButton{top:10px;transform:none;min-height:32px}
+  .profileTournamentHead .tournamentStats{flex-wrap:wrap}
+}

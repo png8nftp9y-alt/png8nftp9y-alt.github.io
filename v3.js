@@ -156,6 +156,7 @@ let calendarHeightObserver = null,
   playerRankingCache = new Map(savedEntries(PLAYER_RANKING_CACHE)),
   playerSearchSequence = 0,
   playerSearchTimer = null,
+  playerSearchController = null,
   activeRouteScrollKey = location.hash || "#home",
   routeScrollMemory = new Map(),
   uiSelectionRestored =
@@ -954,11 +955,14 @@ async function readDurableProjection(key = LAST_GOOD_CACHE) {
   const db = await openProjectionDatabase();
   if (!db) return null;
   return new Promise(resolve => {
+    let done = false;
+    const finish = value => {if (done) return; done = true; clearTimeout(timer); db.close(); resolve(value);};
+    const timer = setTimeout(() => finish(null), 1500);
     try {
-      const request = db.transaction("snapshots", "readonly").objectStore("snapshots").get(key);
-      request.onsuccess = () => { db.close(); resolve(validProjection(request.result) ? request.result : null); };
-      request.onerror = () => { db.close(); resolve(null); };
-    } catch { db.close(); resolve(null); }
+      const transaction = db.transaction("snapshots", "readonly"), request = transaction.objectStore("snapshots").get(key);
+      request.onsuccess = () => finish(validProjection(request.result) ? request.result : null);
+      request.onerror = transaction.onerror = transaction.onabort = () => finish(null);
+    } catch {finish(null);}
   });
 }
 async function restoreDurableProjection() {
@@ -1020,17 +1024,21 @@ async function restoreDurableOpponents() {
   const db = await openProjectionDatabase();
   if (!db) return;
   await new Promise(resolve => {
+    let done = false;
+    const finish = () => {if (done) return; done = true; clearTimeout(timer); db.close(); resolve();};
+    const timer = setTimeout(finish, 1500);
     try {
-      const request = db.transaction("opponents", "readonly").objectStore("opponents").getAll();
+      const transaction = db.transaction("opponents", "readonly"), request = transaction.objectStore("opponents").getAll();
       request.onsuccess = () => {
+        if (done) return;
         for (const entry of request.result || []) {
           if (entry.requestKey && entry.data && !opponentHistoryCache.has(entry.requestKey))
             opponentHistoryCache.set(entry.requestKey, entry.data);
         }
-        db.close(); resolve();
+        finish();
       };
-      request.onerror = () => {db.close(); resolve();};
-    } catch {db.close(); resolve();}
+      request.onerror = transaction.onerror = transaction.onabort = finish;
+    } catch {finish();}
   });
 }
 function cachedPersonalTournaments(previous, visiblePlayers) {
@@ -1625,8 +1633,16 @@ function isolatePlayer(playerId) {
   saveUiState();
   renderHome();
 }
+// A selection elsewhere on the page must never disable navigation.
+function hasLocalMouseSelection(event, element) {
+  if (event?.detail === 0 || event?.pointerType === "touch" || event?.pointerType === "pen" ||
+      (event?.detail > 0 && matchMedia("(pointer: coarse)").matches)) return false;
+  const selection = window.getSelection();
+  return Boolean(selection && !selection.isCollapsed && String(selection).trim() &&
+    (element.contains(selection.anchorNode) || element.contains(selection.focusNode)));
+}
 function bindPlayerHold(element, playerId) {
-  let active = false;
+  let active = false, startX = 0, startY = 0;
   const cancel = () => {
     if (calendarPlayerHoldTimer) {
       clearTimeout(calendarPlayerHoldTimer);
@@ -1640,6 +1656,7 @@ function bindPlayerHold(element, playerId) {
     event.stopPropagation();
     cancel();
     active = true;
+    startX = event.clientX; startY = event.clientY;
     element.classList.add("holding");
     calendarPlayerHoldTimer = setTimeout(() => {
       calendarPlayerHoldTimer = null;
@@ -1648,6 +1665,10 @@ function bindPlayerHold(element, playerId) {
       isolatePlayer(playerId);
     }, 550);
   };
+  element.onpointermove = event => {
+    if (active && Math.hypot(event.clientX - startX, event.clientY - startY) > 10) cancel();
+  };
+  element.onpointerleave = cancel;
   element.onpointerup = cancel;
   element.onpointercancel = cancel;
   element.oncontextmenu = (event) => {
@@ -2198,8 +2219,8 @@ function renderAgenda() {
     : '<div class="empty">Nessuna partita confermata per questa giornata.</div>';
   document.querySelectorAll("#dailyAgenda [data-open-tournament]").forEach(
     (x) =>
-      (x.onclick = () => {
-        if (String(getSelection() || "").trim()) return;
+      (x.onclick = (event) => {
+        if (hasLocalMouseSelection(event, x)) return;
         location.hash =
           "tournament/" + encodeURIComponent(x.dataset.openTournament);
       }),
@@ -2381,10 +2402,10 @@ function renderCalendar() {
   );
   document.querySelectorAll(".tourBand[data-tournament]").forEach(
     (x) =>
-      (x.onclick = () => {
+      (x.onclick = (event) => {
         if (
           Date.now() < suppressTournamentOpenUntil ||
-          String(getSelection() || "").trim()
+          hasLocalMouseSelection(event, x)
         )
           return;
         location.hash =
@@ -2484,28 +2505,44 @@ function renderPlayers() {
         club = esc(displayPlayerClub(p.club) || (playerHasFitpMembership(p) ? "Tesseramento da completare" : "")),
         card = p.membershipCard ? `tessera ${p.membershipCard}` : "",
         nation = esc(foreignPlayerCountryLabel(p));
-      return `<div class="playerRow" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${[club, esc(card), nation, n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"].filter(Boolean).join(" · ")}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
+      return `<div class="playerRow" role="link" tabindex="0" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${[club, esc(card), nation, n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"].filter(Boolean).join(" · ")}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
     .join("") || '<div class="empty">Nessun giocatore. Premi + per aggiungerne uno.</div>';
   document.querySelectorAll("[data-profile]").forEach(
     (x) => {
       const player = ps.find((item) => item.id === x.dataset.profile),
         preloadRanking = () => player && loadCurrentPlayerRanking(player);
+      x.onkeydown = event => {
+        if (event.target === x && (event.key === "Enter" || event.key === " ")) {event.preventDefault(); x.click();}
+      };
       x.addEventListener("pointerenter", preloadRanking, { once: true });
       x.addEventListener("touchstart", preloadRanking, { once: true, passive: true });
-      (x.onclick = () => {
-        if (String(getSelection() || "").trim()) return;
+      (x.onclick = (event) => {
+        if (hasLocalMouseSelection(event, x)) return;
         if (playerRemovalMode) requestPlayerRemoval(x.dataset.profile);
         else openProfile(x.dataset.profile);
       });
     },
   );
 }
-async function searchPlayerPage(query,cursor='') {
-  const response=await fetch(`${PRIVATE_API}/player-search?q=${encodeURIComponent(query)}${cursor?'&cursor='+encodeURIComponent(cursor):''}`,privateApiOptions({cache:'no-store'}));
-  if(!response.ok)throw Error('player search');return response.json();
+async function searchPlayerPage(query, cursor = '', signal) {
+  const controller = new AbortController();
+  const abort = () => controller.abort();
+  if (signal?.aborted) abort();
+  signal?.addEventListener('abort', abort, {once:true});
+  const timer = setTimeout(abort, 12000);
+  try {
+    const response = await fetch(`${PRIVATE_API}/player-search?q=${encodeURIComponent(query)}${cursor?'&cursor='+encodeURIComponent(cursor):''}`,
+      privateApiOptions({cache:'no-store', signal:controller.signal}));
+    if (!response.ok) throw Error('player search');
+    const data = await response.json();
+    if (!Array.isArray(data.results)) throw Error('player search incomplete');
+    return data;
+  } finally {
+    clearTimeout(timer); signal?.removeEventListener('abort', abort);
+  }
 }
-async function searchPlayers(query){return(await searchPlayerPage(query)).results||[]}
+async function searchPlayers(query, signal) {return (await searchPlayerPage(query, '', signal)).results;}
 function playerCircuitLinksHtml(profiles=[]) {
   const labels={'fitp':'FITP','tennis-europe':'Tennis Europe','itf':'ITF'};
   return profiles.filter(p=>labels[p.circuit]).map(p=>{
@@ -2638,34 +2675,42 @@ function openAddPlayerDialog() {
   dialog.setAttribute('aria-labelledby','addPlayerTitle');
   dialog.innerHTML='<h2 id="addPlayerTitle">Aggiungi giocatore</h2><form data-add-player-search role="search"><label for="addPlayerQuery">Nome del giocatore</label><input id="addPlayerQuery" type="search" minlength="2" autocomplete="off" required><button type="submit" class="btn">Cerca</button></form><div data-add-player-results aria-live="polite"></div><button type="button" class="btn" data-close-add-player>Chiudi</button>';
   document.body.append(dialog);
-  let sequence=0,timer;
+  let sequence=0,timer,controller;
   const input=dialog.querySelector('input'),results=dialog.querySelector('[data-add-player-results]');
-  const close=()=>{clearTimeout(timer);sequence++;dialog.close();dialog.remove();$('addPlayer')?.focus()};
+  const close=()=>{clearTimeout(timer);sequence++;controller?.abort();dialog.close();dialog.remove();$('addPlayer')?.focus()};
   dialog.querySelector('[data-close-add-player]').onclick=close;
   dialog.oncancel=event=>{event.preventDefault();close()};
   const search=async()=>{
-    clearTimeout(timer);const query=input.value.trim(),request=++sequence;
+    clearTimeout(timer);controller?.abort();controller=new AbortController();const query=input.value.trim(),request=++sequence;
     dialog.querySelector('[data-player-add-error]')?.remove();
     if(query.length<2){results.textContent='';return}
     results.textContent='Ricerca in corso…';
     try{
-      const found=await searchPlayers(query);
+      const found=await searchPlayers(query,controller.signal);
       if(request!==sequence||!dialog.isConnected)return;
       results.innerHTML=found.length?found.map(result=>playerSearchResultHtml(result,'playerSearchResult')).join(''):'Nessun giocatore trovato.';
       bindPlayerSearchResults(results,found,true);
     }catch{if(request===sequence&&dialog.isConnected)results.textContent='Ricerca temporaneamente non disponibile. Riprova.'}
   };
-  input.oninput=()=>{clearTimeout(timer);sequence++;timer=setTimeout(search,220)};
+  input.oninput=()=>{clearTimeout(timer);sequence++;controller?.abort();timer=setTimeout(search,220)};
   dialog.querySelector('form').onsubmit=event=>{event.preventDefault();search()};
   dialog.showModal();input.focus();
+}
+function dismissPlayerSearch() {
+  clearTimeout(playerSearchTimer); ++playerSearchSequence; playerSearchController?.abort();
+  const suggestions = $("playerSearchSuggestions"), input = $("playerSearchInput");
+  if (suggestions) suggestions.hidden = true;
+  input?.setAttribute("aria-expanded", "false");
 }
 function openPlayerSearchResult(result) {
   // Start the next search empty and discard suggestions still in flight.
   clearTimeout(playerSearchTimer);
   ++playerSearchSequence;
+  playerSearchController?.abort();
   const searchInput = $("playerSearchInput"),
     searchSuggestions = $("playerSearchSuggestions");
   if (searchInput) {
+    searchInput.blur();
     searchInput.value = "";
     searchInput.setAttribute("aria-expanded", "false");
   }
@@ -4173,6 +4218,7 @@ function wire() {
     playerSearchSuggestions = $("playerSearchSuggestions");
   playerSearchInput.oninput = () => {
     clearTimeout(playerSearchTimer);
+    playerSearchController?.abort();
     const query = playerSearchInput.value.trim(),
       sequence = ++playerSearchSequence;
     if (query.length < 2) {
@@ -4180,9 +4226,14 @@ function wire() {
       playerSearchInput.setAttribute("aria-expanded", "false");
       return;
     }
+    playerSearchSuggestions.innerHTML = '<div class="empty" role="status">Ricerca in corso…</div>';
+    playerSearchSuggestions.hidden = false;
+    playerSearchInput.setAttribute("aria-expanded", "true");
     playerSearchTimer = setTimeout(async () => {
+      const controller = new AbortController();
+      playerSearchController = controller;
       try {
-        const results = await searchPlayers(query);
+        const results = await searchPlayers(query, controller.signal);
         if (sequence !== playerSearchSequence) return;
         playerSearchSuggestions.innerHTML = results.length
           ? results.slice(0, 10).map((result) => playerSearchResultHtml(result, "playerSearchSuggestion")).join("")
@@ -4193,7 +4244,8 @@ function wire() {
       } catch {
         if (sequence === playerSearchSequence) {
           playerSearchSuggestions.innerHTML =
-            '<div class="empty">Ricerca temporaneamente non disponibile.</div>';
+            '<button type="button" class="playerSearchSuggestion" data-retry-search>Ricerca non disponibile. Tocca per riprovare.</button>';
+          playerSearchSuggestions.querySelector('[data-retry-search]').onclick = () => playerSearchInput.oninput();
           playerSearchSuggestions.hidden = false;
         }
       }
@@ -4203,8 +4255,10 @@ function wire() {
     event.preventDefault();
     const query = playerSearchInput.value.trim();
     if (query.length < 2) return;
+    clearTimeout(playerSearchTimer); ++playerSearchSequence; playerSearchController?.abort();
     playerSearchSuggestions.hidden = true;
     playerSearchInput.setAttribute("aria-expanded", "false");
+    playerSearchInput.blur();
     location.hash = `player-search/${encodeURIComponent(query)}`;
   };
   $("agendaMode").onchange = () => {
@@ -4309,10 +4363,7 @@ function wire() {
   document.addEventListener("click", (e) => {
     const category = $("calendarCategory");
     if (category?.open && !category.contains(e.target)) category.open = false;
-    if (!playerSearchForm.contains(e.target)) {
-      playerSearchSuggestions.hidden = true;
-      playerSearchInput.setAttribute("aria-expanded", "false");
-    }
+    if (!e.composedPath().includes(playerSearchForm)) dismissPlayerSearch();
     const pop = $("datePopover");
     if (
       !pop.hidden &&
@@ -4324,13 +4375,13 @@ function wire() {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       $("datePopover").hidden = true;
-      playerSearchSuggestions.hidden = true;
-      playerSearchInput.setAttribute("aria-expanded", "false");
+      dismissPlayerSearch();
     }
   });
   for (const event of ["wheel", "touchmove", "pointerdown", "keydown"])
     addEventListener(event, () => { uiScrollRestoreCancelled = true; }, { passive: true });
   addEventListener("hashchange", () => {
+    if (location.hash !== "#players") dismissPlayerSearch();
     uiScrollRestoreCancelled = true;
     const requestedGroup = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
     if (requestedGroup !== PLAYER_GROUP) {
@@ -4353,6 +4404,22 @@ function wire() {
       requestAnimationFrame(() => scrollTo({ top: restoreY, behavior: "auto" })),
     );
   });
+  let lastResumeRefresh = 0;
+  const refreshOnResume = () => {
+    if (!initialProjectionRequest || document.visibilityState === "hidden" || navigator.onLine === false || Date.now() - lastResumeRefresh < 30000) return;
+    lastResumeRefresh = Date.now();
+    load();
+    const opponent = location.hash.match(/^#opponent-profile\/([^/]+)\/([^/]+)\/([^/]+)$/);
+    if (opponent) {
+      const [identity, name, event] = opponent.slice(1).map(decodeURIComponent), hash = location.hash;
+      fetchOpponentHistory(name, event === "-" ? "" : event, identity, true).then(() => {
+        if (location.hash === hash) route();
+      }).catch(() => {});
+    }
+  };
+  addEventListener("online", refreshOnResume);
+  addEventListener("pageshow", event => {if (event.persisted) refreshOnResume();});
+  document.addEventListener("visibilitychange", refreshOnResume);
   addEventListener("pagehide", saveRefreshView);
 }
 // Refresh only known recent Europe matches. Full profiles continue independently.
