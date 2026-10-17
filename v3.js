@@ -72,24 +72,37 @@ const PLAYER_DEMOGRAPHICS = {
   "virginia-cereghini": [2013, "F"],
   "virginia-rossoni": [2016, "F"],
 };
+function validUiState(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const saved = {...value};
+  if (saved.month !== undefined && !/^\d{4}-(0[1-9]|1[0-2])$/.test(String(saved.month))) delete saved.month;
+  if (saved.agenda !== undefined) {
+    const day = String(saved.agenda), date = new Date(day + "T12:00:00");
+    if (!/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(day) ||
+        !Number.isFinite(date.getTime()) || date.getFullYear() !== Number(day.slice(0,4)) ||
+        date.getMonth() + 1 !== Number(day.slice(5,7)) || date.getDate() !== Number(day.slice(8,10))) delete saved.agenda;
+  }
+  return saved;
+}
 function savedUiState() {
   try {
-    return JSON.parse(localStorage.getItem(UI_STATE_CACHE) || "{}");
+    return validUiState(JSON.parse(localStorage.getItem(UI_STATE_CACHE) || "{}"));
   } catch {
     return {};
   }
 }
-function savedEntries(key, storage = localStorage) {
+function savedEntries(key, storage) {
   try {
-    const value = JSON.parse(storage.getItem(key) || "[]");
-    return Array.isArray(value) ? value : [];
+    const value = JSON.parse((storage || localStorage).getItem(key) || "[]");
+    return Array.isArray(value) ? value.filter(entry => Array.isArray(entry) && entry.length === 2 &&
+      typeof entry[0] === "string" && entry[1] && typeof entry[1] === "object" && !Array.isArray(entry[1])) : [];
   } catch {
     return [];
   }
 }
-function saveEntries(key, map, storage = localStorage, limit = 30) {
+function saveEntries(key, map, storage, limit = 30) {
   try {
-    storage.setItem(key, JSON.stringify([...map.entries()].slice(-limit)));
+    (storage || localStorage).setItem(key, JSON.stringify([...map.entries()].slice(-limit)));
   } catch {}
 }
 function savedActiveOpponent(requestKey) {
@@ -4149,16 +4162,21 @@ async function changePlayerGroup(targetGroup, fromHistory = false) {
   // Transfer the view, dates and common filters; player selections belong to each group.
   try {
     const targetKey = "courtwatch-v3-ui-state-v1" + (targetGroup === "others" ? "-others" : "");
-    const current = JSON.parse(localStorage.getItem(UI_STATE_CACHE) || "{}");
-    const mirrored = JSON.parse(localStorage.getItem(targetKey) || "{}");
+    const current = validUiState(JSON.parse(localStorage.getItem(UI_STATE_CACHE) || "{}"));
+    const mirrored = validUiState(JSON.parse(localStorage.getItem(targetKey) || "{}"));
     for (const key of ["agenda", "month", "agendaMode", "categoryFilters", "sexFilter", "scrollY"])
       if ((!fromHistory || key !== "scrollY") && Object.prototype.hasOwnProperty.call(current, key)) mirrored[key] = current[key];
     localStorage.setItem(targetKey, JSON.stringify(mirrored));
   } catch {}
   try {
     const suffix = targetGroup === "others" ? "-others-v2" : "", candidates = [];
-    for (const storage of [localStorage, sessionStorage]) for (const key of ["courtwatch-v3-last-good-v1" + suffix, "courtwatch-v3-calendar-v1" + suffix]) {
-      try {candidates.push(JSON.parse(storage.getItem(key) || "null"));} catch {}
+    for (const name of ["localStorage", "sessionStorage"]) {
+      try {
+        const storage = window[name];
+        for (const key of ["courtwatch-v3-last-good-v1" + suffix, "courtwatch-v3-calendar-v1" + suffix]) {
+          try {candidates.push(JSON.parse(storage.getItem(key) || "null"));} catch {}
+        }
+      } catch {}
     }
     candidates.push(await readDurableProjection("courtwatch-v3-last-good-v1" + suffix));
     const saved = candidates.filter(data => validProjection(data) && data.personalProjectionComplete === true && (!data.group || data.group === targetGroup)).sort((a, b) => (b.cachedAt || 0) - (a.cachedAt || 0))[0];
