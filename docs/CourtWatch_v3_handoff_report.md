@@ -5912,3 +5912,5 @@ Componenti: v3.css, revisione CSS in v3.html, nuovo tools/verify-agenda-layout-b
 Limite: accesso alla specifica giornata privata bloccato dalla richiesta di login nel browser disponibile; verifica riprodotta con dati di prova e markup effettivo, non certificata visivamente sui dati privati del 21 settembre. Nessuna modifica ad acquisizione, D1/R2, risultati o OOP. Dopo deploy verificare la giornata segnalata.
 
 ITF discovery 2026-10-17T05:00:20.238Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-10-17T11:14:41.676Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
