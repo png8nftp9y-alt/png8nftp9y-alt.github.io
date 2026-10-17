@@ -6,7 +6,7 @@ import {knownMatchResults} from '../lib/known-match-results.mjs';
 import {completeAppRankings} from '../lib/missing-match-rankings.mjs';
 import {renderMetadataQueue} from '../lib/admin-itf-metadata.mjs';
 import {appSnapshotMembership} from '../lib/app-snapshot-membership.mjs';
-import {enrichPersonalTournamentPresentation} from '../lib/personal-tournament-presentation.mjs';
+import {enrichPersonalTournamentPresentation,tournamentPresentationContext} from '../lib/personal-tournament-presentation.mjs';
 // D1_WRITE_POLICY: incremental
 import {buildIncrementalSyncPlan} from '../lib/d1-incremental-sync.mjs';
 import {playerListGroup,playerMembershipTable,playerMembershipGuard} from '../lib/player-list-group.mjs';
@@ -195,19 +195,36 @@ async function protectedApp(request,env,path,url){
     const selection=memberSelection+(playerId?' AND courtwatch_id=?':''),selectionBinds=[user.id,...(playerId?[playerId]:[])];
     const[players,tournaments,matches,manifest,overrides]=await Promise.all([all(env,'app_players',`WHERE id IN (${selection}) ORDER BY seq`,selectionBinds),all(env,'app_tournaments',`WHERE player_id IN (${selection}) ORDER BY seq`,selectionBinds),all(env,'app_matches',`WHERE player_id IN (${selection}) ORDER BY seq`,selectionBinds),env.DB.prepare("SELECT * FROM generations WHERE id='current'").first(),optionalRows(env.DB.prepare("SELECT entity_type,entity_id,action,payload FROM manual_overrides WHERE active=1 AND NOT (entity_type='player' AND ?='main' AND EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=? AND r.courtwatch_id=manual_overrides.entity_id)) ORDER BY updated_at").bind(group,user.id))]);let added=[];try{added=await personalPlayerAdditions(env,user.id,group,playerId)}catch(error){if(!missingOptionalTable(error))throw error}
     const playerMap=new Map(players.map(player=>[player.id,player]));for(const player of added)playerMap.set(player.id,{...playerMap.get(player.id),...player});players.splice(0,players.length,...playerMap.values());
-    const entryProfiles=await exactPersonalEntryProfiles(env.DB,added);
+    const presentation=playerId?tournamentPresentationContext():null;
+    const prepare=rows=>{presentation.prepare(rows);return rows};
+    const scopedData=playerId?await Promise.all([
+      exactPersonalEntryProfiles(env.DB,added).then(profiles=>Promise.all(added.filter(p=>p.sourceKey).map(async player=>{
+        const entries=await playerEntryTournaments(env,player,{entryRows:profiles.get(player.id)});
+        return [player.id,prepare(entries)];
+      }))),
+      personalUnreleasedTournamentHistory(env.DB,added).then(async rows=>{
+        prepare(rows);
+        return [rows,rows.some(t=>t.circuit==='itf')?await itfTournamentMetadata():new Map()];
+      }),
+      Promise.all(added.map(async player=>{
+        const history=await personalCircuitHistory(env.DB,player);prepare(history.tournaments);return history;
+      }))
+    ]):null;
+    // All branches read independently, but preserve the established merge order.
+    const entryProfiles=scopedData?null:await exactPersonalEntryProfiles(env.DB,added);
+    const entrySets=scopedData?new Map(scopedData[0]):null;
     for(const player of added.filter(player=>player.sourceKey)){
-      const entries=await playerEntryTournaments(env,player,{entryRows:entryProfiles.get(player.id)});
+      const entries=scopedData?entrySets.get(player.id):await playerEntryTournaments(env,player,{entryRows:entryProfiles.get(player.id)});
       const live=mergePersonalLiveTournaments(tournaments,entries.map(t=>({...t,playerName:player.name})),player.id);
       tournaments.splice(0,tournaments.length,...live);
     }
-    const unreleasedHistory=await personalUnreleasedTournamentHistory(env.DB,added);
-    const officialItf=unreleasedHistory.some(t=>t.circuit==='itf')?await itfTournamentMetadata():new Map();
+    const unreleasedHistory=scopedData?scopedData[1][0]:await personalUnreleasedTournamentHistory(env.DB,added);
+    const officialItf=scopedData?scopedData[1][1]:unreleasedHistory.some(t=>t.circuit==='itf')?await itfTournamentMetadata():new Map();
     const allHistory=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
     for(const t of unreleasedHistory){const official=officialItf.get(String(t.competitionId||'').toUpperCase())||{};const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;allHistory.set(key,mergePersonalHistoryTournament({...t,location:t.location||official.location||'',startDate:t.startDate||official.startDate||'',endDate:t.endDate||official.endDate||''},allHistory.get(key)));}
     tournaments.splice(0,tournaments.length,...allHistory.values());
     for(const player of added){
-      const history=await personalCircuitHistory(env.DB,player);
+      const history=scopedData?scopedData[2][added.indexOf(player)]:await personalCircuitHistory(env.DB,player);
       const position=players.findIndex(p=>p.id===player.id);if(position>=0)players[position]=personalPlayerMetadata({...history.player,sourceCircuit:player.sourceCircuit});
       const tournamentMap=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
       for(const t of history.tournaments){const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;tournamentMap.set(key,mergePersonalHistoryTournament(t,tournamentMap.get(key)));}
@@ -216,7 +233,7 @@ async function protectedApp(request,env,path,url){
       for(const m of history.matches)matchMap.set(`${m.playerId}|${m.matchId||m.id}`,{...matchMap.get(`${m.playerId}|${m.matchId||m.id}`),...m});
       matches.splice(0,matches.length,...matchMap.values());
     }
-    tournaments.splice(0,tournaments.length,...await enrichPersonalTournamentPresentation(tournaments));
+    tournaments.splice(0,tournaments.length,...await (presentation?presentation.enrich(tournaments):enrichPersonalTournamentPresentation(tournaments)));
     try{await applyPreparedTennisEuropeRankings(env,players,matches,[...new Set(players.map(p=>p.id))])}catch(error){console.error('prepared_tennis_europe_projection_failed',error)}const linkedProfiles=await resolveCircuitProfiles(env.DB,players);for(const player of players)player.circuitProfiles=linkedProfiles.get(player)||[];const selectedIds=new Set(players.map(p=>p.id));const scoped=(rows,field)=>(playerId||group==='others')?rows.filter(row=>selectedIds.has(row[field])):rows;return privateJson({group,...(playerId?{playerId}:{}),membershipIds,generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players:scoped(applyOverrides(players,overrides,'player'),'id'),tournaments:scoped(applyOverrides(tournaments,overrides,'tournament'),'playerId'),matches})}
   if(apiPath==='/match-analysis-status'&&request.method==='GET'){const rows=await optionalRows(env.DB.prepare('SELECT match_key,updated_at FROM user_match_analyses WHERE user_id=? ORDER BY updated_at DESC').bind(user.id));return privateJson({matches:rows.map(row=>({matchKey:row.match_key,updatedAt:row.updated_at}))})}
   if(apiPath==='/match-analysis'){const matchKey=String(url.searchParams.get('matchKey')||'').trim().slice(0,240);if(request.method==='GET'){if(!matchKey)return privateJson({error:'match_key_required'},400);const row=await env.DB.prepare('SELECT match_key,analysis,updated_at FROM user_match_analyses WHERE user_id=? AND match_key=?').bind(user.id,matchKey).first();return privateJson(row?{matchKey:row.match_key,analysis:row.analysis,updatedAt:row.updated_at}:{matchKey,analysis:'',updatedAt:null})}if(request.method==='PUT'){const body=await request.json().catch(()=>null),key=String(body?.matchKey||'').trim().slice(0,240),analysis=String(body?.analysis||'').trim();if(!key||!analysis||analysis.length>20000)return privateJson({error:'invalid_analysis'},400);const now=new Date().toISOString();await env.DB.prepare('INSERT INTO user_match_analyses(user_id,match_key,analysis,updated_at) VALUES(?,?,?,?) ON CONFLICT(user_id,match_key) DO UPDATE SET analysis=excluded.analysis,updated_at=excluded.updated_at').bind(user.id,key,analysis,now).run();return privateJson({matchKey:key,analysis,updatedAt:now})}if(request.method==='DELETE'){if(!matchKey)return privateJson({error:'match_key_required'},400);await env.DB.prepare('DELETE FROM user_match_analyses WHERE user_id=? AND match_key=?').bind(user.id,matchKey).run();return privateJson({success:true,matchKey})}return privateJson({error:'method_not_allowed'},405)}

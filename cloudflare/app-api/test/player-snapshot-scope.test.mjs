@@ -42,3 +42,44 @@ test('scoped snapshots reject invalid, foreign and removed membership before rea
   assert.equal((await request(d.db,'main','cw-target-0')).status,404);
  }finally{d.close()}
 });
+
+test('scoped match history starts while entry profiles are still pending', {timeout:5000}, async()=>{
+ const d=database({identityMapping:true}),original=globalThis.fetch;globalThis.fetch=async()=>({ok:true,json:async()=>({tournaments:[]})});
+ try{seed(d,1);let release,overlap=false;
+  function wrap(s,sql){return new Proxy(s,{get(t,k){const v=t[k];if(k==='bind')return(...args)=>wrap(v.apply(t,args),sql);
+   if(k==='all')return async(...args)=>{
+    if(sql.includes('JOIN opponent_entry_profiles'))return new Promise((resolve,reject)=>{release=()=>Promise.resolve(v.apply(t,args)).then(resolve,reject)});
+    if(sql.includes('WITH candidate_matches AS MATERIALIZED')&&release){overlap=true;release();release=null;}
+    return v.apply(t,args);
+   };return typeof v==='function'?v.bind(t):v;}})}
+  const db={prepare:sql=>wrap(d.db.prepare(sql),sql),batch:s=>d.db.batch(s)},before=d.writes();
+  const response=await request(db,'others','cw-target-0');assert.equal(response.status,200);
+  const body=await response.json();assert.equal(body.matches.length,1);assert.equal(overlap,true);assert.equal(d.writes(),before);
+ }finally{globalThis.fetch=original;d.close()}
+});
+
+test('scoped public presentation loads before match history finishes and final output matches the full snapshot', {timeout:5000}, async()=>{
+ const d=database({identityMapping:true}),original=globalThis.fetch;
+ let releaseHistory,startedHistory,overlap=false;
+ const historyStarted=new Promise(resolve=>{startedHistory=resolve});
+ globalThis.fetch=async url=>{
+  if(String(url).includes('/history/itf_official_metadata.json')){
+   await historyStarted;overlap=true;releaseHistory();
+   return {ok:true,json:async()=>({tournaments:[{circuit:'itf',competitionId:'t0',venueName:'Verified Club',qualificationStartDate:'2026-09-30'}]})};
+  }
+  return {ok:true,json:async()=>({tournaments:[]})};
+ };
+ try{seed(d,1);
+  function wrap(s,sql){return new Proxy(s,{get(t,k){const v=t[k];if(k==='bind')return(...args)=>wrap(v.apply(t,args),sql);
+   if(k==='all'&&sql.includes('WITH candidate_matches AS MATERIALIZED'))return(...args)=>new Promise((resolve,reject)=>{
+    releaseHistory=()=>Promise.resolve(v.apply(t,args)).then(resolve,reject);startedHistory();
+   });return typeof v==='function'?v.bind(t):v;}})}
+  const db={prepare:sql=>wrap(d.db.prepare(sql),sql),batch:s=>d.db.batch(s)},before=d.writes();
+  const response=await request(db,'others','cw-target-0');assert.equal(response.status,200);const scoped=await response.json();
+  assert.equal(overlap,true);assert.equal(scoped.matches.length,1);assert.equal(scoped.tournaments[0].venueName,'Verified Club');
+  assert.equal(scoped.tournaments[0].startDate,'2026-09-30');
+  const full=await (await request(d.db,'others')).json();
+  for(const key of ['players','tournaments','matches'])assert.deepEqual(scoped[key],full[key],key);
+  assert.equal(d.writes(),before);
+ }finally{globalThis.fetch=original;d.close()}
+});

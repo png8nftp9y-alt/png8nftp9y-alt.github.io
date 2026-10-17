@@ -243,3 +243,16 @@ test('Europe addition recovers the club through its verified canonical FITP iden
   const read=await personalPlayerAdditions(db.env,user.id);assert.equal(read[0].club,'Tennis Club Lecco');assert.equal(db.writes(),before);
  }finally{db.close()}
 });
+
+test('addition reuses the identity it just verified instead of resolving the same source twice',async()=>{
+ const d=database({identityMapping:true});try{
+  const key='itf|id:101',id='person:reuse',person={id,canonicalId:id,name:'Test Player',sourceKey:key,sourceCircuit:'itf',worldTennisId:'101'};
+  d.execute('INSERT INTO player_identity_people VALUES(?,?,?)',[id,'TEST PLAYER',JSON.stringify(person)]);
+  d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES(?,?,?,?,?,?,?)',[key,id,'TEST PLAYER','itf','101','TEST PLAYER',person.name]);
+  let lookups=0;const db={prepare(sql){if(sql.startsWith('SELECT p.payload FROM player_identity_people'))lookups++;return d.env.DB.prepare(sql)},batch:s=>d.env.DB.batch(s)};
+  const result=await addCourtWatchPlayer({DB:db},user,{sourceKey:key,name:person.name});
+  assert.equal(result.playerId,id);assert.equal(result.player.worldTennisId,'101');assert.equal(lookups,1);
+  const before=d.writes();lookups=0;const replay=await addCourtWatchPlayer({DB:db},user,{sourceKey:key,name:person.name});
+  assert.equal(replay.changed,false);assert.equal(d.writes(),before);assert.equal(lookups,1);
+ }finally{d.close()}
+});

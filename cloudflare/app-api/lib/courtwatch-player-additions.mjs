@@ -83,8 +83,9 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=officialFitpC
   player=personalPlayerMetadata(player,payload);
   observedSourceKey=row.source_key;
  }
- const mapped=await mappedPlayerId(env.DB,observedSourceKey,user.id);if(mapped){player.id=mapped.playerId;player.canonicalId=mapped.canonicalId;}
- player=await hydratePersonalCircuitIdentity(env.DB,player);
+ const mapped=await mappedPlayerId(env.DB,observedSourceKey,user.id,{includeIdentity:true});if(mapped){player.id=mapped.playerId;player.canonicalId=mapped.canonicalId;}
+ player=await hydratePersonalCircuitIdentity(env.DB,player,
+  mapped?.identity&&player.sourceKey===observedSourceKey?mapped.identity:undefined);
  let [previous,linked,removed]=await Promise.all([
   env.DB.prepare('SELECT courtwatch_id,observed_source_key,payload FROM user_app_player_additions WHERE user_id=? AND observed_source_key=?').bind(user.id,observedSourceKey).first(),
   env.DB.prepare(`SELECT courtwatch_id FROM ${membership} WHERE user_id=? AND courtwatch_id=?`).bind(user.id,player.id).first(),

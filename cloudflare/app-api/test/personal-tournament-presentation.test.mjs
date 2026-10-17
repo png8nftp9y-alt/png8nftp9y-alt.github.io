@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mergeTournamentPresentation,fetchTournamentPresentation} from '../lib/personal-tournament-presentation.mjs';
+import {mergeTournamentPresentation,fetchTournamentPresentation,tournamentPresentationContext} from '../lib/personal-tournament-presentation.mjs';
 for(const circuit of ['itf','fitp','tennis-europe'])test(circuit+' preserves participation and restores official and club fields',()=>{
  const t={circuit,competitionId:'EXACT',sourceUrl:'',venueName:'',address:'',location:'',entryStatus:'withdrawn',event:'B-D-Q-KO'};
  const out=mergeTournamentPresentation(t,{sourceUrl:'https://official.invalid/event',club:'Official club',clubAddress:'Via Uno 1',location:'City, Country'});
@@ -37,4 +37,17 @@ test('recursive opponent renderer exposes official links without tournament loca
   if(circuit!=='tennis-europe')assert.ok(body.innerHTML.includes('https://official.invalid/event'));
   else assert.ok(body.innerHTML.includes('https://te.tournamentsoftware.com/tournament/EXACT'));
  }
+});
+
+
+test('request preparation overlaps catalogues without changing tournament precedence or refetching empty results',async()=>{
+ let finish,calls=0;
+ const ctx=tournamentPresentationContext({itf:()=>{calls++;return new Promise(resolve=>{finish=resolve})}});
+ const source={circuit:'itf',competitionId:'EXACT',location:'Observed location',entryStatus:'withdrawn',event:'GS'};
+ ctx.prepare([source]);ctx.prepare([source]);assert.equal(calls,1);
+ finish(new Map([['itf|EXACT',{location:'Official location',venueName:'Official club',qualificationStartDate:'2026-10-02'}]]));
+ const [enriched]=await ctx.enrich([source]);assert.equal(enriched.location,'Observed location');assert.equal(enriched.venueName,'Official club');assert.equal(enriched.entryStatus,'withdrawn');assert.equal(enriched.event,'GS');assert.equal(calls,1);
+ let emptyCalls=0;const empty=tournamentPresentationContext({itf:async()=>{emptyCalls++;return new Map()}});
+ empty.prepare([source]);await empty.enrich([source]);await empty.enrich([source]);assert.equal(emptyCalls,1);
+ assert.deepEqual(source,{circuit:'itf',competitionId:'EXACT',location:'Observed location',entryStatus:'withdrawn',event:'GS'});
 });
