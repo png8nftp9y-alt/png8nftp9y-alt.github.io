@@ -51,3 +51,18 @@ test('request preparation overlaps catalogues without changing tournament preced
  empty.prepare([source]);await empty.enrich([source]);await empty.enrich([source]);assert.equal(emptyCalls,1);
  assert.deepEqual(source,{circuit:'itf',competitionId:'EXACT',location:'Observed location',entryStatus:'withdrawn',event:'GS'});
 });
+
+test('ITF exact-ID factsheet overrides stale calendar copies for both past and future editions',async()=>{
+ const fetcher=async url=>({ok:true,json:async()=>url.endsWith('itf_official_metadata.json')?{tournaments:{EXACT:{venueName:'Verified club',address:'Official street'}}}:{tournaments:[{circuit:'itf',competitionId:'EXACT',venueName:'Stale club',location:'Official City, Country'}]}});
+ const map=await fetchTournamentPresentation('itf',fetcher);
+ assert.equal(map.get('itf|EXACT').venueName,'Verified club');
+ for(const startDate of ['2026-01-01','2027-01-01']){
+  const out=mergeTournamentPresentation({circuit:'itf',competitionId:'EXACT',startDate,venueName:'Sede da confermare',location:'Città e luogo da confermare'},map.get('itf|EXACT'));
+  assert.equal(out.venueName,'Verified club');assert.equal(out.location,'Official City, Country');assert.equal(out.address,'Official street');assert.equal(out.startDate,startDate);
+ }
+});
+test('unavailable official data never erases a stored verified ITF venue or borrows another ID',async()=>{
+ const map=await fetchTournamentPresentation('itf',async()=>{throw Error('unavailable');});
+ const out=mergeTournamentPresentation({circuit:'itf',venueName:'Saved club',location:'Saved city'},map.get('itf|MISSING'));
+ assert.equal(out.venueName,'Saved club');assert.equal(out.location,'Saved city');
+});

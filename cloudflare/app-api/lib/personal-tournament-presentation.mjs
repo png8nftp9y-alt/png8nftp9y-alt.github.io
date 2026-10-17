@@ -3,9 +3,9 @@ const ROOT='https://raw.githubusercontent.com/png8nftp9y-alt/png8nftp9y-alt.gith
 const sources={
  'fitp':['dist/v3/source_fitp_tournaments.json','dist/v3/tournaments.json'],
  'tennis-europe':['dist/v3/source_tennis_europe_tournaments_sharded.json','dist/v3/tournaments.json'],
- 'itf':['dist/v3/source_itf_history_tournaments.json','dist/v3/source_itf_tournaments.json','history/itf_official_metadata.json','dist/v3/tournaments.json']
+ 'itf':['dist/v3/tournaments.json','dist/v3/source_itf_history_tournaments.json','dist/v3/source_itf_tournaments.json','history/itf_official_metadata.json']
 };
-const text=value=>typeof value==='string'?value.trim():'';
+const text=value=>{const v=typeof value==='string'?value.trim():'';return /^(?:(?:citt[aà]|luogo|sede|circolo|citt[aà] e luogo)\s+da\s+(?:confermare|pubblicare)|tbc|tbd|to be confirmed)$/i.test(v)?'':v;};
 const circuit=t=>text(t.circuit)||text(t.source?.circuit)||text(t.source);
 const key=(c,id)=>c+'|'+text(String(id||'')).toUpperCase();
 const first=(...values)=>values.map(text).find(Boolean)||'';
@@ -21,7 +21,11 @@ const presentFields=t=>({
 });
 export function mergeTournamentPresentation(t,official={}){
  const existing=presentFields(t),fallback=presentFields(official),out={...t};
- for(const field of Object.keys(existing))if(existing[field]||fallback[field])out[field]=existing[field]||fallback[field];
+ for(const field of Object.keys(existing)){
+  const authoritative=circuit(t)==='itf'&&['venueName','address'].includes(field);
+  if(existing[field]||fallback[field])out[field]=authoritative?(fallback[field]||existing[field]):(existing[field]||fallback[field]);
+  else if(field in out)out[field]='';
+ }
  if(['itf','tennis-europe'].includes(circuit(t))&&/^\d{4}-\d{2}-\d{2}$/.test(out.qualificationStartDate||''))out.startDate=out.qualificationStartDate;
  return out;
 }

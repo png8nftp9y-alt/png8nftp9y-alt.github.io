@@ -1,0 +1,36 @@
+name: Court Watch ITF tournament places read-only audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-itf-tournament-places-audit.yml'
+      - 'cloudflare/app-api/scripts/audit-itf-tournament-places.mjs'
+      - 'cloudflare/app-api/lib/personal-tournament-presentation.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-itf-places-readonly
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test exact-ID presentation and read-only audit
+        run: node --test cloudflare/app-api/test/personal-tournament-presentation.test.mjs cloudflare/app-api/test/audit-itf-tournament-places.test.mjs
+      - name: Verify all stored and effective ITF locations without writes
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node cloudflare/app-api/scripts/audit-itf-tournament-places.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-tournament-places-verification
+          path: dist/v3/audits/itf-tournament-places.json
+          if-no-files-found: error
+          retention-days: 30
