@@ -1,0 +1,39 @@
+name: Court Watch runtime documents D1 import and verification
+# D1_WRITE_POLICY: incremental
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-runtime-documents-d1.yml'
+      - 'cloudflare/app-api/lib/runtime-document-plan.mjs'
+      - 'cloudflare/app-api/scripts/sync-runtime-documents-d1.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  verify-storage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 0}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test immutable import and complete-source gate
+        run: node --test cloudflare/app-api/test/runtime-document-plan.test.mjs
+      - name: Persist complete runtime documents and verify full content in D1
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node cloudflare/app-api/scripts/sync-runtime-documents-d1.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: runtime-documents-d1-verification
+          path: dist/v3/audits/runtime-documents-d1.json
+          if-no-files-found: error
+          retention-days: 30
