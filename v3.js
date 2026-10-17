@@ -1199,7 +1199,7 @@ function agendaCourtMatchNumber(m) {
 function agendaCourtName(m) {
   const value = readableText(m.court || "");
   if (!value) return "";
-  return /^(?:campo\b|court\b|c(?:c)?(?:[\s.:-]|\d))/i.test(value)
+  return /\b(?:campo|court)(?=\b|\d)/i.test(value) || /^(?:c(?:c)?(?:[\s.:-]|\d))/i.test(value)
     ? value
     : "Court " + value;
 }

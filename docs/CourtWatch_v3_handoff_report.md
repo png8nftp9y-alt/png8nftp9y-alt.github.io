@@ -5914,3 +5914,7 @@ Limite: accesso alla specifica giornata privata bloccato dalla richiesta di logi
 ITF discovery 2026-10-17T05:00:20.238Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-17T11:14:41.676Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-10-17 — Court aggiunto soltanto quando manca nel nome del campo
+Il controllo in agenda riconosceva Court solo all'inizio del testo e poteva mostrare Court Centre Court. agendaCourtName riconosce ora Court/Campo come etichetta in qualsiasi posizione (anche Court1), conserva le abbreviazioni C/CC già supportate e aggiunge Court soltanto quando manca. Nomi ufficiali e riferimenti a più campi non vengono riscritti. Regola comune a tutte le date, TCL/Altri e i due ordinamenti.
+Componenti: v3.js, revisione JS in v3.html, nuovo src/v3/agenda-court-label.test.mjs, workflow browser e report. Validazione: test della funzione effettiva con numeri, campo senza prefisso, Centre Court, Central COURT, Court 2, Court1, Campo, C/CC, campo assente, più campi e formattazione ripetuta; parsing JS; controllo layout browser in 36 combinazioni e test browser condiviso su refresh/navigazione in entrambi i gruppi. Nessuna modifica ai dati salvati, alle sorgenti o alla logica dei risultati. Limite: verifica della stringa privata segnalata non disponibile senza accesso; corretta la condizione generale che aggiungeva il prefisso quando Court era già presente dopo la prima parola.

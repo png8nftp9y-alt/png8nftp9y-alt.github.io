@@ -3,7 +3,7 @@ name: Court Watch Others real snapshot browser
 on:
   push:
     branches: [main]
-    paths: ['v3.css', 'tools/verify-agenda-layout-browser.mjs', 'v3.html', 'tools/replay-others-real-snapshot.mjs', 'cloudflare/app-api/lib/courtwatch-player-additions.mjs', 'cloudflare/app-api/lib/d1-read-retry.mjs', 'cloudflare/app-api/test/personal-player-read-retry.test.mjs', 'cloudflare/app-api/test/replay-others-real-snapshot.test.mjs', 'tools/verify-shared-match-refresh-browser.mjs', 'tools/verify-others-real-snapshot-browser.mjs', 'v3.js', 'cloudflare/app-api/src/index.js', 'cloudflare/app-api/lib/personal-*.mjs', 'cloudflare/app-api/lib/app-snapshot-membership.mjs', '.github/workflows/courtwatch-others-real-snapshot-browser.yml']
+    paths: ['src/v3/agenda-court-label.test.mjs', 'v3.css', 'tools/verify-agenda-layout-browser.mjs', 'v3.html', 'tools/replay-others-real-snapshot.mjs', 'cloudflare/app-api/lib/courtwatch-player-additions.mjs', 'cloudflare/app-api/lib/d1-read-retry.mjs', 'cloudflare/app-api/test/personal-player-read-retry.test.mjs', 'cloudflare/app-api/test/replay-others-real-snapshot.test.mjs', 'tools/verify-shared-match-refresh-browser.mjs', 'tools/verify-others-real-snapshot-browser.mjs', 'v3.js', 'cloudflare/app-api/src/index.js', 'cloudflare/app-api/lib/personal-*.mjs', 'cloudflare/app-api/lib/app-snapshot-membership.mjs', '.github/workflows/courtwatch-others-real-snapshot-browser.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,6 +21,7 @@ jobs:
       - run: npm install
       - run: npx playwright install --with-deps chromium
       - run: node --test cloudflare/app-api/test/personal-player-read-retry.test.mjs cloudflare/app-api/test/replay-others-real-snapshot.test.mjs src/v3/others-independent-loader.test.mjs src/v3/player-addition-ui.test.mjs src/v3/calendar-startup.test.mjs src/v3/agenda-resolved-doubles.test.mjs src/v3/doubles-partner-groups.test.mjs cloudflare/app-api/test/app-snapshot-membership.test.mjs
+      - run: node --test src/v3/agenda-court-label.test.mjs
       - run: node tools/verify-agenda-layout-browser.mjs
       - run: node tools/verify-shared-match-refresh-browser.mjs
       - run: node tools/replay-others-real-snapshot.mjs
