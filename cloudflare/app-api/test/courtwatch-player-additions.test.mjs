@@ -256,3 +256,71 @@ test('addition reuses the identity it just verified instead of resolving the sam
   assert.equal(replay.changed,false);assert.equal(d.writes(),before);assert.equal(lookups,1);
  }finally{d.close()}
 });
+
+function interceptedDatabase(db,intercept){
+ return{prepare(sql){const wrap=statement=>({
+  ...statement,
+  bind(...values){return wrap(statement.bind(...values))},
+  first:()=>intercept(sql,()=>statement.first()),
+  all:()=>intercept(sql,()=>statement.all())
+ });return wrap(db.prepare(sql))},batch:statements=>db.batch(statements)};
+}
+
+test('first addition overlaps exact configured, canonical and personal lookups without extra reads or writes',async()=>{
+ const d=database({identityMapping:true});let release,operation;
+ try{
+  const key='itf|id:101',id='person:parallel';
+  d.execute('INSERT INTO player_identity_people VALUES(?,?,?)',[id,'TEST PLAYER',JSON.stringify({canonicalId:id,name:'Test Player',sourceKey:key,worldTennisId:'101'})]);
+  d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES(?,?,?,?,?,?,?)',[key,id,'TEST PLAYER','itf','101','TEST PLAYER','Test Player']);
+  const gate=new Promise(resolve=>release=resolve);let canonicalStarted;
+  const started=new Promise(resolve=>canonicalStarted=resolve),counts=new Map();
+  const DB=interceptedDatabase(d.env.DB,async(sql,read)=>{
+   counts.set(sql,(counts.get(sql)||0)+1);
+   if(sql.startsWith('SELECT p.payload FROM player_identity_people')){canonicalStarted();await gate}
+   return read();
+  });
+  operation=addCourtWatchPlayer({DB},user,{sourceKey:key,group:'others'});
+  await started;await new Promise(setImmediate);
+  assert.equal([...counts.keys()].some(sql=>sql.includes('WHERE user_id=? AND observed_source_key=?')),true);
+  assert.equal([...counts.keys()].some(sql=>sql.includes('CAST(json_extract(payload,?)')),true);
+  assert.equal(d.writes(),0);release();
+  const first=await operation;assert.equal(first.playerId,id);assert.equal(first.player.worldTennisId,'101');
+  assert.equal([...counts].find(([sql])=>sql.startsWith('SELECT p.payload FROM player_identity_people'))[1],1);
+  const writes=d.writes();assert.equal(writes,3); // Includes the existing identity-queue trigger.
+  assert.equal((await addCourtWatchPlayer({DB},user,{sourceKey:key,group:'others'})).changed,false);
+  assert.equal(d.writes(),writes);
+ }finally{release?.();if(operation)await operation.catch(()=>{});d.close()}
+});
+
+test('official club and membership reads overlap, but both finish before any durable write',async()=>{
+ const d=database();let release,operation;
+ try{
+  d.execute('INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',['fitp|id:777','fitp','777','TEST PLAYER','Test Player','{}']);
+  let membershipStarted,clubStarted=false;const started=new Promise(resolve=>membershipStarted=resolve),gate=new Promise(resolve=>release=resolve);
+  const DB=interceptedDatabase(d.env.DB,async(sql,read)=>{
+   if(sql.startsWith('SELECT courtwatch_id FROM user_app_other_players WHERE')){membershipStarted();await gate}
+   return read();
+  });
+  operation=addCourtWatchPlayer({DB},user,{sourceKey:'fitp|id:777',group:'others'},{fetchClub:async()=>{clubStarted=true;return 'Tennis Club Lecco'}});
+  await started;await new Promise(setImmediate);
+  assert.equal(clubStarted,true);assert.equal(d.writes(),0);release();
+  const result=await operation;assert.equal(result.player.club,'Tennis Club Lecco');assert.equal(d.writes(),2);
+ }finally{release?.();if(operation)await operation.catch(()=>{});d.close()}
+});
+
+test('retained personal ID is checked directly for membership with no redundant canonical-ID read',async()=>{
+ const d=database({identityMapping:true});try{
+  const key='itf|id:101',canonicalId='person:current',retainedId='cw-retained-personal';
+  d.execute('INSERT INTO player_identity_people VALUES(?,?,?)',[canonicalId,'TEST PLAYER',JSON.stringify({canonicalId,name:'Test Player',sourceKey:key,worldTennisId:'101'})]);
+  d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES(?,?,?,?,?,?,?)',[key,canonicalId,'TEST PLAYER','itf','101','TEST PLAYER','Test Player']);
+  const first=await addCourtWatchPlayer(d.env,user,{sourceKey:key,group:'others'});
+  const saved={...first.player,id:retainedId};
+  d.execute('UPDATE user_app_player_additions SET courtwatch_id=?,payload=? WHERE courtwatch_id=?',[retainedId,JSON.stringify(saved),canonicalId]);
+  d.execute('UPDATE user_app_other_players SET courtwatch_id=? WHERE courtwatch_id=?',[retainedId,canonicalId]);
+  const membershipIds=[];
+  const DB={prepare(sql){const statement=d.env.DB.prepare(sql);if(!sql.startsWith('SELECT courtwatch_id FROM user_app_other_players WHERE'))return statement;return{...statement,bind(...values){membershipIds.push(values[1]);return statement.bind(...values)}}},batch:statements=>d.env.DB.batch(statements)};
+  const before=d.writes(),result=await addCourtWatchPlayer({DB},user,{sourceKey:key,group:'others'});
+  assert.equal(result.playerId,retainedId);assert.equal(result.changed,false);assert.equal(d.writes(),before);
+  assert.deepEqual(membershipIds,[retainedId]);
+ }finally{d.close()}
+});

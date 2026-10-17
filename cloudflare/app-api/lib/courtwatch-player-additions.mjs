@@ -33,7 +33,7 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=async()=>'',m
   if(configured){if(name&&nameKey(parse(configured.payload).name)!==nameKey(name))throw failure('player_identity_ambiguous',409);courtwatchId=configured.id;}
   else if(await env.DB.prepare('SELECT courtwatch_id FROM user_app_player_additions WHERE user_id=? AND courtwatch_id=?').bind(user.id,identity).first())courtwatchId=identity;
  }
- let player,observedSourceKey;
+ let player,observedSourceKey,configuredIdentity;
  if(courtwatchId&&!sourceKey){
   let row=await env.DB.prepare('SELECT id,payload FROM app_players WHERE id=?').bind(courtwatchId).first();
   if(!row){const personal=await env.DB.prepare('SELECT courtwatch_id AS id,observed_source_key,payload FROM user_app_player_additions WHERE user_id=? AND courtwatch_id=?').bind(user.id,courtwatchId).first();if(personal)row=personal;}
@@ -75,27 +75,35 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=async()=>'',m
   // Reuse a configured player only with a matching official circuit identity.
   const identityPaths={fitp:'$.membershipCard',itf:'$.worldTennisId','tennis-europe':'$.profileSync.tennisEurope.profileId'};
   const identityPath=identityPaths[row.circuit];
-  if(row.official_id&&identityPath){
-   const existing=(await env.DB.prepare('SELECT id,payload FROM app_players WHERE CAST(json_extract(payload,?) AS TEXT)=? LIMIT 2').bind(identityPath,String(row.official_id)).all()).results||[];
-   if(existing.length>1)throw failure('player_identity_ambiguous',409);
-   if(existing.length===1)player={...parse(existing[0].payload),id:existing[0].id,userAdded:true,sourceCircuit:row.circuit,sourceKey:row.source_key,sourcePlayerId:row.official_id};
-  }
+  if(row.official_id&&identityPath)configuredIdentity={path:identityPath,row,payload};
   player=personalPlayerMetadata(player,payload);
   observedSourceKey=row.source_key;
  }
- const mapped=await mappedPlayerId(env.DB,observedSourceKey,user.id,{includeIdentity:true});if(mapped){player.id=mapped.playerId;player.canonicalId=mapped.canonicalId;}
+ // These lookups depend only on the verified source, not on each other.
+ const [mapped,previous,configured]=await Promise.all([
+  mappedPlayerId(env.DB,observedSourceKey,user.id,{includeIdentity:true}),
+  env.DB.prepare('SELECT courtwatch_id,observed_source_key,payload FROM user_app_player_additions WHERE user_id=? AND observed_source_key=?').bind(user.id,observedSourceKey).first(),
+  configuredIdentity?env.DB.prepare('SELECT id,payload FROM app_players WHERE CAST(json_extract(payload,?) AS TEXT)=? LIMIT 2').bind(configuredIdentity.path,String(configuredIdentity.row.official_id)).all():null
+ ]);
+ const existing=configured?.results||[];
+ if(existing.length>1)throw failure('player_identity_ambiguous',409);
+ if(existing.length===1){
+  const {row,payload}=configuredIdentity;
+  player=personalPlayerMetadata({...parse(existing[0].payload),id:existing[0].id,userAdded:true,sourceCircuit:row.circuit,sourceKey:row.source_key,sourcePlayerId:row.official_id},payload);
+ }
+ if(mapped){player.id=mapped.playerId;player.canonicalId=mapped.canonicalId;}
  player=await hydratePersonalCircuitIdentity(env.DB,player,
   mapped?.identity&&player.sourceKey===observedSourceKey?mapped.identity:undefined);
- let [previous,linked,removed]=await Promise.all([
-  env.DB.prepare('SELECT courtwatch_id,observed_source_key,payload FROM user_app_player_additions WHERE user_id=? AND observed_source_key=?').bind(user.id,observedSourceKey).first(),
-  env.DB.prepare(`SELECT courtwatch_id FROM ${membership} WHERE user_id=? AND courtwatch_id=?`).bind(user.id,player.id).first(),
-  group==='main'?env.DB.prepare('SELECT courtwatch_id FROM user_app_player_removals WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first():null
- ]);
- if(previous&&previous.courtwatch_id!==player.id){if(mapped){player.id=previous.courtwatch_id;[linked,removed]=await Promise.all([env.DB.prepare(`SELECT courtwatch_id FROM ${membership} WHERE user_id=? AND courtwatch_id=?`).bind(user.id,player.id).first(),group==='main'?env.DB.prepare('SELECT courtwatch_id FROM user_app_player_removals WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first():null]);}else throw failure('player_identity_conflict',409);}
+ // Resolve a retained personal ID before querying membership, avoiding a second read.
+ if(previous&&previous.courtwatch_id!==player.id){if(mapped)player.id=previous.courtwatch_id;else throw failure('player_identity_conflict',409);}
  if(!player.club&&previous)player.club=personalPlayerMetadata(parse(previous.payload)).club||'';
- if(player.membershipCard&&!player.club){
-  try{player.club=await measure('official_fitp_club',()=>fetchClub(player.membershipCard))||''}catch{player.club=''}
- }
+ const [linked,removed,club]=await Promise.all([
+  env.DB.prepare(`SELECT courtwatch_id FROM ${membership} WHERE user_id=? AND courtwatch_id=?`).bind(user.id,player.id).first(),
+  group==='main'?env.DB.prepare('SELECT courtwatch_id FROM user_app_player_removals WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first():null,
+  player.membershipCard&&!player.club?
+   Promise.resolve().then(()=>measure('official_fitp_club',()=>fetchClub(player.membershipCard))).catch(()=>''):player.club
+ ]);
+ player.club=club||'';
  player=personalPlayerMetadata(player);
  const incoming={courtwatch_id:player.id,observed_source_key:observedSourceKey,payload:JSON.stringify(player)};
  const plan=buildIncrementalSyncPlan({current:previous?[previous]:[],incoming:[incoming],keyOf:row=>row.courtwatch_id,sourceComplete:Boolean(player.id&&player.name)});
