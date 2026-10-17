@@ -3225,13 +3225,15 @@ async function fetchOpponentHistory(name, event = "", profileId = "", refresh = 
     const data = mergeOpponentHistory(preparedOpponentHistory(name, event, profileId), incoming);
     opponentHistoryCache.set(requestKey, data);
     opponentHistoryValidated.set(requestKey, epoch);
-    saveEntries(
-      OPPONENT_HISTORY_CACHE,
-      opponentHistoryCache,
-      localStorage,
-      20,
-    );
-      await saveDurableOpponent(name, event, profileId, requestKey, data);
+    // Navigation needs the received data, not completion of local disk writes.
+    const persist = () => {
+      const latest = opponentHistoryCache.get(requestKey) || data;
+      saveEntries(OPPONENT_HISTORY_CACHE, opponentHistoryCache, undefined, 20);
+      Promise.resolve(saveDurableOpponent(name, event, profileId, requestKey, latest))
+        .catch(error => console.warn("Salvataggio locale avversario non disponibile", error));
+    };
+    if (typeof requestIdleCallback === "function") requestIdleCallback(persist, {timeout:1000});
+    else setTimeout(persist, 0);
       return data;
     }).finally(() => {
       clearTimeout(timer);

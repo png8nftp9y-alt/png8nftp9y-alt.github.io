@@ -26,7 +26,7 @@ try {
   await page.route('**/*',async route=>{
    const u=new URL(route.request().url()),name=u.pathname.split('/').pop();
    if(u.pathname==='/app')return route.fulfill({body:assets['v3.html'].replace('<head>','<head><base href="https://png8nftp9y-alt.github.io/">'),contentType:'text/html'});
-   if(assets[name])return route.fulfill({body:assets[name],contentType:name.endsWith('.css')?'text/css':'application/javascript'});
+   if(assets[name])return route.fulfill({headers:{'Access-Control-Allow-Origin':'*'},body:assets[name],contentType:name.endsWith('.css')?'text/css':'application/javascript'});
    if(u.pathname.endsWith('/app-snapshot')){
     const group=route.request().headers()['x-courtwatch-group'];assert.ok(['main','others'].includes(group));
     const id=group+'-player',player={id,name:group==='main'?'TCL Player':'Others Player',userAdded:true};

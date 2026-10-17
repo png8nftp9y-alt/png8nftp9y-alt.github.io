@@ -304,7 +304,63 @@
         } catch {}
       })();
     </script>
-    <script src="v3.js?v=20261017-mobile-search-timing-fix"></script>
+    <script id="courtwatchSafariDiagnostics">
+      (function () {
+        if (!/(?:^|[?&])cw-debug=1(?:&|$)/.test(location.search)) return;
+        var rows = [], started = Date.now(), output, panel;
+        function log(message) {
+          rows.push(((Date.now() - started) / 1000).toFixed(1) + 's ' + String(message).replace(/https?:\/\/[^\s]+/g, function (url) {return url.split('?')[0];}));
+          if (rows.length > 60) rows.shift();
+          if (output) output.textContent = rows.join('\n');
+        }
+        function mount() {
+          panel = document.createElement('details'); panel.id = 'cwMobileDiagnostics'; panel.open = true;
+          panel.style.cssText = 'position:fixed;left:6px;right:6px;bottom:6px;z-index:100000;background:white;color:#111;border:2px solid #2477b3;border-radius:10px;padding:10px;font:13px/1.4 monospace;box-shadow:0 4px 20px #0003';
+          var summary = document.createElement('summary');summary.textContent = 'Diagnosi Safari';panel.appendChild(summary);
+          var copy = document.createElement('button');copy.type = 'button';copy.textContent = 'Copia diagnosi';copy.style.cssText = 'min-height:44px;margin:6px 0';
+          output = document.createElement('pre');output.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere;max-height:30vh;overflow:auto;margin:0';
+          copy.onclick = function () {
+            var value = rows.join('\n');
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(value).then(function(){copy.textContent='Copiato';},function(){copy.textContent='Seleziona il testo qui sotto';});
+            else {var range=document.createRange();range.selectNodeContents(output);getSelection().removeAllRanges();getSelection().addRange(range);}
+          };
+          panel.appendChild(copy);panel.appendChild(output);document.body.appendChild(panel);output.textContent = rows.join('\n');
+        }
+        log('Diagnosi versione 20261017-safari-diagnosis');
+        log(navigator.userAgent);
+        addEventListener('error', function (event) {
+          var target = event.target;
+          if (target && target.tagName === 'SCRIPT') log('SCRIPT NON CARICATO: ' + target.getAttribute('src'));
+          else log('ERRORE JS: ' + event.message + ' riga ' + event.lineno + ':' + event.colno);
+        }, true);
+        addEventListener('unhandledrejection', function(event){log('PROMISE: ' + (event.reason && event.reason.message || event.reason));});
+        addEventListener('load',function(event){if(event.target && event.target.tagName==='SCRIPT' && /v3\.js/.test(event.target.src))log('Script applicazione caricato');},true);
+        ['pointerdown','click'].forEach(function(type){document.addEventListener(type,function(event){
+          var target=event.target && event.target.closest && event.target.closest('[data-switch-player-group]');
+          if(target)log('TOCCO ALTRI: '+type+' disabled='+target.disabled);
+        },true);});
+        if (window.fetch) {
+          var originalFetch=window.fetch;
+          window.fetch=function(input,options){
+            var url;try{url=new URL(typeof input==='string'?input:input.url,location.href);}catch(error){return originalFetch.apply(this,arguments);}
+            var watched=url.pathname.indexOf('/app/api/')===0, label=url.pathname;
+            if(watched && options && options.headers && options.headers.get)label+=' gruppo='+options.headers.get('X-CourtWatch-Group');
+            if(watched)log('INVIO '+label);
+            return originalFetch.apply(this,arguments).then(function(response){if(watched)log('RISPOSTA '+label+' HTTP '+response.status+' '+(response.headers.get('content-type')||''));return response;},function(error){if(watched)log('RETE '+label+' '+error.message);throw error;});
+          };
+        }
+        function checkpoint(){
+          try {
+            log('STATO gruppo='+(typeof PLAYER_GROUP==='undefined'?'non avviato':PLAYER_GROUP)+' cambio='+(typeof groupSwitchRunning==='undefined'?'-':groupSwitchRunning)+' dati='+(typeof state==='undefined'||!state.data?'assenti':state.data.players.length+' giocatori')+' caricamento='+(typeof loadRunning==='undefined'?'-':loadRunning));
+            var button=document.querySelector('#homeOthers:not([hidden]), main.view.active [data-switch-player-group]');
+            if(button){var r=button.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);log('TASTO '+Math.round(r.width)+'x'+Math.round(r.height)+' coperto='+(hit&&!button.contains(hit)?hit.tagName+'.'+hit.className:'no'));}
+          } catch(error){log('STATO '+error.message);}
+        }
+        [1000,5000,15000,45000].forEach(function(ms){setTimeout(checkpoint,ms);});
+        if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
+      })();
+    </script>
+    <script crossorigin="anonymous" src="v3.js?v=20261017-safari-diagnosis"></script>
   </body>
 </html>
 
