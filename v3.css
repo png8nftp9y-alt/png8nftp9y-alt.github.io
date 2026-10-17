@@ -566,3 +566,28 @@ button,a,[role="link"],summary{touch-action:manipulation}
   .unifiedMatchRow>.matchAnalysisButton{top:10px;transform:none;min-height:32px}
   .profileTournamentHead .tournamentStats{flex-wrap:wrap}
 }
+
+/* Agenda dropdown filters and contrasting tournament headers. */
+.agendaCard{overflow:visible}
+.agendaFilters{display:flex;flex-wrap:wrap;gap:10px;padding:10px 15px;border-bottom:1px solid var(--line)}
+.agendaFilter{position:relative;min-width:0;max-width:100%}
+.agendaFilter summary{border:1px solid var(--line);border-radius:8px;background:#fff;padding:9px 12px;cursor:pointer;font-weight:700;overflow-wrap:anywhere;min-height:42px}
+.agendaFilter summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.agendaFilter summary span{font-size:12px;color:var(--muted)}
+.agendaFilterMenu{position:absolute;z-index:45;top:calc(100% + 5px);left:0;width:320px;max-width:calc(100vw - 52px);padding:10px;border:1px solid var(--line);border-radius:9px;background:#fff;box-shadow:0 8px 22px rgba(0,0,0,.14)}
+.agendaFilterActions{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.agendaFilterActions .btn{font-size:12px;min-height:40px}
+.agendaPlayerOptions{max-height:300px;max-height:min(300px,45dvh);overflow-y:auto;overscroll-behavior:contain}
+.agendaPlayerOptions label,.agendaCategoryOptions label{display:flex;align-items:center;gap:8px;padding:9px 5px;min-height:42px;cursor:pointer}
+.agendaPlayerOptions label:hover{background:var(--blueSoft)}
+.agendaPlayerOptions span{min-width:0;overflow-wrap:anywhere}
+.agendaPlayerOptions .filteredOut{color:var(--muted)}
+.agendaFilter input[type=checkbox]{flex:0 0 auto;width:18px;height:18px;margin:0;accent-color:var(--blue)}
+.agendaCategoryOptions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;border:0;padding:0;margin:0 0 10px;min-width:0}
+.agendaCategoryOptions legend{font-weight:700;padding:0}
+.agendaSexLabel{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-weight:700}
+.agendaSexLabel select{min-width:0;flex:1;font:inherit;font-size:16px;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.agendaTournamentBlock .agendaTournamentHead,.agendaTournamentBlock.fitp .agendaTournamentHead,.agendaTournamentBlock.tennis-europe .agendaTournamentHead,.agendaTournamentBlock.itf .agendaTournamentHead,.agendaChronologicalTournament{background:#e9edf3;border-bottom:1px solid #d4dbe5}
+.agendaTournamentHead h3 button,.agendaTournamentHead h3 span,.agendaTournamentBlock.fitp .agendaTournamentHead h3 button,.agendaTournamentBlock.fitp .agendaTournamentHead h3 span,.agendaTournamentBlock.tennis-europe .agendaTournamentHead h3 button,.agendaTournamentBlock.tennis-europe .agendaTournamentHead h3 span,.agendaTournamentBlock.itf .agendaTournamentHead h3 button,.agendaTournamentBlock.itf .agendaTournamentHead h3 span{color:#3b4454}
+.agendaTournamentMatches .agendaItem{background:#fff}
+@media(max-width:650px){.agendaFilter{flex:1 1 100%}.agendaFilterMenu{width:100%;max-width:100%}.agendaFilters{padding:10px}.agendaFilter summary{font-size:13px}}

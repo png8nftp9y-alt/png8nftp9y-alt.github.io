@@ -1,16 +1,17 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {chromium} from 'playwright';
+import {chromium,webkit} from 'playwright';
 
 const assets=Object.fromEntries(await Promise.all(['v3.html','v3.css','v3.js'].map(async name=>[name,await readFile(new URL('../'+name,import.meta.url),'utf8')])));
 const players=[
  {id:'layout-a',name:'Alexandre Maximilien de la Rochefoucauld'},
  {id:'layout-b',name:'Maria Alexandra Constantinopoulos'},
  {id:'layout-c',name:'Jean-Baptiste LongUnbrokenSurnameForLayoutVerification'},
-].map(p=>({...p,userAdded:true}));
+].map((p,i)=>({...p,userAdded:true,birthYear:i===1?2014:2012,sex:i===1?'M':'F'}));
 const tournament={competitionId:'layout-europe',name:'International European Junior Championship with a long tournament name',location:'Saint-Georges-de-Commiers, Francia',circuit:'tennis-europe',startDate:'2026-09-20',endDate:'2026-09-27',surface:'Clay',environment:'Outdoor'};
 const matches=players.map((p,i)=>({id:'layout-match-'+i,playerId:p.id,playerName:p.name,competitionId:tournament.competitionId,tournamentName:tournament.name,circuit:'tennis-europe',date:'2026-09-21',time:'10:30',court:i===0?'Campo centrale internazionale Saint-Georges-de-Commiers':'Court '+(i+1),courtMatchNumber:2,playerNationality:'FRA',playerTeRanking:1234,partnerNationalities:['NED'],partnerTeRankings:[234],opponentNationalities:['GER','ESP'],opponentTeRankings:[100,1000],event:i===1?'GD14 - Girls Doubles 14 Main Draw':'GS14 - Girls Singles 14 Main Draw',round:'Quarter final',matchType:i===1?'doubles':'singles',partner:i===1?'Anastasia Marie-Louise Papadopoulou':'',opponent:i===1?'VeryLongOpponentSurnameWithoutSpaces / Alexandra Constantinopoulos':'Alexandra Maria de la Rochefoucauld',score:'6-7(12) 7-6(10) 10-8',result:'6-7(12) 7-6(10) 10-8',advances:i!==1}));
-const browser=await chromium.launch({headless:true,executablePath:process.env.COURTWATCH_TEST_CHROMIUM||undefined});
+const engine=process.env.COURTWATCH_LAYOUT_BROWSER==='webkit'?webkit:chromium;
+const browser=await engine.launch({headless:true,executablePath:engine===chromium?process.env.COURTWATCH_TEST_CHROMIUM||undefined:undefined});
 try{
  for(const group of ['main','others']){
   const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(String(e)));
@@ -24,10 +25,59 @@ try{
   });
   await page.goto('http://courtwatch.test/v3.html?group='+group+'#agenda');
   await page.waitForFunction(()=>typeof state!=='undefined'&&state.data?.players?.some(p=>p.id==='layout-a')&&!loadRunning);
+  // Exercise the actual date link, shared dropdown filters and reload persistence.
+  for(const width of [320,390,1280]){
+   await page.setViewportSize({width,height:1000});
+   await page.evaluate(()=>{state.month=new Date(2026,8,1,12);location.hash='calendar';renderHome();});
+   await page.locator('.calDay[data-date="2026-09-21"]').click();
+   await page.waitForFunction(()=>location.hash==='#agenda'&&document.querySelector('#agendaView.active'));
+   assert.equal(await page.evaluate(()=>iso(state.agenda)),'2026-09-21');
+   assert.equal(await page.locator('#dailyAgenda .agendaItem').count(),3);
+   await page.locator('#agendaDemographicFilter summary').click();
+   await page.locator('#agendaDemographicFilter [value="U14"]').check();
+   await page.locator('#agendaSex').selectOption('F');
+   assert.equal(await page.locator('#dailyAgenda .agendaItem').count(),2);
+   assert.equal(await page.locator('#calendarSex').inputValue(),'F');
+   assert.equal(await page.locator('#calendarCategory [value="U14"]').isChecked(),true);
+   await page.locator('#agendaPlayerFilter summary').click();
+   await page.waitForFunction(()=>!document.querySelector('#agendaDemographicFilter').open);
+   await page.locator('[data-agenda-player="layout-a"]').uncheck();
+   assert.equal(await page.locator('#dailyAgenda .agendaItem').count(),1);
+   assert.deepEqual(await page.evaluate(()=>[...state.selected]),['layout-c']);
+   assert.equal(await page.locator('#playerFilters [data-filter="layout-c"]').getAttribute('class'),'chip selected');
+   const menuBounds=await page.locator('#agendaPlayerFilter .agendaFilterMenu').boundingBox();
+   assert.ok(menuBounds.x>=0&&menuBounds.x+menuBounds.width<=width+1,`dropdown must fit ${width}px`);
+   await page.keyboard.press('Escape');
+   assert.equal(await page.locator('#agendaPlayerFilter').getAttribute('open'),null);
+   await page.reload();
+   await page.waitForFunction(()=>typeof state!=='undefined'&&state.data&&!loadRunning);
+   assert.equal(await page.evaluate(()=>iso(state.agenda)),'2026-09-21');
+   assert.equal(await page.locator('#dailyAgenda .agendaItem').count(),1);
+   assert.deepEqual(await page.evaluate(()=>[...state.selected]),['layout-c']);
+   await page.locator('#agendaPlayerFilter summary').click();
+   await page.locator('#agendaSelectAll').click();
+   assert.equal(await page.locator('#dailyAgenda .agendaItem').count(),3);
+   assert.equal(await page.locator('#agendaSex').inputValue(),'all');
+   await page.locator('#agendaDeselectAll').click();
+   assert.equal(await page.locator('#dailyAgenda .agendaItem').count(),0);
+   await page.locator('#agendaSelectAll').click();
+   await page.locator('#agendaPlayerFilter summary').click();
+   await page.locator('#agendaDemographicFilter summary').click();
+   await page.locator('#agendaDemographicFilter [value="U12"]').check();
+   assert.equal(await page.locator('#dailyAgenda .agendaItem').count(),1);
+   await page.locator('#agendaResetDemographics').click();
+   assert.equal(await page.locator('#dailyAgenda .agendaItem').count(),3);
+   await page.locator('#agendaDemographicFilter summary').click();
+  }
   for(const mode of ['chronological','tournament'])for(const width of [320,375,390,650,768,900,1000,1280,1440]){
    await page.setViewportSize({width,height:1000});
    await page.evaluate(({matches,mode})=>{state.agenda=new Date(2026,8,21,12);state.agendaMode=mode;state.data.agenda=matches;state.selected=new Set(matches.map(m=>m.playerId));renderAgenda();},{matches,mode});
    assert.equal(await page.locator('#dailyAgenda .agendaItem').count(),3);
+   assert.equal(await page.evaluate(()=>{
+    const header=document.querySelector('#dailyAgenda .agendaTournamentHead,#dailyAgenda .agendaChronologicalTournament');
+    const match=document.querySelector('#dailyAgenda .agendaItem');
+    return Boolean(header&&match&&getComputedStyle(header).backgroundColor!==getComputedStyle(match).backgroundColor);
+   }),true,`${group}/${mode}: tournament and match rows need different backgrounds`);
    const problems=await page.evaluate(()=>{
     const bad=[],visible=e=>e.getClientRects().length>0,inside=(a,b)=>a.left>=b.left-1&&a.right<=b.right+1&&a.top>=b.top-1&&a.bottom<=b.bottom+1;
     const root=document.querySelector('#dailyAgenda');
@@ -56,6 +106,6 @@ try{
    assert.deepEqual(problems,[],`${group}/${mode}/${width}px: ${problems.join('; ')}`);
    if(process.env.COURTWATCH_LAYOUT_CAPTURE&&group==='others'&&mode==='tournament'&&[390,1280].includes(width))await page.screenshot({path:process.env.COURTWATCH_LAYOUT_CAPTURE+'-'+width+'.png',fullPage:true});
   }
-  assert.deepEqual(errors,[]);console.log(JSON.stringify({group,agendaDate:'2026-09-21',modes:2,widths:9,longNames:'passed',courtLabels:'passed',doubles:'passed',noTextOverlap:'passed'}));await page.close();
+  assert.deepEqual(errors,[]);console.log(JSON.stringify({group,engine:engine.name(),agendaDate:'2026-09-21',modes:2,widths:9,dropdownPlayers:'passed',demographicFilters:'passed',calendarDayLink:'passed',filterReload:'passed',contrastingHeaders:'passed',longNames:'passed',courtLabels:'passed',doubles:'passed',noTextOverlap:'passed'}));await page.close();
  }
 }finally{await browser.close();}

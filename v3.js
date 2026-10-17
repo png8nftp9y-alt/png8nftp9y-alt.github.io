@@ -1779,6 +1779,75 @@ function renderFilters() {
       renderHome();
     };
   });
+  renderAgendaFilters(all, eligibleIds);
+}
+function renderAgendaFilters(players, eligibleIds) {
+  const options = $("agendaPlayerOptions");
+  if (!options) return;
+  const selectedCount = players.filter((player) => state.selected.has(player.id)).length;
+  $("agendaPlayerFilterLabel").textContent = !selectedCount ? "Nessuno" : selectedCount === players.length ? "Tutti" : `${selectedCount} di ${players.length}`;
+  $("agendaDemographicFilterLabel").textContent = [
+    state.categoryFilters.size ? [...state.categoryFilters].join(", ") : "Tutte le categorie",
+    state.sexFilter === "M" ? "Maschile" : state.sexFilter === "F" ? "Femminile" : "Tutti i sessi",
+  ].join(" · ");
+  $("agendaSex").value = state.sexFilter;
+  const markup = players.map((player) => `<label class="${eligibleIds.has(player.id) ? "" : "filteredOut"}"><input type="checkbox" data-agenda-player="${esc(player.id)}" ${state.selected.has(player.id) ? "checked" : ""} /> <span>${esc(readablePerson(player.name))}</span></label>`).join("") || '<p class="empty">Nessun giocatore presente.</p>';
+  // Keep the focused checkbox in place during periodic data refreshes.
+  if (options.courtWatchFilterMarkup !== markup) {
+    const focused = options.contains?.(document.activeElement) ? document.activeElement.dataset.agendaPlayer : null;
+    const scrollTop = options.scrollTop;
+    options.innerHTML = markup;
+    options.courtWatchFilterMarkup = markup;
+    options.scrollTop = scrollTop;
+    if (focused) [...options.querySelectorAll("[data-agenda-player]")].find((input) => input.dataset.agendaPlayer === focused)?.focus({preventScroll: true});
+  }
+  document.querySelectorAll("[data-agenda-player]").forEach((input) => {
+    input.onchange = () => {
+      if (input.checked && !eligibleIds.has(input.dataset.agendaPlayer)) clearDemographicFilters();
+      input.checked ? state.selected.add(input.dataset.agendaPlayer) : state.selected.delete(input.dataset.agendaPlayer);
+      saveUiState();
+      renderHome();
+    };
+  });
+}
+function wireAgendaFilters() {
+  $("agendaSelectAll").onclick = () => {
+    clearDemographicFilters();
+    state.selected = new Set((state.data?.players || []).map((player) => player.id));
+    saveUiState();
+    renderHome();
+  };
+  $("agendaDeselectAll").onclick = () => {
+    state.selected.clear();
+    saveUiState();
+    renderHome();
+  };
+  $("agendaSex").onchange = () => {
+    state.sexFilter = $("agendaSex").value;
+    applyDemographicSelection();
+    saveUiState();
+    renderHome();
+  };
+  $("agendaResetDemographics").onclick = () => {
+    clearDemographicFilters();
+    applyDemographicSelection();
+    saveUiState();
+    renderHome();
+  };
+  const menus = [...document.querySelectorAll(".agendaFilter")];
+  for (const menu of menus) menu.addEventListener("toggle", () => {
+    if (menu.open) for (const other of menus) if (other !== menu) other.open = false;
+  });
+  document.addEventListener("click", (event) => {
+    for (const menu of menus) if (!menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    for (const menu of menus) if (menu.open) {
+      menu.open = false;
+      menu.querySelector("summary").focus();
+    }
+  });
 }
 function matchTournament(m) {
   return groups(false).find(
@@ -2420,6 +2489,7 @@ function renderCalendar() {
         state.agenda = new Date(x.dataset.date + "T12:00:00");
         syncMonthFromAgenda();
         renderSynchronizedDates();
+        location.hash = "agenda";
         requestAnimationFrame(() => scrollTo({ top: 0, behavior: "smooth" }));
       }),
   );
@@ -4307,6 +4377,7 @@ function wire() {
     saveUiState();
     renderAgenda();
   };
+  wireAgendaFilters();
   document.querySelectorAll("[data-category-filter]").forEach(
     (input) =>
       (input.onchange = () => {
@@ -4315,8 +4386,7 @@ function wire() {
           : state.categoryFilters.delete(input.value);
         applyDemographicSelection();
         saveUiState();
-        renderFilters();
-        renderCalendar();
+        renderHome();
       }),
   );
   $("prevCalendarMonth").onclick = () => {
@@ -4338,8 +4408,7 @@ function wire() {
     state.sexFilter = $("calendarSex").value;
     applyDemographicSelection();
     saveUiState();
-    renderFilters();
-    renderCalendar();
+    renderHome();
   };
   $("prevAgendaMonth").onclick = () => {
     moveBothToMonth(state.agenda.getFullYear(), state.agenda.getMonth() - 1);

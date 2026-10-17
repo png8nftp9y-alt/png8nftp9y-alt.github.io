@@ -2,7 +2,7 @@ name: Court Watch mobile browser
 on:
   push:
     branches: [main]
-    paths: ['src/v3/opponent-navigation-storage.test.mjs', 'tools/verify-safari-diagnostics-browser.mjs', 'src/v3/ui-state-validation.test.mjs', 'tools/verify-mobile-group-startup-browser.mjs', 'v3.js', 'v3.css', 'v3.html', 'src/v3/mobile-interactions.test.mjs', 'tools/verify-mobile-browser.mjs', '.github/workflows/courtwatch-mobile-browser.yml']
+    paths: ['tools/verify-agenda-layout-browser.mjs', 'src/v3/opponent-navigation-storage.test.mjs', 'tools/verify-safari-diagnostics-browser.mjs', 'src/v3/ui-state-validation.test.mjs', 'tools/verify-mobile-group-startup-browser.mjs', 'v3.js', 'v3.css', 'v3.html', 'src/v3/mobile-interactions.test.mjs', 'tools/verify-mobile-browser.mjs', '.github/workflows/courtwatch-mobile-browser.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,6 +17,10 @@ jobs:
       - run: npm install --no-package-lock
       - run: npx playwright install --with-deps chromium webkit
       - run: node --test src/v3/mobile-interactions.test.mjs src/v3/ui-state-validation.test.mjs src/v3/opponent-navigation-storage.test.mjs
+      - run: node tools/verify-agenda-layout-browser.mjs
+      - run: node tools/verify-agenda-layout-browser.mjs
+        env:
+          COURTWATCH_LAYOUT_BROWSER: webkit
       - run: node tools/verify-mobile-browser.mjs
       - run: node tools/verify-mobile-browser.mjs
         env:

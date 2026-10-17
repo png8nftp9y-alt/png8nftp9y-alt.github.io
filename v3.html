@@ -23,7 +23,7 @@
     <link rel="preload" as="fetch" href="https://png8nftp9y-alt.github.io/dist/v3/tournament_entries.json" crossorigin="anonymous" />
     <link rel="preload" as="fetch" href="https://png8nftp9y-alt.github.io/dist/v3/results.json" crossorigin="anonymous" />
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=20261017-mobile-complete" />
+    <link rel="stylesheet" href="v3.css?v=20261018-agenda-filters" />
   </head>
   <body>
     <div class="shell">
@@ -126,6 +126,40 @@
                 ≫
               </button>
             </div>
+          </div>
+          <div class="agendaFilters" aria-label="Filtri agenda">
+            <details class="agendaFilter" id="agendaPlayerFilter">
+              <summary>Giocatori: <span id="agendaPlayerFilterLabel">Tutti</span></summary>
+              <div class="agendaFilterMenu">
+                <div class="agendaFilterActions">
+                  <button type="button" class="btn" id="agendaSelectAll">Seleziona tutti</button>
+                  <button type="button" class="btn" id="agendaDeselectAll">Deseleziona tutti</button>
+                </div>
+                <div id="agendaPlayerOptions" class="agendaPlayerOptions"></div>
+              </div>
+            </details>
+            <details class="agendaFilter" id="agendaDemographicFilter">
+              <summary>Categoria e sesso: <span id="agendaDemographicFilterLabel">Tutti</span></summary>
+              <div class="agendaFilterMenu">
+                <fieldset class="agendaCategoryOptions">
+                  <legend>Categoria</legend>
+                  <label><input type="checkbox" value="U10" data-category-filter /> U10</label>
+                  <label><input type="checkbox" value="U12" data-category-filter /> U12</label>
+                  <label><input type="checkbox" value="U14" data-category-filter /> U14</label>
+                  <label><input type="checkbox" value="U16" data-category-filter /> U16</label>
+                  <label><input type="checkbox" value="U18" data-category-filter /> U18</label>
+                  <label><input type="checkbox" value="O18" data-category-filter /> O18</label>
+                </fieldset>
+                <label class="agendaSexLabel">Sesso
+                  <select id="agendaSex" aria-label="Filtra agenda per sesso">
+                    <option value="all">Tutti</option>
+                    <option value="M">Maschile</option>
+                    <option value="F">Femminile</option>
+                  </select>
+                </label>
+                <button type="button" class="btn" id="agendaResetDemographics">Tutte le categorie e i sessi</button>
+              </div>
+            </details>
           </div>
           <div id="datePopover" class="datePopover" hidden></div>
           <div id="dailyAgenda"></div>
@@ -360,7 +394,7 @@
         if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
       })();
     </script>
-    <script crossorigin="anonymous" src="v3.js?v=20261017-safari-diagnosis"></script>
+    <script crossorigin="anonymous" src="v3.js?v=20261018-agenda-filters"></script>
   </body>
 </html>
 
