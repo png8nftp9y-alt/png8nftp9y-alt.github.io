@@ -35,8 +35,9 @@ export function releasePlan(documents,sourceCommit,previous=null){
  const fingerprint=hash(JSON.stringify(manifest));
  const old=previous?JSON.parse(previous):null;
  if(old?.fingerprint===fingerprint)return {changed:false,manifest,previous,sql:[]};
- const value=JSON.stringify({version:1,sourceCommit,fingerprint,documents:manifest,verifiedAt:new Date().toISOString()});
+ const stamp=new Date().toISOString();
+ const value=JSON.stringify({version:1,sourceCommit,fingerprint,documents:manifest,verifiedAt:stamp});
  const plan=buildIncrementalSyncPlan({current:previous?[{key:'runtimeDocumentRelease',value:previous}]:[],incoming:[{key:'runtimeDocumentRelease',value}],keyOf:x=>x.key,sourceComplete:true});
- const sql=plan.inserts.length?[`INSERT INTO app_state(key,value) VALUES('runtimeDocumentRelease',${quote(value)}) ON CONFLICT(key) DO NOTHING;`]:[`UPDATE app_state SET value=${quote(value)} WHERE key='runtimeDocumentRelease' AND value=${quote(previous)};`];
+ const sql=plan.inserts.length?[`INSERT INTO app_state(key,value,updated_at) VALUES('runtimeDocumentRelease',${quote(value)},${quote(stamp)}) ON CONFLICT(key) DO NOTHING;`]:[`UPDATE app_state SET value=${quote(value)},updated_at=${quote(stamp)} WHERE key='runtimeDocumentRelease' AND value=${quote(previous)};`];
  return {changed:true,manifest,value,previous,sql};
 }

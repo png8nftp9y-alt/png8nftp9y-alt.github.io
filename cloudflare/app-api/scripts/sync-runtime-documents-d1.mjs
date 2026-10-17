@@ -3,12 +3,14 @@ import fs from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {RUNTIME_DOCUMENT_FILES,encodeDocument,decodeDocument,versionStatements,releasePlan} from '../lib/runtime-document-plan.mjs';
+const failureReport={status:'failed',stage:'preflight',verifiedDocuments:0,cutoverEnabled:false};
+try{
 const root=fileURLToPath(new URL('../../../',import.meta.url));
 const sourceCommit=execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();
 const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
 if(!account||!token)throw Error('runtime_d1_credentials_missing');
 const endpoint=`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database`;
-async function cf(path,body){const response=await fetch(endpoint+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(60000)});const result=await response.json();if(!response.ok||!result.success)throw Error('runtime_d1_request_failed:'+response.status);return result.result;}
+async function cf(path,body){const response=await fetch(endpoint+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(60000)});const result=await response.json();if(!response.ok||!result.success)throw Object.assign(Error('runtime_d1_request_failed:'+response.status),{cloudflareCodes:(result.errors||[]).map(e=>e.code)});return result.result;}
 const db=(await cf('?name=courtwatch-app&per_page=100')).find(d=>d.name==='courtwatch-app');
 if(!db)throw Error('Existing database required; no database created');
 const metrics={rowsRead:0,rowsWritten:0};
@@ -21,6 +23,7 @@ if(previous){const old=JSON.parse(previous);if(old.sourceCommit!==sourceCommit){
 await query('CREATE TABLE IF NOT EXISTS runtime_document_chunks(path TEXT NOT NULL,content_hash TEXT NOT NULL,seq INTEGER NOT NULL,data TEXT NOT NULL,PRIMARY KEY(path,content_hash,seq)) WITHOUT ROWID');
 const plan=releasePlan(documents,sourceCommit,previous);
 let insertedVersions=0,unchangedVersions=0;
+failureReport.stage='content_verification';
 for(const d of documents){
  const stored=await query('SELECT seq,data FROM runtime_document_chunks WHERE path=? AND content_hash=? ORDER BY seq',[d.path,d.hash]);
  const existing=stored.length?stored.map(r=>r.data):null;
@@ -31,11 +34,20 @@ for(const d of documents){
  else{for(const sql of versionStatements(d,null))await query(sql);insertedVersions++;}
  const check=await query('SELECT seq,data FROM runtime_document_chunks WHERE path=? AND content_hash=? ORDER BY seq',[d.path,d.hash]);
  decodeDocument({...d,chunks:d.chunks.length},check.map(r=>r.data));
+ failureReport.verifiedDocuments++;
 }
 // Publish one release pointer only AFTER every document's full-content readback.
+failureReport.stage='release_publication';
 for(const sql of plan.sql)await query(sql);
 const actual=(await query("SELECT value FROM app_state WHERE key='runtimeDocumentRelease'"))[0]?.value;
 const expected=plan.changed?plan.value:previous;if(actual!==expected)throw Error('Runtime release pointer conflict');
 const report={status:'verified',sourceCommit,verifiedDocuments:documents.length,insertedVersions,unchangedVersions,releaseChanged:plan.changed,metrics,documents:plan.manifest,cutoverEnabled:false};
 await fs.mkdir(root+'dist/v3/audits',{recursive:true});await fs.writeFile(root+'dist/v3/audits/runtime-documents-d1.json',JSON.stringify(report,null,2)+'\n');
 console.log('RUNTIME_DOCUMENTS_D1='+JSON.stringify(report));
+
+}catch(error){
+ const report={...failureReport,error:error.message,cloudflareCodes:error.cloudflareCodes||[]};
+ const folder=fileURLToPath(new URL('../../../dist/v3/audits/',import.meta.url));
+ await fs.mkdir(folder,{recursive:true});await fs.writeFile(folder+'runtime-documents-d1.json',JSON.stringify(report,null,2)+'\n');
+ console.error('RUNTIME_DOCUMENTS_D1_FAILED='+JSON.stringify(report));process.exitCode=1;
+}
