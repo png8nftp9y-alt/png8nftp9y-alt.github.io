@@ -5953,3 +5953,5 @@ Validazione: 80 test Node passati; nuovo browser test touch Chromium con base es
 
 ## 2026-10-17 — Fixture cambio gruppo compatibile con validUiState
 - La fixture carica la vera validUiState e fornisce window per lo storage. Corretti i test delle preferenze TCL/Altri; comportamento app invariato.
+
+ITF discovery 2026-10-17T16:00:36.798Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
