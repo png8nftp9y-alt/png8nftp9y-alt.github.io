@@ -379,7 +379,8 @@ export default{
   async fetch(request,env,ctx){
     env={...env,RUNTIME_DOCUMENTS:runtimeDocumentReader(env.DB)};
     try{
-      if(['/v3.js','/v3.css'].includes(new URL(request.url).pathname))return env.ASSETS.fetch(request);
+      const assetPath=new URL(request.url).pathname;
+      if(['/v3.js','/v3.css'].includes(assetPath)||(['GET','HEAD'].includes(request.method)&&/^\/flags\/(?:[a-z]{2}|mx-flat)\.svg$/.test(assetPath)))return env.ASSETS.fetch(request);
       if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
       const url=new URL(request.url),path=url.pathname.replace(/\/$/,'');
       if(path==='/app'||path.startsWith('/app-api/')||path.startsWith('/app/api/')){

@@ -8,6 +8,9 @@ on:
       - 'cloudflare/app-api/src/index.js'
       - 'cloudflare/app-api/lib/**'
       - 'cloudflare/app-api/test/**'
+      - 'cloudflare/app-api/scripts/prepare-runtime-assets.mjs'
+      - 'cloudflare/app-api/scripts/verify-static-flags.mjs'
+      - 'flags/**'
       - '.github/workflows/courtwatch-cloudflare-app-hotfix.yml'
       - 'v3.js'
       - 'v3.css'
@@ -51,6 +54,8 @@ jobs:
         run: node scripts/sync-runtime-documents-d1.mjs
       - name: Deploy Worker only
         run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
+      - name: Verify deployed nationality flags
+        run: node scripts/verify-static-flags.mjs
       - name: Verify protected app no Worker exception
         working-directory: .
         run: |
