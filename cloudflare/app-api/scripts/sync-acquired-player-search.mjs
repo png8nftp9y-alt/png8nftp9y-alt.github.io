@@ -1,3 +1,4 @@
+import {cachedReadCheck,readCheckVersion} from '../lib/d1-read-check-cache.mjs';
 import fs from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 import {acquiredPlayer,documentPlayers,searchPlayerSql,acquiredSearchPlan} from '../lib/acquired-player-index.mjs';
@@ -26,8 +27,9 @@ export async function syncAcquiredSearch(query){
  return{status:'verified_indexed_sources',documentsProcessed,matchesProcessed,playerWritesRequested,generatedAt:new Date().toISOString()};
 }
 async function main(){
+ const metrics={queries:0,rowsRead:0,rowsWritten:0};
  const config=JSON.parse(await fs.readFile('wrangler.generated.jsonc','utf8')),db=config.d1_databases.find(x=>x.binding==='DB').database_id;
- async function query(sql){for(let attempt=0;attempt<3;attempt++)try{const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/d1/database/${db}/query`,{method:'POST',headers:{Authorization:`Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)}),j=await r.json();if(!r.ok||j.success!==true||!j.result?.every(x=>x.success))throw Error('D1 search sync failed: HTTP '+r.status);return j.result[0].results||[]}catch(e){if(attempt===2)throw e}}
- const audit=await syncAcquiredSearch(query);await fs.mkdir('tmp',{recursive:true});await fs.writeFile('tmp/acquired-search-sync.json',JSON.stringify(audit)+'\n');console.log(JSON.stringify(audit));
+ async function query(sql){for(let attempt=0;attempt<3;attempt++)try{const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/d1/database/${db}/query`,{method:'POST',headers:{Authorization:`Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,'Content-Type':'application/json'},body:JSON.stringify({sql}),signal:AbortSignal.timeout(60000)}),j=await r.json();if(!r.ok||j.success!==true||!j.result?.every(x=>x.success))throw Error('D1 search sync failed: HTTP '+r.status);for(const r of j.result){metrics.rowsRead+=Number(r.meta?.rows_read||0);metrics.rowsWritten+=Number(r.meta?.rows_written||0)}metrics.queries+=j.result.length;return j.result[0].results||[]}catch(e){if(attempt===2)throw e}}
+ const checked=await cachedReadCheck(query,'search-sources',await readCheckVersion(),()=>syncAcquiredSearch(query));const audit=checked.reused?{status:'verified_unchanged_sources',documentsProcessed:0,matchesProcessed:0,playerWritesRequested:0,verifiedAt:checked.verifiedAt}:checked.value;audit.d1Metrics=metrics;await fs.mkdir('tmp',{recursive:true});await fs.writeFile('tmp/acquired-search-sync.json',JSON.stringify(audit)+'\n');console.log(JSON.stringify(audit));
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();

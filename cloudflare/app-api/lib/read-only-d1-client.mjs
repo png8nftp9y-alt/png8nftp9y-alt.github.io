@@ -5,7 +5,7 @@ export function createReadOnlyD1Client(execute){
  const db={prepare(sql){const statement={bind(...params){return{all:async()=>({results:await query(sql,params)}),first:async()=>(await query(sql,params))[0]||null}},all:async()=>({results:await query(sql)}),first:async()=>(await query(sql))[0]||null};return statement;}};
  return{query,db};
 }
-export async function openReadOnlyD1({fetcher=globalThis.fetch,databaseId=process.env.CLOUDFLARE_D1_DATABASE_ID||''}={}){
+export async function openReadOnlyD1({fetcher=globalThis.fetch,databaseId=process.env.CLOUDFLARE_D1_DATABASE_ID||'',onMetrics}={}){
  const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
  if(!account||!token)throw Error('diagnostic_credentials_missing');
  if(databaseId&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(databaseId))throw Error('diagnostic_invalid_database_id');
@@ -21,5 +21,5 @@ export async function openReadOnlyD1({fetcher=globalThis.fetch,databaseId=proces
   throw Error(`diagnostic_d1_request_failed:http_${response.status}:codes_${codes.join(',')||'none'}`);
  }
  let id=databaseId;if(!id){const list=await cf('?name=courtwatch-app&per_page=100');if(!Array.isArray(list))throw Error('diagnostic_invalid_database_list');const database=list.find(d=>d.name==='courtwatch-app');if(!database)throw Error('diagnostic_database_missing');id=database.uuid||database.id;if(!id)throw Error('diagnostic_database_id_missing');}
- return createReadOnlyD1Client(async(sql,params)=>{const rows=await cf(`/${id}/query`,{sql,params});if(!Array.isArray(rows))throw Error('diagnostic_invalid_query_result');if(!rows.every(r=>r.success))throw Error('diagnostic_query_failed');return rows[0]?.results||[];});
+ return createReadOnlyD1Client(async(sql,params)=>{const rows=await cf(`/${id}/query`,{sql,params});if(!Array.isArray(rows))throw Error('diagnostic_invalid_query_result');if(!rows.every(r=>r.success))throw Error('diagnostic_query_failed');if(onMetrics)onMetrics(rows);return rows[0]?.results||[];});
 }

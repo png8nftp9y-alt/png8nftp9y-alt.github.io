@@ -21,10 +21,11 @@ export async function exportOpponentEntryState(query,{pageSize=5000}={}){
  return{rows};
 }
 async function main(){
- const {query}=await openReadOnlyD1();
+ const metrics={queries:0,rowsRead:0,rowsWritten:0};
+ const {query}=await openReadOnlyD1({onMetrics:results=>{for(const r of results){if(!Number.isFinite(r.meta?.rows_read)||!Number.isFinite(r.meta?.rows_written))throw Error('opponent_export_metrics_unavailable');metrics.queries++;metrics.rowsRead+=r.meta.rows_read;metrics.rowsWritten+=r.meta.rows_written;}}});
  const state=await exportOpponentEntryState(query);
  const output='tmp/opponent-entry-remote.json';
  await fs.mkdir('tmp',{recursive:true});await fs.writeFile(output,JSON.stringify(state,null,2)+'\n');
- console.log(JSON.stringify({status:'opponent_entry_remote_state_ready',profiles:state.rows.length,output}));
+ console.log(JSON.stringify({status:'opponent_entry_remote_state_ready',profiles:state.rows.length,output,metrics}));
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await main();

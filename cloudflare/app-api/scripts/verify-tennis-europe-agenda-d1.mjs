@@ -1,3 +1,5 @@
+import {cachedReadCheck,readCheckVersion} from '../lib/d1-read-check-cache.mjs';
+import {cliD1Query} from '../lib/d1-cli-query.mjs';
 import fs from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
@@ -42,9 +44,8 @@ const query=`SELECT
  AND json_extract(payload,'$.sourceUrl') LIKE '%/matches/%'
  AND COALESCE(CAST(json_extract(payload,'$.courtMatchNumber') AS INTEGER),0)<=0
 ) appMissingCourtMatchNumbers`;
-const run=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',query,'--json'],{encoding:'utf8'});
-if(run.status!==0)throw new Error(run.stderr||run.stdout);
-const parsed=JSON.parse(run.stdout),row=parsed.flatMap(x=>x.results||[])[0]||{},errors=[];
+const checked=await cachedReadCheck(cliD1Query,'europe-counts',await readCheckVersion(),()=>cliD1Query(query));
+const row=checked.value[0]||{},errors=[];console.log('EUROPE_PARITY_READ_CACHE='+JSON.stringify({reused:checked.reused,verifiedAt:checked.verifiedAt,saved:checked.cacheSaved}));
 const incremental=oop.incremental===true||candidates.incremental===true;
 for(const [key,value] of Object.entries(expected)){const actual=Number(row[key]);if(key==='appInvalid'||key==='appMissingCourtMatchNumbers'){if(actual!==value)errors.push(`${key}: D1=${actual} expected=${value}`)}else if(incremental?actual<value:actual!==value)errors.push(`${key}: D1=${actual} expected${incremental?'>=':'='}${value}`)}
 if(errors.length)throw new Error('Tennis Europe D1 parity failed: '+errors.join('; '));

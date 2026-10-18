@@ -1,3 +1,4 @@
+import {cachedReadCheck,readCheckVersion} from '../lib/d1-read-check-cache.mjs';
 import fs from 'node:fs/promises';
 import {recoverCircuitNativeSources,circuitOfficialJson,circuitMissingNativeSourcesSql} from '../lib/circuit-native-source-recovery.mjs';
 import {syncPlayerIdentities,addD1Metrics} from './sync-player-identities.mjs';
@@ -14,10 +15,15 @@ async function query(sql){
 const report={status:'started',checkedAt:new Date().toISOString(),metrics,requests:0};
 await fs.mkdir('tmp',{recursive:true});
 try{
+ const checked=await cachedReadCheck(query,'native-profiles',await readCheckVersion(),async()=>{
  report.recovery=await recoverCircuitNativeSources(query,{officialJson:circuitOfficialJson({onRequest:()=>report.requests++}),onProgress:p=>console.log('CIRCUIT_NATIVE_PROFILE_PROGRESS='+JSON.stringify(p))});
  const mapping=await syncPlayerIdentities(query);report.mapping={status:mapping.status,pending:mapping.pending,writes:mapping.writes};
  const after=await query(circuitMissingNativeSourcesSql);report.after={missingSources:after.length,byCircuit:{fitp:after.filter(r=>r.circuit==='fitp').length,itf:after.filter(r=>r.circuit==='itf').length}};
  report.status=after.length||mapping.pending||report.recovery.unresolved?'unresolved_official_evidence':'complete_zero_verified';
  if(report.status!=='complete_zero_verified')throw Error('circuit_native_profiles_unresolved:'+after.length);
+ const {metrics,...value}=report;return value;
+ });
+ if(checked.reused){checked.value.recovery={...checked.value.recovery,examined:0,repaired:0,requests:0,verifiedUnchanged:true};checked.value.mapping={status:'unchanged',writes:0,pending:0};checked.value.requests=0;}
+ Object.assign(report,checked.value,{checkedAt:new Date().toISOString(),metrics,cache:{reused:checked.reused,verifiedAt:checked.verifiedAt,saved:checked.cacheSaved}});
 }catch(e){report.error=e.message;if(report.status==='started')report.status='failed';throw e}
 finally{report.elapsedMs=Date.now()-started;await fs.writeFile('tmp/circuit-native-profile-recovery.json',JSON.stringify(report)+'\n');console.log(JSON.stringify(report))}

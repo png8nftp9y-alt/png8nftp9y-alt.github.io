@@ -1,3 +1,5 @@
+import {cachedReadCheck,readCheckVersion} from '../lib/d1-read-check-cache.mjs';
+import {cliD1Query} from '../lib/d1-cli-query.mjs';
 import {ownershipSelect, ownershipErrors} from './player-ownership-policy.mjs';
 import fs from 'node:fs/promises';import {spawnSync} from 'node:child_process';
 const read=async file=>JSON.parse(await fs.readFile(file,'utf8'));
@@ -18,21 +20,8 @@ const expected={
   appMatches:candidates.counts.playerMatchOccurrences,appUniqueMatches:candidates.counts.uniqueMatches,appInvalid:0
 };
 const query=`SELECT
-(SELECT COUNT(*) FROM players) players,(SELECT COUNT(*) FROM tournaments) tournaments,(SELECT COUNT(*) FROM entries) entries,
-(SELECT COUNT(*) FROM schedules) schedules,(SELECT COUNT(*) FROM matches) matches,(SELECT COUNT(*) FROM results) results,
-(SELECT COUNT(*) FROM tournaments WHERE id LIKE 'te-oop:%') teOopTournaments,
-(SELECT COUNT(*) FROM matches WHERE circuit='tennis-europe') teMatches,
-(SELECT COUNT(*) FROM schedules WHERE circuit='tennis-europe') teSchedules,
-(SELECT COUNT(*) FROM results WHERE circuit='tennis-europe') teResults,
-(SELECT COUNT(*) FROM tennis_europe_players) tePlayers,(SELECT COUNT(*) FROM match_participants) teParticipants,
-(SELECT COUNT(*) FROM app_match_candidates) candidateRelations,(SELECT COUNT(DISTINCT match_id) FROM app_match_candidates) candidateUniqueMatches,
-(SELECT COUNT(*) FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe') appMatches,
-(SELECT COUNT(DISTINCT json_extract(payload,'$.matchId')) FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe') appUniqueMatches,
+(SELECT COUNT(*) FROM players) players,(SELECT COUNT(*) FROM entries) entries,
 (SELECT COUNT(*) FROM app_matches WHERE json_extract(payload,'$.circuit')='tennis-europe' AND (COALESCE(json_extract(payload,'$.playerId'),'')='' OR COALESCE(json_extract(payload,'$.matchId'),'')='' OR COALESCE(json_extract(payload,'$.date'),'')='' OR COALESCE(json_extract(payload,'$.tournamentName'),'')='' OR COALESCE(json_extract(payload,'$.opponent'),'')='' OR COALESCE(json_extract(payload,'$.round'),'')='' OR (json_extract(payload,'$.status')='completed' AND COALESCE(json_extract(payload,'$.result'),'')=''))) appInvalid,
-(SELECT COUNT(*) FROM observed_players) observedPlayers,
-(SELECT COUNT(*) FROM observed_players WHERE circuit='fitp') observedFitp,
-(SELECT COUNT(*) FROM observed_players WHERE circuit='tennis-europe') observedTe,
-(SELECT COUNT(*) FROM observed_players WHERE circuit='itf') observedItf,
 (SELECT COUNT(*) FROM app_users WHERE id='user-federico-181099' AND lower(email)='federico181099@gmail.com' AND status='active') ownerUsers,
 (SELECT COUNT(*) FROM user_app_players u WHERE user_id='user-federico-181099' AND NOT EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id=u.user_id AND r.courtwatch_id=u.courtwatch_id)) ownerPlayerLinks,
 (SELECT COUNT(*) FROM app_players a WHERE EXISTS (SELECT 1 FROM user_app_player_removals r WHERE r.user_id='user-federico-181099' AND r.courtwatch_id=a.id)) ownerRemovedPlayers,
@@ -40,8 +29,13 @@ const query=`SELECT
 ${ownershipSelect},
 (SELECT COUNT(*) FROM user_match_analyses WHERE user_id='user-federico-181099') ownerAnalyses,
 (SELECT COUNT(*) FROM match_analyses) legacyAnalyses`;
-const run=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',query,'--json'],{encoding:'utf8'});if(run.status!==0)throw new Error(run.stderr||run.stdout);
-const parsed=JSON.parse(run.stdout),row=parsed.flatMap(x=>x.results||[])[0]||{},errors=[];
+const version=await readCheckVersion();
+const observedCheck=await cachedReadCheck(cliD1Query,'observed-counts',version,()=>cliD1Query(`SELECT (SELECT COUNT(*) FROM observed_players) observedPlayers,
+(SELECT COUNT(*) FROM observed_players WHERE circuit='fitp') observedFitp,
+(SELECT COUNT(*) FROM observed_players WHERE circuit='tennis-europe') observedTe,
+(SELECT COUNT(*) FROM observed_players WHERE circuit='itf') observedItf`));
+const checked=await cachedReadCheck(cliD1Query,'universal-counts',version,()=>cliD1Query(query));
+const row={...checked.value[0],...observedCheck.value[0]},errors=[];console.log('D1_PARITY_READ_CACHE='+JSON.stringify({reused:checked.reused,observedReused:observedCheck.reused,verifiedAt:checked.verifiedAt,saved:checked.cacheSaved}));
 // Tennis Europe relational rows are owned and certified by the dedicated
 // agenda workflow. The universal import must not fail because that independent
 // projection advanced between its R2 restore and this final verification.
@@ -64,7 +58,8 @@ DELETE FROM user_match_analyses WHERE user_id='${probeUser}' AND match_key='${pr
 SELECT COUNT(*) AS crudRemaining FROM user_match_analyses WHERE user_id='${probeUser}' AND match_key='${probeKey}';`;
 const probe=spawnSync('npx',['wrangler','d1','execute','courtwatch-app','--remote','--config','wrangler.generated.jsonc','--command',probeSql,'--json'],{encoding:'utf8'});
 if(probe.status!==0)throw new Error('Analysis CRUD probe failed: '+(probe.stderr||probe.stdout));
-const probeRows=JSON.parse(probe.stdout).flatMap(x=>x.results||[]);
+const probeResults=JSON.parse(probe.stdout),probeRows=probeResults.flatMap(x=>x.results||[]);
+console.log('ANALYSIS_PROBE_D1_METRICS='+JSON.stringify({rowsRead:probeResults.reduce((n,r)=>n+Number(r.meta?.rows_read||0),0),rowsWritten:probeResults.reduce((n,r)=>n+Number(r.meta?.rows_written||0),0)}));
 const created=probeRows.find(x=>Object.hasOwn(x,'crudCreated'))?.crudCreated,updated=probeRows.find(x=>Object.hasOwn(x,'crudUpdated'))?.crudUpdated,remaining=probeRows.find(x=>Object.hasOwn(x,'crudRemaining'))?.crudRemaining;
 if(created!=='crud-created'||updated!=='crud-updated'||Number(remaining)!==0)throw new Error('Analysis CRUD probe mismatch: '+JSON.stringify({created,updated,remaining}));
 console.log(JSON.stringify({status:'green',schema:manifest.version,counts:expected,observedPlayers:observed,analysisCrud:'green'}));

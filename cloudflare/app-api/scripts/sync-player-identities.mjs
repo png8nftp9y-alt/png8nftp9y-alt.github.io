@@ -1,3 +1,4 @@
+import {cachedReadCheck,readCheckVersion} from '../lib/d1-read-check-cache.mjs';
 import {includedPlayerIdSourceSql} from '../lib/player-id-audit-scope.mjs';
 import {recoverProfileEvidence,validOfficialId,matchProfileCandidates} from '../lib/player-profile-evidence.mjs';
 import {buildIncrementalSyncPlan} from '../lib/d1-incremental-sync.mjs';
@@ -40,7 +41,7 @@ export async function profileRecoveryAudit(query){
 
 export async function syncPlayerIdentities(query,{allowBulk=false,maxChanges=5000}={}){
  const pending=[];for(const [table]of sources){let after='';while(true){const batch=await query(`SELECT * FROM player_identity_pending_sources WHERE source_table=${sqlString(table)} AND source_key>${sqlString(after)} ORDER BY source_key LIMIT 1000`);pending.push(...batch);if(batch.length<1000)break;after=batch.at(-1).source_key;}}
- if(!pending.length){const counts=await query('SELECT (SELECT COUNT(*) FROM player_identity_people) AS people,(SELECT COUNT(*) FROM player_circuit_identities) AS links');return{status:'unchanged',writes:0,pending:0,...counts[0]};}
+ if(!pending.length)return{status:'unchanged',writes:0,pending:0};
  const full=pending.length>500,rows=[];
  for(const [table,key]of sources){const keys=pending.filter(p=>p.source_table===table).map(p=>p.source_key);const selected=full?await allRows(query,table,key):keys.length?await byKeys(query,table,key,keys):[];for(const row of selected)rows.push(row);}
  let currentLinks=[],currentPeople=[],currentAliases=[];
@@ -75,7 +76,7 @@ async function main(){const config=JSON.parse(await fs.readFile('wrangler.genera
  try{
  const request=(await query("SELECT status FROM player_profile_recovery_runs WHERE evidence_version=2"))[0];const oneTime=request?.status!=='complete';const repair=oneTime||process.env.REPAIR_MISSING_PROFILES==='true',allowBulk=oneTime||process.env.ALLOW_BULK_IDENTITY_WRITES==='true';
  if(repair&&!allowBulk)throw Error('profile_repair_requires_explicit_bulk_authorization');
- phase='recovery';const recovery=await recoverMissingProfiles(query,{limit:repair?Infinity:200});
+ phase='recovery';const checked=await cachedReadCheck(query,'profile-evidence',await readCheckVersion(),()=>recoverMissingProfiles(query,{limit:repair?Infinity:200}),{force:repair,canCache:r=>!r.limited});const recovery=checked.reused?{examined:0,repaired:0,verifiedUnchanged:true}:checked.value;
  phase='mapping';const audit=await syncPlayerIdentities(query,{allowBulk});
  if(repair){phase='audit';const profiles=await profileRecoveryAudit(query);audit.profileRecovery={...recovery,unresolved:profiles.unresolved,byCircuit:profiles.byCircuit};await fs.writeFile('tmp/player-profile-unresolved.json',JSON.stringify(profiles)+'\n');}else audit.profileRecovery=recovery;
  audit.d1Metrics=metrics;await fs.writeFile('tmp/player-identity-sync.json',JSON.stringify(audit)+'\n');console.log(JSON.stringify(audit));if(audit.status==='pending')throw Error('identity_mapping_pending_sources');if(oneTime)await query("INSERT INTO player_profile_recovery_runs(evidence_version,status) VALUES(2,'complete') ON CONFLICT(evidence_version) DO UPDATE SET status=excluded.status WHERE status IS NOT excluded.status");
