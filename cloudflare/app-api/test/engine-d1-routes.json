@@ -1,0 +1,15 @@
+[
+ {"id":"fitp-catalogue","producer":"courtwatch-v3-fitp-tournaments-sharded.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-seed.mjs","reader":"src/index.js"},
+ {"id":"fitp-entries","producer":"courtwatch-v3-fitp-entries.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-opponent-entry-seed.mjs","reader":"lib/personal-entry-profiles.mjs"},
+ {"id":"europe-catalogue","producer":"courtwatch-v3-tennis-europe-sharded.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-seed.mjs","reader":"src/index.js"},
+ {"id":"europe-entries","producer":"courtwatch-v3-tennis-europe-live.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-opponent-entry-seed.mjs","reader":"lib/personal-entry-profiles.mjs"},
+ {"id":"europe-live-matches","producer":"courtwatch-tennis-europe-oop-live.yml","bridge":"courtwatch-tennis-europe-agenda.yml","script":"generate-tennis-europe-app-candidates.mjs","reader":"lib/personal-tennis-europe-history.mjs"},
+ {"id":"europe-historical-matches","producer":"courtwatch-tennis-europe-oop-merge.yml","bridge":"courtwatch-tennis-europe-agenda.yml","script":"generate-tennis-europe-oop-seed.mjs","reader":"lib/personal-tennis-europe-history.mjs"},
+ {"id":"itf-catalogue","producer":"courtwatch-v3-itf-tournaments-sharded.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-seed.mjs","reader":"src/index.js"},
+ {"id":"itf-known-entries","producer":"courtwatch-v3-itf-known-fast.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-opponent-entry-seed.mjs","reader":"lib/personal-entry-profiles.mjs"},
+ {"id":"itf-entries-42d","producer":"courtwatch-v3-itf-live.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-opponent-entry-seed.mjs","reader":"lib/personal-entry-profiles.mjs"},
+ {"id":"itf-entries-120d","producer":"courtwatch-v3-itf-safety-120d.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-opponent-entry-seed.mjs","reader":"lib/personal-entry-profiles.mjs"},
+ {"id":"itf-backfill-entries","producer":"courtwatch-v3-itf-backfill.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-opponent-entry-seed.mjs","reader":"lib/personal-entry-profiles.mjs"},
+ {"id":"projected-order-of-play","producer":"courtwatch-v3-oop.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-seed.mjs","reader":"lib/runtime-document-reader.mjs"},
+ {"id":"projected-results","producer":"courtwatch-v3-results.yml","bridge":"courtwatch-cloudflare-app-api.yml","script":"generate-seed.mjs","reader":"lib/runtime-document-reader.mjs"}
+]

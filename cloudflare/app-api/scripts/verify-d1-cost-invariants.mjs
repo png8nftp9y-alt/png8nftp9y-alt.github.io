@@ -30,7 +30,7 @@ forbidText(opponentEntries,"DELETE FROM opponent_entry_profiles WHERE circuit IN
 requireText(opponentEntries,"import {buildIncrementalSyncPlan} from '../lib/d1-incremental-sync.mjs'",'delta profili avversari senza pianificatore protetto');
 requireText(opponentEntries,'sourceComplete:complete','delta profili avversari senza controllo di completezza');
 requireText(opponentEntries,'const plan=buildIncrementalSyncPlan({current,incoming','profili avversari invariati non confrontati dal pianificatore');
-requireText(opponentRestore,'test "$count" -gt "$best_count"','snapshot ITF avversari non selezionato per completezza massima');
+requireText(opponentRestore,'break # Current complete generation owns additions and withdrawals; backups are fallback only.','snapshot Europe corrente completo non prioritario rispetto ai backup');
 requireText(opponentEntries,"['fitp','itf','tennis-europe']",'iscrizioni future Tennis Europe non indicizzate per avversario');
 requireText(opponentRestore,'tennis_europe_participant_cache.json.gz','cache Tennis Europe non ripristinata per indice iscrizioni');
 forbidText(teOop,'INSERT OR REPLACE INTO tournaments','tornei Tennis Europe riscritti senza confronto');

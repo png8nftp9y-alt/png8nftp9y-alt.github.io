@@ -20,7 +20,17 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  engine-source:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   shard:
+    needs: [engine-source]
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -30,6 +40,8 @@ jobs:
         province: ['201','2','3','4','5','6','7','8','9','210','11','12','13','14','215','16','17','18','19','20','21','22','23','24','25','26','227','28','29','30','31','32','33','34','35','36','237','38','39','40','41','42','43','44','45','46','47','248','49','50','51','52','53','54','55','56','57','258','59','60','61','62','263','64','65','66','67','68','69','70','71','272','73','74','75','76','77','78','79','280','81','282','283','84','85','86','287','88','89','90','91','292','93','94','95','96','97','98','99','100','101','102','103','108','109','110','111']
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -46,11 +58,13 @@ jobs:
           retention-days: 7
 
   merge:
-    needs: shard
+    needs: [engine-source, shard]
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

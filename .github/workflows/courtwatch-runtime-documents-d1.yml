@@ -20,6 +20,7 @@ on:
       - Court Watch ITF T-1 artifact persistence recovery
       - Court Watch v3 results engine
       - Court Watch v3 order of play engine
+      - Court Watch ITF incremental catalog and diagnostics
     types: [completed]
     branches: [main]
   workflow_dispatch:
@@ -52,6 +53,14 @@ on:
       - 'dist/v3/itf_tournament_metadata_diagnostics.json'
       - 'dist/v3/operational_status.json'
       - 'history/itf_official_metadata.json'
+      - 'cloudflare/app-api/scripts/verify-runtime-d1-read-path.mjs'
+      - 'cloudflare/app-api/lib/verify-runtime-app-readers.mjs'
+      - 'cloudflare/app-api/test/d1-single-source.test.mjs'
+      - 'cloudflare/app-api/test/multicircuit-player-view.test.mjs'
+      - 'cloudflare/app-api/test/runtime-publishers.test.mjs'
+      - 'cloudflare/app-api/test/engine-d1-routing.test.mjs'
+      - 'cloudflare/app-api/test/engine-d1-routes.json'
+      - 'cloudflare/app-api/test/opponent-entry-current-source.test.mjs'
 permissions:
   contents: read
 concurrency:
@@ -73,7 +82,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Check source outside the D1 writer queue
-        run: node --test cloudflare/app-api/test/runtime-document-plan.test.mjs cloudflare/app-api/test/runtime-document-reader.test.mjs cloudflare/app-api/test/d1-single-source.test.mjs cloudflare/app-api/test/runtime-source-order.test.mjs tools/tests/d1-workflow-queues.test.mjs
+        run: node --test cloudflare/app-api/test/runtime-document-plan.test.mjs cloudflare/app-api/test/runtime-document-reader.test.mjs cloudflare/app-api/test/d1-single-source.test.mjs cloudflare/app-api/test/runtime-source-order.test.mjs tools/tests/d1-workflow-queues.test.mjs cloudflare/app-api/test/runtime-publishers.test.mjs cloudflare/app-api/test/multicircuit-player-view.test.mjs
   verify-storage:
     needs: check-source
     concurrency:
@@ -96,7 +105,7 @@ jobs:
         run: |
           git -C "$GITHUB_WORKSPACE" fetch --no-tags --depth=1 origin "$CHECKED_SHA"
           if ! git -C "$GITHUB_WORKSPACE" diff --quiet "$CHECKED_SHA" HEAD -- cloudflare/app-api src/v3 tools/tests v3.js v3.html v3.css .github/workflows; then
-            node --test cloudflare/app-api/test/runtime-document-plan.test.mjs cloudflare/app-api/test/runtime-document-reader.test.mjs cloudflare/app-api/test/d1-single-source.test.mjs cloudflare/app-api/test/runtime-source-order.test.mjs tools/tests/d1-workflow-queues.test.mjs
+            node --test cloudflare/app-api/test/runtime-document-plan.test.mjs cloudflare/app-api/test/runtime-document-reader.test.mjs cloudflare/app-api/test/d1-single-source.test.mjs cloudflare/app-api/test/runtime-source-order.test.mjs tools/tests/d1-workflow-queues.test.mjs cloudflare/app-api/test/runtime-publishers.test.mjs cloudflare/app-api/test/multicircuit-player-view.test.mjs
           fi
       - name: Persist complete runtime documents and verify full content in D1
         env:

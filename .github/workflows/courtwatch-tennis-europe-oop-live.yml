@@ -21,11 +21,23 @@ concurrency:
   group: courtwatch-tennis-europe-oop-live
   cancel-in-progress: false
 jobs:
+  engine-source:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   acquire-live:
+    needs: [engine-source]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with:
           node-version: '22'

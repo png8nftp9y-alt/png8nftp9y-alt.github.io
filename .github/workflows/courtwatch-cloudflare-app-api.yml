@@ -8,10 +8,22 @@ on:
         type: boolean
         default: false
   workflow_run:
-    # Europe agenda is the priority publication gate. The general rebuild
-    # follows it, including exact drawUrl values from the latest verified OOP snapshot.
+    # Every independent producer publishes its own changed data to D1.
+    # Bot pushes do not trigger push workflows; completion routes are explicit.
+    # Europe match projection retains its dedicated verified Agenda gate.
     workflows:
       - Court Watch Tennis Europe agenda D1
+      - Court Watch v3 FITP provincial primary
+      - Court Watch v3 FITP player entries
+      - Court Watch v3 Tennis Europe tournament map
+      - Court Watch v3 Tennis Europe live entries
+      - Court Watch v3 ITF global tournament map
+      - Court Watch v3 ITF known labels fast
+      - Court Watch v3 ITF acceptance discovery 42d
+      - Court Watch v3 ITF acceptance safety 120d
+      - Court Watch v3 ITF complete backfill
+      - Court Watch v3 order of play engine
+      - Court Watch v3 results engine
     types: [completed]
     branches: [main]
   push:

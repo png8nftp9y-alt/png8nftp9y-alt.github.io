@@ -15,7 +15,17 @@ concurrency:
   group: courtwatch-v3-tennis-europe-map
   cancel-in-progress: false
 jobs:
+  engine-source:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   tournament-shards:
+    needs: [engine-source]
     name: Tournament shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -25,6 +35,8 @@ jobs:
         shard: [core, west, east, north]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
       - run: TE_SHARD=${{ matrix.shard }} node src/v3/discover-tennis-europe-tournaments-shard.mjs
@@ -34,11 +46,13 @@ jobs:
           path: dist/v3/shards/tennis-europe/tournaments-${{ matrix.shard }}.json
   publish-map:
     runs-on: ubuntu-latest
-    needs: tournament-shards
+    needs: [engine-source, tournament-shards]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
       - uses: actions/download-artifact@v4

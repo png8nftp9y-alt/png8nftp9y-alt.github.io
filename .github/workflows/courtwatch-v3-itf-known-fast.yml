@@ -6,7 +6,17 @@ on:
 permissions: {contents: write}
 concurrency: {group: courtwatch-v3-itf-known-fast,cancel-in-progress: false}
 jobs:
+  engine-source:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   acceptance:
+    needs: [engine-source]
     runs-on: ubuntu-latest
     timeout-minutes: 13
     strategy:
@@ -15,6 +25,8 @@ jobs:
       matrix: {shard: [0,1,2,3]}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Scan live acceptance and withdrawn status
@@ -32,7 +44,7 @@ jobs:
         if: always()
         with: {name: 'itf-acceptance-${{ matrix.shard }}', path: 'dist/v3/shards/itf/*-${{ matrix.shard }}*', retention-days: 2}
   retry_acceptance:
-    needs: acceptance
+    needs: [engine-source, acceptance]
     runs-on: ubuntu-latest
     timeout-minutes: 13
     strategy:
@@ -41,6 +53,8 @@ jobs:
       matrix: {shard: [0,1,2,3]}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
@@ -64,12 +78,14 @@ jobs:
           retention-days: 2
   review:
     concurrency: {group: courtwatch-v3-itf-publish,cancel-in-progress: false,queue: max}
-    needs: retry_acceptance
+    needs: [engine-source, retry_acceptance]
     runs-on: ubuntu-latest
     timeout-minutes: 13
     steps:
       - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Configure R2

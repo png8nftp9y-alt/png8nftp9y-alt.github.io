@@ -7,7 +7,17 @@ on:
 permissions: {contents: write, actions: write}
 concurrency: {group: courtwatch-v3-itf-map,cancel-in-progress: false}
 jobs:
+  engine-source:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   shard:
+    needs: [engine-source]
     runs-on: ubuntu-latest
     timeout-minutes: 55
     strategy:
@@ -15,6 +25,8 @@ jobs:
       matrix: {region: [europe, americas, asia_pacific, africa_middle_east, other]}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: ITF_REGION_SHARD=${{ matrix.region }} node src/v3/discover-itf-tournaments-shard.mjs
@@ -22,7 +34,7 @@ jobs:
         if: always()
         with: {name: 'itf-tournaments-${{ matrix.region }}', path: 'dist/v3/shards/itf/tournaments-${{ matrix.region }}.json'}
   publish:
-    needs: shard
+    needs: [engine-source, shard]
     concurrency: {group: courtwatch-itf-meta-state, cancel-in-progress: false, queue: max}
     outputs:
       new_count: ${{ steps.publish.outputs.new_count }}
@@ -30,7 +42,9 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4

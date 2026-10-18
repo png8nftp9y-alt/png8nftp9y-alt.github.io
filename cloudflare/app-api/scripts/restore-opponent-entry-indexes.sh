@@ -56,8 +56,9 @@ restore_tennis_europe(){
     gzip -t "$candidate"
     count="$(gzip -cd "$candidate" | jq -r '[.tournaments[]?.participants[]?] | length')"
     echo "Tennis Europe opponent-entry candidate slot=$slot participants=$count"
-    if test "$count" -ge "$TE_MIN_PERMANENT_PARTICIPANTS" && test "$count" -gt "$best_count"; then
+    if test "$count" -ge "$TE_MIN_PERMANENT_PARTICIPANTS"; then
       best_count="$count"; best_candidate="$candidate"; best_slot="$slot"
+      break # Current complete generation owns additions and withdrawals; backups are fallback only.
     fi
   done
   if test -z "$best_candidate"; then

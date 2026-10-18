@@ -16,7 +16,7 @@ test('circuit identities use native links and reject conflicting IDs and foreign
 });
 test('search opponent and followed snapshot use all three circuits; only opponent limits the combined window',async()=>{
  const d=database({identityMapping:true}),fetchBefore=globalThis.fetch;
- globalThis.fetch=async()=>({ok:true,json:async()=>({tournaments:[]})});
+ globalThis.fetch=async()=>{throw Error('External data request forbidden in D1-only mode')};
  try{
   await d.query(readFileSync(new URL('../migrations/0022_opponent_entry_profiles.sql',import.meta.url),'utf8'));
   await d.query(readFileSync(new URL('../migrations/0003_manual_overrides.sql',import.meta.url),'utf8'));

@@ -15,7 +15,17 @@ concurrency:
   group: courtwatch-tennis-europe-ranking-import
   cancel-in-progress: false
 jobs:
+  engine-source:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   discover:
+    needs: [engine-source]
     if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_commit.message == 'Sync official Court Watch players') }}
     runs-on: ubuntu-latest
     outputs:
@@ -28,6 +38,8 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: npm install
@@ -47,7 +59,7 @@ jobs:
             cloudflare/app-api/tennis-europe-ranking-publications.json
           retention-days: 2
   backfill:
-    needs: discover
+    needs: [engine-source, discover]
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -67,6 +79,8 @@ jobs:
       TE_RANKING_DATE: ${{ matrix.publication.rankingDate }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - uses: actions/download-artifact@v4
@@ -92,7 +106,7 @@ jobs:
             test "$imported" -eq 1
           done
   verify:
-    needs: backfill
+    needs: [engine-source, backfill]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -102,6 +116,8 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: npm install
