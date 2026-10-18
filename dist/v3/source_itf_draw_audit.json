@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-18T17:25:31.566Z",
+  "generatedAt": "2026-10-18T17:47:02.018Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,20 +9,20 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 5,
-    "acquiredSections": 3,
-    "unusedAlternativeSections": 1,
+    "requestedSections": 4,
+    "acquiredSections": 2,
+    "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 4,
-    "missingSections": 2,
-    "newSectionsCached": 2,
+    "resolvedSections": 2,
+    "missingSections": 4,
+    "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 2,
+    "retrySections": 4,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 2,
+    "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 481,
@@ -103,23 +103,23 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-DOM-2026-005",
-      "tournamentName": "J30 Cabarete",
+      "competitionId": "J-J60-USA-2026-007",
+      "tournamentName": "J60 Orlando",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 3,
-      "unusedAlternativeSections": 1,
+      "acquiredSections": 2,
+      "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 4,
-      "missingSections": 2,
+      "resolvedSections": 2,
+      "missingSections": 4,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "B-S-Q-KO",
@@ -138,16 +138,16 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "G-S-Q-KO",
           "family": "G-S-Q",
-          "acquired": false,
+          "acquired": true,
           "resolved": true,
-          "status": "empty_singles_qualification"
+          "status": "acquired"
         },
         {
           "event": "G-D-M-KO",
@@ -160,14 +160,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -177,7 +177,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 19,
+              "players": 50,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -199,26 +199,26 @@
         },
         {
           "family": "G-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 24,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "empty_singles_qualification",
-              "failureType": "empty_singles_qualification",
+              "players": 64,
+              "error": null,
+              "failureType": null,
               "resolved": true
             }
           ]
