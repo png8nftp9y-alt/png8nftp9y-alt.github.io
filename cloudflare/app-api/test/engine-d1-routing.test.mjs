@@ -1,12 +1,17 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
 const root=new URL('../../../',import.meta.url),read=file=>readFileSync(new URL(file,root),'utf8');
 const routes=JSON.parse(readFileSync(new URL('./engine-d1-routes.json',import.meta.url),'utf8'));
-test('each acquisition motor has an explicit completion route to its D1 importer without relying on bot push events',()=>{
+test('every acquisition motor retains D1 publication, with general imports consolidated after verified Europe Agenda',()=>{
  for(const route of routes){
   const producer=read('.github/workflows/'+route.producer),bridge=read('.github/workflows/'+route.bridge),name=producer.match(/^name: (.+)$/m)?.[1];
   assert.ok(name,route.id+': missing producer name');
   const completion=bridge.match(/^  workflow_run:\n([\s\S]*?)(?=^  [a-z_]+:|^permissions:|^jobs:)/m)?.[1]||'';
-  assert.ok(completion.includes(name),route.id+': no explicit D1 completion bridge for '+name);
+  if(route.bridge==='courtwatch-cloudflare-app-api.yml'){
+   const triggers=(completion.match(/^      - .+$/gm)||[]).map(line=>line.slice(8));
+   assert.deepEqual(triggers,['Court Watch Tennis Europe agenda D1'],route.id+': general imports must follow only Agenda');
+   const writer=bridge.slice(bridge.indexOf('  migrate-import-verify-deploy:'));
+   assert.match(writer,/with: \{ref: main, fetch-depth: 1\}/,route.id+': consolidation must read current data after the writer lease');
+  }else assert.ok(completion.includes(name),route.id+': no explicit D1 completion bridge for '+name);
   const packageScripts=JSON.parse(read('cloudflare/app-api/package.json')).scripts;
   assert.ok(bridge.includes(route.script)||(bridge.includes('npm run seed')&&packageScripts.seed.includes(route.script)),route.id+': missing importer');
   assert.ok(read('cloudflare/app-api/'+route.reader).length>0,route.id+': missing app reader');
@@ -36,4 +41,17 @@ test('D1 runtime publication and acquired indexing are completion-driven without
   assert.doesNotMatch(triggers,/^  schedule:/m,file+': polling');assert.match(triggers,/workflow_run:/);
   assert.match(source,/ref: main/);assert.match(source,/queue: single/);
  }
+});
+
+test('general D1 follows successful Europe Agenda and has no autonomous periodic timer',()=>{
+ const general=read('.github/workflows/courtwatch-cloudflare-app-api.yml');
+ const header=general.split('permissions:')[0];
+ assert.doesNotMatch(header,/^  schedule:|cron:/m);
+ assert.match(header,/^  workflow_dispatch:/m);assert.match(header,/^  push:/m);
+ assert.match(general,/github.event.workflow_run.conclusion == 'success'/);
+ const agenda=read('.github/workflows/courtwatch-tennis-europe-agenda.yml');
+ assert.match(agenda,/Court Watch Tennis Europe OOP and results live/);
+ assert.match(agenda,/github.event.workflow_run.conclusion == 'success'/);
+ assert.match(general,/node src\/v3\/build-universal-database.mjs/);
+ assert.match(general,/node scripts\/sync-runtime-documents-d1.mjs/);
 });
