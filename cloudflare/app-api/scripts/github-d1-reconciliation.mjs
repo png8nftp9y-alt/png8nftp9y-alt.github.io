@@ -5,3 +5,11 @@ export const identity=value=>String(value??'').trim().toUpperCase();
 export function projectionComparison(expected,actual){const byId=new Map(actual.map(r=>[String(r.id),r])),missing=[],different=[];for(const r of expected){const found=byId.get(String(r.id));if(!found){missing.push(String(r.id));continue;}const payload=typeof found.payload==='string'?JSON.parse(found.payload):found.payload;if(JSON.stringify(stable(r))!==JSON.stringify(stable(payload)))different.push(String(r.id));}return{expected:expected.length,present:expected.length-missing.length,missing,different};}
 export function catalogueComparison(expected,stored){const keys=new Set(stored.map(r=>identity(r.competitionId||r.sourceTournamentId)));const missing=expected.filter(r=>!keys.has(identity(r.competitionId||r.sourceTournamentId))).map(r=>({competitionId:r.competitionId||r.sourceTournamentId,name:r.tournamentName||r.name||'',startDate:r.startDate||''}));return{expected:expected.length,present:expected.length-missing.length,missing};}
 export function relationComparison(expected,stored){const key=r=>[r.circuit,r.playerId,identity(r.competitionId)].join('|'),keys=new Set(stored.map(key));const missing=expected.filter(r=>!keys.has(key(r))).map(r=>({circuit:r.circuit,playerId:r.playerId,competitionId:r.competitionId,calendarState:r.calendarState||r.calendarStatus||'',permanenceStatus:r.permanenceStatus||''}));return{expected:expected.length,present:expected.length-missing.length,missing,scope:'player/tournament presence; acceptance timeline and event-level payload equality not certified'};}
+export function historicalRelations(doc,field,path){
+ const value=doc?.[field];
+ if(!value||typeof value!=='object')throw Error('invalid_relations:'+path);
+ const rows=Array.isArray(value)?value:Object.values(value);
+ if(rows.some(r=>!r||typeof r!=='object'||Array.isArray(r)||!r.playerId||!r.competitionId))throw Error('invalid_relation_row:'+path);
+ if(field==='relations'&&Number.isInteger(doc.relationCount)&&doc.relationCount!==rows.length)throw Error('incomplete_relations:'+path);
+ return rows;
+}
