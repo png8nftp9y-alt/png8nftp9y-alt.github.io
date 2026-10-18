@@ -1,7 +1,7 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-10-18T12:58:44.272Z",
-  "status": "results_engine_ex_novo_waiting_official_results",
+  "generatedAt": "2026-10-18T12:59:02.417Z",
+  "status": "entries_engine_merged_ex_novo_discoveries_with_validated_te_acceptance_lists",
   "coverageFrom": "2025-12-18",
   "checks": {
     "players": 23,
@@ -15,14 +15,7 @@
     "warnings": 0,
     "tennisEuropeVisible": 98,
     "tennisEuropeAcceptanceConfirmed": 4,
-    "diagnostics": "green",
-    "agenda": 462,
-    "results": 462,
-    "completed": 0,
-    "losses": 0,
-    "opponents": 0,
-    "opponentsWithClub": 0,
-    "opponentsWithNationality": 0
+    "diagnostics": "green"
   },
   "engines": {
     "discoverFitp": {
@@ -36,15 +29,15 @@
       "status": "itf_acceptance_complete_state_machine"
     },
     "entries": {
-      "status": "built"
+      "status": "built",
+      "file": "src/v3/entries-engine.mjs",
+      "method": "merge FITP + validated dated TE acceptance list/profile entries + ITF; no v1/v2/data.json"
     },
     "ordersOfPlay": {
-      "status": "built"
+      "status": "active"
     },
     "results": {
-      "status": "built",
-      "file": "src/v3/results-engine.mjs",
-      "method": "starts only from v3 agenda and official result targets; no data.json and no v2"
+      "status": "active"
     }
   },
   "warnings": []
