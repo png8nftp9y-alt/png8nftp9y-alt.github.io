@@ -69,3 +69,80 @@ test('FITP D1 transport reports numeric Cloudflare codes without leaking body or
   let calls=0;await assert.rejects(openD1({fetcher:async()=>{calls++;return{ok:false,status:500,json}}}),error=>{assert.match(error.message,/fitp_d1_http_500:codes_(7500|none)$/);assert.doesNotMatch(error.message,/SECRET|private|secret-token/);return true});assert.equal(calls,1);
  }}finally{if(oldAccount===undefined)delete process.env.CLOUDFLARE_ACCOUNT_ID;else process.env.CLOUDFLARE_ACCOUNT_ID=oldAccount;if(oldToken===undefined)delete process.env.CLOUDFLARE_API_TOKEN;else process.env.CLOUDFLARE_API_TOKEN=oldToken;}
 });
+
+const realBatch=d=>statements=>d.db.batch(statements.map(({sql,params})=>({sql,values:params})));
+test('checkpoint is sent only after every data write succeeds; failed cursor resumes without rewriting saved metadata',()=>setup(async(d,ctx,calls)=>{
+ const logs=[],batches=[];let rejected=false;
+ const writeBatch=async statements=>{
+  batches.push(statements);
+  const checkpoint=statements.find(s=>s.sql.includes('INSERT INTO fitp_metadata_progress'));
+  if(checkpoint?.params[1]==='222222'&&!rejected){rejected=true;throw Error('fitp_d1_timeout:phase_batch:request_outcome_unknown_resume_manually');}
+  return realBatch(d)(statements);
+ };
+ await assert.rejects(syncFitpMetadata({...ctx,writeBatch,log:line=>logs.push(JSON.parse(line))}),/timeout/);
+ assert.equal(d.execute('SELECT last_card FROM fitp_metadata_progress')[0].last_card,'123456');
+ assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_player_metadata')[0].n,2);
+ assert.equal(logs.at(-1).lastConfirmedCheckpoint.checked,1);assert.equal(logs.at(-1).attemptedThrough,'222222');
+ assert.ok(batches.filter(batch=>batch.some(s=>s.sql.includes('INSERT INTO fitp_metadata_progress'))).every(batch=>batch.length===1));
+ calls.length=0;const replay=[];await syncFitpMetadata({...ctx,writeBatch:async statements=>{replay.push(...statements);return realBatch(d)(statements)}});assert.deepEqual(calls,['222222']);
+ assert.equal(replay.filter(s=>s.sql===metadataWriteSql).length,0);
+ assert.equal(d.execute('SELECT complete FROM fitp_metadata_progress')[0].complete,1);
+}));
+test('partially committed REST data batch cannot advance cursor; explicit resume writes only the missing delta',()=>setup(async(d,ctx,calls)=>{
+ await assert.rejects(syncFitpMetadata({...ctx,batchSize:2,writeBatch:async statements=>{
+  // Model an API failure after metadata was committed but before cleanup. No atomic REST guarantee is needed.
+  const first=statements[0];assert.equal(first.sql,metadataWriteSql);await ctx.write(first.sql,first.params);throw Error('fitp_d1_http_500:codes_7500');
+ }}),/7500/);
+ assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_metadata_progress')[0].n,0);
+ calls.length=0;const replay=[];await syncFitpMetadata({...ctx,batchSize:2,writeBatch:async statements=>{replay.push(...statements);return realBatch(d)(statements)}});
+ assert.deepEqual(calls,['123456','222222']);assert.equal(replay.filter(s=>s.sql===metadataWriteSql).length,0);
+ assert.equal(d.execute('SELECT checked FROM fitp_metadata_progress')[0].checked,2);
+}));
+test('lost batch acknowledgement resumes from persisted checkpoint without fetching already committed profiles',()=>setup(async(d,ctx,calls)=>{
+ let lost=false;await assert.rejects(syncFitpMetadata({...ctx,writeBatch:async statements=>{
+  await realBatch(d)(statements);if(!lost&&statements[0].sql.includes('INSERT INTO fitp_metadata_progress')){lost=true;throw Error('fitp_d1_network:phase_batch:request_outcome_unknown_resume_manually');}
+ }}),/network/);
+ assert.equal(d.execute('SELECT checked FROM fitp_metadata_progress')[0].checked,1);
+ calls.length=0;await syncFitpMetadata({...ctx,writeBatch:realBatch(d)});assert.deepEqual(calls,['222222']);
+}));
+test('batched next-cycle import sends no identical metadata upserts and keeps source-failure ledger honest',()=>setup(async(d,ctx)=>{
+ const batches=[];const writeBatch=async statements=>{batches.push(statements);return realBatch(d)(statements)};
+ await syncFitpMetadata({...ctx,writeBatch});batches.length=0;
+ await syncFitpMetadata({...ctx,writeBatch,now:()=>Date.UTC(2026,10,8)});
+ assert.ok(batches.length);assert.equal(batches.flat().filter(s=>s.sql===metadataWriteSql).length,0);
+ await assert.rejects(syncFitpMetadata({...ctx,writeBatch,batchSize:2,now:()=>Date.UTC(2026,10,29),fetchProfile:async card=>{if(card==='123456')throw Error('fitp_http_503');return source[1]}}),/retry_failures_manually/);
+ assert.equal(d.execute("SELECT complete FROM fitp_metadata_progress WHERE cycle='2026-11-29'")[0].complete,1);
+ assert.equal(d.execute("SELECT COUNT(*) AS n FROM fitp_metadata_failures WHERE cycle='2026-11-29'")[0].n,1);
+}));
+test('D1 REST sends one batch request and never retries HTTP500, timeout or network failures',async()=>{
+ const {openD1,D1_REQUEST_TIMEOUT_MS}=await import('../scripts/sync-fitp-player-metadata.mjs');
+ const oldAccount=process.env.CLOUDFLARE_ACCOUNT_ID,oldToken=process.env.CLOUDFLARE_API_TOKEN;
+ process.env.CLOUDFLARE_ACCOUNT_ID='fixture';process.env.CLOUDFLARE_API_TOKEN='secret-token';
+ const databaseId='cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda';
+ const good=n=>({ok:true,status:200,json:async()=>({success:true,result:Array.from({length:n},()=>({success:true,results:[]}))})});
+ try{
+  const requests=[];const client=await openD1({databaseId,fetcher:async(url,options)=>{const body=JSON.parse(options.body);requests.push({url,body});return good(body.batch?.length||1)}});
+  const batch=[{sql:'SELECT ?',params:['one']},{sql:'SELECT ?',params:['two']}];await client.writeBatch(batch);
+  assert.equal(requests.length,2);assert.deepEqual(requests[1].body,{batch});assert.ok(requests.every(r=>r.url.endsWith('/'+databaseId+'/query')));assert.equal(D1_REQUEST_TIMEOUT_MS,120000);
+  for(const failure of ['500','timeout','network','body-timeout','partial']){
+   let requests=0;
+   const client=await openD1({databaseId,fetcher:async()=>{
+    if(++requests===1)return good(1);
+    if(failure==='500')return{ok:false,status:500,json:async()=>({success:false,errors:[{code:7500,message:'SECRET SQL'}]})};
+    if(failure==='timeout')throw new DOMException('SECRET URL','TimeoutError');
+    if(failure==='network')throw Error('SECRET TOKEN');
+    if(failure==='body-timeout')return{ok:true,status:200,json:async()=>{throw new DOMException('SECRET SQL','AbortError')}};
+    return good(1);
+   }});
+   await assert.rejects(client.writeBatch(batch),error=>{assert.match(error.message,/phase_batch|incomplete_batch/);assert.doesNotMatch(error.message,/SECRET|secret-token/);return true});assert.equal(requests,2);
+  }
+ }finally{if(oldAccount===undefined)delete process.env.CLOUDFLARE_ACCOUNT_ID;else process.env.CLOUDFLARE_ACCOUNT_ID=oldAccount;if(oldToken===undefined)delete process.env.CLOUDFLARE_API_TOKEN;else process.env.CLOUDFLARE_API_TOKEN=oldToken;}
+});
+test('CLI retains a machine-readable failure report even when D1 setup fails',async()=>{
+ const {mkdtempSync,rmSync}=await import('node:fs');const {tmpdir}=await import('node:os');const {join}=await import('node:path');const {spawnSync}=await import('node:child_process');const {fileURLToPath}=await import('node:url');
+ const directory=mkdtempSync(join(tmpdir(),'cw-fitp-report-'));
+ try{
+  const result=spawnSync(process.execPath,[fileURLToPath(new URL('../scripts/sync-fitp-player-metadata.mjs',import.meta.url))],{cwd:directory,env:{...process.env,CLOUDFLARE_ACCOUNT_ID:'',CLOUDFLARE_API_TOKEN:''},encoding:'utf8'});
+  assert.equal(result.status,1);assert.deepEqual(JSON.parse(readFileSync(join(directory,'fitp-metadata-report.json'),'utf8')),{status:'failed',error:'fitp_d1_credentials_missing'});
+ }finally{rmSync(directory,{recursive:true,force:true});}
+});

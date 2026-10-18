@@ -1,5 +1,5 @@
 // D1_WRITE_POLICY: incremental
-import {readFile} from 'node:fs/promises';
+import {readFile,writeFile} from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 import {buildIncrementalSyncPlan} from '../lib/d1-incremental-sync.mjs';
 import {fetchFitpSheet,fitpCycle} from '../lib/fitp-player-metadata.mjs';
@@ -28,7 +28,7 @@ const failureWriteSql=`INSERT INTO fitp_metadata_failures(cycle,membership_card,
  SELECT ?,json_extract(value,'$.membership_card'),json_extract(value,'$.canonical_id'),json_extract(value,'$.error') FROM json_each(?) WHERE 1
  ON CONFLICT(cycle,membership_card) DO UPDATE SET canonical_id=excluded.canonical_id,error=excluded.error
  WHERE fitp_metadata_failures.canonical_id<>excluded.canonical_id OR fitp_metadata_failures.error<>excluded.error`;
-export async function syncFitpMetadata({query,write,fetchProfile=fetchFitpSheet,now=()=>Date.now(),log=console.log,batchSize=100,concurrency=4,maxDurationMs=19800000,retryFailures=false}){
+export async function syncFitpMetadata({query,write,writeBatch,fetchProfile=fetchFitpSheet,now=()=>Date.now(),log=console.log,batchSize=100,concurrency=4,maxDurationMs=19800000,retryFailures=false}){
  if(!Number.isInteger(batchSize)||batchSize<1||batchSize>100||!Number.isInteger(concurrency)||concurrency<1||concurrency>4)throw Error('fitp_invalid_batch_settings');
  const started=now(),cycle=fitpCycle(started);
  const state=(await query('SELECT * FROM fitp_metadata_progress WHERE cycle=?',[cycle]))[0]||{last_card:'',checked:0,with_club:0,with_ranking:0,unavailable:0,complete:0};
@@ -37,8 +37,19 @@ export async function syncFitpMetadata({query,write,fetchProfile=fetchFitpSheet,
  if(retryFailures&&!state.complete)throw Error('fitp_finish_initial_acquisition_before_retry');
  let retryCursor='';
  const coverage=(await query(`SELECT COUNT(*) AS eligible,SUM(people>1) AS ambiguous FROM (SELECT l.official_id,COUNT(DISTINCT COALESCE(a.canonical_id,l.canonical_id)) AS people ${identities} WHERE l.circuit='fitp' AND ${validCard} GROUP BY l.official_id)`))[0]||{};
- log(JSON.stringify({status:'inventory',cycle,...coverage}));
- const checkpoint=complete=>write(progressWriteSql,[cycle,state.last_card,complete,state.checked,state.with_club,state.with_ranking,state.unavailable,new Date(now()).toISOString()]);
+ log(JSON.stringify({status:'inventory',cycle,...coverage,lastConfirmedCheckpoint:{...state}}));
+ const progressStatement=(next,complete)=>({sql:progressWriteSql,params:[cycle,next.last_card,complete,next.checked,next.with_club,next.with_ranking,next.unavailable,new Date(now()).toISOString()]});
+ const persist=async(statements,attemptedThrough=state.last_card)=>{
+  if(!statements.length)return;
+  try{
+   if(writeBatch)await writeBatch(statements);
+   else for(const {sql,params} of statements)await write(sql,params);
+  }catch(error){
+   log(JSON.stringify({status:'d1_batch_failed',cycle,lastConfirmedCheckpoint:{...state},attemptedThrough,error:error.message}));
+   throw error;
+  }
+ };
+ const checkpoint=complete=>persist([progressStatement(state,complete)]);
  while(true){
   if(now()-started>maxDurationMs)throw Error('fitp_run_time_budget_reached_resume_manually');
   const cards=retryFailures?await query(`SELECT f.membership_card,MIN(COALESCE(a.canonical_id,l.canonical_id)) AS canonical_id
@@ -62,31 +73,66 @@ export async function syncFitpMetadata({query,write,fetchProfile=fetchFitpSheet,
    }catch(error){errors.push({...row,error:String(error.message).slice(0,240)});}}
   }));
   const plan=metadataPlan(current,incoming),changed=[...plan.inserts,...plan.updates.map(r=>r.after)];
-  if(changed.length)await write(metadataWriteSql,[new Date(now()).toISOString(),JSON.stringify(changed)]);
-  if(errors.length)await write(failureWriteSql,[cycle,JSON.stringify(errors)]);
-  // A retry is always explicit. Normal acquisition keeps visiting distinct cards.
-  if(incoming.length)await write('DELETE FROM fitp_metadata_failures WHERE cycle=? AND membership_card IN (SELECT value FROM json_each(?))',[cycle,JSON.stringify(incoming.map(r=>r.membership_card))]);
-  if(errors.some(r=>/http_(401|403|429)$/.test(r.error))||errors.length===cards.length)throw Error('fitp_source_unavailable_resume_manually');
-  if(retryFailures){retryCursor=cards.at(-1).membership_card;log(JSON.stringify({status:'retry_progress',cycle,attempted:cards.length,failed:errors.length,dataWrites:plan.writes}));continue;}
-  state.last_card=cards.at(-1).membership_card;state.checked+=cards.length;
-  state.with_club+=incoming.filter(r=>r.club).length;state.with_ranking+=incoming.filter(r=>r.ranking).length;
-  state.unavailable+=incoming.filter(r=>!r.club||!r.ranking).length;
-  await checkpoint(0);log(JSON.stringify({status:'progress',cycle,...state,dataWrites:plan.writes,failed:errors.length}));
+  const statements=[];
+  if(changed.length)statements.push({sql:metadataWriteSql,params:[new Date(now()).toISOString(),JSON.stringify(changed)]});
+  if(errors.length)statements.push({sql:failureWriteSql,params:[cycle,JSON.stringify(errors)]});
+  // Successful cards can clear failures from a previously interrupted explicit run.
+  if(incoming.length)statements.push({sql:'DELETE FROM fitp_metadata_failures WHERE cycle=? AND membership_card IN (SELECT value FROM json_each(?))',params:[cycle,JSON.stringify(incoming.map(r=>r.membership_card))]});
+  const sourceUnavailable=errors.some(r=>/http_(401|403|429)$/.test(r.error))||errors.length===cards.length;
+  if(sourceUnavailable){await persist(statements,cards.at(-1).membership_card);throw Error('fitp_source_unavailable_resume_manually');}
+  if(retryFailures){await persist(statements,cards.at(-1).membership_card);retryCursor=cards.at(-1).membership_card;log(JSON.stringify({status:'retry_progress',cycle,attempted:cards.length,failed:errors.length,dataWrites:plan.writes}));continue;}
+  const next={...state,last_card:cards.at(-1).membership_card,checked:state.checked+cards.length,
+   with_club:state.with_club+incoming.filter(r=>r.club).length,with_ranking:state.with_ranking+incoming.filter(r=>r.ranking).length,
+   unavailable:state.unavailable+incoming.filter(r=>!r.club||!r.ranking).length};
+  // Confirm every data result before a separate cursor write. Do not assume REST batches roll back atomically.
+  await persist(statements,next.last_card);
+  await persist([progressStatement(next,0)],next.last_card);Object.assign(state,next);
+  log(JSON.stringify({status:'progress',cycle,...state,dataWrites:plan.writes,failed:errors.length}));
  }
 }
-export async function openD1({fetcher=globalThis.fetch}={}){
+export const D1_REQUEST_TIMEOUT_MS=120000;
+export async function openD1({fetcher=globalThis.fetch,databaseId=process.env.CLOUDFLARE_D1_DATABASE_ID}={}){
  const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
  if(!account||!token)throw Error('fitp_d1_credentials_missing');
+ if(databaseId&&!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(databaseId))throw Error('fitp_d1_invalid_database_id');
  const base=`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database`;
- const request=async(path,body)=>{
-  const r=await fetcher(base+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(30000)});
-  let data;try{data=await r.json();}catch{}
+ const request=async(path,body,phase)=>{
+  // One request only. The HTTP deadline includes network/queue time; it does not alter D1's SQL limit.
+  let r,data;
+  try{
+   r=await fetcher(base+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(D1_REQUEST_TIMEOUT_MS)});
+   try{data=await r.json();}catch(error){if(error?.name==='TimeoutError'||error?.name==='AbortError')throw error;}
+  }catch(error){throw Error('fitp_d1_'+(['TimeoutError','AbortError'].includes(error?.name)?'timeout':'network')+':phase_'+phase+':request_outcome_unknown_resume_manually');}
   const codes=(data?.errors||[]).map(e=>e.code).filter(Number.isFinite);
-  if(!r.ok||!data?.success)throw Error('fitp_d1_http_'+r.status+':codes_'+(codes.join(',')||'none'));return data.result;
+  if(!r.ok||!data?.success)throw Error('fitp_d1_phase_'+phase+':fitp_d1_http_'+r.status+':codes_'+(codes.join(',')||'none'));return data.result;
  };
- const database=(await request('?name=courtwatch-app&per_page=100')).find(r=>r.name==='courtwatch-app');if(!database)throw Error('fitp_d1_database_missing');
- const execute=async(sql,params=[])=>{const data=await request('/'+(database.uuid||database.id)+'/query',{sql,params});if(!Array.isArray(data)||!data.every(r=>r.success)){const codes=(Array.isArray(data)?data:[]).flatMap(r=>r.errors||[]).map(e=>e.code).filter(Number.isFinite);throw Error('fitp_d1_query_failed:codes_'+(codes.join(',')||'none'));}return data[0]?.results||[];};
- await execute(await readFile(new URL('../migrations/0041_fitp_metadata_engine.sql',import.meta.url),'utf8'));
- return{query:execute,write:execute};
+ if(!databaseId){const database=(await request('?name=courtwatch-app&per_page=100',undefined,'discover')).find(r=>r.name==='courtwatch-app');if(!database)throw Error('fitp_d1_database_missing');databaseId=database.uuid||database.id;}
+ const executeBody=async(body,phase)=>{
+  const data=await request('/'+databaseId+'/query',body,phase);
+  if(!Array.isArray(data)||!data.length||!data.every(r=>r.success)){
+   const codes=(Array.isArray(data)?data:[]).flatMap(r=>r.errors||[]).map(e=>e.code).filter(Number.isFinite);
+   throw Error('fitp_d1_phase_'+phase+':fitp_d1_query_failed:codes_'+(codes.join(',')||'none'));
+  }
+  return data;
+ };
+ const execute=async(sql,params=[])=> (await executeBody({sql,params},'query'))[0]?.results||[];
+ const writeBatch=async batch=>{
+  if(!batch.length)return;
+  const data=await executeBody({batch},'batch');
+  if(data.length!==batch.length)throw Error('fitp_d1_incomplete_batch_response_resume_manually');
+ };
+ await executeBody({sql:await readFile(new URL('../migrations/0041_fitp_metadata_engine.sql',import.meta.url),'utf8'),params:[]},'schema');
+ return{query:execute,write:execute,writeBatch};
 }
-if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)await syncFitpMetadata({...await openD1(),retryFailures:process.env.FITP_RETRY_FAILURES==='true'});
+if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
+ let lastEvent;
+ const log=line=>{lastEvent=JSON.parse(line);console.log(line);};
+ try{
+  await syncFitpMetadata({...await openD1(),log,retryFailures:process.env.FITP_RETRY_FAILURES==='true'});
+  await writeFile('fitp-metadata-report.json',JSON.stringify(lastEvent,null,2)+'\n');
+ }catch(error){
+  const report={status:'failed',error:error.message,lastEvent};
+  await writeFile('fitp-metadata-report.json',JSON.stringify(report,null,2)+'\n');
+  console.error(JSON.stringify(report));process.exitCode=1;
+ }
+}

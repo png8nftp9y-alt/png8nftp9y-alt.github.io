@@ -40,6 +40,8 @@ on:
       - '!cloudflare/app-api/scripts/github-d1-reconciliation.mjs'
       - '!cloudflare/app-api/scripts/github-d1-audit-scope.mjs'
       - '!cloudflare/app-api/scripts/read-audit-projection.mjs'
+      # The FITP metadata acquisition has its own incremental writer.
+      - '!cloudflare/app-api/scripts/sync-fitp-player-metadata.mjs'
       - '!cloudflare/app-api/scripts/generate-tennis-europe-oop-seed.mjs'
       - '!cloudflare/app-api/scripts/generate-tennis-europe-app-candidates.mjs'
       - '!cloudflare/app-api/scripts/restore-tennis-europe-oop.sh'

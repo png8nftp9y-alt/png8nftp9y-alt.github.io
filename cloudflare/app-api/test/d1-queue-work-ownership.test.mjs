@@ -47,3 +47,11 @@ test('Node seed/diagnostic helpers retain the required owner without redundant W
  for(const file of ['cloudflare/app-api/scripts/github-d1-audit-scope.mjs','cloudflare/app-api/scripts/read-audit-projection.mjs'])assert.equal(owns(common,file),false,file);
  for(const file of ['cloudflare/app-api/lib/courtwatch-player-additions.mjs','cloudflare/app-api/src/index.js'])assert.equal(owns(hotfix,file),true,file);
 });
+
+test('FITP acquisition-only changes do not also rebuild D1 or deploy the Worker',()=>{
+ const script='cloudflare/app-api/scripts/sync-fitp-player-metadata.mjs';
+ assert.equal(owns(common,script),false);assert.equal(owns(hotfix,script),false);
+ assert.equal(owns(read('courtwatch-fitp-player-metadata.yml'),script),true);
+ assert.equal(owns(hotfix,'cloudflare/app-api/test/sync-fitp-player-metadata.test.mjs'),false);
+ assert.equal(owns(hotfix,'cloudflare/app-api/lib/fitp-player-metadata.mjs'),true);
+});
