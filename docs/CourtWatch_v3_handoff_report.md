@@ -6090,3 +6090,5 @@ Validation: integrated npm run check: 381 tests, zero failures; 28 targeted queu
 ### 2026-10-18 — Bound historical projection audit to compared IDs
 
 Run 39128948638 failed reading matches with HTTP 500 / Cloudflare 7500. The code scanned every stored match payload in pages of 200, even though comparison only needs the GitHub projection IDs. This unbounded scope is removed for players, entries, schedules, matches and results: parameterized primary-key lookups in batches of at most 20 preserve complete payload comparisons and missing-ID detection. Tournament catalogue reads remain exhaustive. No retry, timer, write or runtime app change. Exact Cloudflare server-side cause is not proven; production success and historical completeness still require the next audit report. Targeted tests cover batching, deduplication, missing IDs, payload preservation, empty scope and single-attempt failures.
+
+ITF discovery 2026-10-18T16:12:07.128Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
