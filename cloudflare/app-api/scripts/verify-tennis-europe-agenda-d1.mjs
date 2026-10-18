@@ -44,7 +44,7 @@ const query=`SELECT
  AND json_extract(payload,'$.sourceUrl') LIKE '%/matches/%'
  AND COALESCE(CAST(json_extract(payload,'$.courtMatchNumber') AS INTEGER),0)<=0
 ) appMissingCourtMatchNumbers`;
-const checked=await cachedReadCheck(cliD1Query,'europe-counts',await readCheckVersion(),()=>cliD1Query(query));
+const checked=await cachedReadCheck(cliD1Query,'europe-counts',await readCheckVersion(import.meta.url),()=>cliD1Query(query));
 const row=checked.value[0]||{},errors=[];console.log('EUROPE_PARITY_READ_CACHE='+JSON.stringify({reused:checked.reused,verifiedAt:checked.verifiedAt,saved:checked.cacheSaved}));
 const incremental=oop.incremental===true||candidates.incremental===true;
 for(const [key,value] of Object.entries(expected)){const actual=Number(row[key]);if(key==='appInvalid'||key==='appMissingCourtMatchNumbers'){if(actual!==value)errors.push(`${key}: D1=${actual} expected=${value}`)}else if(incremental?actual<value:actual!==value)errors.push(`${key}: D1=${actual} expected${incremental?'>=':'='}${value}`)}

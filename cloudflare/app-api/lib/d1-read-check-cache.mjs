@@ -2,16 +2,27 @@
 import {createHash,randomUUID} from 'node:crypto';
 import {readdir,readFile} from 'node:fs/promises';
 import {sqlString} from '../../../src/v3/itf-draw-document-d1.mjs';
-let codeVersion;
-export async function readCheckVersion(){
- return codeVersion??=(async()=>{
-  const hash=createHash('sha256');
-  // A change in check logic or its local dependencies invalidates prior results.
-  for(const directory of [new URL('./',import.meta.url),new URL('../scripts/',import.meta.url),new URL('../../../src/v3/',import.meta.url),new URL('../migrations/',import.meta.url)]){
-   for(const name of (await readdir(directory)).filter(n=>/\.(mjs|sql)$/.test(n)).sort())hash.update(name).update(await readFile(new URL(name,directory)));
-  }
-  return hash.digest('hex');
- })();
+// Hash only the actual local import graph. Unrelated scripts must not flush all consumers.
+export async function dependencyVersion(entry,extraFiles=[]){
+ const files=new Map();
+ async function visit(url){
+  if(files.has(url.href))return;
+  const body=await readFile(url,'utf8');files.set(url.href,body);
+  const imports=body.matchAll(/(?:\bfrom\s*|\bimport\s*(?:\(\s*)?)['"](\.[^'"]+)['"]/g);
+  for(const match of imports)await visit(new URL(match[1],url));
+ }
+ await visit(new URL(entry));
+ for(const url of extraFiles)await visit(url);
+ const hash=createHash('sha256');
+ // Relative names make a version stable across runner checkout directories.
+ const root=new URL('../../../',import.meta.url).href;
+ for(const [name,body]of [...files].sort(([a],[b])=>a.localeCompare(b)))hash.update(name.replace(root,'')).update(body);
+ return hash.digest('hex');
+}
+export async function readCheckVersion(entry=import.meta.url){
+ const directory=new URL('../migrations/',import.meta.url);
+ const migrations=(await readdir(directory)).filter(n=>n.endsWith('.sql')).sort().map(n=>new URL(n,directory));
+ return dependencyVersion(entry,migrations);
 }
 export async function cachedReadCheck(query,name,version,work,{force=false,canCache=()=>true}={}){
  const schema=await query("SELECT name FROM sqlite_master WHERE type='table' AND name='d1_read_check_cache'");

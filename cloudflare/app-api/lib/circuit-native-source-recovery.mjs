@@ -1,3 +1,4 @@
+import {recoveryReadQuery} from './recovery-read-query.mjs';
 import {sourceNativeEvidence,hasConflictingNativeSource} from './native-player-source-fields.mjs';
 import {acquiredPlayer} from './acquired-player-index.mjs';
 import {playerNameKey} from './player-circuit-profiles.mjs';
@@ -88,15 +89,25 @@ export function circuitAcceptanceRecovery(doc,{officialJson=circuitOfficialJson(
   }return resolved;
  };
 }
-export const circuitMissingNativeSourcesSql=`${playerNativeIdAuditCtes}
-SELECT s.*,l.canonical_id FROM (
- SELECT 'observed_players' AS source_table,source_key,circuit,official_id,normalized_name,display_name,payload FROM observed_players
- UNION ALL SELECT 'search_acquired_players',source_key,circuit,official_id,normalized_name,display_name,payload FROM search_acquired_players
-) s JOIN eligible_links l ON l.source_key=s.source_key AND l.circuit=s.circuit
-WHERE s.circuit IN ('fitp','itf') AND NOT EXISTS(SELECT 1 FROM native n WHERE n.canonical_id=l.canonical_id AND n.circuit=l.circuit)
-ORDER BY s.source_table,s.source_key`;
+// Only groups containing an invalid native ID can be missing native evidence.
+// The full native rules (including configured profile URLs) still decide recovery.
+const invalidNative=`(l.circuit='fitp' AND NOT(length(trim(l.official_id)) BETWEEN 6 AND 12 AND trim(l.official_id) NOT GLOB '*[^0-9]*')) OR (l.circuit='itf' AND NOT(length(trim(l.official_id))=9 AND trim(l.official_id) GLOB '800*' AND trim(l.official_id) NOT GLOB '*[^0-9]*'))`;
+const scopedNativeCtes=playerNativeIdAuditCtes.replace('WITH RECURSIVE eligible_links AS (',`WITH RECURSIVE candidate_links AS MATERIALIZED (
+ SELECT l.source_key,l.canonical_id,l.circuit FROM player_circuit_identities l WHERE ${invalidNative}
+), eligible_links AS (`).replace('FROM player_circuit_identities WHERE','FROM player_circuit_identities INDEXED BY player_circuit_identity_person WHERE canonical_id IN (SELECT canonical_id FROM candidate_links) AND');
+export const circuitMissingNativeSourcesSql=`${scopedNativeCtes}
+SELECT 'observed_players' AS source_table,s.source_key,s.circuit,s.official_id,s.normalized_name,s.display_name,s.payload,l.canonical_id
+FROM candidate_links c JOIN eligible_links l ON l.source_key=c.source_key
+CROSS JOIN observed_players s ON s.source_key=l.source_key AND s.circuit=l.circuit
+WHERE NOT EXISTS(SELECT 1 FROM native n WHERE n.canonical_id=l.canonical_id AND n.circuit=l.circuit)
+UNION ALL
+SELECT 'search_acquired_players',s.source_key,s.circuit,s.official_id,s.normalized_name,s.display_name,s.payload,l.canonical_id
+FROM candidate_links c JOIN eligible_links l ON l.source_key=c.source_key
+CROSS JOIN search_acquired_players s ON s.source_key=l.source_key AND s.circuit=l.circuit
+WHERE NOT EXISTS(SELECT 1 FROM native n WHERE n.canonical_id=l.canonical_id AND n.circuit=l.circuit)
+ORDER BY 1,2`;
 export async function recoverCircuitNativeSources(query,{officialJson=circuitOfficialJson(),onProgress=()=>{}}={}){
- const rows=await query(circuitMissingNativeSourcesSql),report={examined:rows.length,repaired:0,unresolved:0};
+ const rows=await recoveryReadQuery(query,circuitMissingNativeSourcesSql,'identity_invalid_native'),report={examined:rows.length,repaired:0,unresolved:0};
  for(const row of rows){
   const refs=[];let afterMatch='',afterPlayer='';
   // Indexed normalized_name is only a narrowing filter; the source hash must match.

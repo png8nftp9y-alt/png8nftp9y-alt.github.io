@@ -29,7 +29,7 @@ const query=`SELECT
 ${ownershipSelect},
 (SELECT COUNT(*) FROM user_match_analyses WHERE user_id='user-federico-181099') ownerAnalyses,
 (SELECT COUNT(*) FROM match_analyses) legacyAnalyses`;
-const version=await readCheckVersion();
+const version=await readCheckVersion(import.meta.url);
 const observedCheck=await cachedReadCheck(cliD1Query,'observed-counts',version,()=>cliD1Query(`SELECT (SELECT COUNT(*) FROM observed_players) observedPlayers,
 (SELECT COUNT(*) FROM observed_players WHERE circuit='fitp') observedFitp,
 (SELECT COUNT(*) FROM observed_players WHERE circuit='tennis-europe') observedTe,

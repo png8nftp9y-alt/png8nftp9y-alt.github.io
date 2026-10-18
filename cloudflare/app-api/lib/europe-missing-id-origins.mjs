@@ -1,13 +1,16 @@
 import {includedPlayerIdSourceSql} from './player-id-audit-scope.mjs';
 const validGuid=value=>`length(${value})=36 AND substr(${value},9,1)='-' AND substr(${value},14,1)='-' AND substr(${value},19,1)='-' AND substr(${value},24,1)='-' AND length(replace(${value},'-',''))=32 AND lower(replace(${value},'-','')) NOT GLOB '*[^0-9a-f]*'`;
 // Read-only, same native-ID scope as the admin counter; no exported player names.
-export const europeMissingIdOriginsSql=`WITH eligible_links AS MATERIALIZED (
- SELECT source_key,canonical_id,circuit,official_id FROM player_circuit_identities
- WHERE circuit IN ('tennis-europe','courtwatch') AND ${includedPlayerIdSourceSql()}
+export const europeMissingIdOriginsSql=`WITH candidate_people AS MATERIALIZED (
+ SELECT DISTINCT canonical_id FROM player_circuit_identities
+ WHERE circuit='tennis-europe' AND NOT (${validGuid('trim(official_id)')}) AND ${includedPlayerIdSourceSql()}
+), eligible_links AS MATERIALIZED (
+ SELECT source_key,canonical_id,circuit,official_id FROM player_circuit_identities INDEXED BY player_circuit_identity_person
+ WHERE canonical_id IN (SELECT canonical_id FROM candidate_people) AND circuit IN ('tennis-europe','courtwatch') AND ${includedPlayerIdSourceSql()}
 ), native_europe AS MATERIALIZED (
  SELECT DISTINCT canonical_id FROM eligible_links WHERE circuit='tennis-europe' AND ${validGuid('trim(official_id)')}
- UNION SELECT p.canonical_id FROM player_identity_people p
- JOIN (SELECT DISTINCT canonical_id FROM eligible_links WHERE circuit='courtwatch') e ON e.canonical_id=p.canonical_id,
+ UNION SELECT p.canonical_id FROM (SELECT DISTINCT canonical_id FROM eligible_links WHERE circuit='courtwatch') e
+ CROSS JOIN player_identity_people p ON p.canonical_id=e.canonical_id,
  json_each(p.payload,'$.circuitProfiles') profile
  WHERE json_extract(profile.value,'$.circuit')='tennis-europe'
  AND lower(substr(json_extract(profile.value,'$.url'),1,49))='https://te.tournamentsoftware.com/player-profile/'

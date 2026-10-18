@@ -1,3 +1,4 @@
+import {recoveryReadQuery} from '../lib/recovery-read-query.mjs';
 import {cachedReadCheck,readCheckVersion} from '../lib/d1-read-check-cache.mjs';
 import fs from 'node:fs/promises';
 import {recoverEuropeMatchProfiles} from '../lib/europe-match-profile-recovery.mjs';
@@ -16,12 +17,12 @@ async function query(sql){
 const audit={status:'started',checkedAt:new Date().toISOString(),metrics};
 await fs.mkdir('tmp',{recursive:true});
 try{
- const checked=await cachedReadCheck(query,'europe-profiles',await readCheckVersion(),async()=>{
- audit.before=europeMissingIdOriginsResult((await query(europeMissingIdOriginsSql))[0]);
+ const checked=await cachedReadCheck(query,'europe-profiles',await readCheckVersion(import.meta.url),async()=>{
+ audit.before=europeMissingIdOriginsResult((await recoveryReadQuery(query,europeMissingIdOriginsSql,'identity_invalid_europe'))[0]);
  audit.recovery=await recoverEuropeMatchProfiles(query,{onProgress:p=>console.log('EUROPE_NATIVE_PROFILE_PROGRESS='+JSON.stringify(p))});
  const mapping=await syncPlayerIdentities(query);
  audit.mapping={status:mapping.status,pending:mapping.pending,writes:mapping.writes};
- audit.after=europeMissingIdOriginsResult((await query(europeMissingIdOriginsSql))[0]);
+ audit.after=europeMissingIdOriginsResult((await recoveryReadQuery(query,europeMissingIdOriginsSql,'identity_invalid_europe'))[0]);
  audit.status=audit.after.missingPeople||audit.after.pendingMapping||audit.recovery.unresolved?'unresolved_official_evidence':'complete_zero_verified';
  if(audit.status!=='complete_zero_verified')throw Error('europe_official_profiles_unresolved:'+audit.after.missingPeople);
  const {metrics,...value}=audit;return value;

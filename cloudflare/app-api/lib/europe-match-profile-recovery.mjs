@@ -1,3 +1,4 @@
+import {recoveryReadQuery} from './recovery-read-query.mjs';
 import {acquiredPlayer} from './acquired-player-index.mjs';
 import {validOfficialId} from './player-profile-evidence.mjs';
 import {matchingNation} from './archived-profile-evidence.mjs';
@@ -73,7 +74,7 @@ export async function recoverEuropeMatchProfiles(query,{publicPage=europePublicP
  let examined=0,repaired=0,unresolved=0,requests=0;
  // Use exactly the production missing-person scope. A legacy source without an
  // ID does not require HTTP recovery if its canonical person already has one.
- const targets=await query(europeMissingIdDetailsSql);
+ const targets=await recoveryReadQuery(query,europeMissingIdDetailsSql,'identity_invalid_europe');
  for(let offset=0;offset<targets.length;offset+=100){
   const keys=targets.slice(offset,offset+100).map(r=>sqlString(r.source_key)).join(',');
   const rows=(await query(`SELECT s.*,l.nationality,l.birth_year FROM search_acquired_players s LEFT JOIN player_circuit_identities l ON l.source_key=s.source_key WHERE s.circuit='tennis-europe' AND s.source_key IN (${keys}) AND COALESCE(s.official_id,'')='' ORDER BY s.source_key`)).map(r=>({...r,source_table:'search_acquired_players'}));

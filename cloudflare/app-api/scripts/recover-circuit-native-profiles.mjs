@@ -1,3 +1,4 @@
+import {recoveryReadQuery} from '../lib/recovery-read-query.mjs';
 import {cachedReadCheck,readCheckVersion} from '../lib/d1-read-check-cache.mjs';
 import fs from 'node:fs/promises';
 import {recoverCircuitNativeSources,circuitOfficialJson,circuitMissingNativeSourcesSql} from '../lib/circuit-native-source-recovery.mjs';
@@ -15,10 +16,10 @@ async function query(sql){
 const report={status:'started',checkedAt:new Date().toISOString(),metrics,requests:0};
 await fs.mkdir('tmp',{recursive:true});
 try{
- const checked=await cachedReadCheck(query,'native-profiles',await readCheckVersion(),async()=>{
+ const checked=await cachedReadCheck(query,'native-profiles',await readCheckVersion(import.meta.url),async()=>{
  report.recovery=await recoverCircuitNativeSources(query,{officialJson:circuitOfficialJson({onRequest:()=>report.requests++}),onProgress:p=>console.log('CIRCUIT_NATIVE_PROFILE_PROGRESS='+JSON.stringify(p))});
  const mapping=await syncPlayerIdentities(query);report.mapping={status:mapping.status,pending:mapping.pending,writes:mapping.writes};
- const after=await query(circuitMissingNativeSourcesSql);report.after={missingSources:after.length,byCircuit:{fitp:after.filter(r=>r.circuit==='fitp').length,itf:after.filter(r=>r.circuit==='itf').length}};
+ const after=await recoveryReadQuery(query,circuitMissingNativeSourcesSql,'identity_invalid_native');report.after={missingSources:after.length,byCircuit:{fitp:after.filter(r=>r.circuit==='fitp').length,itf:after.filter(r=>r.circuit==='itf').length}};
  report.status=after.length||mapping.pending||report.recovery.unresolved?'unresolved_official_evidence':'complete_zero_verified';
  if(report.status!=='complete_zero_verified')throw Error('circuit_native_profiles_unresolved:'+after.length);
  const {metrics,...value}=report;return value;
