@@ -42,7 +42,11 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=async()=>'',m
   player={...parse(row.payload),id:row.id,userAdded:true};observedSourceKey=row.observed_source_key||'courtwatch|'+row.id;
  }else{
   const sourceTable=(sourceKey||identity).startsWith('acquired|')?'search_acquired_players':'observed_players';
-  let rows=(await env.DB.prepare(`SELECT source_key,circuit,official_id,display_name,payload FROM ${sourceTable} WHERE source_key=? OR official_id=? LIMIT 20`).bind(sourceKey||identity,sourceKey?'':identity).all()).results||[];
+  // A selected source key is unique. The official-ID OR branch cannot use
+  // the circuit-prefixed index and otherwise scans the whole source table.
+  const sourceWhere=sourceKey?'source_key=?':'source_key=? OR official_id=?';
+  const sourceValues=sourceKey?[sourceKey]:[identity,identity];
+  let rows=(await measure('source_lookup',()=>env.DB.prepare(`SELECT source_key,circuit,official_id,display_name,payload FROM ${sourceTable} WHERE ${sourceWhere} LIMIT 20`).bind(...sourceValues).all())).results||[];
   if(!rows.length&&!sourceKey&&identity){try{rows=(await env.DB.prepare('SELECT source_key,circuit,official_id,display_name,payload FROM search_acquired_players WHERE source_key=? OR official_id=? LIMIT 20').bind(identity,identity).all()).results||[]}catch(error){if(!/no such table/i.test(error.message))throw error}}
   // Search may return a retained canonical identity after an upstream rebuild,
   // or its verified current name may differ from the original circuit spelling.
@@ -81,9 +85,9 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=async()=>'',m
  }
  // These lookups depend only on the verified source, not on each other.
  const [mapped,previous,configured]=await Promise.all([
-  mappedPlayerId(env.DB,observedSourceKey,user.id,{includeIdentity:true}),
-  env.DB.prepare('SELECT courtwatch_id,observed_source_key,payload FROM user_app_player_additions WHERE user_id=? AND observed_source_key=?').bind(user.id,observedSourceKey).first(),
-  configuredIdentity?env.DB.prepare('SELECT id,payload FROM app_players WHERE CAST(json_extract(payload,?) AS TEXT)=? LIMIT 2').bind(configuredIdentity.path,String(configuredIdentity.row.official_id)).all():null
+  measure('identity_mapping',()=>mappedPlayerId(env.DB,observedSourceKey,user.id,{includeIdentity:true})),
+  measure('personal_selection',()=>env.DB.prepare('SELECT courtwatch_id,observed_source_key,payload FROM user_app_player_additions WHERE user_id=? AND observed_source_key=?').bind(user.id,observedSourceKey).first()),
+  configuredIdentity?measure('configured_identity',()=>env.DB.prepare('SELECT id,payload FROM app_players WHERE CAST(json_extract(payload,?) AS TEXT)=? LIMIT 2').bind(configuredIdentity.path,String(configuredIdentity.row.official_id)).all()):null
  ]);
  const existing=configured?.results||[];
  if(existing.length>1)throw failure('player_identity_ambiguous',409);
@@ -92,13 +96,13 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=async()=>'',m
   player=personalPlayerMetadata({...parse(existing[0].payload),id:existing[0].id,userAdded:true,sourceCircuit:row.circuit,sourceKey:row.source_key,sourcePlayerId:row.official_id},payload);
  }
  if(mapped){player.id=mapped.playerId;player.canonicalId=mapped.canonicalId;}
- player=await hydratePersonalCircuitIdentity(env.DB,player,
-  mapped?.identity&&player.sourceKey===observedSourceKey?mapped.identity:undefined);
+ player=await measure('identity_hydration',()=>hydratePersonalCircuitIdentity(env.DB,player,
+  mapped?.identity&&player.sourceKey===observedSourceKey?mapped.identity:undefined));
  // Resolve a retained personal ID before querying membership, avoiding a second read.
  if(previous&&previous.courtwatch_id!==player.id){if(mapped)player.id=previous.courtwatch_id;else throw failure('player_identity_conflict',409);}
  if(!player.club&&previous)player.club=personalPlayerMetadata(parse(previous.payload)).club||'';
  const [linked,removed,club]=await Promise.all([
-  env.DB.prepare(`SELECT courtwatch_id FROM ${membership} WHERE user_id=? AND courtwatch_id=?`).bind(user.id,player.id).first(),
+  measure('membership_read',()=>env.DB.prepare(`SELECT courtwatch_id FROM ${membership} WHERE user_id=? AND courtwatch_id=?`).bind(user.id,player.id).first()),
   group==='main'?env.DB.prepare('SELECT courtwatch_id FROM user_app_player_removals WHERE user_id=? AND courtwatch_id=?').bind(user.id,player.id).first():null,
   player.membershipCard&&!player.club?
    Promise.resolve().then(()=>measure('official_fitp_club',()=>fetchClub(player.membershipCard))).catch(()=>''):player.club

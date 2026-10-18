@@ -324,3 +324,29 @@ test('retained personal ID is checked directly for membership with no redundant 
   assert.deepEqual(membershipIds,[retainedId]);
  }finally{d.close()}
 });
+
+test('exact observed and acquired selections use a unique index despite many unrelated rows and blank official IDs',async()=>{
+ for(const table of ['observed_players','search_acquired_players']){
+  const d=database({identityMapping:true});try{
+   d.execute(`WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i+1 FROM n WHERE i<15000)
+    INSERT INTO ${table}(source_key,circuit,official_id,normalized_name,display_name,payload)
+    SELECT 'unrelated|'||i,'fitp','','UNRELATED','Unrelated Player','{}' FROM n`);
+   const key=(table==='search_acquired_players'?'acquired|':'')+'fitp|id:998877';
+   d.execute(`INSERT INTO ${table}(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)`,[key,'fitp','998877','SELECTED PLAYER','Selected Player',JSON.stringify({club:'Tennis Club Lecco',ranking:'3.2',birthYear:2011})]);
+   const sourceQueries=[],stages=[];
+   const DB=interceptedDatabase(d.env.DB,(sql,read)=>{
+    if(sql.startsWith('SELECT source_key,circuit,official_id,display_name,payload FROM '))sourceQueries.push(sql);
+    return read();
+   });
+   const result=await addCourtWatchPlayer({DB},user,{sourceKey:key,name:'Selected Player',group:'others'},{measure:(stage,operation)=>{stages.push(stage);return operation()}});
+   assert.equal(result.player.name,'Selected Player');assert.equal(result.player.sourceKey,key);
+   assert.equal(result.player.membershipCard,'998877');assert.equal(result.player.club,'Tennis Club Lecco');assert.equal(result.player.ranking,'3.2');assert.equal(result.player.birthYear,2011);
+   assert.equal(sourceQueries.length,1);assert.match(sourceQueries[0],/WHERE source_key=\? LIMIT 20$/);assert.doesNotMatch(sourceQueries[0],/ OR /);
+   const plan=d.execute('EXPLAIN QUERY PLAN '+sourceQueries[0],[key]).rows.map(row=>row.detail).join('\n');
+   assert.match(plan,/SEARCH .* USING INDEX .*source_key=\?/);assert.doesNotMatch(plan,/SCAN /);
+   for(const stage of ['source_lookup','identity_mapping','personal_selection','configured_identity','identity_hydration','membership_read','membership_write'])assert.ok(stages.includes(stage),stage);
+   const before=d.writes(),replay=await addCourtWatchPlayer({DB},user,{sourceKey:key,name:'Selected Player',group:'others'});
+   assert.equal(replay.changed,false);assert.equal(d.writes(),before);
+  }finally{d.close()}
+ }
+});
