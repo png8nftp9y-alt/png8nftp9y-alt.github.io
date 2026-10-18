@@ -40,6 +40,8 @@ jobs:
         with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - name: Check empty and acquired-document persistence guards
+        run: node --test cloudflare/app-api/test/itf-automatic-d1-persistence.test.mjs
       - id: download
         name: Download acquired artifacts even if a later publication step failed
         env:
@@ -69,11 +71,14 @@ jobs:
             echo "has_draws=false" >> "$GITHUB_OUTPUT"
             echo "NO_DRAW_ARTIFACTS: no D1 coverage claim; inspect source run $SOURCE_RUN_ID if acquisition was expected."
           fi
-      - name: Build acquired documents and incremental match projection
+      - id: seed
+        name: Build acquired documents and incremental match projection
         if: steps.download.outputs.has_draws == 'true'
-        run: node src/v3/build-itf-draw-d1-seed.mjs /tmp/itf-run-draws
+        run: |
+          node src/v3/build-itf-draw-d1-seed.mjs /tmp/itf-run-draws
+          node src/v3/itf-draw-d1-work-plan.mjs
       - name: Configure, migrate and import D1
-        if: steps.download.outputs.has_draws == 'true'
+        if: steps.seed.outputs.has_documents == 'true'
         working-directory: cloudflare/app-api
         run: |
           set -euo pipefail

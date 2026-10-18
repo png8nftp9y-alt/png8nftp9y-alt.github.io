@@ -4,9 +4,7 @@ import {sqlString,verifyDocument} from './itf-draw-document-d1.mjs';
 
 const root=process.cwd();
 const expected=JSON.parse(await fs.readFile(path.join(root,'dist/v3/audits/itf-draw-d1-sync.json'),'utf8'));
-const config=JSON.parse(await fs.readFile(path.join(root,'cloudflare/app-api/wrangler.generated.jsonc'),'utf8'));
-const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN,id=config.d1_databases?.find(x=>x.binding==='DB')?.database_id;
-if(!account||!token||!id)throw new Error('Missing configured D1 credentials/database');
+let account,token,id;
 async function query(sql){
  for(let attempt=0;attempt<4;attempt++){
   let error;
@@ -17,6 +15,11 @@ async function query(sql){
 }
 const report={version:3,verifiedAt:new Date().toISOString(),scope:expected.scope,expectedDocuments:expected.documents.length,verifiedDocuments:0,missingOrCorrupt:[],archivedUnverified:expected.archivedUnverified||[],resolvedEmptyQualifications:expected.resolvedEmptyQualifications||[],fullPeriodCertified:false};
 try{
+ if(expected.documents.length){
+  const config=JSON.parse(await fs.readFile(path.join(root,'cloudflare/app-api/wrangler.generated.jsonc'),'utf8'));
+  account=process.env.CLOUDFLARE_ACCOUNT_ID;token=process.env.CLOUDFLARE_API_TOKEN;id=config.d1_databases?.find(x=>x.binding==='DB')?.database_id;
+  if(!account||!token||!id)throw new Error('Missing configured D1 credentials/database');
+ }
  for(let offset=0;offset<expected.documents.length;offset+=10){
   const batch=expected.documents.slice(offset,offset+10);
   const predicate=batch.map(x=>`(d.draw_key=${sqlString(x.drawKey)} AND d.content_sha256=${sqlString(x.sha256)} AND d.acquisition_state=${sqlString((x.acquisitionState||'complete')==='complete'?'complete':'saved_non_complete')})`).join(' OR ');

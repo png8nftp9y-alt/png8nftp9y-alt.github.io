@@ -1,4 +1,5 @@
 import test from 'node:test';
+import './itf-empty-draw-import.test.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read=name=>readFileSync(new URL('../../../.github/workflows/'+name,import.meta.url),'utf8');
@@ -29,4 +30,11 @@ test('D1 workflow fails on missing mandatory artifacts and verifies content afte
  const triggers=sync.slice(0,sync.indexOf('permissions:'));
  assert.doesNotMatch(triggers,/Court Watch v3 ITF T-1 complete draws/);
  assert.match(sync,/if: always\(\) && steps.download.outputs.has_draws == 'true'/);
+});
+
+test('pending-only batches bypass migrations while still producing a content-verification report',()=>{
+ const step=sync.slice(sync.indexOf('      - name: Configure, migrate and import D1'),sync.indexOf('      - name: Verify every imported document'));
+ assert.match(step,/if: steps.seed.outputs.has_documents == 'true'/);
+ assert.match(sync,/id: seed[\s\S]*?node src\/v3\/itf-draw-d1-work-plan.mjs/);
+ assert.match(sync,/Verify every imported document[\s\S]*?if: steps.download.outputs.has_draws == 'true'/);
 });

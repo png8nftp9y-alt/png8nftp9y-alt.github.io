@@ -15,6 +15,7 @@ test('ITF result imports keep the permanent incremental contract',()=>{
   assert.match(source,/ON CONFLICT\(id\) DO UPDATE/);
   assert.match(source,/WHERE \$\{different/);
   assert.doesNotMatch(source,/DELETE\s+FROM\s+(matches|results)/i);
-  assert.match(source,/doc\.status==='complete'/);
+  assert.match(source,/documentRecord\(doc/);
+  assert.match(source,/acquisitionState==='complete'/);
   assert.ok([D1_TEST_INITIAL_IMPORT,D1_TEST_IDENTICAL_ZERO_WRITES,D1_TEST_REAL_DELTAS_ONLY,D1_TEST_INCOMPLETE_SOURCE_GUARD].every(Boolean));
 });

@@ -2,6 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';import {rea
 import {storedPresentationLoaders} from '../lib/personal-tournament-presentation.mjs';
 import './runtime-publishers.test.mjs';
 import './engine-d1-routing.test.mjs';
+import './itf-automatic-d1-persistence.test.mjs';
 import './opponent-entry-current-source.test.mjs';
 import './courtwatch-acceptance-player-profiles.test.mjs';
 import {prepareRuntimeAssets} from '../scripts/prepare-runtime-assets.mjs';
