@@ -30,6 +30,11 @@ on:
     branches: [main]
     paths:
       - 'cloudflare/app-api/**'
+      # Worker-only code/assets are published by the dedicated hotfix workflow.
+      - '!cloudflare/app-api/src/**'
+      - '!cloudflare/app-api/test/**'
+      - '!cloudflare/app-api/scripts/prepare-runtime-assets.mjs'
+      - '!cloudflare/app-api/scripts/verify-static-flags.mjs'
       - '!cloudflare/app-api/scripts/audit-github-d1-completeness.mjs'
       - '!cloudflare/app-api/scripts/github-d1-reconciliation.mjs'
       - '!cloudflare/app-api/scripts/generate-tennis-europe-oop-seed.mjs'
@@ -200,6 +205,7 @@ jobs:
       - name: Apply user-confirmed personal birth years
         run: node scripts/sync-confirmed-personal-birth-years.mjs
       - name: Build read-only Europe parity manifests
+        if: steps.import.outputs.changed == 'true'
         run: |
           npm run seed:te-oop
           npm run seed:te-candidates

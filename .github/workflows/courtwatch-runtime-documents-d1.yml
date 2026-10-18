@@ -1,25 +1,15 @@
 name: Court Watch runtime documents D1 import and verification
 # D1_WRITE_POLICY: incremental
 on:
+  # Shared acquisition completions publish runtime documents in the general importer.
+  # This workflow owns the remaining metadata/diagnostic producers and document paths.
   workflow_run:
     workflows:
-      - Court Watch v3 FITP provincial primary
-      - Court Watch v3 FITP player entries
-      - Court Watch v3 Tennis Europe tournament map
-      - Court Watch v3 Tennis Europe live entries
-      - Court Watch Tennis Europe agenda D1
-      - Court Watch v3 ITF global tournament map
-      - Court Watch v3 ITF acceptance discovery 42d
-      - Court Watch v3 ITF known labels fast
-      - Court Watch v3 ITF acceptance safety 120d
-      - Court Watch v3 ITF complete backfill
       - Court Watch ITF Meta engine
       - Court Watch future ITF tournament metadata acquisition
       - Court Watch v3 ITF T-1 complete draws
       - Court Watch ITF T-1 extraordinary concluded recovery
       - Court Watch ITF T-1 artifact persistence recovery
-      - Court Watch v3 results engine
-      - Court Watch v3 order of play engine
       - Court Watch ITF incremental catalog and diagnostics
     types: [completed]
     branches: [main]
@@ -31,15 +21,10 @@ on:
       - 'cloudflare/app-api/lib/runtime-document-plan.mjs'
       - 'cloudflare/app-api/scripts/sync-runtime-documents-d1.mjs'
       - 'dist/v3/players.json'
-      - 'dist/v3/tournaments.json'
       - 'dist/v3/matches.json'
-      - 'dist/v3/agenda.json'
-      - 'dist/v3/results.json'
       - 'dist/v3/opponents.json'
-      - 'dist/v3/tournament_entries.json'
       - 'dist/v3/sync_status.json'
       - 'dist/v3/diagnostics.json'
-      - 'dist/v3/manual_matches.json'
       - 'dist/v3/source_itf_history_tournaments.json'
       - 'dist/v3/source_itf_tournaments.json'
       - 'dist/v3/source_fitp_tournaments.json'

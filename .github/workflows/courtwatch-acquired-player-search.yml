@@ -28,7 +28,25 @@ concurrency:
   cancel-in-progress: false
   queue: single
 jobs:
+  check-source:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      source_sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check source outside the D1 writer queue
+        run: |
+          node --test test/courtwatch-acquired-player-search.test.mjs
+          (cd cloudflare/app-api && node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs test/player-profile-evidence.test.mjs test/player-identity-write-budget.test.mjs test/player-native-profile-recovery.test.mjs test/europe-match-profile-recovery.test.mjs test/circuit-native-source-recovery.test.mjs)
   index:
+    needs: check-source
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     concurrency:
       group: courtwatch-d1-writes
@@ -44,14 +62,19 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main}
+        with: {ref: main, fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Test completion triggers and preserved recovery guards
-        run: node --test test/courtwatch-acquired-player-search.test.mjs
-      - name: Test incremental source and replay guards
-        working-directory: cloudflare/app-api
-        run: node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs test/player-profile-evidence.test.mjs test/player-identity-write-budget.test.mjs test/player-native-profile-recovery.test.mjs test/europe-match-profile-recovery.test.mjs test/circuit-native-source-recovery.test.mjs
+      - name: Recheck source only when code advanced during the wait
+        env:
+          CHECKED_SHA: ${{ needs.check-source.outputs.source_sha }}
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          git fetch --no-tags --depth=1 origin "$CHECKED_SHA"
+          if ! git diff --quiet "$CHECKED_SHA" HEAD -- cloudflare/app-api src/v3 tools/tests test .github/workflows; then
+            node --test test/courtwatch-acquired-player-search.test.mjs
+            (cd cloudflare/app-api && node --test test/acquired-player-index.test.mjs test/sync-acquired-player-search.test.mjs test/player-identity-mapping.test.mjs test/player-profile-evidence.test.mjs test/player-identity-write-budget.test.mjs test/player-native-profile-recovery.test.mjs test/europe-match-profile-recovery.test.mjs test/circuit-native-source-recovery.test.mjs)
+          fi
       - name: Configure database and apply additive migrations
         working-directory: cloudflare/app-api
         run: |

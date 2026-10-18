@@ -11,4 +11,4 @@ test('agenda checks out latest main after acquiring the writer lease, before imp
 
 test('runtime document publication has event triggers and no periodic polling schedule',()=>{const s=read('courtwatch-runtime-documents-d1.yml');assert.doesNotMatch(s,/^  schedule:|cron:/m);assert.match(s,/^  workflow_run:/m);assert.match(s,/^  workflow_dispatch:/m);assert.match(s,/^  push:/m);});
 import {RUNTIME_DOCUMENT_FILES} from '../../cloudflare/app-api/lib/runtime-document-plan.mjs';
-test('every runtime input has a file-change trigger so periodic polling is unnecessary',()=>{const s=read('courtwatch-runtime-documents-d1.yml');for(const path of RUNTIME_DOCUMENT_FILES)assert.ok(s.includes("      - '"+path+"'"),path);});
+test('every runtime input retains one event-driven publishing owner',()=>{const sources=['courtwatch-cloudflare-app-api.yml','courtwatch-runtime-documents-d1.yml','courtwatch-tennis-europe-agenda.yml'].map(read);for(const path of RUNTIME_DOCUMENT_FILES)assert.equal(sources.filter(s=>s.includes("      - '"+path+"'")).length,1,path);});
