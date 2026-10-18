@@ -52,6 +52,7 @@ jobs:
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Configure Tennis Europe R2 reads

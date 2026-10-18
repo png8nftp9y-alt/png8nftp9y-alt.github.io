@@ -8,6 +8,8 @@ on:
       - 'cloudflare/app-api/scripts/audit-github-d1-completeness.mjs'
       - 'cloudflare/app-api/scripts/github-d1-reconciliation.mjs'
       - 'tools/tests/github-d1-reconciliation.test.mjs'
+      - 'cloudflare/app-api/lib/read-only-d1-client.mjs'
+      - 'cloudflare/app-api/test/read-only-d1-client.test.mjs'
 permissions:
   contents: read
 concurrency:
@@ -24,7 +26,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Verify missing-data detection and enforced read-only adapter
-        run: node --test tools/tests/github-d1-reconciliation.test.mjs
+        run: node --test tools/tests/github-d1-reconciliation.test.mjs cloudflare/app-api/test/read-only-d1-client.test.mjs
       - name: Compare GitHub historical records with stored D1 data without writes
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}

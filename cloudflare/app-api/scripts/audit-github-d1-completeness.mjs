@@ -12,21 +12,26 @@ const report={status:'running',sourceCommit:execFileSync('git',['rev-parse','HEA
 const read=async p=>JSON.parse(await fs.readFile(root+p,'utf8'));
 async function pages(query,table,columns,key='id'){const rows=[];let after=key==='seq'?0:'';while(true){const batch=await query(`SELECT ${columns} FROM ${table} WHERE ${key}>? ORDER BY ${key} LIMIT 200`,[after]);rows.push(...batch);if(batch.length<200)break;after=batch.at(-1)[key];}return rows;}
 try{
+ report.stage='open_database';
  const {query,db}=await openReadOnlyD1();
  const generationMarker=async()=>JSON.stringify(await query("SELECT id,generated_at,counts_json FROM generations WHERE id='current'"));
  const beforeGeneration=await generationMarker();
  const reader=runtimeDocumentReader(db),release=await reader.release();report.releaseSourceCommit=release.sourceCommit;
- const storedDocuments=new Map();for(const path of RUNTIME_DOCUMENT_FILES){const value=await reader.get(path);storedDocuments.set(path,value);const current=encodeDocument(path,await read(path)),record=release.documents.find(d=>d.path===path);report.documents.push({path,verifiedInD1:true,sameAsGitHub:current.hash===record.hash});}
+ report.stage='runtime_documents';
+ const storedDocuments=new Map();for(const path of RUNTIME_DOCUMENT_FILES){report.currentSource=path;const value=await reader.get(path);storedDocuments.set(path,value);const current=encodeDocument(path,await read(path)),record=release.documents.find(d=>d.path===path);report.documents.push({path,verifiedInD1:true,sameAsGitHub:current.hash===record.hash});}
+ report.stage='canonical_projections';
  const tableRows={};
  for(const [table,list]of [['players','players'],['tournaments','tournaments'],['entries','entries'],['schedules','schedules'],['matches','matches'],['results','results']]){
-  const source=(await read('dist/v3/universal/'+table+'.json'))[list];if(!Array.isArray(source))throw Error('invalid_source:'+table);
+  report.currentSource=table;const source=(await read('dist/v3/universal/'+table+'.json'))[list];if(!Array.isArray(source))throw Error('invalid_source:'+table);
   const expected=['matches','results','schedules'].includes(table)?source.filter(r=>r.circuit!=='tennis-europe'):source;
   const rows=await pages(query,table,table==='tournaments'?'id,circuit,source_tournament_id,payload':'id,payload');tableRows[table]=rows;report.projections[table]={...projectionComparison(expected,rows),source:'dist/v3/universal/'+table+'.json',excludedTennisEuropeRows:source.length-expected.length};
  }
+ report.stage='historical_catalogues_and_relations';delete report.currentSource;
  const app=await pages(query,'app_tournaments','seq,player_id,competition_id,circuit,payload','seq'),storedRelations=app.map(r=>({...JSON.parse(r.payload),circuit:r.circuit,playerId:r.player_id,competitionId:r.competition_id}));
  const nativeTournaments=tableRows.tournaments.map(r=>({...JSON.parse(r.payload),circuit:r.circuit,sourceTournamentId:r.source_tournament_id}));
  for(const [circuit,path,source]of [['fitp','history/fitp_tournament_archive.json','dist/v3/source_fitp_tournaments.json'],['tennis-europe','history/tennis_europe_tournament_catalog.json','dist/v3/source_tennis_europe_tournaments_sharded.json']]){const doc=await read(path),expected=Array.isArray(doc.tournaments)?doc.tournaments:Object.values(doc.tournaments||{});if(!expected.length)throw Error('empty_catalogue:'+path);report.catalogues[circuit]={...catalogueComparison(expected,[...nativeTournaments.filter(r=>r.circuit===circuit),...(storedDocuments.get(source)?.tournaments||[])]),source:path};}
  for(const [path,field,circuit]of [['history/player_tournaments.json','entries','fitp'],['history/itf_historical_player_tournaments.json','entries','itf'],['history/itf_player_tournament_db.json','relations','itf'],['history/tennis_europe_player_tournament_db.json','relations','tennis-europe']]){const doc=await read(path),rows=historicalRelations(doc,field,path);report.relations[path]=relationComparison(rows.map(r=>({...r,circuit:r.circuit||circuit})),storedRelations);}
+ report.stage='itf_draw_manifests';
  const drawSource=await read('history/itf_draw_target_db.json'),expected=[];for(const t of Object.values(drawSource.tournaments||{}))for(const [event,d]of Object.entries(t.eventCache||{}))if(d.populated===true&&!d.error&&!d.failureType)expected.push({competitionId:identity(t.competitionId),event});
  report.catalogues.itf={...catalogueComparison(Object.values(drawSource.tournaments||{}),[...nativeTournaments.filter(r=>r.circuit==='itf'),...(storedDocuments.get('dist/v3/source_itf_history_tournaments.json')?.tournaments||[]),...(storedDocuments.get('dist/v3/source_itf_tournaments.json')?.tournaments||[])]),source:'history/itf_draw_target_db.json'};
  const manifests=await query('SELECT competition_id,event,draw_key,content_sha256,chunk_count FROM itf_current_draw_documents');
@@ -39,4 +44,4 @@ try{
  report.concurrentGenerationChanged=beforeGeneration!==await generationMarker();
  report.status=report.concurrentGenerationChanged||report.missingIdentifiers||report.differingProjectionPayloads||report.releaseDifferences.length||report.historyFiles.some(d=>d.coverage==='UNVERIFIED')?'needs_review':'checked_scopes_match';
 }catch(error){report.status='error';report.error=String(error.message);process.exitCode=1;}
-finally{report.finishedAt=new Date().toISOString();await fs.mkdir(root+'dist/v3/audits',{recursive:true});await fs.writeFile(out,JSON.stringify(report,null,2)+'\n');console.log('GITHUB_D1_COMPLETENESS='+JSON.stringify({status:report.status,sourceCommit:report.sourceCommit,releaseSourceCommit:report.releaseSourceCommit,missingIdentifiers:report.missingIdentifiers,differingProjectionPayloads:report.differingProjectionPayloads,releaseDifferences:report.releaseDifferences,writes:0,error:report.error}));}
+finally{report.finishedAt=new Date().toISOString();await fs.mkdir(root+'dist/v3/audits',{recursive:true});await fs.writeFile(out,JSON.stringify(report,null,2)+'\n');console.log('GITHUB_D1_COMPLETENESS='+JSON.stringify({status:report.status,sourceCommit:report.sourceCommit,releaseSourceCommit:report.releaseSourceCommit,missingIdentifiers:report.missingIdentifiers,differingProjectionPayloads:report.differingProjectionPayloads,releaseDifferences:report.releaseDifferences,writes:0,stage:report.stage,currentSource:report.currentSource,error:report.error}));}
