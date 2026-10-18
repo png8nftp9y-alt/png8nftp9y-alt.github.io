@@ -1,3 +1,4 @@
+import {enrichFitpMetadata} from '../lib/fitp-player-metadata.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -101,7 +102,7 @@ test('SQLite Europe history through the real API assembler renders current and p
    }}
   };
   const future={id:'future',competitionId:'future',circuit:'tennis-europe',startDate:'2026-10-21',endDate:'2026-10-25',matches:[]};
-  const ctx={Map,Set,Date,Intl,console,opponentTournamentWindow,opponentEuropeSources,opponentSelfParticipant,tennisEuropeNativeId,linkedOpponentIdentity:async()=>null,
+  const ctx={enrichFitpMetadata,Map,Set,Date,Intl,console,opponentTournamentWindow,opponentEuropeSources,opponentSelfParticipant,tennisEuropeNativeId,linkedOpponentIdentity:async()=>null,
    tennisEuropeTournamentMetadata:async()=>new Map(),searchIdentityProfile:async()=>({name:'Test Person',sourcePlayerId:'profile-test',sourceCircuit:'tennis-europe'}),playerCircuitIdentities:()=>[],
    playerEntryTournaments:async()=>[future,...[7,8,9].map(i=>({id:'entry'+i,circuit:'tennis-europe',startDate:'2026-10-0'+i,endDate:'2026-10-0'+i,matches:[]}))],otherCircuitOpponentHistory:async()=>[],resolveCircuitProfiles:async()=>new Map(),circuitProfiles:()=>[],enrichPersonalTournamentPresentation:async x=>x,
    currentTennisEuropePlayerRanking:async()=>({rankings:[]}),currentRankingCategoryAllowed:()=>true};

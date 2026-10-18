@@ -1,3 +1,4 @@
+import {enrichFitpMetadata} from './fitp-player-metadata.mjs';
 import {readD1Rows} from './d1-read-retry.mjs';
 import {mappedPlayerId,storedIdentity,storedIdentities} from './player-identity-lookup.mjs';
 import {playerCircuitIdentities} from './player-circuit-profiles.mjs';
@@ -108,6 +109,7 @@ export async function addCourtWatchPlayer(env,user,body,{fetchClub=async()=>'',m
    Promise.resolve().then(()=>measure('official_fitp_club',()=>fetchClub(player.membershipCard))).catch(()=>''):player.club
  ]);
  player.club=club||'';
+ await enrichFitpMetadata(env.DB,[player]);
  player=personalPlayerMetadata(player);
  const incoming={courtwatch_id:player.id,observed_source_key:observedSourceKey,payload:JSON.stringify(player)};
  const plan=buildIncrementalSyncPlan({current:previous?[previous]:[],incoming:[incoming],keyOf:row=>row.courtwatch_id,sourceComplete:Boolean(player.id&&player.name)});

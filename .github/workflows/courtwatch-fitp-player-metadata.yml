@@ -1,0 +1,56 @@
+name: Court Watch FITP clubs and rankings D1
+on:
+  workflow_dispatch:
+    inputs:
+      retry_failures:
+        description: Retry only failed profiles from the current completed cycle
+        type: boolean
+        default: false
+  schedule:
+    - cron: '0 2 * * 0'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-fitp-player-metadata.yml'
+      - 'cloudflare/app-api/scripts/sync-fitp-player-metadata.mjs'
+      - 'cloudflare/app-api/lib/fitp-player-metadata.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-fitp-player-metadata
+  cancel-in-progress: false
+  queue: single
+jobs:
+  due:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.due.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - id: due
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          node --input-type=module <<'JS' >> "$GITHUB_OUTPUT"
+          import {fitpScheduledDay} from './cloudflare/app-api/lib/fitp-player-metadata.mjs';
+          console.log('run='+(process.env.EVENT_NAME!=='schedule'||fitpScheduledDay()));
+          JS
+  acquire:
+    needs: due
+    if: needs.due.outputs.run == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      FITP_RETRY_FAILURES: ${{ inputs.retry_failures || 'false' }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify FITP metadata engine
+        run: node --test cloudflare/app-api/test/fitp-player-metadata.test.mjs cloudflare/app-api/test/sync-fitp-player-metadata.test.mjs
+      - name: Acquire official FITP metadata with incremental D1 writes
+        run: node cloudflare/app-api/scripts/sync-fitp-player-metadata.mjs
