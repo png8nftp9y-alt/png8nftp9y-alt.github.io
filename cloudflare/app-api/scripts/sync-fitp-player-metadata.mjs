@@ -74,16 +74,18 @@ export async function syncFitpMetadata({query,write,fetchProfile=fetchFitpSheet,
   await checkpoint(0);log(JSON.stringify({status:'progress',cycle,...state,dataWrites:plan.writes,failed:errors.length}));
  }
 }
-async function openD1(){
+export async function openD1({fetcher=globalThis.fetch}={}){
  const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
  if(!account||!token)throw Error('fitp_d1_credentials_missing');
  const base=`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database`;
  const request=async(path,body)=>{
-  const r=await fetch(base+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(30000)});
-  const data=await r.json();if(!r.ok||!data.success)throw Error('fitp_d1_http_'+r.status);return data.result;
+  const r=await fetcher(base+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(30000)});
+  let data;try{data=await r.json();}catch{}
+  const codes=(data?.errors||[]).map(e=>e.code).filter(Number.isFinite);
+  if(!r.ok||!data?.success)throw Error('fitp_d1_http_'+r.status+':codes_'+(codes.join(',')||'none'));return data.result;
  };
  const database=(await request('?name=courtwatch-app&per_page=100')).find(r=>r.name==='courtwatch-app');if(!database)throw Error('fitp_d1_database_missing');
- const execute=async(sql,params=[])=>{const data=await request('/'+(database.uuid||database.id)+'/query',{sql,params});if(!data.every(r=>r.success))throw Error('fitp_d1_query_failed');return data[0]?.results||[];};
+ const execute=async(sql,params=[])=>{const data=await request('/'+(database.uuid||database.id)+'/query',{sql,params});if(!Array.isArray(data)||!data.every(r=>r.success)){const codes=(Array.isArray(data)?data:[]).flatMap(r=>r.errors||[]).map(e=>e.code).filter(Number.isFinite);throw Error('fitp_d1_query_failed:codes_'+(codes.join(',')||'none'));}return data[0]?.results||[];};
  await execute(await readFile(new URL('../migrations/0041_fitp_metadata_engine.sql',import.meta.url),'utf8'));
  return{query:execute,write:execute};
 }

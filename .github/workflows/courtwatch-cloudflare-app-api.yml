@@ -43,6 +43,8 @@ on:
       - '!cloudflare/app-api/scripts/verify-tennis-europe-agenda-d1.mjs'
       - '!cloudflare/app-api/migrations/0006_tennis_europe_oop.sql'
       - '!cloudflare/app-api/migrations/0007_app_match_candidates.sql'
+      - 'src/v3/build-universal-database.mjs'
+      - 'src/v3/historical-tournament-catalogue.mjs'
       - 'dist/v3/universal/**'
       - 'data.json'
       - 'players.json'
@@ -149,6 +151,7 @@ jobs:
       - name: Rebuild current universal projection
         working-directory: .
         run: |
+          node --test tools/tests/historical-tournament-catalogue.test.mjs
           node src/v3/build-universal-database.mjs
           node src/v3/validate-universal-database.mjs
       - name: Build and import universal generation

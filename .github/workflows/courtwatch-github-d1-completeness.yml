@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
     paths:
+      - cloudflare/app-api/scripts/github-d1-audit-scope.mjs
+      - tools/tests/github-d1-audit-scope.test.mjs
       - cloudflare/app-api/scripts/read-audit-projection.mjs
       - tools/tests/read-audit-projection.test.mjs
       - '.github/workflows/courtwatch-github-d1-completeness.yml'
@@ -28,7 +30,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Verify missing-data detection and enforced read-only adapter
-        run: node --test tools/tests/github-d1-reconciliation.test.mjs tools/tests/read-audit-projection.test.mjs cloudflare/app-api/test/read-only-d1-client.test.mjs
+        run: node --test tools/tests/github-d1-audit-scope.test.mjs tools/tests/github-d1-reconciliation.test.mjs tools/tests/read-audit-projection.test.mjs cloudflare/app-api/test/read-only-d1-client.test.mjs
       - name: Compare GitHub historical records with stored D1 data without writes
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}

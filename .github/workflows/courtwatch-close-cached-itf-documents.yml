@@ -1,0 +1,72 @@
+name: Court Watch restore four saved ITF qualifications
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/courtwatch-close-cached-itf-documents.yml
+      - src/v3/repair-itf-cached-qualification-documents.mjs
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify repair guards outside the D1 lease
+        run: node --test tools/tests/repair-itf-cached-qualification-documents.test.mjs
+      - name: Read only the four saved R2 event prefixes
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet awscli
+          mkdir -p /tmp/itf-qualification-raw
+          for competition in J-J30-LTU-2026-003 J-J60-ESP-2026-007; do
+            for event in B-S-Q-KO G-S-Q-KO; do
+              aws --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" s3 cp "s3://$R2_BUCKET/itf/live-draws/tournaments/$competition/$event/" "/tmp/itf-qualification-raw/$competition/$event/" --recursive --only-show-errors
+            done
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: four-itf-qualification-sources
+          path: /tmp/itf-qualification-raw
+          retention-days: 7
+          if-no-files-found: error
+  repair:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: courtwatch-d1-writes
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
+        with:
+          name: four-itf-qualification-sources
+          path: /tmp/itf-qualification-raw
+      - name: Restore only absent raw documents and verify full content
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node src/v3/repair-itf-cached-qualification-documents.mjs /tmp/itf-qualification-raw
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: four-itf-qualification-repair-audit
+          path: dist/v3/audits/itf-cached-qualification-repair.json
+          if-no-files-found: error
+          retention-days: 30

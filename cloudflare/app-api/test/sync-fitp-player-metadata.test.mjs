@@ -52,3 +52,20 @@ test('mismatched source cards do not attach; incomplete metadata does not erase 
 test('inventory uses the circuit and official-ID index, without OFFSET or repeated source scans',()=>setup(async(d)=>{
  const plan=d.execute('EXPLAIN QUERY PLAN '+inventorySql,['123456',100]).map(r=>r.detail).join('\n');assert.match(plan,/SEARCH l USING INDEX player_circuit_identity_official/);assert.doesNotMatch(plan,/SCAN l\b/);
 }));
+
+test('D1 write failure never advances persisted cursor; explicit resume replays only interrupted batch',()=>setup(async(d,ctx,calls)=>{
+ const write=ctx.write;let failed=false;
+ await assert.rejects(syncFitpMetadata({...ctx,write:async(sql,params)=>{if(sql===metadataWriteSql&&params[1].includes('222222')){failed=true;throw Error('fitp_d1_http_500:codes_7500');}return write(sql,params)}}),/codes_7500/);
+ assert.ok(failed);assert.equal(d.execute('SELECT last_card FROM fitp_metadata_progress')[0].last_card,'123456');
+ assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_player_metadata')[0].n,1);
+ calls.length=0;await syncFitpMetadata(ctx);assert.deepEqual(calls,['222222']);assert.equal(d.execute('SELECT complete FROM fitp_metadata_progress')[0].complete,1);
+}));
+
+test('FITP D1 transport reports numeric Cloudflare codes without leaking body or retrying',async()=>{
+ const {openD1}=await import('../scripts/sync-fitp-player-metadata.mjs');
+ const oldAccount=process.env.CLOUDFLARE_ACCOUNT_ID,oldToken=process.env.CLOUDFLARE_API_TOKEN;
+ process.env.CLOUDFLARE_ACCOUNT_ID='fixture';process.env.CLOUDFLARE_API_TOKEN='secret-token';
+ try{for(const json of [async()=>({success:false,errors:[{code:7500,message:'SECRET SQL'}]}),async()=>{throw Error('private response')}]){
+  let calls=0;await assert.rejects(openD1({fetcher:async()=>{calls++;return{ok:false,status:500,json}}}),error=>{assert.match(error.message,/fitp_d1_http_500:codes_(7500|none)$/);assert.doesNotMatch(error.message,/SECRET|private|secret-token/);return true});assert.equal(calls,1);
+ }}finally{if(oldAccount===undefined)delete process.env.CLOUDFLARE_ACCOUNT_ID;else process.env.CLOUDFLARE_ACCOUNT_ID=oldAccount;if(oldToken===undefined)delete process.env.CLOUDFLARE_API_TOKEN;else process.env.CLOUDFLARE_API_TOKEN=oldToken;}
+});
