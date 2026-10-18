@@ -17,7 +17,9 @@ try{
  report.stage='open_database';
  const {query,db}=await openReadOnlyD1();
  const generationMarker=async()=>JSON.stringify(await query("SELECT id,generated_at,counts_json FROM generations WHERE id='current'"));
+ report.stage='generation_marker_before';
  const beforeGeneration=await generationMarker();
+ report.stage='runtime_release_pointer';
  const reader=runtimeDocumentReader(db),release=await reader.release();report.releaseSourceCommit=release.sourceCommit;
  report.stage='runtime_documents';
  const storedDocuments=new Map();for(const path of RUNTIME_DOCUMENT_FILES){report.currentSource=path;const value=await reader.get(path);storedDocuments.set(path,value);const current=encodeDocument(path,await read(path)),record=release.documents.find(d=>d.path===path);report.documents.push({path,verifiedInD1:true,sameAsGitHub:current.hash===record.hash});}
@@ -43,6 +45,7 @@ try{
  report.missingIdentifiers=Object.values(report.projections).reduce((n,s)=>n+s.missing.length,0)+Object.values(report.catalogues).reduce((n,s)=>n+s.missing.length,0)+Object.values(report.relations).reduce((n,s)=>n+s.missing.length,0)+report.drawManifests.missing.length;
  report.differingProjectionPayloads=Object.values(report.projections).reduce((n,s)=>n+s.different.length,0);report.releaseDifferences=report.documents.filter(d=>!d.sameAsGitHub).map(d=>d.path);
  for(const [kind,groups]of Object.entries({projections:report.projections,catalogues:report.catalogues,relations:report.relations,draws:{manifests:report.drawManifests}}))for(const [name,section]of Object.entries(groups))console.log('GITHUB_D1_FINDINGS='+JSON.stringify({kind,name,expected:section.expected,present:section.present,missingCount:section.missing.length,missingPreview:section.missing.slice(0,25),differentCount:section.different?.length||0,differentPreview:section.different?.slice(0,25)||[]}));
+ report.stage='generation_marker_after';
  report.concurrentGenerationChanged=beforeGeneration!==await generationMarker();
  report.status=report.concurrentGenerationChanged||report.missingIdentifiers||report.differingProjectionPayloads||report.releaseDifferences.length||report.historyFiles.some(d=>d.coverage==='UNVERIFIED')?'needs_review':'checked_scopes_match';
 }catch(error){report.status='error';report.error=String(error.message);process.exitCode=1;}
