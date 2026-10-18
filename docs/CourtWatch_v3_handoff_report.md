@@ -6069,3 +6069,9 @@ Validation for the queue patch: complete npm run check passed (368 tests, zero f
 - Risultato: orario del conteggio, perimetro FITP, totali con/senza circolo; nessun elenco di persone o dati individuali nel log. Il dato presente non certifica che l'affiliazione sia ancora attuale. Numeri remoti ancora da acquisire dopo pubblicazione del controllo dal terminale dell'utente.
 - Verifiche: SQLite su duplicati tra circuiti e fonti, circolo personale recuperato, alias, profilo configurato, omonimi separati, ID locali vuoti e profili ITF esclusi; guardia SELECT-only e assenza di scritture. Errori di accesso o schema non diventano un falso conteggio zero.
 - Controlli superati: due test SQLite e 18 invarianti costo D1. I file di diagnostica sono in tools per non attivare i workflow di import/deploy app quando viene pubblicato questo solo conteggio.
+
+## 2026-10-18 — Correzione conteggio circoli FITP dopo timeout
+
+Il primo conteggio remoto (39128401060) ha superato il timeout di 30 secondi; nessun totale valido è stato prodotto. Sostituita la query aggregata con join e sottoquery correlate con letture paginate per rowid (2000 righe), campi ridotti e deduplicazione in memoria. Nessuna scrittura, modifica schema o cambiamento al runtime app. Non viene aumentato il timeout né ripetuta automaticamente una query fallita. Ogni tabella viene percorsa con un cursore, senza OFFSET; limiti superiori fissati prima di ciascuna lettura. I log mostrano avanzamento e totale finale solo al completamento. Le modifiche concorrenti al database restano un limite esplicito: non è uno snapshot transazionale unico.
+
+Il test usa INSERT solo per fixture SQLite locali: spostato in tools/test/, cartella già esclusa dalla policy globale per i test, senza indebolire la policy. Verifica con pagine di due righe, identità canoniche, omonimi distinti, duplicati, circolo recuperato, propagazione errori e zero scritture durante conteggio.

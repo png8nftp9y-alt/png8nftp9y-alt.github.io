@@ -24,6 +24,6 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Check count and identity deduplication
-        run: node --test tools/fitp-player-club-count.test.mjs
+        run: node --test tools/test/fitp-player-club-count.test.mjs
       - name: Count stored clubs without writes
         run: node tools/count-fitp-player-clubs.mjs
