@@ -1,0 +1,29 @@
+name: Court Watch player club count (read only)
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-player-club-count.yml'
+      - 'tools/count-fitp-player-clubs.mjs'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-player-club-count
+  cancel-in-progress: false
+jobs:
+  count:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check count and identity deduplication
+        run: node --test tools/fitp-player-club-count.test.mjs
+      - name: Count stored clubs without writes
+        run: node tools/count-fitp-player-clubs.mjs
