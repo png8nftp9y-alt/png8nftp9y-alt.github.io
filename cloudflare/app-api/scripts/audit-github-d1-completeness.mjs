@@ -1,4 +1,4 @@
-import {relationScope,cachedDrawScope} from './github-d1-audit-scope.mjs';
+import {relationScope,cachedDrawScope,projectionScope} from './github-d1-audit-scope.mjs';
 // D1_READ_ONLY: guarded
 import fs from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
@@ -25,8 +25,8 @@ try{
  const tableRows={};
  for(const [table,list]of [['players','players'],['tournaments','tournaments'],['entries','entries'],['schedules','schedules'],['matches','matches'],['results','results']]){
   report.currentSource=table;const source=(await read('dist/v3/universal/'+table+'.json'))[list];if(!Array.isArray(source))throw Error('invalid_source:'+table);
-  const expected=['matches','results','schedules'].includes(table)?source.filter(r=>r.circuit!=='tennis-europe'):source;
-  const rows=table==='tournaments'?await pages(query,table,'id,circuit,source_tournament_id,payload'):await readProjectionRows(query,table,expected.map(row=>row.id));tableRows[table]=rows;report.projections[table]={...projectionComparison(expected,rows),source:'dist/v3/universal/'+table+'.json',excludedTennisEuropeRows:source.length-expected.length};
+  const {expected,...scope}=projectionScope(table,source);
+  const rows=table==='tournaments'?await pages(query,table,'id,circuit,source_tournament_id,payload'):await readProjectionRows(query,table,expected.map(row=>row.id));tableRows[table]=rows;report.projections[table]={...projectionComparison(expected,rows),source:'dist/v3/universal/'+table+'.json',...scope};
  }
  report.stage='historical_catalogues_and_relations';delete report.currentSource;
  const app=await pages(query,'app_tournaments','seq,player_id,competition_id,circuit,payload','seq'),storedRelations=app.map(r=>({...JSON.parse(r.payload),circuit:r.circuit,playerId:r.player_id,competitionId:r.competition_id}));

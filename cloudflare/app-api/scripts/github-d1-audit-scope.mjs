@@ -14,3 +14,9 @@ export function cachedDrawScope(tournaments){
  }
  return{expected,excluded};
 }
+
+// Explicit user scope: ITF raw draws stay included; ITF matches/results do not.
+export function projectionScope(table,rows){
+ const excludeEurope=['matches','results','schedules'].includes(table),excludeItf=['matches','results'].includes(table);
+ return{expected:rows.filter(r=>!(excludeEurope&&r.circuit==='tennis-europe')&&!(excludeItf&&r.circuit==='itf')),excludedTennisEuropeRows:excludeEurope?rows.filter(r=>r.circuit==='tennis-europe').length:0,excludedITFMatchRows:excludeItf?rows.filter(r=>r.circuit==='itf').length:0,...(excludeItf?{itfMatchScope:'excluded_by_explicit_user_request; raw draw documents remain included'}:{})};
+}
