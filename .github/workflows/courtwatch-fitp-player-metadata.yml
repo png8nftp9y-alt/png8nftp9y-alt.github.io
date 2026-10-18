@@ -14,6 +14,7 @@ on:
       - '.github/workflows/courtwatch-fitp-player-metadata.yml'
       - 'cloudflare/app-api/scripts/sync-fitp-player-metadata.mjs'
       - 'cloudflare/app-api/lib/fitp-player-metadata.mjs'
+      - 'cloudflare/app-api/lib/fitp-write-reconciliation.mjs'
 permissions:
   contents: read
 concurrency:
@@ -27,6 +28,7 @@ jobs:
       run: ${{ steps.due.outputs.run }}
     steps:
       - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - id: due
@@ -49,6 +51,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Verify FITP metadata engine

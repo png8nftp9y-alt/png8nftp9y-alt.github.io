@@ -71,7 +71,7 @@ test('FITP D1 transport reports numeric Cloudflare codes without leaking body or
 });
 
 const realBatch=d=>statements=>d.db.batch(statements.map(({sql,params})=>({sql,values:params})));
-test('checkpoint is sent only after every data write succeeds; failed cursor resumes without rewriting saved metadata',()=>setup(async(d,ctx,calls)=>{
+test('failed cursor is corrected once after verified data, without refetching or rewriting saved metadata',()=>setup(async(d,ctx,calls)=>{
  const logs=[],batches=[];let rejected=false;
  const writeBatch=async statements=>{
   batches.push(statements);
@@ -79,14 +79,11 @@ test('checkpoint is sent only after every data write succeeds; failed cursor res
   if(checkpoint?.params[1]==='222222'&&!rejected){rejected=true;throw Error('fitp_d1_timeout:phase_batch:request_outcome_unknown_resume_manually');}
   return realBatch(d)(statements);
  };
- await assert.rejects(syncFitpMetadata({...ctx,writeBatch,log:line=>logs.push(JSON.parse(line))}),/timeout/);
- assert.equal(d.execute('SELECT last_card FROM fitp_metadata_progress')[0].last_card,'123456');
+ await syncFitpMetadata({...ctx,writeBatch,log:line=>logs.push(JSON.parse(line))});
+ assert.deepEqual(calls,['123456','222222']);assert.equal(d.execute('SELECT complete FROM fitp_metadata_progress')[0].complete,1);
  assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_player_metadata')[0].n,2);
- assert.equal(logs.at(-1).lastConfirmedCheckpoint.checked,1);assert.equal(logs.at(-1).attemptedThrough,'222222');
+ assert.ok(logs.some(r=>r.status==='d1_write_reconciled'&&r.correctiveRequests===1));
  assert.ok(batches.filter(batch=>batch.some(s=>s.sql.includes('INSERT INTO fitp_metadata_progress'))).every(batch=>batch.length===1));
- calls.length=0;const replay=[];await syncFitpMetadata({...ctx,writeBatch:async statements=>{replay.push(...statements);return realBatch(d)(statements)}});assert.deepEqual(calls,['222222']);
- assert.equal(replay.filter(s=>s.sql===metadataWriteSql).length,0);
- assert.equal(d.execute('SELECT complete FROM fitp_metadata_progress')[0].complete,1);
 }));
 test('partially committed REST data batch cannot advance cursor; explicit resume writes only the missing delta',()=>setup(async(d,ctx,calls)=>{
  await assert.rejects(syncFitpMetadata({...ctx,batchSize:2,writeBatch:async statements=>{
@@ -98,12 +95,14 @@ test('partially committed REST data batch cannot advance cursor; explicit resume
  assert.deepEqual(calls,['123456','222222']);assert.equal(replay.filter(s=>s.sql===metadataWriteSql).length,0);
  assert.equal(d.execute('SELECT checked FROM fitp_metadata_progress')[0].checked,2);
 }));
-test('lost batch acknowledgement resumes from persisted checkpoint without fetching already committed profiles',()=>setup(async(d,ctx,calls)=>{
- let lost=false;await assert.rejects(syncFitpMetadata({...ctx,writeBatch:async statements=>{
+test('lost checkpoint acknowledgement is read back with no corrective write or source refetch',()=>setup(async(d,ctx,calls,writes)=>{
+ let lost=false;const logs=[];
+ await syncFitpMetadata({...ctx,log:line=>logs.push(JSON.parse(line)),writeBatch:async statements=>{
   await realBatch(d)(statements);if(!lost&&statements[0].sql.includes('INSERT INTO fitp_metadata_progress')){lost=true;throw Error('fitp_d1_network:phase_batch:request_outcome_unknown_resume_manually');}
- }}),/network/);
- assert.equal(d.execute('SELECT checked FROM fitp_metadata_progress')[0].checked,1);
- calls.length=0;await syncFitpMetadata({...ctx,writeBatch:realBatch(d)});assert.deepEqual(calls,['222222']);
+ }});
+ assert.equal(d.execute('SELECT checked FROM fitp_metadata_progress')[0].checked,2);
+ assert.deepEqual(calls,['123456','222222']);assert.equal(writes.length,0);
+ assert.ok(logs.some(r=>r.status==='d1_write_reconciled'&&r.correctiveRequests===0));
 }));
 test('batched next-cycle import sends no identical metadata upserts and keeps source-failure ledger honest',()=>setup(async(d,ctx)=>{
  const batches=[];const writeBatch=async statements=>{batches.push(statements);return realBatch(d)(statements)};
@@ -145,4 +144,90 @@ test('CLI retains a machine-readable failure report even when D1 setup fails',as
   const result=spawnSync(process.execPath,[fileURLToPath(new URL('../scripts/sync-fitp-player-metadata.mjs',import.meta.url))],{cwd:directory,env:{...process.env,CLOUDFLARE_ACCOUNT_ID:'',CLOUDFLARE_API_TOKEN:''},encoding:'utf8'});
   assert.equal(result.status,1);assert.deepEqual(JSON.parse(readFileSync(join(directory,'fitp-metadata-report.json'),'utf8')),{status:'failed',error:'fitp_d1_credentials_missing'});
  }finally{rmSync(directory,{recursive:true,force:true});}
+});
+
+test('HTTP500/7500 before metadata commit is reconciled with only the missing delta, then census completes',()=>setup(async(d,ctx,calls)=>{
+ let failed=false;const corrections=[],logs=[];
+ await syncFitpMetadata({...ctx,batchSize:2,log:line=>logs.push(JSON.parse(line)),write:async(sql,params,phase)=>{corrections.push({sql,params,phase});return ctx.write(sql,params)},writeBatch:async statements=>{
+  if(!failed&&statements[0].sql===metadataWriteSql){failed=true;throw Error('fitp_d1_phase_batch:fitp_d1_http_500:codes_7500')}
+  return realBatch(d)(statements);
+ }});
+ assert.deepEqual([...calls].sort(),['123456','222222']);assert.equal(d.execute('SELECT checked FROM fitp_metadata_progress')[0].checked,2);
+ assert.equal(d.execute('SELECT complete FROM fitp_metadata_progress')[0].complete,1);
+ assert.equal(corrections.length,1);assert.equal(corrections[0].phase,'metadata_delta');assert.equal(JSON.parse(corrections[0].params[1]).length,2);
+ assert.ok(logs.some(r=>r.status==='d1_write_reconciled'));
+}));
+
+test('partial metadata commit corrects one missing identity and never rewrites the saved card',()=>setup(async(d,ctx,calls)=>{
+ let failed=false;const corrections=[];
+ await syncFitpMetadata({...ctx,batchSize:2,write:async(sql,params,phase)=>{corrections.push({sql,params,phase});return ctx.write(sql,params)},writeBatch:async statements=>{
+  if(!failed&&statements[0].sql===metadataWriteSql){failed=true;const p=statements[0].params;await ctx.write(metadataWriteSql,[p[0],JSON.stringify([JSON.parse(p[1])[0]])]);throw Error('fitp_d1_phase_batch:fitp_d1_http_500:codes_7500')}
+  return realBatch(d)(statements);
+ }});
+ assert.equal(corrections.length,1);assert.equal(JSON.parse(corrections[0].params[1]).length,1);
+ assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_player_metadata')[0].n,2);assert.equal(calls.length,2);
+}));
+
+test('persistent provider failure stops after one corrective pass and never advances checkpoint',()=>setup(async(d,ctx,calls)=>{
+ let corrective=0;
+ await assert.rejects(syncFitpMetadata({...ctx,batchSize:2,writeBatch:async()=>{throw Error('fitp_d1_phase_batch:fitp_d1_http_500:codes_7500')},write:async()=>{corrective++;throw Error('fitp_d1_phase_metadata_delta:fitp_d1_http_500:codes_7500')}}),/7500/);
+ assert.equal(corrective,1);assert.equal(calls.length,2);assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_metadata_progress')[0].n,0);
+}));
+
+test('delayed old checkpoints cannot roll progress backward and identical checkpoints write zero rows',()=>setup(async(d,ctx)=>{
+ const {progressWriteSql}=await import('../scripts/sync-fitp-player-metadata.mjs');
+ await syncFitpMetadata(ctx);const before=d.writes();
+ const current=d.execute('SELECT * FROM fitp_metadata_progress')[0];
+ d.execute(progressWriteSql,[current.cycle,current.last_card,1,current.checked,current.with_club,current.with_ranking,current.unavailable,'later']);assert.equal(d.writes(),before);
+ d.execute(progressWriteSql,[current.cycle,'123456',0,1,1,1,0,'later']);assert.equal(d.writes(),before);assert.equal(d.execute('SELECT checked FROM fitp_metadata_progress')[0].checked,2);
+}));
+
+test('single-statement writes bypass REST batch and ordinary success does not inspect or clean an empty failure ledger',async()=>{
+ const {openD1}=await import('../scripts/sync-fitp-player-metadata.mjs');
+ const oldAccount=process.env.CLOUDFLARE_ACCOUNT_ID,oldToken=process.env.CLOUDFLARE_API_TOKEN;process.env.CLOUDFLARE_ACCOUNT_ID='fixture';process.env.CLOUDFLARE_API_TOKEN='secret';
+ try{const bodies=[];const client=await openD1({databaseId:'cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda',fetcher:async(url,options)=>{bodies.push(JSON.parse(options.body));return{ok:true,status:200,json:async()=>({success:true,result:[{success:true,results:[]}]})}}});
+ await client.writeBatch([{sql:'UPDATE example SET value=?',params:['x']}]);assert.deepEqual(bodies[1],{sql:'UPDATE example SET value=?',params:['x']});
+ }finally{if(oldAccount===undefined)delete process.env.CLOUDFLARE_ACCOUNT_ID;else process.env.CLOUDFLARE_ACCOUNT_ID=oldAccount;if(oldToken===undefined)delete process.env.CLOUDFLARE_API_TOKEN;else process.env.CLOUDFLARE_API_TOKEN=oldToken}
+ await setup(async(d,ctx,calls,writes)=>{await syncFitpMetadata(ctx);assert.ok(!writes.some(sql=>sql.startsWith('DELETE FROM fitp_metadata_failures')))});
+});
+
+test('corrective metadata writes are bounded to 20 exact missing rows per request',()=>setup(async(d,ctx)=>{
+ const {reconcileFitpWrites}=await import('../lib/fitp-write-reconciliation.mjs');
+ const incoming=Array.from({length:45},(_,i)=>({membership_card:String(300000+i),canonical_id:'p'+i,club:'Saved Club',ranking:'2.7'})),sizes=[];
+ await reconcileFitpWrites({query:ctx.query,write:async(sql,params)=>{sizes.push(JSON.parse(params[1]).length);return ctx.write(sql,params)},statements:[{sql:metadataWriteSql,params:['now',JSON.stringify(incoming)]}],kinds:{metadataSql:metadataWriteSql}});
+ assert.deepEqual(sizes,[20,20,5]);assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_player_metadata')[0].n,45);
+ const before=d.writes();await reconcileFitpWrites({query:ctx.query,write:async()=>assert.fail('saved rows must not be rewritten'),statements:[{sql:metadataWriteSql,params:['now',JSON.stringify(incoming)]}],kinds:{metadataSql:metadataWriteSql}});assert.equal(d.writes(),before);
+}));
+
+test('partial data batch reconciles the failure ledger without masking unresolved source errors',()=>setup(async(d,ctx)=>{
+ let interrupted=false;const corrective=[];
+ await assert.rejects(syncFitpMetadata({...ctx,batchSize:2,fetchProfile:async card=>{if(card==='123456')throw Error('fitp_http_503');return source[1]},write:async(sql,params,phase)=>{corrective.push(phase);return ctx.write(sql,params)},writeBatch:async statements=>{
+  if(!interrupted&&statements.some(s=>s.sql===metadataWriteSql)){interrupted=true;await realBatch(d)(statements.filter(s=>s.sql===metadataWriteSql));throw Error('fitp_d1_phase_batch:fitp_d1_http_500:codes_7500')}
+  return realBatch(d)(statements);
+ }}),/retry_failures_manually/);
+ assert.deepEqual(corrective,['failure_delta']);assert.equal(d.execute('SELECT complete FROM fitp_metadata_progress')[0].complete,1);
+ assert.equal(d.execute('SELECT membership_card FROM fitp_metadata_failures')[0].membership_card,'123456');
+ await syncFitpMetadata({...ctx,retryFailures:true});assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_metadata_failures')[0].n,0);
+}));
+
+test('provider failure classification preserves the real category and request trace without leaking SQL or credentials',async()=>{
+ const {fitpD1FailureInfo,recoverableFitpWrite}=await import('../lib/fitp-write-reconciliation.mjs');
+ const cases=[['not authorized PRIVATE SQL','authorization',false],['D1 DB is overloaded. PRIVATE TOKEN','overloaded',true],['D1 storage reset PRIVATE NAME','database_reset',true],['SQL syntax error PRIVATE NAME','sql_rejected',false],['UNIQUE constraint failed PRIVATE NAME','constraint',false]];
+ for(const [message,reason,recoverable]of cases){
+  const d1Failure=fitpD1FailureInfo({phase:'metadata_delta',httpStatus:500,codes:[7500],messages:[message],ray:'1234567890abcdef-MXP'});
+  assert.equal(d1Failure.reason,reason);assert.equal(d1Failure.cfRay,'1234567890abcdef-MXP');assert.doesNotMatch(JSON.stringify(d1Failure),/PRIVATE|SQL|TOKEN|NAME/);
+  assert.equal(recoverableFitpWrite(Object.assign(Error('fitp_d1_phase_batch:fitp_d1_http_500:codes_7500'),{d1Failure})),recoverable);
+ }
+ assert.ok(!('cfRay' in fitpD1FailureInfo({ray:'PRIVATE DATA'})));
+});
+
+test('REST error retains sanitized provider reason on the error object for CLI reports',async()=>{
+ const {openD1}=await import('../scripts/sync-fitp-player-metadata.mjs');
+ const oldAccount=process.env.CLOUDFLARE_ACCOUNT_ID,oldToken=process.env.CLOUDFLARE_API_TOKEN;process.env.CLOUDFLARE_ACCOUNT_ID='fixture';process.env.CLOUDFLARE_API_TOKEN='secret';
+ try{let calls=0;const client=await openD1({databaseId:'cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda',fetcher:async()=>{
+  if(++calls===1)return{ok:true,status:200,json:async()=>({success:true,result:[{success:true,results:[]}]})};
+  return{ok:false,status:500,headers:new Headers({'cf-ray':'1234567890abcdef-MXP'}),json:async()=>({success:false,errors:[{code:7500,message:'not authorized SECRET SQL TOKEN'}]})};
+ }});
+ await assert.rejects(client.write('UPDATE private SET value=?',['secret']),e=>{assert.equal(e.d1Failure.reason,'authorization');assert.equal(e.d1Failure.phase,'query');assert.equal(e.d1Failure.httpStatus,500);assert.equal(e.d1Failure.cfRay,'1234567890abcdef-MXP');assert.doesNotMatch(JSON.stringify(e),/SECRET|TOKEN|private/);return true});assert.equal(calls,2);
+ }finally{if(oldAccount===undefined)delete process.env.CLOUDFLARE_ACCOUNT_ID;else process.env.CLOUDFLARE_ACCOUNT_ID=oldAccount;if(oldToken===undefined)delete process.env.CLOUDFLARE_API_TOKEN;else process.env.CLOUDFLARE_API_TOKEN=oldToken}
 });
