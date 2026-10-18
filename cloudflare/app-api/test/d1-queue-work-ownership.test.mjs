@@ -40,3 +40,10 @@ test('identity and search tests run before their writer lease and changed code i
   assert.ok(writer.indexOf('Recheck source only when code advanced')<writer.indexOf('node scripts/configure-d1.mjs'));
  }
 });
+
+test('Node seed/diagnostic helpers retain the required owner without redundant Worker deploys',()=>{
+ for(const file of ['cloudflare/app-api/lib/read-only-d1-client.mjs','cloudflare/app-api/lib/tournament-seed-statements.mjs','cloudflare/app-api/lib/seed-statement-plan.mjs']){assert.equal(owns(hotfix,file),false,file);assert.equal(owns(common,file),true,file);}
+ assert.equal(owns(hotfix,'cloudflare/app-api/test/read-only-d1-client.test.mjs'),false);
+ for(const file of ['cloudflare/app-api/scripts/github-d1-audit-scope.mjs','cloudflare/app-api/scripts/read-audit-projection.mjs'])assert.equal(owns(common,file),false,file);
+ for(const file of ['cloudflare/app-api/lib/courtwatch-player-additions.mjs','cloudflare/app-api/src/index.js'])assert.equal(owns(hotfix,file),true,file);
+});

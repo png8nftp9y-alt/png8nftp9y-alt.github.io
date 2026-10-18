@@ -1,3 +1,4 @@
+import {boundedDeleteMissing,assertStatementBudget,filterSeedSections,remoteSeedHashes} from '../lib/seed-statement-plan.mjs';
 // D1_WRITE_POLICY: incremental
 // buildIncrementalSyncPlan contract: stable content fingerprint and guarded upserts; unchanged data is skipped by the publisher.
 import {tournamentSeedStatements} from '../lib/tournament-seed-statements.mjs';
@@ -16,8 +17,8 @@ const volatileHashKeys=new Set(['generatedAt','lastSeen','lastSeenAt','lastDrawC
 const canonicalHashValue=value=>Array.isArray(value)?value.map(canonicalHashValue):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).filter(([key])=>!volatileHashKeys.has(key)).map(([key,item])=>[key,canonicalHashValue(item)])):value;
 const esc=value=>`'${String(value??'').replaceAll("'","''")}'`,payload=row=>esc(JSON.stringify(canonicalHashValue(row)));
 const circuit=row=>{const s=String(row.circuit||row.sourceId||row.sourceName||'').toLowerCase();return s.includes('tennis-europe')||s.includes('tennis europe')?'tennis-europe':s.includes('itf')?'itf':'fitp'};
-const sql=['PRAGMA foreign_keys=ON;'],cleanup=[],different=columns=>columns.map(column=>`${column} IS NOT excluded.${column}`).join(' OR '),idList=rows=>rows.map(row=>esc(row.id)).join(',');
-const deleteMissing=(table,rows,scope='1=1')=>cleanup.push(rows.length?`DELETE FROM ${table} WHERE ${scope} AND id NOT IN (${idList(rows)});`:`DELETE FROM ${table} WHERE ${scope};`);
+const sql=['PRAGMA foreign_keys=ON;'],cleanup=[],different=columns=>columns.map(column=>`${column} IS NOT excluded.${column}`).join(' OR ');
+const deleteMissing=(table,rows,scope='1=1')=>cleanup.push(...boundedDeleteMissing(table,rows,scope));
 for(const r of observed.players||[])sql.push(`INSERT INTO observed_players(source_key,circuit,official_id,normalized_name,display_name,monitored,observations,first_observed_at,last_observed_at,payload) VALUES(${esc(r.sourceKey)},${esc(r.circuit)},${esc(r.officialId)},${esc(r.normalizedName)},${esc(r.displayName)},${r.monitored?1:0},${Number(r.observations)||1},${esc(r.firstObservedAt)},${esc(r.lastObservedAt)},${payload(r)}) ON CONFLICT(source_key) DO UPDATE SET circuit=excluded.circuit,official_id=excluded.official_id,normalized_name=excluded.normalized_name,display_name=excluded.display_name,monitored=excluded.monitored,observations=excluded.observations,first_observed_at=excluded.first_observed_at,last_observed_at=excluded.last_observed_at,payload=excluded.payload WHERE ${different(['circuit','official_id','normalized_name','display_name','monitored','observations','first_observed_at','last_observed_at','payload'])};`);
 const playerRows=players.players||[];deleteMissing('players',playerRows);for(const r of playerRows)sql.push(`INSERT INTO players(id,courtwatch_id,display_name,active,payload) VALUES(${esc(r.id)},${esc(r.courtwatchId)},${esc(r.displayName)},${r.active===false?0:1},${payload(r)}) ON CONFLICT(id) DO UPDATE SET courtwatch_id=excluded.courtwatch_id,display_name=excluded.display_name,active=excluded.active,payload=excluded.payload WHERE ${different(['courtwatch_id','display_name','active','payload'])};`);
 const tournamentRows=tournaments.tournaments||[];deleteMissing('tournaments',tournamentRows,"id NOT LIKE 'te-oop:%' AND circuit!='itf'");sql.push(...tournamentSeedStatements(tournamentRows.map(canonicalHashValue)));
@@ -40,16 +41,21 @@ const counts={...manifest.counts,observedPlayers:(observed.players||[]).length,o
 if(process.env.D1_SKIP_OBSERVED==='1'){delete counts.observedPlayers;delete counts.observedByCircuit;delete counts.observedSources;}
 // Stable fingerprint of the effective application payload. generatedAt is
 // intentionally excluded so unchanged scheduled runs do not rewrite D1.
-const hashPayload={players:players.players||[],tournaments:tournaments.tournaments||[],entries:entries.entries||[],schedules:(schedules.schedules||[]).filter(r=>r.circuit!=='tennis-europe'),matches:(matches.matches||[]).filter(r=>r.circuit!=='tennis-europe'),results:(results.results||[]).filter(r=>r.circuit!=='tennis-europe'),appPlayers,appTournaments,observed:process.env.D1_SKIP_OBSERVED==='1'?[]:(observed.players||[])};
+const hashPayload={seedPlanVersion:2,appMatches,players:players.players||[],tournaments:tournaments.tournaments||[],entries:entries.entries||[],schedules:(schedules.schedules||[]).filter(r=>r.circuit!=='tennis-europe'),matches:(matches.matches||[]).filter(r=>r.circuit!=='tennis-europe'),results:(results.results||[]).filter(r=>r.circuit!=='tennis-europe'),appPlayers,appTournaments,observed:process.env.D1_SKIP_OBSERVED==='1'?[]:(observed.players||[])};
+const previousHashes=process.env.D1_REMOTE_GENERATION_FILE?remoteSeedHashes(await read(process.env.D1_REMOTE_GENERATION_FILE)):{};
+counts.seedPlanVersion=2;counts.seedSectionHashes=Object.fromEntries(Object.entries(hashPayload).filter(([key])=>key!=='seedPlanVersion').map(([key,value])=>[key,crypto.createHash('sha256').update(JSON.stringify(canonicalHashValue(value))).digest('hex')]));
 counts.importHash=crypto.createHash('sha256').update(JSON.stringify(canonicalHashValue(hashPayload))).digest('hex');
 sql.push(`INSERT OR REPLACE INTO generations(id,generated_at,schema_version,status,counts_json) VALUES('current',${esc(manifest.generatedAt)},${esc(manifest.version)},'green',json_patch(COALESCE((SELECT counts_json FROM generations WHERE id='current'),'{}'),${esc(JSON.stringify(counts))}));`);
+const planned=filterSeedSections(sql,counts.seedSectionHashes,previousHashes);
+assertStatementBudget(planned);
 await fs.rm(out,{recursive:true,force:true});await fs.mkdir(out,{recursive:true});
 await fs.writeFile(`${out}/import-hash.txt`,counts.importHash+'\n');
 // Keep remote D1 imports comfortably below the storage-operation timeout.
 // The files remain ordered and idempotent, so a transient failure retries only
 // the current 500-statement block instead of rebuilding the whole generation.
-const statements=sql.filter(x=>x!=='PRAGMA foreign_keys=ON;'),chunkSize=500;
+const statements=planned.filter(x=>x!=='PRAGMA foreign_keys=ON;'),chunkSize=500;
 const control=statements.filter(x=>x.startsWith('DELETE FROM ')),data=statements.filter(x=>!x.startsWith('DELETE FROM '));
-for(let index=0;index<control.length;index++)await fs.writeFile(`${out}/${String(index).padStart(3,'0')}-control.sql`,['PRAGMA foreign_keys=ON;',control[index]].join('\n')+'\n');
-for(let start=0,index=control.length;start<data.length;start+=chunkSize,index++){const chunk=['PRAGMA foreign_keys=ON;',...data.slice(start,start+chunkSize)];await fs.writeFile(`${out}/${String(index).padStart(3,'0')}-data.sql`,chunk.join('\n')+'\n')}
-console.log(JSON.stringify({output:out,files:control.length+Math.ceil(data.length/chunkSize),controlStatements:control.length,dataStatements:data.length,counts}));
+const controlFiles=control.length?1:0;
+if(control.length)await fs.writeFile(`${out}/000-control.sql`,['PRAGMA foreign_keys=ON;',...control].join('\n')+'\n');
+for(let start=0,index=controlFiles;start<data.length;start+=chunkSize,index++){const chunk=['PRAGMA foreign_keys=ON;',...data.slice(start,start+chunkSize)];await fs.writeFile(`${out}/${String(index).padStart(3,'0')}-data.sql`,chunk.join('\n')+'\n')}
+console.log(JSON.stringify({output:out,files:controlFiles+Math.ceil(data.length/chunkSize),controlStatements:control.length,dataStatements:data.length,skippedStatements:sql.length-planned.length,counts}));

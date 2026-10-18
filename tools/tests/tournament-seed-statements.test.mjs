@@ -9,3 +9,6 @@ test('D1_TEST_IDENTICAL_ZERO_WRITES and D1_TEST_REAL_DELTAS_ONLY: replay does ze
  }finally{d.close();}
 });
 test('D1_TEST_INCOMPLETE_SOURCE_GUARD: invalid batches/identities fail before import',()=>{assert.throws(()=>tournamentSeedStatements([{}]));assert.throws(()=>tournamentSeedStatements(rows,{batchSize:101}));assert.deepEqual(tournamentSeedStatements([]),[]);});
+test('large multibyte tournament batches split below D1 byte limit; one unsplittable row is rejected',()=>{
+ const large=Array.from({length:100},(_,i)=>({...rows[0],id:'large'+i,name:'🎾'.repeat(600)}));const sql=tournamentSeedStatements(large);assert.ok(sql.length>1);assert.ok(sql.every(s=>Buffer.byteLength(s)<=100000));assert.throws(()=>tournamentSeedStatements([{...rows[0],name:'x'.repeat(100001)}]),/exceeds/);
+});

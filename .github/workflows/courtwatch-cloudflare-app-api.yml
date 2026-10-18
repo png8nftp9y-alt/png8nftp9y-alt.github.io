@@ -1,3 +1,4 @@
+# D1_WRITE_POLICY: incremental
 name: Court Watch Cloudflare D1 and app API
 
 on:
@@ -37,6 +38,8 @@ on:
       - '!cloudflare/app-api/scripts/verify-static-flags.mjs'
       - '!cloudflare/app-api/scripts/audit-github-d1-completeness.mjs'
       - '!cloudflare/app-api/scripts/github-d1-reconciliation.mjs'
+      - '!cloudflare/app-api/scripts/github-d1-audit-scope.mjs'
+      - '!cloudflare/app-api/scripts/read-audit-projection.mjs'
       - '!cloudflare/app-api/scripts/generate-tennis-europe-oop-seed.mjs'
       - '!cloudflare/app-api/scripts/generate-tennis-europe-app-candidates.mjs'
       - '!cloudflare/app-api/scripts/restore-tennis-europe-oop.sh'
@@ -157,11 +160,11 @@ jobs:
       - name: Build and import universal generation
         id: import
         run: |
-          npm run seed
-          LOCAL_IMPORT_HASH=$(tr -d '\r\n' < seed-universal/import-hash.txt)
           npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --json \
-            --command "SELECT json_extract(counts_json, '$.importHash') AS import_hash FROM generations WHERE id='current'" \
+            --command "SELECT json_extract(counts_json, '$.importHash') AS import_hash,counts_json FROM generations WHERE id='current'" \
             > remote-import-hash.json
+          D1_REMOTE_GENERATION_FILE=remote-import-hash.json npm run seed
+          LOCAL_IMPORT_HASH=$(tr -d '\r\n' < seed-universal/import-hash.txt)
           REMOTE_IMPORT_HASH=$(node -e "const fs=require('fs'),x=JSON.parse(fs.readFileSync('remote-import-hash.json','utf8'));let found='';const walk=v=>{if(!v||found)return;if(Array.isArray(v))return v.forEach(walk);if(typeof v==='object'){if(typeof v.import_hash==='string')found=v.import_hash;else Object.values(v).forEach(walk)}};walk(x);process.stdout.write(found)")
           if [ -n "$REMOTE_IMPORT_HASH" ] && [ "$LOCAL_IMPORT_HASH" = "$REMOTE_IMPORT_HASH" ]; then
             VERIFIED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -173,16 +176,7 @@ jobs:
             node scripts/guard-d1-import.mjs seed-universal/*.sql
             for sql_file in seed-universal/*.sql; do
               echo "Importing $sql_file"
-              imported=0
-              for attempt in 1 2 3 4; do
-                if npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"; then
-                  imported=1
-                  break
-                fi
-                echo "Retry $attempt for $sql_file after transient D1 state"
-                sleep $((attempt * 5))
-              done
-              test "$imported" -eq 1
+              npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"
             done
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi

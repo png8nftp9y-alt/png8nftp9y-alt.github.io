@@ -1,3 +1,4 @@
+import {MAX_SQL_BYTES} from './seed-statement-plan.mjs';
 // D1_WRITE_POLICY: incremental
 // buildIncrementalSyncPlan contract: stable IDs, guarded upserts, identical rows write zero.
 export function tournamentSeedStatements(rows,{batchSize=100}={}){
@@ -7,7 +8,8 @@ export function tournamentSeedStatements(rows,{batchSize=100}={}){
  for(let i=0;i<rows.length;i+=batchSize){
   const batch=rows.slice(i,i+batchSize);if(batch.some(r=>!r.id||!r.circuit||!r.sourceTournamentId))throw Error('invalid_tournament_seed_row');
   const json="'"+JSON.stringify(batch).replaceAll("'","''")+"'";
-  statements.push(`INSERT INTO tournaments(id,circuit,source_tournament_id,start_date,end_date,payload) SELECT json_extract(value,'$.id'),json_extract(value,'$.circuit'),json_extract(value,'$.sourceTournamentId'),COALESCE(json_extract(value,'$.startDate'),''),COALESCE(json_extract(value,'$.endDate'),''),value FROM json_each(${json}) WHERE 1 ON CONFLICT(id) DO UPDATE SET circuit=excluded.circuit,source_tournament_id=excluded.source_tournament_id,start_date=excluded.start_date,end_date=excluded.end_date,payload=excluded.payload WHERE ${different};`);
+  const statement=`INSERT INTO tournaments(id,circuit,source_tournament_id,start_date,end_date,payload) SELECT json_extract(value,'$.id'),json_extract(value,'$.circuit'),json_extract(value,'$.sourceTournamentId'),COALESCE(json_extract(value,'$.startDate'),''),COALESCE(json_extract(value,'$.endDate'),''),value FROM json_each(${json}) WHERE 1 ON CONFLICT(id) DO UPDATE SET circuit=excluded.circuit,source_tournament_id=excluded.source_tournament_id,start_date=excluded.start_date,end_date=excluded.end_date,payload=excluded.payload WHERE ${different};`;
+  if(Buffer.byteLength(statement)>MAX_SQL_BYTES){if(batch.length===1)throw Error('D1 tournament payload exceeds SQL statement limit');const half=Math.ceil(batch.length/2);statements.push(...tournamentSeedStatements(batch,{batchSize:half}));}else statements.push(statement);
  }
  return statements;
 }
