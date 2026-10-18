@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
+import {readProjectionRows} from './read-audit-projection.mjs';
 import {openReadOnlyD1} from '../lib/read-only-d1-client.mjs';
 import {runtimeDocumentReader} from '../lib/runtime-document-reader.mjs';
 import {RUNTIME_DOCUMENT_FILES,encodeDocument} from '../lib/runtime-document-plan.mjs';
@@ -24,7 +25,7 @@ try{
  for(const [table,list]of [['players','players'],['tournaments','tournaments'],['entries','entries'],['schedules','schedules'],['matches','matches'],['results','results']]){
   report.currentSource=table;const source=(await read('dist/v3/universal/'+table+'.json'))[list];if(!Array.isArray(source))throw Error('invalid_source:'+table);
   const expected=['matches','results','schedules'].includes(table)?source.filter(r=>r.circuit!=='tennis-europe'):source;
-  const rows=await pages(query,table,table==='tournaments'?'id,circuit,source_tournament_id,payload':'id,payload');tableRows[table]=rows;report.projections[table]={...projectionComparison(expected,rows),source:'dist/v3/universal/'+table+'.json',excludedTennisEuropeRows:source.length-expected.length};
+  const rows=table==='tournaments'?await pages(query,table,'id,circuit,source_tournament_id,payload'):await readProjectionRows(query,table,expected.map(row=>row.id));tableRows[table]=rows;report.projections[table]={...projectionComparison(expected,rows),source:'dist/v3/universal/'+table+'.json',excludedTennisEuropeRows:source.length-expected.length};
  }
  report.stage='historical_catalogues_and_relations';delete report.currentSource;
  const app=await pages(query,'app_tournaments','seq,player_id,competition_id,circuit,payload','seq'),storedRelations=app.map(r=>({...JSON.parse(r.payload),circuit:r.circuit,playerId:r.player_id,competitionId:r.competition_id}));
