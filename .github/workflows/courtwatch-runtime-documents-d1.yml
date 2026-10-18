@@ -34,11 +34,31 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: courtwatch-d1-writes
+  group: courtwatch-runtime-release-${{ github.event.workflow_run.conclusion || 'success' }}
   cancel-in-progress: false
-  queue: max
+  queue: single
 jobs:
+  check-source:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      source_sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check source outside the D1 writer queue
+        run: node --test cloudflare/app-api/test/runtime-document-plan.test.mjs cloudflare/app-api/test/runtime-document-reader.test.mjs cloudflare/app-api/test/d1-single-source.test.mjs cloudflare/app-api/test/runtime-source-order.test.mjs tools/tests/d1-workflow-queues.test.mjs
   verify-storage:
+    needs: check-source
+    concurrency:
+      group: courtwatch-d1-writes
+      cancel-in-progress: false
+      queue: max
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -49,8 +69,14 @@ jobs:
         with: {ref: main, fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Test immutable import and complete-source gate
-        run: node --test cloudflare/app-api/test/runtime-document-plan.test.mjs cloudflare/app-api/test/runtime-document-reader.test.mjs cloudflare/app-api/test/d1-single-source.test.mjs cloudflare/app-api/test/runtime-source-order.test.mjs
+      - name: Recheck source only when code advanced during the wait
+        env:
+          CHECKED_SHA: ${{ needs.check-source.outputs.source_sha }}
+        run: |
+          git -C "$GITHUB_WORKSPACE" fetch --no-tags --depth=1 origin "$CHECKED_SHA"
+          if ! git -C "$GITHUB_WORKSPACE" diff --quiet "$CHECKED_SHA" HEAD -- cloudflare/app-api src/v3 tools/tests v3.js v3.html v3.css .github/workflows; then
+            node --test cloudflare/app-api/test/runtime-document-plan.test.mjs cloudflare/app-api/test/runtime-document-reader.test.mjs cloudflare/app-api/test/d1-single-source.test.mjs cloudflare/app-api/test/runtime-source-order.test.mjs tools/tests/d1-workflow-queues.test.mjs
+          fi
       - name: Persist complete runtime documents and verify full content in D1
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}

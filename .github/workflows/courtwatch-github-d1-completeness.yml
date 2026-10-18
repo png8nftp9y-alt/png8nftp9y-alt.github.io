@@ -11,9 +11,9 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: courtwatch-d1-writes
+  group: courtwatch-d1-readonly-reconciliation
   cancel-in-progress: false
-  queue: max
+  queue: single
 jobs:
   reconcile:
     runs-on: ubuntu-latest

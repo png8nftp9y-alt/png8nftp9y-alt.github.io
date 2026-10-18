@@ -15,11 +15,31 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: courtwatch-d1-writes
+  group: courtwatch-te-rankings
   cancel-in-progress: false
-  queue: max
+  queue: single
 jobs:
+  check-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      source_sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check source outside the D1 writer queue
+        working-directory: cloudflare/app-api
+        run: npm run check
   sync:
+    needs: check-source
+    concurrency:
+      group: courtwatch-d1-writes
+      cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 60
     defaults:
@@ -32,9 +52,18 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: npm install
+      - name: Recheck source only when code advanced during the wait
+        env:
+          CHECKED_SHA: ${{ needs.check-source.outputs.source_sha }}
+        run: |
+          git -C "$GITHUB_WORKSPACE" fetch --no-tags --depth=1 origin "$CHECKED_SHA"
+          if ! git -C "$GITHUB_WORKSPACE" diff --quiet "$CHECKED_SHA" HEAD -- cloudflare/app-api src/v3 tools/tests v3.js v3.html v3.css .github/workflows; then
+            npm run check
+          fi
       - run: node scripts/configure-d1.mjs
       - name: Read all selected app players and their Tennis Europe matches
         run: node scripts/export-all-app-ranking-input.mjs
@@ -64,7 +93,6 @@ jobs:
         run: node scripts/sync-runtime-documents-d1.mjs
       - name: Deploy ranking-aware API
         run: |
-          npm run check
           npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
 
       - name: Verify actual Agenda ranking links after import

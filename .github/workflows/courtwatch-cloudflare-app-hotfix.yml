@@ -20,12 +20,33 @@ permissions:
   contents: read
 
 concurrency:
-  group: courtwatch-d1-writes
+  group: courtwatch-app-hotfix
   cancel-in-progress: false
-  queue: max
+  queue: single
 
 jobs:
+  check-source:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      source_sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check source outside the D1 writer queue
+        working-directory: cloudflare/app-api
+        run: npm run check && node --test test/app-worker-r2-binding.test.mjs
   deploy-worker:
+    needs: check-source
+    concurrency:
+      group: courtwatch-d1-writes
+      cancel-in-progress: false
+      queue: max
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -42,8 +63,14 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: npm install
-      - name: Check Worker and UI contracts
-        run: npm run check && node --test test/app-worker-r2-binding.test.mjs
+      - name: Recheck source only when code advanced during the wait
+        env:
+          CHECKED_SHA: ${{ needs.check-source.outputs.source_sha }}
+        run: |
+          git -C "$GITHUB_WORKSPACE" fetch --no-tags --depth=1 origin "$CHECKED_SHA"
+          if ! git -C "$GITHUB_WORKSPACE" diff --quiet "$CHECKED_SHA" HEAD -- cloudflare/app-api src/v3 tools/tests v3.js v3.html v3.css .github/workflows; then
+            npm run check && node --test test/app-worker-r2-binding.test.mjs
+          fi
       - name: Require archive binding before configuring Worker
         run: test -n "$R2_BUCKET"
       - run: npm run configure

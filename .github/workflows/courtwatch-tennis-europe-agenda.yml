@@ -26,12 +26,16 @@ permissions:
   actions: read
 
 concurrency:
-  group: courtwatch-d1-writes
+  group: courtwatch-te-agenda-${{ github.event.workflow_run.name == 'Court Watch Tennis Europe OOP historical merge' && 'historical' || 'live' }}-${{ github.event.workflow_run.conclusion || 'success' }}
   cancel-in-progress: false
-  queue: max
+  queue: single
 
 jobs:
   import-verify-deploy:
+    concurrency:
+      group: courtwatch-d1-writes
+      cancel-in-progress: false
+      queue: max
     if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60

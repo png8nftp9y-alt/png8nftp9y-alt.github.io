@@ -18,6 +18,8 @@ on:
     branches: [main]
     paths:
       - 'cloudflare/app-api/**'
+      - '!cloudflare/app-api/scripts/audit-github-d1-completeness.mjs'
+      - '!cloudflare/app-api/scripts/github-d1-reconciliation.mjs'
       - '!cloudflare/app-api/scripts/generate-tennis-europe-oop-seed.mjs'
       - '!cloudflare/app-api/scripts/generate-tennis-europe-app-candidates.mjs'
       - '!cloudflare/app-api/scripts/restore-tennis-europe-oop.sh'
@@ -39,12 +41,33 @@ permissions:
   contents: read
 
 concurrency:
-  group: courtwatch-d1-writes
+  group: courtwatch-app-refresh${{ ((github.event_name == 'workflow_dispatch' && inputs.full_refresh) || (github.event_name == 'push' && (github.event.head_commit.message == 'Sync official Court Watch players' || startsWith(github.event.head_commit.message, 'Repair D1 observed index')))) && '-full' || '' }}-${{ github.event.workflow_run.conclusion || 'success' }}
   cancel-in-progress: false
-  queue: max
+  queue: single
 
 jobs:
+  check-source:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      source_sha: ${{ steps.source.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - id: source
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Check source outside the D1 writer queue
+        working-directory: cloudflare/app-api
+        run: npm run check
   migrate-import-verify-deploy:
+    needs: check-source
+    concurrency:
+      group: courtwatch-d1-writes
+      cancel-in-progress: false
+      queue: max
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -76,8 +99,14 @@ jobs:
           echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
           python -m pip install --disable-pip-version-check --quiet awscli
       - run: npm install
-      - name: Check source
-        run: npm run check
+      - name: Recheck source only when code advanced during the wait
+        env:
+          CHECKED_SHA: ${{ needs.check-source.outputs.source_sha }}
+        run: |
+          git -C "$GITHUB_WORKSPACE" fetch --no-tags --depth=1 origin "$CHECKED_SHA"
+          if ! git -C "$GITHUB_WORKSPACE" diff --quiet "$CHECKED_SHA" HEAD -- cloudflare/app-api src/v3 tools/tests v3.js v3.html v3.css .github/workflows; then
+            npm run check
+          fi
       - name: Create or reuse Court Watch D1
         id: d1
         run: npm run configure
