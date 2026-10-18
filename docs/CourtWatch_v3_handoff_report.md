@@ -6170,3 +6170,5 @@ Il generale continua a usare main aggiornato dopo l'acquisizione del lease e con
 Aggiornati i test di routing: i produttori generali confluiscono nel consolidamento da main dopo l'Agenda; le proiezioni dedicate mantengono i propri collegamenti. Aggiunto vincolo di regressione che consente un solo produttore automatico del generale, verifica la condizione di successo e vieta cron autonomi. Controllati anche i push/manuali preesistenti, la conservazione di importatori/lettori dei tre circuiti e i controlli fuori dal lease. I test di routing/coda vengono eseguiti da npm run check. Verifica anche dello scheduler Europe già esistente, senza modificarlo.
 
 Limiti: la cadenza del generale è indiretta; il run attende il completamento dell'Agenda e l'eventuale coda. Non è garantito un avvio esatto ogni 15 minuti. La modifica non cancella esecuzioni già create con la vecchia configurazione e non risolve errori Cloudflare o recuperi dati pendenti. Pubblicazione soltanto dal terminale dell'utente.
+
+ITF discovery 2026-10-18T21:03:46.271Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
