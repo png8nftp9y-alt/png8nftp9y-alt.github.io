@@ -7,12 +7,12 @@ async function setup(fn){const d=database({identityMapping:true});try{
  d.execute("INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES('fitp|1234567','p1','NAME','fitp','1234567','NAME','Name Surname')");
  const ctx={query:async(s,p=[])=>d.execute(s,p),write:async(s,p=[])=>d.execute(s,p),targets:[target],fetchProfile:async card=>({membership_card:card,club:'Club',ranking:'4.1'})};await fn(d,ctx);
  }finally{d.close()}}
-test('recovery verifies saved metadata before clearing unavailable ledger; replay writes zero',()=>setup(async(d,ctx)=>{
+test('D1_TEST_INITIAL_IMPORT / D1_TEST_IDENTICAL_ZERO_WRITES: recovery verifies saved metadata before clearing unavailable ledger; replay writes zero',()=>setup(async(d,ctx)=>{
  d.execute("INSERT INTO fitp_metadata_failures VALUES('2026-10-18','1234567','p1','fitp_profile_missing')");
  const first=await recoverConfirmedProfiles(ctx);assert.equal(first.verified,1);assert.equal(first.dataWrites,1);assert.equal(first.clearedUnavailable,1);
  const before=d.writes();const second=await recoverConfirmedProfiles(ctx);assert.equal(second.dataWrites,0);assert.equal(d.writes(),before);
 }));
-test('no profile does not erase good data or clear the unresolved ledger',()=>setup(async(d,ctx)=>{
+test('D1_TEST_INCOMPLETE_SOURCE_GUARD: no profile does not erase good data or clear the unresolved ledger',()=>setup(async(d,ctx)=>{
  await recoverConfirmedProfiles(ctx);d.execute("INSERT INTO fitp_metadata_failures VALUES('2026-10-18','1234567','p1','fitp_profile_missing')");
  const result=await recoverConfirmedProfiles({...ctx,fetchProfile:async()=>{throw Error('fitp_profile_missing')}});
  assert.equal(result.status,'recovery_incomplete');assert.equal(result.dataWrites,0);assert.equal(d.execute('SELECT club FROM fitp_player_metadata')[0].club,'Club');assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_metadata_failures')[0].n,1);
@@ -35,4 +35,15 @@ test('exact official name and masked card must both match; source called once',a
 test('origin inspection preserves original seven-digit card and selects indexed source keys only',()=>setup(async(d,ctx)=>{
  d.execute("INSERT INTO search_acquired_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES('fitp|1234567','fitp','1234567','NAME','Name Surname','{}')");
  const before=d.writes(),result=await inspectStoredOrigins(ctx.query,['1234567']);assert.equal(result.identities,1);assert.equal(result.sourceRows,1);assert.equal(result.rows[0].official_id,'1234567');assert.equal(result.byTable.search_acquired_players,1);assert.equal(d.writes(),before);
+}));
+
+test('D1_TEST_REAL_DELTAS_ONLY: changed club writes once and preserves the identical second profile',()=>setup(async(d,ctx)=>{
+ d.execute("INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES('fitp|7654321','p2','OTHER','fitp','7654321','OTHER','Other Person')");
+ const second={membership_card:'7654321',canonical_id:'p2',name:'Other Person'};
+ const both={...ctx,targets:[target,second]};await recoverConfirmedProfiles(both);
+ d.execute("UPDATE fitp_player_metadata SET updated_at='original'");
+ const result=await recoverConfirmedProfiles({...both,fetchProfile:async card=>({membership_card:card,club:card===target.membership_card?'New Club':'Club',ranking:'4.1'})});
+ assert.equal(result.dataWrites,1);
+ assert.equal(d.execute("SELECT club FROM fitp_player_metadata WHERE membership_card='1234567'")[0].club,'New Club');
+ assert.equal(d.execute("SELECT updated_at FROM fitp_player_metadata WHERE membership_card='7654321'")[0].updated_at,'original');
 }));

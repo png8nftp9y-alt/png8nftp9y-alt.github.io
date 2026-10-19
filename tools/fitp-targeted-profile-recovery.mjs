@@ -1,7 +1,9 @@
+// D1_WRITE_POLICY: incremental
+import {buildIncrementalSyncPlan} from '../cloudflare/app-api/lib/d1-incremental-sync.mjs';
 import {readFile,writeFile} from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 import {fetchFitpSheet} from '../cloudflare/app-api/lib/fitp-player-metadata.mjs';
-import {openD1,metadataPlan,metadataWriteSql} from '../cloudflare/app-api/scripts/sync-fitp-player-metadata.mjs';
+import {openD1,metadataWriteSql} from '../cloudflare/app-api/scripts/sync-fitp-player-metadata.mjs';
 const normalized=s=>String(s||'').normalize('NFD').replace(/\p{M}/gu,'').toUpperCase().replace(/[^\p{L}\p{N}]/gu,'');
 export async function recoverConfirmedProfiles({query,write,targets,fetchProfile=fetchFitpSheet,now=()=>new Date().toISOString()}){
  if(!targets.length||targets.length>8||new Set(targets.map(r=>r.membership_card)).size!==targets.length)throw Error('fitp_target_scope_invalid');
@@ -18,7 +20,7 @@ export async function recoverConfirmedProfiles({query,write,targets,fetchProfile
  const cards=incoming.map(r=>r.membership_card),params=[JSON.stringify(cards)];
  const sql='SELECT membership_card,canonical_id,club,ranking FROM fitp_player_metadata WHERE membership_card IN (SELECT value FROM json_each(?))';
  const current=cards.length?await query(sql,params):[];
- const plan=metadataPlan(current,incoming),changed=[...plan.inserts,...plan.updates.map(r=>r.after)];
+ const plan=buildIncrementalSyncPlan({current,incoming:incoming.map(({membership_card,canonical_id,club,ranking})=>({membership_card,canonical_id,club,ranking})),keyOf:r=>r.membership_card,sourceComplete:true}),changed=[...plan.inserts,...plan.updates.map(r=>r.after)];
  if(changed.length)await write(metadataWriteSql,[now(),JSON.stringify(changed)]);
  const saved=cards.length?await query(sql,params):[];
  for(const expected of incoming){const actual=saved.find(r=>r.membership_card===expected.membership_card);if(!actual||['canonical_id','club','ranking'].some(k=>actual[k]!==expected[k]))throw Error('fitp_target_write_not_verified');}

@@ -1,13 +1,6 @@
 name: Court Watch FITP recover eight profiles and inspect stored IDs
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/courtwatch-fitp-targeted-profile-recovery.yml
-      - tools/fitp-targeted-profile-recovery.mjs
-      - tools/fitp-targeted-profile-recovery.json
-      - cloudflare/app-api/test/fitp-targeted-profile-recovery.test.mjs
 permissions:
   contents: read
 concurrency:
