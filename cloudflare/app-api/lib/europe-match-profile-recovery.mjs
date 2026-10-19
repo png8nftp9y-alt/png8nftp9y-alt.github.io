@@ -34,12 +34,32 @@ export function europePublicPages({fetchPage=fetch}={}){
  };
 }
 
+// Exact source-to-profile bindings supplied by the user on 2026-10-20.
+// They are not name searches or inferred equivalences of federation codes.
+export const userConfirmedEuropeProfiles=Object.freeze([
+ ['a13740e659705eee53b3a7ef','Kristina DEMYANKO','ITF','9ab1a4e8-a38c-40ee-aecc-f6da91a50767'],
+ ['e319bc874abba7544f4e0fde','Beata KUTIAVINA','RUS','d5bb3efc-2d8c-402c-8c35-bff7b391f8f6'],
+ ['ec24b01e3e4f73f565c73355','Veronika BABURINA','ITF','95304d41-5692-47e7-b0e1-d1d685a93ca9'],
+ ['ed66f03b7fc64f2abc275b87','Uliana TSYBINA','RUS','09208755-8677-4531-af05-dc78e82ca178'],
+ ['ee4d881308a011e475b81780','Denis GORDEEV','RUS','033e2af1-a29e-4021-b809-59236a452bc4']
+].map(([key,name,nationality,officialId])=>Object.freeze({sourceKey:'acquired|tennis-europe|name:'+key,name,nationality,officialId})));
+export function userConfirmedEuropeProfile(row){
+ const binding=userConfirmedEuropeProfiles.find(p=>p.sourceKey===row.source_key);
+ if(!binding||row.source_table!=='search_acquired_players'||row.circuit!=='tennis-europe')return null;
+ const payload=parse(row.payload),nation=row.nationality||payload.nationality||'';
+ if(row.display_name!==binding.name||nation!==binding.nationality)throw Error('europe_confirmed_source_changed');
+ if(row.official_id&&row.official_id.toLowerCase()!==binding.officialId)throw Error('europe_confirmed_existing_id_conflict');
+ if(payload.officialId&&payload.officialId.toLowerCase()!==binding.officialId)throw Error('europe_confirmed_payload_id_conflict');
+ return {officialId:binding.officialId,profileUrl:host+'/player-profile/'+binding.officialId,profileEvidenceProvenance:{type:'user_confirmed_exact_source_profile',confirmedOn:'2026-10-20',sourceKey:binding.sourceKey}};
+}
+
 export async function europeMatchProfileEvidence(rows,query,publicPage){
  const resolved=new Map(),report={examined:rows.length,sourceBound:0,verified:0,unresolved:0,requests:0,details:[]};
  const pages=new Map();
  const page=url=>{if(!pages.has(url)){report.requests++;pages.set(url,publicPage(url))}return pages.get(url)};
  for(const row of rows){
   const detail={sourceKey:row.source_key,name:row.display_name,nationality:row.nationality||parse(row.payload).nationality||'',references:[],reason:''};report.details.push(detail);
+  const confirmed=userConfirmedEuropeProfile(row);if(confirmed){resolved.set(row.source_table+'|'+row.source_key,confirmed);report.verified++;detail.reason='user_confirmed_exact_source_profile';detail.profileUrl=confirmed.profileUrl;detail.officialId=confirmed.officialId;continue}
   if(row.circuit!=='tennis-europe'||!row.source_key.startsWith('acquired|tennis-europe|name:')||validOfficialId('tennis-europe',row.official_id)){detail.reason='ineligible_source';report.unresolved++;continue}
   const refs=new Map();let afterMatch='',afterPlayer='',matchedParticipants=0;
   while(true){

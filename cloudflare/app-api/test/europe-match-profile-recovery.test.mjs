@@ -98,3 +98,30 @@ test('diagnostics distinguish missing provenance from conflicting official IDs',
  const result=await europeMatchProfileEvidence([row],async()=>[],async()=>{throw Error('unexpected source fetch')});
  assert.equal(result.report.details[0].reason,'exact_acquired_match_source_missing');assert.equal(result.report.requests,0);assert.equal(result.resolved.size,0);
 });
+
+test('all five user-confirmed exact sources resolve without HTTP or name-only lookup',async()=>{
+ const {userConfirmedEuropeProfiles}=await import('../lib/europe-match-profile-recovery.mjs');
+ const rows=userConfirmedEuropeProfiles.map(p=>({source_key:p.sourceKey,source_table:'search_acquired_players',circuit:'tennis-europe',official_id:'',display_name:p.name,payload:JSON.stringify({nationality:p.nationality})}));
+ const result=await europeMatchProfileEvidence(rows,async()=>{throw Error('unexpected query')},async()=>{throw Error('unexpected HTTP')});
+ assert.equal(result.resolved.size,5);assert.equal(result.report.requests,0);
+ for(const r of rows)assert.equal(result.resolved.get(r.source_table+'|'+r.source_key).profileEvidenceProvenance.type,'user_confirmed_exact_source_profile');
+});
+test('confirmed bindings reject changed records, conflicting IDs and same-name other sources',async()=>{
+ const {userConfirmedEuropeProfiles,userConfirmedEuropeProfile}=await import('../lib/europe-match-profile-recovery.mjs'),p=userConfirmedEuropeProfiles[0];
+ const row={source_key:p.sourceKey,source_table:'search_acquired_players',circuit:'tennis-europe',official_id:'',display_name:p.name,payload:JSON.stringify({nationality:p.nationality})};
+ assert.throws(()=>userConfirmedEuropeProfile({...row,display_name:'Another Person'}),/source_changed/);
+ assert.throws(()=>userConfirmedEuropeProfile({...row,official_id:guid(99)}),/existing_id_conflict/);
+ assert.throws(()=>userConfirmedEuropeProfile({...row,payload:JSON.stringify({nationality:'RUS'})}),/source_changed/);
+ assert.equal(userConfirmedEuropeProfile({...row,source_key:row.source_key+'other'}),null);
+});
+test('confirmed five persist through the production flow and replay has zero reads from public sources or writes',async()=>{
+ const {userConfirmedEuropeProfiles}=await import('../lib/europe-match-profile-recovery.mjs');
+ const d=database({identityMapping:true});try{
+  for(const p of userConfirmedEuropeProfiles)d.execute('INSERT INTO search_acquired_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',[p.sourceKey,'tennis-europe','',p.name.toUpperCase(),p.name,JSON.stringify({nationality:p.nationality})]);
+  await syncPlayerIdentities(d.query);const result=await recoverEuropeMatchProfiles(d.query,{publicPage:async()=>{throw Error('unexpected HTTP')}});
+  assert.equal(result.repaired,5);assert.equal(result.unresolved,0);await syncPlayerIdentities(d.query);
+  assert.equal(europeMissingIdOriginsResult((await d.query(europeMissingIdOriginsSql))[0]).missingPeople,0);
+  for(const p of userConfirmedEuropeProfiles){const row=d.execute('SELECT official_id,payload FROM search_acquired_players WHERE source_key=?',[p.sourceKey])[0];assert.equal(row.official_id,p.officialId);assert.equal(JSON.parse(row.payload).nationality,p.nationality);}
+  const writes=d.writes();assert.equal((await recoverEuropeMatchProfiles(d.query,{publicPage:async()=>{throw Error('replay HTTP')}})).examined,0);assert.equal(d.writes(),writes);
+ }finally{d.close()}
+});
