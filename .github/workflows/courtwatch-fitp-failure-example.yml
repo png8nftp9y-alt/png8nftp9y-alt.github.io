@@ -1,0 +1,33 @@
+name: Court Watch one FITP missing-profile example
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-fitp-failure-example.yml']
+permissions:
+  contents: read
+jobs:
+  example:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Read one stored failure and its existing FITP identity
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_D1_DATABASE_ID: cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda
+        run: |
+          node --input-type=module <<'JS'
+          import {openReadOnlyD1} from './cloudflare/app-api/lib/read-only-d1-client.mjs';
+          import {fitpCycle} from './cloudflare/app-api/lib/fitp-player-metadata.mjs';
+          const {query}=await openReadOnlyD1();
+          const row=(await query('SELECT cycle,membership_card,canonical_id,error FROM fitp_metadata_failures WHERE cycle=? ORDER BY membership_card LIMIT 1',[fitpCycle()]))[0];
+          if(!row)console.log('FITP_FAILURE_EXAMPLE='+JSON.stringify({status:'no_remaining_failure',writes:0}));
+          else{
+            const identities=await query("SELECT canonical_id,display_name FROM player_circuit_identities WHERE circuit='fitp' AND official_id=? ORDER BY source_key LIMIT 5",[row.membership_card]);
+            console.log('FITP_FAILURE_EXAMPLE='+JSON.stringify({status:'stored_failure',...row,identities,writes:0}));
+          }
+          JS
