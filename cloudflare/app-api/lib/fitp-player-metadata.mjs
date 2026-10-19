@@ -27,7 +27,9 @@ export async function fetchFitpSheet(card,fetcher=fetch){
  });
  if(response.status===404)return{membership_card:String(card),club:'',ranking:'',availability:'not_found'};
  if(!response.ok)throw Error('fitp_profile_http_'+response.status);
- return parseFitpSheet(await response.json(),card);
+ const data=await response.json();
+ if(!data||typeof data!=='object'||Array.isArray(data))throw Error('fitp_profile_invalid_response');
+ return parseFitpSheet(data,card);
 }
 export async function enrichFitpMetadata(db,players){
  const ids=new Map(players.map(p=>[p,playerCircuitIdentities(p).find(i=>i.circuit==='fitp')?.profileId]));

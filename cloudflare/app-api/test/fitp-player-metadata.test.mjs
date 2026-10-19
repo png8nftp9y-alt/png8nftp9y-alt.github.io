@@ -21,3 +21,8 @@ test('metadata reads exact FITP cards in batches, never names; deployment compat
  await enrichFitpMetadata({prepare(){throw Error('no such table: fitp_player_metadata')}},[a]);
  await assert.rejects(enrichFitpMetadata({prepare(){throw Error('D1 unavailable')}},[a]),/unavailable/);
 });
+
+test('malformed successful responses remain technical errors, null player remains explicitly unavailable',async()=>{
+ for(const value of ['',null,[],'not a profile'])await assert.rejects(fetchFitpSheet('123456',async()=>new Response(JSON.stringify(value))),/invalid_response/);
+ await assert.rejects(fetchFitpSheet('123456',async()=>new Response(JSON.stringify({player:null}))),/profile_missing/);
+});

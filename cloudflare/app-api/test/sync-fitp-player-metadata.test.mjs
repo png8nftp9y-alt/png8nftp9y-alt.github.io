@@ -6,7 +6,7 @@ test('failed-only recovery continues past individually invalid profiles and pres
  await syncFitpMetadata(ctx);
  for(const row of source)d.execute('INSERT INTO fitp_metadata_failures(cycle,membership_card,canonical_id,error) VALUES(?,?,?,?)',['2026-10-18',row.membership_card,row.canonical_id,'fitp_profile_missing']);
  const calls=[],events=[];
- await assert.rejects(syncFitpMetadata({...ctx,retryFailures:true,log:line=>events.push(JSON.parse(line)),fetchProfile:async card=>{calls.push(card);if(card==='123456')throw Error('fitp_profile_missing');return{...source[1],club:'Recovered Club'};}}),/fitp_profiles_failed_1_retry_failures_manually/);
+ await syncFitpMetadata({...ctx,retryFailures:true,log:line=>events.push(JSON.parse(line)),fetchProfile:async card=>{calls.push(card);if(card==='123456')throw Error('fitp_profile_missing');return{...source[1],club:'Recovered Club'};}});
  assert.deepEqual(calls,['123456','222222']);assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_metadata_failures')[0].n,1);
  assert.equal(d.execute("SELECT club FROM fitp_player_metadata WHERE membership_card='123456'")[0].club,'Club One');
  assert.equal(d.execute("SELECT club FROM fitp_player_metadata WHERE membership_card='222222'")[0].club,'Recovered Club');
@@ -17,7 +17,7 @@ test('failed-only recovery still stops on access blocking and genuine service fa
  const {fitpSourceFailureDecision:check}=await import('../scripts/sync-fitp-player-metadata.mjs');
  for(const error of ['fitp_profile_http_401','fitp_profile_http_403','fitp_profile_http_429','fitp_profile_http_503','fetch failed','TimeoutError'])assert.equal(check([{error}],1,{retryFailures:true}).sourceUnavailable,true,error);
  assert.equal(check([{error:'fitp_profile_identity_mismatch'}],1,{retryFailures:true}).sourceUnavailable,false);
- assert.equal(check([{error:'fitp_profile_missing'}],1,{retryFailures:false}).sourceUnavailable,true);
+ assert.equal(check([{error:'fitp_profile_missing'}],1,{retryFailures:false}).sourceUnavailable,false);
  assert.equal(check([{error:'fitp_profile_http_429'}],100,{retryFailures:true}).sourceUnavailable,true);
 });
 async function setup(fn){const d=database({identityMapping:true});try{
@@ -248,4 +248,18 @@ test('REST error retains sanitized provider reason on the error object for CLI r
  }});
  await assert.rejects(client.write('UPDATE private SET value=?',['secret']),e=>{assert.equal(e.d1Failure.reason,'authorization');assert.equal(e.d1Failure.phase,'query');assert.equal(e.d1Failure.httpStatus,500);assert.equal(e.d1Failure.cfRay,'1234567890abcdef-MXP');assert.doesNotMatch(JSON.stringify(e),/SECRET|TOKEN|private/);return true});assert.equal(calls,2);
  }finally{if(oldAccount===undefined)delete process.env.CLOUDFLARE_ACCOUNT_ID;else process.env.CLOUDFLARE_ACCOUNT_ID=oldAccount;if(oldToken===undefined)delete process.env.CLOUDFLARE_API_TOKEN;else process.env.CLOUDFLARE_API_TOKEN=oldToken}
+});
+
+test('unavailable profiles complete the cycle, retain old metadata, and are not refetched before the next cycle',()=>setup(async(d,ctx,calls)=>{
+ await syncFitpMetadata(ctx);calls.length=0;const events=[];
+ const next={...ctx,now:()=>Date.UTC(2026,10,8),log:s=>events.push(JSON.parse(s)),fetchProfile:async card=>{calls.push(card);throw Error('fitp_profile_missing');}};
+ await syncFitpMetadata(next);
+ assert.equal(events.at(-1).status,'complete_with_unavailable_profiles');assert.equal(events.at(-1).unavailableProfiles,2);assert.equal(events.at(-1).failed,0);
+ assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_metadata_failures')[0].n,2);
+ assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_player_metadata')[0].n,2);
+ calls.length=0;const before=d.writes();await syncFitpMetadata(next);assert.deepEqual(calls,[]);assert.equal(d.writes(),before);
+}));
+test('summary never hides transport, identity mismatch or malformed response errors',async()=>{
+ const {fitpFailureSummary}=await import('../scripts/sync-fitp-player-metadata.mjs');
+ assert.deepEqual(fitpFailureSummary([{error:'fitp_profile_missing',count:494},{error:'fitp_profile_invalid_response',count:1},{error:'fitp_profile_identity_mismatch',count:2}]),{unavailableProfiles:494,technicalFailures:3});
 });

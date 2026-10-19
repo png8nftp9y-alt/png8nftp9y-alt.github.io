@@ -6238,3 +6238,11 @@ Extended the single-example read-only workflow to inventory all current-cycle fa
 ITF discovery 2026-10-19T05:21:51.811Z: 2 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-19T13:58:45.501Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+### 2026-10-19 — Recover eight confirmed FITP profiles and distinguish unavailable profiles
+
+- Direct one-pass inspection of all 503 non-Equiparato failures returned 494 HTTP-200 null-player responses, eight usable profiles and one malformed/empty response (Matteo Giuseppe Pisani). All 349 seven-digit IDs returned null; no IDs are padded, replaced, deleted or linked by name.
+- Add an explicit targeted recovery workflow for only the eight confirmed IDs. Re-fetch official metadata, validate exact normalized name and masked membership-card suffix, require unchanged unambiguous canonical identity, write only changed club/ranking data, verify saved values, then remove only the recovered unavailable-ledger entries. Replays do not rewrite identical metadata.
+- The same one-shot workflow reads the original stored source rows for the 503 IDs using indexed identity/card and source-key queries, and diagnoses Pisani once. Full evidence is saved as a workflow artifact; it does not repeat the 503 source acquisitions. No cron, polling, retry loop, automatic exclusions or identity edits are introduced.
+- Ordinary FITP metadata runs distinguish unavailable profiles (`fitp_profile_missing`, ledger retained) from technical failures. An unavailable-only cycle completes with an explicit unavailable count and does not refetch on a same-cycle rerun. Access, transport, malformed-response and identity errors retain failure behavior. Existing metadata is preserved; the 21-day schedule is unchanged.
+- Validation: metadata, synchronization and targeted recovery tests cover masked-card/name checks, exact identity scope, verified writes before ledger cleanup, null profiles preserving data, technical-failure reporting, indexed source lookup and zero-write replay. Production recovery and source-origin conclusions still require the new workflow report after publication.

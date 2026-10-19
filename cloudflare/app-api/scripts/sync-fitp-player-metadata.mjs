@@ -9,7 +9,13 @@ export function fitpSourceFailureDecision(errors,total,{retryFailures=false}={})
  for(const row of errors){const e=String(row.error||'');const reason=individual.has(e)?e:/^fitp_profile_http_\d+$/.test(e)?e:/timeout|aborted/i.test(e)?'fitp_source_timeout':/fetch failed|network|socket/i.test(e)?'fitp_source_network':'fitp_source_other';reasons[reason]=(reasons[reason]||0)+1;}
  const accessBlocked=errors.some(r=>/http_(401|403|429)$/.test(r.error)),allFailed=total>0&&errors.length===total;
  const individualOnly=errors.length>0&&errors.every(r=>individual.has(r.error));
- return {sourceUnavailable:accessBlocked||(allFailed&&!(retryFailures&&individualOnly)),reasons,individualOnly};
+ const unavailableOnly=errors.length>0&&errors.every(r=>r.error==='fitp_profile_missing');
+ return {sourceUnavailable:accessBlocked||(allFailed&&!unavailableOnly&&!(retryFailures&&individualOnly)),reasons,individualOnly};
+}
+export function fitpFailureSummary(reasons){
+ const unavailableProfiles=reasons.filter(r=>r.error==='fitp_profile_missing').reduce((n,r)=>n+Number(r.count),0);
+ const technicalFailures=reasons.filter(r=>r.error!=='fitp_profile_missing').reduce((n,r)=>n+Number(r.count),0);
+ return {unavailableProfiles,technicalFailures};
 }
 export function metadataPlan(current,incoming){
  const old=new Map(current.map(r=>[r.membership_card,r]));
@@ -43,8 +49,8 @@ export async function syncFitpMetadata({query,write,writeBatch,fetchProfile=fetc
  if(!Number.isInteger(batchSize)||batchSize<1||batchSize>100||!Number.isInteger(concurrency)||concurrency<1||concurrency>4)throw Error('fitp_invalid_batch_settings');
  const started=now(),cycle=fitpCycle(started);
  const state=(await query('SELECT * FROM fitp_metadata_progress WHERE cycle=?',[cycle]))[0]||{last_card:'',checked:0,with_club:0,with_ranking:0,unavailable:0,complete:0};
- const failedCount=async()=>Number((await query('SELECT COUNT(*) AS n FROM fitp_metadata_failures WHERE cycle=?',[cycle]))[0]?.n||0);
- if(state.complete&&!retryFailures){const failed=await failedCount();log(JSON.stringify({status:'already_complete',cycle,...state,failed}));if(failed)throw Error('fitp_profiles_failed_'+failed+'_retry_failures_manually');return state;}
+ const failureSummary=async()=>{const remainingFailureReasons=await query('SELECT error,COUNT(*) AS count FROM fitp_metadata_failures WHERE cycle=? GROUP BY error',[cycle]);return {...fitpFailureSummary(remainingFailureReasons),remainingFailureReasons};};
+ if(state.complete&&!retryFailures){const summary=await failureSummary();log(JSON.stringify({status:summary.technicalFailures?'already_complete_with_source_errors':summary.unavailableProfiles?'already_complete_with_unavailable_profiles':'already_complete',cycle,...state,...summary,failed:summary.technicalFailures}));if(summary.technicalFailures)throw Error('fitp_profiles_failed_'+summary.technicalFailures+'_retry_failures_manually');return state;}
  if(retryFailures&&!state.complete)throw Error('fitp_finish_initial_acquisition_before_retry');
  const failedCards=new Set((await query('SELECT membership_card FROM fitp_metadata_failures WHERE cycle=?',[cycle])).map(r=>r.membership_card));
  let retryCursor='';
@@ -70,10 +76,9 @@ export async function syncFitpMetadata({query,write,writeBatch,fetchProfile=fetc
  WHERE f.cycle=? AND f.membership_card>? GROUP BY f.membership_card HAVING COUNT(DISTINCT COALESCE(a.canonical_id,l.canonical_id))=1 ORDER BY f.membership_card LIMIT ?`,[cycle,retryCursor,batchSize]):await query(inventorySql,[state.last_card,batchSize]);
   if(!cards.length){
    if(!retryFailures){await checkpoint(1);state.complete=1;}
-   const failed=await failedCount();
-   const remainingFailureReasons=failed?await query('SELECT error,COUNT(*) AS count FROM fitp_metadata_failures WHERE cycle=? GROUP BY error',[cycle]):[];
+   const summary=await failureSummary(),failed=summary.technicalFailures;
    const stored=(await query("SELECT COUNT(*) AS total,SUM(club<>'') AS with_club,SUM(ranking<>'') AS with_ranking FROM fitp_player_metadata"))[0]||{};
-   log(JSON.stringify({stored,status:failed?'complete_with_source_errors':coverage.ambiguous?'complete_with_identity_conflicts':state.unavailable?'complete_with_unavailable_fields':'complete',cycle,...state,failed,coverage,retryFailures,remainingFailureReasons}));
+   log(JSON.stringify({stored,status:failed?'complete_with_source_errors':summary.unavailableProfiles?'complete_with_unavailable_profiles':coverage.ambiguous?'complete_with_identity_conflicts':state.unavailable?'complete_with_unavailable_fields':'complete',cycle,...state,failed,coverage,retryFailures,...summary}));
    if(failed)throw Error('fitp_profiles_failed_'+failed+'_retry_failures_manually');
    return state;
   }
