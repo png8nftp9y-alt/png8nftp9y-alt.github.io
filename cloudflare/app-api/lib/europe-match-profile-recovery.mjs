@@ -35,42 +35,46 @@ export function europePublicPages({fetchPage=fetch}={}){
 }
 
 export async function europeMatchProfileEvidence(rows,query,publicPage){
- const resolved=new Map(),report={examined:rows.length,sourceBound:0,verified:0,unresolved:0,requests:0};
+ const resolved=new Map(),report={examined:rows.length,sourceBound:0,verified:0,unresolved:0,requests:0,details:[]};
  const pages=new Map();
  const page=url=>{if(!pages.has(url)){report.requests++;pages.set(url,publicPage(url))}return pages.get(url)};
  for(const row of rows){
-  if(row.circuit!=='tennis-europe'||!row.source_key.startsWith('acquired|tennis-europe|name:')||validOfficialId('tennis-europe',row.official_id)){report.unresolved++;continue}
-  const refs=new Map();let afterMatch='',afterPlayer='';
+  const detail={sourceKey:row.source_key,name:row.display_name,nationality:row.nationality||parse(row.payload).nationality||'',references:[],reason:''};report.details.push(detail);
+  if(row.circuit!=='tennis-europe'||!row.source_key.startsWith('acquired|tennis-europe|name:')||validOfficialId('tennis-europe',row.official_id)){detail.reason='ineligible_source';report.unresolved++;continue}
+  const refs=new Map();let afterMatch='',afterPlayer='',matchedParticipants=0;
   while(true){
    const batch=await query(`SELECT p.match_id,p.participant_key,p.display_name,p.source_player_id,p.nationality,p.payload,t.source_tournament_id FROM match_participants p JOIN matches m ON m.id=p.match_id JOIN tournaments t ON t.id=m.tournament_id WHERE m.circuit='tennis-europe' AND p.normalized_name=${sqlString(row.normalized_name.toLowerCase())} AND (p.match_id,p.participant_key)>(${sqlString(afterMatch)},${sqlString(afterPlayer)}) ORDER BY p.match_id,p.participant_key LIMIT 1000`);
    for(const participant of batch){
     const raw=parse(participant.payload),source=acquiredPlayer('tennis-europe',{...raw,name:participant.display_name,source_player_id:participant.source_player_id,nationality:participant.nationality||raw.nationality});
     // Reconstruct the production hash: names alone cannot establish provenance.
     if(source?.sourceKey!==row.source_key)continue;
+    matchedParticipants++;
     const href=retainedPlayerReference(raw,participant.source_tournament_id,participant.source_player_id);
     if(href)refs.set(href,participant);
    }
    if(batch.length<1000)break;afterMatch=batch.at(-1).match_id;afterPlayer=batch.at(-1).participant_key;
   }
-  if(!refs.size){report.unresolved++;continue}report.sourceBound++;
+  if(!refs.size){detail.reason=matchedParticipants?'retained_tournament_reference_missing':'exact_acquired_match_source_missing';report.unresolved++;continue}report.sourceBound++;
   const evidence=new Map();let complete=true;
-  for(const [href,participant] of refs){try{
+  for(const [href,participant] of refs){const reference={url:href,tournamentId:participant.source_tournament_id,localPlayerId:participant.source_player_id,status:'started'};detail.references.push(reference);try{
    const local=await page(href),tournament=participant.source_tournament_id,player=participant.source_player_id;
    let anchor=tournamentProfileAnchor(local.text,local.url,tournament,player);
    if(!anchor){const alias=tournamentFederationAlias(local.text,local.url,tournament,player);if(alias)anchor=redirectedGlobalProfile(await page(alias))}
    if(!anchor)throw Error('europe_profile_global_link_missing');
+   reference.profileUrl=anchor.profileUrl;
    const global=await page(anchor.profileUrl),verified=teProfileEvidence(global.text,{...anchor,name:row.display_name},global.url);
    const own=parse(row.payload),nation=matchingNation('tennis-europe',row.nationality||own.nationality);
    if(!verified||nation&&matchingNation('tennis-europe',verified.nationality)!==nation)throw Error('europe_profile_identity_unverified');
+   reference.status='verified';reference.officialId=verified.officialId;
    evidence.set(verified.officialId,{officialId:verified.officialId,profileUrl:verified.profileUrl,
     profileEvidenceProvenance:{type:'exact_acquired_match_tournament_global_profile',originalCompetitions:new Set([...refs.values()].map(p=>p.source_tournament_id)).size}});
-  }catch{complete=false}}
-  if(complete&&evidence.size===1){resolved.set(row.source_table+'|'+row.source_key,[...evidence.values()][0]);report.verified++}else report.unresolved++;
+  }catch(error){complete=false;reference.status='unresolved';reference.reason=/^europe_profile_[a-z0-9_]+$/.test(error.message)?error.message:'public_profile_request_failed'}}
+  if(complete&&evidence.size===1){resolved.set(row.source_table+'|'+row.source_key,[...evidence.values()][0]);report.verified++;detail.reason='verified'}else{report.unresolved++;detail.reason=evidence.size>1?'conflicting_official_ids':'official_profile_evidence_incomplete'}
  }
  return{resolved,report};
 }
 
-export async function recoverEuropeMatchProfiles(query,{publicPage=europePublicPages(),onProgress=()=>{}}={}){
+export async function recoverEuropeMatchProfiles(query,{publicPage=europePublicPages(),onProgress=()=>{},onDetail=()=>{}}={}){
  let examined=0,repaired=0,unresolved=0,requests=0;
  // Use exactly the production missing-person scope. A legacy source without an
  // ID does not require HTTP recovery if its canonical person already has one.
@@ -80,6 +84,7 @@ export async function recoverEuropeMatchProfiles(query,{publicPage=europePublicP
   const rows=(await query(`SELECT s.*,l.nationality,l.birth_year FROM search_acquired_players s LEFT JOIN player_circuit_identities l ON l.source_key=s.source_key WHERE s.circuit='tennis-europe' AND s.source_key IN (${keys}) AND COALESCE(s.official_id,'')='' ORDER BY s.source_key`)).map(r=>({...r,source_table:'search_acquired_players'}));
   if(!rows.length)continue;
   const evidence=await europeMatchProfileEvidence(rows,query,publicPage);
+  for(const detail of evidence.report.details)onDetail(detail);
   const delta=await applyArchiveEvidence(query,rows,{resolve:r=>evidence.resolved.get(r.source_table+'|'+r.source_key)});
   examined+=rows.length;repaired+=delta.repaired;unresolved+=rows.length-delta.repaired;requests+=evidence.report.requests;
   onProgress({examined,repaired,unresolved,requests});

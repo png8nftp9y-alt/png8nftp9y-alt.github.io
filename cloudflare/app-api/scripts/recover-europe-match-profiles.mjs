@@ -14,12 +14,12 @@ async function query(sql){
  if(!response.ok||body.success!==true||!body.result?.every(r=>r.success))throw Error('europe_profile_D1_failed_HTTP_'+response.status);
  addD1Metrics(metrics,body);return body.result[0].results||[];
 }
-const audit={status:'started',checkedAt:new Date().toISOString(),metrics};
+const audit={details:[],status:'started',checkedAt:new Date().toISOString(),metrics};
 await fs.mkdir('tmp',{recursive:true});
 try{
  const checked=await cachedReadCheck(query,'europe-profiles',await readCheckVersion(import.meta.url),async()=>{
  audit.before=europeMissingIdOriginsResult((await recoveryReadQuery(query,europeMissingIdOriginsSql,'identity_invalid_europe'))[0]);
- audit.recovery=await recoverEuropeMatchProfiles(query,{onProgress:p=>console.log('EUROPE_NATIVE_PROFILE_PROGRESS='+JSON.stringify(p))});
+ audit.recovery=await recoverEuropeMatchProfiles(query,{onDetail:d=>{audit.details.push(d);console.log('EUROPE_NATIVE_PROFILE_DETAIL='+JSON.stringify(d))},onProgress:p=>console.log('EUROPE_NATIVE_PROFILE_PROGRESS='+JSON.stringify(p))});
  const mapping=await syncPlayerIdentities(query);
  audit.mapping={status:mapping.status,pending:mapping.pending,writes:mapping.writes};
  audit.after=europeMissingIdOriginsResult((await recoveryReadQuery(query,europeMissingIdOriginsSql,'identity_invalid_europe'))[0]);

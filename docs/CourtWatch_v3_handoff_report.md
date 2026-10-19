@@ -6262,3 +6262,10 @@ ITF discovery 2026-10-19T13:58:45.501Z: 0 newly discovered future tournaments; M
 - Validation: new acquisition and existing workflow regression tests pass (20 tests), existing FITP parser/periodic tests pass (34 tests). Global D1 incremental-policy verification is required by the installer. Production deployment and first live acquisition remain pending publication.
 
 ITF discovery 2026-10-19T22:43:47.916Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+### 2026-10-20 — Explain five unresolved Europe native IDs
+
+- Inspected runs 39335115229 and 39335914438: both fail on five acquired Europe people lacking verified native IDs; four public profile requests recover none. Acceptance is complete (15,985, zero unsaved). FITP first-acquisition step independently succeeds with no new queued IDs.
+- Existing recovery swallowed per-reference exceptions and exported only cumulative counts, preventing evidence-based repair. Export each exact source key/name/nationality, retained tournament/local ID, profile URL and categorized failure to existing logs and artifact. Distinguish absent match provenance, missing retained reference, profile-link failure, HTTP failure, identity verification failure and conflicting official IDs.
+- This is targeted diagnostic instrumentation, not a claim that five IDs have been recovered. Identity guards, missing-only selection, D1 writes and schedules remain unchanged; no polling or automatic retries added.
+- Validation: eight SQLite/public-profile regressions cover successful recovery/replay, homonyms, wrong names/nations, missing provenance and explicit per-reference errors. Live names and root causes require the next existing acquired-index run after publication.

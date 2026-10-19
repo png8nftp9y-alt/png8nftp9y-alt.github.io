@@ -83,3 +83,18 @@ test('public session is lazy, preserves cookies, and blocks foreign redirects',a
  let calls=0;const publicPage=europePublicPages({fetchPage:async url=>{calls++;return{status:302,headers:new Headers({location:'https://foreign.example/'}),text:async()=>''}}});
  assert.equal(calls,0);await assert.rejects(publicPage(host+'/sport/player.aspx?id='+tournament+'&player=1'),/foreign_url/);assert.equal(calls,1);
 });
+
+test('unresolved diagnostics retain exact source, name, tournament and safe failure reason without assigning an ID',async()=>{
+ const d=database({identityMapping:true});try{
+  fixture(d);await syncAcquiredSearch(d.query);await syncPlayerIdentities(d.query);const details=[],writes=d.writes();
+  const result=await recoverEuropeMatchProfiles(d.query,{publicPage:async()=>{throw Error('europe_profile_http_403')},onDetail:d=>details.push(d)});
+  assert.equal(result.unresolved,1);assert.equal(result.repaired,0);assert.equal(d.writes(),writes);
+  assert.equal(details[0].name,'Test Player 1');assert.equal(details[0].reason,'official_profile_evidence_incomplete');
+  assert.equal(details[0].references[0].tournamentId,tournament);assert.equal(details[0].references[0].localPlayerId,'1');assert.equal(details[0].references[0].reason,'europe_profile_http_403');
+ }finally{d.close()}
+});
+test('diagnostics distinguish missing provenance from conflicting official IDs',async()=>{
+ const raw={name:'Test Player 1',nationality:'POL'},source=acquiredPlayer('tennis-europe',raw),row={source_key:source.sourceKey,source_table:'search_acquired_players',circuit:'tennis-europe',normalized_name:source.normalizedName,display_name:raw.name,payload:JSON.stringify(source.payload)};
+ const result=await europeMatchProfileEvidence([row],async()=>[],async()=>{throw Error('unexpected source fetch')});
+ assert.equal(result.report.details[0].reason,'exact_acquired_match_source_missing');assert.equal(result.report.requests,0);assert.equal(result.resolved.size,0);
+});
