@@ -4,6 +4,13 @@ import {readFile,writeFile} from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 import {buildIncrementalSyncPlan} from '../lib/d1-incremental-sync.mjs';
 import {fetchFitpSheet,fitpCycle} from '../lib/fitp-player-metadata.mjs';
+export function fitpSourceFailureDecision(errors,total,{retryFailures=false}={}){
+ const individual=new Set(['fitp_profile_missing','fitp_profile_identity_mismatch','fitp_invalid_card']),reasons={};
+ for(const row of errors){const e=String(row.error||'');const reason=individual.has(e)?e:/^fitp_profile_http_\d+$/.test(e)?e:/timeout|aborted/i.test(e)?'fitp_source_timeout':/fetch failed|network|socket/i.test(e)?'fitp_source_network':'fitp_source_other';reasons[reason]=(reasons[reason]||0)+1;}
+ const accessBlocked=errors.some(r=>/http_(401|403|429)$/.test(r.error)),allFailed=total>0&&errors.length===total;
+ const individualOnly=errors.length>0&&errors.every(r=>individual.has(r.error));
+ return {sourceUnavailable:accessBlocked||(allFailed&&!(retryFailures&&individualOnly)),reasons,individualOnly};
+}
 export function metadataPlan(current,incoming){
  const old=new Map(current.map(r=>[r.membership_card,r]));
  const valid=incoming.map(r=>{
@@ -64,8 +71,9 @@ export async function syncFitpMetadata({query,write,writeBatch,fetchProfile=fetc
   if(!cards.length){
    if(!retryFailures){await checkpoint(1);state.complete=1;}
    const failed=await failedCount();
+   const remainingFailureReasons=failed?await query('SELECT error,COUNT(*) AS count FROM fitp_metadata_failures WHERE cycle=? GROUP BY error',[cycle]):[];
    const stored=(await query("SELECT COUNT(*) AS total,SUM(club<>'') AS with_club,SUM(ranking<>'') AS with_ranking FROM fitp_player_metadata"))[0]||{};
-   log(JSON.stringify({stored,status:failed?'complete_with_source_errors':coverage.ambiguous?'complete_with_identity_conflicts':state.unavailable?'complete_with_unavailable_fields':'complete',cycle,...state,failed,coverage,retryFailures}));
+   log(JSON.stringify({stored,status:failed?'complete_with_source_errors':coverage.ambiguous?'complete_with_identity_conflicts':state.unavailable?'complete_with_unavailable_fields':'complete',cycle,...state,failed,coverage,retryFailures,remainingFailureReasons}));
    if(failed)throw Error('fitp_profiles_failed_'+failed+'_retry_failures_manually');
    return state;
   }
@@ -85,7 +93,9 @@ export async function syncFitpMetadata({query,write,writeBatch,fetchProfile=fetc
   // Successful cards can clear failures from a previously interrupted explicit run.
   const clearedFailures=incoming.filter(r=>failedCards.has(r.membership_card));
   if(clearedFailures.length)statements.push({sql:failureDeleteSql,params:[cycle,JSON.stringify(clearedFailures.map(r=>r.membership_card))]});
-  const sourceUnavailable=errors.some(r=>/http_(401|403|429)$/.test(r.error))||errors.length===cards.length;
+  const sourceDecision=fitpSourceFailureDecision(errors,cards.length,{retryFailures});
+  const sourceUnavailable=sourceDecision.sourceUnavailable;
+  if(errors.length)log(JSON.stringify({status:'source_batch_diagnostics',cycle,retryFailures,attempted:cards.length,succeeded:incoming.length,failed:errors.length,...sourceDecision}));
   if(sourceUnavailable){await persist(statements,cards.at(-1).membership_card);throw Error('fitp_source_unavailable_resume_manually');}
   if(retryFailures){await persist(statements,cards.at(-1).membership_card);for(const r of errors)failedCards.add(r.membership_card);for(const r of clearedFailures)failedCards.delete(r.membership_card);retryCursor=cards.at(-1).membership_card;log(JSON.stringify({status:'retry_progress',cycle,attempted:cards.length,failed:errors.length,dataWrites:plan.writes}));continue;}
   const next={...state,last_card:cards.at(-1).membership_card,checked:state.checked+cards.length,

@@ -46,7 +46,7 @@ jobs:
     timeout-minutes: 350
     env:
       CLOUDFLARE_D1_DATABASE_ID: cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda
-      FITP_RETRY_FAILURES: ${{ inputs.retry_failures || 'false' }}
+      FITP_RETRY_FAILURES: ${{ inputs.retry_failures || (github.event_name == 'push' && github.event.head_commit.message == 'FITP recupero mirato dei profili falliti') || 'false' }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
     steps:

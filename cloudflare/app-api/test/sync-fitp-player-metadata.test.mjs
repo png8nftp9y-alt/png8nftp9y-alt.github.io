@@ -2,6 +2,24 @@ import test from 'node:test';import assert from 'node:assert/strict';import {rea
 import {database} from './search-sqlite-fixture.mjs';
 import {syncFitpMetadata,metadataPlan,metadataWriteSql,inventorySql} from '../scripts/sync-fitp-player-metadata.mjs';
 const source=[{membership_card:'123456',canonical_id:'p1',club:'Club One',ranking:'2.7'},{membership_card:'222222',canonical_id:'p2',club:'Club Two',ranking:'4.NC'}];
+test('failed-only recovery continues past individually invalid profiles and preserves their failure ledger',()=>setup(async(d,ctx)=>{
+ await syncFitpMetadata(ctx);
+ for(const row of source)d.execute('INSERT INTO fitp_metadata_failures(cycle,membership_card,canonical_id,error) VALUES(?,?,?,?)',['2026-10-18',row.membership_card,row.canonical_id,'fitp_profile_missing']);
+ const calls=[],events=[];
+ await assert.rejects(syncFitpMetadata({...ctx,retryFailures:true,log:line=>events.push(JSON.parse(line)),fetchProfile:async card=>{calls.push(card);if(card==='123456')throw Error('fitp_profile_missing');return{...source[1],club:'Recovered Club'};}}),/fitp_profiles_failed_1_retry_failures_manually/);
+ assert.deepEqual(calls,['123456','222222']);assert.equal(d.execute('SELECT COUNT(*) AS n FROM fitp_metadata_failures')[0].n,1);
+ assert.equal(d.execute("SELECT club FROM fitp_player_metadata WHERE membership_card='123456'")[0].club,'Club One');
+ assert.equal(d.execute("SELECT club FROM fitp_player_metadata WHERE membership_card='222222'")[0].club,'Recovered Club');
+ assert.equal(events.find(e=>e.status==='source_batch_diagnostics').sourceUnavailable,false);
+ assert.deepEqual(events.at(-1).remainingFailureReasons,[{error:'fitp_profile_missing',count:1}]);
+}));
+test('failed-only recovery still stops on access blocking and genuine service failures',async()=>{
+ const {fitpSourceFailureDecision:check}=await import('../scripts/sync-fitp-player-metadata.mjs');
+ for(const error of ['fitp_profile_http_401','fitp_profile_http_403','fitp_profile_http_429','fitp_profile_http_503','fetch failed','TimeoutError'])assert.equal(check([{error}],1,{retryFailures:true}).sourceUnavailable,true,error);
+ assert.equal(check([{error:'fitp_profile_identity_mismatch'}],1,{retryFailures:true}).sourceUnavailable,false);
+ assert.equal(check([{error:'fitp_profile_missing'}],1,{retryFailures:false}).sourceUnavailable,true);
+ assert.equal(check([{error:'fitp_profile_http_429'}],100,{retryFailures:true}).sourceUnavailable,true);
+});
 async function setup(fn){const d=database({identityMapping:true});try{
  await d.query(readFileSync(new URL('../migrations/0041_fitp_metadata_engine.sql',import.meta.url),'utf8'));
  for(const r of source)d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name) VALUES(?,?,?,?,?,?,?)',['fitp|'+r.membership_card,r.canonical_id,'same','fitp',r.membership_card,'SAME','Same']);
