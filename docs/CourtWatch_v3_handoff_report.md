@@ -6234,3 +6234,5 @@ The recovery report exposed 1390 fitp_profile_missing failures but no exact iden
 ### 2026-10-19 — Inspect every FITP missing-profile identity without reacquisition
 
 Extended the single-example read-only workflow to inventory all current-cycle failure IDs in bounded indexed pages and resolve existing identity names with exact official-card lookups. Exports every failure with canonical ID, names, source error and conservative label category. Only names beginning Equiparato are marked equiparato_label; ordinary/ambiguous names and missing names remain review/unknown. These labels do not authorize deleting or excluding identities. Count checks before/after detect changing failure scope. No FITP requests, D1 writes, retries, cron or monitoring; only publication/manual triggers. Report contains all rows plus summary counts and review samples. Tests cover complete row preservation, mixed names, absent names and empty evidence. D1 inventory still requires execution in Actions.
+
+ITF discovery 2026-10-19T05:21:51.811Z: 2 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
