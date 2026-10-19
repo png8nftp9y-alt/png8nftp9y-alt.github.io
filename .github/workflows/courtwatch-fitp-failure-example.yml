@@ -1,9 +1,9 @@
-name: Court Watch one FITP missing-profile example
+name: Court Watch all FITP missing-profile identities
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['.github/workflows/courtwatch-fitp-failure-example.yml']
+    paths: ['.github/workflows/courtwatch-fitp-failure-example.yml', 'tools/fitp-failure-inventory.mjs', 'tools/tests/fitp-failure-inventory.test.mjs']
 permissions:
   contents: read
 jobs:
@@ -14,7 +14,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Read one stored failure and its existing FITP identity
+      - run: node --test tools/tests/fitp-failure-inventory.test.mjs cloudflare/app-api/test/read-only-d1-client.test.mjs
+      - name: Read all stored failures and exact FITP identity labels
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -23,11 +24,30 @@ jobs:
           node --input-type=module <<'JS'
           import {openReadOnlyD1} from './cloudflare/app-api/lib/read-only-d1-client.mjs';
           import {fitpCycle} from './cloudflare/app-api/lib/fitp-player-metadata.mjs';
-          const {query}=await openReadOnlyD1();
-          const row=(await query('SELECT cycle,membership_card,canonical_id,error FROM fitp_metadata_failures WHERE cycle=? ORDER BY membership_card LIMIT 1',[fitpCycle()]))[0];
-          if(!row)console.log('FITP_FAILURE_EXAMPLE='+JSON.stringify({status:'no_remaining_failure',writes:0}));
-          else{
-            const identities=await query("SELECT canonical_id,display_name FROM player_circuit_identities WHERE circuit='fitp' AND official_id=? ORDER BY source_key LIMIT 5",[row.membership_card]);
-            console.log('FITP_FAILURE_EXAMPLE='+JSON.stringify({status:'stored_failure',...row,identities,writes:0}));
+          import fs from 'node:fs/promises';
+          import {failureInventory} from './tools/fitp-failure-inventory.mjs';
+          const {query}=await openReadOnlyD1(),cycle=fitpCycle();
+          const count=async()=>Number((await query('SELECT COUNT(*) AS n FROM fitp_metadata_failures WHERE cycle=?',[cycle]))[0]?.n||0);
+          const before=await count(),failures=[],identities=[];let after='';
+          while(true){
+            const batch=await query('SELECT cycle,membership_card,canonical_id,error FROM fitp_metadata_failures WHERE cycle=? AND membership_card>? ORDER BY membership_card LIMIT 200',[cycle,after]);
+            failures.push(...batch);if(batch.length<200)break;after=batch.at(-1).membership_card;
           }
+          for(let offset=0;offset<failures.length;offset+=100){
+            const cards=failures.slice(offset,offset+100).map(r=>r.membership_card);
+            identities.push(...await query("SELECT official_id,canonical_id,display_name FROM player_circuit_identities WHERE circuit='fitp' AND official_id IN (SELECT value FROM json_each(?))",[JSON.stringify(cards)]));
+          }
+          const result=failureInventory(failures,identities),afterCount=await count();
+          const stable=before===afterCount&&failures.length===before;
+          const report={status:stable?'inventory_complete':'concurrent_change',cycle,writes:0,before,after:afterCount,verifiedAt:new Date().toISOString(),...result};
+          await fs.writeFile('fitp-all-failure-identities.json',JSON.stringify(report,null,2)+'\n');
+          console.log('FITP_ALL_FAILURE_IDENTITIES='+JSON.stringify({...report,rows:undefined,reviewExamples:result.rows.filter(r=>r.classification!=='equiparato_label').slice(0,20),labelExamples:result.rows.filter(r=>r.classification==='equiparato_label').slice(0,5)}));
+          if(!stable)process.exitCode=2;
           JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fitp-all-failure-identities
+          path: fitp-all-failure-identities.json
+          if-no-files-found: warn
+          retention-days: 30
