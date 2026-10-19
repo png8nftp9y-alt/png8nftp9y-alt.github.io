@@ -6260,3 +6260,5 @@ ITF discovery 2026-10-19T13:58:45.501Z: 0 newly discovered future tournaments; M
 - The existing acquired-player-search run processes new identities after native identity recovery, obtains club/ranking once from the current official endpoint, saves real deltas and reads them back before acknowledging the ledger. Exact card and canonical identity checks preserve homonyms; empty responses never erase known metadata.
 - Already acquired IDs make no further source calls. Unavailable and technical outcomes are recorded once; no polling, retry loop or scheduler is added. The existing 21-day engine remains responsible for periodic refresh. Empty pending queues issue one indexed read and no writes.
 - Validation: new acquisition and existing workflow regression tests pass (20 tests), existing FITP parser/periodic tests pass (34 tests). Global D1 incremental-policy verification is required by the installer. Production deployment and first live acquisition remain pending publication.
+
+ITF discovery 2026-10-19T22:43:47.916Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
