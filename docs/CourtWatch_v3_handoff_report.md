@@ -6253,3 +6253,10 @@ ITF discovery 2026-10-19T13:58:45.501Z: 0 newly discovered future tournaments; M
 - Fix the new recovery module's missing incremental-policy declaration and invoke buildIncrementalSyncPlan directly on exact metadata rows. Add the required initial import, identical zero writes, real delta and incomplete-source test labels, plus a two-profile regression proving one changed row does not rewrite the other.
 - The completed one-shot recovery is now workflow_dispatch-only, preventing code changes from reacquiring the same eight profiles or repeating origin inspection. No schedule or polling is added.
 - Validation: 11 targeted/planner tests passed; the full global D1 policy verifier passed with the recovery module included (one D1 file checked). The original global policy run was red because the new module lacked policy markers; successful D1 recovery was independently verified.
+
+### 2026-10-20 — First FITP club and ranking acquisition for newly acquired identities
+
+- Add a persistent D1 first-acquisition ledger, populated by insertion of new official FITP identities or recovery of a missing native ID. No historical backfill or reopening of closed profiles.
+- The existing acquired-player-search run processes new identities after native identity recovery, obtains club/ranking once from the current official endpoint, saves real deltas and reads them back before acknowledging the ledger. Exact card and canonical identity checks preserve homonyms; empty responses never erase known metadata.
+- Already acquired IDs make no further source calls. Unavailable and technical outcomes are recorded once; no polling, retry loop or scheduler is added. The existing 21-day engine remains responsible for periodic refresh. Empty pending queues issue one indexed read and no writes.
+- Validation: new acquisition and existing workflow regression tests pass (20 tests), existing FITP parser/periodic tests pass (34 tests). Global D1 incremental-policy verification is required by the installer. Production deployment and first live acquisition remain pending publication.

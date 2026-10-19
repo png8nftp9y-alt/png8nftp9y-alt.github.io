@@ -114,7 +114,7 @@ export async function syncFitpMetadata({query,write,writeBatch,fetchProfile=fetc
  }
 }
 export const D1_REQUEST_TIMEOUT_MS=120000;
-export async function openD1({fetcher=globalThis.fetch,databaseId=process.env.CLOUDFLARE_D1_DATABASE_ID}={}){
+export async function openD1({fetcher=globalThis.fetch,databaseId=process.env.CLOUDFLARE_D1_DATABASE_ID,initializeSchema=true}={}){
  const account=process.env.CLOUDFLARE_ACCOUNT_ID,token=process.env.CLOUDFLARE_API_TOKEN;
  if(!account||!token)throw Error('fitp_d1_credentials_missing');
  if(databaseId&&!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(databaseId))throw Error('fitp_d1_invalid_database_id');
@@ -144,7 +144,7 @@ export async function openD1({fetcher=globalThis.fetch,databaseId=process.env.CL
   const data=await executeBody(batch.length===1?batch[0]:{batch},batch.length===1?'write':'batch');
   if(data.length!==batch.length)throw Error('fitp_d1_incomplete_batch_response_resume_manually');
  };
- await executeBody({sql:await readFile(new URL('../migrations/0041_fitp_metadata_engine.sql',import.meta.url),'utf8'),params:[]},'schema');
+ if(initializeSchema)await executeBody({sql:await readFile(new URL('../migrations/0041_fitp_metadata_engine.sql',import.meta.url),'utf8'),params:[]},'schema');
  return{query:execute,write:execute,writeBatch};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
