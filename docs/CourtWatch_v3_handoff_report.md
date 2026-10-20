@@ -6278,3 +6278,5 @@ ITF discovery 2026-10-19T22:43:47.916Z: 0 newly discovered future tournaments; M
 - Validation: eleven recovery regressions cover all five exact bindings, production SQLite persistence and zero-missing canonical result, replay, changed names/affiliations, conflicting IDs and homonyms. Live D1 readback remains pending publication and acquired-index execution.
 
 ITF discovery 2026-10-20T05:17:49.110Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-10-20T12:12:53.043Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
