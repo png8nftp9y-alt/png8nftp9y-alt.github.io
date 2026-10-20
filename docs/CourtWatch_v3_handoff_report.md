@@ -6292,3 +6292,11 @@ ITF discovery 2026-10-20T21:57:15.845Z: 0 newly discovered future tournaments; M
 - Twelve recovery tests pass using current pinned source dependencies: six source records/five supplied profiles persist and canonical missing count reaches zero; replay writes zero; conflicting IDs and same-name other sources remain rejected. Live D1 completion remains pending deployment and indexed recovery. No schedule, polling or automatic retry is added.
 
 - Installer v2 replaces only validated exact content blocks and generates the patch against the actual files, avoiding the failed test-file context/EOF hunk of v1. Application tested on current 3c905d4ef0 source and a second invocation produces an empty patch. All other file contents are preserved.
+
+## 2026-10-21 — Riduzione attese nella prima aggiunta giocatore
+
+- Dopo la conferma durevole dell'aggiunta, la pagina continua a caricare soltanto lo snapshot autorizzato del giocatore. Il percorso UI, i gruppi TCL/Altri e i controlli di identità restano invariati.
+- Metadati della sorgente acquisita e identità canonica vengono letti contemporaneamente, con le stesse pagine limitate e la stessa precedenza finale dei campi. La risoluzione dei profili nei due archivi interroga le sorgenti in parallelo, mantenendo l'ordine di fusione e il rifiuto delle identità incompatibili.
+- La presentazione dei tornei non blocca più l'applicazione delle classifiche e la risoluzione dei collegamenti. I metadati FITP continuano ad applicarsi alla fine, dopo ranking e collegamenti, per conservare l'associazione alla tessera e la precedenza corretta.
+- Nessuna nuova query, scrittura D1, schedulazione o polling. Il confronto delle due letture su fixture con latenza simulata di 100 ms per query ha dato 405→304 ms per l'identità (4 letture) e 302→202 ms per i collegamenti (3 letture), con output identico. Sono misure locali simulate, non tempi garantiti in produzione.
+- Validazione: test di sovrapposizione con letture sospese, protezione omonimi/errori, parità dello snapshot e zero scritture; suite completa `npm run check` superata (exit 0), controlli D1 verdi. La misura in produzione richiede la pubblicazione da parte dell'utente e una nuova aggiunta; il precedente limite osservato di 7,4 s non era una misura esatta del completamento dei tornei.

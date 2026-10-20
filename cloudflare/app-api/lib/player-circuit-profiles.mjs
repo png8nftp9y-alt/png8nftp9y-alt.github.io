@@ -59,7 +59,14 @@ export function circuitProfiles(player,rows=[]){
 export async function resolveCircuitProfiles(db,players){
  const stored=await mappedProfiles(db,players),results=new Map(stored),pending=players.filter(p=>!stored.has(p));
  for(let offset=0;offset<pending.length;offset+=20){const batch=pending.slice(offset,offset+20),names=[...new Set(batch.flatMap(p=>{const n=normalizePlayerName(p.name),reverse=n.split(' ').reverse().join(' ');return[n,n.toLowerCase(),reverse,reverse.toLowerCase()]}).filter(Boolean))],rows=[];
-  if(names.length)for(const table of ['observed_players','search_acquired_players'])try{rows.push(...((await db.prepare(`SELECT circuit,official_id,display_name,payload FROM ${table} WHERE normalized_name IN (${names.map(()=>'?').join(',')})`).bind(...names).all()).results||[]))}catch(e){if(!/no such table/i.test(e.message))throw e}
+  if(names.length){
+   const pages=await Promise.all(['observed_players','search_acquired_players'].map(async table=>{
+    try{return (await db.prepare(`SELECT circuit,official_id,display_name,payload FROM ${table} WHERE normalized_name IN (${names.map(()=>'?').join(',')})`).bind(...names).all()).results||[]}
+    catch(e){if(!/no such table/i.test(e.message))throw e;return []}
+   }));
+   // Flatten in original source order: concurrency must not change identity evidence.
+   rows.push(...pages.flat());
+  }
   for(const p of batch)results.set(p,stored.get(p)||circuitProfiles(p,rows));
  }
  return results;

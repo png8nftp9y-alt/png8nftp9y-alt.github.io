@@ -350,3 +350,20 @@ test('exact observed and acquired selections use a unique index despite many unr
   }finally{d.close()}
  }
 });
+
+test('saved acquired-player metadata and exact canonical identity load together with unchanged precedence',async()=>{
+ const sourceKey='acquired|itf|id:800123456',player={id:'cw-parallel-read',name:'Case Person',sourceKey,sourceCircuit:'itf',worldTennisId:'800123456'};
+ const canonical={canonicalId:'person:parallel-read',name:player.name,circuitProfiles:[{circuit:'fitp',url:'https://www.fitp.it/Pagina-Giocatore/?cardNumber='+btoa('1234567890')}]};
+ let release,overlap=false;const calls=[];
+ const db={prepare(sql){return {bind(){return {all:async()=>{
+  calls.push(sql);
+  if(sql.startsWith('SELECT a.payload'))return {results:[{payload:JSON.stringify(player)}]};
+  if(sql.startsWith('SELECT source_key,payload'))return new Promise(resolve=>{release=()=>resolve({results:[{source_key:sourceKey,payload:'{"birthYear":2012,"nationality":"ITA"}'}]})});
+  if(sql.includes('WITH requested AS')){overlap=Boolean(release);release();return {results:[{lookup_key:sourceKey,canonical_id:canonical.canonicalId,payload:JSON.stringify(canonical)}]}}
+  if(sql.startsWith('SELECT official_id,payload'))return {results:[{official_id:'1234567890',payload:'{"club":"Verified Club","ranking":"3.1"}'}]};
+  throw Error('unexpected read '+sql);
+ }}}}}};
+ const result=await personalPlayerAdditions({DB:db},'owner','others',player.id);
+ assert.equal(overlap,true);assert.equal(calls.length,4);assert.equal(result.length,1);
+ assert.equal(result[0].id,player.id);assert.equal(result[0].membershipCard,'1234567890');assert.equal(result[0].club,'Verified Club');assert.equal(result[0].ranking,'3.1');assert.equal(result[0].birthYear,2012);
+});

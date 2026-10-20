@@ -98,3 +98,19 @@ test('scoped ranking reads overlap history and a ranking outage still preserves 
   }assert.equal(d.writes(),before);
  }finally{globalThis.fetch=original;d.close()}
 });
+
+test('final profile resolution overlaps a pending catalogue and preserves exact snapshot with zero writes', {timeout:60000},async()=>{
+ const d=database({identityMapping:true});let held=false,release,overlap=false,timer;
+ try{seed(d,1);const before=d.writes();
+  const expected=await (await request(d.db,'others','cw-target-0')).json();
+  function wrap(s,sql,values=[]){return new Proxy(s,{get(t,k){const v=t[k];if(k==='bind')return(...args)=>wrap(v.apply(t,args),sql,args);
+   if(k==='all')return async(...args)=>{
+    if(sql.includes('runtime_document_chunks')&&values[0]==='dist/v3/tournaments.json'&&!held){held=true;return new Promise((resolve,reject)=>{release=()=>Promise.resolve(v.apply(t,args)).then(resolve,reject);timer=setTimeout(()=>{release();release=null},5000)})}
+    if(sql.includes('WITH requested AS')&&held&&release){overlap=true;clearTimeout(timer);release();release=null;}
+    return v.apply(t,args);
+   };return typeof v==='function'?v.bind(t):v;}})}
+  const db={prepare:sql=>wrap(d.db.prepare(sql),sql),batch:s=>d.db.batch(s)};
+  const response=await request(db,'others','cw-target-0');assert.equal(response.status,200);
+  const result=await response.json();assert.equal(overlap,true);assert.deepEqual({...result,generatedAt:null},{...expected,generatedAt:null});assert.equal(d.writes(),before);
+ }finally{clearTimeout(timer);d.close()}
+});

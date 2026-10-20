@@ -26,3 +26,22 @@ test('conflicting or ambiguous new profiles remain unlinked and exact source par
  assert.deepEqual(circuitProfiles(p,[{...base,payload:'{"birthYear":2010,"nationality":"ITA"}'}]),[]);
  assert.deepEqual(circuitProfiles({...p,sourceCircuit:'itf',sourceKey:'acquired|itf|name:verified-source'}).map(x=>x.circuit),['itf']);
 });
+
+test('profile sources overlap without linking a conflicting same-name identity or hiding read errors',async()=>{
+ const {resolveCircuitProfiles}=await import('../lib/player-circuit-profiles.mjs');
+ const player={id:'cw-parallel',name:'Person Test',membershipCard:'1420520369',birthYear:2009,nationality:'ITA'};
+ const correct={circuit:'tennis-europe',display_name:'Person Test',official_id:guid,payload:'{"birthYear":2009,"nationality":"ITA"}'};
+ const conflicting={...correct,official_id:'12345678-1234-1234-1234-123456789abc',payload:'{"birthYear":2010,"nationality":"ITA"}'};
+ let release,overlap=false;const calls=[];
+ const db={prepare(sql){return {bind(){return {all:async()=>{
+  calls.push(sql);
+  if(sql.includes('FROM observed_players'))return new Promise(resolve=>{release=()=>resolve({results:[correct]})});
+  if(sql.includes('FROM search_acquired_players')){overlap=Boolean(release);release();return {results:[conflicting]}}
+  return {results:[]};
+ }}}}}};
+ const profiles=(await resolveCircuitProfiles(db,[player])).get(player);
+ assert.equal(overlap,true);assert.deepEqual(profiles.map(p=>p.circuit),['fitp','tennis-europe']);
+ assert.equal(profiles[1].url,'https://te.tournamentsoftware.com/player-profile/'+guid);assert.equal(calls.length,3);
+ const broken={prepare(sql){return {bind(){return {all:async()=>{if(sql.includes('FROM search_acquired_players'))throw Error('provider_failure');return {results:[]}}}}}}};
+ await assert.rejects(resolveCircuitProfiles(broken,[player]),/provider_failure/);
+});
