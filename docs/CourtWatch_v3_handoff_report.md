@@ -6276,3 +6276,5 @@ ITF discovery 2026-10-19T22:43:47.916Z: 0 newly discovered future tournaments; M
 - Use existing incremental archive-evidence persistence with optimistic payload guards, exact readback and ordinary canonical mapping. Preserve source nationality, match history and source keys. Record explicit user-confirmed provenance; no claim of live public-page verification (this environment cannot read these pages).
 - Missing-only selection avoids repeat HTTP, replay writes zero, no new scheduler, workflow, polling or automatic retry. This resolves these user-confirmed records once applied in live D1; it is not a general inference that ITF and RUS are equivalent affiliations, nor a demonstrated root-cause fix for future unidentified players.
 - Validation: eleven recovery regressions cover all five exact bindings, production SQLite persistence and zero-missing canonical result, replay, changed names/affiliations, conflicting IDs and homonyms. Live D1 readback remains pending publication and acquired-index execution.
+
+ITF discovery 2026-10-20T05:17:49.110Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
