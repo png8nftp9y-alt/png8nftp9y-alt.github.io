@@ -38,6 +38,7 @@ export function europePublicPages({fetchPage=fetch}={}){
 // They are not name searches or inferred equivalences of federation codes.
 export const userConfirmedEuropeProfiles=Object.freeze([
  ['a13740e659705eee53b3a7ef','Kristina DEMYANKO','ITF','9ab1a4e8-a38c-40ee-aecc-f6da91a50767'],
+ ['9d640088a5e2ad49a1a7168a','Kristina DEMYANKO','BLR','9ab1a4e8-a38c-40ee-aecc-f6da91a50767'],
  ['e319bc874abba7544f4e0fde','Beata KUTIAVINA','RUS','d5bb3efc-2d8c-402c-8c35-bff7b391f8f6'],
  ['ec24b01e3e4f73f565c73355','Veronika BABURINA','ITF','95304d41-5692-47e7-b0e1-d1d685a93ca9'],
  ['ed66f03b7fc64f2abc275b87','Uliana TSYBINA','RUS','09208755-8677-4531-af05-dc78e82ca178'],

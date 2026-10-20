@@ -103,7 +103,7 @@ test('all five user-confirmed exact sources resolve without HTTP or name-only lo
  const {userConfirmedEuropeProfiles}=await import('../lib/europe-match-profile-recovery.mjs');
  const rows=userConfirmedEuropeProfiles.map(p=>({source_key:p.sourceKey,source_table:'search_acquired_players',circuit:'tennis-europe',official_id:'',display_name:p.name,payload:JSON.stringify({nationality:p.nationality})}));
  const result=await europeMatchProfileEvidence(rows,async()=>{throw Error('unexpected query')},async()=>{throw Error('unexpected HTTP')});
- assert.equal(result.resolved.size,5);assert.equal(result.report.requests,0);
+ assert.equal(result.resolved.size,6);assert.equal(new Set([...result.resolved.values()].map(p=>p.officialId)).size,5);assert.equal(result.report.requests,0);
  for(const r of rows)assert.equal(result.resolved.get(r.source_table+'|'+r.source_key).profileEvidenceProvenance.type,'user_confirmed_exact_source_profile');
 });
 test('confirmed bindings reject changed records, conflicting IDs and same-name other sources',async()=>{
@@ -119,9 +119,18 @@ test('confirmed five persist through the production flow and replay has zero rea
  const d=database({identityMapping:true});try{
   for(const p of userConfirmedEuropeProfiles)d.execute('INSERT INTO search_acquired_players(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',[p.sourceKey,'tennis-europe','',p.name.toUpperCase(),p.name,JSON.stringify({nationality:p.nationality})]);
   await syncPlayerIdentities(d.query);const result=await recoverEuropeMatchProfiles(d.query,{publicPage:async()=>{throw Error('unexpected HTTP')}});
-  assert.equal(result.repaired,5);assert.equal(result.unresolved,0);await syncPlayerIdentities(d.query);
+  assert.equal(result.repaired,6);assert.equal(result.unresolved,0);await syncPlayerIdentities(d.query);
   assert.equal(europeMissingIdOriginsResult((await d.query(europeMissingIdOriginsSql))[0]).missingPeople,0);
   for(const p of userConfirmedEuropeProfiles){const row=d.execute('SELECT official_id,payload FROM search_acquired_players WHERE source_key=?',[p.sourceKey])[0];assert.equal(row.official_id,p.officialId);assert.equal(JSON.parse(row.payload).nationality,p.nationality);}
   const writes=d.writes();assert.equal((await recoverEuropeMatchProfiles(d.query,{publicPage:async()=>{throw Error('replay HTTP')}})).examined,0);assert.equal(d.writes(),writes);
  }finally{d.close()}
+});
+
+test('Demyanko retained BLR source binds only its exact key and preserves affiliation',async()=>{
+ const {userConfirmedEuropeProfile}=await import('../lib/europe-match-profile-recovery.mjs');
+ const row={source_key:'acquired|tennis-europe|name:9d640088a5e2ad49a1a7168a',source_table:'search_acquired_players',circuit:'tennis-europe',official_id:'',display_name:'Kristina DEMYANKO',payload:JSON.stringify({nationality:'BLR'})};
+ assert.equal(userConfirmedEuropeProfile(row).officialId,'9ab1a4e8-a38c-40ee-aecc-f6da91a50767');
+ assert.equal(JSON.parse(row.payload).nationality,'BLR');
+ assert.throws(()=>userConfirmedEuropeProfile({...row,official_id:'95304d41-5692-47e7-b0e1-d1d685a93ca9'}),/existing_id_conflict/);
+ assert.equal(userConfirmedEuropeProfile({...row,source_key:row.source_key+'x'}),null);
 });

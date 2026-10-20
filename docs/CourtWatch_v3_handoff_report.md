@@ -6284,3 +6284,11 @@ ITF discovery 2026-10-20T12:12:53.043Z: 0 newly discovered future tournaments; M
 ITF discovery 2026-10-20T17:36:46.489Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-20T21:57:15.845Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+### 2026-10-21 — Complete retained Demyanko BLR source binding
+
+- Run 39339665507 after the original repair and latest run 39514856591 both report one residual: Kristina Demyanko, source acquired|tennis-europe|name:9d640088a5e2ad49a1a7168a, affiliation BLR. The prior binding covered her ITF source only; the five supplied GUIDs alone did not cover this additional retained source.
+- Extend the existing explicit user-confirmed binding for Demyanko to this exact BLR source and her supplied GUID 9ab1a4e8-a38c-40ee-aecc-f6da91a50767. Preserve source affiliation and all existing key/name/circuit/storage/conflicting-ID guards. No general federation equivalence or name-only automatic merge is introduced.
+- Twelve recovery tests pass using current pinned source dependencies: six source records/five supplied profiles persist and canonical missing count reaches zero; replay writes zero; conflicting IDs and same-name other sources remain rejected. Live D1 completion remains pending deployment and indexed recovery. No schedule, polling or automatic retry is added.
+
+- Installer v2 replaces only validated exact content blocks and generates the patch against the actual files, avoiding the failed test-file context/EOF hunk of v1. Application tested on current 3c905d4ef0 source and a second invocation produces an empty patch. All other file contents are preserved.
