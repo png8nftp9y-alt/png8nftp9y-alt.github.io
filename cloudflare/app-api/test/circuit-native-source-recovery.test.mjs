@@ -67,8 +67,8 @@ test('missing match sources use the exact acquired hash, preserve history, and r
   const writes=d.writes();assert.equal((await recoverCircuitNativeSources(d.query,{officialJson:()=>{throw Error('replay fetch')}})).examined,0);assert.equal(d.writes(),writes);assert.equal(requests,2);
  }finally{d.close()}
 });
-test('ordinary cycle and acceptance importer both run FITP/ITF recovery without new schedules',()=>{
- const y=readFileSync(new URL('../../../.github/workflows/courtwatch-acquired-player-search.yml',import.meta.url),'utf8');assert.match(y,/node scripts\/recover-circuit-native-profiles.mjs/);assert.match(y,/workflow_run:/);assert.doesNotMatch(y,/schedule:/);
+test('hourly index and acceptance importer retain FITP/ITF recovery',()=>{
+ const y=readFileSync(new URL('../../../.github/workflows/courtwatch-acquired-player-search.yml',import.meta.url),'utf8');assert.match(y,/node scripts\/recover-circuit-native-profiles.mjs/);assert.match(y,/cron: '17 \* \* \* \*'/);assert.doesNotMatch(y,/workflow_run:/);
  const loader=readFileSync(new URL('../lib/acceptance-native-id-recovery.mjs',import.meta.url),'utf8');assert.match(loader,/otherCircuits\(rows\)/);
 });
 test('native aliases and relative official links are preserved at indexing, including draw-only players',async()=>{
