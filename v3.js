@@ -2621,7 +2621,7 @@ function renderPlayers() {
         club = esc(displayPlayerClub(p.club) || (playerHasFitpMembership(p) ? "Tesseramento da completare" : "")),
         card = p.membershipCard ? `tessera ${p.membershipCard}` : "",
         nation = esc(foreignPlayerCountryLabel(p));
-      return `<div class="playerRow" role="link" tabindex="0" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${[club, esc(card), nation, n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Ricerca iscrizioni in corso"].filter(Boolean).join(" · ")}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
+      return `<div class="playerRow" role="link" tabindex="0" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${[club, esc(card), nation, n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Nessun torneo monitorato"].filter(Boolean).join(" · ")}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
     .join("") || '<div class="empty">Nessun giocatore. Premi + per aggiungerne uno.</div>';
   document.querySelectorAll("[data-profile]").forEach(
