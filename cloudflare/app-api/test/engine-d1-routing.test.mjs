@@ -35,8 +35,8 @@ test('motor runs resolve main at start and keep one code revision across their a
   if(source.includes('needs.engine-source.outputs.sha')){assert.match(source,/engine-source:\n[\s\S]*?ref: main/);assert.match(source,/sha: \$\{\{ steps.source.outputs.sha \}\}/);}
  }
 });
-test('D1 runtime publication and acquired indexing are completion-driven without polling schedules',()=>{
- for(const file of ['courtwatch-runtime-documents-d1.yml','courtwatch-acquired-player-search.yml']){
+test('D1 runtime publication remains completion-driven without a periodic schedule',()=>{
+ for(const file of ['courtwatch-runtime-documents-d1.yml']){
   const source=read('.github/workflows/'+file),triggers=source.split('permissions:')[0];
   assert.doesNotMatch(triggers,/^  schedule:/m,file+': polling');assert.match(triggers,/workflow_run:/);
   assert.match(source,/ref: main/);assert.match(source,/queue: single/);
@@ -54,4 +54,13 @@ test('general D1 follows successful Europe Agenda and has no autonomous periodic
  assert.match(agenda,/github.event.workflow_run.conclusion == 'success'/);
  assert.match(general,/node src\/v3\/build-universal-database.mjs/);
  assert.match(general,/node scripts\/sync-runtime-documents-d1.mjs/);
+});
+
+test('acquired index has only the user-approved hourly schedule and manual entrypoint',()=>{
+ const source=read('.github/workflows/courtwatch-acquired-player-search.yml'),header=source.split('permissions:')[0];
+ assert.match(header,/^  schedule:/m);assert.match(header,/cron: '17 \* \* \* \*'/);
+ assert.equal((header.match(/cron:/g)||[]).length,1);
+ assert.doesNotMatch(header,/^  (workflow_run|push):/m);assert.match(header,/^  workflow_dispatch:/m);
+ assert.match(source,/group: courtwatch-acquired-search\n/);assert.match(source,/queue: single/);
+ assert.match(source,/group: courtwatch-d1-writes\n      cancel-in-progress: false\n      queue: max/);
 });
