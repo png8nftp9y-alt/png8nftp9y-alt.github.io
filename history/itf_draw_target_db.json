@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-10-21T15:08:01.744Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-10-21T15:10:21.683Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -793282,14 +793282,14 @@
       "tournamentName": "J30 Limassol",
       "startDate": "2026-10-19",
       "endDate": "2026-10-25",
-      "decision": "pending",
-      "checkedAt": "2026-10-21T14:55:22.458Z",
+      "decision": "complete",
+      "checkedAt": "2026-10-21T15:10:20.198Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 4,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 4,
-      "missingSections": 2,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -793403,14 +793403,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -793442,14 +793442,14 @@
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -794496,6 +794496,194 @@
             "complete": true,
             "taskId": "J-J30-CYP-2026-006__G-D-M-KO",
             "storedAt": "2026-10-21T09:40:58.624Z"
+          }
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800675745",
+              "name": "Ruben Stanmore",
+              "givenName": "Ruben",
+              "familyName": "Stanmore",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/ruben-stanmore/800675745/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800717282",
+              "name": "Joao Deus",
+              "givenName": "Joao",
+              "familyName": "Deus",
+              "nationalityCode": "POR",
+              "profileLink": "/en/players/joao-deus/800717282/por/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800651395",
+              "name": "Athos Karakatsianis",
+              "givenName": "Athos",
+              "familyName": "Karakatsianis",
+              "nationalityCode": "CYP",
+              "profileLink": "/en/players/athos-karakatsianis/800651395/cyp/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800595070",
+              "name": "Andreanos Kyriakides",
+              "givenName": "Andreanos",
+              "familyName": "Kyriakides",
+              "nationalityCode": "CYP",
+              "profileLink": "/en/players/andreanos-kyriakides/800595070/cyp/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800697061",
+              "name": "Lukasz Andrzej Maliszewski",
+              "givenName": "Lukasz Andrzej",
+              "familyName": "Maliszewski",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/lukasz-andrzej-maliszewski/800697061/pol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800734503",
+              "name": "Callum Sharkey",
+              "givenName": "Callum",
+              "familyName": "Sharkey",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/callum-sharkey/800734503/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800693791",
+              "name": "Daniel Czarnecki",
+              "givenName": "Daniel",
+              "familyName": "Czarnecki",
+              "nationalityCode": "GER",
+              "profileLink": "/en/players/daniel-czarnecki/800693791/ger/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800692161",
+              "name": "Matvei Semenov",
+              "givenName": "Matvei",
+              "familyName": "Semenov",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/matvei-semenov/800692161/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-21T15:10:20.198Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-CYP-2026-006__B-S-M-KO",
+            "storedAt": "2026-10-21T15:10:20.198Z"
+          }
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800660001",
+              "name": "Andrea Georgiou Papakyriacou",
+              "givenName": "Andrea",
+              "familyName": "Georgiou Papakyriacou",
+              "nationalityCode": "CYP",
+              "profileLink": "/en/players/andrea-georgiou-papakyriacou/800660001/cyp/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766434",
+              "name": "Olivia Frauchiger",
+              "givenName": "Olivia",
+              "familyName": "Frauchiger",
+              "nationalityCode": "SUI",
+              "profileLink": "/en/players/olivia-frauchiger/800766434/sui/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800709007",
+              "name": "Noya Rojansky",
+              "givenName": "Noya",
+              "familyName": "Rojansky",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/noya-rojansky/800709007/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800716460",
+              "name": "Nadja Knezevic",
+              "givenName": "Nadja",
+              "familyName": "Knezevic",
+              "nationalityCode": "MNE",
+              "profileLink": "/en/players/nadja-knezevic/800716460/mne/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800684634",
+              "name": "Lior Javetz",
+              "givenName": "Lior",
+              "familyName": "Javetz",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/lior-javetz/800684634/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766026",
+              "name": "Foteini Maria Fotopoulou",
+              "givenName": "Foteini Maria",
+              "familyName": "Fotopoulou",
+              "nationalityCode": "CYP",
+              "profileLink": "/en/players/foteini-maria-fotopoulou/800766026/cyp/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800693456",
+              "name": "Julia Reynolds",
+              "givenName": "Julia",
+              "familyName": "Reynolds",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/julia-reynolds/800693456/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800654983",
+              "name": "Shira Dvir",
+              "givenName": "Shira",
+              "familyName": "Dvir",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/shira-dvir/800654983/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-21T15:10:20.198Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-CYP-2026-006__G-S-M-KO",
+            "storedAt": "2026-10-21T15:10:20.198Z"
           }
         }
       }
@@ -797927,7 +798115,7 @@
       "startDate": "2026-10-19",
       "endDate": "2026-10-24",
       "decision": "pending",
-      "checkedAt": "2026-10-21T14:55:22.841Z",
+      "checkedAt": "2026-10-21T15:10:20.585Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -803672,7 +803860,7 @@
       "startDate": "2026-10-19",
       "endDate": "2026-10-24",
       "decision": "pending",
-      "checkedAt": "2026-10-21T14:55:23.931Z",
+      "checkedAt": "2026-10-21T15:10:21.683Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 3,
@@ -816265,7 +816453,7 @@
       "startDate": "2026-10-20",
       "endDate": "2026-10-25",
       "decision": "pending",
-      "checkedAt": "2026-10-21T14:55:23.205Z",
+      "checkedAt": "2026-10-21T15:10:20.951Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -817728,7 +817916,7 @@
       "startDate": "2026-10-20",
       "endDate": "2026-10-25",
       "decision": "pending",
-      "checkedAt": "2026-10-21T14:55:23.568Z",
+      "checkedAt": "2026-10-21T15:10:21.320Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
