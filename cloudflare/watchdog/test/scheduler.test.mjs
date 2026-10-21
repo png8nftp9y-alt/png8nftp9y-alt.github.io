@@ -15,7 +15,7 @@ const fitpWorkflows = ["courtwatch-v3-fitp-entries.yml"];
 const auditWorkflows = ["courtwatch-cloudflare-full-cost-audit.yml"];
 const workflows = [...itfWorkflows, ...europeWorkflows, ...fitpWorkflows, ...auditWorkflows];
 const slot = Math.floor(Date.now() / 900000) * 900000;
-async function tick(cron, runs = [], failWorkflow = null) {
+async function tick(cron, runs = [], failWorkflow = null, scheduledTime = slot) {
   const requests = [], pending = [];
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (url, init = {}) => {
@@ -30,7 +30,7 @@ async function tick(cron, runs = [], failWorkflow = null) {
       : {generatedAt: new Date().toISOString()});
   };
   try {
-    await worker.scheduled({cron, scheduledTime: slot}, {COURTWATCH_GITHUB_TOKEN: "test"}, {
+    await worker.scheduled({cron, scheduledTime}, {COURTWATCH_GITHUB_TOKEN: "test"}, {
       waitUntil(promise) {pending.push(promise);},
     });
     await Promise.all(pending);
@@ -82,4 +82,37 @@ test("10-minute watchdog retains D1 recovery and daily ITF safety", async () => 
 test("one GitHub API error does not prevent the other ITF dispatches", async () => {
   const requests = await tick("0,15,30,45 * * * *", [], workflows[0]);
   assert.equal(requests.filter(r => r.method === "POST").length, 2);
+});
+
+const indexWorkflow = "courtwatch-acquired-player-search.yml";
+const hourly = Date.UTC(2026,9,21,10,17);
+test("hourly index dispatches once at minute 17 and never from maintenance or circuit crons", async()=>{
+ const requests=await tick("17 * * * *",[{id:90,status:"completed",conclusion:"success",created_at:new Date(hourly-3600000).toISOString()}],null,hourly);
+ assert.equal(requests.filter(r=>r.method==="POST").length,1);
+ assert.ok(requests.filter(r=>r.method==="POST").every(r=>r.url.includes(indexWorkflow)));
+ for(const cron of ["3,13,23,33,43,53 * * * *","0,15,30,45 * * * *","5,20,35,50 * * * *","10,25,40,55 * * * *","12 * * * *"]){
+  const requests=await tick(cron);assert.ok(!requests.some(r=>r.url.includes(indexWorkflow)));
+ }
+});
+test("same-hour manual or scheduled index suppresses a duplicate even outside the current quarter hour",async()=>{
+ for(const delta of [0,12*60000]){
+  const requests=await tick("17 * * * *",[{id:91,status:"completed",conclusion:"success",created_at:new Date(hourly-delta).toISOString()}],null,hourly);
+  assert.equal(requests.filter(r=>r.method==="POST").length,0);
+ }
+});
+test("any active index prevents another dispatch and an API failure does not retry",async()=>{
+ for(const status of ["queued","pending","waiting","in_progress"]){
+  const requests=await tick("17 * * * *",[{id:92,status,created_at:new Date(hourly-3*3600000).toISOString()}],null,hourly);
+  assert.equal(requests.filter(r=>r.method==="POST").length,0);
+ }
+ const failed=await tick("17 * * * *",[],indexWorkflow,hourly);
+ assert.equal(failed.length,1);assert.equal(failed.filter(r=>r.method==="POST").length,0);
+});
+test("hourly index timer exists in Cloudflare only, preserving the shared D1 queue",async()=>{
+ const {readFileSync}=await import('node:fs');
+ const config=JSON.parse(readFileSync(new URL('../wrangler.jsonc',import.meta.url),'utf8'));
+ assert.equal(config.triggers.crons.filter(x=>x==='17 * * * *').length,1);
+ const workflow=readFileSync(new URL('../../../.github/workflows/courtwatch-acquired-player-search.yml',import.meta.url),'utf8');
+ assert.doesNotMatch(workflow.split('permissions:')[0],/^  (schedule|workflow_run|push):/m);
+ assert.match(workflow,/workflow_dispatch:/);assert.match(workflow,/group: courtwatch-d1-writes/);
 });

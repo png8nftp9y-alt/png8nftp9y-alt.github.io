@@ -6398,3 +6398,10 @@ ITF Meta ordinary 2026-10-22T05:24:33.206Z: attempted 4, acquired 4, ordinary 0,
 ITF discovery 2026-10-22T12:28:12.988Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-22T17:43:59.226Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## Index orario: avvio dal watchdog Cloudflare
+- Problema verificato: cron GitHub configurato ogni ora al minuto 17, ma partenze schedule osservate alle 15:13 e 19:18 UTC con intervalli superiori a un ora. Ultimo index completato con successo, senza prove di un errore del motore.
+- Spostato l avvio orario al watchdog Cloudflare esistente, cron 17 * * * *. Rimosso il timer GitHub per evitare un secondo avvio ritardato. Invariati recupero manuale, pipeline identita e metadati FITP, lock condiviso D1 e coda singola.
+- Anti-duplicazione: nessun nuovo avvio con index attivo o gia avviato nella stessa ora; nessun rilancio automatico per errore API e nessun controllo index dai cicli di manutenzione. L avvio non garantisce l inizio immediato del job su GitHub, che puo attendere runner o lock D1.
+- Validazione locale: nove test watchdog e un controllo dedicato della rotta index superati; test di compatibilita aggiornati per la nuova autorita del timer. Lo script di installazione esegue tutti i controlli API nel checkout effettivo prima del push.
+- Chiarimento ITF, senza modifiche: i contatori globalPendingTechnical/Publication sono calcolati sugli stati pending cumulativi del vecchio archivio; la coda inventario aggiornata applica acquisizioni, esclusioni RR e date. Al controllo la coda aveva zero blocchi tecnici, sei tabelloni vuoti per Panama, Vierumaki e Arnhem, e 202 tornei futuri. Nessuna nuova certificazione dell intero archivio D1.

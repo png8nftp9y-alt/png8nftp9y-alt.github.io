@@ -68,7 +68,7 @@ test('missing match sources use the exact acquired hash, preserve history, and r
  }finally{d.close()}
 });
 test('hourly index and acceptance importer retain FITP/ITF recovery',()=>{
- const y=readFileSync(new URL('../../../.github/workflows/courtwatch-acquired-player-search.yml',import.meta.url),'utf8');assert.match(y,/node scripts\/recover-circuit-native-profiles.mjs/);assert.match(y,/cron: '17 \* \* \* \*'/);assert.doesNotMatch(y,/workflow_run:/);
+ const y=readFileSync(new URL('../../../.github/workflows/courtwatch-acquired-player-search.yml',import.meta.url),'utf8');assert.match(y,/node scripts\/recover-circuit-native-profiles.mjs/);assert.match(y,/Dispatched hourly at minute 17/);assert.doesNotMatch(y,/^  schedule:/m);assert.doesNotMatch(y,/workflow_run:/);
  const loader=readFileSync(new URL('../lib/acceptance-native-id-recovery.mjs',import.meta.url),'utf8');assert.match(loader,/otherCircuits\(rows\)/);
 });
 test('native aliases and relative official links are preserved at indexing, including draw-only players',async()=>{

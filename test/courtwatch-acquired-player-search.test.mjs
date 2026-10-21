@@ -7,8 +7,8 @@ import '../cloudflare/app-api/test/sync-acquired-player-search.test.mjs';
 const workflow = readFileSync(new URL('../.github/workflows/courtwatch-acquired-player-search.yml', import.meta.url), 'utf8');
 test('hourly indexing retains manual recovery, removes producer fanout and serializes D1 writes', () => {
   const triggers = workflow.split('permissions:')[0];
-  assert.match(triggers, /schedule:/);
-  assert.match(triggers, /cron: '17 \* \* \* \*'/);
+  assert.doesNotMatch(triggers, /schedule:/);
+  assert.match(workflow, /Dispatched hourly at minute 17/);
   assert.doesNotMatch(workflow, /workflow_run/);
   assert.doesNotMatch(triggers, /\n  push:/);
   assert.match(workflow, /queue: single/);

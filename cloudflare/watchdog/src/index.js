@@ -4,6 +4,7 @@ const API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
 
 const MAINTENANCE_CRON = "3,13,23,33,43,53 * * * *";
 const LIVE_GROUPS = new Map([
+  ["17 * * * *", new Set(["acquired-search"])],
   ["0,15,30,45 * * * *", new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one"])],
   ["5,20,35,50 * * * *", new Set(["tennis-europe-oop", "tennis-europe"])],
   ["10,25,40,55 * * * *", new Set(["fitp"])],
@@ -12,6 +13,7 @@ const LIVE_GROUPS = new Map([
 const LIVE_IDS = new Set([...LIVE_GROUPS.values()].flatMap((ids) => [...ids]));
 
 const TARGETS = [
+  { id: "acquired-search", workflow: "courtwatch-acquired-player-search.yml", intervalMinutes: 60 },
   { id: "tennis-europe-oop", workflow: "courtwatch-tennis-europe-oop-live.yml" },
   { id: "d1", workflow: "courtwatch-cloudflare-app-api.yml", successfulRunMaxAgeMinutes: 40, cooldownMinutes: 25 },
   {
@@ -127,11 +129,12 @@ async function checkLiveSchedule(target, env, scheduledTime) {
   const runs = target.id === "itf-t-minus-one"
     ? allRuns.filter((run) => !/^ITF T-1 extraordinary-[ab]$/.test(String(run.display_title || "")))
     : allRuns;
-  const slotStart = Math.floor(scheduledTime / 900000) * 900000;
+  const intervalMs = (target.intervalMinutes || 15) * 60000;
+  const slotStart = Math.floor(scheduledTime / intervalMs) * intervalMs;
   const active = runs.find(
     (run) =>
       run.status !== "completed" &&
-      ageMinutes(run.created_at, scheduledTime) <= 120,
+      (target.id === "acquired-search" || ageMinutes(run.created_at, scheduledTime) <= 120),
   );
   if (active) return { id: target.id, action: "active", runId: active.id };
   const inSlot = runs.find((run) => Date.parse(run.created_at) >= slotStart);

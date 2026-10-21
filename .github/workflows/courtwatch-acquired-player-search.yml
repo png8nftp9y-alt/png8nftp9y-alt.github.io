@@ -10,9 +10,7 @@ on:
         description: 'Authorize more than 5000 identity record changes in this run'
         type: boolean
         default: false
-  schedule:
-    # One acquisition-index pass per hour; manual recovery remains available.
-    - cron: '17 * * * *'
+  # Dispatched hourly at minute 17 by the existing Cloudflare watchdog.
 permissions:
   contents: read
 concurrency:

@@ -58,8 +58,8 @@ test('general D1 follows successful Europe Agenda and has no autonomous periodic
 
 test('acquired index has only the user-approved hourly schedule and manual entrypoint',()=>{
  const source=read('.github/workflows/courtwatch-acquired-player-search.yml'),header=source.split('permissions:')[0];
- assert.match(header,/^  schedule:/m);assert.match(header,/cron: '17 \* \* \* \*'/);
- assert.equal((header.match(/cron:/g)||[]).length,1);
+ assert.doesNotMatch(header,/^  schedule:/m);assert.match(header,/Dispatched hourly at minute 17/);
+ assert.equal((header.match(/cron:/g)||[]).length,0);
  assert.doesNotMatch(header,/^  (workflow_run|push):/m);assert.match(header,/^  workflow_dispatch:/m);
  assert.match(source,/group: courtwatch-acquired-search\n/);assert.match(source,/queue: single/);
  assert.match(source,/group: courtwatch-d1-writes\n      cancel-in-progress: false\n      queue: max/);
