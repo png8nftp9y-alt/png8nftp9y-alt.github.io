@@ -9,7 +9,7 @@ const docs=Object.fromEntries(['itf_t1_queue_status.json','itf_metadata_queue_st
 async function open(view,{remoteFailure=false}={}) {
   const sql=[],objects=[],urls=[];
   const documents=RUNTIME_DOCUMENT_FILES.map(path=>encodeDocument(path,docs[path.split('/').at(-1)]||{status:'fixture_complete',players:[{}],tournaments:[{}]})),release=releasePlan(documents,'fixture');
-  const db={prepare(query){sql.push(query);return{bind(...values){this.values=values;return this},async first(){if(query.includes("key='runtimeDocumentRelease'"))return{value:release.value};return query.includes('generations')?{status:'green',counts_json:'{}'}:{n:0}},async all(){if(query.includes('runtime_document_chunks'))return{results:documents.find(d=>d.path===this.values[0]).chunks.map((data,seq)=>({seq,data}))};return{success:true,results:query===playerIdDiagnosticsSql?['fitp','tennis-europe','itf'].map(circuit=>({circuit,ids:0,players:0,missing:0})):[]}}}}};
+  const db={prepare(query){sql.push(query);return{bind(...values){this.values=values;return this},async first(){if(query.includes("key='runtimeDocumentRelease'"))return{value:release.value};return query.includes('generations')?{status:'green',counts_json:'{}'}:{n:0}},async all(){if(query.includes('AS table_name'))return{results:[...query.matchAll(/SELECT '([^']+)' AS table_name/g)].map(m=>({table_name:m[1],n:0}))};if(query.startsWith('WITH current AS'))return{results:[{kind:'release',data:release.value},...documents.filter(d=>this.values.includes(d.path)).flatMap(d=>d.chunks.map((data,seq)=>({kind:'chunk',path:d.path,seq,data})))]};if(query.includes('runtime_document_chunks'))return{results:documents.find(d=>d.path===this.values[0]).chunks.map((data,seq)=>({seq,data}))};return{success:true,results:query===playerIdDiagnosticsSql?['fitp','tennis-europe','itf'].map(circuit=>({circuit,ids:0,players:0,missing:0})):[]}}}}};
   const archive={async get(key){objects.push(key);return{async json(){return{}}}}};
   const previousFetch=globalThis.fetch;
   globalThis.fetch=async url=>{urls.push(String(url));return remoteFailure?new Response('',{status:503}):Response.json(docs[String(url).split('/').at(-1)]||{});};
@@ -28,13 +28,13 @@ test('Cloudflare reads only its R2 usage snapshot, including during a remote out
 });
 test('ITF reads exactly two verified D1 reports, without HTTP or R2',async()=>{
   const r=await open('itf');
-  assert.equal(r.sql.length,3);assert.deepEqual(r.objects,[]);assert.deepEqual(r.urls,[]);
-  assert.equal(r.sql.filter(q=>q.includes('runtime_document_chunks')).length,2);
+  assert.equal(r.sql.length,1);assert.deepEqual(r.objects,[]);assert.deepEqual(r.urls,[]);
+  assert.equal(r.sql.filter(q=>q.includes('runtime_document_chunks')).length,1);
   assert.match(r.html,/Completezza tabelloni ITF/);assert.match(r.html,/metadati/i);
 });
 test('Users keeps device and override controls but performs no remote or R2 reads',async()=>{
   const r=await open('utenti',{remoteFailure:true});
-  assert.equal(r.sql.length,4);assert.deepEqual(r.urls,[]);assert.deepEqual(r.objects,[]);
+  assert.equal(r.sql.length,3);assert.deepEqual(r.urls,[]);assert.deepEqual(r.objects,[]);
   assert.ok(r.sql.every(query=>/app_users|user_player_profiles|app_user_devices|manual_overrides/.test(query)));
   assert.match(r.html,/action="\/admin\/override"/);assert.match(r.html,/Dispositivi connessi/);
 });
@@ -46,7 +46,22 @@ test('ID is independent of remote diagnostics and backup availability',async()=>
 });
 test('Diagnostics retains all requested controls, reads only three current R2 pointers and excludes ITF queues',async()=>{
   const r=await open('diagnostica');
-  assert.equal(r.sql.length,21);assert.equal(r.objects.length,4);assert.ok(r.objects.slice(1).every(key=>key.endsWith('/pointers/current.json')));
+  assert.equal(r.sql.length,4);assert.equal(r.objects.length,4);assert.ok(r.objects.slice(1).every(key=>key.endsWith('/pointers/current.json')));
   assert.equal(r.urls.length,0);assert.ok(!r.urls.some(url=>/itf_.*(?:queue_status|metadata_diagnostics)/.test(url)));
   for(const heading of ['D1 operativo','Copertura','Motori','Workflow e watchdog','Diagnostica applicativa','Conteggi D1','R2 backup'])assert.ok(r.html.includes('<h2>'+heading+'</h2>'));
+});
+
+test('cold Diagnostics executes consolidated counts on SQLite; optional missing tables retain safe fallback',async()=>{
+ const {database}=await import('./search-sqlite-fixture.mjs');const d=database();
+ try{
+  const queries=[];const db={prepare(sql){queries.push(sql);return d.db.prepare(sql)}};
+  const req=()=>new Request('https://cold.test/admin/diagnostica',{headers:{Authorization:'Basic '+btoa('admin:test-only')}});
+  const before=d.writes();const response=await worker.fetch(req(),{ADMIN_TOKEN:'test-only',DB:db});
+  assert.equal(response.status,200);const html=await response.text();assert.match(html,/Conteggi D1/);
+  assert.equal(queries.length,4);assert.equal(d.writes(),before);
+  const countSql=queries.find(sql=>sql.includes('AS table_name'));
+  for(const row of d.execute(countSql))assert.equal(row.n,d.execute('SELECT COUNT(*) AS n FROM '+row.table_name)[0].n);
+  d.execute('DROP TABLE admin_audit');
+  const fallback=await worker.fetch(req(),{ADMIN_TOKEN:'test-only',DB:db});assert.equal(fallback.status,200);assert.match(await fallback.text(),/Conteggi D1/);
+ }finally{d.close();}
 });

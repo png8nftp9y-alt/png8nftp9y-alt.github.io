@@ -1,6 +1,6 @@
 // D1_WRITE_POLICY: incremental; no D1 mutations. R2 writes on first build or manual refresh only.
 // Store only the authenticated ID/operational diagnostic pages, never account/device pages.
-const flights=new Map(),versions=new Map();
+const flights=new Map(),versions=new Map(),preparedIds=new WeakMap();
 const spec={id:{flag:'refreshIds',label:'Aggiorna conteggi'},diagnostica:{flag:'refreshDiagnostics',label:'Aggiorna diagnostica'}};
 const key=view=>'monitoring/admin-pages/'+view+'/current.json';
 
@@ -39,5 +39,9 @@ export async function savedAdminPage(request,env,view,render){
 
 export async function prepareSavedIdPage(request,env,render){
  if(!env.ARCHIVE)return;
- await savedAdminPage(new Request(new URL('/admin/id',request.url)),env,'id',render);
+ if(preparedIds.has(env.ARCHIVE))return preparedIds.get(env.ARCHIVE);
+ const preparing=savedAdminPage(new Request(new URL('/admin/id',request.url)),env,'id',render);
+ preparedIds.set(env.ARCHIVE,preparing);
+ try{const html=await preparing;if(html.includes('Conteggi ID non disponibili')||html.includes('Questa lettura non è stata salvata'))preparedIds.delete(env.ARCHIVE);}
+ catch(error){preparedIds.delete(env.ARCHIVE);throw error;}
 }

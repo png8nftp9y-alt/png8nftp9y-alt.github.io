@@ -22,9 +22,11 @@ for(const [view,flag] of [['id','refreshIds'],['diagnostica','refreshDiagnostics
  });
 }
 test('background ID preparation builds once and never refreshes an existing saved reading',async()=>{
- const d=setup('id');await prepareSavedIdPage(d.request(),d.env,d.render);
+ const d=setup('id');let reads=0;const get=d.env.ARCHIVE.get;d.env.ARCHIVE.get=async key=>{reads++;return get(key)};
+ await Promise.all([prepareSavedIdPage(d.request(),d.env,d.render),prepareSavedIdPage(d.request(),d.env,d.render)]);
  await prepareSavedIdPage(d.request(),d.env,async()=>{throw Error('must not recalculate')});
  assert.equal(d.builds(),1);assert.equal(d.writes(),1);
+ assert.equal(reads,1);
 });
 test('failed ID refresh preserves the valid saved snapshot',async()=>{
  const d=setup('id');const first=await savedAdminPage(d.request(),d.env,'id',d.render);

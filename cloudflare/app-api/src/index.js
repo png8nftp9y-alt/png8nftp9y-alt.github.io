@@ -1,5 +1,6 @@
 import {enrichFitpMetadata} from '../lib/fitp-player-metadata.mjs';
 import {runtimeDocumentReader,FRONTEND_DOCUMENTS} from '../lib/runtime-document-reader.mjs';
+import {adminRuntimeDocuments} from '../lib/admin-runtime-documents.mjs';
 import {playerLoadTiming} from '../lib/player-load-timing.mjs';
 import {storageUsageMetric,r2UsageRows} from '../lib/cloudflare-storage-usage.mjs';
 import {linkedOpponentIdentity,tennisEuropeNativeId} from '../lib/opponent-linked-identity.mjs';
@@ -39,6 +40,13 @@ async function all(env,table,where='',binds=[]){return parseRows(await env.DB.pr
 function missingOptionalTable(error){return/no such table/i.test(String(error?.message||error))}
 async function optionalRows(statement,fallback=[]){try{return(await statement.all()).results||fallback}catch(error){if(missingOptionalTable(error))return fallback;throw error}}
 async function optionalCount(env,table){try{return Number((await env.DB.prepare(`SELECT COUNT(*) AS n FROM ${table}`).first())?.n||0)}catch(error){if(missingOptionalTable(error))return 0;throw error}}
+
+async function optionalCounts(env,tables){
+ if(!tables.length)return [];
+ const sql=tables.map(table=>`SELECT '${table}' AS table_name,COUNT(*) AS n FROM ${table}`).join(' UNION ALL ');
+ try{return ((await env.DB.prepare(sql).all()).results||[]).map(row=>[row.table_name,Number(row.n||0)]);}
+ catch(error){if(!missingOptionalTable(error))throw error;return Promise.all(tables.map(async table=>[table,await optionalCount(env,table)]));}
+}
 const normalizeTennisEuropeName=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
 const tennisEuropeNameKey=value=>normalizeTennisEuropeName(value).split(' ').filter(Boolean).sort().join(' ');
 const tennisEuropeNameVariants=value=>{const normalized=normalizeTennisEuropeName(value),parts=normalized.split(' ').filter(Boolean),reversed=parts.length>1?[...parts].reverse().join(' '):normalized;return[...new Set([normalized,reversed].filter(Boolean))]};
@@ -259,7 +267,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
 }
 function age(value){const ms=Date.now()-Date.parse(value||'');if(!Number.isFinite(ms))return'—';const minutes=Math.max(0,Math.round(ms/60000));return minutes<60?minutes+' min fa':minutes<1440?Math.round(minutes/60)+' h fa':Math.round(minutes/1440)+' g fa'}
 function tone(status){const value=String(status||'').toLowerCase();return value==='success'||value==='green'||value.includes('complete')||value.includes('built')?'ok':value==='failure'||value==='cancelled'||value==='red'||value.includes('error')?'bad':'warn'}
-async function adminRemote(view,env){return loadAdminRemote({primaryBase:PUBLIC_DATA,files:ADMIN_REMOTE_FILES_BY_VIEW[view]||[],cache:null,fetcher:async url=>({ok:true,json:()=>env.RUNTIME_DOCUMENTS.get(new URL(url).pathname.slice(1))})})}
+async function adminRemote(view,env){const documents=adminRuntimeDocuments(env.DB);await documents.preload((ADMIN_REMOTE_FILES_BY_VIEW[view]||[]).map(file=>'dist/v3/'+file)).catch(()=>null);return loadAdminRemote({primaryBase:PUBLIC_DATA,files:ADMIN_REMOTE_FILES_BY_VIEW[view]||[],cache:null,fetcher:async url=>({ok:true,json:()=>documents.get(new URL(url).pathname.slice(1))})})}
 function engineRow(label,status,generatedAt,detail,url=''){const title=url?`<a href="${esc(url)}" rel="noreferrer">${esc(label)}</a>`:esc(label);return `<tr><td><b>${title}</b></td><td><span class="pill ${tone(status)}">${esc(status||'non disponibile')}</span></td><td>${esc(age(generatedAt))}</td><td class="muted">${esc(detail||'—')}</td></tr>`}
 const QUERY_TABLES={
   observed_players:{label:'Profili osservati',from:'observed_players',select:'*',search:'payload',fields:{display_name:'Nome',circuit:'Circuito',official_id:'ID ufficiale',monitored:'Monitorato',observations:'Osservazioni',last_observed_at:'Ultima osservazione'}},
@@ -312,7 +320,7 @@ async function adminPage(request,env,ctx){
   const [generation,cloudflareUsage,countRows,presenceResult,devices,overrideRowsRaw,r2CurrentPointers,remote]=await Promise.all([
     diagnosticView?env.DB.prepare("SELECT * FROM generations WHERE id='current'").first():null,
     view==='cloudflare'&&env.ARCHIVE?(async()=>{try{const object=await env.ARCHIVE.get('monitoring/cloudflare-usage/current.json');return object?await object.json():null}catch(error){console.error('cloudflare_usage_read_failed',error);return null}})():null,
-    Promise.all(tables.map(async table=>[table,await optionalCount(env,table)])),
+    optionalCounts(env,tables),
     diagnosticView?env.DB.prepare('SELECT circuit,COUNT(*) AS presences,COUNT(DISTINCT player_id) AS players FROM app_tournaments GROUP BY circuit').all():{results:[]},
     userView?(async()=>{try{return{rows:(await env.DB.prepare("SELECT device_id,label,first_seen,last_seen,last_path,status,revoked_at FROM app_user_devices WHERE user_id=? ORDER BY CASE status WHEN 'active' THEN 0 ELSE 1 END,last_seen DESC").bind(ACCESS_OWNER.id).all()).results||[],warning:''}}catch(error){console.error('admin_devices_read_failed',error);return{rows:[],warning:'Registro dispositivi in inizializzazione'}}})():{rows:[],warning:''},
     userView?optionalRows(env.DB.prepare("SELECT id,entity_type,entity_id,action,payload,created_at,updated_at FROM manual_overrides WHERE active=1 ORDER BY updated_at DESC LIMIT 50")):[],
