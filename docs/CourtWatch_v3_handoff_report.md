@@ -6355,3 +6355,9 @@ ITF Meta ordinary 2026-10-21T20:23:54.353Z: attempted 5, acquired 5, ordinary 0,
 - Il medesimo SELECT read-only ora restituisce fino a dieci identità mancanti e dieci sorgenti irrisolte, con chiavi esatte, nomi, redirect e candidati canonici (massimo dieci ciascuno). Nessun utente, account o payload completo esportato. Nessun ID assegnato, merge o modifica dati; criteri di successo invariati.
 - Il workflow esegue i test SQL prima dell'audit; il controllo per circuito procede anche se il controllo globale fallisce, purché i conteggi siano riusciti. Il job resta rosso in presenza di errori reali. Corretta la fixture obsoleta manual_overrides per usare lo schema di migrazione effettivo.
 - Validazione: test SQLite dell'audit, esclusioni e workflow giornaliero; verifica di limiti dei dettagli, candidati ambigui, zero scritture e assenza di account nei risultati. La risoluzione dei dati resta aperta fino all'output puntuale del prossimo run avviato dall'utente. Nessun polling, pubblicazione diretta o modifica Index.
+
+## PUC FITP: oscura Challenger
+- Richiesta: non mostrare Challenger provenienti dal PUC, per tutti i giocatori (esempi Carboni e Cina).
+- Esteso il filtro di presentazione gia applicato ai tornei PUC ITF: nasconde tornei Challenger e riferimenti collegati per ID in agenda, risultati, partite e iscrizioni. Nessuna cancellazione in D1 o modifica ai motori.
+- Verifica: test PUC ITF e Challenger, riferimenti collegati, circuiti ITF/Europe preservati, idempotenza e input invariato; controllo sintassi frontend.
+- Limite: classificazione tramite denominazione contenente la parola Challenger; riferimenti senza nome vengono rimossi se collegati per ID a un torneo riconosciuto.

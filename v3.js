@@ -542,7 +542,7 @@ function withoutPucItfReferences(data) {
   if (!data) return data;
   const fields = ["tournaments", "matches", "agenda", "results", "tournamentEntries"];
   const isPuc = item => circuit(item) === "fitp";
-  const mentionsItf = item => /\bITF\b/i.test([item?.tournamentName, item?.name, item?.nome_torneo, item?.description, item?.descrizione].filter(Boolean).join(" "));
+  const mentionsItf = item => /\b(?:ITF|CHALLENGER)\b/i.test([item?.tournamentName, item?.name, item?.nome_torneo, item?.description, item?.descrizione].filter(Boolean).join(" "));
   const ids = item => [item?.competitionId, item?.tournamentId, item?.tournamentKey].filter(Boolean).map(value => String(value).toUpperCase());
   const blocked = new Set();
   for (const field of fields) for (const item of data[field] || [])
