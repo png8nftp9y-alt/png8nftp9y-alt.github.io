@@ -7,5 +7,7 @@ test('daily full check is serialized with imports and retains independent native
  const workflow=fs.readFileSync(new URL('../../../.github/workflows/courtwatch-d1-daily-verification.yml',import.meta.url),'utf8');
  assert.match(workflow,/cron: '17 4 \* \* \*'/);assert.match(workflow,/group: courtwatch-d1-writes/);
  for(const script of ['daily-d1-verification.mjs','all-player-id-audit.mjs','per-circuit-player-id-audit.mjs'])assert.ok(workflow.includes(script));
+ assert.match(workflow,/id: counts/);assert.ok(workflow.includes("!cancelled() && steps.counts.outcome == 'success'"));assert.doesNotMatch(workflow,/continue-on-error/);
+ assert.match(workflow,/node --test test\/all-player-id-audit.test.mjs/);
  assert.doesNotMatch(workflow,/sync-acquired|recover-europe|sync-player-identities|wrangler deploy/);
 });

@@ -105,6 +105,19 @@ SELECT (SELECT COUNT(*) FROM people) AS players,
    AND (excluded.source_key=s.source_key OR excluded.source_key=s.lookup_key OR excluded.canonical_id=s.lookup_key
     OR EXISTS(SELECT 1 FROM player_identity_aliases a WHERE a.alias_id=s.lookup_key AND a.canonical_id=excluded.canonical_id)))) AS unresolved_refs_to_excluded_identity,
 
+ (SELECT json_group_array(json_object('canonicalId',canonical_id,'name',name,'redirectedTo',redirected_to)) FROM (
+  SELECT p.canonical_id,json_extract(stored.payload,'$.name') AS name,
+   (SELECT canonical_id FROM player_identity_aliases WHERE alias_id=p.canonical_id) AS redirected_to
+  FROM people p JOIN player_identity_people stored ON stored.canonical_id=p.canonical_id
+  WHERE p.circuits=0 ORDER BY p.canonical_id LIMIT 10)) AS missing_id_details,
+ (SELECT json_group_array(json_object('source',source,'sourceKey',source_key,'lookupKey',lookup_key,'mappedPlayers',mapped,
+  'candidates',json((SELECT json_group_array(json_object('canonicalId',canonical_id,'name',name,'nativeCircuits',circuits)) FROM (
+   SELECT DISTINCT r.canonical_id,json_extract(stored.payload,'$.name') AS name,p.circuits
+   FROM resolved r JOIN people p ON p.canonical_id=r.canonical_id
+   JOIN player_identity_people stored ON stored.canonical_id=r.canonical_id
+   WHERE r.source=s.source AND r.source_key=s.source_key AND r.lookup_key=s.lookup_key ORDER BY r.canonical_id LIMIT 10)))))
+  FROM (SELECT * FROM source_coverage WHERE mapped<>1 ORDER BY source,source_key,lookup_key LIMIT 10) s) AS unresolved_source_details,
+
  (SELECT COUNT(*) FROM people p JOIN player_identity_people stored ON stored.canonical_id=p.canonical_id WHERE p.circuits=0 AND EXISTS
   (SELECT 1 FROM json_each(stored.payload,'$.circuitProfiles') profile WHERE json_extract(profile.value,'$.url')<>'')) AS missing_with_stored_profile_urls,
  (SELECT COUNT(*) FROM people p JOIN player_identity_people stored ON stored.canonical_id=p.canonical_id WHERE p.circuits=0

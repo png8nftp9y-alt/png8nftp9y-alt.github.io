@@ -6347,3 +6347,11 @@ ITF discovery 2026-10-21T17:44:10.936Z: 0 newly discovered future tournaments; M
 - Verifica locale: entrambi i checkout includono tutte le dipendenze statiche della configurazione. Dopo pubblicazione controllare il run Meta e il salvataggio D1; dati ufficiali eventualmente non disponibili restano pendenti. Nessun polling.
 
 ITF Meta ordinary 2026-10-21T20:23:54.353Z: attempted 5, acquired 5, ordinary 0, extraordinary 0. Partial metadata preserved; official D1 sync follows.
+
+
+## 2026-10-21 — chat 1: diagnosi puntuale del blocco audit ID giornaliero
+
+- L'utente considera accettabili i consumi e chiede di risolvere il controllo ID. Il log 39589433895 segnala un'identità courtwatch senza ID nativo e una sorgente personale con due candidati, ma non contiene nomi o chiavi: non permette una correzione dei dati verificabile.
+- Il medesimo SELECT read-only ora restituisce fino a dieci identità mancanti e dieci sorgenti irrisolte, con chiavi esatte, nomi, redirect e candidati canonici (massimo dieci ciascuno). Nessun utente, account o payload completo esportato. Nessun ID assegnato, merge o modifica dati; criteri di successo invariati.
+- Il workflow esegue i test SQL prima dell'audit; il controllo per circuito procede anche se il controllo globale fallisce, purché i conteggi siano riusciti. Il job resta rosso in presenza di errori reali. Corretta la fixture obsoleta manual_overrides per usare lo schema di migrazione effettivo.
+- Validazione: test SQLite dell'audit, esclusioni e workflow giornaliero; verifica di limiti dei dettagli, candidati ambigui, zero scritture e assenza di account nei risultati. La risoluzione dei dati resta aperta fino all'output puntuale del prossimo run avviato dall'utente. Nessun polling, pubblicazione diretta o modifica Index.

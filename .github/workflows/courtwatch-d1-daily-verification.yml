@@ -30,13 +30,17 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - run: npm install --ignore-scripts
+      - name: Check native-ID audit SQL and failure diagnostics
+        run: node --test test/all-player-id-audit.test.mjs test/player-id-audit-scope.test.mjs
       - name: Configure existing database and apply additive migrations
         run: |
           node scripts/configure-d1.mjs
           npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
       - name: Reconcile complete counts once per UTC date
+        id: counts
         run: node scripts/daily-d1-verification.mjs
       - name: Check native ID coverage across all players
         run: node scripts/all-player-id-audit.mjs
       - name: Check circuit identity coverage
+        if: ${{ !cancelled() && steps.counts.outcome == 'success' }}
         run: node scripts/per-circuit-player-id-audit.mjs
