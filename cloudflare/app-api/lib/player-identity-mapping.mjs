@@ -1,11 +1,16 @@
 import {recoverProfileEvidence} from './player-profile-evidence.mjs';
 import {createHash} from 'node:crypto';
 import {mergeSearchIdentities} from './paginated-player-search.mjs';
-import {playerNameKey,normalizePlayerName,officialPlayerUrl,circuitProfiles} from './player-circuit-profiles.mjs';
+import {playerNameKey,normalizePlayerName,officialPlayerUrl,circuitProfiles,playerCircuitIdentities} from './player-circuit-profiles.mjs';
 import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
 import {sqlString} from '../../../src/v3/itf-draw-document-d1.mjs';
 // D1_WRITE_POLICY: incremental
 const parsed=value=>{try{return JSON.parse(value||'{}')}catch{throw Error('identity_source_incomplete')}};
+// Keep independent fields visible even when one payload contains conflicting IDs.
+export const personalNativeEvidence=p=>[
+ ...playerCircuitIdentities({...p,circuitProfiles:[]}),
+ ...(p.circuitProfiles||[]).flatMap(profile=>playerCircuitIdentities({circuitProfiles:[profile]}))
+];
 const officialKey=r=>{const id=String(r.official_id||'').toLowerCase();return (r.circuit==='fitp'?/^\d{6,12}$/.test(id):r.circuit==='itf'?/^800\d{6}$/.test(id):r.circuit==='tennis-europe'?/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id):false)?r.circuit+'|'+id:''};
 export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],currentAliases=[],sourceComplete=true,confirmedLinks=[]}={}){
  if(!sourceComplete)throw Error('identity_source_incomplete');
@@ -25,6 +30,23 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
   if(!Array.isArray(rule.identities)||rule.identities.length!==2||new Set(rule.identities.map(x=>x.circuit)).size!==2)throw Error('confirmed_identity_link_invalid');
   const wanted=new Set(rule.identities.map(x=>officialKey({circuit:x.circuit,official_id:x.officialId})));if(wanted.has(''))throw Error('confirmed_identity_link_invalid');
   const found=sets.map((members,i)=>({members,i})).filter(g=>g.members.some(r=>wanted.has(officialKey(r))));
+  // An explicitly approved personal binding must still carry matching native
+  // evidence; a name or a previous canonical ID alone never authorizes a merge.
+  const personalIds=rule.courtwatchIds||[];
+  if(!Array.isArray(personalIds)||personalIds.some(id=>typeof id!=='string'||!id))throw Error('confirmed_personal_link_invalid');
+  for(const id of personalIds){
+   const personal=sets.map((members,i)=>({members,i})).filter(g=>g.members.some(r=>r.circuit==='courtwatch'&&r.official_id===id));
+   for(const g of personal){
+    for(const r of g.members){
+     const raw=parsed(r.payload),ids=personalNativeEvidence({...raw,name:r.display_name});
+     if(r.circuit==='courtwatch'&&(!ids.length||ids.some(x=>!wanted.has(x.circuit+'|'+x.profileId))
+      ||rule.nameKey&&playerNameKey(r.display_name)!==rule.nameKey
+      ||rule.birthYear&&(raw.birthYear||raw.birthDate||raw.dateOfBirth)&&Number(raw.birthYear||String(raw.birthDate||raw.dateOfBirth).slice(0,4))!==rule.birthYear))throw Error('confirmed_personal_link_evidence_conflict');
+    }
+    if(!found.some(x=>x.i===g.i))found.push(g);
+   }
+  }
+
   if(new Set(found.flatMap(g=>g.members.map(officialKey).filter(k=>wanted.has(k)))).size!==wanted.size)continue;
   const roots=new Set(found.map(g=>find(g.i))),members=sets.flatMap((g,i)=>roots.has(find(i))?g:[]),ids=new Map();
   for(const r of members){const key=officialKey(r);if(!key)continue;const known=ids.get(r.circuit)||new Set();known.add(key);ids.set(r.circuit,known);}

@@ -49,9 +49,21 @@ export const playerNativeIdAuditCtes=`WITH RECURSIVE eligible_links AS (
  UNION SELECT canonical_id,circuit,official_id FROM profile_native
 )`;
 
-export const allPlayerIdAuditSql=`${playerNativeIdAuditCtes}, people AS (
+export const allPlayerIdAuditSql=`${playerNativeIdAuditCtes}, excluded_personal_refs AS (
+ SELECT courtwatch_id AS lookup_key,'courtwatch|'||courtwatch_id AS source_key
+ FROM user_app_player_additions GROUP BY courtwatch_id
+ HAVING MIN(observed_source_key)='tennis-europe|name:MOEZ BEN AMOR'
+ AND MAX(observed_source_key)='tennis-europe|name:MOEZ BEN AMOR'
+ AND NOT EXISTS(SELECT 1 FROM app_players a WHERE a.id=courtwatch_id)
+), audit_eligible_links AS (
+ SELECT * FROM eligible_links l WHERE NOT (
+ l.circuit='courtwatch' AND EXISTS(SELECT 1 FROM excluded_personal_refs e WHERE e.source_key=l.source_key)
+ AND NOT EXISTS(SELECT 1 FROM eligible_links n WHERE n.canonical_id=l.canonical_id AND n.circuit IN ('fitp','itf','tennis-europe'))
+ AND NOT EXISTS(SELECT 1 FROM player_identity_people p WHERE p.canonical_id=l.canonical_id
+ AND (COALESCE(json_array_length(p.payload,'$.circuitProfiles'),0)>0 OR COALESCE(json_extract(p.payload,'$.membershipCard'),'')<>'' OR COALESCE(json_extract(p.payload,'$.worldTennisId'),'')<>'')))
+), people AS (
  SELECT p.canonical_id,COUNT(DISTINCT n.circuit) AS circuits FROM player_identity_people p
- JOIN (SELECT DISTINCT canonical_id FROM eligible_links) e ON e.canonical_id=p.canonical_id
+ JOIN (SELECT DISTINCT canonical_id FROM audit_eligible_links) e ON e.canonical_id=p.canonical_id
  LEFT JOIN native n ON n.canonical_id=p.canonical_id GROUP BY p.canonical_id
 ), observed_source_refs AS (
  SELECT 'observed' AS source,source_key,source_key AS lookup_key,circuit FROM observed_players
@@ -69,6 +81,8 @@ export const allPlayerIdAuditSql=`${playerNativeIdAuditCtes}, people AS (
  UNION ALL SELECT * FROM member_source_refs
 ), sources AS (
  SELECT DISTINCT source,source_key,lookup_key FROM source_refs s WHERE ${includedPlayerIdSourceSql('s')}
+ AND NOT (s.circuit='courtwatch' AND EXISTS(SELECT 1 FROM excluded_personal_refs e WHERE e.lookup_key=s.lookup_key OR e.source_key=s.source_key)
+ AND NOT EXISTS(SELECT 1 FROM audit_eligible_links l WHERE l.source_key=s.source_key OR l.source_key='courtwatch|'||s.lookup_key))
 ), resolved_links AS (
  SELECT s.source,s.source_key,s.lookup_key,COALESCE(a.canonical_id,l.canonical_id) AS canonical_id FROM sources s JOIN player_circuit_identities l ON l.source_key=s.source_key LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE ${includedPlayerIdSourceSql('l')}
  UNION SELECT s.source,s.source_key,s.lookup_key,COALESCE(a.canonical_id,l.canonical_id) FROM sources s JOIN player_circuit_identities l ON l.source_key=s.lookup_key LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE ${includedPlayerIdSourceSql('l')}
@@ -87,7 +101,7 @@ SELECT (SELECT COUNT(*) FROM people) AS players,
  (SELECT COUNT(*) FROM people WHERE circuits>1) AS players_with_multiple_circuits,
  (SELECT COUNT(*) FROM source_coverage WHERE mapped<>1) AS unmapped_or_ambiguous_sources,
  (SELECT COUNT(*) FROM sources) AS source_records,
- (SELECT COUNT(*) FROM eligible_links l WHERE NOT EXISTS(SELECT 1 FROM player_identity_people p WHERE p.canonical_id=l.canonical_id)) AS orphan_links,
+ (SELECT COUNT(*) FROM audit_eligible_links l WHERE NOT EXISTS(SELECT 1 FROM player_identity_people p WHERE p.canonical_id=l.canonical_id)) AS orphan_links,
  (SELECT COUNT(*) FROM player_identity_pending_sources) AS pending_mapping,
  COALESCE((SELECT status FROM player_identity_sync WHERE id='current'),'absent') AS mapping_status,
  (SELECT COUNT(*) FROM player_circuit_identities WHERE NOT (${includedPlayerIdSourceSql()})) AS excluded_records,
@@ -95,7 +109,7 @@ SELECT (SELECT COUNT(*) FROM people) AS players,
  (SELECT COUNT(DISTINCT official_id) FROM native WHERE circuit='tennis-europe') AS tennis_europe_ids,
  (SELECT COUNT(DISTINCT official_id) FROM native WHERE circuit='itf') AS itf_ids,
  (SELECT json_group_array(json_object('circuit',circuit,'players',n)) FROM
-  (SELECT l.circuit,COUNT(DISTINCT l.canonical_id) AS n FROM eligible_links l JOIN people p ON p.canonical_id=l.canonical_id WHERE p.circuits=0 GROUP BY l.circuit)) AS missing_by_link_circuit,
+  (SELECT l.circuit,COUNT(DISTINCT l.canonical_id) AS n FROM audit_eligible_links l JOIN people p ON p.canonical_id=l.canonical_id WHERE p.circuits=0 GROUP BY l.circuit)) AS missing_by_link_circuit,
  (SELECT json_group_array(json_object('source',source,'records',n)) FROM
   (SELECT source,COUNT(*) AS n FROM source_coverage WHERE mapped<>1 GROUP BY source)) AS unmapped_by_source_class,
  (SELECT json_group_array(json_object('source',source,'mapped_players',mapped,'records',n)) FROM

@@ -39,8 +39,9 @@ export async function profileRecoveryAudit(query){
  return{byCircuit,unresolved:residual.length,residual,excluded};
 }
 
-export async function syncPlayerIdentities(query,{allowBulk=false,maxChanges=5000}={}){
- const pending=[];for(const [table]of sources){let after='';while(true){const batch=await query(`SELECT * FROM player_identity_pending_sources WHERE source_table=${sqlString(table)} AND source_key>${sqlString(after)} ORDER BY source_key LIMIT 1000`);pending.push(...batch);if(batch.length<1000)break;after=batch.at(-1).source_key;}}
+export async function syncPlayerIdentities(query,{allowBulk=false,maxChanges=5000,pendingSources=null}={}){
+ if(pendingSources!==null&&(!Array.isArray(pendingSources)||pendingSources.length>1000||pendingSources.some(r=>!sources.some(([t])=>t===r.source_table)||typeof r.source_key!=='string'||!r.source_key)))throw Error('identity_pending_scope_invalid');
+ const pending=[];for(const [table]of sources){const scope=pendingSources===null?null:pendingSources.filter(r=>r.source_table===table).map(r=>r.source_key);if(scope&&!scope.length)continue;let after='';while(true){const batch=await query(`SELECT * FROM player_identity_pending_sources WHERE source_table=${sqlString(table)} AND source_key>${sqlString(after)}${scope?' AND source_key IN ('+scope.map(sqlString).join(',')+')':''} ORDER BY source_key LIMIT 1000`);pending.push(...batch);if(batch.length<1000)break;after=batch.at(-1).source_key;}}
  if(!pending.length)return{status:'unchanged',writes:0,pending:0};
  const full=pending.length>500,rows=[];
  for(const [table,key]of sources){const keys=pending.filter(p=>p.source_table===table).map(p=>p.source_key);const selected=full?await allRows(query,table,key):keys.length?await byKeys(query,table,key,keys):[];for(const row of selected)rows.push(row);}
