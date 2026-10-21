@@ -6345,3 +6345,5 @@ ITF discovery 2026-10-21T17:44:10.936Z: 0 newly discovered future tournaments; M
 - Il run ordinario 39657601357 acquisisce il batch ma fallisce in configure-d1.mjs: v3.html non incluso nel checkout parziale. Aggiunti v3.html, v3.js, v3.css e flags ai due checkout del motore Meta, richiesti da prepareRuntimeAssets. Nessuna modifica a dati, code, frequenze o criteri: indirizzo solo Italia.
 - Audit archivio Git rispetto a 5ae0b6cb2e: 756 tornei precedenti tutti conservati, 759 attuali, nessun campo sede/indirizzo/data qualificazioni valorizzato divenuto vuoto. Cinque record ordinari pendenti, non ancora certificati recuperati.
 - Verifica locale: entrambi i checkout includono tutte le dipendenze statiche della configurazione. Dopo pubblicazione controllare il run Meta e il salvataggio D1; dati ufficiali eventualmente non disponibili restano pendenti. Nessun polling.
+
+ITF Meta ordinary 2026-10-21T20:23:54.353Z: attempted 5, acquired 5, ordinary 0, extraordinary 0. Partial metadata preserved; official D1 sync follows.
