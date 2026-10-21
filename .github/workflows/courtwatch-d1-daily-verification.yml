@@ -1,0 +1,42 @@
+# D1_WRITE_POLICY: incremental; source data is never rewritten by this audit.
+name: Court Watch daily complete D1 verification
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 4 * * *'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-d1-daily-verification.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: courtwatch-d1-writes
+      cancel-in-progress: false
+      queue: max
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main, fetch-depth: 1}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: npm install --ignore-scripts
+      - name: Configure existing database and apply additive migrations
+        run: |
+          node scripts/configure-d1.mjs
+          npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+      - name: Reconcile complete counts once per UTC date
+        run: node scripts/daily-d1-verification.mjs
+      - name: Check native ID coverage across all players
+        run: node scripts/all-player-id-audit.mjs
+      - name: Check circuit identity coverage
+        run: node scripts/per-circuit-player-id-audit.mjs

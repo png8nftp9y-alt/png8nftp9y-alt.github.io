@@ -84,8 +84,9 @@ test('actual general and Europe verifier SQL keeps all required guards after rem
  const {readFileSync}=await import('node:fs');const {ownershipSelect}=await import('../scripts/player-ownership-policy.mjs');
  const d=create();try{
   for(const file of ['verify-d1.mjs','verify-tennis-europe-agenda-d1.mjs']){
-   const source=readFileSync(new URL('../scripts/'+file,import.meta.url),'utf8'),literal=source.match(/const query=(`[^`]+`);/)[1];
-   const sql=Function('ownershipSelect','return '+literal)(ownershipSelect),row=(await d.query(sql))[0];
+   const source=readFileSync(new URL('../scripts/'+file,import.meta.url),'utf8');
+   const sql=file==='verify-d1.mjs'?Function('ownershipSelect','return '+source.match(/const query=(`[^`]+`);/)[1])(ownershipSelect):(await import('../lib/d1-verification-counts.mjs')).fullVerificationSql;
+   const row=(await d.query(sql))[0];
    const required=file==='verify-d1.mjs'?['players','entries','appInvalid','ownerUsers','ownerMissingBaseLinks','ownerUnresolvedLinks','ownerUnresolvedOtherLinks','ownerAnalyses','legacyAnalyses']:['teMatches','teSchedules','teResults','teParticipants','appInvalid','appMissingCourtMatchNumbers'];
    for(const field of required)assert.ok(Number.isFinite(row[field]),file+':'+field);
    if(file==='verify-d1.mjs')assert.doesNotMatch(sql,/FROM match_participants|FROM schedules|FROM results|FROM matches\b/);

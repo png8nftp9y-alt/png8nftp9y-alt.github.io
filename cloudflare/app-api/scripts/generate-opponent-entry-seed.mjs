@@ -1,3 +1,4 @@
+import {bucketKey,entryBucket} from '../lib/opponent-entry-buckets.mjs';
 import {fitpSubscriptionDates,mergeFitpSubscriptionDates,fitpSubscriptionRegistrations,mergeFitpSubscriptionRegistrations} from '../../../src/v3/fitp-subscription-dates.mjs';
 import fs from 'node:fs/promises';
 import {cachedItfDrawEntries,mergeItfDrawTournament} from '../lib/itf-cached-draw-entries.mjs';
@@ -41,10 +42,12 @@ if(process.argv.includes('--prepare')){
  console.log(JSON.stringify({status:'opponent_entry_prepared',profiles:rows.length,hash:desiredHash}));
  process.exit(0);
 }
-const remote=JSON.parse(await fs.readFile('tmp/opponent-entry-remote.json','utf8')).rows||[],sql=['PRAGMA foreign_keys=ON;'],now=new Date().toISOString();
+const remoteState=JSON.parse(await fs.readFile('tmp/opponent-entry-remote.json','utf8'));
+const scope=remoteState.scopeBuckets&&new Set(remoteState.scopeBuckets.map(r=>bucketKey(r.circuit,r.bucket)));
+const remote=remoteState.rows||[],sql=['PRAGMA foreign_keys=ON;'],now=new Date().toISOString();
 const aliases=retainedNativeNameAliases(remote,rows,{sourceComplete:complete});
 const current=remote.map(r=>({circuit:r.circuit,sourcePlayerId:r.source_player_id,normalizedName:r.normalized_name,displayName:r.display_name,payload:r.payload}));
-const incoming=rows.map(r=>({circuit:r.circuit,sourcePlayerId:r.sourcePlayerId,normalizedName:r.normalizedName,displayName:r.displayName,payload:JSON.stringify({circuit:r.circuit,sourcePlayerId:r.sourcePlayerId,normalizedName:r.normalizedName,displayName:r.displayName,tournaments:r.tournaments})}));
+const incoming=rows.filter(r=>!scope||scope.has(bucketKey(r.circuit,entryBucket(r.sourcePlayerId)))).map(r=>({circuit:r.circuit,sourcePlayerId:r.sourcePlayerId,normalizedName:r.normalizedName,displayName:r.displayName,payload:JSON.stringify({circuit:r.circuit,sourcePlayerId:r.sourcePlayerId,normalizedName:r.normalizedName,displayName:r.displayName,tournaments:r.tournaments})}));
 const retainedKeys=new Set(aliases.map(r=>r.circuit+'|'+r.source_player_id));
 incoming.push(...current.filter(r=>retainedKeys.has(r.circuit+'|'+r.sourcePlayerId)||!['fitp','itf','tennis-europe'].includes(r.circuit)));
 const plan=buildIncrementalSyncPlan({current,incoming,keyOf:r=>r.circuit+'|'+r.sourcePlayerId,sourceComplete:complete});
@@ -52,6 +55,7 @@ const inserted=plan.inserts.length,changed=plan.updates.length,deleted=plan.dele
 console.log(JSON.stringify({status:'opponent_entry_delta_checked',remoteProfiles:remote.length,desiredProfiles:rows.length,retainedLegacyAliases:aliases.length,fitp:rows.filter(r=>r.circuit==='fitp').length,itf:rows.filter(r=>r.circuit==='itf').length,inserted,changed,deleted,delta,riskyDelta:deleted,maxDelta:Number.isFinite(maxDelta)?maxDelta:null}));
 for(const row of [...plan.inserts,...plan.updates.map(u=>u.after)])sql.push(`INSERT INTO opponent_entry_profiles(circuit,source_player_id,normalized_name,display_name,payload,updated_at) VALUES(${esc(row.circuit)},${esc(row.sourcePlayerId)},${esc(row.normalizedName)},${esc(row.displayName)},${esc(row.payload)},${esc(now)}) ON CONFLICT(circuit,source_player_id) DO UPDATE SET normalized_name=excluded.normalized_name,display_name=excluded.display_name,payload=excluded.payload,updated_at=excluded.updated_at WHERE normalized_name IS NOT excluded.normalized_name OR display_name IS NOT excluded.display_name OR payload IS NOT excluded.payload;`);
 for(const row of plan.deletes)sql.push(`DELETE FROM opponent_entry_profiles WHERE circuit=${esc(row.circuit)} AND source_player_id=${esc(row.sourcePlayerId)};`);
+for(const bucket of remoteState.scopeBuckets||[])sql.push(`INSERT INTO opponent_entry_bucket_checks(circuit,bucket,digest) VALUES(${esc(bucket.circuit)},${bucket.bucket},${esc(bucket.hash)}) ON CONFLICT(circuit,bucket) DO UPDATE SET digest=excluded.digest WHERE digest IS NOT excluded.digest;`);
 const hash=desiredHash;
 sql.push(`INSERT INTO app_state(key,value,updated_at) VALUES('opponentEntryHash',${esc(hash)},${esc(now)}) ON CONFLICT(key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at WHERE value IS NOT excluded.value;`);
 await fs.rm(OUTPUT,{recursive:true,force:true});await fs.mkdir(OUTPUT,{recursive:true});await fs.writeFile(`${OUTPUT}/hash.txt`,hash+'\n');const chunk=400;for(let start=0,index=0;start<sql.length;start+=chunk,index++)await fs.writeFile(`${OUTPUT}/${String(index).padStart(3,'0')}.sql`,sql.slice(start,start+chunk).join('\n')+'\n');

@@ -1,3 +1,4 @@
+import {readVerificationCounts} from '../lib/d1-verification-counts.mjs';
 import {cachedReadCheck,readCheckVersion} from '../lib/d1-read-check-cache.mjs';
 import {cliD1Query} from '../lib/d1-cli-query.mjs';
 import {ownershipSelect, ownershipErrors} from './player-ownership-policy.mjs';
@@ -30,11 +31,10 @@ ${ownershipSelect},
 (SELECT COUNT(*) FROM user_match_analyses WHERE user_id='user-federico-181099') ownerAnalyses,
 (SELECT COUNT(*) FROM match_analyses) legacyAnalyses`;
 const version=await readCheckVersion(import.meta.url);
-const observedCheck=await cachedReadCheck(cliD1Query,'observed-counts',version,()=>cliD1Query(`SELECT (SELECT COUNT(*) FROM observed_players) observedPlayers,
-(SELECT COUNT(*) FROM observed_players WHERE circuit='fitp') observedFitp,
-(SELECT COUNT(*) FROM observed_players WHERE circuit='tennis-europe') observedTe,
-(SELECT COUNT(*) FROM observed_players WHERE circuit='itf') observedItf`));
+const counts=await readVerificationCounts(cliD1Query,{version:await readCheckVersion(new URL('../lib/d1-verification-counts.mjs',import.meta.url))});
+const observedCheck={value:[counts.value],reused:counts.mode==='incremental'};
 const checked=await cachedReadCheck(cliD1Query,'universal-counts',version,()=>cliD1Query(query));
+console.log('D1_VERIFICATION_MODE='+counts.mode);
 const row={...checked.value[0],...observedCheck.value[0]},errors=[];console.log('D1_PARITY_READ_CACHE='+JSON.stringify({reused:checked.reused,observedReused:observedCheck.reused,verifiedAt:checked.verifiedAt,saved:checked.cacheSaved}));
 // Tennis Europe relational rows are owned and certified by the dedicated
 // agenda workflow. The universal import must not fail because that independent
