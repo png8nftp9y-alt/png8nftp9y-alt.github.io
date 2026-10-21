@@ -7,17 +7,19 @@ import {verifyDocument,sqlString} from '../../../src/v3/itf-draw-document-d1.mjs
 // acquiredSearchPlan uses buildIncrementalSyncPlan; checkpoints follow verified writes.
 export async function syncAcquiredSearch(query){
  let documentsProcessed=0,matchesProcessed=0,playerWritesRequested=0;
+ let documentCursor=null;
  const incrementalMatches=(await query("SELECT name FROM sqlite_master WHERE type='table' AND name='search_pending_matches'")).length>0;
  async function batchWrite(statements){let batch=[],bytes=0;for(const sql of statements){const size=Buffer.byteLength(sql);if(size>90000)throw Error('Search SQL statement exceeds safe size');if(batch.length&&(batch.length>=20||bytes+size>90000)){await query(batch.join('\n'));batch=[];bytes=0}batch.push(sql);bytes+=size+1}if(batch.length)await query(batch.join('\n'));}
  async function add(players){const keys=[...new Set(players.filter(Boolean).map(r=>r.sourceKey))],current=[];for(let i=0;i<keys.length;i+=40)current.push(...await query(`SELECT * FROM search_acquired_players WHERE source_key IN (${keys.slice(i,i+40).map(sqlString).join(',')})`));const plan=acquiredSearchPlan(current,players);const delta=[...plan.inserts,...plan.updates.map(r=>r.after)];await batchWrite(delta.map(searchPlayerSql));playerWritesRequested+=delta.length;}
  while(true){
-  const docs=await query('SELECT d.* FROM itf_current_draw_documents d WHERE NOT EXISTS(SELECT 1 FROM search_draw_indexed_versions s WHERE s.draw_key=d.draw_key AND s.content_sha256=d.content_sha256) ORDER BY d.draw_key LIMIT 20');if(!docs.length)break;
+  const after=documentCursor?` AND (d.draw_key,d.observed_at,d.content_sha256)>(${documentCursor.map(sqlString).join(',')})`:'';
+  const docs=await query(`SELECT d.* FROM itf_draw_documents d WHERE NOT EXISTS(SELECT 1 FROM search_draw_indexed_versions s WHERE s.draw_key=d.draw_key AND s.content_sha256=d.content_sha256)${after} ORDER BY d.draw_key,d.observed_at,d.content_sha256 LIMIT 20`);if(!docs.length)break;
   const players=[],checkpoints=[];
   for(const d of docs){const chunks=[];for(let offset=0;offset<Number(d.chunk_count);offset+=40)chunks.push(...await query(`SELECT chunk_index,content FROM itf_draw_document_chunks WHERE draw_key=${sqlString(d.draw_key)} AND content_sha256=${sqlString(d.content_sha256)} AND chunk_index>=${offset} AND chunk_index<${offset+40} ORDER BY chunk_index`));const row={drawKey:d.draw_key,sha256:d.content_sha256,chunkCount:Number(d.chunk_count),bytes:Number(d.content_bytes),playerCount:Number(d.player_count),matchCount:Number(d.match_count),acquisitionState:'complete'};
    verifyDocument(row,d,chunks);players.push(...documentPlayers(JSON.parse(chunks.map(x=>x.content).join(''))).map(p=>acquiredPlayer('itf',p)));
    checkpoints.push(`INSERT INTO search_draw_indexed_versions(draw_key,content_sha256) VALUES(${sqlString(d.draw_key)},${sqlString(d.content_sha256)}) ON CONFLICT DO NOTHING;`);
   }
-  await add(players);await batchWrite(checkpoints);documentsProcessed+=docs.length;console.log(`ITF_SEARCH_DOCUMENTS_INDEXED=${documentsProcessed}`);
+  await add(players);await batchWrite(checkpoints);const last=docs.at(-1);documentCursor=[last.draw_key,last.observed_at,last.content_sha256];documentsProcessed+=docs.length;console.log(`ITF_SEARCH_DOCUMENTS_INDEXED=${documentsProcessed}`);
  }
  while(true){
   const matches=await query(incrementalMatches?'SELECT m.id,m.circuit,m.payload,p.revision FROM search_pending_matches p CROSS JOIN matches m ON m.id=p.match_id ORDER BY p.match_id LIMIT 100':'SELECT m.id,m.circuit,m.payload FROM matches m LEFT JOIN search_match_indexed s ON s.match_id=m.id WHERE s.source_payload IS NOT m.payload ORDER BY m.id LIMIT 100');if(!matches.length)break;
