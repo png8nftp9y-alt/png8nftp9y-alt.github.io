@@ -43,8 +43,8 @@ async function optionalCount(env,table){try{return Number((await env.DB.prepare(
 
 async function optionalCounts(env,tables){
  if(!tables.length)return [];
- const sql=tables.map(table=>`SELECT '${table}' AS table_name,COUNT(*) AS n FROM ${table}`).join(' UNION ALL ');
- try{return ((await env.DB.prepare(sql).all()).results||[]).map(row=>[row.table_name,Number(row.n||0)]);}
+ const sql='SELECT '+tables.map(table=>`(SELECT COUNT(*) FROM ${table}) AS ${table}`).join(',');
+ try{const row=await env.DB.prepare(sql).first();return tables.map(table=>[table,Number(row?.[table]||0)]);}
  catch(error){if(!missingOptionalTable(error))throw error;return Promise.all(tables.map(async table=>[table,await optionalCount(env,table)]));}
 }
 const normalizeTennisEuropeName=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();

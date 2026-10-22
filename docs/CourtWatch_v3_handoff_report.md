@@ -1,3 +1,10 @@
+## 2026-10-22 — Correzione aggiornamento manuale Diagnostica e limite D1
+
+- Motivo: il conteggio accorpato introdotto nell'ottimizzazione Admin usava 11 rami UNION ALL; D1 consente al massimo tre termini nelle SELECT composte. SQLite locale non riproduceva quel limite.
+- Componenti: optionalCounts nel Worker usa ora una SELECT con sottoquery scalari, mantenendo un'unica richiesta, gli stessi conteggi e il fallback per tabelle opzionali assenti.
+- Verifica: test Admin con query reale e SQLITE_LIMIT_COMPOUND_SELECT=3 (vecchia query rifiutata, nuova accettata); aggiornamento esplicito refreshDiagnostics=1, salvataggio R2, riapertura senza query D1, zero scritture D1; controlli generali npm run check.
+- Limite: verifica runtime in produzione da eseguire dopo pubblicazione Worker; nessun polling aggiunto.
+
 ## 2026-10-21 — Admin: primo caricamento e navigazione senza attese di letture estranee
 
 - Obiettivo utente: ritrovare la reattività del 13 ottobre anche al primo caricamento, mantenendo aggiornate le code ITF. Il passaggio D1-only del commit 5ae0b6cb2e ha sostituito il caricamento remoto con lettura/verifica dei documenti compressi a ogni richiesta, disattivando la cache precedente. Questo è lavoro aggiuntivo confermato dal codice; non è una misura dell'intera latenza live né prova che ogni attesa dipenda solo da esso.
