@@ -6383,3 +6383,5 @@ ITF Meta ordinary 2026-10-21T20:23:54.353Z: attempted 5, acquired 5, ordinary 0,
 - Sostituito il testo fuorviante Ricerca iscrizioni in corso con Nessun torneo monitorato quando il conteggio dei tornei visibili e zero.
 - Modificata solo la presentazione della lista giocatori, per tutti i profili, inclusi Cina e Carboni. Conteggi, dati, motori e richieste invariati.
 - Validazione: controllo sintassi JavaScript e verifica della sostituzione unica.
+
+ITF discovery 2026-10-22T05:23:38.914Z: 4 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
