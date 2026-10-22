@@ -1,3 +1,11 @@
+## 2026-10-22 — Certificazione operativa ITF allineata alla copertura ufficiale corrente
+
+- Causa: validate-itf-system leggeva il riepilogo legacy di itf_draw_target_db (33 pending tecnici, 12 di pubblicazione), indipendente dalla copertura ufficiale corrente che registra 900 completi, 13 cancellati, zero pendenti esigibili e 206 futuri.
+- Correzione: modulo comune itf-system-coverage valida forma, totali, identità e data della coda ufficiale. Il generatore della coda aggiorna anche il riepilogo generale; il validatore applica la stessa fonte dopo la riconciliazione. I publisher incrementale e straordinario pubblicano entrambi i documenti.
+- Garanzie: problemi tecnici/inventari sconosciuti attivi mantengono non certificato; errori bloccanti preservati; coda mancante, incoerente o non odierna blocca la certificazione. Tornei futuri distinti, non dichiarati completi. Nessuna acquisizione, schedulazione o scrittura D1 aggiunta; pubblicazione runtime documenti esistente.
+- Verifica: 19 test policy/missing-only/incrementale/certificazione superati; riepilogo reale rigenerato con zero pending correnti, 900 completi e 206 futuri; sintassi e diff controllati.
+- Limite: certificazione operativa del perimetro attualmente esigibile secondo il criterio ufficiale corrente; non certificazione retroattiva di ogni byte o riga di archivio. Pubblicazione e aggiornamento manuale diagnostica da eseguire dall'utente.
+
 ## 2026-10-22 — Correzione aggiornamento manuale Diagnostica e limite D1
 
 - Motivo: il conteggio accorpato introdotto nell'ottimizzazione Admin usava 11 rami UNION ALL; D1 consente al massimo tre termini nelle SELECT composte. SQLite locale non riproduceva quel limite.

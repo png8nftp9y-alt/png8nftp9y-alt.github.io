@@ -1,3 +1,4 @@
+import {applySystemCoverage} from './itf-system-coverage.mjs';
 import {withCurrentCoverageCatalog} from './itf-incremental-coverage.mjs';
 import {TODAY,readJson,writeJson} from './itf-common.mjs';
 import {t1Candidates} from './itf-t1-candidates.mjs';
@@ -10,7 +11,10 @@ const strictAudit=await withCurrentCoverageCatalog(process.env.ITF_AUDIT_STATE_F
 if(strictAudit.criterion===AUDIT_CRITERION){
  const baseline=await readJson('src/v3/itf-audit-baseline-20261001.json',null);
  const plan=buildCoverageQueuePlan(strictAudit,baseline,TODAY);
- await writeJson('dist/v3/itf_t1_queue_status.json',coverageDiagnostic(plan));
+ const queue=coverageDiagnostic(plan);
+ await writeJson('dist/v3/itf_t1_queue_status.json',queue);
+ const diagnostic=await readJson('dist/v3/itf_system_diagnostics.json',null);
+ if(diagnostic)await writeJson('dist/v3/itf_system_diagnostics.json',applySystemCoverage(diagnostic,queue,TODAY));
  console.log('ITF_T1_QUEUE_STATUS='+JSON.stringify(plan.summary));
  process.exit(0);
 }

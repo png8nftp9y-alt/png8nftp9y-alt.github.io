@@ -263,13 +263,13 @@ jobs:
             cp dist/v3/source_itf_draw_audit.json "dist/v3/audits/itf-t1-batch/$id.json"
           done
           node src/v3/maintain-itf-database.mjs
-          node src/v3/validate-itf-system.mjs
           node src/v3/entries-engine.mjs
           node src/v3/reconcile-itf-t1-strict-audit.mjs /tmp/itf-audit-state.json draw-tasks /tmp/itf-audit-state.json
           endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
           aws --endpoint-url "$endpoint" s3 cp /tmp/itf-audit-state.json "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" --only-show-errors
           node src/v3/build-itf-t1-extraordinary-batch.mjs
           node src/v3/build-itf-t1-admin-status.mjs
+          node src/v3/validate-itf-system.mjs
       - name: Publish changed database generation to R2
         run: bash src/v3/itf-r2-cache.sh publish
       - name: Commit validated T-1 decisions and map
