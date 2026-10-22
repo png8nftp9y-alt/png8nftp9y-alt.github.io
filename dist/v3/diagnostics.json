@@ -1,6 +1,6 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-10-22T16:26:18.250Z",
+  "generatedAt": "2026-10-22T16:26:44.124Z",
   "overall": "yellow",
   "legend": {
     "green": "ok",
@@ -41,7 +41,7 @@
       "label": "Calendario",
       "detail": "510 tornei visibili · FITP 453 · TE 49 · ITF 8",
       "critical": true,
-      "generatedAt": "2026-10-22T16:26:18.250Z"
+      "generatedAt": "2026-10-22T16:26:44.124Z"
     },
     {
       "status": "yellow",
@@ -67,9 +67,9 @@
     {
       "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 22/10/2026, 18:26:18",
+      "detail": "file v3 generati · ultimo merge 22/10/2026, 18:26:44",
       "critical": true,
-      "generatedAt": "2026-10-22T16:26:18.250Z"
+      "generatedAt": "2026-10-22T16:26:44.124Z"
     },
     {
       "status": "green",
@@ -80,15 +80,25 @@
     },
     {
       "label": "Deploy watchdog Cloudflare",
-      "status": "yellow",
+      "status": "green",
       "critical": true,
       "workflow": "courtwatch-cloudflare-watchdog-deploy.yml",
-      "latestRun": null,
-      "runId": null,
-      "url": null,
-      "generatedAt": "2026-10-22T16:26:18.250Z",
-      "checkedAt": "2026-10-22T16:24:58.957Z",
-      "detail": "nessuna verifica · data n/d"
+      "latestRun": {
+        "id": 37074669094,
+        "name": "Court Watch Cloudflare watchdog deploy",
+        "path": ".github/workflows/courtwatch-cloudflare-watchdog-deploy.yml",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-02T22:51:11Z",
+        "updated_at": "2026-10-02T22:51:45Z",
+        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/37074669094",
+        "display_title": "Recover ITF draws from December 18 independently of rolling discovery"
+      },
+      "runId": 37074669094,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/37074669094",
+      "generatedAt": "2026-10-02T22:51:45Z",
+      "checkedAt": "2026-10-22T16:26:41.776Z",
+      "detail": "success · 28415 min fa"
     },
     {
       "label": "ITF sicurezza 120 giorni",
@@ -109,8 +119,8 @@
       "runId": 39748974869,
       "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39748974869",
       "generatedAt": "2026-10-22T09:07:09Z",
-      "checkedAt": "2026-10-22T16:25:00.228Z",
-      "detail": "success · 438 min fa · nuova esecuzione in corso"
+      "checkedAt": "2026-10-22T16:26:42.538Z",
+      "detail": "success · 440 min fa · nuova esecuzione in corso"
     },
     {
       "label": "FITP pubblicazione catalogo",
@@ -120,8 +130,8 @@
       "latestRun": null,
       "runId": null,
       "url": null,
-      "generatedAt": "2026-10-22T16:26:18.250Z",
-      "checkedAt": "2026-10-22T16:24:59.176Z",
+      "generatedAt": "2026-10-22T16:26:44.124Z",
+      "checkedAt": "2026-10-22T16:26:42.088Z",
       "detail": "nessuna verifica · data n/d"
     },
     {
@@ -132,33 +142,53 @@
       "latestRun": null,
       "runId": null,
       "url": null,
-      "generatedAt": "2026-10-22T16:26:18.250Z",
-      "checkedAt": "2026-10-22T16:24:59.207Z",
+      "generatedAt": "2026-10-22T16:26:44.124Z",
+      "checkedAt": "2026-10-22T16:26:42.121Z",
       "detail": "nessuna verifica · data n/d"
     },
     {
       "label": "Europe motore live",
-      "status": "yellow",
+      "status": "green",
       "critical": true,
       "workflow": "courtwatch-v3-tennis-europe-live.yml",
-      "latestRun": null,
-      "runId": null,
-      "url": null,
-      "generatedAt": "2026-10-22T16:26:18.250Z",
-      "checkedAt": "2026-10-22T16:24:59.229Z",
-      "detail": "nessuna verifica · data n/d"
+      "latestRun": {
+        "id": 39813169734,
+        "name": "Court Watch v3 Tennis Europe live entries",
+        "path": ".github/workflows/courtwatch-v3-tennis-europe-live.yml",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-10-22T16:20:17Z",
+        "updated_at": "2026-10-22T16:23:10Z",
+        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39813169734",
+        "display_title": "Court Watch v3 Tennis Europe live entries"
+      },
+      "runId": 39810902070,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39810902070",
+      "generatedAt": "2026-10-22T16:12:08Z",
+      "checkedAt": "2026-10-22T16:26:42.164Z",
+      "detail": "success · 15 min fa · nuova esecuzione in corso"
     },
     {
       "label": "ITF discovery e R2",
-      "status": "yellow",
+      "status": "green",
       "critical": true,
       "workflow": "courtwatch-v3-itf-live.yml",
-      "latestRun": null,
-      "runId": null,
-      "url": null,
-      "generatedAt": "2026-10-22T16:26:18.250Z",
-      "checkedAt": "2026-10-22T16:24:58.573Z",
-      "detail": "nessuna verifica · data n/d"
+      "latestRun": {
+        "id": 39812425764,
+        "name": "Court Watch v3 ITF acceptance discovery 42d",
+        "path": ".github/workflows/courtwatch-v3-itf-live.yml",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-10-22T16:15:17Z",
+        "updated_at": "2026-10-22T16:26:01Z",
+        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39812425764",
+        "display_title": "Court Watch v3 ITF acceptance discovery 42d"
+      },
+      "runId": 39807780209,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39807780209",
+      "generatedAt": "2026-10-22T16:18:37Z",
+      "checkedAt": "2026-10-22T16:26:42.086Z",
+      "detail": "success · 8 min fa · nuova esecuzione in corso"
     },
     {
       "label": "ITF labels e R2",
@@ -168,8 +198,8 @@
       "latestRun": null,
       "runId": null,
       "url": null,
-      "generatedAt": "2026-10-22T16:26:18.250Z",
-      "checkedAt": "2026-10-22T16:24:59.395Z",
+      "generatedAt": "2026-10-22T16:26:44.124Z",
+      "checkedAt": "2026-10-22T16:26:41.833Z",
       "detail": "nessuna verifica · data n/d"
     },
     {
@@ -191,8 +221,8 @@
       "runId": 39810221468,
       "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39810221468",
       "generatedAt": "2026-10-22T16:19:04Z",
-      "checkedAt": "2026-10-22T16:25:00.181Z",
-      "detail": "success · 6 min fa · nuova esecuzione in corso"
+      "checkedAt": "2026-10-22T16:26:42.480Z",
+      "detail": "success · 8 min fa · nuova esecuzione in corso"
     },
     {
       "label": "Agenda/OOP Europe",
@@ -202,33 +232,53 @@
       "latestRun": null,
       "runId": null,
       "url": null,
-      "generatedAt": "2026-10-22T16:26:18.250Z",
-      "checkedAt": "2026-10-22T16:24:59.005Z",
+      "generatedAt": "2026-10-22T16:26:44.124Z",
+      "checkedAt": "2026-10-22T16:26:42.037Z",
       "detail": "nessuna verifica · data n/d"
     },
     {
       "label": "D1 generale",
-      "status": "yellow",
+      "status": "green",
       "critical": true,
       "workflow": "courtwatch-cloudflare-app-api.yml",
-      "latestRun": null,
-      "runId": null,
-      "url": null,
-      "generatedAt": "2026-10-22T16:26:18.250Z",
-      "checkedAt": "2026-10-22T16:24:58.586Z",
-      "detail": "nessuna verifica · data n/d"
+      "latestRun": {
+        "id": 39813838827,
+        "name": "Court Watch Cloudflare D1 and app API",
+        "path": ".github/workflows/courtwatch-cloudflare-app-api.yml",
+        "status": "pending",
+        "conclusion": null,
+        "created_at": "2026-10-22T16:24:49Z",
+        "updated_at": "2026-10-22T16:24:50Z",
+        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39813838827",
+        "display_title": "Court Watch Cloudflare D1 and app API"
+      },
+      "runId": 39811490673,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39811490673",
+      "generatedAt": "2026-10-22T16:15:20Z",
+      "checkedAt": "2026-10-22T16:26:42.105Z",
+      "detail": "success · 11 min fa · nuova esecuzione in corso"
     },
     {
       "label": "D1 agenda Europe",
-      "status": "yellow",
+      "status": "green",
       "critical": true,
       "workflow": "courtwatch-tennis-europe-agenda.yml",
-      "latestRun": null,
-      "runId": null,
-      "url": null,
-      "generatedAt": "2026-10-22T16:26:18.250Z",
-      "checkedAt": "2026-10-22T16:24:58.998Z",
-      "detail": "nessuna verifica · data n/d"
+      "latestRun": {
+        "id": 39813492667,
+        "name": "Court Watch Tennis Europe agenda D1",
+        "path": ".github/workflows/courtwatch-tennis-europe-agenda.yml",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-22T16:22:28Z",
+        "updated_at": "2026-10-22T16:24:47Z",
+        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39813492667",
+        "display_title": "Court Watch Tennis Europe agenda D1"
+      },
+      "runId": 39813492667,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39813492667",
+      "generatedAt": "2026-10-22T16:24:47Z",
+      "checkedAt": "2026-10-22T16:26:42.006Z",
+      "detail": "success · 2 min fa"
     }
   ],
   "raw": {
