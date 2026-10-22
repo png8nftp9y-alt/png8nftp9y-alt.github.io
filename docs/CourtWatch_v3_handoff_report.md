@@ -6413,3 +6413,11 @@ ITF discovery 2026-10-22T17:43:59.226Z: 0 newly discovered future tournaments; M
 - Anti-duplicazione: nessun nuovo avvio con index attivo o gia avviato nella stessa ora; nessun rilancio automatico per errore API e nessun controllo index dai cicli di manutenzione. L avvio non garantisce l inizio immediato del job su GitHub, che puo attendere runner o lock D1.
 - Validazione locale: nove test watchdog e un controllo dedicato della rotta index superati; test di compatibilita aggiornati per la nuova autorita del timer. Lo script di installazione esegue tutti i controlli API nel checkout effettivo prima del push.
 - Chiarimento ITF, senza modifiche: i contatori globalPendingTechnical/Publication sono calcolati sugli stati pending cumulativi del vecchio archivio; la coda inventario aggiornata applica acquisizioni, esclusioni RR e date. Al controllo la coda aveva zero blocchi tecnici, sei tabelloni vuoti per Panama, Vierumaki e Arnhem, e 202 tornei futuri. Nessuna nuova certificazione dell intero archivio D1.
+
+## Ricerca David Dumitru: diagnosi identità separate (22 ottobre 2026)
+
+Riprodotti nell’app autenticata tre risultati distinti: ITF 800695612 (cw-00da55a289cf2b5831a483e3d2706932), Tennis Europe d583abbf-29a7-4963-a408-6591f34c34db (cw-16c61a293832a5390311dab3457f23d8), FITP 2543087015 (cw-eb1a97dbec8884f3594e34cbfb374411). Nessun conflitto di nascita/nazionalità dimostrato dai soli risultati; la causa del mancato collegamento richiede i record originali. Non autorizzata un’unione basata solo sul nome.
+
+Aggiunta verifica puntuale di sola lettura: confronta fonti, ID canonici, coda pendente e proiezione dell’algoritmo corrente; conserva i metadati originali nel rapporto. Nessuna discovery, modifica D1, schedulazione, polling o ritentativo. Workflow su pubblicazione dei soli file diagnostici oppure avvio manuale.
+
+Validazione: test SQLite reale distingue una mappa separata rimasta vecchia da sorgenti compatibili, mantiene separati omonimi discordanti e verifica zero scritture. Limite: diagnosi di produzione e correzione ancora da completare dopo il rapporto D1.
