@@ -1,0 +1,37 @@
+name: Court Watch equivalent nationality identity repair
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-nationality-identity-repair.yml', 'cloudflare/app-api/scripts/repair-nationality-identity-links.mjs']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test production evidence, homonyms, alias stability and zero repeat writes
+        run: node --test test/nationality-identity-repair.test.mjs test/player-identity-mapping.test.mjs test/paginated-player-search.test.mjs test/player-identity-write-budget.test.mjs
+      - run: node scripts/configure-d1.mjs
+      - name: Reconcile existing ROM/ROU and MGO/MNE groups once through the normal identity mapper
+        run: node scripts/repair-nationality-identity-links.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nationality-identity-repair
+          path: cloudflare/app-api/tmp/nationality-identity-repair.json
+          retention-days: 30

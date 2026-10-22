@@ -6430,3 +6430,13 @@ Riprodotti nell’app autenticata tre risultati distinti: ITF 800695612 (cw-00da
 Aggiunta verifica puntuale di sola lettura: confronta fonti, ID canonici, coda pendente e proiezione dell’algoritmo corrente; conserva i metadati originali nel rapporto. Nessuna discovery, modifica D1, schedulazione, polling o ritentativo. Workflow su pubblicazione dei soli file diagnostici oppure avvio manuale.
 
 Validazione: test SQLite reale distingue una mappa separata rimasta vecchia da sorgenti compatibili, mantiene separati omonimi discordanti e verifica zero scritture. Limite: diagnosi di produzione e correzione ancora da completare dopo il rapporto D1.
+
+## Identità giocatori: sigle nazionalità equivalenti e recupero esistenti (22 ottobre 2026)
+
+Causa verificata nel run 39855462170: sette fonti David Dumitru, un solo ID ufficiale per ciascun circuito, ma nazionalità ROU e ROM nello stesso profilo Tennis Europe. Il confronto della ricerca trattava le due sigle come paesi differenti; il mapper manteneva tre persone canoniche, senza elementi in coda. Nessun conflitto reale di anno di nascita o di ID nel gruppo verificato.
+
+Confronto condiviso di nazionalità in ricerca e risoluzione profili: ROM equivale a ROU e MGO a MNE, equivalenze già riconosciute dalle evidenze archiviate. Conservati valori originali e controlli contro ID ufficiali distinti, anni di nascita e nazioni realmente discordanti. La correzione si applica anche alle acquisizioni future.
+
+Recupero una tantum delle identità esistenti con queste sigle: gruppi di 25 nomi, sole associazioni coinvolte tramite syncPlayerIdentities, blocco scritture D1 condiviso e limite variazioni ordinario. Nessuna riscrittura delle fonti, partite o iscrizioni; alias dei precedenti ID mantenuti; nessuna nuova schedulazione, polling o ritentativo. Checkpoint salvato solo dopo verifica dei tre circuiti di Dumitru; successive esecuzioni complete non ripetono scansione o scritture.
+
+Validazione locale: 32 test distinti passati tra regressione con evidenza reale D1, secondo giocatore con sigle equivalenti, ricerca paginata, mapping, budget scritture, profili ufficiali e storico avversario. Verificati unico risultato Dumitru con tre profili e nascita 2012, associazioni utente conservate, fonti invariate, ripetizione senza scritture, omonimi incompatibili separati. Limite: recupero produzione e deploy Worker da verificare dopo pubblicazione; non corregge duplicati dovuti a cause diverse dalle equivalenze documentate.

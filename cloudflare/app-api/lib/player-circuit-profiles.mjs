@@ -1,9 +1,10 @@
 import {mappedProfiles} from './player-identity-lookup.mjs';
+import {playerNationalityKey} from './player-nationality.mjs';
 export const normalizePlayerName=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,' ').trim().toUpperCase();
 export const playerNameKey=value=>normalizePlayerName(value).split(' ').sort().join(' ');
 export const profileCircuit=value=>{const s=String(value||'').toLowerCase();return /europe/.test(s)?'tennis-europe':/itf/.test(s)?'itf':/fitp/.test(s)?'fitp':''};
 const guid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i;
-const country=value=>({ITALY:'ITA',ITALIA:'ITA',IT:'ITA',SWITZERLAND:'SUI',CH:'SUI'}[String(value||'').toUpperCase()]||String(value||'').toUpperCase());
+const country=playerNationalityKey;
 const birth=p=>Number(p.birthYear||String(p.birthDate||p.dateOfBirth||'').slice(0,4))||null;
 export function officialPlayerUrl(circuit,player={}){
  const c=profileCircuit(circuit),sync=player.profileSync?.[c==='tennis-europe'?'tennisEurope':c]||{};
