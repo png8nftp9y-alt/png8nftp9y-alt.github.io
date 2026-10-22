@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-10-22T15:23:21.266Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-10-22T15:25:29.600Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -804048,7 +804048,7 @@
       "startDate": "2026-10-19",
       "endDate": "2026-10-24",
       "decision": "pending",
-      "checkedAt": "2026-10-22T15:13:03.541Z",
+      "checkedAt": "2026-10-22T15:25:29.600Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 3,
@@ -804155,8 +804155,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -804194,8 +804194,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_artifact_missing",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -804214,7 +804214,7 @@
           ]
         }
       ],
-      "eventFailure": "B-S-M-KO:draw_artifact_missing | G-S-M-KO:draw_artifact_missing",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -816640,14 +816640,14 @@
       "tournamentName": "J60 Vierumaki",
       "startDate": "2026-10-20",
       "endDate": "2026-10-25",
-      "decision": "pending",
-      "checkedAt": "2026-10-22T15:13:02.869Z",
+      "decision": "complete",
+      "checkedAt": "2026-10-22T15:25:28.856Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 5,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 5,
-      "missingSections": 1,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -816761,14 +816761,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -818189,6 +818189,100 @@
             "taskId": "J-J60-FIN-2026-002__G-S-M-KO",
             "storedAt": "2026-10-22T11:40:04.942Z"
           }
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800719008",
+              "name": "William Thulin",
+              "givenName": "William",
+              "familyName": "Thulin",
+              "nationalityCode": "DEN",
+              "profileLink": "/en/players/william-thulin/800719008/den/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800712306",
+              "name": "Tristan de Cande",
+              "givenName": "Tristan",
+              "familyName": "de Cande",
+              "nationalityCode": "CAN",
+              "profileLink": "/en/players/tristan-de-cande/800712306/can/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800670196",
+              "name": "Aatu Niemelae",
+              "givenName": "Aatu",
+              "familyName": "Niemelae",
+              "nationalityCode": "FIN",
+              "profileLink": "/en/players/aatu-niemelae/800670196/fin/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800785317",
+              "name": "Villiam Jousmaki",
+              "givenName": "Villiam",
+              "familyName": "Jousmaki",
+              "nationalityCode": "FIN",
+              "profileLink": "/en/players/villiam-jousmaki/800785317/fin/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800597284",
+              "name": "Miro Savolainen",
+              "givenName": "Miro",
+              "familyName": "Savolainen",
+              "nationalityCode": "FIN",
+              "profileLink": "/en/players/miro-savolainen/800597284/fin/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800667756",
+              "name": "Ilari Jaemsae",
+              "givenName": "Ilari",
+              "familyName": "Jaemsae",
+              "nationalityCode": "FIN",
+              "profileLink": "/en/players/ilari-jaemsae/800667756/fin/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800664791",
+              "name": "Philippe Jourdren",
+              "givenName": "Philippe",
+              "familyName": "Jourdren",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/philippe-jourdren/800664791/cze/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781981",
+              "name": "Novak Palombo",
+              "givenName": "Novak",
+              "familyName": "Palombo",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/novak-palombo/800781981/aus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-22T15:25:28.856Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-FIN-2026-002__B-S-M-KO",
+            "storedAt": "2026-10-22T15:25:28.856Z"
+          }
         }
       }
     },
@@ -818198,7 +818292,7 @@
       "startDate": "2026-10-20",
       "endDate": "2026-10-25",
       "decision": "pending",
-      "checkedAt": "2026-10-22T15:13:03.218Z",
+      "checkedAt": "2026-10-22T15:25:29.238Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
