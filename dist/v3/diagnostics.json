@@ -1,6 +1,6 @@
 {
   "version": "cw-v3-agenda-first",
-  "generatedAt": "2026-10-22T15:23:58.173Z",
+  "generatedAt": "2026-10-22T15:24:30.949Z",
   "overall": "red",
   "legend": {
     "green": "ok",
@@ -41,7 +41,7 @@
       "label": "Calendario",
       "detail": "510 tornei visibili · FITP 453 · TE 49 · ITF 8",
       "critical": true,
-      "generatedAt": "2026-10-22T15:23:58.173Z"
+      "generatedAt": "2026-10-22T15:24:30.949Z"
     },
     {
       "status": "yellow",
@@ -67,9 +67,9 @@
     {
       "status": "green",
       "label": "App/UI",
-      "detail": "file v3 generati · ultimo merge 22/10/2026, 17:23:58",
+      "detail": "file v3 generati · ultimo merge 22/10/2026, 17:24:30",
       "critical": true,
-      "generatedAt": "2026-10-22T15:23:58.173Z"
+      "generatedAt": "2026-10-22T15:24:30.949Z"
     },
     {
       "status": "green",
@@ -80,25 +80,15 @@
     },
     {
       "label": "Deploy watchdog Cloudflare",
-      "status": "green",
+      "status": "yellow",
       "critical": true,
       "workflow": "courtwatch-cloudflare-watchdog-deploy.yml",
-      "latestRun": {
-        "id": 37074669094,
-        "name": "Court Watch Cloudflare watchdog deploy",
-        "path": ".github/workflows/courtwatch-cloudflare-watchdog-deploy.yml",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-02T22:51:11Z",
-        "updated_at": "2026-10-02T22:51:45Z",
-        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/37074669094",
-        "display_title": "Recover ITF draws from December 18 independently of rolling discovery"
-      },
-      "runId": 37074669094,
-      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/37074669094",
-      "generatedAt": "2026-10-02T22:51:45Z",
-      "checkedAt": "2026-10-22T15:20:03.442Z",
-      "detail": "success · 28348 min fa"
+      "latestRun": null,
+      "runId": null,
+      "url": null,
+      "generatedAt": "2026-10-22T15:24:30.949Z",
+      "checkedAt": "2026-10-22T15:24:28.640Z",
+      "detail": "nessuna verifica · data n/d"
     },
     {
       "label": "ITF sicurezza 120 giorni",
@@ -119,8 +109,8 @@
       "runId": 39748974869,
       "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39748974869",
       "generatedAt": "2026-10-22T09:07:09Z",
-      "checkedAt": "2026-10-22T15:20:04.727Z",
-      "detail": "success · 373 min fa"
+      "checkedAt": "2026-10-22T15:24:29.415Z",
+      "detail": "success · 377 min fa"
     },
     {
       "label": "FITP pubblicazione catalogo",
@@ -141,20 +131,30 @@
       "runId": 39741701273,
       "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39741701273",
       "generatedAt": "2026-10-22T07:43:30Z",
-      "checkedAt": "2026-10-22T15:20:04.260Z",
-      "detail": "success · 457 min fa"
+      "checkedAt": "2026-10-22T15:24:29.634Z",
+      "detail": "success · 461 min fa"
     },
     {
       "label": "FITP motore live",
-      "status": "yellow",
+      "status": "green",
       "critical": true,
       "workflow": "courtwatch-v3-fitp-entries.yml",
-      "latestRun": null,
-      "runId": null,
-      "url": null,
-      "generatedAt": "2026-10-22T15:23:58.173Z",
-      "checkedAt": "2026-10-22T15:20:03.491Z",
-      "detail": "nessuna verifica · data n/d"
+      "latestRun": {
+        "id": 39802276978,
+        "name": "Court Watch v3 FITP player entries",
+        "path": ".github/workflows/courtwatch-v3-fitp-entries.yml",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-22T15:10:17Z",
+        "updated_at": "2026-10-22T15:11:43Z",
+        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39802276978",
+        "display_title": "Court Watch v3 FITP player entries"
+      },
+      "runId": 39802276978,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39802276978",
+      "generatedAt": "2026-10-22T15:11:43Z",
+      "checkedAt": "2026-10-22T15:24:29.619Z",
+      "detail": "success · 13 min fa"
     },
     {
       "label": "Europe motore live",
@@ -175,76 +175,76 @@
       "runId": 39799204891,
       "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39799204891",
       "generatedAt": "2026-10-22T14:59:25Z",
-      "checkedAt": "2026-10-22T15:20:05.496Z",
-      "detail": "success · 21 min fa · nuova esecuzione in corso"
+      "checkedAt": "2026-10-22T15:24:29.526Z",
+      "detail": "success · 25 min fa · nuova esecuzione in corso"
     },
     {
       "label": "ITF discovery e R2",
-      "status": "red",
+      "status": "yellow",
       "critical": true,
       "workflow": "courtwatch-v3-itf-live.yml",
-      "latestRun": {
-        "id": 39803067137,
-        "name": "Court Watch v3 ITF acceptance discovery 42d",
-        "path": ".github/workflows/courtwatch-v3-itf-live.yml",
-        "status": "queued",
-        "conclusion": null,
-        "created_at": "2026-10-22T15:15:16Z",
-        "updated_at": "2026-10-22T15:15:38Z",
-        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39803067137",
-        "display_title": "Court Watch v3 ITF acceptance discovery 42d"
-      },
-      "runId": 39798448655,
-      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39798448655",
-      "generatedAt": "2026-10-22T15:05:27Z",
-      "checkedAt": "2026-10-22T15:20:03.896Z",
-      "detail": "failure · 15 min fa · nuova esecuzione in corso"
+      "latestRun": null,
+      "runId": null,
+      "url": null,
+      "generatedAt": "2026-10-22T15:24:30.949Z",
+      "checkedAt": "2026-10-22T15:24:28.774Z",
+      "detail": "nessuna verifica · data n/d"
     },
     {
       "label": "ITF labels e R2",
-      "status": "yellow",
+      "status": "green",
       "critical": true,
       "workflow": "courtwatch-v3-itf-known-fast.yml",
-      "latestRun": null,
-      "runId": null,
-      "url": null,
-      "generatedAt": "2026-10-22T15:23:58.173Z",
-      "checkedAt": "2026-10-22T15:20:03.148Z",
-      "detail": "nessuna verifica · data n/d"
+      "latestRun": {
+        "id": 39803070124,
+        "name": "Court Watch v3 ITF known labels fast",
+        "path": ".github/workflows/courtwatch-v3-itf-known-fast.yml",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-22T15:15:17Z",
+        "updated_at": "2026-10-22T15:24:10Z",
+        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39803070124",
+        "display_title": "Court Watch v3 ITF known labels fast"
+      },
+      "runId": 39803070124,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39803070124",
+      "generatedAt": "2026-10-22T15:24:10Z",
+      "checkedAt": "2026-10-22T15:24:29.152Z",
+      "detail": "success · 0 min fa"
     },
     {
       "label": "ITF T−1 e R2",
-      "status": "yellow",
+      "status": "red",
       "critical": true,
       "workflow": "courtwatch-v3-itf-t-minus-one.yml",
-      "latestRun": null,
-      "runId": null,
-      "url": null,
-      "generatedAt": "2026-10-22T15:23:58.173Z",
-      "checkedAt": "2026-10-22T15:20:03.149Z",
-      "detail": "nessuna verifica · data n/d"
+      "latestRun": {
+        "id": 39803068330,
+        "name": "ITF T-1 ordinary",
+        "path": ".github/workflows/courtwatch-v3-itf-t-minus-one.yml",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-10-22T15:15:16Z",
+        "updated_at": "2026-10-22T15:24:10Z",
+        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39803068330",
+        "display_title": "ITF T-1 ordinary"
+      },
+      "runId": 39800714254,
+      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39800714254",
+      "generatedAt": "2026-10-22T15:16:38Z",
+      "checkedAt": "2026-10-22T15:24:29.631Z",
+      "detail": "failure · 8 min fa · nuova esecuzione in corso"
     },
     {
       "label": "Agenda/OOP Europe",
-      "status": "green",
+      "status": "yellow",
       "critical": true,
       "workflow": "courtwatch-tennis-europe-oop-live.yml",
-      "latestRun": {
-        "id": 39801491367,
-        "name": "Court Watch Tennis Europe OOP and results live",
-        "path": ".github/workflows/courtwatch-tennis-europe-oop-live.yml",
-        "status": "in_progress",
-        "conclusion": null,
-        "created_at": "2026-10-22T15:05:16Z",
-        "updated_at": "2026-10-22T15:10:37Z",
-        "html_url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39801491367",
-        "display_title": "Court Watch Tennis Europe OOP and results live"
-      },
-      "runId": 39799203730,
-      "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39799203730",
-      "generatedAt": "2026-10-22T14:54:54Z",
-      "checkedAt": "2026-10-22T15:20:03.964Z",
-      "detail": "success · 25 min fa · nuova esecuzione in corso"
+      "latestRun": null,
+      "runId": null,
+      "url": null,
+      "generatedAt": "2026-10-22T15:24:30.949Z",
+      "checkedAt": "2026-10-22T15:24:29.059Z",
+      "detail": "nessuna verifica · data n/d"
     },
     {
       "label": "D1 generale",
@@ -265,8 +265,8 @@
       "runId": 39802748502,
       "url": "https://github.com/png8nftp9y-alt/png8nftp9y-alt.github.io/actions/runs/39802748502",
       "generatedAt": "2026-10-22T15:19:48Z",
-      "checkedAt": "2026-10-22T15:20:04.634Z",
-      "detail": "success · 0 min fa"
+      "checkedAt": "2026-10-22T15:24:29.417Z",
+      "detail": "success · 5 min fa"
     },
     {
       "label": "D1 agenda Europe",
@@ -276,8 +276,8 @@
       "latestRun": null,
       "runId": null,
       "url": null,
-      "generatedAt": "2026-10-22T15:23:58.173Z",
-      "checkedAt": "2026-10-22T15:20:03.802Z",
+      "generatedAt": "2026-10-22T15:24:30.949Z",
+      "checkedAt": "2026-10-22T15:24:28.784Z",
       "detail": "nessuna verifica · data n/d"
     }
   ],
