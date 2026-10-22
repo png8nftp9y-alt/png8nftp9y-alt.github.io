@@ -1,3 +1,4 @@
+import {personalPlayerList} from '../lib/personal-player-list.mjs';
 import {enrichFitpMetadata} from '../lib/fitp-player-metadata.mjs';
 import {runtimeDocumentReader,FRONTEND_DOCUMENTS} from '../lib/runtime-document-reader.mjs';
 import {adminRuntimeDocuments} from '../lib/admin-runtime-documents.mjs';
@@ -202,6 +203,11 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
     if(request.headers.get('Origin')&&request.headers.get('Origin')!==url.origin)return privateJson({error:'origin_not_allowed'},403);
     const body=await request.json().catch(()=>null);
     try{return privateJson({group,matches:await knownMatchResults(env.DB,body?.matchIds)})}catch(error){if(error.status===400)return privateJson({error:error.message},400);throw error}
+  }
+  if(apiPath==='/player-list'&&request.method==='GET'){
+    const list=await personalPlayerList(env.DB,user.id,group);
+    const overrides=await optionalRows(env.DB.prepare("SELECT entity_type,entity_id,action,payload FROM manual_overrides WHERE active=1 AND entity_type='player' ORDER BY updated_at"));
+    return privateJson({group,generatedAt:new Date().toISOString(),membershipIds:list.membershipIds,players:applyOverrides(list.players,overrides,'player').filter(p=>list.membershipIds.includes(p.id))});
   }
   if(apiPath==='/app-snapshot'&&request.method==='GET'){const playerId=url.searchParams.get('playerId')||'';
     if(url.searchParams.has('playerId')&&(!playerId||playerId.length>160))return privateJson({error:'invalid_player'},400);

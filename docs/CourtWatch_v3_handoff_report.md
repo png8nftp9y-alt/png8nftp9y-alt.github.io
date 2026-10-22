@@ -1,3 +1,12 @@
+## 2026-10-22 — Lista giocatori tra dispositivi indipendente dallo storico
+
+- Motivo: il refresh leggeva la lista solo nella risposta completa app-snapshot; lo storico lento di un qualsiasi giocatore ritardava anche le nuove aggiunte già salvate in D1. Riprodotto in test, senza attribuire retroattivamente una durata o una richiesta precisa al caso Lorenzo Calandra.
+- Componenti: endpoint autenticato player-list con una SELECT indicizzata su appartenenze/schede salvate e una lettura degli override giocatore. Nessuna lettura di storico, tornei o documenti runtime, nessuna mutazione applicativa. Main/Altri, account e rimozioni restano isolati; dati mancanti/incoerenti falliscono senza produrre una lista vuota valida.
+- Frontend: lettura leggera solo all'avvio/refresh pagina, rientro visibile e cambio gruppo con cache. Nessun nuovo timer periodico; i caricamenti periodici preesistenti non aggiungono questa richiesta. Coalescenza delle richieste simultanee; il rientro può leggere la lista anche durante un full snapshot già in corso. Un solo full snapshot, che non attende la lista. Versione/epoca/gruppo impediscono sovrascritture tardive.
+- UX: nomi e circoli già salvati sono disponibili prima dello storico; nuovi giocatori mostrano Caricamento tornei… e non assenza di tornei. Dati precedenti, selezioni esplicitamente disattivate, vista e posizione sono preservati. L'apertura di un nuovo profilo attende la disponibilità dei dati completi.
+- Verifica: test reali Worker/SQLite e loader frontend con promessa storico bloccata, ricezione lista prima dello storico, timeout/errore lista, ordine inverso delle risposte, richieste simultanee, isolamento account/gruppi/rimozioni, query plan indicizzato e zero scritture applicative. Test inseriti in npm run check; controlli generali eseguiti prima della consegna.
+- Limiti: aggiunta di una richiesta leggera per gli eventi indicati, con due query dati indicizzate oltre al middleware autenticato comune. Non garantito zero costo o tempo di rete; tempi reali tra telefono e PC da verificare dopo la pubblicazione. Nessuna pubblicazione dell'agente.
+
 ## 2026-10-22 — Certificazione operativa ITF allineata alla copertura ufficiale corrente
 
 - Causa: validate-itf-system leggeva il riepilogo legacy di itf_draw_target_db (33 pending tecnici, 12 di pubblicazione), indipendente dalla copertura ufficiale corrente che registra 900 completi, 13 cancellati, zero pendenti esigibili e 206 futuri.

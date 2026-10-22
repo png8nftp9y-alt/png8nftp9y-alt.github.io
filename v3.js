@@ -893,6 +893,38 @@ async function fetchProjection(url, timeoutMs, group = PLAYER_GROUP) {
     if (activeProjectionController === controller) activeProjectionController = null;
   }
 }
+async function refreshPlayerMembership(group,epoch,isSnapshotComplete) {
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),12000);
+  try {
+    const response=await fetch(PRIVATE_API+'/player-list',privateApiOptions({cache:'no-store',credentials:'same-origin',signal:controller.signal},group));
+    if(!response.ok)throw Error('Elenco giocatori non disponibile: '+response.status);
+    const list=await response.json();
+    if(list.group!==group||!Array.isArray(list.players)||!Array.isArray(list.membershipIds)||
+      list.players.some(p=>!p.id||!p.name||!list.membershipIds.includes(p.id))||
+      new Set(list.players.map(p=>p.id)).size!==list.players.length)throw Error('Elenco giocatori incompleto');
+    if(group!==PLAYER_GROUP||epoch!==(state.playerSelectionEpoch||0)||isSnapshotComplete())return;
+    const previous=state.data||cachedData()||{},old=new Map((previous.players||[]).map(p=>[p.id,p]));
+    const players=list.players.filter(p=>(!FORMER_PLAYERS.has(p.id)||p.userAdded)&&!removedCourtWatchPlayers.has(p.id)).map(p=>old.get(p.id)||{...p,membershipPending:true});
+    for(const p of confirmedCourtWatchPlayers.values())if(!players.some(r=>r.id===p.id)&&!removedCourtWatchPlayers.has(p.id))players.push(p);
+    const ids=new Set(players.map(p=>p.id));
+    state.data={matches:[],agenda:[],results:[],opponents:[],tournamentEntries:[],tournaments:[],...previous,group,players};
+    for(const key of ['matches','agenda','results','tournamentEntries','tournaments'])state.data[key]=(state.data[key]||[]).filter(r=>ids.has(r.playerId));
+    state.selected=new Set([...state.selected].filter(id=>ids.has(id)));
+    for(const p of players)if(!old.has(p.id))state.selected.add(p.id);
+    const hash=location.hash,y=typeof scrollY==='number'?scrollY:null;
+    renderIfDataChanged();
+    if(y!==null&&location.hash===hash)scrollTo({top:y,behavior:'auto'});
+  } catch(error){console.warn('Sincronizzazione elenco non disponibile; conservo la lista precedente',error);}
+  finally{clearTimeout(timer);}
+}
+function requestPlayerMembershipRefresh() {
+  const group=PLAYER_GROUP,epoch=state.playerSelectionEpoch||0;
+  if(state.membershipRefresh?.group===group&&state.membershipRefresh.epoch===epoch)return;
+  const version=state.completeProjectionVersion||0,flight={group,epoch};
+  state.membershipRefresh=flight;
+  flight.promise=refreshPlayerMembership(group,epoch,()=>version!==(state.completeProjectionVersion||0))
+    .finally(()=>{if(state.membershipRefresh===flight)state.membershipRefresh=null;});
+}
 async function apiProjection() {
   // Personal histories can outlive a short timeout. Keep one request in flight;
   // the cached projection stays visible while it completes.
@@ -2621,7 +2653,7 @@ function renderPlayers() {
         club = esc(displayPlayerClub(p.club) || (playerHasFitpMembership(p) ? "Tesseramento da completare" : "")),
         card = p.membershipCard ? `tessera ${p.membershipCard}` : "",
         nation = esc(foreignPlayerCountryLabel(p));
-      return `<div class="playerRow" role="link" tabindex="0" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${[club, esc(card), nation, n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Nessun torneo monitorato"].filter(Boolean).join(" · ")}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
+      return `<div class="playerRow" role="link" tabindex="0" data-profile="${esc(p.id)}"><div class="avatar">${initials(p.name)}</div><div><strong>${esc(readablePerson(p.name))}</strong><small>${[club, esc(card), nation, p.membershipPending ? "Caricamento tornei…" : n ? `${n} ${n === 1 ? "torneo" : "tornei"} monitorati` : "Nessun torneo monitorato"].filter(Boolean).join(" · ")}</small></div>${playerRemovalMode ? `<button type="button" class="playerRowRemove btn" data-remove-player="${esc(p.id)}" aria-label="Rimuovi ${esc(readablePerson(p.name))}">Rimuovi</button>` : "<i>›</i>"}</div>`;
     })
     .join("") || '<div class="empty">Nessun giocatore. Premi + per aggiungerne uno.</div>';
   document.querySelectorAll("[data-profile]").forEach(
@@ -2953,8 +2985,8 @@ function hasAvailablePlayerProfile(id) {
 }
 async function openProfile(id) {
   const epoch = ++profileNavigationEpoch, previousHash = location.hash;
-  if (!hasAvailablePlayerProfile(id)) await (initialProjectionRequest || load());
-  if (epoch !== profileNavigationEpoch || location.hash !== previousHash || !hasAvailablePlayerProfile(id)) return;
+  if (!hasAvailablePlayerProfile(id)||state.data?.players?.find(p=>p.id===id)?.membershipPending) await (initialProjectionRequest || load());
+  if (epoch !== profileNavigationEpoch || location.hash !== previousHash || !hasAvailablePlayerProfile(id)||state.data?.players?.find(p=>p.id===id)?.membershipPending) return;
   location.hash = "player/" + encodeURIComponent(id);
 }
 async function openCurrentOpponent(profileId, name, event = "") {
@@ -4321,7 +4353,7 @@ async function changePlayerGroup(targetGroup, fromHistory = false) {
     scrollTo(0, fromHistory ? Number(restoredUi.scrollY) || 0 : previousY);
     activeRouteScrollKey = location.hash || "#home";
     saveUiState();
-    if (cached) load();
+    if (cached) load(null,null,true);
   } catch (error) {console.warn("Cambio sezione non disponibile; conservo la pagina corrente", error);}
   finally {groupSwitchRunning = false;}
 }
@@ -4539,7 +4571,7 @@ function wire() {
   const refreshOnResume = () => {
     if (!initialProjectionRequest || document.visibilityState === "hidden" || navigator.onLine === false || Date.now() - lastResumeRefresh < 30000) return;
     lastResumeRefresh = Date.now();
-    load();
+    load(null,null,true);
     const opponent = location.hash.match(/^#opponent-profile\/([^/]+)\/([^/]+)\/([^/]+)$/);
     if (opponent) {
       const [identity, name, event] = opponent.slice(1).map(decodeURIComponent), hash = location.hash;
@@ -4607,8 +4639,9 @@ function refreshKnownMatchResults() {
   return request;
 }
 
-async function load(preparedProjection = null, preparedDocuments = null) {
+async function load(preparedProjection = null, preparedDocuments = null, refreshMembership = false) {
   refreshKnownMatchResults();
+  if(refreshMembership&&!preparedProjection)requestPlayerMembershipRefresh();
   if (loadRunning) return activeLoadCompletion;
   let finishLoad;
   activeLoadCompletion = new Promise(resolve => {finishLoad = resolve;});
@@ -4821,6 +4854,7 @@ async function load(preparedProjection = null, preparedDocuments = null) {
       return null;
     }).then(projection => {
       if (projection) {
+        state.completeProjectionVersion=(state.completeProjectionVersion||0)+1;
         // Fresh API data must not wait for secondary JSON or local persistence.
         try { publishProjection(projection, typeof lastLoadedDocuments === "object" && lastLoadedDocuments || {}, []); }
         catch (error) { console.warn("Aggiornamento immediato non disponibile", error); }
@@ -5145,7 +5179,7 @@ async function startCourtWatch() {
   wire();
   wireAccount();
   await Promise.all([restoreDurableProjection(), restoreDurableOpponents()]);
-  initialProjectionRequest = load();
+  initialProjectionRequest = load(null,null,true);
   route();
   if (state.data) {
     renderedDataSignature = renderDataSignature(state.data);
