@@ -30,7 +30,7 @@ function setup(group, projection, {cached = null, staticData = {}, staticOffline
 
 const memberSource=source.slice(source.indexOf('async function refreshPlayerMembership('),source.indexOf('async function apiProjection()'));
 function live(c){
- Object.assign(c.ctx,{PRIVATE_API:'/app/api',AbortController,setTimeout,clearTimeout,privateApiOptions:x=>x,location:{hash:'#players'}});
+ Object.assign(c.ctx,{refreshAfterPlayerAddition:async()=>{},PRIVATE_API:'/app/api',AbortController,setTimeout,clearTimeout,privateApiOptions:x=>x,location:{hash:'#players'}});
  vm.runInContext(memberSource,c.ctx);
 }
 const a={id:'a',name:'Existing',club:'Rich Club',ranking:'2.1'},b={id:'b',name:'New'};
@@ -91,4 +91,50 @@ test('resume refresh bypasses a blocked existing full load and coalesces simulta
  await new Promise(r=>setImmediate(r));
  assert.equal(c.ctx.state.data.players[1].id,'b');assert.equal(c.ctx.state.data.players[1].membershipPending,true);
  finish(full);await Promise.all([initial,resume,duplicate]);assert.equal(fullReads,1);
+});
+
+function scopedSync(c){
+ live(c);
+ Object.assign(c.ctx,{recordPlayerLoadTiming(){},scrollTo(){},PRIVATE_API:'/app/api'});
+ const start=source.indexOf('const addedPlayerRefreshes = new Map();');
+ vm.runInContext(source.slice(start,source.indexOf('async function addCourtWatchPlayerFromUi(',start)),c.ctx);
+}
+test('second device loads only newly discovered player tournaments while full group remains blocked',async()=>{
+ const c=setup('others',full,{cached});scopedSync(c);
+ c.ctx.state.data=structuredClone(cached);c.ctx.uiSelectionRestored=true;
+ let finishFull,finishPlayer,scopedReads=0,fullReads=0;
+ c.ctx.apiProjection=()=>{fullReads++;return new Promise(r=>finishFull=r)};
+ c.ctx.fetch=async()=>({ok:true,json:async()=>({group:'others',players:[a,b],membershipIds:['a','b']})});
+ c.ctx.fetchProjection=(url,timeout,group)=>{assert.equal(url,'/app/api/app-snapshot?playerId=b');assert.equal(group,'others');scopedReads++;return new Promise(r=>finishPlayer=r)};
+ const loading=c.ctx.load(null,null,true);await new Promise(r=>setImmediate(r));
+ assert.equal(c.ctx.state.data.players[1].membershipPending,true);assert.equal(scopedReads,1);assert.equal(fullReads,1);
+ finishPlayer({group:'others',playerId:'b',players:[{...b,club:'New Club'}],tournaments:[{playerId:'b',name:'Ready',competitionId:'new',circuit:'fitp'}],matches:[]});
+ await new Promise(r=>setImmediate(r));
+ assert.equal(c.ctx.state.data.players[1].membershipPending,undefined);
+ assert.equal(c.ctx.state.data.players[1].club,'New Club');
+ assert.equal(c.ctx.state.data.tournaments.some(t=>t.name==='Ready'),true);
+ assert.equal(c.ctx.state.data.tournaments.some(t=>t.name==='History'),true);
+ await c.ctx.refreshPlayerMembership('others',0,()=>false);assert.equal(scopedReads,1,'unchanged membership does not read histories again');
+ finishFull(full);await loading;
+});
+test('late scoped sync cannot overwrite complete group data, removals or another group',async()=>{
+ for(const action of ['complete','removed','group','epoch']){
+  const c=setup('others',full,{cached});scopedSync(c);c.ctx.state.data={...structuredClone(cached),players:[a,{...b,membershipPending:true}]};
+  let release;c.ctx.fetchProjection=()=>new Promise(r=>release=r);
+  const pending=c.ctx.refreshAfterPlayerAddition(0,'others','b',{membershipSync:true});
+  if(action==='complete'){c.ctx.state.completeProjectionVersion=1;c.ctx.state.data=structuredClone(full);}
+  if(action==='removed'){c.ctx.removedCourtWatchPlayers.add('b');c.ctx.state.data.players=[a];}
+  if(action==='group')c.ctx.PLAYER_GROUP='main';
+  if(action==='epoch')c.ctx.state.playerSelectionEpoch=1;
+  const before=JSON.stringify(c.ctx.state.data);
+  release({group:'others',playerId:'b',players:[b],tournaments:[{playerId:'b',name:'Stale'}],matches:[]});await pending;
+  assert.equal(JSON.stringify(c.ctx.state.data),before,action);
+ }
+});
+test('scoped refresh coalesces duplicate requests and failed history retains pending state',async()=>{
+ const c=setup('others',full,{cached});scopedSync(c);c.ctx.state.data={...structuredClone(cached),players:[a,{...b,membershipPending:true}]};
+ let reject,reads=0;c.ctx.fetchProjection=()=>{reads++;return new Promise((_r,j)=>reject=j)};
+ const first=c.ctx.refreshAfterPlayerAddition(0,'others','b',{membershipSync:true});
+ await c.ctx.refreshAfterPlayerAddition(0,'others','b',{membershipSync:true});assert.equal(reads,1);
+ reject(Error('offline'));await assert.rejects(first,/offline/);assert.equal(c.ctx.state.data.players[1].membershipPending,true);
 });

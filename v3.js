@@ -865,7 +865,7 @@ async function fetchProjection(url, timeoutMs, group = PLAYER_GROUP) {
   let timingResponse;
   const controller = new AbortController(),
     timer = setTimeout(() => controller.abort(), timeoutMs);
-  if (group === PLAYER_GROUP) activeProjectionController = controller;
+  if (group === PLAYER_GROUP && !timingEnabled) activeProjectionController = controller;
   try {
     const response = await fetch(
       url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(),
@@ -908,6 +908,8 @@ async function refreshPlayerMembership(group,epoch,isSnapshotComplete) {
     const hash=location.hash,y=typeof scrollY==='number'?scrollY:null;
     renderIfDataChanged();
     if(y!==null&&location.hash===hash)scrollTo({top:y,behavior:'auto'});
+    for(const p of players.filter(p=>!old.has(p.id)&&p.membershipPending))
+      refreshAfterPlayerAddition(epoch,group,p.id,{membershipSync:true}).catch(error=>console.warn('Tornei del nuovo giocatore non ancora disponibili',error));
   } catch(error){console.warn('Sincronizzazione elenco non disponibile; conservo la lista precedente',error);}
 }
 async function fetchPlayerMembership(group) {
@@ -2707,9 +2709,11 @@ function playerCircuitLinksHtml(profiles=[]) {
 }
 const playerAdditionsInFlight = new Map();
 const addedPlayerRefreshes = new Map();
-async function refreshAfterPlayerAddition(epoch, group, playerId) {
+async function refreshAfterPlayerAddition(epoch, group, playerId, {membershipSync=false} = {}) {
   if (!playerId || group !== PLAYER_GROUP) return;
   const key = group + '|' + playerId, token = {};
+  if(membershipSync&&addedPlayerRefreshes.has(key))return;
+  const completeVersion=state.completeProjectionVersion||0;
   addedPlayerRefreshes.set(key, token);
   try {
     let data = await fetchProjection(PRIVATE_API + '/app-snapshot?playerId=' + encodeURIComponent(playerId), 45000, group);
@@ -2718,6 +2722,7 @@ async function refreshAfterPlayerAddition(epoch, group, playerId) {
       players:data.players.filter(p => p.id === playerId),
       tournaments:data.tournaments.filter(t => t.playerId === playerId),
       matches:data.matches.filter(m => m.playerId === playerId)};
+    if(membershipSync&&(epoch!==(state.playerSelectionEpoch||0)||completeVersion!==(state.completeProjectionVersion||0)))return;
     if (group !== PLAYER_GROUP || addedPlayerRefreshes.get(key) !== token ||
         removedCourtWatchPlayers.has(playerId) || !state.data?.players?.some(p => p.id === playerId)) return;
     if (data.playerId !== playerId || data.group !== group ||
@@ -2732,7 +2737,7 @@ async function refreshAfterPlayerAddition(epoch, group, playerId) {
       [[t.playerId,t.circuit,t.competitionId || t.id].join('|'),t])).values()];
     const hash = location.hash, y = typeof scrollY === 'number' ? scrollY : null;
     state.data = normalizeMatchProjection(applyKnownResultUpdates({...previous,
-      players: previous.players.map(p => p.id === playerId ? {...p,...data.players[0]} : p),
+      players: previous.players.map(p => {if(p.id!==playerId)return p;const enriched={...p,...data.players[0]};delete enriched.membershipPending;return enriched;}),
       tournaments, matches: mergeKnownMatches(previous.matches || [], data.matches),
       personalEnrichedPlayerIds: [...new Set([...(previous.personalEnrichedPlayerIds || []),playerId])],
     }, group));
