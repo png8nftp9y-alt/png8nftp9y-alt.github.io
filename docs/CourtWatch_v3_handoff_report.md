@@ -7264,3 +7264,5 @@ Workflow una tantum courtwatch-remaining-identity-links.yml sotto lock courtwatc
 Validazione: 37 test superati: caso Vitali reale con FITP/Europe e omonimo, tutti i sette gruppi personali effettivi, conflitti nei campi, data di nascita, nome e ID assente; recupero SQLite con alias precedenti e originali invariati; replay zero scritture; input incompleto; mapping ordinario, collegamento confermato Sala e recupero sigle federali. Il recupero in produzione e il dossier dei 143 richiedono il nuovo run. I 143 non sono dichiarati risolti né automaticamente omonimi: i casi senza collegamento certo rimangono espliciti nel report per la successiva valutazione.
 
 ITF Meta extraordinary 2026-10-23T23:34:09.112Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-23T23:35:03.039Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
