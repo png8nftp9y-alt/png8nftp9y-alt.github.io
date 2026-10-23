@@ -6444,3 +6444,5 @@ Validazione locale: 32 test distinti passati tra regressione con evidenza reale 
 ITF discovery 2026-10-23T05:23:34.060Z: 12 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-10-23T05:24:29.954Z: attempted 8, acquired 8, ordinary 4, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta ordinary 2026-10-23T05:25:26.237Z: attempted 4, acquired 4, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
