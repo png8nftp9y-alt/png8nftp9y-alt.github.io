@@ -7194,3 +7194,5 @@ ITF Meta extraordinary 2026-10-23T22:45:44.768Z: attempted 1, acquired 0, ordina
 - Il browser richiede il nuovo JavaScript; corretto il blocco cache-v3.js di Shield.
 - Nessuna modifica alla logica applicativa o a D1. Verifica remota dopo pubblicazione.
 ITF Meta extraordinary 2026-10-23T22:46:44.687Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-23T22:54:26.444Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
