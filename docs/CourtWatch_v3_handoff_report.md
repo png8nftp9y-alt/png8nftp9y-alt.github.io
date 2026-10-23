@@ -1,3 +1,11 @@
+## 2026-10-23 — Mobile CI: browser pronti e dipendenze di sistema preinstallate
+
+- Evidenza: run 39855960645/job120094110380 annullato al limite di 10 minuti durante apt nella fase playwright install --with-deps; nessun test applicativo avviato. Il Worker della sincronizzazione lista è già pubblicato (39855960572 verde); un successivo D1/API 39942591161 è verde.
+- Correzione limitata al workflow mobile: immagine ufficiale mcr.microsoft.com/playwright:v1.54.2-noble, allineata alla dipendenza esatta già presente in package.json. Eliminata installazione apt/browser a ogni run; resta l'installazione del pacchetto npm. Preflight verifica versione richiesta/installata/immagine, presenza degli eseguibili e avvio reale di Chromium e WebKit. IPC host per Chromium; limite job 15 minuti per preparazione ed esecuzione.
+- Tutti i test mobili/layout/avvio gruppi/diagnostica Safari restano presenti in entrambi i browser. Nessuna modifica a app, D1, dati, frequenze o code di scrittura.
+- Verifiche: YAML parsato, parità completa dei comandi test/browser rispetto al workflow precedente, versioni coerenti, sintassi JavaScript del preflight, suite Node mobile/stato UI/storage. Nessun test saltato e nessun polling Actions.
+- Limite: Docker non disponibile nell'ambiente locale; pull dell'immagine e suite browser nel nuovo container da certificare tramite il run GitHub dopo pubblicazione dell'utente. Non garantita l'assenza di futuri problemi di rete del registry/npm.
+
 ## 2026-10-22 — Lista giocatori tra dispositivi indipendente dallo storico
 
 - Motivo: il refresh leggeva la lista solo nella risposta completa app-snapshot; lo storico lento di un qualsiasi giocatore ritardava anche le nuove aggiunte già salvate in D1. Riprodotto in test, senza attribuire retroattivamente una durata o una richiesta precisa al caso Lorenzo Calandra.

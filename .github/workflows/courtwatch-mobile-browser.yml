@@ -9,13 +9,37 @@ permissions:
 jobs:
   mobile:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.54.2-noble
+      options: --ipc=host
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: npm install --no-package-lock
-      - run: npx playwright install --with-deps chromium webkit
+      - name: Install the pinned Playwright package
+        run: npm install --no-package-lock --no-audit --no-fund
+      - name: Verify image/package parity and launch both installed browsers
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+          import {chromium,webkit} from 'playwright';
+          const workflow=fs.readFileSync('.github/workflows/courtwatch-mobile-browser.yml','utf8');
+          const imageVersion=workflow.match(/image:\s*mcr\.microsoft\.com\/playwright:v([\d.]+)-noble/)[1];
+          const required=JSON.parse(fs.readFileSync('package.json','utf8')).dependencies.playwright;
+          const installed=JSON.parse(fs.readFileSync('node_modules/playwright/package.json','utf8')).version;
+          assert.equal(required,imageVersion,'Pin the browser image to the package version');
+          assert.equal(installed,imageVersion,'Installed Playwright differs from the browser image');
+          for(const engine of [chromium,webkit]){
+            assert.ok(fs.existsSync(engine.executablePath()),engine.name()+' is missing from the image');
+            const browser=await engine.launch({headless:true});
+            await browser.close();
+            console.log(engine.name()+': preinstalled browser launched');
+          }
+          JS
       - run: node --test src/v3/mobile-interactions.test.mjs src/v3/ui-state-validation.test.mjs src/v3/opponent-navigation-storage.test.mjs
       - run: node tools/verify-agenda-layout-browser.mjs
       - run: node tools/verify-agenda-layout-browser.mjs
