@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-23T16:52:36.400Z",
+  "generatedAt": "2026-10-23T16:58:27.941Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,27 +9,27 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 6,
+    "requestedSections": 4,
     "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
     "resolvedSections": 2,
     "missingSections": 4,
-    "newSectionsCached": 2,
+    "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
     "retrySections": 4,
-    "technicalErrorSections": 1,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 3,
+    "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 502,
     "globalCancelledNoDraws": 13,
     "globalPendingTotal": 62,
-    "globalPendingTechnical": 38,
-    "globalPendingPublication": 24,
+    "globalPendingTechnical": 35,
+    "globalPendingPublication": 27,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -65,10 +65,7 @@
       "J-J100-USA-2026-002",
       "J-J100-USA-2026-004",
       "J-J30-CYP-2026-005",
-      "J-J30-LTU-2026-005",
-      "J-J60-FIN-2026-003",
-      "J-J60-KAZ-2026-004",
-      "J-J60-THA-2026-004"
+      "J-J30-LTU-2026-005"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-DOM-2026-001",
@@ -93,14 +90,17 @@
       "J-J30-PAK-2026-004",
       "J-J60-CHN-2026-012",
       "J-J60-ESA-2026-004",
+      "J-J60-FIN-2026-003",
+      "J-J60-KAZ-2026-004",
       "J-J60-KEN-2026-004",
+      "J-J60-THA-2026-004",
       "J-J60-USA-2026-009"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J30-LTU-2026-005",
-      "tournamentName": "J30 Vilnius",
+      "competitionId": "J-J60-THA-2026-004",
+      "tournamentName": "J60 Nonthaburi",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
@@ -173,7 +173,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 32,
+              "players": 36,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -212,7 +212,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 18,
+              "players": 13,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -226,14 +226,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
