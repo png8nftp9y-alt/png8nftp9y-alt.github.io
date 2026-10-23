@@ -8,7 +8,7 @@ const restore=source.slice(source.indexOf('function applyCachedProjection('),sou
 const filter=source.slice(source.indexOf('function renderFilters()'),source.indexOf('function matchTournament('));
 const readable=source.slice(source.indexOf('const readablePerson ='),source.indexOf('const IOC_REGION ='));
 test('navigation renders only the requested section, including date and selection updates',()=>{
- const calls=[],ctx={location:{hash:''},saveUiState:()=>calls.push('save')};
+ const calls=[],ctx={state:{},location:{hash:''},saveUiState:()=>calls.push('save')};
  for(const name of ['renderFilters','renderAgenda','renderCalendar','renderPlayers','renderDiagnostics'])ctx[name]=()=>calls.push(name);
  vm.createContext(ctx);
  vm.runInContext(source.slice(source.indexOf('function renderHome()'),source.indexOf('function renderDataSignature(')),ctx);

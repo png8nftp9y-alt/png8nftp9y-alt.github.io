@@ -28,7 +28,7 @@ const switchSource=source.slice(source.indexOf('function validUiState('),source.
 function configureGroupSwitch(ctx){
  ctx.window=ctx;
  ctx.location.hash=new URL(ctx.location.href).hash;
- Object.assign(ctx,{groupSwitchRunning:false,playerAdditionsInFlight:new Set(),document:{getElementById:()=>null,querySelectorAll:()=>[]},$:()=>({}),saveRefreshView(){},sessionStorage:{getItem:()=>null},readDurableProjection:async()=>null,validProjection:data=>Boolean(data?.players),mergeKnownMatches:(...arrays)=>arrays.flat(),APP_API:'https://courtwatch.example/app/api/app-snapshot',state:{},activeProjectionController:null,activeLoadCompletion:Promise.resolve(),durableProjectionFallback:null,uiSelectionRestored:false,uiScrollRestoreCancelled:false,removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),renderedDataSignature:'',lastLoadedDocuments:{},scrollY:640,scrollTo(){},fetchProjection:async(_url,_timeout,group)=>({group,players:[{id:'target-player'}],matches:[],personalProjectionComplete:true}),load:async projection=>{ctx.state.data=projection},savedUiState(){try{return JSON.parse(ctx.localStorage.getItem(ctx.UI_STATE_CACHE)||'{}')}catch{return{}}},console:{warn(...args){throw Error('Switch failed: '+args.join(' '))}}});
+ Object.assign(ctx,{groupSwitchRunning:false,playerAdditionsInFlight:new Set(),document:{getElementById:()=>null,querySelectorAll:()=>[]},$:()=>({}),saveRefreshView(){},sessionStorage:{getItem:()=>null},readDurableProjection:async()=>null,validProjection:data=>Boolean(data?.players),mergeKnownMatches:(...arrays)=>arrays.flat(),APP_API:'https://courtwatch.example/app/api/app-snapshot',state:{},activeProjectionController:null,activeLoadCompletion:Promise.resolve(),durableProjectionFallback:null,uiSelectionRestored:false,uiScrollRestoreCancelled:false,removedCourtWatchPlayers:new Set(),confirmedCourtWatchPlayers:new Map(),renderedDataSignature:'',lastLoadedDocuments:{},renderIfDataChanged(){},fetchPlayerMembership:async group=>({group,membershipIds:['target-player'],players:[{id:'target-player',name:'Target'}]}),scrollY:640,scrollTo(){},fetchProjection:async(_url,_timeout,group)=>({group,players:[{id:'target-player'}],matches:[],personalProjectionComplete:true}),load:async projection=>{ctx.state.data=projection},savedUiState(){try{return JSON.parse(ctx.localStorage.getItem(ctx.UI_STATE_CACHE)||'{}')}catch{return{}}},console:{warn(...args){throw Error('Switch failed: '+args.join(' '))}}});
 }
 test('TCL and Altri keep the current page, dates, filters and scroll without copying player selections',async()=>{
  for(const group of ['main','others'])for(const hash of ['#calendar','#agenda','#players','']){
@@ -71,4 +71,38 @@ test('late restoration cannot override user input or a changed route',()=>{
   if(action==='input')ctx.uiScrollRestoreCancelled=true;else ctx.location.hash='#players';
   while(frames.length)frames.shift()();assert.deepEqual(scrolls,[80]);
  }
+});
+
+test('cold group switches using saved membership before either target history or old group load finishes',async()=>{
+ const ctx={PLAYER_GROUP:'main',UI_STATE_CACHE:'courtwatch-v3-ui-state-v1',URL,location:{href:'https://courtwatch.example/app#players'},saveUiState(){},localStorage:{getItem:()=>null,setItem(){}}};
+ configureGroupSwitch(ctx);let releaseOld,releaseFull,fullReads=0,listReads=0,renders=0,loads=0;
+ ctx.activeLoadCompletion=new Promise(r=>releaseOld=r);
+ ctx.fetchProjection=()=>{fullReads++;return new Promise(r=>releaseFull=r)};
+ ctx.fetchPlayerMembership=async group=>{listReads++;return{group,membershipIds:['new'],players:[{id:'new',name:'New',club:'Saved Club'}]}};
+ ctx.load=async data=>{loads++;ctx.state.data=data;ctx.state.initialMatchProjectionPending=false};
+ ctx.renderIfDataChanged=()=>renders++;
+ ctx.history={pushState:(_s,_t,url)=>{ctx.location.href=url}};
+ vm.createContext(ctx);vm.runInContext(switchSource,ctx);
+ await ctx.switchPlayerGroup();
+ assert.equal(ctx.PLAYER_GROUP,'others');assert.equal(ctx.groupSwitchRunning,false);
+ assert.equal(new URL(ctx.location.href).searchParams.get('group'),'others');
+ assert.equal(ctx.state.data.players[0].club,'Saved Club');assert.equal(ctx.state.data.players[0].membershipPending,true);
+ assert.equal(ctx.state.data.personalProjectionComplete,false);assert.equal(ctx.state.data.membershipOnly,true);
+ assert.equal(renders,1);assert.equal(loads,0);assert.equal(fullReads,1);assert.equal(listReads,1);
+ releaseOld();await new Promise(r=>setImmediate(r));assert.equal(loads,0);
+ const complete={group:'others',players:[{id:'new',name:'New'}],tournaments:[{playerId:'new',name:'Complete Tournament'}],matches:[]};
+ releaseFull(complete);await ctx.initialProjectionRequest;
+ assert.equal(loads,1);assert.equal(ctx.state.data.tournaments[0].name,'Complete Tournament');
+ assert.equal(ctx.state.data.membershipOnly,undefined);assert.equal(fullReads,1);
+});
+test('failed lightweight endpoint falls back to complete snapshot without switching groups prematurely',async()=>{
+ const ctx={PLAYER_GROUP:'main',UI_STATE_CACHE:'courtwatch-v3-ui-state-v1',URL,location:{href:'https://courtwatch.example/app#players'},saveUiState(){},localStorage:{getItem:()=>null,setItem(){}}};
+ configureGroupSwitch(ctx);let release;
+ ctx.fetchProjection=()=>new Promise(r=>release=r);
+ ctx.fetchPlayerMembership=async()=>{throw Error('old Worker')};
+ ctx.history={pushState:(_s,_t,url)=>{ctx.location.href=url}};
+ vm.createContext(ctx);vm.runInContext(switchSource,ctx);
+ const switching=ctx.switchPlayerGroup();await new Promise(r=>setImmediate(r));assert.equal(ctx.PLAYER_GROUP,'main');
+ release({group:'others',players:[{id:'new'}],tournaments:[],matches:[]});
+ await switching;await ctx.initialProjectionRequest;assert.equal(ctx.PLAYER_GROUP,'others');
 });

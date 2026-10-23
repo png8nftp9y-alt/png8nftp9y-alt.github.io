@@ -5,6 +5,48 @@ const assets=Object.fromEntries(await Promise.all(['v3.html','v3.css','v3.js'].m
 const engine=process.env.COURTWATCH_MOBILE_BROWSER==='webkit'?webkit:chromium;
 const browser=await engine.launch({headless:true,...(engine===chromium&&process.env.COURTWATCH_TEST_CHROMIUM?{executablePath:process.env.COURTWATCH_TEST_CHROMIUM}:{})});
 try {
+ // Cold group switch: keep both the previous load and target history blocked.
+ {
+  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+  const page=await context.newPage(),errors=[];page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(String(e)));
+  let releaseOld,releaseTarget,targetReads=0,listReads=0;
+  const oldGate=new Promise(r=>releaseOld=r),targetGate=new Promise(r=>releaseTarget=r);
+  await page.addInitScript(()=>{window.setInterval=()=>0});
+  await page.route('**/*',async route=>{
+   const u=new URL(route.request().url()),name=u.pathname.split('/').pop(),group=route.request().headers()['x-courtwatch-group']||'main';
+   if(u.pathname==='/app')return route.fulfill({body:assets['v3.html'].replace('<head>','<head><base href="https://png8nftp9y-alt.github.io/">'),contentType:'text/html'});
+   if(assets[name])return route.fulfill({body:assets[name],contentType:name.endsWith('.css')?'text/css':'application/javascript'});
+   const id=group+'-player',player={id,name:group==='main'?'TCL Player':'Others Cold Player',userAdded:true,club:'Saved Club'};
+   if(u.pathname.endsWith('/player-list')){if(group==='others')listReads++;return route.fulfill({json:{group,membershipIds:[id],players:[player]}});}
+   if(u.pathname.endsWith('/app-snapshot')){
+    if(group==='others'){targetReads++;await targetGate;}
+    return route.fulfill({json:{group,membershipIds:[id],players:[player],tournaments:[{playerId:id,competitionId:'event',name:'Complete Tournament',circuit:'tennis-europe',startDate:'2026-10-01',endDate:'2026-10-31'}],matches:[]}});
+   }
+   if(name==='diagnostics.json'&&group==='main')await oldGate;
+   if(u.pathname.endsWith('/session'))return route.fulfill({json:{user:{displayName:'Fixture'}}});
+   return route.fulfill({json:{players:[],tournaments:[],matches:[],agenda:[],results:[],rankings:[]}});
+  });
+  try{
+   await page.goto('https://courtwatch.test/app#players');
+   await page.waitForFunction(()=>state.data?.players?.[0]?.id==='main-player'&&loadRunning);
+   const identity=await page.evaluate(()=>documentIdentity='preserved');
+   await page.locator('#playersView [data-switch-player-group]').tap();
+   await page.waitForFunction(()=>PLAYER_GROUP==='others'&&!groupSwitchRunning&&state.data?.membershipOnly===true);
+   await page.locator('#playersList [data-profile="others-player"]').waitFor();
+   assert.match(await page.locator('#playersList').innerText(),/Saved Club/);
+   assert.match(await page.locator('#playersList').innerText(),/Caricamento tornei/);
+   assert.doesNotMatch(await page.locator('#playersList').innerText(),/Nessun torneo/);
+   assert.equal(targetReads,1);assert.equal(listReads,1);
+   assert.equal(await page.evaluate(()=>documentIdentity),identity);
+   await page.evaluate(()=>location.hash='agenda');
+   await page.waitForFunction(()=>document.querySelector('#dailyAgenda')?.textContent.includes('Caricamento tornei'));
+   releaseOld();releaseTarget();
+   await page.waitForFunction(()=>!state.data?.membershipOnly&&!loadRunning&&state.data?.tournaments?.some(t=>t.name==='Complete Tournament'));
+   assert.equal(targetReads,1);assert.equal(listReads,1);
+   assert.deepEqual(errors,[]);
+   console.log(JSON.stringify({engine:engine.name(),coldSwitchBeforeOldLoadAndTargetHistory:'passed',fullTargetRequests:targetReads,listRequests:listReads}));
+  } finally {releaseOld();releaseTarget();await context.close();}
+ }
  for(const scenario of ['fresh','null-ui','array-ui','invalid-dates','invalid-maps','storage-denied']) {
   const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   const page=await context.newPage(),errors=[];page.setDefaultTimeout(12000);page.on('pageerror',e=>errors.push(String(e)));
