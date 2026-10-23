@@ -1,0 +1,36 @@
+name: Court Watch global identity split audit once
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-global-identity-splits.yml', 'cloudflare/app-api/scripts/audit-split-player-identities.mjs']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-global-identity-splits-readonly
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test complete scope, duplicate evidence and zero mutations
+        run: node --test test/audit-split-player-identities.test.mjs
+      - name: Inspect all split names and exact official identities in D1 without writes
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_D1_DATABASE_ID: cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda
+        run: node scripts/audit-split-player-identities.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: global-identity-splits
+          path: cloudflare/app-api/tmp/split-player-identities.json
+          retention-days: 14
