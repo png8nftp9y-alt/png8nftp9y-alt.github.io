@@ -6442,3 +6442,5 @@ Recupero una tantum delle identità esistenti con queste sigle: gruppi di 25 nom
 Validazione locale: 32 test distinti passati tra regressione con evidenza reale D1, secondo giocatore con sigle equivalenti, ricerca paginata, mapping, budget scritture, profili ufficiali e storico avversario. Verificati unico risultato Dumitru con tre profili e nascita 2012, associazioni utente conservate, fonti invariate, ripetizione senza scritture, omonimi incompatibili separati. Limite: recupero produzione e deploy Worker da verificare dopo pubblicazione; non corregge duplicati dovuti a cause diverse dalle equivalenze documentate.
 
 ITF discovery 2026-10-23T05:23:34.060Z: 12 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-10-23T05:24:29.954Z: attempted 8, acquired 8, ordinary 4, extraordinary 1. Partial metadata preserved; official D1 sync follows.
