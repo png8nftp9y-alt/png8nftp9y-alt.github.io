@@ -7236,3 +7236,5 @@ Validazione: 35 test passati, inclusi evidenze di tutti i 16 gruppi contenenti s
 - Verifiche: 53 test Node superati su sincronizzazione lista, gruppi, aggiunta e avvio calendario, incluso gruppo bloccato con tornei individuali già visibili, risposta tardiva, rimozione e fallimento individuale. Verifica sintattica/diff. Tempi reali di rete e browser sul secondo dispositivo da confermare dopo pubblicazione. Cache JavaScript aggiornata nello stesso intervento.
 
 ITF Meta extraordinary 2026-10-23T23:17:29.892Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-23T23:18:23.721Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
