@@ -7185,3 +7185,5 @@ Richiesta: identificare eventuali altri duplicati in tutto l’archivio, non sol
 Rilegge le fonti dei soli gruppi candidati in pagine da 25 nomi tramite indice name_key; classifica compatibilità, ID distinti nello stesso circuito, anno di nascita o nazionalità discordanti e fonti mancanti. Nessuna unione automatica: una discordanza è un caso da esaminare, non prova di omonimia. Rapporto completo come artifact; coda pendente o conteggi cambiati impediscono un esito conclusivo. Nessuna discovery, scrittura D1, nuova schedulazione o polling.
 
 Validazione: test SQLite reale con pagine multiple, ID ripetuto attraverso nomi diversi, alias già unificati, metadati equivalenti/discordanti, fonti originali mancanti e coda pendente; verificati zero scritture e blocco delle mutazioni prima del trasporto. Policy incrementale superata. Limite: audit di produzione ancora da eseguire; nomi diversi senza ID o altre evidenze comuni non sono certificabili come stessa persona da questo controllo.
+
+ITF Meta extraordinary 2026-10-23T22:45:44.768Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
