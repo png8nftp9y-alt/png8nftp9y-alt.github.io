@@ -7187,3 +7187,5 @@ Rilegge le fonti dei soli gruppi candidati in pagine da 25 nomi tramite indice n
 Validazione: test SQLite reale con pagine multiple, ID ripetuto attraverso nomi diversi, alias già unificati, metadati equivalenti/discordanti, fonti originali mancanti e coda pendente; verificati zero scritture e blocco delle mutazioni prima del trasporto. Policy incrementale superata. Limite: audit di produzione ancora da eseguire; nomi diversi senza ID o altre evidenze comuni non sono certificabili come stessa persona da questo controllo.
 
 ITF Meta extraordinary 2026-10-23T22:45:44.768Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-23T22:46:44.687Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
