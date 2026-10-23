@@ -7160,3 +7160,12 @@ ITF Meta extraordinary 2026-10-23T22:35:57.678Z: attempted 1, acquired 0, ordina
 ITF Meta extraordinary 2026-10-23T22:37:07.649Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-10-23T22:37:57.165Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+
+## 2026-10-23 — chat 1: Shield e audit costi D1
+
+- Richiesta: considerare funzionante il controllo globale D1 incrementale; correggere Shield e audit costi D1, con applicazione e pubblicazione da terminale a cura dell’utente. Nessun polling o rilancio automatico di vecchi audit storici.
+- Shield: il run 39158959534 falliva nel primo wait del test funzionale. Il mock non forniva lo snapshot privato del gruppo principale e aspettava il calendario prima dell’apertura della pagina, incompatibile con il rendering differito attuale. Il test ora serve lo snapshot locale del commit per entrambi i gruppi, usa il numero reale di giocatori, apre le viste prima di verificarle, allinea l’etichetta “Vai a TCL” e blocca il tempo solo nel browser di test. Workflow allineato alla versione Playwright del lockfile e Node 22; push mirato alle modifiche dello Shield, timeout 10 minuti. Nessuna modifica a v3.js, v3.html, v3.css o ai motori.
+- Audit: il run 39240820948 aveva completato Insights, ma usciva 1 per una proiezione di 20.448.982.107 letture, oltre il margine prudenziale 20 miliardi e sotto i 25 miliardi inclusi configurati. Distinti verde, warning (soglie prudenziali invariate) ed exceeded (soglie incluse invariate, ancora errore). Warning visibile nelle annotazioni e nel riepilogo; dati mancanti/non numerici rimangono errori. Indicata la limitazione dei dati Insights: i gruppi di query selezionati forniscono una proiezione parziale minima, non il consumo totale del ciclo di fatturazione.
+- Validazione locale: Shield Chromium, 39 controlli superati; test budget con il caso reale e soglie letture/scritture, 3 test superati. La lettura Cloudflare live non è stata rieseguita in locale: credenziali non disponibili. Dopo la pubblicazione occorre verificare i nuovi run Shield e D1 cost audit. Nessun vecchio run è dichiarato verde e nessun dato produttivo è stato modificato.

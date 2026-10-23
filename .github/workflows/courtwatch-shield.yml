@@ -1,5 +1,8 @@
 name: CourtWatch Shield
 on:
+  push:
+    branches: [main]
+    paths: ['tools/courtwatch-functional-shield.mjs', '.github/workflows/courtwatch-shield.yml']
   pull_request:
     paths:
       - 'v3.js'
@@ -24,6 +27,7 @@ permissions:
 jobs:
   release-guard:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Load proposed CourtWatch version
         uses: actions/checkout@v4
@@ -32,11 +36,11 @@ jobs:
       - name: Configure Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - name: Run CourtWatch release guard
         run: node --test tools/courtwatch-refresh-contract.test.mjs && node tools/courtwatch-release-guard.mjs
       - name: Install browser for functional shield
-        run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
+        run: npm ci --no-audit --no-fund && npx playwright install --with-deps chromium
       - name: Run complete functional shield
         run: node tools/courtwatch-functional-shield.mjs
       - name: Save detailed guard report

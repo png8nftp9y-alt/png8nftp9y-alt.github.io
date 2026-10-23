@@ -4,6 +4,10 @@ import path from 'node:path';
 import { chromium } from 'playwright';
 
 const root=process.cwd(),artifacts=path.join(root,'artifacts');
+const players=JSON.parse(await fs.readFile(path.join(root,'dist/v3/players.json'),'utf8')).players;
+const tournaments=JSON.parse(await fs.readFile(path.join(root,'dist/v3/tournaments.json'),'utf8')).tournaments;
+const matches=JSON.parse(await fs.readFile(path.join(root,'dist/v3/agenda.json'),'utf8')).agenda;
+const playerCount=players.length;
 await fs.mkdir(artifacts,{recursive:true});
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.svg':'image/svg+xml'};
 const server=http.createServer(async(req,res)=>{
@@ -17,6 +21,9 @@ const server=http.createServer(async(req,res)=>{
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const base='http://127.0.0.1:'+server.address().port;
 const browser=await chromium.launch({headless:true}),page=await browser.newPage({viewport:{width:1440,height:1000}});
+await page.clock.setFixedTime(new Date('2026-10-17T12:00:00Z'));
+await page.addInitScript(()=>{window.setInterval=()=>0});
+page.setDefaultTimeout(10000);
 const errors=[],analysis=new Map(),checks=[],otherPlayers=new Map();
 const otherPerson={id:'shield-other',name:'Test Other',sourceKey:'itf|id:800000001',sourceCircuit:'itf',worldTennisId:'800000001',userAdded:true,nationality:'ITA',club:'Tennis Club Demo'};
 page.on('pageerror',error=>errors.push(String(error)));
@@ -34,6 +41,9 @@ await page.route('**/app/api/**',async route=>{
   const request=route.request(),url=new URL(request.url()),api=url.pathname.replace(/^\/app\/api/,'');
   if(api==='/session')return route.fulfill({json:{user:{id:'shield-user',email:'shield@courtwatch.test',displayName:'CourtWatch Shield',role:'admin'}}});
   const group=request.headers()['x-courtwatch-group']||'main';
+  if(api==='/app-snapshot'&&group==='main')return route.fulfill({json:{group,players,tournaments,matches,agenda:matches}});
+  if(api==='/player-list')return route.fulfill({json:{group,players:group==='others'?[...otherPlayers.values()]:players}});
+  if(api==='/player-ranking')return route.fulfill({json:{rankings:[]}});
   if(api==='/app-snapshot'&&group==='others')return route.fulfill({json:{group,generatedAt:new Date().toISOString(),players:[...otherPlayers.values()],tournaments:[...otherPlayers.values()].map(p=>({playerId:p.id,name:'Torneo Demo',competitionId:'shield-demo',circuit:'itf',startDate:new Date().toISOString().slice(0,10),endDate:new Date().toISOString().slice(0,10)})),matches:[]}});
   if(api==='/player-search')return route.fulfill({json:{results:[{sourceKey:otherPerson.sourceKey,identity:otherPerson.worldTennisId,name:otherPerson.name,circuit:'itf'}],nextCursor:null}});
   if(api==='/courtwatch-player'&&request.method()==='POST'){
@@ -55,7 +65,7 @@ await page.route('**/app/api/**',async route=>{
   }
   return route.fulfill({status:404,json:{error:'not_found'}});
 });
-const requireCheck=(condition,name,detail='')=>{if(!condition)throw new Error(name+(detail?': '+detail:''));checks.push({name,status:'pass',detail})};
+const requireCheck=(condition,name,detail='')=>{if(!condition)throw new Error(name+(detail?': '+detail:''));checks.push({name,status:'pass',detail});console.log('PASS '+name)};
 const openSection=async section=>{
   await page.locator(`[data-home-route="${section}"]:visible`).first().click();
   await page.locator(`#${section}View.active`).waitFor({state:'visible'});
@@ -65,12 +75,14 @@ try{
   requireCheck(appSource.includes('${agendaDrawCodeHtml(m,itemTournament)}</div><${whenTag} class="agendaWhenDetails'),'sigla evento linkata al tabellone nella colonna sinistra');
   requireCheck(appSource.includes('agendaRoundOopLink')&&appSource.includes('agendaWhenDetails${oopUrl'), 'collegamenti OOP separati dal link tabellone');
   await page.goto(base+'/v3.html',{waitUntil:'domcontentloaded',timeout:30000});
-  await page.waitForFunction(()=>document.querySelectorAll('#playersList [data-profile]').length>=23&&document.querySelectorAll('#calendar .tourBand').length>0,null,{timeout:45000});
-  requireCheck(await page.locator('#playersList [data-profile]').count()===23,'23 giocatori');
-  requireCheck(await page.locator('#calendar .tourBand').count()>0,'calendario popolato');
-  requireCheck(await page.locator('#playerFilters button').count()===23,'filtri giocatori');
+  await openSection('players');
+  await page.waitForFunction(n=>document.querySelectorAll('#playersList [data-profile]').length===n,playerCount,{timeout:15000});
+  requireCheck(await page.locator('#playersList [data-profile]').count()===playerCount,'giocatori del dataset');
+  await page.locator('#brandHome').click();await page.locator('#homeView.active').waitFor({state:'visible'});
   requireCheck(await page.locator('#homeView.active').isVisible(),'home con sezioni');
   await openSection('calendar');
+  requireCheck(await page.locator('#calendar .tourBand').count()>0,'calendario popolato');
+  requireCheck(await page.locator('#playerFilters button').count()===playerCount,'filtri giocatori');
   requireCheck(await page.locator('#toggleAll').isVisible(),'filtri nella pagina calendario');
   await page.locator('#toggleAll').click();await page.locator('#toggleAll').click();
   requireCheck(await page.locator('#accountMenuButton').isVisible(),'menu account');
@@ -80,7 +92,7 @@ try{
   await openSection('players');
 
   const rows=page.locator('#playersList [data-profile]');let analysisButton=null;
-  for(let i=0;i<Math.min(23,await rows.count());i++){
+  for(let i=0;i<await rows.count();i++){
     await rows.nth(i).click();await page.waitForTimeout(100);
     if(await page.locator('#profileView.active').count()){
       const toggles=page.locator('.profileTournament:visible .tournamentToggle:visible');
@@ -128,9 +140,9 @@ try{
   requireCheck(await page.locator('#homeView').isVisible(),'layout mobile home');
   requireCheck(await page.locator('[data-switch-player-group]').count()===4,'quattro accessi alla sezione parallela');
   await page.locator('#homeOthers').click();await page.waitForURL(url=>url.searchParams.get('group')==='others',{waitUntil:'domcontentloaded'});
+  await openSection('players');
   await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='0');
   requireCheck(await page.locator('#activePlayerGroup').isVisible(),'sezione Altri riconoscibile');
-  await openSection('players');
   requireCheck(await page.locator('#playersList [data-profile]').count()===0,'Altri inizialmente vuoto');
   await page.locator('#addPlayer').click();await page.locator('#addPlayerQuery').fill(otherPerson.name);
   await page.locator('[data-add-player-search]').evaluate(form=>form.requestSubmit());
@@ -141,7 +153,7 @@ try{
   await openSection('players');await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='1');
   requireCheck(await page.locator('#playersList [data-profile]').count()===1,'Altri conservato dopo ricarica');
   await page.locator('#playersView [data-switch-player-group]').click();await page.waitForURL(url=>!url.searchParams.has('group'),{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='23');
+  await page.waitForFunction(n=>document.querySelector('#playerTotal')?.textContent===String(n),playerCount);
   requireCheck(await page.locator('#playersList [data-profile="shield-other"]').count()===0,'aggiunta Altri non modifica TCL');
   requireCheck(await page.locator('#playersView.active').isVisible()&&new URL(page.url()).hash==='#players','Altri → TCL conserva pagina Giocatori');
   await page.setViewportSize({width:390,height:500});
@@ -152,14 +164,14 @@ try{
   requireCheck(mirrorScroll>0,'calendario sorgente con posizione di scroll verificabile');
   await page.locator('#calendarView [data-switch-player-group]').evaluate(button=>button.click());
   await page.waitForURL(url=>url.searchParams.get('group')==='others'&&url.hash==='#calendar',{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='1');
+  await page.waitForFunction(()=>document.querySelectorAll('#playerFilters button').length===1);
   await page.waitForFunction(y=>Math.abs(scrollY-y)<=2,mirrorScroll);
   requireCheck(await page.locator('#calendarView.active').isVisible(),'TCL → Altri conserva Calendario');
   requireCheck(await page.locator('#calendarMonthLabel').textContent()===mirrorMonth&&await page.locator('#calendarSex').inputValue()==='F','Calendario speculare conserva mese e filtro');
-  requireCheck(await page.locator('#calendarView [data-switch-player-group]').textContent()==='TCL','etichetta TCL nel calendario Altri');
+  requireCheck(await page.locator('#calendarView [data-switch-player-group]').textContent()==='Vai a TCL','etichetta TCL nel calendario Altri');
   await page.locator('#calendarView [data-switch-player-group]').evaluate(button=>button.click());
   await page.waitForURL(url=>!url.searchParams.has('group')&&url.hash==='#calendar',{waitUntil:'domcontentloaded'});
-  await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='23');
+  await page.waitForFunction(n=>document.querySelectorAll('#playerFilters button').length===n,playerCount);
   await page.waitForFunction(y=>Math.abs(scrollY-y)<=2,mirrorScroll);
   requireCheck(await page.locator('#calendarMonthLabel').textContent()===mirrorMonth,'Altri → TCL conserva Calendario e posizione');
   await openSection('players');
