@@ -6726,3 +6726,5 @@ Run 39856647754 riuscito: 538 gruppi esaminati, 111 gruppi ridotti a una sola id
 ITF Meta extraordinary 2026-10-23T11:19:04.861Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-10-23T11:19:56.664Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-23T11:20:47.464Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
