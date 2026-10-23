@@ -7266,3 +7266,5 @@ Validazione: 37 test superati: caso Vitali reale con FITP/Europe e omonimo, tutt
 ITF Meta extraordinary 2026-10-23T23:34:09.112Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-10-23T23:35:03.039Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-23T23:36:01.069Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
