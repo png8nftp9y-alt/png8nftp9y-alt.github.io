@@ -6718,3 +6718,7 @@ ITF Meta extraordinary 2026-10-23T10:57:00.161Z: attempted 1, acquired 0, ordina
 ITF Meta extraordinary 2026-10-23T10:57:47.162Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-10-23T11:08:35.724Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+## Controllo policy recupero nazionalità (23 ottobre 2026)
+
+Run 39856647754 riuscito: 538 gruppi esaminati, 111 gruppi ridotti a una sola identità; Dumitru FITP, Tennis Europe e ITF verificati sullo stesso ID canonico. Worker e D1/API pubblicati con successo. Il controllo 39856647738 non trovava il test associato al nome repair-nationality-identity-links. Aggiunto l’entry point atteso, che esegue le regressioni reali esistenti e verifica il blocco senza scritture né checkpoint in assenza della fonte originale. Nessuna modifica alla logica applicativa, D1 o schedulazioni. Validazione: tre test superati e controllo policy sul recupero superato. Non rilanciare il recupero dati già concluso.
