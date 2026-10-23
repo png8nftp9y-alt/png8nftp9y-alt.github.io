@@ -1,3 +1,4 @@
+import {latestFitpEntryRankings} from '../../../src/v3/fitp-entry-ranking.mjs';
 import {acceptanceQueryBatches} from '../lib/acceptance-query-batches.mjs';
 import {saveAcceptanceImportDiagnostics} from '../lib/acceptance-import-diagnostics.mjs';
 import fs from 'node:fs/promises';
@@ -18,10 +19,13 @@ export function acceptancePlayers(circuit, doc, knownFitpNames = new Map()) {
  const participants=circuit==='itf'?doc.participants:Object.values(doc.tournaments).flatMap(t=>{if(!Array.isArray(t.participants))throw Error('acceptance_source_incomplete');return t.participants});
  if(!participants.length)throw Error('acceptance_source_incomplete');
  const rows=new Map();
+ const fitpRankings=circuit==='fitp'?latestFitpEntryRankings(doc):new Map();
  for(const p of participants){
   let row=acquiredPlayer(circuit,{...p,name:participantName(p)});
   if(!row&&circuit==='fitp'&&knownFitpNames.has(String(p.membershipCard||'')))row=acquiredPlayer(circuit,{...p,name:knownFitpNames.get(String(p.membershipCard))});
   if(!row)throw Error('acceptance_source_incomplete');
+  const entryRanking=fitpRankings.get(String(row?.officialId||''));
+  if(entryRanking)row.payload={...row.payload,fitpEntryRanking:entryRanking};
   // Reuse the established observed key for native IDs; unidentified names retain country/year distinctions.
   const source_key=row.officialId?circuit+'|id:'+row.officialId:'acceptance|'+row.sourceKey;
   if(!rows.has(source_key))rows.set(source_key,{source_key,circuit,official_id:row.officialId,normalized_name:row.normalizedName,display_name:row.displayName,payload:row.payload});

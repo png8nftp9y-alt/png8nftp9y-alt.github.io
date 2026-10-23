@@ -1,3 +1,7 @@
+## Chat 1 — Classifica FITP dalla più recente iscrizione
+
+La pagina giocatore dà precedenza alla classifica della più recente iscrizione FITP con data valida e tessera esatta, anche se peggiore. Scheda FITP come alternativa; circolo invariato. Se due valori discordano alla stessa data, il selettore non sceglie arbitrariamente. Nessuna nuova chiamata FITP, scansione D1 o polling: associazione tramite source_key indicizzata nella lettura metadati esistente. Il motore entries prepara il dato statico; Acceptance Player Profiles salva la stessa evidenza nel payload D1 per i profili dinamici. Inclusa prima proiezione dei giocatori già pubblicati (Danesi 2.5 dall'iscrizione 15/10). I profili dinamici ricevono il campo al successivo import FITP ordinario. Non certifica la data di validità federale della classifica: la regola richiesta ordina per data d'iscrizione. Validazione: selettore, import D1 e ripetizione senza scritture, arricchimento metadati e controlli sintattici. Pubblicazione ed esiti remoti da verificare.
+
 ## 2026-10-24 — Primo passaggio TCL/Altri senza attesa dello storico completo
 
 - Causa: il percorso senza cache di changePlayerGroup continuava ad attendere fetchProjection completo (timeout 45 secondi); inoltre la visualizzazione aspettava il vecchio activeLoadCompletion. La lettura leggera introdotta per sincronizzazione dispositivi non copriva questo primo ingresso. I precedenti test browser restituivano snapshot immediati e non verificavano l'attesa.

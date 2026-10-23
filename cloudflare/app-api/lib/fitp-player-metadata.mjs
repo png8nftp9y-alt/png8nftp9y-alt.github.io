@@ -36,12 +36,15 @@ export async function enrichFitpMetadata(db,players){
  const cards=[...new Set([...ids.values()].filter(Boolean))];if(!cards.length)return players;
  const found=new Map();
  try{for(let i=0;i<cards.length;i+=100){
-  const rows=(await db.prepare('SELECT membership_card,club,ranking,updated_at FROM fitp_player_metadata WHERE membership_card IN (SELECT value FROM json_each(?))').bind(JSON.stringify(cards.slice(i,i+100))).all()).results||[];
+  const rows=(await db.prepare(`SELECT cards.value AS membership_card,m.club,m.ranking,m.updated_at,json_extract(o.payload,'$.fitpEntryRanking') AS entry_ranking FROM json_each(?) AS cards LEFT JOIN fitp_player_metadata m ON m.membership_card=cards.value LEFT JOIN observed_players o ON o.source_key='fitp|id:'||cards.value`).bind(JSON.stringify(cards.slice(i,i+100))).all()).results||[];
   for(const row of rows)found.set(row.membership_card,row);
  }}catch(error){if(/no such table: (?:main\.)?fitp_player_metadata/i.test(error.message))return players;throw error;}
  for(const p of players){const m=found.get(ids.get(p));if(!m)continue;
   if(m.club)p.club=m.club;
   if(m.ranking){p.fitpRanking=m.ranking;p.ranking=m.ranking;}
+  const entry=typeof m.entry_ranking==='string'?JSON.parse(m.entry_ranking):m.entry_ranking;
+  const latest=entry||p.fitpEntryRanking;
+  if(latest?.ranking){p.fitpEntryRanking=latest;p.fitpRanking=latest.ranking;p.ranking=latest.ranking;}
   p.fitpMetadataUpdatedAt=m.updated_at;
  }
  return players;

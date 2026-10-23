@@ -1,3 +1,4 @@
+import {latestFitpEntryRankings} from './fitp-entry-ranking.mjs';
 import {fitpSubscriptionDates,fitpSubscriptionRegistrations} from './fitp-subscription-dates.mjs';
 import fs from "node:fs/promises";
 const NOW = new Date().toISOString();
@@ -174,6 +175,12 @@ const activePlayers = playersDoc.players || [],
 const fitp = await readJson("dist/v3/source_fitp_entries.json", {
   entries: [],
 });
+const fitpEntryRankings = latestFitpEntryRankings(fitp);
+for (const player of activePlayers) {
+ const latest = fitpEntryRankings.get(String(player.membershipCard || ''));
+ if (latest) player.fitpEntryRanking = latest;
+ else delete player.fitpEntryRanking;
+}
 const fitpTournaments = await readJson("dist/v3/source_fitp_tournaments.json", {
   tournaments: [],
 });

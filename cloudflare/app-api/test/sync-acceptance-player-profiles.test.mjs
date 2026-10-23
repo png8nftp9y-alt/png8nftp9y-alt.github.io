@@ -129,3 +129,13 @@ test('D1_TEST_REAL_DELTAS_ONLY: 801 acquired players need three comparison reads
  const readback=reads.find(q=>!q.includes('normalized_name,display_name,payload'));assert.match(readback,/itf\|id:800100600/);assert.ok(!readback.includes('itf|id:800100599'));
  const before=d.writes();reads.length=0;await syncAcceptanceProfiles(query,'itf',doc);assert.equal(reads.length,0);assert.equal(d.writes(),before);
 }finally{d.close()}});
+
+test('FITP dated registration ranking survives D1 import and unchanged replay writes nothing',async()=>{
+ const d=database({identityMapping:true});try{
+  const doc={tournaments:{older:{participants:[{full1:'Martina Danesi',membershipCard:'9879449037',ranking:'2.6',subscriptionDate:'2026-09-01'}]},brescia:{participants:[{full1:'Martina Danesi',membershipCard:'9879449037',ranking:'2.5',subscriptionDate:'2026-10-15T10:30:14.12'}]}}};
+  await syncAcceptanceProfiles(d.query,'fitp',doc);
+  const row=d.execute("SELECT payload FROM observed_players WHERE source_key='fitp|id:9879449037'")[0];
+  assert.equal(JSON.parse(row.payload).fitpEntryRanking.ranking,'2.5');
+  const writes=d.writes();await syncAcceptanceProfiles(d.query,'fitp',doc);assert.equal(d.writes(),writes);
+ }finally{d.close()}
+});

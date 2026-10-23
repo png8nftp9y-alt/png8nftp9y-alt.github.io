@@ -451,7 +451,8 @@ function latestCurrentRankingRow(row,player) {
 }
 function currentPlayerRankingLabels(player, rows = null) {
   const labels = [];
-  if (player?.ranking) labels.push(`${readableText(player.ranking)} FITP`);
+  const fitpRanking = player?.fitpEntryRanking?.ranking || player?.ranking;
+  if (fitpRanking) labels.push(`${readableText(fitpRanking)} FITP`);
   const liveRows = Array.isArray(rows)
     ? rows
     : Object.entries(player?.tennisEuropeRankings || {}).map(([category, ranking]) => ({
