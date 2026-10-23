@@ -3,7 +3,7 @@ import {pathToFileURL} from 'node:url';
 import {openReadOnlyD1} from '../lib/read-only-d1-client.mjs';
 import {includedPlayerIdSourceSql} from '../lib/player-id-audit-scope.mjs';
 import {mergeSearchIdentities} from '../lib/paginated-player-search.mjs';
-import {playerNationalityKey} from '../lib/player-nationality.mjs';
+import {playerFederationMatchKey} from '../lib/player-nationality.mjs';
 // D1_READ_ONLY: guarded. One finite audit; no source discovery or identity writes.
 const links=`WITH links AS (SELECT l.*,COALESCE(a.canonical_id,l.canonical_id) AS person_id
  FROM player_circuit_identities l LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id
@@ -18,7 +18,7 @@ export function splitIdentityReasons(rows){
  const years=new Set(),countries=new Set(),native=new Map();let missingOriginal=false;
  for(const r of rows){const p=JSON.parse(r.payload);if(r.original_missing)missingOriginal=true;
   const year=Number(p.birthYear||String(p.birthDate||p.dateOfBirth||'').slice(0,4));if(year)years.add(year);
-  const country=playerNationalityKey(p.nationality||p.country);if(country)countries.add(country);
+  const country=playerFederationMatchKey(r.circuit,p.nationality||p.country);if(country)countries.add(country);
   if(r.circuit==='courtwatch')continue;
   const id=String(r.official_id||'').toLowerCase();const valid=r.circuit==='fitp'?/^\d{6,12}$/.test(id):r.circuit==='itf'?/^800\d{6}$/.test(id):/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id);
   if(valid){const ids=native.get(r.circuit)||new Set();ids.add(id);native.set(r.circuit,ids);}

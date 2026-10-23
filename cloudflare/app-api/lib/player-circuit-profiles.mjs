@@ -1,5 +1,5 @@
 import {mappedProfiles} from './player-identity-lookup.mjs';
-import {playerNationalityKey} from './player-nationality.mjs';
+import {playerNationalityKey,playerFederationMatchKey} from './player-nationality.mjs';
 export const normalizePlayerName=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/gi,' ').trim().toUpperCase();
 export const playerNameKey=value=>normalizePlayerName(value).split(' ').sort().join(' ');
 export const profileCircuit=value=>{const s=String(value||'').toLowerCase();return /europe/.test(s)?'tennis-europe':/itf/.test(s)?'itf':/fitp/.test(s)?'fitp':''};
@@ -42,7 +42,8 @@ export function circuitProfiles(player,rows=[]){
  }
  const grouped=new Map();for(const row of rows){let payload={};try{payload=JSON.parse(row.payload||'{}')}catch{}const c=profileCircuit(row.circuit);if(!c||playerNameKey(row.display_name)!==playerNameKey(player.name))continue;
   const candidate={...payload,name:row.display_name,officialId:row.official_id||payload.officialId||''};
-  if(country(player.nationality)&&country(candidate.nationality)&&country(player.nationality)!==country(candidate.nationality))continue;
+  const ownNation=playerFederationMatchKey(source,player.nationality),candidateNation=playerFederationMatchKey(c,candidate.nationality);
+  if(ownNation&&candidateNation&&ownNation!==candidateNation)continue;
   if(birth(player)&&birth(candidate)&&birth(player)!==birth(candidate))continue;
   const expected=identityFor(c,player)||(c===source?String(player.sourcePlayerId||player.officialId||''):'');
   if(officialIdentity(c,expected)&&officialIdentity(c,candidate.officialId)&&expected!==candidate.officialId)continue;

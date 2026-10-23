@@ -1,14 +1,12 @@
 import {profileEvidence,recoverProfileEvidence,validOfficialId} from './player-profile-evidence.mjs';
 import {playerNameKey} from './player-circuit-profiles.mjs';
+import {playerFederationMatchKey} from './player-nationality.mjs';
 
 // Equivalent federation codes, not inferred nationalities.
 export const canonicalNation=value=>({ROM:'ROU',MGO:'MNE'}[String(value||'').toUpperCase()]||String(value||'').toUpperCase());
 // Tennis Europe acceptance lists use federation codes for neutral entrants.
 // This is a comparison key only: never overwrite the source affiliation.
-export const matchingNation=(circuit,value)=>{
- const nation=canonicalNation(value);
- return circuit==='tennis-europe'?({RTF:'RUS',BTF:'BLR'}[nation]||nation):nation;
-};
+export const matchingNation=playerFederationMatchKey;
 export function archivedCandidates(circuit,payload){
  const out=[];
  function walk(v,depth=0){

@@ -1,6 +1,6 @@
 import {mappedPlayerSearch,storedIdentity} from './player-identity-lookup.mjs';
 import {normalizePlayerName,officialPlayerUrl} from './player-circuit-profiles.mjs';
-import {playerNationalityKey} from './player-nationality.mjs';
+import {playerFederationMatchKey} from './player-nationality.mjs';
 export const SEARCH_PAGE_SIZE=60;
 function cursor(value){if(!value)return null;try{const row=JSON.parse(decodeURIComponent(escape(atob(value))));if(typeof row.n!=='string'||typeof row.k!=='string'||row.n.length>240||row.k.length>400)throw Error();return row}catch{throw Object.assign(Error('invalid_search_cursor'),{status:400})}}
 const encode=(row,mode='source')=>btoa(unescape(encodeURIComponent(JSON.stringify({n:row.normalized_name,k:row.cursor_key,m:mode}))));
@@ -15,11 +15,10 @@ async function select(db,where,binds,limit=''){
  return groups.flat().sort(compare);
 }
 function result(r,linked){const p=payload(r);return{courtwatchId:r.circuit==='courtwatch'?r.official_id:linked.get(r.source_key)||'',sourceKey:r.circuit==='courtwatch'?'':r.source_key,identity:r.official_id||r.source_key,name:r.display_name,circuit:r.circuit,nationality:p.nationality||p.country||'',club:p.club||'',birthYear:p.birthYear||null,sources:[r.circuit]}}
-const country=playerNationalityKey;
 const candidate=r=>({...payload(r),name:r.display_name,officialId:r.official_id||payload(r).officialId||''});
 function unify(members,linked){
  const rows=members.map(r=>result(r,linked));
- const years=new Set(rows.map(r=>String(r.birthYear||'')).filter(Boolean)),countries=new Set(rows.map(r=>country(r.nationality)).filter(Boolean));
+ const years=new Set(rows.map(r=>String(r.birthYear||'')).filter(Boolean)),countries=new Set(rows.map(r=>playerFederationMatchKey(r.circuit,r.nationality)).filter(Boolean));
  const profiles=new Map(),identities=new Map();for(const r of members){if(r.circuit==='courtwatch')continue;const p=candidate(r),id=String(p.officialId||'').toLowerCase(),url=officialPlayerUrl(r.circuit,p),valid=r.circuit==='fitp'?/^\d{6,12}$/.test(id):r.circuit==='tennis-europe'?/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id):/^800\d{6}$/.test(id);let key=valid?id:url;
   if(url&&!valid){const u=new URL(url);key=r.circuit==='itf'?u.pathname.match(/\/(800\d{6})\//)?.[1]||url:r.circuit==='tennis-europe'?u.pathname.split('/').filter(Boolean).at(-1).toLowerCase():u.searchParams.get('cardNumber')||url;}
   if(key){const known=identities.get(r.circuit)||new Set();known.add(key);identities.set(r.circuit,known);}

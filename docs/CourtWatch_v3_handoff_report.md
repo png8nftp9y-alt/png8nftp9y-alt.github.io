@@ -7216,3 +7216,13 @@ ITF Meta extraordinary 2026-10-23T23:01:18.606Z: attempted 1, acquired 0, ordina
 ITF Meta extraordinary 2026-10-23T23:09:12.400Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-10-23T23:10:04.691Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+## Esame dei 158 gruppi fra circuiti: federazioni e casi discordanti (24 ottobre 2026)
+
+Esaminato il rapporto D1 del run 40035378729: 158 gruppi fra circuiti. Sui metadati acquisiti, 15 gruppi sono separati solo da RTF/RUS o LIB/LBN; 116 contengono più identificativi nello stesso circuito e 27 altre discord transnazionali. Questi ultimi non sono classificati automaticamente come omonimi o duplicati.
+
+Esteso il confronto condiviso: LIB/LBN come sigle del Libano; RTF/RUS e BTF/BLR solo per fonti Tennis Europe. Affiliazione originale, bandiere e payload non riscritti. Confronto coerente in ricerca, risoluzione profili, evidenze archiviate e audit. Riferimenti: Tennis Europe statement on Russia and Belarus (https://www.tenniseurope.org/news/142648/Tennis-Europe-statement-on-Russia-and-Belarus); ITF constitution 2025, Lebanon (LIB), https://www.itftennis.com/media/15040/the-constitution-of-the-itf-2025-web.pdf.
+
+Workflow una tantum sotto lock scritture D1: rilegge le fonti dei 158 nomi verificati; solo gruppi interamente compatibili con le sigle documentate vengono accodati al mapper ordinario. Verifica di lettura su ogni vecchio source key prima di registrare il completamento; checkpoint impedisce ripetizioni. Report completo con originali e motivi dei casi rimasti come artifact, senza nuove discovery esterne, cron, polling o retry. I vecchi ID restano alias; nessuna riscrittura di partite/iscrizioni.
+
+Validazione: 35 test passati, inclusi evidenze di tutti i 16 gruppi contenenti sigle RTF/LIB (15 recuperabili e Daria Vasileva mantenuta separata), omonimi FITP e paese discordante, recupero D1 SQLite, readback, alias precedenti, zero scritture ripetute e input incompleto. Policy incrementale superata. Limite: applicazione in produzione e dossier originali degli altri 143 gruppi da leggere nel nuovo run; il lavoro generale non è dichiarato chiuso.
