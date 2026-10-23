@@ -1,0 +1,37 @@
+name: Court Watch retained native links and 143 identity groups
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-remaining-identity-links.yml', 'cloudflare/app-api/scripts/review-remaining-identity-links.mjs']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test exact native bindings, existing identities and homonym isolation
+        run: node --test test/personal-native-identity-links.test.mjs test/review-remaining-identity-links.test.mjs test/player-identity-mapping.test.mjs test/confirmed-pietro-sala-link.test.mjs test/repair-federation-identity-links.test.mjs
+      - run: node scripts/configure-d1.mjs
+      - name: Recover certain native bindings and inspect retained evidence for all 143 groups
+        run: node scripts/review-remaining-identity-links.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: remaining-143-identity-evidence
+          path: cloudflare/app-api/tmp/remaining-identity-review.json
+          retention-days: 30

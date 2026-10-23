@@ -9,6 +9,8 @@ const parsed=value=>{try{return JSON.parse(value||'{}')}catch{throw Error('ident
 // Keep independent fields visible even when one payload contains conflicting IDs.
 export const personalNativeEvidence=p=>[
  ...playerCircuitIdentities({...p,circuitProfiles:[]}),
+ ...['membershipCard','worldTennisId','profileSync'].flatMap(key=>playerCircuitIdentities({[key]:p[key]})),
+ ...['sourcePlayerId','officialId'].flatMap(key=>playerCircuitIdentities({circuit:p.sourceCircuit||p.circuit,officialId:p[key]})),
  ...(p.circuitProfiles||[]).flatMap(profile=>playerCircuitIdentities({circuitProfiles:[profile]}))
 ];
 const officialKey=r=>{const id=String(r.official_id||'').toLowerCase();return (r.circuit==='fitp'?/^\d{6,12}$/.test(id):r.circuit==='itf'?/^800\d{6}$/.test(id):r.circuit==='tennis-europe'?/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id):false)?r.circuit+'|'+id:''};
@@ -25,6 +27,21 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
  // distinct official profiles or inconsistent birth/country evidence.
  const parent=sets.map((_,i)=>i),find=i=>parent[i]===i?i:parent[i]=find(parent[i]),official=new Map();
  sets.forEach((members,i)=>members.forEach(r=>{const key=officialKey(r);if(!key)return;if(official.has(key))parent[find(i)]=find(official.get(key));else official.set(key,i)}));
+ // A retained personal record binds exact native profiles independently of
+ // same-name homonyms. Reject contradictory personal IDs or birth evidence.
+ const rootMembers=roots=>sets.flatMap((members,i)=>roots.has(find(i))?members:[]);
+ for(let i=0;i<sets.length;i++)for(const r of sets[i].filter(r=>r.circuit==='courtwatch')){
+  const raw=parsed(r.payload),evidence=personalNativeEvidence(raw),byCircuit=new Map();
+  for(const e of evidence){const key=officialKey({circuit:e.circuit,official_id:e.profileId});if(!key)continue;const ids=byCircuit.get(e.circuit)||new Set();ids.add(key);byCircuit.set(e.circuit,ids);}
+  if(!byCircuit.size||[...byCircuit.values()].some(ids=>ids.size!==1))continue;
+  const wanted=[...byCircuit.values()].map(ids=>[...ids][0]);
+  if(wanted.some(key=>!official.has(key)))continue;
+  const roots=new Set([find(i),...wanted.map(key=>find(official.get(key)))]),members=rootMembers(roots),ids=new Map(),years=new Set();
+  if(members.some(m=>playerNameKey(m.display_name)!==playerNameKey(r.display_name)))continue;
+  for(const m of members){const p=parsed(m.payload),year=Number(p.birthYear||String(p.birthDate||p.dateOfBirth||'').slice(0,4));if(year)years.add(year);const key=officialKey(m);if(key){const known=ids.get(m.circuit)||new Set();known.add(key);ids.set(m.circuit,known);}}
+  if(years.size>1||[...ids.values()].some(values=>values.size>1))continue;
+  const root=find(i);for(const current of roots)parent[find(current)]=root;
+ }
  // User-confirmed cross-circuit links are exact native IDs, never name matches.
  for(const rule of confirmedLinks){
   if(!Array.isArray(rule.identities)||rule.identities.length!==2||new Set(rule.identities.map(x=>x.circuit)).size!==2)throw Error('confirmed_identity_link_invalid');
@@ -55,7 +72,7 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
   const root=find(found[0].i);for(const g of found)parent[find(g.i)]=root;
  }
  const priorBySource=new Map(currentLinks.map(r=>[r.source_key,r.canonical_id])),priorGroups=new Map();
- sets.forEach((members,i)=>{for(const id of new Set(members.map(r=>priorBySource.get(r.source_key)).filter(Boolean))){const previous=priorGroups.get(id)||[];for(const j of previous){const combined=[...sets[find(i)],...sets[find(j)]].map(r=>({...r,display_name:'Persisted identity'}));if(mergeSearchIdentities(combined,new Map()).length===1)parent[find(i)]=find(j);}previous.push(i);priorGroups.set(id,previous);}});
+ sets.forEach((members,i)=>{for(const id of new Set(members.map(r=>priorBySource.get(r.source_key)).filter(Boolean))){const previous=priorGroups.get(id)||[];for(const j of previous){const combined=rootMembers(new Set([find(i),find(j)])).map(r=>({...r,display_name:'Persisted identity'}));if(mergeSearchIdentities(combined,new Map()).length===1)parent[find(i)]=find(j);}previous.push(i);priorGroups.set(id,previous);}});
  const groups=new Map();sets.forEach((members,i)=>{const root=find(i);groups.set(root,[...(groups.get(root)||[]),...members]);});
  const existing=new Map(currentLinks.map(r=>[r.source_key,r.canonical_id])),people=[],links=[],aliases=[],assigned=new Set();
  for(const members of groups.values()){
