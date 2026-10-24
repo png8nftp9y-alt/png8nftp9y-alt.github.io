@@ -8989,3 +8989,5 @@ ITF Meta extraordinary 2026-10-24T14:04:25.658Z: attempted 1, acquired 0, ordina
 - Verifiche locali: 74 test mirati passati su storico, budget SQL/indici, alias, API individuale, sincronizzazione, aggiunta, gruppi e calendario. Nuova regressione assicura avvio simultaneo di lettura ID e verifica alias, senza doppia lettura esatta. Sintassi e UI analisi verdi, invarianti costo D1 verdi (18 controlli). Installer verificato due volte. Nessuna misura di tempo reale sul dispositivo: verificare dopo deploy, non dichiarare risolto dalla sola CI.
 
 ITF Meta extraordinary 2026-10-24T14:09:22.972Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-24T14:10:29.966Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
