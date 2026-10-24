@@ -9075,3 +9075,7 @@ Workflow una tantum courtwatch-approved-identity-links.yml sotto lock courtwatch
 A valle, il rapporto classifica i gruppi rimanenti per più tessere FITP, profili multipli Europe/ITF, nazioni discordanti e anni diversi; distingue anche i collegamenti già unificati/confermati e i gruppi che non richiedono un collegamento tra circuiti. I dodici identificativi con scheda vuota, dichiarati chiusi dall'utente, non vengono riaperti. Il risultato non presenta il conteggio delle semplici omonimie come numero di errori.
 
 Validazione: 35 test superati e policy incrementale superata; dati reali dei 16 gruppi, readback SQLite di tutte le associazioni, esclusione omonimi, originali invariati, Vasileva invariata, nazionalità canonica TUN, successivo delta ordinario che preserva l'associazione e replay senza scritture, input incompleto bloccato. Verifiche di regressione su mapper, Sala, legami personali, ricerca paginata e circuiti. Produzione da verificare nel run dopo la pubblicazione; il lavoro non è dichiarato applicato prima del readback D1.
+
+
+## Correzione confronto regole identità confermate
+Il piano incrementale confronta solo le chiavi delle approvazioni interessate, preservando tutte le regole precedenti. Il primo run si era fermato con zero scritture D1.

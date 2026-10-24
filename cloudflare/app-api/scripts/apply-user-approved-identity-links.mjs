@@ -51,7 +51,7 @@ export async function applyApprovedIdentityLinks(query,{reviewNames=approval.rev
   if(!rows.some(r=>wanted.has(keyOf(r))&&r.source_table))throw Error('approved_identity_source_not_queueable');
  }
  const priorBy=new Map(existing.map(r=>[r.key,r.value]));for(const r of rules)if(priorBy.has(r.key)&&priorBy.get(r.key)!==r.value)throw Error('approved_identity_rule_changed');
- const rulePlan=buildIncrementalSyncPlan({current:existing,incoming:rules,keyOf:r=>r.key,sourceComplete:true});
+ const rulePlan=buildIncrementalSyncPlan({current:existing.filter(r=>rules.some(w=>w.key===r.key)),incoming:rules,keyOf:r=>r.key,sourceComplete:true});
  for(const r of rulePlan.inserts)await query(`INSERT INTO app_state(key,value,updated_at) VALUES(${sqlString(r.key)},${sqlString(r.value)},${sqlString(new Date().toISOString())}) ON CONFLICT(key) DO NOTHING;`);
  const persisted=await query("SELECT key,value FROM app_state WHERE key LIKE 'confirmedPlayerCircuitLink:approved-20261024:%' ORDER BY key");if(rules.some(r=>!persisted.some(p=>p.key===r.key&&p.value===r.value)))throw Error('approved_identity_rules_not_verified');
  const wantedKeys=new Set(approval.associations.flatMap(e=>e.identities.map(keyOf))),scope=before.filter(r=>wantedKeys.has(keyOf(r))&&r.source_table).map(r=>({source_table:r.source_table,source_key:r.source_key}));
