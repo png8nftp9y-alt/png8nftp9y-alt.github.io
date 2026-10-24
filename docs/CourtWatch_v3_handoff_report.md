@@ -9093,3 +9093,11 @@ Il piano incrementale confronta solo le chiavi delle approvazioni interessate, p
 - I run Worker 40127406953, CRUD 40127407068 e D1/API 40127406994 falliscono tutti nel test isolato fitp-subscription-dates.test.mjs: ReferenceError loadInlineFitpDrawLinks non definito. La nuova dipendenza del rendering non era stata aggiunta al contesto VM del test. Deploy Worker e import D1 sono saltati prima dell’esecuzione.
 - Aggiornata la fixture con la dipendenza di caricamento, senza modificare il codice applicativo; aggiunta verifica che il caricatore riceva il torneo corretto una volta per FITP e non per ITF/Europe. I test specifici dei nuovi link FITP entrano anche nel comando check usato dai workflow, evitando che restino solo verifiche manuali.
 - Validazione: 14 test mirati superati (7 iscrizioni + 7 link tabelloni), verifica analysis UI verde. Il controllo completo npm run check va eseguito prima della pubblicazione e poi verificato nei nuovi run. Nessuna modifica al comportamento dell’app, a letture/scritture D1 o a schedulazioni.
+
+## Quattro collegamenti FITP–Europe confermati (24 ottobre 2026)
+
+L'utente conferma esplicitamente l'associazione dei profili Sara Bajo, Siro Bergonzoli, Tommaso Cenci e Chiara Gualtieri. Intervento una tantum limitato alle quattro coppie di ID nativi nel manifesto dedicato; nessuna regola di unione per solo nome, classifica o nazionalità estesa ad altri gruppi. I vecchi identificativi FITP con scheda vuota restano esclusi e separati.
+
+Workflow courtwatch-approved-four-identity-links.yml sotto lock courtwatch-d1-writes. Simulazione prima delle scritture, inserimento solo regole mancanti senza cancellare quelle preesistenti, mapper ordinario sulla sola coda selezionata e readback di ciascun collegamento; tutte le fonti originarie mantenute. Controllo indipendente della partizione Daria Vasileva invariata. Marker dedicato, replay completato con sola lettura e zero scritture. Nessuna schedulazione, discovery esterna, polling o retry automatico.
+
+Validazione: test con le fonti reali dei cinque gruppi, protezione schede vuote, preservazione delle regole preesistenti, aggiornamento ordinario successivo, replay senza scritture e blocco input incompleto; regressioni del mapper e precedenti associazioni. Applicazione in produzione da confermare nel run dopo il push.
