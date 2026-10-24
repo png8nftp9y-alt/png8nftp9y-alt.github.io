@@ -1,3 +1,7 @@
+## 2026-10-24 — chat 1: correzione test cache cataloghi
+
+I run 40129305189 e 40129305132 fallivano perché la cache scaldata dalla baseline evitava la lettura intercettata dal test. Pubblicata nella fixture una versione equivalente con hash distinto. Mantenuti controlli concorrenza, parità risposta e zero scritture. Nessuna modifica runtime. Validazione locale: 40 test superati. Deploy da verificare dopo push.
+
 ## 2026-10-24 — chat 1: riuso cataloghi verificati per apertura profilo
 
 Lettore runtime D1: cache in memoria del Worker limitata a 8 MiB di testo UTF-16 per i sei cataloghi pubblici tornei. Ogni richiesta continua a leggere e validare il release pointer da D1; riuso solo con path, hash SHA-256 e dimensione esatti. Nuova versione immediatamente selezionata, nessun TTL e nessun polling. Documenti personali esclusi. Conservato testo JSON verificato e restituiti oggetti separati tra richieste per evitare mutazioni condivise. Cache LRU, documenti oltre limite non memorizzati, nessun fallback HTTP/R2 o su errore. Si evitano query chunk, decodifica base64, decompressione e hash per cataloghi già disponibili nello stesso Worker; parsing JSON resta necessario. Apertura profilo completa invariata. Validazione: 23 test mirati superati, inclusi cambio versione, isolamento mutazioni, esclusione dati personali e release assente. Guadagno reale non ancora misurato in produzione; cache fredda e documenti oltre limite mantengono il percorso originale. Deploy e verifica dopo push.

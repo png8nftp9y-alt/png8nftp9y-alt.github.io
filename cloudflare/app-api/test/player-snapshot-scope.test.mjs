@@ -101,8 +101,11 @@ test('scoped ranking reads overlap history and a ranking outage still preserves 
 
 test('final profile resolution overlaps a pending catalogue and preserves exact snapshot with zero writes', {timeout:60000},async()=>{
  const d=database({identityMapping:true});let held=false,release,overlap=false,timer;
- try{seed(d,1);const before=d.writes();
+ try{seed(d,1);
   const expected=await (await request(d.db,'others','cw-target-0')).json();
+  // A distinct published version ensures this test exercises a cold catalogue.
+  d.publishRuntimeDocuments({'dist/v3/tournaments.json':{status:'fixture_complete',players:[{id:'fixture'}],tournaments:[{competitionId:'FIXTURE'}],testVersion:'pending-catalogue-overlap'}});
+  const before=d.writes();
   function wrap(s,sql,values=[]){return new Proxy(s,{get(t,k){const v=t[k];if(k==='bind')return(...args)=>wrap(v.apply(t,args),sql,args);
    if(k==='all')return async(...args)=>{
     if(sql.includes('runtime_document_chunks')&&values[0]==='dist/v3/tournaments.json'&&!held){held=true;return new Promise((resolve,reject)=>{release=()=>Promise.resolve(v.apply(t,args)).then(resolve,reject);timer=setTimeout(()=>{release();release=null},5000)})}
