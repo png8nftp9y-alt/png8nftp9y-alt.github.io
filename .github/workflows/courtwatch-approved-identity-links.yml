@@ -1,0 +1,37 @@
+name: Court Watch approved 14 associations Chahine and Daria
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-approved-identity-links.yml', 'cloudflare/app-api/scripts/apply-user-approved-identity-links.mjs']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test approved exact IDs, nationality, preserved homonyms and zero-write replay
+        run: node --test test/apply-user-approved-identity-links.test.mjs test/player-identity-mapping.test.mjs test/confirmed-pietro-sala-link.test.mjs test/personal-native-identity-links.test.mjs
+      - run: node scripts/configure-d1.mjs
+      - name: Apply approved associations, read back each result and classify remaining groups
+        run: node scripts/apply-user-approved-identity-links.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: approved-identities-and-remaining-groups
+          path: cloudflare/app-api/tmp/approved-identity-links.json
+          retention-days: 30

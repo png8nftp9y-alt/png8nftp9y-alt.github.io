@@ -9059,3 +9059,15 @@ ITF Meta 2026-10-24T14:37:04.541Z: queue initialized/reconciled, started tournam
 ITF Meta extraordinary 2026-10-24T14:37:21.131Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF discovery 2026-10-24T16:18:01.256Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## Associazioni confermate: 14 casi Pantò, Chahine e Vasileva (24 ottobre 2026)
+
+Richiesta esplicita: procedere solo sui 14 gruppi con un Europe, un ITF e più tessere FITP scegliendo la tessera con la classifica più alta della lettura verificata del 24 ottobre; collegare Chahine Ben Aissa come stessa persona con nazionalità attuale Tunisia; lasciare separati i profili Daria Vasileva. Gli altri gruppi non ricevono nuove associazioni.
+
+Manifesto limitato a 15 associazioni con ID nativi precisi e tessere FITP escluse: i 14 scelti e Chahine. Le classifiche motivano la selezione iniziale, non diventano una regola generale o ricalcolata per altri nomi e per i futuri giocatori. Il mapper usa le 29 coppie di collegamento confermate persistite in app_state, con controlli sui nomi e sull'assenza di più ID dello stesso circuito nel gruppo unificato. Per Chahine l'affiliazione TUN confermata si applica alla vista canonica; documenti e nazionalità originali rimangono come storico.
+
+Workflow una tantum courtwatch-approved-identity-links.yml sotto lock courtwatch-d1-writes. Prima delle scritture simula tutti i collegamenti sui dati letti; applica attraverso il mapper ordinario solo la coda esplicitamente selezionata, rilegge ogni fonte e verifica le 15 associazioni, le tessere escluse e TUN. Confronta l'intera partizione dei source key Vasileva prima/dopo: deve restare invariata. Solo dopo i controlli registra il completamento. Riesecuzione completata senza scritture. Nessuna discovery esterna, schedulazione, polling o retry.
+
+A valle, il rapporto classifica i gruppi rimanenti per più tessere FITP, profili multipli Europe/ITF, nazioni discordanti e anni diversi; distingue anche i collegamenti già unificati/confermati e i gruppi che non richiedono un collegamento tra circuiti. I dodici identificativi con scheda vuota, dichiarati chiusi dall'utente, non vengono riaperti. Il risultato non presenta il conteggio delle semplici omonimie come numero di errori.
+
+Validazione: 35 test superati e policy incrementale superata; dati reali dei 16 gruppi, readback SQLite di tutte le associazioni, esclusione omonimi, originali invariati, Vasileva invariata, nazionalità canonica TUN, successivo delta ordinario che preserva l'associazione e replay senza scritture, input incompleto bloccato. Verifiche di regressione su mapper, Sala, legami personali, ricerca paginata e circuiti. Produzione da verificare nel run dopo la pubblicazione; il lavoro non è dichiarato applicato prima del readback D1.
