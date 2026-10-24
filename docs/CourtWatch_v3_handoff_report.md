@@ -7812,3 +7812,5 @@ ITF Meta extraordinary 2026-10-24T04:56:46.786Z: attempted 1, acquired 0, ordina
 ITF Meta extraordinary 2026-10-24T04:57:56.115Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-10-24T04:58:53.191Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF discovery 2026-10-24T05:03:28.043Z: 2 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
