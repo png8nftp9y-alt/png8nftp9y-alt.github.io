@@ -24,7 +24,7 @@ export function fitpDrawLinks(detail, competitionId) {
       if (seen.has(url)) continue;
       seen.add(url);
       const phase = String(section.SectionDescription || section.SectionType || 'Tabellone').trim();
-      const shortPhase = phase.replace(/^(?:tabellone|sezione)\s*(?:di\s+)?/i, '').replace(/\s*-\s*/g,' ').replace(/\s+/g,' ').trim().toLocaleLowerCase('it') || phase;
+      const shortPhase = /inizial/i.test(phase) ? 'INIZIALE' : /intermedi/i.test(phase) ? 'INTERMEDIO' : /final|conclu|concu/i.test(phase) ? 'FINALE' : /inizial/i.test(section.SectionType || '') ? 'INIZIALE' : /final|conclu/i.test(section.SectionType || '') ? 'FINALE' : 'INTERMEDIO';
       sections.push({tournamentId,phaseId,category,categoryCode,phase,shortPhase,url});
     }
     for (const row of sections) rows.push({...row,label:categoryCode + (sections.length > 1 ? ' ' + row.shortPhase : '')});

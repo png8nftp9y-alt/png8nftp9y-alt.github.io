@@ -9105,3 +9105,9 @@ L'utente conferma esplicitamente l'associazione dei profili Sara Bajo, Siro Berg
 Workflow courtwatch-approved-four-identity-links.yml sotto lock courtwatch-d1-writes. Simulazione prima delle scritture, inserimento solo regole mancanti senza cancellare quelle preesistenti, mapper ordinario sulla sola coda selezionata e readback di ciascun collegamento; tutte le fonti originarie mantenute. Controllo indipendente della partizione Daria Vasileva invariata. Marker dedicato, replay completato con sola lettura e zero scritture. Nessuna schedulazione, discovery esterna, polling o retry automatico.
 
 Validazione: test con le fonti reali dei cinque gruppi, protezione schede vuote, preservazione delle regole preesistenti, aggiornamento ordinario successivo, replay senza scritture e blocco input incompleto; regressioni del mapper e precedenti associazioni. Applicazione in produzione da confermare nel run dopo il push.
+
+## 2026-10-24 — Etichette sintetiche tabelloni FITP
+
+- Richiesta da screenshot Brallo: eliminare ripetizioni dei codici, testo tecnico e intervalli di classifica dai badge. Mostrare solo codice categoria e fase maiuscola INIZIALE/INTERMEDIO/FINALE. Intermedi multipli numerati 1, 2, ecc.; categoria con un solo tabellone continua a mostrare solo il codice (es. DF14).
+- Modificata esclusivamente la sintesi del nome nel modulo fitp-draw-links.mjs; descrizione originale conservata nel campo phase e nel titolo del collegamento. TournamentId, SectionCode, URL e apertura Safari conservati. Nessuna modifica a chiamate, cache, polling o dati D1.
+- Validazione: cinque test del modulo superati, incluso esempio SM12 con iniziale, due intermedi e finale con nomi FITP contenenti prefissi e classifiche; verificati collegamenti e caso singolo. Aggiornate le attese esistenti. Dopo deploy ricaricare la pagina per svuotare la cache in memoria dei nomi precedenti.
