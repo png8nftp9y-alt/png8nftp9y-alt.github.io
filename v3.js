@@ -2900,18 +2900,27 @@ function playerSearchResultHtml(result, className) {
   return `<button type="button" class="${className}" data-search-player="${esc(result.sourceKey || result.identity || result.courtwatchId)}" data-search-name="${esc(result.name)}" data-search-courtwatch="${esc(result.courtwatchId || "")}"><span><b>${esc(readablePerson(result.name))}</b>${result.nationality ? nationalityHtml(result.nationality) : ""}${result.club ? `<small>${esc(displayPlayerClub(result.club))}</small>` : ""}</span><small>${esc(detail)}</small></button>`;
 }
 function bindPlayerSearchResults(root, results, adding = false) {
+  let prepared = 0;
   root.querySelectorAll("[data-search-player]").forEach((button) => {
+    const result = results.find(item =>
+      String(item.sourceKey || item.identity || item.courtwatchId) === button.dataset.searchPlayer &&
+      readablePerson(item.name) === readablePerson(button.dataset.searchName));
+    if (!result) return;
+    const prepare = () => {
+      if (adding) return;
+      const identity = result.sourceKey || result.identity || result.courtwatchId;
+      const followed = result.courtwatchId && (state.data?.players || []).some(
+        player => player.id === result.courtwatchId && player.active !== false);
+      if (!followed && !monitoredOpponentPlayer(identity)) queueOpponentPreload(result.name, "", identity, () => button.isConnected && !root.hidden);
+    };
+    // Bounded preparation starts while the user reads results; no recurring refresh.
+    if (!adding && prepared++ < 2) prepare();
+    button.onpointerenter = prepare;
+    button.onfocus = prepare;
+    button.ontouchstart = prepare;
     button.onclick = () => {
-      const result = results.find(
-        (item) =>
-          String(item.sourceKey || item.identity || item.courtwatchId) ===
-            button.dataset.searchPlayer &&
-          readablePerson(item.name) === readablePerson(button.dataset.searchName),
-      );
-      if (result) {
-        if (adding) addCourtWatchPlayerFromUi(result, button);
-        else openPlayerSearchResult(result);
-      }
+      if (adding) addCourtWatchPlayerFromUi(result, button);
+      else openPlayerSearchResult(result);
     };
   });
 }
@@ -3393,7 +3402,7 @@ function runOpponentPrefetchQueue() {
     const item = opponentPrefetchQueue.shift(),
       { requestKey } = opponentHistoryKey(item.name, item.event, item.profileId);
     opponentPrefetchQueued.delete(requestKey);
-    if (opponentHistoryIsFresh(requestKey)) continue;
+    if ((item.isCurrent && !item.isCurrent()) || opponentHistoryIsFresh(requestKey)) continue;
     opponentPrefetchActive++;
     fetchOpponentHistory(item.name, item.event, item.profileId)
       .catch(() => {})
@@ -3403,7 +3412,7 @@ function runOpponentPrefetchQueue() {
       });
   }
 }
-function queueOpponentPreload(name, event = "", profileId = "") {
+function queueOpponentPreload(name, event = "", profileId = "", isCurrent = null) {
   if (!readablePerson(name)) return;
   const { requestKey } = opponentHistoryKey(name, event, profileId);
   if (
@@ -3413,7 +3422,7 @@ function queueOpponentPreload(name, event = "", profileId = "") {
   )
     return;
   opponentPrefetchQueued.add(requestKey);
-  opponentPrefetchQueue.push({ name, event, profileId });
+  opponentPrefetchQueue.push({ name, event, profileId, isCurrent });
   runOpponentPrefetchQueue();
 }
 async function loadOpponentHistory(name, event = "", profileId = "") {
