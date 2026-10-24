@@ -9127,3 +9127,11 @@ Validazione: 21 test superati, incluso test di regressione che applica il limite
 - Richiesta: tutti i tabelloni della stessa categoria sulla stessa riga; categorie ordinate per età e poi SM, SF, DM, DF, DX. Etichette sintetiche e associazione ai tabelloni restano quelle ufficiali già acquisite.
 - Frontend raggruppa i link per codice categoria e ordina le fasi INIZIALE, INTERMEDIO numerico, FINALE; CSS separa le righe e permette ai link della stessa categoria di andare a capo su schermi stretti. Aggiornate versioni cache JS/CSS. Nessuna richiesta aggiuntiva, polling o modifica D1.
 - Validazione: quattro test frontend superati, compresi ordine SM10/SF10/DM10/DF10/SM12/DF12, fasi e integrità delle URL; controllo sintassi JS. Apertura Safari preservata.
+
+## Tre associazioni Europe–ITF confermate: Chen, Kim e Liu (24 ottobre 2026)
+
+L'utente conferma gli ID ITF da associare ai rispettivi profili Europe: CHEN MEIQI 800800298, HEE KIM TAE 800742596 e LIU YICHEN 800794057. Manifesto con tre coppie di ID esatti; gli altri ITF 800860083, 800753996, 800866511 e 800807639 restano esclusi e separati. Nessuna regola per solo nome o nazionalità e nessuna selezione automatica per altri giocatori.
+
+Workflow una tantum courtwatch-approved-three-itf-identity-links.yml sotto lock D1. Simulazione completa prima di scrivere, preservazione delle regole precedenti, mapper ordinario limitato alle fonti selezionate, readback di tutti i collegamenti e degli ID esclusi, controllo Vasileva invariata. Lettura con IN sulle chiavi esatte, senza pattern oltre il limite D1. Marker dedicato, ripresa da regole già salvate e replay completato con zero scritture. Nessuna discovery, schedulazione, polling o retry automatico.
+
+Validazione: 21 test superati, fonti reali dei quattro gruppi, esclusione degli altri ITF, originali invariati, regole precedenti mantenute, delta ordinario successivo, input incompleto bloccato, ripresa parziale e replay senza scritture; policy D1 incrementale. Applicazione in produzione da confermare nel run successivo al push.
