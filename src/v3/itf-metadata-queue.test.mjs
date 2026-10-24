@@ -42,3 +42,34 @@ test('foreign address-only gaps complete; Italian gaps stay queued across public
  state=applyMetadataBatch(state,{attempts:[{competitionId:'J-FOREIGN',checkedAt:now}]},now);state=reconcileMetadataQueue(state,catalogue,saved,today,now);
  assert.equal(state.tournaments['J-FOREIGN'].status,'complete');assert.equal(metadataQueueStatus(state).extraordinary.missingFields,1);
 });
+
+const june={tournaments:[{...t('J-JUNE'),startDate:'2027-06-01',endDate:'2027-06-06',hostNationCode:'INA'}]};
+const club={'J-JUNE':{venueName:'Official Club'}};
+function juneState(now,checkedAt){let s=reconcileMetadataQueue(null,june,club,now.slice(0,10),now);if(checkedAt)s=applyMetadataBatch(s,{attempts:[{competitionId:'J-JUNE',checkedAt}]},now);return reconcileMetadataQueue(s,june,club,now.slice(0,10),now);}
+test('distant partial tournaments wait one week without losing acquired metadata or looping',()=>{
+ const s=juneState('2026-10-24T14:00:00Z','2026-10-24T13:00:00Z'),row=s.tournaments['J-JUNE'];
+ assert.equal(row.retryCadence,'weekly');assert.equal(row.nextCheckAt,'2026-10-31T00:00:00.000Z');assert.equal(row.alert,false);
+ assert.deepEqual(row.acquired,['venueName']);assert.deepEqual(row.missing,['qualificationStartDate']);
+ assert.equal(selectMetadataBatch(s,'extraordinary').length,0);assert.equal(metadataQueueStatus(s).extraordinary.total,1);
+ const due=juneState('2026-10-31T05:17:00Z','2026-10-24T13:00:00Z');assert.equal(selectMetadataBatch(due,'extraordinary').length,1);
+});
+test('daily phase starts March 1 even when the weekly deadline would be later',()=>{
+ const feb=juneState('2027-02-28T05:17:00Z','2027-02-27T05:20:00Z');assert.equal(feb.tournaments['J-JUNE'].nextCheckAt,'2027-03-01T00:00:00.000Z');
+ const march=juneState('2027-03-01T05:17:00Z','2027-02-27T05:20:00Z');assert.equal(march.tournaments['J-JUNE'].retryCadence,'daily');assert.equal(selectMetadataBatch(march,'extraordinary').length,1);
+ const done=juneState('2027-03-01T05:20:00Z','2027-03-01T05:19:00Z');assert.equal(selectMetadataBatch(done,'extraordinary').length,0);
+ const tomorrow=juneState('2027-03-02T05:17:00Z','2027-03-01T05:19:00Z');assert.equal(selectMetadataBatch(tomorrow,'extraordinary').length,1);
+});
+test('April alert includes missing fields and disappears when acquired or out of scope',()=>{
+ const march=juneState('2027-03-31T12:00:00Z','2027-03-31T11:00:00Z');assert.equal(metadataQueueStatus(march).alerts.total,0);
+ let april=juneState('2027-04-01T05:17:00Z','2027-03-31T11:00:00Z');assert.equal(metadataQueueStatus(april).alerts.total,1);
+ const html=renderMetadataQueue(metadataQueueStatus(april),String,()=> 'ora');assert.ok(html.includes('ATTENZIONE'));assert.ok(html.includes('Prossimo tentativo'));assert.ok(html.includes('Data qualificazioni'));
+ const complete=reconcileMetadataQueue(april,june,{'J-JUNE':{venueName:'Official Club',qualificationStartDate:'2027-05-30'}},'2027-04-01','2027-04-01T06:00:00Z');assert.equal(metadataQueueStatus(complete).alerts.total,0);assert.equal(complete.tournaments['J-JUNE'].nextCheckAt,undefined);
+ const past=reconcileMetadataQueue(april,june,club,'2027-06-02','2027-06-02T06:00:00Z');assert.equal(metadataQueueStatus(past).alerts.total,0);assert.equal(past.tournaments['J-JUNE'].status,'out_of_scope');
+});
+test('new discoveries get an immediate first attempt; completed and user-resolved never retry',()=>{
+ const s=reconcileMetadataQueue(null,june,club,'2026-10-24','2026-10-24T12:00:00Z',{tournaments:[]});assert.equal(selectMetadataBatch(s,'ordinary').length,1);
+ const done=applyMetadataBatch(s,{attempts:[{competitionId:'J-JUNE',checkedAt:'2026-10-24T12:00:00Z'}]},'2026-10-24T12:01:00Z');assert.equal(selectMetadataBatch(done,'extraordinary').length,0);
+});
+test('month-end boundaries clamp to the last valid day',async()=>{
+ const {metadataRetrySchedule}=await import('./itf-metadata-queue.mjs');const s=metadataRetrySchedule({status:'extraordinary',startDate:'2027-05-31',checkedAt:'2027-02-27T12:00:00Z'},'2027-02-27T13:00:00Z');assert.equal(s.nextCheckAt,'2027-02-28T00:00:00.000Z');assert.equal(s.alertAt,'2027-03-31T00:00:00.000Z');
+});

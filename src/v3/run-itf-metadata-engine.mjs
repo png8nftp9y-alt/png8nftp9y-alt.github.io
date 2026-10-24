@@ -18,7 +18,7 @@ if(process.argv.includes('--discovery')){
  await fs.appendFile('docs/CourtWatch_v3_handoff_report.md',`\nITF discovery ${now()}: ${state.newIds.length} newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.\n`);
 }else if(process.argv.includes('--select')){
  const targets=selectMetadataBatch(state,mode);await writeJson('/tmp/itf-meta-targets.json',targets);
- await fs.appendFile(process.env.GITHUB_OUTPUT,`count=${targets.length}\nordinary_count=${metadataQueueStatus(state).ordinary.total}\nextraordinary_count=${metadataQueueStatus(state).extraordinary.total}\ncleanup=${Object.values(original?.tournaments||{}).some(t=>['ordinary','extraordinary'].includes(t.status)&&state.tournaments[t.competitionId]?.status==='out_of_scope')}\n`);
+ await fs.appendFile(process.env.GITHUB_OUTPUT,`count=${targets.length}\nordinary_count=${metadataQueueStatus(state).ordinary.total}\nextraordinary_count=${selectMetadataBatch(state,'extraordinary',Infinity).length}\ncleanup=${JSON.stringify(Object.values(original?.tournaments||{}).map(t=>[t.competitionId,t.status,t.nextCheckAt,t.retryCadence,t.alert,t.alertAt]))!==JSON.stringify(Object.values(state.tournaments||{}).map(t=>[t.competitionId,t.status,t.nextCheckAt,t.retryCadence,t.alert,t.alertAt]))}\n`);
 }else if(process.argv.includes('--acquire')){
  const targets=await readJson('/tmp/itf-meta-targets.json',[]),attempts=[];
  const require=createRequire(new URL('../../infra/itf-acquirer/package.json',import.meta.url)),{chromium}=require('playwright');
@@ -32,6 +32,6 @@ if(process.argv.includes('--discovery')){
  await writeJson('dist/v3/source_itf_tournaments.json',enrichTournamentMetadata(catalogue,official.tournaments));
  state=applyMetadataBatch(state,result,now());state=reconcileMetadataQueue(state,catalogue,{...saved,...official.tournaments},TODAY,now());await persist();
  const nextMode=selectMetadataBatch(state,'ordinary').length?'ordinary':selectMetadataBatch(state,'extraordinary').length?'extraordinary':'';
- await fs.appendFile(process.env.GITHUB_OUTPUT,`next_mode=${nextMode}\nordinary_count=${metadataQueueStatus(state).ordinary.total}\nextraordinary_count=${metadataQueueStatus(state).extraordinary.total}\n`);
+ await fs.appendFile(process.env.GITHUB_OUTPUT,`next_mode=${nextMode}\nordinary_count=${metadataQueueStatus(state).ordinary.total}\nextraordinary_count=${selectMetadataBatch(state,'extraordinary',Infinity).length}\n`);
  await fs.appendFile('docs/CourtWatch_v3_handoff_report.md',`\nITF Meta ${mode} ${now()}: attempted ${result.attempts.length}, acquired ${result.acquired}, ordinary ${metadataQueueStatus(state).ordinary.total}, extraordinary ${metadataQueueStatus(state).extraordinary.total}. Partial metadata preserved; official D1 sync follows.\n`);
 }else if(process.argv.includes('--bootstrap')){await persist();await fs.appendFile('docs/CourtWatch_v3_handoff_report.md',`\nITF Meta ${now()}: queue initialized/reconciled, started tournaments excluded, no historical recovery.\n`);}
