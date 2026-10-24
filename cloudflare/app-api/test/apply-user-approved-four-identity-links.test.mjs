@@ -45,3 +45,22 @@ test('D1_TEST_INITIAL_IMPORT / D1_TEST_REAL_DELTAS_ONLY: four readbacks preserve
 test('D1_TEST_INCOMPLETE_SOURCE_GUARD: absent originals stop before any rules or completion writes',async()=>{
  const d=database({identityMapping:true});try{const n=d.writes();await assert.rejects(applyApprovedIdentityLinks(d.query),/daria_not_separate/);assert.equal(d.writes(),n);}finally{d.close();}
 });
+
+test('resume after persisted rules uses exact key readback within D1 LIKE limit and never reinserts saved rules',async()=>{
+ const d=database({identityMapping:true});try{
+  insert(d);
+  for(const r of approvedRules())d.execute('INSERT INTO app_state(key,value,updated_at) VALUES(?,?,?)',[r.key,r.value,'2026-10-24']);
+  let ruleWrites=0,exactRead=false;
+  const query=async sql=>{
+   for(const m of sql.matchAll(/\b(?:LIKE|GLOB)\s+'([^']*)'/gi))if(Buffer.byteLength(m[1])>50)throw Error('D1 LIKE/GLOB pattern exceeds 50 bytes');
+   if(sql.startsWith('INSERT INTO app_state')&&sql.includes('confirmedPlayerCircuitLink:approved-four-20261024:'))ruleWrites++;
+   if(sql.startsWith('SELECT key,value FROM app_state WHERE key IN ('))exactRead=true;
+   return d.query(sql);
+  };
+  const r=await applyApprovedIdentityLinks(query);
+  assert.equal(r.summary.approvedAssociationsVerified,4);
+  assert.equal(r.summary.fitpEuropeVerified,4);
+  assert.equal(r.summary.daria,'separate_partition_unchanged');
+  assert.equal(ruleWrites,0);assert.equal(exactRead,true);
+ }finally{d.close();}
+});

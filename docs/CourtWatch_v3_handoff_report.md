@@ -9111,3 +9111,9 @@ Validazione: test con le fonti reali dei cinque gruppi, protezione schede vuote,
 - Richiesta da screenshot Brallo: eliminare ripetizioni dei codici, testo tecnico e intervalli di classifica dai badge. Mostrare solo codice categoria e fase maiuscola INIZIALE/INTERMEDIO/FINALE. Intermedi multipli numerati 1, 2, ecc.; categoria con un solo tabellone continua a mostrare solo il codice (es. DF14).
 - Modificata esclusivamente la sintesi del nome nel modulo fitp-draw-links.mjs; descrizione originale conservata nel campo phase e nel titolo del collegamento. TournamentId, SectionCode, URL e apertura Safari conservati. Nessuna modifica a chiamate, cache, polling o dati D1.
 - Validazione: cinque test del modulo superati, incluso esempio SM12 con iniziale, due intermedi e finale con nomi FITP contenenti prefissi e classifiche; verificati collegamenti e caso singolo. Aggiornate le attese esistenti. Dopo deploy ricaricare la pagina per svuotare la cache in memoria dei nomi precedenti.
+
+## Ripresa quattro associazioni: limite LIKE D1 (24 ottobre 2026)
+
+Il run 40129261733 si ferma nella rilettura delle regole dopo 8 righe scritte. Il pattern LIKE usato dalla patch è lungo 51 byte, oltre il limite D1 documentato di 50. Sostituito con WHERE key IN sulle sole quattro chiavi esatte: stessa verifica completa, senza pattern o scansione per prefisso. Le regole già persistite vengono riconosciute e non reinserite; ripresa sulla coda dei soli quattro gruppi e readback finale invariati. Errori API ora includono codici e messaggi restituiti da Cloudflare. Nessun retry o monitoraggio automatico.
+
+Validazione: 21 test superati, incluso test di regressione che applica il limite LIKE/GLOB di D1 e simula le quattro regole già salvate, verificando zero reinserimenti e tutte le associazioni. Schede vuote escluse, Daria separata, regole precedenti mantenute; policy incrementale. Risultato in D1 da verificare nel nuovo run dopo pubblicazione.
