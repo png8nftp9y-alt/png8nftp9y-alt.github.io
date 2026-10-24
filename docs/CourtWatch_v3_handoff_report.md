@@ -9135,3 +9135,5 @@ L'utente conferma gli ID ITF da associare ai rispettivi profili Europe: CHEN MEI
 Workflow una tantum courtwatch-approved-three-itf-identity-links.yml sotto lock D1. Simulazione completa prima di scrivere, preservazione delle regole precedenti, mapper ordinario limitato alle fonti selezionate, readback di tutti i collegamenti e degli ID esclusi, controllo Vasileva invariata. Lettura con IN sulle chiavi esatte, senza pattern oltre il limite D1. Marker dedicato, ripresa da regole già salvate e replay completato con zero scritture. Nessuna discovery, schedulazione, polling o retry automatico.
 
 Validazione: 21 test superati, fonti reali dei quattro gruppi, esclusione degli altri ITF, originali invariati, regole precedenti mantenute, delta ordinario successivo, input incompleto bloccato, ripresa parziale e replay senza scritture; policy D1 incrementale. Applicazione in produzione da confermare nel run successivo al push.
+
+ITF discovery 2026-10-24T21:16:25.796Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
