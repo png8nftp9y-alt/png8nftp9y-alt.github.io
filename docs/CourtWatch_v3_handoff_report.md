@@ -9079,3 +9079,11 @@ Validazione: 35 test superati e policy incrementale superata; dati reali dei 16 
 
 ## Correzione confronto regole identità confermate
 Il piano incrementale confronta solo le chiavi delle approvazioni interessate, preservando tutte le regole precedenti. Il primo run si era fermato con zero scritture D1.
+
+## 2026-10-24 — Singoli tabelloni FITP nella pagina torneo
+
+- Richiesta: collegamenti diretti nella voce Tabelloni esistente, senza pagina aggiuntiva. Nomi da categoria e fase ufficiali: SM14 iniziale/intermedio/finale; se una categoria ha un solo tabellone, solo il codice (es. DF14). Il numero di fasi si conta per categoria ufficiale, non sull’intero torneo. Dettagli distintivi delle fasi conservati; descrizione originale nel titolo del link.
+- Collegamento costruito esclusivamente con TournamentId e SectionCode ufficiali. Recupero al render della pagina torneo tramite endpoint protetto /app/api/fitp-draw-links; risposta validata per competizione. Pagina e partite non aspettano la richiesta; risultati riutilizzati in memoria per cinque minuti, richieste simultanee accorpate, nessun polling. Nessuna scansione o modifica dei dati tennis D1; rimane l’autenticazione ordinaria dell’endpoint.
+- Su iPhone/iPad iOS >=17 i soli link diretti dei tabelloni richiedono Safari con x-safari-https; altrove HTTPS normale. Questo intervento non modifica l’apertura del link titolo torneo. Schema Safari da confermare sul dispositivo; non è un contratto stabile Apple documentato.
+- Validazione: sette test mirati superati (categoria/fasi/DF14 singolo, identificativi, errori, render, Safari, cache e accorpamento), controlli sintassi JS/Worker, cinque tabelloni reali di Brescia e URL finale identica a quella provata via QR.
+- Limiti: i gironi FITP non espongono lo stesso visualizzatore diretto e non sono spacciati per tabelloni a eliminazione; rimangono consultabili dalla pagina ufficiale del torneo. I dati devono essere disponibili presso FITP; errori distinti dall’assenza di tabelloni. Verifica finale in app dopo pubblicazione. Sostituisce le precedenti proposte non applicate (selettore separato e apertura titolo torneo in Safari).

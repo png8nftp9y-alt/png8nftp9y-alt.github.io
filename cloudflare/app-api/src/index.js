@@ -1,3 +1,4 @@
+import {loadFitpDrawLinks} from '../lib/fitp-draw-links.mjs';
 import {personalPlayerList} from '../lib/personal-player-list.mjs';
 import {enrichFitpMetadata} from '../lib/fitp-player-metadata.mjs';
 import {runtimeDocumentReader,FRONTEND_DOCUMENTS} from '../lib/runtime-document-reader.mjs';
@@ -175,6 +176,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
   const user=await timing.measure('authentication',()=>accessUser(request,env));if(!user)return privateJson({error:'access_authentication_required'},401);
   const device=await timing.measure('device',()=>recordDevice(request,env,user,path));if(device.revoked)return privateJson({error:'device_revoked'},403);
   const apiPath=path.replace(/^\/app(?:-api|\/api)/,'');
+  if(apiPath==='/fitp-draw-links'&&request.method==='GET'){try{return privateJson(await loadFitpDrawLinks(url.searchParams.get('competitionId')||''))}catch(error){return privateJson({error:error.status===400?error.message:'fitp_draw_links_unavailable'},error.status||502)}}
   let group;try{group=playerListGroup(request.headers.get('X-CourtWatch-Group')||'main')}catch(error){return privateJson({error:error.message},400)}
   const membership=playerMembershipTable(group);
   const memberSelection=`SELECT courtwatch_id FROM ${membership} u WHERE user_id=? AND ${playerMembershipGuard(group)}`;

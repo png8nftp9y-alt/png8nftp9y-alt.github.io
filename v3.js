@@ -3654,6 +3654,7 @@ function agendaDrawCodeHtml(m, t) {
     : `<span class="type drawCode ${esc(gender)}">${esc(code)}</span>`;
 }
 function tournamentDrawLinks(t, matches) {
+  if (circuit(t) === "fitp") return fitpInlineDrawSlot(t);
   const draws = new Map();
   for (const m of matches) {
     const code = agendaEventCode(m);
@@ -3875,6 +3876,7 @@ function renderTournament(key) {
     surfaceLabel = tournamentSurfaceLabel(t);
   $("profileContent").innerHTML =
     `<div class="card tournamentHero"><div><h2>${title}</h2>${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(displayDate(t.startDate) || "data da pubblicare")} – ${esc(displayDate(t.endDate) || "data da pubblicare")}</p></div><div class="tournamentHeroActions">${acceptanceLink}<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div></div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
+  if (source === "fitp") loadInlineFitpDrawLinks(t);
   bindParticipantNavigation($("profileContent"));
   if (multiPlayer)
     $("profileContent")
@@ -5240,4 +5242,54 @@ async function startCourtWatch() {
     if (!/^#opponent(?:-profile)?\//.test(location.hash)) load();
   }, 30000);
 }
+// FITP_INLINE_DRAW_LINKS_START
+const fitpDrawLinkCache = new Map();
+const fitpDrawLinkRequests = new Map();
+function fitpInlineCompetitionId(t) {
+  let id = String(t.competitionId || '').trim();
+  if (!id) {try {id = new URL(t.sourceUrl).searchParams.get('competitionId') || '';} catch {}}
+  return /^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id) ? id.toUpperCase() : '';
+}
+function fitpInlineDrawHref(url, platform = navigator) {
+  const version = /OS (\d+)[_\d]* like Mac OS X/.exec(platform.userAgent || '');
+  return /iPhone|iPad|iPod/.test(platform.userAgent || '') && version && Number(version[1]) >= 17
+    ? url.replace(/^https:/,'x-safari-https:') : url;
+}
+function fitpInlineDrawHtml(rows) {
+  return rows.map(row => {
+    let url;try {url=new URL(row.url);}catch{return '';}
+    if (url.protocol !== 'https:' || url.hostname !== 'www.fitp.it' || url.pathname !== '/Tornei/Areas/Federtennis/Scripts/Puc/Tabellone_v3' || url.username || url.password || url.port) return '';
+    if (!/^\d+$/.test(url.searchParams.get('tournamentId')||'') || !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(url.searchParams.get('phaseId')||'')) return '';
+    return `<a class="type tournamentDrawLink" href="${esc(fitpInlineDrawHref(url.href))}" target="_blank" rel="noopener noreferrer" title="${esc([row.category,row.phase].filter(Boolean).join(' · '))}">${esc(row.label)}</a>`;
+  }).join('') || 'Nessun tabellone diretto pubblicato';
+}
+function fitpInlineDrawSlot(t) {
+  const id=fitpInlineCompetitionId(t);
+  if (!id) return '—';
+  const saved=fitpDrawLinkCache.get(id);
+  return `<span data-fitp-draw-links="${esc(id)}">${saved && Date.now()-saved.savedAt<300000 ? fitpInlineDrawHtml(saved.draws) : 'Caricamento tabelloni…'}</span>`;
+}
+async function loadInlineFitpDrawLinks(t) {
+  const id=fitpInlineCompetitionId(t);
+  if (!id) return;
+  const slot=()=>document.querySelector(`[data-fitp-draw-links="${id}"]`);
+  const saved=fitpDrawLinkCache.get(id);
+  if(saved && Date.now()-saved.savedAt<300000) {if(slot())slot().innerHTML=fitpInlineDrawHtml(saved.draws);return;}
+  let pending=fitpDrawLinkRequests.get(id);
+  if (!pending) {
+    pending=(async()=>{
+      const response=await fetch('/app/api/fitp-draw-links?competitionId='+encodeURIComponent(id),{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(20000)});
+      if (!response.ok) throw new Error('fitp_unavailable');
+      const data=await response.json();
+      if (String(data.competitionId||'').toUpperCase()!==id || !Array.isArray(data.draws)) throw new Error('fitp_invalid_response');
+      fitpDrawLinkCache.set(id,{draws:data.draws,savedAt:Date.now()});
+      return data.draws;
+    })();
+    fitpDrawLinkRequests.set(id,pending);
+  }
+  try {const rows=await pending;if(slot())slot().innerHTML=fitpInlineDrawHtml(rows);}
+  catch {if(slot())slot().textContent='Tabelloni FITP temporaneamente non disponibili';}
+  finally {if(fitpDrawLinkRequests.get(id)===pending)fitpDrawLinkRequests.delete(id);}
+}
+// FITP_INLINE_DRAW_LINKS_END
 startCourtWatch();
