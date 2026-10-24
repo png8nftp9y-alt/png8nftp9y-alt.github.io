@@ -53,20 +53,26 @@ async function personalHistory(db,player,circuit){
  const name=normalized(player.name),variants=[...new Set([name,name.split(' ').reverse().join(' ')])];
  if(!name)return {player,tournaments:[],matches:[]};
  const native=playerCircuitIdentities(player).find(p=>p.circuit===circuit)?.profileId;
- const aliases=await verifiedParticipantAliases(db,player,circuit,native,variants);
- const aliasMatches=[...new Set([...aliases].map(key=>JSON.parse(key)[0]))];
- // Build the small set of this player's match IDs before joining payloads.
- // UNION removes native/alias overlap without an OR that can scan all matches.
- const sources=[];let last='';
- while(true){
-  const candidates=native
-   ? 'SELECT match_id FROM match_participants WHERE source_player_id=? AND match_id>? UNION SELECT value AS match_id FROM json_each(?) WHERE value>?'
-   : `SELECT DISTINCT match_id FROM match_participants WHERE lower(normalized_name) IN (${variants.map(()=>'?').join(',')}) AND match_id>?`;
-  const values=native?[native,last,JSON.stringify(aliasMatches),last]:[...variants,last];
-  const batch=await rows(db,`WITH candidate_matches AS MATERIALIZED (${candidates}) SELECT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM candidate_matches ids CROSS JOIN matches m ON m.id=ids.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...values,circuit,last]);
-  sources.push(...batch);if(batch.length<250)break;
-  const next=batch.at(-1).match_id;if(next<=last)throw Error('personal_history_pagination_failed');last=next;
- }
+ // Exact indexed history need not wait for the independent alias checks.
+ const readSources=async(aliasMatches,includeNative)=>{
+  const sources=[];let last='';
+  while(true){
+   const candidates=native
+    ? (includeNative?'SELECT match_id FROM match_participants WHERE source_player_id=? AND match_id>? UNION SELECT value AS match_id FROM json_each(?) WHERE value>?':'SELECT value AS match_id FROM json_each(?) WHERE value>?')
+    : `SELECT DISTINCT match_id FROM match_participants WHERE lower(normalized_name) IN (${variants.map(()=>'?').join(',')}) AND match_id>?`;
+   const values=native?(includeNative?[native,last,JSON.stringify(aliasMatches),last]:[JSON.stringify(aliasMatches),last]):[...variants,last];
+   const batch=await rows(db,`WITH candidate_matches AS MATERIALIZED (${candidates}) SELECT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM candidate_matches ids CROSS JOIN matches m ON m.id=ids.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...values,circuit,last]);
+   sources.push(...batch);if(batch.length<250)break;
+   const next=batch.at(-1).match_id;if(next<=last)throw Error('personal_history_pagination_failed');last=next;
+  }
+  return sources;
+ };
+ const [aliases,nativeSources]=await Promise.all([
+  verifiedParticipantAliases(db,player,circuit,native,variants),readSources([],true)
+ ]);
+ const known=new Set(nativeSources.map(row=>row.match_id));
+ const aliasMatches=[...new Set([...aliases].map(key=>JSON.parse(key)[0]))].filter(id=>!known.has(id));
+ const sources=[...nativeSources,...(aliasMatches.length?await readSources(aliasMatches,false):[])].sort((a,b)=>a.match_id<b.match_id?-1:a.match_id>b.match_id?1:0);
  const participants=[];
  // At most four independent participant pages in flight; flatten in source order.
  for(let offset=0;offset<sources.length;offset+=160){

@@ -109,7 +109,7 @@ test('concurrent added players merge independently and a newer request for the s
  await Promise.all([a,b,fresh]);assert.equal(c.state.data.players.find(p=>p.id==='a').club,'fresh');assert.equal(c.state.data.players.find(p=>p.id==='b').club,'B');assert.equal(c.state.data.tournaments.length,2);
 });
 test('home player without matches opens immediately even after the transient confirmation is gone',async()=>{
- const c=context(null);c.context.profileNavigationEpoch=0;c.state.initialMatchProjectionPending=true;c.state.data.matches=[];c.state.data.players=[{id:'new',userAdded:true}];
+ const c=context(null);c.context.profileNavigationEpoch=0;c.state.initialMatchProjectionPending=true;c.state.data.matches=[];c.state.data.players=[{id:'new',userAdded:true,membershipPending:true}];
  let release;c.context.initialProjectionRequest=new Promise(resolve=>release=resolve);
  const start=source.indexOf('function hasAvailablePlayerProfile('),end=source.indexOf('async function openCurrentOpponent(',start);vm.runInContext(source.slice(start,end),c.context);
  assert.equal(c.context.confirmedCourtWatchPlayers.size,0);
@@ -201,4 +201,12 @@ test('refresh keeps the saved profile until match projection is ready without bl
  ctx.state.data.matches=[];ctx.state.initialMatchProjectionPending=false;assert.equal(ctx.shouldKeepPlayerRefreshPreview('new'),false);
  ctx.state.initialMatchProjectionPending=true;ctx.location.hash='#players';assert.equal(ctx.shouldKeepPlayerRefreshPreview('new'),false);
  ctx.location.hash='#player/new';delete ctx.window.courtWatchRefreshPreview;assert.equal(ctx.shouldKeepPlayerRefreshPreview('new'),false);
+});
+
+test('pending synchronized player shows loading on a previously complete snapshot',()=>{
+ const ctx={state:{data:{personalProjectionComplete:true,personalEnrichedPlayerIds:['new'],players:[{id:'new',membershipPending:true}]}},confirmedCourtWatchPlayers:new Map()};
+ vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function playerTournamentsEmptyHtml('),source.indexOf('function renderProfile(')),ctx);
+ assert.match(ctx.playerTournamentsEmptyHtml('new'),/role="status"/);
+ assert.doesNotMatch(ctx.playerTournamentsEmptyHtml('new'),/Nessun torneo/);
+ ctx.state.data.players[0].membershipPending=false;assert.match(ctx.playerTournamentsEmptyHtml('new'),/Nessun torneo/);
 });

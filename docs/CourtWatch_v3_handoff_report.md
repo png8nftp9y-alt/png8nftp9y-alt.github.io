@@ -8974,3 +8974,11 @@ ITF Meta extraordinary 2026-10-24T14:00:16.936Z: attempted 1, acquired 0, ordina
 ITF Meta extraordinary 2026-10-24T14:01:16.394Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-10-24T14:02:06.379Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+
+## 2026-10-24 — Velocità storico del giocatore sincronizzato e apertura profilo
+- Causa: la richiesta individuale leggeva prima gli alias e poi lo storico esatto, anche se indipendenti. I cataloghi dei tornei base partivano tardi. Inoltre openProfile aspettava ancora lo snapshot del gruppo quando membershipPending era attivo.
+- Correzione server: avvia lo storico indicizzato per ID insieme alla verifica alias. Legge separatamente solo gli eventuali match alias non già ottenuti; ricompone nello stesso ordine e conserva verifiche identità e paginazione. Anticipa i cataloghi per i tornei già disponibili, riusando le promesse per circuito. Nessun polling, migrazione o scrittura aggiuntiva. Nessun alias: stesso numero di query; alias aggiuntivi: possibile query separata, senza promessa di riduzione globale delle letture.
+- Frontend: scheda già disponibile cliccabile durante il caricamento; sezione tornei con stato di aggiornamento invece di falsa assenza. Cache JS aggiornata. Non cambia i dati mostrati a caricamento completo.
+- Verifiche locali: 74 test mirati passati su storico, budget SQL/indici, alias, API individuale, sincronizzazione, aggiunta, gruppi e calendario. Nuova regressione assicura avvio simultaneo di lettura ID e verifica alias, senza doppia lettura esatta. Sintassi e UI analisi verdi, invarianti costo D1 verdi (18 controlli). Installer verificato due volte. Nessuna misura di tempo reale sul dispositivo: verificare dopo deploy, non dichiarare risolto dalla sola CI.

@@ -3001,8 +3001,8 @@ function hasAvailablePlayerProfile(id) {
 }
 async function openProfile(id) {
   const epoch = ++profileNavigationEpoch, previousHash = location.hash;
-  if (!hasAvailablePlayerProfile(id)||state.data?.players?.find(p=>p.id===id)?.membershipPending) await (initialProjectionRequest || load());
-  if (epoch !== profileNavigationEpoch || location.hash !== previousHash || !hasAvailablePlayerProfile(id)||state.data?.players?.find(p=>p.id===id)?.membershipPending) return;
+  if (!hasAvailablePlayerProfile(id)) await (initialProjectionRequest || load());
+  if (epoch !== profileNavigationEpoch || location.hash !== previousHash || !hasAvailablePlayerProfile(id)) return;
   location.hash = "player/" + encodeURIComponent(id);
 }
 async function openCurrentOpponent(profileId, name, event = "") {
@@ -3498,7 +3498,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   loadOpponentHistory(name, event, identity);
 }
 function playerTournamentsEmptyHtml(playerId) {
-  const pending = !state.data?.personalEnrichedPlayerIds?.includes(playerId) &&
+  const pending = state.data?.players?.some(p=>p.id===playerId&&p.membershipPending) || !state.data?.personalEnrichedPlayerIds?.includes(playerId) &&
     (confirmedCourtWatchPlayers.has(playerId) ||
     (state.data?.personalProjectionComplete === false &&
       state.data?.players?.some(player => player.id === playerId && player.userAdded)));

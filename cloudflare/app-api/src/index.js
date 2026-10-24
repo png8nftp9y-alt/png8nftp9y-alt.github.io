@@ -220,6 +220,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
     ]);
     const playerMap=new Map(players.map(player=>[player.id,player]));for(const player of added)playerMap.set(player.id,{...playerMap.get(player.id),...player});players.splice(0,players.length,...playerMap.values());
     const presentation=playerId?tournamentPresentationContext(undefined,timing.measure,env.RUNTIME_DOCUMENTS):null;
+    presentation?.prepare(tournaments);
     const prepare=rows=>{presentation.prepare(rows);return rows};
     const scopedData=playerId?await Promise.all([
       timing.measure('entries',()=>exactPersonalEntryProfiles(env.DB,added).then(profiles=>Promise.all(added.filter(p=>p.sourceKey).map(async player=>{

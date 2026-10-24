@@ -99,3 +99,15 @@ test('native-ID history skips redundant canonical alias reads and loads particip
   assert.equal(aliasLookups,0);assert.equal(maximum,3);assert.ok(maximum<=4);assert.equal(d.writes(),before);
  }finally{d.close()}
 });
+
+test('native history starts before slow alias verification ends without a duplicate read',async()=>{
+ let releaseAliases,releaseHistory,aliasReads=0,historyReads=0;
+ const db={prepare(sql){return {bind(){return {all(){
+  if(sql.includes('p.normalized_name IN')){aliasReads++;return new Promise(r=>releaseAliases=()=>r({results:[]}));}
+  if(sql.includes('candidate_matches')){historyReads++;return new Promise(r=>releaseHistory=()=>r({results:[]}));}
+  throw Error('Unexpected query: '+sql);
+ }}}}}};
+ const pending=personalCircuitHistory(db,{id:'test',name:'Case Player',sourceCircuit:'tennis-europe',profileSync:{tennisEurope:{profileId:'12345678-1234-1234-1234-123456789abc'}}});
+ await new Promise(r=>setImmediate(r));assert.equal(aliasReads,1);assert.equal(historyReads,1);
+ releaseHistory();releaseAliases();const result=await pending;assert.deepEqual(result.matches,[]);assert.equal(historyReads,1);
+});
