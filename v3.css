@@ -591,3 +591,8 @@ button,a,[role="link"],summary{touch-action:manipulation}
 .agendaTournamentHead h3 button,.agendaTournamentHead h3 span,.agendaTournamentBlock.fitp .agendaTournamentHead h3 button,.agendaTournamentBlock.fitp .agendaTournamentHead h3 span,.agendaTournamentBlock.tennis-europe .agendaTournamentHead h3 button,.agendaTournamentBlock.tennis-europe .agendaTournamentHead h3 span,.agendaTournamentBlock.itf .agendaTournamentHead h3 button,.agendaTournamentBlock.itf .agendaTournamentHead h3 span{color:#3b4454}
 .agendaTournamentMatches .agendaItem{background:#fff}
 @media(max-width:650px){.agendaFilter{flex:1 1 100%}.agendaFilterMenu{width:100%;max-width:100%}.agendaFilters{padding:10px}.agendaFilter summary{font-size:13px}}
+
+/* FITP_CATEGORY_ROWS */
+.tournamentDraws [data-fitp-draw-links]{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
+.fitpDrawCategoryRow{display:flex;flex-wrap:wrap;align-items:center;gap:5px;width:100%}
+.tournamentDraws:has([data-fitp-draw-links]){align-items:flex-start;flex-wrap:nowrap}

@@ -5256,11 +5256,24 @@ function fitpInlineDrawHref(url, platform = navigator) {
     ? url.replace(/^https:/,'x-safari-https:') : url;
 }
 function fitpInlineDrawHtml(rows) {
-  return rows.map(row => {
-    let url;try {url=new URL(row.url);}catch{return '';}
-    if (url.protocol !== 'https:' || url.hostname !== 'www.fitp.it' || url.pathname !== '/Tornei/Areas/Federtennis/Scripts/Puc/Tabellone_v3' || url.username || url.password || url.port) return '';
-    if (!/^\d+$/.test(url.searchParams.get('tournamentId')||'') || !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(url.searchParams.get('phaseId')||'')) return '';
-    return `<a class="type tournamentDrawLink" href="${esc(fitpInlineDrawHref(url.href))}" target="_blank" rel="noopener noreferrer" title="${esc([row.category,row.phase].filter(Boolean).join(' · '))}">${esc(row.label)}</a>`;
+  const categories = new Map();
+  for (const row of rows) {
+    let url;try {url=new URL(row.url);}catch{continue;}
+    if (url.protocol !== 'https:' || url.hostname !== 'www.fitp.it' || url.pathname !== '/Tornei/Areas/Federtennis/Scripts/Puc/Tabellone_v3' || url.username || url.password || url.port) continue;
+    if (!/^\d+$/.test(url.searchParams.get('tournamentId')||'') || !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(url.searchParams.get('phaseId')||'')) continue;
+    const code = String(row.categoryCode || String(row.label || '').split(/\s+/)[0]);
+    const key = /^(?:SM|SF|DM|DF|DX)(?:O?\d{1,2})?$/.test(code) ? code : String(row.category || code);
+    if (!categories.has(key)) categories.set(key,[]);
+    categories.get(key).push({...row,url:url.href});
+  }
+  const categoryOrder = code => {
+    const match = code.match(/^(SM|SF|DM|DF|DX)(?:(O)?(\d{1,2}))?$/);
+    return match ? [match[3] ? Number(match[3])+(match[2]?1000:0) : 500, ['SM','SF','DM','DF','DX'].indexOf(match[1])] : [10000,0];
+  };
+  const phaseOrder = row => /INIZIALE/i.test(row.label) ? 0 : /INTERMEDIO/i.test(row.label) ? 1 : /FINALE/i.test(row.label) ? 2 : 3;
+  return [...categories].sort(([a],[b])=>{const x=categoryOrder(a),y=categoryOrder(b);return x[0]-y[0] || x[1]-y[1] || a.localeCompare(b,'it');}).map(([category,draws]) => {
+    const links=draws.sort((a,b)=>phaseOrder(a)-phaseOrder(b) || String(a.label).localeCompare(String(b.label),'it',{numeric:true})).map(row=>`<a class="type tournamentDrawLink" href="${esc(fitpInlineDrawHref(row.url))}" target="_blank" rel="noopener noreferrer" title="${esc([row.category,row.phase].filter(Boolean).join(' · '))}">${esc(row.label)}</a>`).join('');
+    return `<span class="fitpDrawCategoryRow" data-fitp-draw-category="${esc(category)}">${links}</span>`;
   }).join('') || 'Nessun tabellone diretto pubblicato';
 }
 function fitpInlineDrawSlot(t) {

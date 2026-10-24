@@ -9121,3 +9121,9 @@ Validazione: test con le fonti reali dei cinque gruppi, protezione schede vuote,
 Il run 40129261733 si ferma nella rilettura delle regole dopo 8 righe scritte. Il pattern LIKE usato dalla patch è lungo 51 byte, oltre il limite D1 documentato di 50. Sostituito con WHERE key IN sulle sole quattro chiavi esatte: stessa verifica completa, senza pattern o scansione per prefisso. Le regole già persistite vengono riconosciute e non reinserite; ripresa sulla coda dei soli quattro gruppi e readback finale invariati. Errori API ora includono codici e messaggi restituiti da Cloudflare. Nessun retry o monitoraggio automatico.
 
 Validazione: 21 test superati, incluso test di regressione che applica il limite LIKE/GLOB di D1 e simula le quattro regole già salvate, verificando zero reinserimenti e tutte le associazioni. Schede vuote escluse, Daria separata, regole precedenti mantenute; policy incrementale. Risultato in D1 da verificare nel nuovo run dopo pubblicazione.
+
+## 2026-10-24 — Tabelloni FITP su righe per categoria
+
+- Richiesta: tutti i tabelloni della stessa categoria sulla stessa riga; categorie ordinate per età e poi SM, SF, DM, DF, DX. Etichette sintetiche e associazione ai tabelloni restano quelle ufficiali già acquisite.
+- Frontend raggruppa i link per codice categoria e ordina le fasi INIZIALE, INTERMEDIO numerico, FINALE; CSS separa le righe e permette ai link della stessa categoria di andare a capo su schermi stretti. Aggiornate versioni cache JS/CSS. Nessuna richiesta aggiuntiva, polling o modifica D1.
+- Validazione: quattro test frontend superati, compresi ordine SM10/SF10/DM10/DF10/SM12/DF12, fasi e integrità delle URL; controllo sintassi JS. Apertura Safari preservata.
