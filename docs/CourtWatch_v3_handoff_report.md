@@ -1,3 +1,7 @@
+## 2026-10-25 — chat 1: associazione Aye Diallo confermata
+
+Associata la sorgente acquisita esatta di Aye DIALLO al profilo Europe 98471900-d3d3-4468-ae75-a7738fd96356, su conferma utente. Nazionalità sorgente preservata. Recovery incrementale esistente, guardie identità e conflitti mantenute; data conferma per binding. Test recovery e Index verificati localmente. Salvataggio D1 al prossimo Index sulla nuova versione; esito remoto ancora da verificare. Nessun polling.
+
 ## 2026-10-24 — chat 1: correzione test cache cataloghi
 
 I run 40129305189 e 40129305132 fallivano perché la cache scaldata dalla baseline evitava la lettura intercettata dal test. Pubblicata nella fixture una versione equivalente con hash distinto. Mantenuti controlli concorrenza, parità risposta e zero scritture. Nessuna modifica runtime. Validazione locale: 40 test superati. Deploy da verificare dopo push.

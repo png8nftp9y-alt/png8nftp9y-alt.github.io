@@ -34,16 +34,17 @@ export function europePublicPages({fetchPage=fetch}={}){
  };
 }
 
-// Exact source-to-profile bindings supplied by the user on 2026-10-20.
+// Exact source-to-profile bindings supplied by the user on 2026-10-20 and 2026-10-25.
 // They are not name searches or inferred equivalences of federation codes.
 export const userConfirmedEuropeProfiles=Object.freeze([
+ ['9625837adb91e59c671b0786','Aye DIALLO','','98471900-d3d3-4468-ae75-a7738fd96356','2026-10-25'],
  ['a13740e659705eee53b3a7ef','Kristina DEMYANKO','ITF','9ab1a4e8-a38c-40ee-aecc-f6da91a50767'],
  ['9d640088a5e2ad49a1a7168a','Kristina DEMYANKO','BLR','9ab1a4e8-a38c-40ee-aecc-f6da91a50767'],
  ['e319bc874abba7544f4e0fde','Beata KUTIAVINA','RUS','d5bb3efc-2d8c-402c-8c35-bff7b391f8f6'],
  ['ec24b01e3e4f73f565c73355','Veronika BABURINA','ITF','95304d41-5692-47e7-b0e1-d1d685a93ca9'],
  ['ed66f03b7fc64f2abc275b87','Uliana TSYBINA','RUS','09208755-8677-4531-af05-dc78e82ca178'],
  ['ee4d881308a011e475b81780','Denis GORDEEV','RUS','033e2af1-a29e-4021-b809-59236a452bc4']
-].map(([key,name,nationality,officialId])=>Object.freeze({sourceKey:'acquired|tennis-europe|name:'+key,name,nationality,officialId})));
+].map(([key,name,nationality,officialId,confirmedOn='2026-10-20'])=>Object.freeze({sourceKey:'acquired|tennis-europe|name:'+key,name,nationality,officialId,confirmedOn})));
 export function userConfirmedEuropeProfile(row){
  const binding=userConfirmedEuropeProfiles.find(p=>p.sourceKey===row.source_key);
  if(!binding||row.source_table!=='search_acquired_players'||row.circuit!=='tennis-europe')return null;
@@ -51,7 +52,7 @@ export function userConfirmedEuropeProfile(row){
  if(row.display_name!==binding.name||nation!==binding.nationality)throw Error('europe_confirmed_source_changed');
  if(row.official_id&&row.official_id.toLowerCase()!==binding.officialId)throw Error('europe_confirmed_existing_id_conflict');
  if(payload.officialId&&payload.officialId.toLowerCase()!==binding.officialId)throw Error('europe_confirmed_payload_id_conflict');
- return {officialId:binding.officialId,profileUrl:host+'/player-profile/'+binding.officialId,profileEvidenceProvenance:{type:'user_confirmed_exact_source_profile',confirmedOn:'2026-10-20',sourceKey:binding.sourceKey}};
+ return {officialId:binding.officialId,profileUrl:host+'/player-profile/'+binding.officialId,profileEvidenceProvenance:{type:'user_confirmed_exact_source_profile',confirmedOn:binding.confirmedOn,sourceKey:binding.sourceKey}};
 }
 
 export async function europeMatchProfileEvidence(rows,query,publicPage){
