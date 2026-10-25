@@ -65,6 +65,18 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
   }
 
   if(new Set(found.flatMap(g=>g.members.map(officialKey).filter(k=>wanted.has(k)))).size!==wanted.size)continue;
+  // Explicit exact retained-source bindings may accompany confirmed native IDs.
+  // They never grant a general name-only matching rule.
+  const sourceKeys=rule.sourceKeys||[];
+  if(!Array.isArray(sourceKeys)||sourceKeys.some(k=>typeof k!=='string'||!k)||sourceKeys.length&&!rule.nameKey)throw Error('confirmed_source_link_invalid');
+  for(const sourceKey of sourceKeys){
+   const targets=sets.map((members,i)=>({members,i})).filter(g=>g.members.some(r=>r.source_key===sourceKey));
+   for(const g of targets){const r=g.members.find(r=>r.source_key===sourceKey),raw=parsed(r.payload),native=officialKey({...r,official_id:r.official_id||raw.officialId||''});
+    if(r.circuit==='courtwatch'||!rule.identities.some(id=>id.circuit===r.circuit)||playerNameKey(r.display_name)!==rule.nameKey||native&&!wanted.has(native)||rule.currentNationality&&(raw.nationality||raw.country)&&String(raw.nationality||raw.country)!==rule.currentNationality)throw Error('confirmed_source_link_evidence_conflict');
+    if(!found.some(x=>x.i===g.i))found.push(g);
+   }
+  }
+
   const roots=new Set(found.map(g=>find(g.i))),members=sets.flatMap((g,i)=>roots.has(find(i))?g:[]),ids=new Map();
   for(const r of members){const key=officialKey(r);if(!key)continue;const known=ids.get(r.circuit)||new Set();known.add(key);ids.set(r.circuit,known);}
   if([...ids.values()].some(s=>s.size>1))throw Error('confirmed_identity_link_conflicts_with_existing_profile');

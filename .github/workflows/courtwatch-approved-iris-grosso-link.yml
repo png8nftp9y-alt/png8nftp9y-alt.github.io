@@ -1,0 +1,37 @@
+name: Court Watch approved Iris Grosso association
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-approved-iris-grosso-link.yml', 'cloudflare/app-api/scripts/apply-approved-iris-identity.mjs']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify exact Iris IDs, search, review closure and replay
+        run: node --test test/apply-approved-iris-identity.test.mjs test/identity-review-queue.test.mjs test/player-identity-mapping.test.mjs
+      - run: node scripts/configure-d1.mjs
+      - name: Apply confirmed Iris association and verify D1 and search
+        run: node scripts/apply-approved-iris-identity.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iris-grosso-approved-identity-readback
+          path: cloudflare/app-api/tmp/approved-iris-identity.json
+          retention-days: 30
