@@ -18,6 +18,7 @@ on:
       - 'cloudflare/app-api/scripts/generate-tennis-europe-import-hash.mjs'
       - 'cloudflare/app-api/scripts/import-tennis-europe-query.mjs'
       - 'cloudflare/app-api/test/tennis-europe-query-import.test.mjs'
+      - 'cloudflare/app-api/test/tennis-europe-historical-sync.test.mjs'
       - 'dist/v3/manual_matches.json'
       - 'cloudflare/app-api/scripts/restore-tennis-europe-oop.sh'
       - 'cloudflare/app-api/scripts/verify-tennis-europe-agenda-d1.mjs'
@@ -51,8 +52,9 @@ jobs:
         working-directory: cloudflare/app-api
     env:
       GITHUB_TOKEN: ${{ github.token }}
-      # Live upstream runs import deltas; historical merges and maintenance runs rebuild the full Europe archive.
-      TE_INCREMENTAL: ${{ ((github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Court Watch Tennis Europe OOP historical merge') || (github.event_name == 'workflow_dispatch' && inputs.full_archive)) && '0' || '1' }}
+      # Historical sync checks the complete archive using guarded, non-destructive writes.
+      TE_INCREMENTAL: '1'
+      TE_SYNC_HISTORICAL: ${{ ((github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Court Watch Tennis Europe OOP historical merge') || (github.event_name == 'workflow_dispatch' && inputs.full_archive)) && '1' || '0' }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -75,7 +77,7 @@ jobs:
       - run: npm install
       - name: Check Tennis Europe sources
         run: |
-          node --test test/tennis-europe-query-import.test.mjs
+          node --test test/tennis-europe-query-import.test.mjs test/tennis-europe-historical-sync.test.mjs
           node --check scripts/generate-tennis-europe-oop-seed.mjs
           node --check scripts/generate-tennis-europe-app-candidates.mjs
           node --check scripts/verify-tennis-europe-agenda-d1.mjs
