@@ -28,7 +28,7 @@ test('new cases appear even with a previously saved ID page; authorized JSON exp
  let reads=0;const guarded={prepare(sql){reads++;return d.db.prepare(sql)}};
  const noauth=await worker.fetch(new Request('https://app/admin/id?reviewExport=1'),{...env,DB:guarded});assert.equal(noauth.status,401);assert.equal(reads,0);
  save(d);const writes=d.writes(),authorization='Basic '+btoa('admin:secret'),headers={Authorization:authorization};
- const page=await worker.fetch(new Request('https://app/admin/id',{headers}),env),html=await page.text();assert.equal(page.status,200);assert.match(html,/CACHED COUNTS/);assert.match(html,/EXAMPLE PLAYER/);assert.equal(d.writes(),writes);
+ const page=await worker.fetch(new Request('https://app/admin/id',{headers}),env),html=await page.text();assert.equal(page.status,200);assert.match(html,/CACHED COUNTS/);assert.match(html,/EXAMPLE PLAYER/);assert.ok(html.indexOf('id="identita-sospette"')<html.indexOf('CACHED COUNTS'),'review section must precede cached ID counts');assert.equal(d.writes(),writes);
  const exported=await worker.fetch(new Request('https://app/admin/id?reviewExport=1',{headers}),env);assert.equal(exported.status,200);assert.equal((await exported.json()).cases.length,1);assert.equal(d.writes(),writes);
  }finally{d.close()}
 });
