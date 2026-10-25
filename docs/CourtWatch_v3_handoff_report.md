@@ -9153,3 +9153,13 @@ ITF discovery 2026-10-24T21:16:25.796Z: 0 newly discovered future tournaments; M
 - Frontend filtra le righe tramite categorie delle iscrizioni subscriptionRegistrations, draw/event delle presenze e partite FITP degli stessi playerId nella stessa competitionId. Nessuna deduzione dalla sola età del giocatore; categorie prive di evidenza escluse con messaggio esplicito. Il catalogo pubblico rimane condivisibile, il filtro viene ricalcolato sul torneo corrente anche quando proviene dalla cache.
 - Due sezioni: nomi sintetici INIZIALE e FINALE mantenendo gli identificativi e le descrizioni originali nel titolo. Unica sezione: solo sigla; tre o più: comportamento precedente. Righe per età, colori per sesso e Safari conservati. Nessuna nuova richiesta, polling o lettura/scrittura D1.
 - Validazione: 12 test superati su filtro iscrizioni/partite, esclusione di altri giocatori e tornei, cache, colori e URL; caso due sezioni e descrizione originale; sintassi frontend valida. Versione cache JS aggiornata.
+
+## Conferme numerate 1–30: identità e nazionalità attuale (25 ottobre 2026)
+
+Decisione esplicita dell'utente sulla tabella a numerazione fissa: unire 29 gruppi; per #9 Emma Cao mantenere separati Europe AUS e ITF CAN. Le nazionalità attuali confermate sono salvate nel manifesto per numero e ID nativi, senza alterare le fonti storiche. Nigeria=NGR, Spagna=ESP e Regno Unito=GBR.
+
+Scelte specifiche tra più ID ITF: #16 Juan Lee 800843135 NZL, #18 Sofia Kuzmina 800712926 IRL, #22 Luka Mitrovic 800693835 CRO, #26 Sophia Santos 800661870 CRO, #30 Tara Stojanovic 800765041 CRO. Gli altri ITF restano separati. #1 Aso Mawlood e #14 Pietro Gandolfo collegano anche la tessera FITP precisa; #21 Louis Spagnardi collega FITP ed Europe. Il manifesto comprende 29 associazioni e 31 coppie di regole confermate. Nessuna estensione a nomi fuori da questa lista.
+
+Workflow una tantum courtwatch-approved-nationality-links.yml sotto lock courtwatch-d1-writes, simulazione prima di scrivere, sole regole mancanti, mapper ordinario sulle fonti selezionate e readback di ogni associazione e nazionalità canonica. Readback con chiavi esatte IN; nessun LIKE oltre il limite D1. Verifiche: ID esclusi separati, tutte le fonti preservate, Emma Cao stessa partizione con nazionalità e payload originali, Vasileva invariata, ripresa da regole già salvate, replay completato zero scritture. Nessuna discovery esterna, polling, schedulazione o retry automatico.
+
+Validazione locale: regressioni quattro e tre associazioni precedenti e mapper; fixture reali dei 31 gruppi per scelte attuali e controlli. Applicazione in produzione da confermare nel nuovo run dopo il push.
