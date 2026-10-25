@@ -33,13 +33,24 @@ test('failed ID refresh preserves the valid saved snapshot',async()=>{
  await savedAdminPage(d.request('refreshIds'),d.env,'id',async()=>'<html><nav></nav><div class="admin-page page-id">Conteggi ID non disponibili</div></html>');
  assert.equal(d.writes(),1);assert.equal(await savedAdminPage(d.request(),d.env,'id',d.render),first);
 });
-test('saved page access stays authenticated and no-store; it does not query D1',async()=>{
+test('saved pages stay authenticated and no-store; only ID reviews read D1 while counts stay saved',async()=>{
  for(const view of ['id','diagnostica']){
  const d=setup(view);const first=await savedAdminPage(d.request(),d.env,view,d.render);
- d.env.DB={prepare(){throw Error('cached page must not query D1')}};
+ let reviewReads=0;
+ d.env.DB={prepare(sql){
+  assert.match(sql,/^SELECT key,value,updated_at FROM app_state WHERE key>\? AND key<\? ORDER BY key LIMIT 51$/);
+  return{bind(...params){assert.deepEqual(params,['identityReviewCase:','identityReviewCase;']);return{async all(){reviewReads++;return{success:true,results:[]}}}}};
+ }};
  let reads=0;const get=d.env.ARCHIVE.get;d.env.ARCHIVE.get=async key=>{reads++;return get(key)};
- assert.equal((await worker.fetch(d.request(),d.env)).status,401);assert.equal(reads,0);
+ assert.equal((await worker.fetch(d.request(),d.env)).status,401);assert.equal(reads,0);assert.equal(reviewReads,0);
  const r=await worker.fetch(new Request(d.request().url,{headers:{Authorization:'Basic '+btoa('admin:test-only')}}),d.env);
- assert.equal(r.status,200);assert.equal(r.headers.get('Cache-Control'),'no-store');assert.equal(await r.text(),first);assert.equal(reads,1);
+ assert.equal(r.status,200);assert.equal(r.headers.get('Cache-Control'),'no-store');const html=await r.text();
+ if(view==='id'){
+  assert.match(html,/id="identita-sospette"/);assert.match(html,/Nessun caso sospetto segnalato/);
+  assert.equal(html.replace(/<section class="card" id="identita-sospette">[\s\S]*?<\/section>/,''),first);
+  assert.ok(html.indexOf('id="identita-sospette"')<html.indexOf('Aggiorna conteggi'));
+ }else assert.equal(html,first);
+ assert.equal(reviewReads,view==='id'?1:0);assert.equal(reads,1);assert.equal(d.builds(),1);assert.equal(d.writes(),1);
+ assert.equal(await savedAdminPage(d.request(),d.env,view,d.render),first);
  }
 });
