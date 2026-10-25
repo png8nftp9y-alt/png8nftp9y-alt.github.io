@@ -133,3 +133,10 @@ jobs:
           VERIFY_SCOPE: tennis-europe
         working-directory: .
         run: node src/v3/verify-cloudflare-api-parity.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tennis-europe-draw-walkover-audit
+          path: cloudflare/app-api/seed-tennis-europe-oop/draw-walkover-audit.json
+          if-no-files-found: warn
+          retention-days: 14
