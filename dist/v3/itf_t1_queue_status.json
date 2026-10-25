@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-10-25T12:15:45.396Z",
+  "generatedAt": "2026-10-25T12:24:46.017Z",
   "today": "2026-10-25",
   "windowEnd": "2026-10-28",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -11,17 +11,17 @@
     "complete": 900,
     "cancelledNoDraws": 13,
     "resolved": 913,
-    "missingDrawsTournaments": 21,
-    "unverifiable": 199,
-    "declaredDraws": 5302,
-    "acquiredDraws": 5219,
-    "missingDraws": 83,
-    "actionableUnverifiable": 4,
+    "missingDrawsTournaments": 22,
+    "unverifiable": 198,
+    "declaredDraws": 5308,
+    "acquiredDraws": 5221,
+    "missingDraws": 87,
+    "actionableUnverifiable": 3,
     "futureUnverifiable": 195,
     "ordinary": {
       "total": 25,
-      "missingDraws": 83,
-      "inventoryRequired": 4
+      "missingDraws": 87,
+      "inventoryRequired": 3
     },
     "extraordinaryA": {
       "total": 0,
@@ -1452,27 +1452,77 @@
         "tournamentName": "J30 Osaka",
         "startDate": "2026-10-28",
         "endDate": "2026-11-01",
-        "status": "inventory_empty",
-        "inventoryError": "empty_inventory",
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "status": "missing",
+        "inventoryError": null,
+        "knownDraws": 6,
+        "acquiredDraws": 2,
+        "missingDraws": 4,
+        "missingEvents": [
+          {
+            "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-10-25T12:17:04.530Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-10-25T12:17:04.530Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-10-25T12:17:04.530Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-10-25T12:17:04.530Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-25T11:29:34.651Z",
+        "needsInventory": false,
+        "checkedAt": "2026-10-25T12:17:04.530Z",
         "eligibleFrom": "2026-10-27"
       }
     ],
     "total": 25,
-    "missingDraws": 83,
-    "acquiredDraws": 40,
+    "missingDraws": 87,
+    "acquiredDraws": 42,
     "missingByReason": {
-      "draw_without_players": 83
+      "draw_without_players": 86,
+      "incapsula_blocked": 1
     },
     "byStatus": {
-      "missing": 21,
-      "inventory_empty": 4
+      "missing": 22,
+      "inventory_empty": 3
     }
   },
   "extraordinary": {
@@ -4615,9 +4665,9 @@
     }
   },
   "audit": {
-    "urgentUnverifiable": 4,
+    "urgentUnverifiable": 3,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 4,
+    "actionableUnverifiable": 3,
     "futureUnverifiable": 195,
     "blocked": 0
   }
