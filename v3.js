@@ -5278,18 +5278,51 @@ function fitpInlineDrawHtml(rows) {
     return `<span class="fitpDrawAgeRow" data-fitp-draw-age="${esc(key)}"><b class="fitpDrawAgeLabel">${esc(group.label)}</b>${links}</span>`;
   }).join('') || 'Nessun tabellone diretto pubblicato';
 }
+function fitpObservedCategoryKey(value) {
+  const text=String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[_-]/g,' ').replace(/\s+/g,' ').trim();
+  const direct=text.match(/(?:^|\s)(SM|SF|DM|DF|DX)(?:U?(\d{1,2})|O(\d{2}))?(?=$|\s)/);
+  if(direct)return direct[1]+(direct[2] || (direct[3]?'O'+direct[3]:''));
+  const kind=/\b(?:DOPPIO|DOUBLES?)\b/.test(text)?'D':/\b(?:SINGOLARE|SINGLES?)\b/.test(text)?'S':'';
+  const gender=/\b(?:MISTO|MIXED)\b/.test(text)?'X':/\b(?:FEMMINILE|FEMALE|GIRLS?)\b/.test(text)?'F':/\b(?:MASCHILE|MALE|BOYS?)\b/.test(text)?'M':'';
+  const ages=[...text.matchAll(/\b(?:UNDER\s*|U)(\d{1,2})\b/g)].map(m=>m[1]);
+  if(new Set(ages).size>1)return '';
+  const over=text.match(/\bOVER\s*(\d{2})\b/);
+  return kind&&gender ? kind+gender+(ages[0] || (over?'O'+over[1]:'')) : '';
+}
+function fitpObservedDrawRows(t, rows) {
+  const allowed=new Set(),ids=new Set((t.playerIds || []).map(String));
+  const add=value=>{const key=fitpObservedCategoryKey(value);if(key)allowed.add(key);};
+  const entries=Array.isArray(t.people)?t.people:[t];
+  for(const person of entries){
+    if(person.playerId)ids.add(String(person.playerId));
+    for(const registration of person.subscriptionRegistrations || [])add(registration.category);
+    for(const draw of Array.isArray(person.draws)?person.draws:[])add(typeof draw==='string'?draw:draw?.category || draw?.draw || draw?.event);
+    add(person.draw);add(person.event);add(`${person.draw || ''} ${person.event || ''}`);
+  }
+  const competitionId=fitpInlineCompetitionId(t);
+  for(const match of state.data?.matches || []){
+    if(!ids.has(String(match.playerId)) || String(match.circuit || 'fitp')!=='fitp')continue;
+    if(!competitionId || String(match.competitionId || '').toUpperCase()!==competitionId)continue;
+    add(match.event);add(match.draw);add(`${match.event || ''} ${match.draw || ''}`);
+  }
+  return rows.filter(row=>allowed.has(fitpObservedCategoryKey(row.categoryCode || row.category)));
+}
+function fitpObservedDrawHtml(t, rows) {
+  const observed=fitpObservedDrawRows(t,rows);
+  return observed.length?fitpInlineDrawHtml(observed):'Nessun tabellone pubblicato per i giocatori osservati';
+}
 function fitpInlineDrawSlot(t) {
   const id=fitpInlineCompetitionId(t);
   if (!id) return '—';
   const saved=fitpDrawLinkCache.get(id);
-  return `<span data-fitp-draw-links="${esc(id)}">${saved && Date.now()-saved.savedAt<300000 ? fitpInlineDrawHtml(saved.draws) : 'Caricamento tabelloni…'}</span>`;
+  return `<span data-fitp-draw-links="${esc(id)}">${saved && Date.now()-saved.savedAt<300000 ? fitpObservedDrawHtml(t,saved.draws) : 'Caricamento tabelloni…'}</span>`;
 }
 async function loadInlineFitpDrawLinks(t) {
   const id=fitpInlineCompetitionId(t);
   if (!id) return;
   const slot=()=>document.querySelector(`[data-fitp-draw-links="${id}"]`);
   const saved=fitpDrawLinkCache.get(id);
-  if(saved && Date.now()-saved.savedAt<300000) {if(slot())slot().innerHTML=fitpInlineDrawHtml(saved.draws);return;}
+  if(saved && Date.now()-saved.savedAt<300000) {if(slot())slot().innerHTML=fitpObservedDrawHtml(t,saved.draws);return;}
   let pending=fitpDrawLinkRequests.get(id);
   if (!pending) {
     pending=(async()=>{
@@ -5302,7 +5335,7 @@ async function loadInlineFitpDrawLinks(t) {
     })();
     fitpDrawLinkRequests.set(id,pending);
   }
-  try {const rows=await pending;if(slot())slot().innerHTML=fitpInlineDrawHtml(rows);}
+  try {const rows=await pending;if(slot())slot().innerHTML=fitpObservedDrawHtml(t,rows);}
   catch {if(slot())slot().textContent='Tabelloni FITP temporaneamente non disponibili';}
   finally {if(fitpDrawLinkRequests.get(id)===pending)fitpDrawLinkRequests.delete(id);}
 }

@@ -27,6 +27,12 @@ export function fitpDrawLinks(detail, competitionId) {
       const shortPhase = /inizial/i.test(phase) ? 'INIZIALE' : /intermedi/i.test(phase) ? 'INTERMEDIO' : /final|conclu|concu/i.test(phase) ? 'FINALE' : /inizial/i.test(section.SectionType || '') ? 'INIZIALE' : /final|conclu/i.test(section.SectionType || '') ? 'FINALE' : 'INTERMEDIO';
       sections.push({tournamentId,phaseId,category,categoryCode,phase,shortPhase,url});
     }
+    if(sections.length===2){
+      // Preserve each URL; only the compact two-draw display names change.
+      const final=sections.findIndex(row=>/finale/i.test(row.phase));
+      const finalIndex=final>=0?final:1;
+      for(let i=0;i<sections.length;i++)sections[i].shortPhase=i===finalIndex?'FINALE':'INIZIALE';
+    }
     for (const row of sections) rows.push({...row,label:categoryCode + (sections.length > 1 ? ' ' + row.shortPhase : '')});
   }
   const duplicates = new Map();

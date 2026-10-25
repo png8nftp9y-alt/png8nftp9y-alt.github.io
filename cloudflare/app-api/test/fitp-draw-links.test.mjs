@@ -8,7 +8,7 @@ const singles={TournamentId:111,Gender:'M',IsDoubleTournament:false,TournamentDe
 const doubles={TournamentId:222,Gender:'F',IsDoubleTournament:true,TournamentDescription:'Doppio Femminile Under 14',Sections:[section(p1,'TABELLONE FINALE')]};
 test('SM14 has phase suffixes; a category with one draw has only DF14',()=>{
  const rows=fitpDrawLinks({Tournaments:[singles,doubles]},id);
- assert.deepEqual(rows.map(r=>r.label),['SM14 INIZIALE','SM14 INTERMEDIO','DF14']);
+ assert.deepEqual(rows.map(r=>r.label),['SM14 INIZIALE','SM14 FINALE','DF14']);
  assert.match(rows[0].url,new RegExp('tournamentId=111&phaseId='+p1));assert.match(rows[1].url,new RegExp('phaseId='+p2));assert.match(rows[2].url,/tournamentId=222/);
  assert.equal(rows[2].phase,'TABELLONE FINALE');
 });
@@ -36,4 +36,10 @@ test('compact uppercase phases remove embedded codes and number intermediate dra
  assert.deepEqual(rows.map(r=>new URL(r.url).searchParams.get('phaseId')),[p1,p2,p3,p4]);
  assert.equal(rows[0].phase,'smu12_tabellone iniziale_n.c. 4.1');
  assert.equal(fitpDrawLinks({Tournaments:[{...t,Sections:[t.Sections[2]]}]},id)[0].label,'SM12');
+});
+test('two draws always display INIZIALE and FINALE without changing phase IDs',()=>{
+ const t={...singles,Sections:[section(p1,'TABELLONE INTERMEDIO - 4 CATEGORIA'),section(p2,'TABELLONE FINALE')]};
+ const rows=fitpDrawLinks({Tournaments:[t]},id);
+ assert.deepEqual(rows.map(r=>r.label),['SM14 INIZIALE','SM14 FINALE']);
+ assert.deepEqual(rows.map(r=>r.phaseId),[p1,p2]);assert.equal(rows[0].phase,'TABELLONE INTERMEDIO - 4 CATEGORIA');
 });
