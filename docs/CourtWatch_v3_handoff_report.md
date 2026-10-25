@@ -9133,3 +9133,12 @@ Validazione: 21 test superati, incluso test di regressione che applica il limite
 - Sostituisce una riga per specialità con una riga per fascia: Under 10, Under 12, Under 14, ecc. Nella stessa riga SM/SF/DM/DF (eventuale DX), con fasi ordinate iniziale/intermedi numerici/finale per specialità. Femminile rosa, maschile blu e misto distinto. Open/Over restano separati.
 - Modifica del solo rendering e CSS, aggiornate versioni cache JS/CSS. Etichette sintetiche, identificativi ufficiali, URL e apertura Safari preservati. Nessuna richiesta aggiuntiva, polling o modifica D1. Su schermi stretti i link possono andare a capo all’interno della propria fascia.
 - Verifica: quattro test frontend superati, incluso raggruppamento U10/U12, colori SF/DF e SM, integrità delle URL e assenza di polling; sintassi JavaScript valida.
+## Tre associazioni Europe–ITF confermate: Chen, Kim e Liu (24 ottobre 2026)
+
+L'utente conferma gli ID ITF da associare ai rispettivi profili Europe: CHEN MEIQI 800800298, HEE KIM TAE 800742596 e LIU YICHEN 800794057. Manifesto con tre coppie di ID esatti; gli altri ITF 800860083, 800753996, 800866511 e 800807639 restano esclusi e separati. Nessuna regola per solo nome o nazionalità e nessuna selezione automatica per altri giocatori.
+
+Workflow una tantum courtwatch-approved-three-itf-identity-links.yml sotto lock D1. Simulazione completa prima di scrivere, preservazione delle regole precedenti, mapper ordinario limitato alle fonti selezionate, readback di tutti i collegamenti e degli ID esclusi, controllo Vasileva invariata. Lettura con IN sulle chiavi esatte, senza pattern oltre il limite D1. Marker dedicato, ripresa da regole già salvate e replay completato con zero scritture. Nessuna discovery, schedulazione, polling o retry automatico.
+
+Validazione: 21 test superati, fonti reali dei quattro gruppi, esclusione degli altri ITF, originali invariati, regole precedenti mantenute, delta ordinario successivo, input incompleto bloccato, ripresa parziale e replay senza scritture; policy D1 incrementale. Applicazione in produzione da confermare nel run successivo al push.
+
+ITF discovery 2026-10-24T21:16:25.796Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
