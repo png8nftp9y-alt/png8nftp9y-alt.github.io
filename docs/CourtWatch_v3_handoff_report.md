@@ -9242,3 +9242,262 @@ Validation: real SQLite index→queue→Admin/JSON flow; stable ID and reason de
 User asks to put suspicious identities at the top of Admin ID and identify Iris Grosso's discrepancy. Insert the current saved case list directly after navigation, ahead of cached ID count controls and tables. Existing manual count snapshots, authentication and exports are preserved. Add a one-time read-only Iris workflow invoking the existing guarded one-name diagnostic: native sources, canonical links, current search result and projected mapping; no repair or discovery. The workflow starts on this workflow file's push or explicit manual dispatch only; no polling or schedule. Iris's precise reason remains unconfirmed until D1 evidence returns, since no Iris record was found in the consulted repository player data.
 
 Validation: 16 focused tests passed: real Worker asserts review section precedes cached counts; admin pagination/auth/export checks, existing identity inspection and read-only transport regressions. Production deployment and Iris's D1 report remain to verify after user push.
+
+### 2026-10-25 — Recupero W/O inline e regola date nei gironi Europe
+
+- Verifica produzione: run 40228707857 verde, storico completo importato e Worker pubblicato. Grimoldi-Kufstein restituito in /v1/app-snapshot come finale W/O del 2026-07-25; finale BD14 Avvenire del 2026-06-06 verificata nello storico API di Richard Mitchell (vittoria con Jonas Waelti contro Bisserov/Friessnegg). Verificato anche Longo-Grozdev, finale bonus dei Campionati Europei U16 del 2026-09-26, a dimostrazione del recupero automatico oltre i due esempi iniziali.
+- Audit storico: 216 recuperi in 111 tornei, di cui 17 finali, 53 primi turni, 145 turni intermedi e un match con data ufficiale. Segnalazioni residue: 28 date senza riferimento sufficiente; 1626 draw_content_endpoint_missing, 81 no_draws_discovered, 6 identità/vincitore non verificabili. Il successo dell'importazione non certifica questi casi irrisolti.
+- Causa accertata su un tabellone ufficiale BS12 Group A del Memorial Gaio Camporesi: formato Round Robin con match datati direttamente nella pagina, senza form GetDrawContent. Il recupero ora accetta sia knockout inline sia carte Round Robin inline. Su istruzione dell'utente, nei gironi un W/O senza data usa il giorno successivo alla precedente partita datata dello stesso giocatore/squadra, nello stesso girone. La data ufficiale prevale. Non si usano primo/ultimo giorno del torneo. Si sceglie il turno precedente disponibile per ciascuna squadra e la data più recente tra i riferimenti; senza riferimento o fuori dai limiti del torneo il caso resta pending. I turni sono confrontati per numero, anche se una pagina mostra solo il turno corrente; catene di W/O vengono risolte in ordine di turno. Formati non riconosciuti, vincitori mancanti e conflitti restano segnalati. Non si presume che tutte le 1626 segnalazioni abbiano questa stessa causa: il prossimo audit misurerà la riduzione reale.
+- Validazione: 21 test superati: 11 regressioni originali, 5 per contenuti inline e 5 per la regola date nei gironi, inclusi riferimento presente solo nell'OOP, isolamento da altri gironi/eventi, priorità della data ufficiale, limiti del torneo e turni consecutivi mostrati in ordine inverso; fixture RR sintetica basata sulla struttura osservata, fixture ufficiali Avvenire/Kufstein originali. Verificati anche installer e sintassi workflow. Nessuna modifica a UI o importatore D1; pubblicazione tramite terminale dell'utente.
+- Le acquisizioni live e backfill eseguono i nuovi test. La pubblicazione avvia i workflow previsti dai trigger esistenti; il flusso storico prosegue attraverso merge e import D1. Nessun polling o rilancio aggiuntivo.
+- Limiti: nuova riduzione delle segnalazioni da verificare dopo l'acquisizione. I 28 casi privi di riferimento data non vengono arbitrariamente completati; l'elenco sotto è quello dell'audit del run verde citato.
+
+Recuperi dell'audit precedente (data, torneo, categoria, turno, giocatori):
+
+- 2026-01-07 | Horni Mecholupy Open 2026 | BD16 - Boys Doubles 16 Main Draw | Quarter final | Edoardo GHISELLI / Mikael LEHTINEN / Lukas HRON / Gustav VURM
+- 2026-01-07 | Horni Mecholupy Open 2026 | BD16 - Boys Doubles 16 Main Draw | Quarter final | Ilia GUSEV / Julian MRGA TRIFUNOVSKI / Jakub KOLOWIECKI / Blazej KRZYSKO
+- 2026-01-14 | Breclav Open 2026 | GD14 - Girls Doubles 14 Main Draw | Quarter final | Pihla JOUHTEN / Nicole KURYLOVA / Isabella GROF / Natalia ROMANOVA
+- 2026-01-14 | Narva Cup | GD14 - Girls Doubles 14 Main Draw | Quarter final | Mirly NEY / Aleksandra Helerin SAAT / Aisling NAUGHTON / Joanna TOOMISTE
+- 2026-01-17 | TE12 Frydek Mistek | GS12 - Girls Singles 12 Playoff | Quarter final | Julie STEJSKALOVA / Lea HESSEL
+- 2026-01-17 | TE12 Frydek Mistek | GS12 - Girls Singles 12 Playoff | Quarter final | Ketevan CHAKHVASHVILI / Julie SUSZKOVA
+- 2026-01-21 | TE12 Frydek Mistek | GD12 - Girls Doubles 12 Main Draw | Quarter final | Viola Peconkova PECONKA / Julie SUSZKOVA / Lea HESSEL / Jana MALINKOVA
+- 2026-01-22 | TE12 Frydek Mistek | BS12 - Boys Singles 12 Bonus Draw | Quarter final | George MODZMANASHVILI / Denis HAYEK
+- 2026-01-22 | TE12 Frydek Mistek | BS12 - Boys Singles 12 Bonus Draw | Quarter final | Cemil Melih CALISKAN / Marco URVAY
+- 2026-01-22 | TE12 Frydek Mistek | BD12 - Boys Doubles 12 Main Draw | Semi final | Pavel Levi GORECKY / Teo SKOTAK / Tudor Stefan ENCEANU / Alexander GRZECH
+- 2026-01-22 | TE12 Frydek Mistek | BD12 - Boys Doubles 12 Main Draw | Semi final | Dominic DREIER / Matej MLCUCH / Jakub STALCIK / Jiri VASICEK
+- 2026-01-23 | TE12 Frydek Mistek | BS12 - Boys Singles 12 Bonus Draw | Semi final | Dominic DREIER / Tudor Stefan ENCEANU
+- 2026-01-23 | TE12 Frydek Mistek | BS12 - Boys Singles 12 Bonus Draw | Semi final | George MODZMANASHVILI / Cemil Melih CALISKAN
+- 2026-02-01 | Lexus Junior International Liverpool | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Isaac BOND / Max DUTTON / Samuel HARTLEY / Leon MIARKA
+- 2026-02-01 | Lexus Junior International Liverpool | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Scarlet GOGOL / Sophie JONES / Angeliki KAVOURA / Zoe PITCHER
+- 2026-02-06 | Lexus Junior International Liverpool | BD14 - Boys Doubles 14 Main Draw | Quarter final | Ivan HRISTAKIEV / Teodor NIKOLCHOVSKI / Cole EDWARDS / Luke PRATTEN
+- 2026-02-06 | Lexus Junior International Liverpool | GD14 - Girls Doubles 14 Main Draw | Quarter final | Maria Alexandra CIUCIU / Nicole KURYLOVA / Emmanuella IDEMUDIA / Amarachi IKEM
+- 2026-02-08 | Ullevi Tennis Open | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Melker BOSSFALL / Alexander KORITZ / Matyas OPRCHAL / Darius UDWADIA
+- 2026-02-12 | TE 14 Birkerød | BD14 - Boys Doubles 14 Main Draw | Semi final | Ernest COUSIN / Camille GORRINO / Daniel Maciel Araujo PYNDT / Reinholdt Emil Brandt SCHULTZ
+- 2026-02-14 | Robey FOCUS tennis academy open 2026 | BD12 - Boys Doubles 12 Main Draw | Round of 16 | Egor KONOVALOV / Max WLODZIMIROW / Sergey DE BRUIJN / Giannis MATAKOUDIS
+- 2026-02-14 | Robey FOCUS tennis academy open 2026 | GS14 - Girls Singles 14 Main Draw | Round of 32 | Lotte STERKEN / Adele MANIGOLD
+- 2026-02-18 | International Championships of Romania U14 | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Carol DARIE AVORNICITEI / Petru ROSU / Saidaslam FARKXODOV / Sebastian Mihai SAPLACAN
+- 2026-02-18 | International Championships of Romania U14 | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Luca Danush BARCLAY / Joao Vicente PINTO / WILLIAM BATORI / Jurca Tudor IOAN
+- 2026-02-18 | International Championships of Romania U14 | BD14 - Boys Doubles 14 Main Draw | Round of 16 | David DUMITRU / Danny KOLLAR / Victor GIZDAVU / Nicolae IORDAN
+- 2026-02-18 | International Championships of Romania U14 | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Ruben CUXAC / ESTEBAN SIMULESCU / Alexandru AFLAT / Tudor URSACHI
+- 2026-02-18 | International Championships of Romania U14 | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Rose D'ANDREA / Maria TERELAK / Olesya KOLBASYUK / Sofiia TRYBOI
+- 2026-02-18 | Robey FOCUS tennis academy open 2026 | GD12 - Girls Doubles 12 Main Draw | Quarter final | Emma Lynn KEMPERMAN / Emina-Louise MELLOUK / Linda RENDEL / Aurora SEMERARO
+- 2026-02-19 | International Championships of Romania U14 | BD14 - Boys Doubles 14 Main Draw | Quarter final | Mark MESHCHERIAKOV / Tymur TEN / Carol DARIE AVORNICITEI / Petru ROSU
+- 2026-02-19 | Robey FOCUS tennis academy open 2026 | GD12 - Girls Doubles 12 Main Draw | Semi final | Linda RENDEL / Aurora SEMERARO / Mai LAURENT / Mendes LESOURD
+- 2026-02-21 | AHMET ERGUDEN CUP 8 | GD14 - Girls Doubles 14 Main Draw | Round of 32 | Anghelina MALCOCEAN / Ana Maria MOLDOVAN / Berra MALKOC / Oyku TUFEKCI
+- 2026-02-26 | TEJT 2 U14 " Baseline Open U14 2026" | GS14 - Girls Singles 14 Main Draw | Round of 16 | Izabella NAGY / Morena DRUZIJANIC
+- 2026-02-28 | Les Raquettes 2026 | BD16 - Boys Doubles 16 Main Draw | Round of 32 | Vanja KUKURUZOVIC / Aleksa SVICEVIC / Boris RADKOV / Stefan TELKEDZHIEV
+- 2026-03-04 | Les Raquettes 2026 | BD16 - Boys Doubles 16 Main Draw | Round of 16 | Emir EROL / Marco Antonio TRANCIUC / Anastasios ANGELOPOULOS / PETROS GEORGAKAKOS
+- 2026-03-07 | EXALCO CUP | BD16 - Boys Doubles 16 Main Draw | Round of 32 | Giorgos APOSTOLAKIS / Konstantinos LAMPRAKIS / Marin Tudor BUCIU / Roan Kael PREDA
+- 2026-03-08 | EXALCO CUP | BD16 - Boys Doubles 16 Main Draw | Round of 16 | Giorgos APOSTOLAKIS / Konstantinos LAMPRAKIS / Anastasios ANGELOPOULOS / Kristiyan ENEV
+- 2026-03-08 | TEJT 2 U14 ZAFFERANO Cup U14 2026 " | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Adela GORNA / Viktoria KOSTALOVA / Nora NAGY / Alicja STRUGACZ
+- 2026-03-14 | Adriatic Cup | BD16 - Boys Doubles 16 Main Draw | Round of 32 | Robert IORGA / Paolo VALZELLI / Ivano BOZICEVIC / Fran VRLJIC
+- 2026-03-15 | VILAS ACADEMY MALLORCA Under 12 Event | GS12 - Girls Singles 12 Bonus Draw | Final | Zoe AKNIN / Zoe HANRAHAN
+- 2026-03-24 | Vilar Cup | GS14 - Girls Singles 14 Main Draw | Round of 16 | Emija SAULITE / Katrina LUSINA
+- 2026-03-28 | YASON CUP | BS16 - Boys Singles 16 Main Draw | Round of 64 | Luka Oisin ANDJELIC / Mahir BUTKOVIC
+- 2026-03-28 | YASON CUP | BD16 - Boys Doubles 16 Main Draw | Round of 32 | Luka Oisin ANDJELIC / Vladimir GRUBACIC / Callum SHARKEY / Liam SHARKEY
+- 2026-03-28 | YASON CUP | GD16 - Girls Doubles 16 Main Draw | Round of 32 | Aleksandra MARJANOVIC / Milica PUZIC / Ema HUSKIC / Ana SENIC
+- 2026-04-02 | YASON CUP | GD16 - Girls Doubles 16 Main Draw | Quarter final | Karla BARZAKOVA / Zara MINEVA / Maruschka BLASKOVICOVA / Noemi VALDES
+- 2026-04-04 | Vilar Junior Trophy | BS16 - Boys Singles 16 Main Draw | Final | Mateusz DOLINSKI / Igor BARTNIK
+- 2026-04-05 | TE U12 Herodotou Tennis Academy G2 | BD12 - Boys Doubles 12 Main Draw | Final | Andreas GREGORIOU / Andreas LEONTIS / Nikolas ANASTASIADES / Ciprian Petrea
+- 2026-04-07 | Vinkovci Open | GS14 - Girls Singles 14 Main Draw | Round of 32 | Lea BERTOS / Esma HASANAGIC
+- 2026-04-10 | Lexus Junior International Wrexham | GS14 - Girls Singles 14 Main Draw | Quarter final | Marlena KOBERSKA-WASIAK / Lola BROWN
+- 2026-04-10 | Lexus Junior International Wrexham | GD14 - Girls Doubles 14 Main Draw | Semi final | kate MURRAY / Kana SAITO / Lily Victoria HALEY / Coco WITTON
+- 2026-04-11 | Lexus Junior International Wrexham | GD14 - Girls Doubles 14 Main Draw | Semi final | Sophia FLORENCE / Nishta KESAVAN / Dimitra KALLISTROU / Medine RAHMANI
+- 2026-04-12 | TEJT 2 U14 " Trnava Cup U14 2026" | GS14 - Girls Singles 14 Main Draw | Round of 64 | Adela SCIBRANOVA / Ella JELICIC
+- 2026-04-15 | Sori Cup | GS16 - Girls Singles 16 Main Draw | Round of 16 | Valeriia OLEKSYN / Lena HENDIGERY
+- 2026-04-16 | 32ª Taça Internacional Maia Jovem 2026 | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Yanru LI / Liam SHARKEY / David MOTAL / Sebastian SCHAMBERGER
+- 2026-04-16 | ATIK 23 APRIL CUP | BS12 - Boys Singles 12 Bonus Draw | Round of 16 | Toprak KAYAALTI / Poyraz Deniz ERKAN
+- 2026-04-16 | ATIK 23 APRIL CUP | BS12 - Boys Singles 12 Bonus Draw | Round of 16 | Can Ali EKEN / Efe Kerem AYDIN
+- 2026-04-16 | TEJT 2 U14 " Trnava Cup U14 2026" | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Arsenii PINCHUK / Milosz WOZNIAK / Lucas CONSIDERA SEPULCRI / Valentin EKHART
+- 2026-04-17 | 32ª Taça Internacional Maia Jovem 2026 | BD14 - Boys Doubles 14 Main Draw | Quarter final | Yanru LI / Liam SHARKEY / Deniz SENGUL / Aras YALCINKAYA
+- 2026-04-17 | ATIK 23 APRIL CUP | BS12 - Boys Singles 12 Bonus Draw | Quarter final | Poyraz Deniz ERKAN / Guven BADEM
+- 2026-04-18 | 12&U Tennis Europe Tournament Devoted to the Memory of Heydar Aliyev | GS12 - Girls Singles 12 Main Draw | Round of 32 | Karolina KOPOTEVA / Sophie KALTENOVA
+- 2026-04-18 | Bellevue Cup 2026 | GD12 - Girls Doubles 12 Main Draw | Quarter final | Aren Tinda ATA / Ajlin SULJEVIC / Dila ARSLANOGLU / Simge DONMEZ
+- 2026-04-18 | Mladost Grill Open | GD14 - Girls Doubles 14 Main Draw | Round of 32 | Zara CAMDZIC / Rose D'ANDREA / Lucija ANDRIJANIC / Leni LONCARIC
+- 2026-04-18 | ZLTC Brno Cup | GD16 - Girls Doubles 16 Main Draw | Round of 16 | Klara KRCKOVA / Emma KRIVDOVA / Karina SAVCHENKO / Nela STRIHAVKOVA
+- 2026-04-21 | Bellevue Cup 2026 | BD12 - Boys Doubles 12 Main Draw | Quarter final | Oso BUJUPAJ / Amar JUSUFI / Teodor HU / Vojin KRSTAJIC
+- 2026-04-21 | TEJT 1 U14 " The 33rd ENSANA Piestany Cup U14 2026" | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Eva Maria BULAI / Lyubov PRONENKO / Nina ERBANOVA / Tamara TARASOVICOVA
+- 2026-04-22 | O pohar mesta Rakovnik U12 I. | BD12 - Boys Doubles 12 Main Draw | Round of 16 | Samuel ALMAI / Mirko NEMES / Toni SCHOENBERGER / Artur VAN GILS
+- 2026-04-22 | O pohar mesta Rakovnik U12 I. | GD12 - Girls Doubles 12 Main Draw | Round of 16 | Nina LAJDOVA / Jana MALINKOVA / Vira STROKAN / Leen VANDEBEEK
+- 2026-04-22 | TEJT 1 U14 " The 33rd ENSANA Piestany Cup U14 2026" | GS14 - Girls Singles 14 Bonus Draw | Quarter final | Viktoria KOSTALOVA / DANIELA TYMOSHENKO
+- 2026-04-22 | TEJT 1 U14 " The 33rd ENSANA Piestany Cup U14 2026" | BS14 - Boys Singles 14 Bonus Draw | Quarter final | David MOTAL / Leon MIARKA
+- 2026-04-22 | TEJT 1 U14 " The 33rd ENSANA Piestany Cup U14 2026" | BS14 - Boys Singles 14 Main Draw | Round of 16 | Lionel FRIESSNEGG / Oskar LASKOWSKI
+- 2026-04-23 | O pohar mesta Rakovnik U12 I. | GS12 - Girls Singles 12 Bonus Draw | Quarter final | Serena MEGGIOLARO / Leen VANDEBEEK
+- 2026-04-24 | Bellevue Cup 2026 | GS12 - Girls Singles 12 Bonus Draw | Quarter final | Diora GJOKA / Simge DONMEZ
+- 2026-04-25 | Bellevue Cup 2026 | GS12 - Girls Singles 12 Bonus Draw | Semi final | Simge DONMEZ / Ilina - Eva BERCEA
+- 2026-04-25 | Mladost Grill Open | BS14 - Boys Singles 14 Main Draw | Semi final | Niko CHERNOBROVKIN / Leon MOTUSIC
+- 2026-04-25 | Mladost Grill Open | BD14 - Boys Doubles 14 Main Draw | Semi final | Joakim BOBANOVIC / Leon MOTUSIC / Leonis BOUDJEMA / Baptiste CAZALE
+- 2026-04-26 | O pohar mesta Rakovnik U12 I. | GS12 - Girls Singles 12 Bonus Draw | Final | Vira STROKAN / Nina LAJDOVA
+- 2026-04-28 | O Pohar mesta Rakovnik U14 | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Frederick FABRICIUS / Liam SHARKEY / Ulysse D AMIENS / Lucas VIEIRA MALLARD
+- 2026-04-29 | O Pohar mesta Rakovnik U14 | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Korana BARISIC / Beata MARESOVA / Julie POLAKOVA / Marketa SLOBODOVA
+- 2026-04-30 | Cungu Open 2026 | GS14 - Girls Singles 14 Bonus Draw | Semi final | Dea KRSTEVSKA / Nika KOLOKOLOVA
+- 2026-04-30 | O Pohar mesta Rakovnik U14 | GS14 - Girls Singles 14 Main Draw | Round of 16 | Sophia FLORENCE / Korana BARISIC
+- 2026-04-30 | O Pohar mesta Rakovnik U14 | GD14 - Girls Doubles 14 Main Draw | Quarter final | Vanessa BALEJ / Noga BAR SHALOM / Anastasiia BUBALO / Stepanka KOLARIKOVA
+- 2026-05-02 | Bulgaria U14 | GS14 - Girls Singles 14 Main Draw | Round of 64 | Raya NAYDENOVA / Varvara KUZNETSOVA
+- 2026-05-03 | All In Open 2026 | BS12 - Boys Singles 12 Qualifying | Qualification round of 16 | Peter DUFOUR / Timofei LAPIN
+- 2026-05-05 | All In Open 2026 | BD12 - Boys Doubles 12 Main Draw | Round of 16 | Giovanni FAZIO / Leonardo MUSCELLA / Mylo BONELLO HALL / Eliot MCQUATER
+- 2026-05-05 | Bulgaria U14 | GS14 - Girls Singles 14 Main Draw | Round of 32 | Arina BAKULEVA / Polina POLITYLO
+- 2026-05-06 | All In Open 2026 | BD12 - Boys Doubles 12 Main Draw | Round of 16 | Rafael LEBRETON / Maceo MONVILLE / Asmus NOERGAARD STAUN / Athanasios TRIANTAFYLLOU
+- 2026-05-07 | 14&U, 16&U Tennis Europe Tournaments Devoted to the Memory of Heydar Aliyev | BD16 - Boys Doubles 16 Main Draw | Quarter final | Adam CSILLAG / Barnabas Sandor LENCZ / KONSTANTINOS APOSTOLAKIS / Matsvei SHUMILAU
+- 2026-05-07 | XIV MEMORIJAL JOVANA KUKARASA | GS14 - Girls Singles 14 Bonus Draw | Quarter final | Amira KHANIPOVA / Riana Clarisa CIRNU
+- 2026-05-07 | XIV MEMORIJAL JOVANA KUKARASA | GS14 - Girls Singles 14 Bonus Draw | Quarter final | Tanya Ecaterina HAVERMULLER / Latika GARDABUDSKIKH
+- 2026-05-08 | 14&U, 16&U Tennis Europe Tournaments Devoted to the Memory of Heydar Aliyev | GD16 - Girls Doubles 16 Main Draw | Quarter final | Lizaveta KAZHEUNIKAVA / Dziana KUDZI / IVONA DIRNBEK / Thalia FISCHER
+- 2026-05-09 | 14&U, 16&U Tennis Europe Tournaments Devoted to the Memory of Heydar Aliyev | BD16 - Boys Doubles 16 Main Draw | Final | Aleksandr GERASIMOV / Kirill PONOMAREV / KONSTANTINOS APOSTOLAKIS / Matsvei SHUMILAU
+- 2026-05-09 | Maria Lanzendorf Open 2026 - Indoor | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Lena FONAI / Viktorija MILETIC / Federica DE CONCILIIS / Lilly MAYR
+- 2026-05-13 | Dr Oetker Junior Trophy | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Uri FARCHI / Itamar NURIEL / Enzo BRITO / Yuval LEIDER
+- 2026-05-13 | Grawe Open | GD14 - Girls Doubles 14 Main Draw | Quarter final | Juliette LAFONT / GAELLE VAN HULLE / Tita Eva LUNDER / Tara MILANOVIC
+- 2026-05-13 | Open Tennis Valley Cup | GS14 - Girls Singles 14 Main Draw | Round of 32 | Rania POP / Luca GERENCSER
+- 2026-05-13 | Passagespoirs 2026 | BD12 - Boys Doubles 12 Main Draw | Quarter final | Mateo FREIJEIRO PEDREIRA / Tomkin Deng MAI / Raphael FAIVRE / Come LABOURE
+- 2026-05-14 | Open Tennis Valley Cup | BD14 - Boys Doubles 14 Main Draw | Round of 16 | PATRICK CECAVA / Jacopo MAROZZI / Domonkos GEMES / Milan SZUCS
+- 2026-05-14 | Passagespoirs 2026 | BS12 - Boys Singles 12 Bonus Draw | Semi final | Skander CHEIKH ROUHOU / Billy HERTAY
+- 2026-05-14 | Torneo U16 - Roma | GD16 - Girls Doubles 16 Main Draw | Round of 16 | Camilla Olga CASTRACANI / Sofia FERRARIS / Virginia COMI / Eleonora TRANCHERO
+- 2026-05-15 | Torneo U16 - Roma | BD16 - Boys Doubles 16 Main Draw | Quarter final | Giulio BOZZANGA / Diego TARLAZZI / Nikolozi SIRBILADZE / Ioannis-Panagiotis VASILEIADIS
+- 2026-05-20 | Patras Junior | GD12 - Girls Doubles 12 Main Draw | Quarter final | Myrto ALEVIZOPOULOU / Maria Eleni KELNAR / Joanna MOZA / Aggeliki Irini TOUFEKI
+- 2026-05-21 | Hanko Cup | BD14 - Boys Doubles 14 Main Draw | Quarter final | Ilari HAAVISTO / Leo KIVIRINTA / Ayman HAMMOUDEH / Noah PHILIP
+- 2026-05-21 | Hanko Cup | BD14 - Boys Doubles 14 Main Draw | Quarter final | Xavier KLEMENT / Timophey STOROZHUK / Ransom CONWAY / Vilgot HILLMAN
+- 2026-05-23 | Ptolemaida Juniors 2026 | BD12 - Boys Doubles 12 Main Draw | Round of 16 | Pantelis GOUNARAKIS / Filippos KARMIS / Stephanos ANTONIOU / Mehmet Cihan AYDOGDU
+- 2026-05-27 | Ptolemaida Juniors 2026 | BD12 - Boys Doubles 12 Main Draw | Quarter final | Kimonas - Anastasios PETSOULAS / Charalampos VLACHOS / Thanasis CHONDROGIANNIS / Sotiris PAPANIKAS
+- 2026-05-27 | Torneo U14 - Pescara | BD14 - Boys Doubles 14 Main Draw | Quarter final | Egor KOZLOV / Ivan SINYAKOV / Riccardo BRIGANTI / Filippo DEL GIUDICE
+- 2026-05-28 | VARITEX Lodz Cup 2026 | BD14 - Boys Doubles 14 Main Draw | Semi final | Leon MIARKA / Antoni NOWIK / Maciej SZYCA / Julian ZIEBA
+- 2026-05-30 | 59° Torneo Avvenire | BD14 - Boys Doubles 14 Main Draw | Round of 32 | Richard MITCHELL / Jonas WAELTI / Max KARKKAINEN / Tudor URSACHI
+- 2026-05-30 | 59° Torneo Avvenire | GD14 - Girls Doubles 14 Main Draw | Round of 32 | Natalia Gabriela DRAGOMIR / Nadja KNEZEVIC / Michaela FILOVA / Claire HIRSCHI
+- 2026-05-30 | 59° Torneo Avvenire | GD14 - Girls Doubles 14 Main Draw | Round of 32 | Noga BAR SHALOM / Tjasa JAZBEC / Vittoria CARESSA / Olivia Serena CONTICELLO
+- 2026-05-31 | Bitola Open 2026 | GS14 - Girls Singles 14 Main Draw | Final | Dimitra KALLISTROU / Raya PETKOVA
+- 2026-05-31 | Torneo U16 - Perugia | BD16 - Boys Doubles 16 Main Draw | Round of 16 | Matteo ARTEMISIA / Gennaro SCALESE / Alessandro FANI O'BROIN / Tiberio Giulio SPERANZA
+- 2026-06-01 | TE 14-16 Birkerød | BS14 - Boys Singles 14 Qualifying | Qualification round of 16 | Simone CAMBIAGHI / Axel LEVEAU
+- 2026-06-01 | TEJT 1 U12 & U16 " 1st Alibaba Cup U12&16 2026 " | GD12 - Girls Doubles 12 Main Draw | Round of 16 | Sofia ANTOSIKOWA / Natalia DRWIEGA / Charlotte PREKOPP / Niya PRODANOVA
+- 2026-06-03 | Dijon TE 14&U - Les Petits Ducs | BD14 - Boys Doubles 14 Main Draw | Quarter final | Edji ABOKI / ESTEBAN SIMULESCU / Thiago CARMASOL / Lenny LOUIS
+- 2026-06-04 | 59° Torneo Avvenire | GS14 - Girls Singles 14 Bonus Draw | Round of 16 | Rebecca Carla FRANCIA / Ana CEROVIC
+- 2026-06-04 | 59° Torneo Avvenire | GS14 - Girls Singles 14 Bonus Draw | Round of 16 | Ece SEN / MIO OHTA
+- 2026-06-06 | 59° Torneo Avvenire | BD14 - Boys Doubles 14 Main Draw | Final | Richard MITCHELL / Jonas WAELTI / Alexander BISSEROV / Lionel FRIESSNEGG
+- 2026-06-06 | Riga Open by LTS | GS16 - Girls Singles 16 Main Draw | Round of 32 | Eliza KARSUMA / Sofia SINICCO
+- 2026-06-06 | Riga Open by LTS | BD16 - Boys Doubles 16 Main Draw | Round of 16 | William Gronli ANDRESEN / Ryan VALENCIA / Jovan BLAGOJEVIC / Damirs LIVANSKIS
+- 2026-06-06 | Riga Open by LTS | GD16 - Girls Doubles 16 Main Draw | Round of 16 | Meribel TAMSALU / Kätlin TÕNTS / Sofia CALDWELL / Megija SKABEIKE
+- 2026-06-06 | TENNIS POINT OPEN 2026 | BS12 - Boys Singles 12 Bonus Draw | Round of 16 | Nemanja MIJATOVIC / Erkin KALMUTSKIY
+- 2026-06-10 | APPROACH TE 14 BORNE | BS14 - Boys Singles 14 Main Draw | Round of 16 | Carl Johan Leegaard JEPSEN / Max SCHITTKO
+- 2026-06-10 | Mamaia IDU Juniors Championship | BS16 - Boys Singles 16 Main Draw | Round of 16 | Vladyslav BOHOMOLKIN / DAVID MAXIMILIAN MIHNEA
+- 2026-06-10 | Mamaia IDU Juniors Championship | BD16 - Boys Doubles 16 Main Draw | Quarter final | Darius Alexandru RATIU / Codrin SERBANOIU / WILLIAM BATORI / Petru ROSU
+- 2026-06-10 | Torneo Internazionale Under 16 - Città di Crema | GD16 - Girls Doubles 16 Main Draw | Semi final | MARTA GAZZETTI / Lilli MARTH / LUCREZIA CAVALIERI / Matilde FIGUEIREDO
+- 2026-06-11 | Mamaia IDU Juniors Championship | BS16 - Boys Singles 16 Main Draw | Quarter final | IANIS ANDREI GHIULEA / Matei CRACIUN
+- 2026-06-11 | Riga Open by LTS | BD12 - Boys Doubles 12 Main Draw | Quarter final | Hubertas GELDUTIS / Emilis KUBICKAS / Michael ANIKIN / Dani VAN DER LECQ
+- 2026-06-11 | Riga Open by LTS | BD16 - Boys Doubles 16 Main Draw | Quarter final | Henrik Abel ENGH / Aksel HAUKELI / Bekir CINAR / Jekabs STIKUTS
+- 2026-06-11 | Riga Open by LTS | BD16 - Boys Doubles 16 Main Draw | Quarter final | Simas ABROMAVICIUS / Margiris MURAUSKAS / Camelot CARNELLO / Emil DROBKO
+- 2026-06-13 | EFS Logistics Junior Slovenia Open Under 16 | GD16 - Girls Doubles 16 Main Draw | Round of 16 | Anja CIMPERMAN / Ruby RAZINGAR / Adriana BUKALOVA / Emily BUKALOVA
+- 2026-06-13 | Riga Open by LTS | BD12 - Boys Doubles 12 Main Draw | Final | Michael ANIKIN / Dani VAN DER LECQ / Siim Mattias SALUSTE / Mattias Markus UBA
+- 2026-06-13 | Riga Open by LTS | GD16 - Girls Doubles 16 Main Draw | Quarter final | Charlotte ANDERSSEN / Hennie TROAN / Eliza KARSUMA / Emilija LEKSE
+- 2026-06-13 | Siauliai Tennis Academy Cup 16U | BD16 - Boys Doubles 16 Main Draw | Round of 16 | Yuri COLTURI / Phileas Piero Giacomo SANTOSUOSSO LEBAILLI / Svetoslavs CEREPOVS / Dominykas MOZURAIITS
+- 2026-06-18 | Siauliai Tennis Academy Cup 16U | BD16 - Boys Doubles 16 Main Draw | Quarter final | gor BAKHTAVORYAN / Yuri TIKTOPULO / Jovan BLAGOJEVIC / Damirs LIVANSKIS
+- 2026-06-20 | Lexus Junior International Edinburgh | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Orlando GALLAN / Ivan TIMOSHENKO / Ayman HAMMOUDEH / Awni QUBTI
+- 2026-06-24 | Torneo U12 - Trieste | BD12 - Boys Doubles 12 Main Draw | Quarter final | Jakob CHRISTANELL / Nicolino GIANFELICE / Yul KWON / Yeseong LEE
+- 2026-06-26 | Amjoy Cup 2026 | GD12 - Girls Doubles 12 Main Draw | Quarter final | Elise DEBUSSCHE / Elle PEETERS / Rafaela COLLI / Maya GUBAEVA
+- 2026-06-27 | Amstelpark Tennis Academy Trophy 2026 | BD14 - Boys Doubles 14 Main Draw | Round of 32 | Riddhim KALSA / Helvino SOMEFUN / Aziz ALALI / Sandro MARTINEZ
+- 2026-07-01 | BATD Cup U16 Waterloo Tennis | GD16 - Girls Doubles 16 Main Draw | Semi final | Chloe COURTOIS / Elise VANDEWEYER / Chloe BEAUCLERCQ / Adele MANIGOLD
+- 2026-07-01 | TE14 IRELAND 5 | BD14 - Boys Doubles 14 Main Draw | Quarter final | Marc FULWOOD / Ethan ODRISCOLL / Luke FARRELL / Kiril VALIAUGA
+- 2026-07-01 | TE14 IRELAND 5 | BD14 - Boys Doubles 14 Main Draw | Quarter final | John MCGARVEY / Sam SMYTH / Sam IRWIN / Rafael NAGLE
+- 2026-07-04 | TE14 IRELAND 6 Shankill | BD14 - Boys Doubles 14 Main Draw | Round of 16 | kovalchuk DEMIAN / Kacper LEWANDOWSKI / Ross CONNOLLY / Luca DELLE CHIAIE
+- 2026-07-08 | Koblenz Junior Open | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Matthias GRONIMUS / LIONEL SCHABIO / Lukas ANDONEGUI / Seb BEETLESTONE
+- 2026-07-09 | Koblenz Junior Open | GS14 - Girls Singles 14 Main Draw | Round of 16 | Chiara CASCIU / Michella NORIEGA
+- 2026-07-09 | Slopak Celje Open U16 | BD16 - Boys Doubles 16 Main Draw | Quarter final | Alexander AUFSCHNAITER / Matteo FATH / Enej KRALJ / Dan TURNSEK
+- 2026-07-11 | Peter Hagedorn International | BD16 - Boys Doubles 16 Main Draw | Round of 32 | Louis GOLZ / Clemens MÜLLER / Aleksa GAVRIC / Elliot OVERBY
+- 2026-07-11 | Peter Hagedorn International | BD16 - Boys Doubles 16 Main Draw | Round of 32 | Achille LEROY / Celian SANTORO / Tim HIPP / William WEINBERGER
+- 2026-07-11 | Peter Hagedorn International | GS14 - Girls Singles 14 Qualifying | Qualification round of 32 | Andrijana GAVRILOVIC / Nele Marie GLASER
+- 2026-07-12 | Koblenz Junior Open | BS12 - Boys Singles 12 Bonus Draw | Semi final | Netanel VAISMAN / Altair JUASSOV
+- 2026-07-12 | Koblenz Junior Open | BS12 - Boys Singles 12 Bonus Draw | Semi final | Najib SANGARE / Dimitris CHRISTOFOROS
+- 2026-07-15 | NIKŠIĆ OPEN 2026 | BS16 - Boys Singles 16 Main Draw | Quarter final | Nicholai H PETERSEN / Arber DANO
+- 2026-07-15 | Peter Hagedorn International | BD16 - Boys Doubles 16 Main Draw | Round of 16 | Mattia PALANDRI / Edoardo SENSI / Lorenzo RAUNER / Niklas WEINIG
+- 2026-07-16 | TEJT 3 U14 " DERMAPOINT CUP U14 2026 " | BD14 - Boys Doubles 14 Main Draw | Quarter final | Igor MALINKA / Oliver NOGA / Jachym JURICEK / Tomas KAZIMIR
+- 2026-07-16 | TEJT 3 U14 " DERMAPOINT CUP U14 2026 " | GD14 - Girls Doubles 14 Main Draw | Quarter final | Aneta FREYLICHOVA / Eliska KVAPIKOVA / Karin Julia GAJDOSECHOVA / Chiara HOLECOVA
+- 2026-07-18 | Peter Hagedorn International | GS16 - Girls Singles 16 Main Draw | Semi final | Michaela FILOVA / Adema ALSEIPULOVA
+- 2026-07-21 | Müller Junior Cup | GS14 - Girls Singles 14 Main Draw | Round of 32 | Martina KURBATOVA / Arina PAVLOV
+- 2026-07-25 | Müller Junior Cup | GD14 - Girls Doubles 14 Main Draw | Final | Paula Lillian KNOBLOCH / Emilie SCHELL / Polina LAZARENKO / Emiliya STARUSSEVA
+- 2026-07-26 | BETARD Cup 2026 TE U14 | GS14 - Girls Singles 14 Main Draw | Round of 32 | Daniela ZHARYKAVA / Oliwia WOLSKA
+- 2026-07-26 | BETARD Cup 2026 TE U14 | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Igor PAWLIKOWSKI / Piotr SZCZEREK / Filip BORYCZKO / Lubos HUSENICA
+- 2026-07-30 | Emilio Sánchez Academy Kids Cup U12 | GS12 - Girls Singles 12 Bonus Draw | Quarter final | Ziva GADGIL / Emma CSERESZNYES
+- 2026-08-02 | Emilio Sánchez Academy Youth Cup U16 | GS16 - Girls Singles 16 Qualifying | Qualification round of 16 | Elsa GRANDE / Erika Marthina CONTRERAS PEREZ
+- 2026-08-02 | PKE open 2026 powered by WTV | GS12 - Girls Singles 12 Qualifying | Qualification round of 16 | Viktoriia VAGNER / Veronika JURCIKOVA
+- 2026-08-06 | Antwerp Young Champions Cup | GS14 - Girls Singles 14 Main Draw | Quarter final | Zana PERIC / Sara TRIPIC
+- 2026-08-06 | KILKIS CUP 2026 | BS16 - Boys Singles 16 Main Draw | Semi final | Iordanis CHATZINIKOLAOU / Ilias GOLFINOPOULOS
+- 2026-08-07 | HAI Cup | GS14 - Girls Singles 14 Main Draw | Semi final | Eliska KAZIKOVA / Carla Ioana MARIS
+- 2026-08-08 | O POHAR HEJTMANA ZLINSKEHO KRAJE 12U | BS12 - Boys Singles 12 Bonus Draw | Round of 16 | Radim KOVACH / Filip KOZAK
+- 2026-08-08 | O POHAR HEJTMANA ZLINSKEHO KRAJE 12U | GS12 - Girls Singles 12 Bonus Draw | Round of 16 | Mary-Kate BANDI / Eva DAVIS
+- 2026-08-08 | Zahnärzte Ebenbeck Cup | BD16 - Boys Doubles 16 Main Draw | Round of 32 | Raphael KONSCHAK / Julius WAGNER / Jonas FUELLEMANN / Adam SIKOLA
+- 2026-08-12 | Antonio Hernández Cup U14 | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Daniel Luque Montesino DANIEL / Pavel SHTEINBERG / Antoni BALLESTER SANCHEZ / Luca Danush BARCLAY
+- 2026-08-12 | O POHAR HEJTMANA ZLINSKEHO KRAJE 12U | GS12 - Girls Singles 12 Bonus Draw | Quarter final | Lenka MALEGOVA / Sofia KASPRISIN
+- 2026-08-13 | O POHAR HEJTMANA ZLINSKEHO KRAJE 12U | GS12 - Girls Singles 12 Bonus Draw | Semi final | Charlotte PREKOPP / Veronika JURCIKOVA
+- 2026-08-15 | David Ferrer Tennis Europe Junior Tour U14 | BD14 - Boys Doubles 14 Main Draw | Round of 32 | Julian LIBERT / Teodor NIKOLCHOVSKI / Oscar Alessandro BORRAS FREITAS / Eric XUE
+- 2026-08-15 | Ukrainian Open U14 | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Viktoriia PINTOVA / Yeva SPIEVAKOVA-BUTS / Anna BUK / Milena ZHINCHYN
+- 2026-08-16 | O POHAR HEJTMANA ZLINSKEHO KRAJE 12U | GS12 - Girls Singles 12 Bonus Draw | Final | Veronika JURCIKOVA / Sofia KASPRISIN
+- 2026-08-16 | Zahnärzte Ebenbeck Cup | GS12 - Girls Singles 12 Bonus Draw | Final | Skrollan BERNAS / Emilia SCHOEN
+- 2026-08-20 | International Championships of Baden | GD12 - Girls Doubles 12 Main Draw | Semi final | Eva-Marie KUEHLE / Anna LINDEMANN / Isita KRIEG / Diana TRYNCHUK
+- 2026-08-20 | International Championships of Baden | GD12 - Girls Doubles 12 Main Draw | Semi final | Lylla PROLHAC / Lilou VANDEPUTTE / Mia BIRKLE / Elisa RINNE
+- 2026-08-23 | Aridea Cup | GS16 - Girls Singles 16 Main Draw | Final | Eirini BEKIARI / Maryia BIALIAUSKAYA
+- 2026-08-26 | Vierumäki Cup 5 | BD14 - Boys Doubles 14 Main Draw | Quarter final | Veikka Vilhelmi MATILAINEN / Sisu VAISANEN / Antoni BADUROWICZ / Gustaw BEDZIA
+- 2026-08-30 | Internacionales de Andalucía de Tenis SUB12 | BS12 - Boys Singles 12 Bonus Draw | Final | Pablo NAVARRETE / Alphons SEGERS
+- 2026-09-04 | SG Junior Cup | GD12 - Girls Doubles 12 Main Draw | Semi final | Anastasia JOSAN / Teodora MIRONESCU / Emilia CIUMAC / Teodora Maria NITA
+- 2026-09-09 | Tumba Kumanovo Open 2026 U16 | GD16 - Girls Doubles 16 Main Draw | Quarter final | Andjela BUNIC / Amajla KADRIC / Iuliia SOLOVEEVA / Vedrana TANESKA
+- 2026-09-11 | Nexon Cup 2. Laszlo Bogyo Memorial | BS12 - Boys Singles 12 Bonus Draw | Quarter final | Oiva VIROLAINEN / Luka BAZNIK
+- 2026-09-11 | Nexon Cup 2. Laszlo Bogyo Memorial | GS12 - Girls Singles 12 Bonus Draw | Quarter final | Edith NAPARI / Sofia FOROT
+- 2026-09-12 | 4° Memorial Padre PINO PUGLISI | GS16 - Girls Singles 16 Main Draw | Final | Sofia FOGGIA / Carlotta ARGINELLI
+- 2026-09-12 | TEJT 1 U12&U16" The 2nd Alibaba Cup U12 &16 2026" | GS12 - Girls Singles 12 Bonus Draw | Round of 16 | Beatrice BOICO / Julia PRIESTEROVA
+- 2026-09-12 | TEJT 1 U12&U16" The 2nd Alibaba Cup U12 &16 2026" | GS12 - Girls Singles 12 Bonus Draw | Round of 16 | Charlotta LUKACSOVA / Lilou VANDEPUTTE
+- 2026-09-13 | 5th Laietà Barcelona Cup U16 | BS16 - Boys Singles 16 Qualifying | Qualification round of 32 | Iu BLASI ALMEYDA / Jan BERNAL MORA
+- 2026-09-15 | Max Pro Open U16 | GS16 - Girls Singles 16 Main Draw | Round of 16 | Nina NOKOVA / Grace GEORGIEVA
+- 2026-09-15 | Max Pro Open U16 | GS16 - Girls Singles 16 Main Draw | Round of 16 | Zara MINEVA / Plamena KUKENSKA
+- 2026-09-15 | TEJT 1 U12&U16" The 2nd Alibaba Cup U12 &16 2026" | BS16 - Boys Singles 16 Main Draw | Round of 32 | Martin KOCIS / Philipp STRAUSS
+- 2026-09-16 | Max Pro Open U16 | GD16 - Girls Doubles 16 Main Draw | Quarter final | Zara MINEVA / Simona POPOVA / Vivian BESSALEVA / Lora GEORGIEVA
+- 2026-09-16 | TEJT 1 U12&U16" The 2nd Alibaba Cup U12 &16 2026" | GD16 - Girls Doubles 16 Main Draw | Round of 16 | Alexandra JANOSKOVA / Simona NOVAKOVA / Scarlett SALOKY / Sophia Laura STANKOVA
+- 2026-09-17 | TEJT 1 U12&U16" The 2nd Alibaba Cup U12 &16 2026" | GD12 - Girls Doubles 12 Main Draw | Quarter final | Lola TOTH / Lorena ZIBOJEDOVA / Philippa HENNINGSEN / Lilou VANDEPUTTE
+- 2026-09-18 | Max Pro Open U16 | GS16 - Girls Singles 16 Main Draw | Final | Raya MARKOVA / Kasija KUKRIK
+- 2026-09-18 | TEJT 1 U12&U16" The 2nd Alibaba Cup U12 &16 2026" | GD12 - Girls Doubles 12 Main Draw | Semi final | Andreea NOUR / Vira STROKAN / Diana ANANKO / Elizabeth IMROVA
+- 2026-09-20 | Alexandroupolis Junior Cup | BS14 - Boys Singles 14 Main Draw | Round of 32 | Mustafa Kaan AKKAYA / Mike THEMOS
+- 2026-09-22 | 2026 European Junior Championships 16 & Under | GS16 - Girls Singles 16 Main Draw | Round of 32 | Camilla Olga CASTRACANI / Mila BASTIANELLI
+- 2026-09-23 | 2026 European Junior Championships 16 & Under | BS16 - Boys Singles 16 Bonus Draw | Quarter final | Haqim KAMAL / Arno AVETISYAN
+- 2026-09-23 | 2026 European Junior Championships 16 & Under | GS16 - Girls Singles 16 Bonus Draw | Round of 16 | Kamile SELIUKAITE / Ella VAN GESTEL
+- 2026-09-23 | 2026 European Junior Championships 16 & Under | GS16 - Girls Singles 16 Bonus Draw | Round of 16 | Sofia ALMEIDA / Leah BUSH
+- 2026-09-23 | Iasi Tennis Trophy | BD16 - Boys Doubles 16 Main Draw | Quarter final | VICTOR ANDREI HOREANGA / Roan Kael PREDA / Francesco FERRO / Matei Ioan PRUNESCU NITA
+- 2026-09-24 | Alexandroupolis Junior Cup | GD14 - Girls Doubles 14 Main Draw | Semi final | CHRYSANTHI BATOU / Miranta Zoumpoulia MYSIRLI / Anastasiia ALEKSOVA / Nerina PRASHKOVA
+- 2026-09-26 | 2026 European Junior Championships 16 & Under | BS16 - Boys Singles 16 Bonus Draw | Final | Daniele LONGO / Sava GROZDEV
+- 2026-09-26 | SERRES CUP 2026 | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Penelope Azra BAYRAKTAR / Maudie VAN DER ZWAN / Anna Maria KASIDI / Joanna MOZA
+- 2026-09-26 | SERRES CUP 2026 | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Marina ANGELIDOU / Argyro PAIDAKAKOU / Antonia BORSAN / Maria Eugenia PANAIT
+- 2026-09-29 | WORLD TEC CUP | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Stephani DEGAC / Vera MOROZOVA / Vega BONTIN / Tina JANSONE
+- 2026-10-01 | TE12 TK Terme Ptuj | GS12 - Girls Singles 12 Bonus Draw | Quarter final | Lucia TARLAZZI / Ekaterina ABRAMOVA
+- 2026-10-01 | TE12 TK Terme Ptuj | GS12 - Girls Singles 12 Bonus Draw | Quarter final | Noemi GALLINA / Kasijana MARKICEVIC
+- 2026-10-01 | WORLD TEC CUP | GS14 - Girls Singles 14 Bonus Draw | Quarter final | Taleah HALLOUN / Michaela FILOVA
+- 2026-10-07 | Tennis Europe Inventist Cup | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Lidya NAGIS / Anna POLEZHAEVA / Arina CHURAEVA / Valeriia SILAEVA
+- 2026-10-11 | PODGORICA UNIVERSAL OPEN 2026 | GD16 - Girls Doubles 16 Main Draw | Final | Aleka KUKRIK / Kasija KUKRIK / Milla BRAY / Eva PALCHIKOVSKAIA
+- 2026-10-13 | Corinth Canal Tennis Cup | BS16 - Boys Singles 16 Main Draw | Round of 16 | Georgios POUNTZAS / KONSTANTINOS THEODOSIADIS
+- 2026-10-13 | Karen Kureghyan Memorial Cup | GD12 - Girls Doubles 12 Main Draw | Quarter final | Maria KVARATSKHELIA / Mariam MARIKASHVILI / Mariia POPOVA / Anastasia PUGACHEVA
+- 2026-10-22 | Top 10-12 Bressuire | BS12 - Boys Singles 12 Bonus Draw | Round of 16 | Ayrton BENNETEAU / Alexis CADDEO
+- 2026-10-22 | Vilar Cup | BD14 - Boys Doubles 14 Main Draw | Semi final | Syon HARSHE / Oleksii ZADOROZHNYI / ERYK MANDERLA / Leon MIARKA
+- 2026-10-23 | XIII Guillermo Vilas Trophy U14 | BD14 - Boys Doubles 14 Main Draw | Quarter final | Tomas GABOR / Jakub KYNCL / Riccardo Nikita MESCHI / Leo RACINE
+
+Casi senza riferimento data sufficiente (28):
+
+- EXALCO CUP | GS16 - Girls Singles 16 Main Draw | Round of 32 | Ioanna TSEPETONIDOU / Anastasia MARINOU
+- POWERADE TE U14 JUNIOR TOUR - PAOLA | GS14 - Girls Singles 14 Main Draw | Round of 32 | Maia FRENDO / Amaliya PISMENNYI
+- Open Tennis Valley Cup | GS14 - Girls Singles 14 Main Draw | Round of 32 | Lola TOTH / Zsofia EGYED
+- Werfring Open | GD14 - Girls Doubles 14 Main Draw | Quarter final | Natalia COJOCARI / Elizabeth FELUX / Mavie MAIERHOFER / Viktorija MILETIC
+- TE JR14 Leeuwarden 2026 | GD14 - Girls Doubles 14 Main Draw | Quarter final | Britt BUSSCHER / Maudie VAN DER ZWAN / Julie HOLEJSOVSKA / Lotte KOEKKOEK
+- Mladost Grill Open | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Lia KRALJ / Ajda SERBINEK / Lucija GOJCETA / Marija MILAT
+- KILKIS CUP 2026 | GD16 - Girls Doubles 16 Main Draw | Quarter final | Argyro ARTSITA / KONSTANTINA DIMITRAKOPOULOU / Vasiliki LIAGKRIDONI / Jemma OGANEZOV
+- VARITEX Lodz Cup 2026 | BS14 - Boys Singles 14 Qualifying | Qualification round of 16 | Patryk ZUREK / Hubert RYBICKI
+- Biotehnos Series Cup | BD12 - Boys Doubles 12 Main Draw | Quarter final | Bogdan BERBER / Kyrylo MALIUTA / Ivan SHAPOSHNIKOV / Serhii SUKHANOV
+- Zahnärzte Ebenbeck Cup | BD16 - Boys Doubles 16 Main Draw | Round of 16 | Andrei BALAJ / Felix Jonas NIEKAMP / Aurelio ERLENMAYER / Tim HIPP
+- O pohar mesta Rakovnik U12 I. | BS12 - Boys Singles 12 Bonus Draw | Round of 16 | Aziz Jan EKICI / Piotr CARUK
+- O pohar mesta Rakovnik U12 I. | BS12 - Boys Singles 12 Bonus Draw | Round of 16 | Maxmilian HORA / Artur VAN GILS
+- Bellevue Cup 2026 | GS12 - Girls Singles 12 Bonus Draw | Quarter final | Malda ADEMI / Cezara STAVER
+- Hanko Cup | GS12 - Girls Singles 12 Bonus Draw | Semi final | Essi RUOHONEN / Karoliina QIN
+- 2026 European Junior Championships 14 & Under (Closed Event) | BS14 - Boys Singles 14 Bonus Draw | Round of 32 | Djordje ADAMOVIC / Yuval LEIDER
+- 2026 European Junior Championships 14 & Under (Closed Event) | GD14 - Girls Doubles 14 Main Draw | Round of 32 | Ella ANDREWS WENDELL / Emilia HENNINGSEN / Antonia GAUGAS / Andreea NOUR
+- Austrian Youth Open Kufstein | GS14 - Girls Singles 14 Main Draw | Round of 32 | Ilvi SAIKKONEN / Sofie POULICKOVA
+- Bucharest Junior Trophy | BD16 - Boys Doubles 16 Main Draw | Quarter final | LUCA RAZVAN GHERGHISAN AMZA / Silviu-Fabian VIRGA / RAUL CONDREA / Cristian TUTURUGA
+- APPROACH TE 14 BORNE | BD14 - Boys Doubles 14 Main Draw | Round of 16 | Edouard NOEL / Henri ZAAROUR / Nicolas AGUIRRE AMOROS / BRAM VAN VLIET
+- XIV MEMORIJAL JOVANA KUKARASA | BS14 - Boys Singles 14 Bonus Draw | Round of 16 | Nicolae SULTANA / Nikola JOTIC
+- XIV MEMORIJAL JOVANA KUKARASA | BS14 - Boys Singles 14 Bonus Draw | Round of 16 | Mihajlo RADOJICIC / Petar STRUMBERGER
+- ATA Juniors 14&U Klosters 2026 | GD14 - Girls Doubles 14 Main Draw | Quarter final | Tereza HAVOVA / Sofie POULICKOVA / Grace CRIVELLI / Matilde POZZA
+- Uccle Trophy | GS14 - Girls Singles 14 Main Draw | Round of 16 | Louise GROSEMANS / Navya CHAWLA
+- Kaleva Open | BD16 - Boys Doubles 16 Main Draw | Quarter final | Alexander MONONEN / Veikko PUKKI / Eelis ILLIKAINEN / Joonatan MAKELA
+- TEJT 1 U12&U16" The 2nd Alibaba Cup U12 &16 2026" | BD12 - Boys Doubles 12 Main Draw | Quarter final | Ianis HANTIG / Sergiu Alexandru ONICA / Ilija PERIC / Konrad RYBICKI
+- International Championships of Romania U14 | GD14 - Girls Doubles 14 Main Draw | Semi final | Eva IANCU / Mara Elena MARINCEAN / Mara-Andreia DIACONU / Sofia Ioana STOICA
+- Koblenz Junior Open | GD14 - Girls Doubles 14 Main Draw | Round of 16 | Kristina BERVINOVA / Vlada DEGTYAR / Luna Sienna-Marie DIMA / Barbic EMA
+- Koblenz Junior Open | BS12 - Boys Singles 12 Bonus Draw | Round of 16 | Najib SANGARE / Rafael NORIEGA
