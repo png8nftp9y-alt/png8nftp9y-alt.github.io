@@ -68,7 +68,14 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
   const roots=new Set(found.map(g=>find(g.i))),members=sets.flatMap((g,i)=>roots.has(find(i))?g:[]),ids=new Map();
   for(const r of members){const key=officialKey(r);if(!key)continue;const known=ids.get(r.circuit)||new Set();known.add(key);ids.set(r.circuit,known);}
   if([...ids.values()].some(s=>s.size>1))throw Error('confirmed_identity_link_conflicts_with_existing_profile');
-  if(rule.nameKey&&members.some(r=>r.circuit!=='courtwatch'&&playerNameKey(r.display_name)!==rule.nameKey))throw Error('confirmed_identity_link_name_changed');
+  if(rule.nameKey){
+   // Exact native IDs explicitly confirmed for this person remain authoritative
+   // when retained sources spell the same profile's name differently.
+   // Never extend the exception to another native ID or to a name-only source.
+   const approvedNameIds=new Set(confirmedLinks.filter(link=>link.nameKey===rule.nameKey).flatMap(link=>link.identities.map(id=>officialKey({circuit:id.circuit,official_id:id.officialId}))).filter(Boolean));
+   const unexpected=members.filter(r=>r.circuit!=='courtwatch'&&playerNameKey(r.display_name)!==rule.nameKey&&!approvedNameIds.has(officialKey(r)));
+   if(unexpected.length)throw Error('confirmed_identity_link_name_changed:'+JSON.stringify({nameKey:rule.nameKey,sources:unexpected.slice(0,20).map(r=>({sourceKey:r.source_key,circuit:r.circuit,officialId:r.official_id,name:r.display_name}))}));
+  }
   const root=find(found[0].i);for(const g of found)parent[find(g.i)]=root;
  }
  const priorBySource=new Map(currentLinks.map(r=>[r.source_key,r.canonical_id])),priorGroups=new Map();

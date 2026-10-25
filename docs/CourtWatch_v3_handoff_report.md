@@ -9168,3 +9168,13 @@ Scelte specifiche tra più ID ITF: #16 Juan Lee 800843135 NZL, #18 Sofia Kuzmina
 Workflow una tantum courtwatch-approved-nationality-links.yml sotto lock courtwatch-d1-writes, simulazione prima di scrivere, sole regole mancanti, mapper ordinario sulle fonti selezionate e readback di ogni associazione e nazionalità canonica. Readback con chiavi esatte IN; nessun LIKE oltre il limite D1. Verifiche: ID esclusi separati, tutte le fonti preservate, Emma Cao stessa partizione con nazionalità e payload originali, Vasileva invariata, ripresa da regole già salvate, replay completato zero scritture. Nessuna discovery esterna, polling, schedulazione o retry automatico.
 
 Validazione locale: regressioni quattro e tre associazioni precedenti e mapper; fixture reali dei 31 gruppi per scelte attuali e controlli. Applicazione in produzione da confermare nel nuovo run dopo il push.
+
+## Ripresa associazioni confermate: varianti del nome per ID stabile (25 ottobre 2026)
+
+Il run 40153107139/job/121049502079 fallisce in syncPlayerIdentities con confirmed_identity_link_name_changed dopo aver salvato regole e coda. Riprodotto localmente lo stesso percorso: il preflight legge il nome dall'indice, mentre il mapper ricarica quello originale. Il test precedente usava lo stesso nome per entrambe le viste e non copriva questa differenza.
+
+Le varianti testuali sono ammesse solo per gli ID nativi esplicitamente inclusi nelle regole confermate dello stesso gruppo; nessuna estensione a ID diversi o fonti senza ID. Restano il controllo contro più ID nello stesso circuito e l'esclusione degli omonimi. Errori residui includono gruppo, fonte, circuito, ID e nome coinvolti.
+
+Il recupero legge e rilegge anche le chiavi native confermate, non solo il vecchio nome: la classificazione locale del controllo segue gli ID, senza alterare nomi e payload originali. Lookup per valori esatti della coppia circuito/ID (incluse varianti maiuscolo/minuscolo GUID), senza LOWER sulla colonna. Riepilogo costruito dalle stesse fonti rilette. Regole già salvate conservate e non reinserite, marker completamento solo dopo tutti i controlli.
+
+Regressioni: fonti originali con nomi diversi per tutti i 29 gruppi, 31 regole preesistenti, 29 associazioni e nazionalità verificate, ID esclusi separati, Emma AUS/CAN invariata, Daria invariata, nessuna estensione ai record senza ID o ad altro ID ITF. Verifiche del mapper e dei precedenti recuperi tre e quattro gruppi; policy D1 incrementale. Nessun polling o retry automatico; esito in produzione da confermare dopo pubblicazione.
