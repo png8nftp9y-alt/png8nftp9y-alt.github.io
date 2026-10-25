@@ -1,0 +1,56 @@
+name: Court Watch Iris Grosso identity evidence
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-iris-grosso-identity.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-iris-grosso-readonly
+  cancel-in-progress: false
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify readonly diagnostics and Admin placement
+        run: node --test test/search-identity-split.test.mjs test/read-only-d1-client.test.mjs test/admin-identity-review.test.mjs
+      - name: Read Iris Grosso native IDs and current mapping without writes
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_D1_DATABASE_ID: cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda
+        run: node scripts/inspect-search-identity-split.mjs 'Iris Grosso'
+      - name: Read the exact saved Admin alert without modifying it
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_D1_DATABASE_ID: cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs/promises';
+          import {openReadOnlyD1} from './lib/read-only-d1-client.mjs';
+          import {identityReviewKey} from './lib/identity-review-queue.mjs';
+          import {playerNameKey} from './lib/player-circuit-profiles.mjs';
+          const {query}=await openReadOnlyD1();
+          const rows=await query('SELECT key,value,updated_at FROM app_state WHERE key=?',[identityReviewKey(playerNameKey('Iris Grosso'))]);
+          const cases=rows.map(r=>({...r,value:JSON.parse(r.value)}));
+          await fs.mkdir('tmp',{recursive:true});
+          await fs.writeFile('tmp/iris-review-case.json',JSON.stringify(cases,null,2));
+          console.log('IRIS_SAVED_CASE='+JSON.stringify(cases));
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iris-grosso-identity-evidence
+          path: |
+            cloudflare/app-api/tmp/search-identity-split.json
+            cloudflare/app-api/tmp/iris-review-case.json
+          retention-days: 14

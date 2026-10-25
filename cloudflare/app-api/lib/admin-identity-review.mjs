@@ -27,5 +27,5 @@ export function renderIdentityReviewCases(report){
  return start+introduction+controls+content+next+'<p class="muted">La lista viene letta da D1 aprendo questa pagina o premendo Aggiorna segnalazioni. I conteggi ID sopra mantengono il loro aggiornamento manuale. Nessun polling e nessuna discovery.</p></section>';
 }
 export async function appendIdentityReviewCases(html,db,url){
- return html.replace('</main>',renderIdentityReviewCases(await loadIdentityReviewCases(db,url))+'</main>');
+ return html.replace('</nav>','</nav>'+renderIdentityReviewCases(await loadIdentityReviewCases(db,url)));
 }
