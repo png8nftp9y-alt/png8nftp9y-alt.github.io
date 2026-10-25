@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['src/v3/update-operational-diagnostics.mjs', 'src/v3/entries-engine.mjs', '.github/workflows/courtwatch-operational-diagnostics.yml']
+    paths: ['src/v3/update-operational-diagnostics.mjs', 'src/v3/operational-workflow-status.mjs', 'src/v3/entries-engine.mjs', '.github/workflows/courtwatch-operational-diagnostics.yml']
   workflow_run:
     workflows:
       - Court Watch v3 FITP provincial primary
@@ -16,6 +16,12 @@ on:
       - Court Watch Tennis Europe agenda D1
       - Court Watch Cloudflare D1 and app API
       - Court Watch ITF R2 recovery
+      - Court Watch acceptance player profiles
+      - Court Watch acquired player search index
+      - Court Watch Cloudflare app Worker hotfix
+      - Court Watch ITF Meta engine
+      - Court Watch FITP clubs and rankings D1
+      - Court Watch Tennis Europe rankings
     types: [completed]
     branches: [main]
 permissions:
@@ -33,6 +39,8 @@ jobs:
         with: {ref: main}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - name: Verify workflow status collector
+        run: node --test src/v3/operational-workflow-status.test.mjs
       - name: Publish current operational evidence
         env:
           GITHUB_TOKEN: ${{ github.token }}
