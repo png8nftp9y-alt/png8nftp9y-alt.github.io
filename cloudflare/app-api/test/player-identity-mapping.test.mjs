@@ -29,3 +29,14 @@ test('confirmed exact native IDs accept retained name variants without merging a
  assert.notEqual(ids.get('homonym'),ids.get('itf'));
  assert.throws(()=>buildIdentityMapping(rows,{confirmedLinks:[confirmation]}),/confirmed_identity_link_name_changed.*no-id/);
 });
+
+
+test('explicit retained source key joins approved native pair, while unrelated name-only evidence is not a general exception',()=>{
+ const row=(source_key,circuit,official_id,display_name,payload={})=>({source_key,circuit,official_id,display_name,normalized_name:display_name.toUpperCase(),payload:JSON.stringify(payload)});
+ const rows=[row('fitp','fitp','123456','Iris Grosso',{nationality:'GBR'}),row('te','tennis-europe',guid,'Iris Grosso',{nationality:'ITA'}),row('legacy','tennis-europe','','Iris Grosso',{nationality:'GBR'})];
+ const rule={nameKey:'GROSSO IRIS',identities:[{circuit:'fitp',officialId:'123456'},{circuit:'tennis-europe',officialId:guid}],currentNationality:'GBR',sourceKeys:['legacy']};
+ const plan=buildIdentityMapping(rows,{confirmedLinks:[rule]});assert.equal(new Set(plan.links.map(r=>r.canonical_id)).size,1);
+ assert.throws(()=>buildIdentityMapping([...rows.slice(0,2),row('legacy','tennis-europe','','Other Player',{nationality:'GBR'})],{confirmedLinks:[rule]}),/confirmed_source_link_evidence_conflict/);
+ assert.throws(()=>buildIdentityMapping([...rows.slice(0,2),row('legacy','tennis-europe','87654321-1234-1234-1234-123456789abc','Iris Grosso',{nationality:'GBR'})],{confirmedLinks:[rule]}),/confirmed_source_link_evidence_conflict/);
+ assert.throws(()=>buildIdentityMapping(rows,{confirmedLinks:[{...rule,sourceKeys:'legacy'}]}),/confirmed_source_link_invalid/);
+});
