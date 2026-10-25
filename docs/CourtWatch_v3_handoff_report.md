@@ -9153,3 +9153,9 @@ ITF discovery 2026-10-24T21:16:25.796Z: 0 newly discovered future tournaments; M
 - Frontend filtra le righe tramite categorie delle iscrizioni subscriptionRegistrations, draw/event delle presenze e partite FITP degli stessi playerId nella stessa competitionId. Nessuna deduzione dalla sola età del giocatore; categorie prive di evidenza escluse con messaggio esplicito. Il catalogo pubblico rimane condivisibile, il filtro viene ricalcolato sul torneo corrente anche quando proviene dalla cache.
 - Due sezioni: nomi sintetici INIZIALE e FINALE mantenendo gli identificativi e le descrizioni originali nel titolo. Unica sezione: solo sigla; tre o più: comportamento precedente. Righe per età, colori per sesso e Safari conservati. Nessuna nuova richiesta, polling o lettura/scrittura D1.
 - Validazione: 12 test superati su filtro iscrizioni/partite, esclusione di altri giocatori e tornei, cache, colori e URL; caso due sezioni e descrizione originale; sintassi frontend valida. Versione cache JS aggiornata.
+
+## 2026-10-25 — Spazio intestazione per tabelloni FITP su PC
+
+- Screenshot Gallarate Under 11: il titolo lungo comprimeva l’area dei link e DF11 andava a capo. Su desktop il titolo ora cede spazio e può andare a capo prima; l’area tabelloni mantiene la larghezza naturale fino al 65% della scheda. Una fascia di età non si spezza; eventuali righe molto lunghe scorrono orizzontalmente all’interno dell’area link.
+- Regole CSS limitate alle intestazioni con tabelloni FITP e schermi da 651px. Layout mobile precedente conservato. Nessuna modifica a link, filtri, nomi, colori, richieste o D1. Versione cache CSS aggiornata.
+- Verifica: ambito e soglia delle regole controllati; installer applicato su repository temporaneo con git diff --check superato. Verifica visiva finale dopo deploy.

@@ -603,3 +603,15 @@ button,a,[role="link"],summary{touch-action:manipulation}
 .tournamentDrawLink.fitpDrawFemale{background:#fce7f3;color:#9d174d}
 .tournamentDrawLink.fitpDrawMale{background:#e7f2fb;color:#12629a}
 .tournamentDrawLink.fitpDrawMixed{background:#eee8fc;color:#624099}
+
+/* FITP_DRAW_HEADER_WIDTH */
+@media(min-width:651px){
+ .tournamentHero:has([data-fitp-draw-links])>div:first-child{flex:1 1 0;min-width:0}
+ .tournamentHero:has([data-fitp-draw-links]) .tournamentHeroActions{flex:0 0 auto;width:max-content;max-width:65%;min-width:0}
+ .tournamentHero:has([data-fitp-draw-links]) .tournamentDraws{max-width:100%;min-width:0}
+ .tournamentHero:has([data-fitp-draw-links]) .tournamentDraws>span{min-width:0;max-width:100%}
+ .tournamentHero:has([data-fitp-draw-links]) [data-fitp-draw-links]{min-width:0;max-width:100%;overflow-x:auto}
+ .tournamentHero:has([data-fitp-draw-links]) .fitpDrawAgeRow{flex-wrap:nowrap;width:max-content;min-width:100%}
+ .tournamentHero:has([data-fitp-draw-links]) .fitpDrawAgeLabel,
+ .tournamentHero:has([data-fitp-draw-links]) .tournamentDrawLink{flex-shrink:0;white-space:nowrap}
+}
