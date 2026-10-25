@@ -75,3 +75,5 @@ test('manual refresh submits a GET and each read sees current D1 rather than a r
   assert.doesNotMatch(renderPlayerIdDiagnostics(after),/<script|http-equiv/);
  }finally{d.close()}
 });
+
+import './admin-identity-review.test.mjs';

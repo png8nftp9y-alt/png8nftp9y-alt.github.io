@@ -1,3 +1,4 @@
+import {syncIdentityReview} from '../lib/identity-review-queue.mjs';
 import {cachedReadCheck,readCheckVersion} from '../lib/d1-read-check-cache.mjs';
 import {includedPlayerIdSourceSql} from '../lib/player-id-audit-scope.mjs';
 import {recoverProfileEvidence,validOfficialId,matchProfileCandidates} from '../lib/player-profile-evidence.mjs';
@@ -9,6 +10,7 @@ import {playerNameKey,normalizePlayerName} from '../lib/player-circuit-profiles.
 import {sqlString} from '../../../src/v3/itf-draw-document-d1.mjs';
 // D1_WRITE_POLICY: incremental
 // buildIncrementalSyncPlan is enforced by buildIdentityMapping; checkpoint follows writes.
+const reviewedIdentityDecisions=JSON.parse(await fs.readFile(new URL('../data/identity-review-decisions-20261025.json',import.meta.url),'utf8')).groups;
 const sources=[['observed_players','source_key'],['search_acquired_players','source_key'],['app_players','id'],['user_app_player_additions','courtwatch_id']];
 const projection=table=>table==='app_players'||table==='user_app_player_additions'?`'courtwatch|'||${table==='app_players'?'id':'courtwatch_id'} AS source_key,'courtwatch' AS circuit,${table==='app_players'?'id':'courtwatch_id'} AS official_id,json_extract(payload,'$.name') AS display_name,UPPER(json_extract(payload,'$.name')) AS normalized_name,payload`:'source_key,circuit,official_id,display_name,normalized_name,payload';
 async function write(query,statements){let batch=[],bytes=0;for(const sql of statements){const size=Buffer.byteLength(sql);if(size>90000)throw Error('identity_statement_too_large');if(batch.length&&(batch.length>=20||bytes+size>90000)){await query(batch.join('\n'));batch=[];bytes=0}batch.push(sql);bytes+=size}if(batch.length)await query(batch.join('\n'));}
@@ -77,6 +79,7 @@ export async function syncPlayerIdentities(query,{allowBulk=false,maxChanges=500
   audit={people:new Set(saved.map(r=>r.canonical_id)).size,links:saved.length,sources_without_official_profile:saved.filter(r=>['fitp','itf','tennis-europe'].includes(r.circuit)&&!r.profile_url).length,missing_observed:0,missing_acquired:0};
  }
  audit.auditScope=full?'global':'affected_identity_groups';
+ audit.identityReview=await syncIdentityReview(query,plan.links,{names:[...currentLinks,...plan.links].map(r=>r.name_key),sources:rows,previousLinks:currentLinks,confirmedLinks,reviewed:reviewedIdentityDecisions,sourceComplete:true});
  // Revision predicate retains a source changed while this snapshot was processed.
  const clears=[];for(let i=0;i<pending.length;i+=100)clears.push(`DELETE FROM player_identity_pending_sources WHERE (source_table,source_key,revision) IN (${pending.slice(i,i+100).map(p=>'('+sqlString(p.source_table)+','+sqlString(p.source_key)+','+Number(p.revision)+')').join(',')});`);await write(query,clears);
  const remaining=Number((await query('SELECT COUNT(*) AS total FROM player_identity_pending_sources'))[0].total);
