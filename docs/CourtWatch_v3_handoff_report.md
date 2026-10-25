@@ -9159,3 +9159,12 @@ ITF discovery 2026-10-24T21:16:25.796Z: 0 newly discovered future tournaments; M
 - Screenshot Gallarate Under 11: il titolo lungo comprimeva l’area dei link e DF11 andava a capo. Su desktop il titolo ora cede spazio e può andare a capo prima; l’area tabelloni mantiene la larghezza naturale fino al 65% della scheda. Una fascia di età non si spezza; eventuali righe molto lunghe scorrono orizzontalmente all’interno dell’area link.
 - Regole CSS limitate alle intestazioni con tabelloni FITP e schermi da 651px. Layout mobile precedente conservato. Nessuna modifica a link, filtri, nomi, colori, richieste o D1. Versione cache CSS aggiornata.
 - Verifica: ambito e soglia delle regole controllati; installer applicato su repository temporaneo con git diff --check superato. Verifica visiva finale dopo deploy.
+## Conferme numerate 1–30: identità e nazionalità attuale (25 ottobre 2026)
+
+Decisione esplicita dell'utente sulla tabella a numerazione fissa: unire 29 gruppi; per #9 Emma Cao mantenere separati Europe AUS e ITF CAN. Le nazionalità attuali confermate sono salvate nel manifesto per numero e ID nativi, senza alterare le fonti storiche. Nigeria=NGR, Spagna=ESP e Regno Unito=GBR.
+
+Scelte specifiche tra più ID ITF: #16 Juan Lee 800843135 NZL, #18 Sofia Kuzmina 800712926 IRL, #22 Luka Mitrovic 800693835 CRO, #26 Sophia Santos 800661870 CRO, #30 Tara Stojanovic 800765041 CRO. Gli altri ITF restano separati. #1 Aso Mawlood e #14 Pietro Gandolfo collegano anche la tessera FITP precisa; #21 Louis Spagnardi collega FITP ed Europe. Il manifesto comprende 29 associazioni e 31 coppie di regole confermate. Nessuna estensione a nomi fuori da questa lista.
+
+Workflow una tantum courtwatch-approved-nationality-links.yml sotto lock courtwatch-d1-writes, simulazione prima di scrivere, sole regole mancanti, mapper ordinario sulle fonti selezionate e readback di ogni associazione e nazionalità canonica. Readback con chiavi esatte IN; nessun LIKE oltre il limite D1. Verifiche: ID esclusi separati, tutte le fonti preservate, Emma Cao stessa partizione con nazionalità e payload originali, Vasileva invariata, ripresa da regole già salvate, replay completato zero scritture. Nessuna discovery esterna, polling, schedulazione o retry automatico.
+
+Validazione locale: regressioni quattro e tre associazioni precedenti e mapper; fixture reali dei 31 gruppi per scelte attuali e controlli. Applicazione in produzione da confermare nel nuovo run dopo il push.

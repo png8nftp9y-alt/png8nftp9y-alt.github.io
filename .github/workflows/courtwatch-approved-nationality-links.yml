@@ -1,0 +1,37 @@
+name: Court Watch approved 29 numbered identity associations and nationalities
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-approved-nationality-links.yml', 'cloudflare/app-api/scripts/apply-user-approved-nationality-links.mjs', 'cloudflare/app-api/data/user-approved-nationality-links-20261025.json']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Test exact 29 pairs, excluded cards, previous rules and zero-write replay
+        run: node --test test/apply-user-approved-nationality-links.test.mjs test/apply-user-approved-three-itf-identity-links.test.mjs test/apply-user-approved-four-identity-links.test.mjs test/player-identity-mapping.test.mjs
+      - run: node scripts/configure-d1.mjs
+      - name: Apply only 29 approved pairs and verify D1 readback
+        run: node scripts/apply-user-approved-nationality-links.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: approved-nationality-identities-d1-readback
+          path: cloudflare/app-api/tmp/approved-nationality-links.json
+          retention-days: 30
