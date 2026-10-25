@@ -9178,3 +9178,5 @@ Le varianti testuali sono ammesse solo per gli ID nativi esplicitamente inclusi 
 Il recupero legge e rilegge anche le chiavi native confermate, non solo il vecchio nome: la classificazione locale del controllo segue gli ID, senza alterare nomi e payload originali. Lookup per valori esatti della coppia circuito/ID (incluse varianti maiuscolo/minuscolo GUID), senza LOWER sulla colonna. Riepilogo costruito dalle stesse fonti rilette. Regole già salvate conservate e non reinserite, marker completamento solo dopo tutti i controlli.
 
 Regressioni: fonti originali con nomi diversi per tutti i 29 gruppi, 31 regole preesistenti, 29 associazioni e nazionalità verificate, ID esclusi separati, Emma AUS/CAN invariata, Daria invariata, nessuna estensione ai record senza ID o ad altro ID ITF. Verifiche del mapper e dei precedenti recuperi tre e quattro gruppi; policy D1 incrementale. Nessun polling o retry automatico; esito in produzione da confermare dopo pubblicazione.
+
+ITF discovery 2026-10-25T05:21:29.266Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
