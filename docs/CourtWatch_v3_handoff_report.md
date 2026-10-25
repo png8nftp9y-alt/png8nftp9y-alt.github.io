@@ -9188,3 +9188,9 @@ Regressioni: fonti originali con nomi diversi per tutti i 29 gruppi, 31 regole p
 ITF discovery 2026-10-25T05:21:29.266Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-25T12:04:53.062Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 25 October 2026 — Confirmed FITP–ITF associations 31–48
+
+User selects eighteen FITP cards by the displayed ranking. Interpret the second 31 as 32 (Ferrari 2.8), 463.2 as 46/3.2 and 482.6 as 48/2.6. Persist exact two-native-ID rules only; no general ranking heuristic or nationality override. Existing mapping logic preserves source documents and Riccardo Galbiati's personal identity. One-time workflow uses the shared D1 write lock, no polling or automatic retries. Verify all eighteen associations from D1, excluded FITP homonyms, source retention and Emma Cao/Daria Vasileva separation before writing the completion marker. Replay reads the checkpoint with zero writes.
+
+Validation: eighteen real baseline fixtures, selected ranking/card agreement, preservation of prior rules/raw sources/personal binding, ordinary delta persistence, partial resume with approved-ID name variants and missing-native guard; existing identity-mapper regressions. Production completion still requires the dedicated workflow's successful D1 readback. After verified completion, 61 FITP–Europe groups remain in this review scope.
