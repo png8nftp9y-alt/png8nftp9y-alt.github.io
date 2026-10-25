@@ -9127,3 +9127,9 @@ Validazione: 21 test superati, incluso test di regressione che applica il limite
 - Richiesta: tutti i tabelloni della stessa categoria sulla stessa riga; categorie ordinate per età e poi SM, SF, DM, DF, DX. Etichette sintetiche e associazione ai tabelloni restano quelle ufficiali già acquisite.
 - Frontend raggruppa i link per codice categoria e ordina le fasi INIZIALE, INTERMEDIO numerico, FINALE; CSS separa le righe e permette ai link della stessa categoria di andare a capo su schermi stretti. Aggiornate versioni cache JS/CSS. Nessuna richiesta aggiuntiva, polling o modifica D1.
 - Validazione: quattro test frontend superati, compresi ordine SM10/SF10/DM10/DF10/SM12/DF12, fasi e integrità delle URL; controllo sintassi JS. Apertura Safari preservata.
+
+## 2026-10-25 — Righe tabelloni per età e colori per sesso
+
+- Sostituisce una riga per specialità con una riga per fascia: Under 10, Under 12, Under 14, ecc. Nella stessa riga SM/SF/DM/DF (eventuale DX), con fasi ordinate iniziale/intermedi numerici/finale per specialità. Femminile rosa, maschile blu e misto distinto. Open/Over restano separati.
+- Modifica del solo rendering e CSS, aggiornate versioni cache JS/CSS. Etichette sintetiche, identificativi ufficiali, URL e apertura Safari preservati. Nessuna richiesta aggiuntiva, polling o modifica D1. Su schermi stretti i link possono andare a capo all’interno della propria fascia.
+- Verifica: quattro test frontend superati, incluso raggruppamento U10/U12, colori SF/DF e SM, integrità delle URL e assenza di polling; sintassi JavaScript valida.

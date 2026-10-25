@@ -21,13 +21,17 @@ test('concurrent renders share a request, cached navigation does not poll',async
 test('upstream error is visible and not cached as an empty list',async()=>{
  let count=0;const {ctx,slot}=context(async()=>{count++;return new Response('',{status:502})});await ctx.loadInlineFitpDrawLinks({competitionId:id});assert.match(slot.textContent,/temporaneamente non disponibili/);await ctx.loadInlineFitpDrawLinks({competitionId:id});assert.equal(count,2);
 });
-test('one row per category: age first, then male/female singles and doubles; links stay associated',()=>{
+test('one row per age combines singles and doubles, pink female links preserve IDs',()=>{
  const {ctx}=context();
  const make=(code,phase,id)=>({...draw,categoryCode:code,label:code+' '+phase,url:draw.url.replace('tournamentId=222','tournamentId='+id)});
  const html=ctx.fitpInlineDrawHtml([make('DF12','FINALE',7),make('SF10','FINALE',3),make('SM10','FINALE',2),make('DM10','FINALE',4),make('SM10','INIZIALE',1),make('DF10','FINALE',5),make('SM12','INTERMEDIO 2',6),make('SM12','INTERMEDIO 1',8)]);
- const rows=[...html.matchAll(/data-fitp-draw-category="([^"]+)">([\s\S]*?)<\/span>/g)];
- assert.deepEqual(rows.map(r=>r[1]),['SM10','SF10','DM10','DF10','SM12','DF12']);
- assert.equal((rows[0][2].match(/<a /g)||[]).length,2);assert(rows[0][2].indexOf('SM10 INIZIALE')<rows[0][2].indexOf('SM10 FINALE'));
+ const rows=[...html.matchAll(/data-fitp-draw-age="([^"]+)">([\s\S]*?)<\/span>/g)];
+ assert.deepEqual(rows.map(r=>r[1]),['U10','U12']);
+ assert.match(rows[0][2],/fitpDrawAgeLabel\">Under 10/);
+ assert.match(rows[0][2],/class="[^"]*fitpDrawFemale[^"]*"[^>]*>SF10 FINALE/);
+ assert.match(rows[0][2],/class="[^"]*fitpDrawFemale[^"]*"[^>]*>DF10 FINALE/);
+ assert.match(rows[0][2],/class="[^"]*fitpDrawMale[^"]*"[^>]*>SM10 INIZIALE/);
+ assert.equal((rows[0][2].match(/<a /g)||[]).length,5);assert(rows[0][2].indexOf('SM10 INIZIALE')<rows[0][2].indexOf('SM10 FINALE'));
  assert.match(rows[0][2],/tournamentId=1&amp;[^>]*>SM10 INIZIALE/);assert.match(rows[0][2],/tournamentId=2&amp;[^>]*>SM10 FINALE/);
- assert(rows[4][2].indexOf('INTERMEDIO 1')<rows[4][2].indexOf('INTERMEDIO 2'));
+ assert(rows[1][2].indexOf('INTERMEDIO 1')<rows[1][2].indexOf('INTERMEDIO 2'));
 });

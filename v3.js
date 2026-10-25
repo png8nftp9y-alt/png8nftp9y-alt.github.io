@@ -5256,24 +5256,26 @@ function fitpInlineDrawHref(url, platform = navigator) {
     ? url.replace(/^https:/,'x-safari-https:') : url;
 }
 function fitpInlineDrawHtml(rows) {
-  const categories = new Map();
+  const ages = new Map();
   for (const row of rows) {
     let url;try {url=new URL(row.url);}catch{continue;}
     if (url.protocol !== 'https:' || url.hostname !== 'www.fitp.it' || url.pathname !== '/Tornei/Areas/Federtennis/Scripts/Puc/Tabellone_v3' || url.username || url.password || url.port) continue;
     if (!/^\d+$/.test(url.searchParams.get('tournamentId')||'') || !/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(url.searchParams.get('phaseId')||'')) continue;
     const code = String(row.categoryCode || String(row.label || '').split(/\s+/)[0]);
-    const key = /^(?:SM|SF|DM|DF|DX)(?:O?\d{1,2})?$/.test(code) ? code : String(row.category || code);
-    if (!categories.has(key)) categories.set(key,[]);
-    categories.get(key).push({...row,url:url.href});
+    const parsed = code.match(/^(SM|SF|DM|DF|DX)(?:(O)?(\d{1,2}))?$/);
+    const key = parsed ? parsed[3] ? (parsed[2]?'O':'U')+Number(parsed[3]) : 'OPEN' : String(row.category || code);
+    const label = parsed ? parsed[3] ? (parsed[2]?'Over ':'Under ')+Number(parsed[3]) : 'Open' : key;
+    const order = parsed ? parsed[3] ? Number(parsed[3])+(parsed[2]?1000:0) : 500 : 10000;
+    const kindOrder = parsed ? ['SM','SF','DM','DF','DX'].indexOf(parsed[1]) : 5;
+    const female = parsed ? ['SF','DF'].includes(parsed[1]) : /femminil/i.test(row.category || '');
+    const color = female ? 'fitpDrawFemale' : parsed?.[1] === 'DX' ? 'fitpDrawMixed' : 'fitpDrawMale';
+    if (!ages.has(key)) ages.set(key,{label,order,draws:[]});
+    ages.get(key).draws.push({...row,url:url.href,kindOrder,color});
   }
-  const categoryOrder = code => {
-    const match = code.match(/^(SM|SF|DM|DF|DX)(?:(O)?(\d{1,2}))?$/);
-    return match ? [match[3] ? Number(match[3])+(match[2]?1000:0) : 500, ['SM','SF','DM','DF','DX'].indexOf(match[1])] : [10000,0];
-  };
   const phaseOrder = row => /INIZIALE/i.test(row.label) ? 0 : /INTERMEDIO/i.test(row.label) ? 1 : /FINALE/i.test(row.label) ? 2 : 3;
-  return [...categories].sort(([a],[b])=>{const x=categoryOrder(a),y=categoryOrder(b);return x[0]-y[0] || x[1]-y[1] || a.localeCompare(b,'it');}).map(([category,draws]) => {
-    const links=draws.sort((a,b)=>phaseOrder(a)-phaseOrder(b) || String(a.label).localeCompare(String(b.label),'it',{numeric:true})).map(row=>`<a class="type tournamentDrawLink" href="${esc(fitpInlineDrawHref(row.url))}" target="_blank" rel="noopener noreferrer" title="${esc([row.category,row.phase].filter(Boolean).join(' · '))}">${esc(row.label)}</a>`).join('');
-    return `<span class="fitpDrawCategoryRow" data-fitp-draw-category="${esc(category)}">${links}</span>`;
+  return [...ages].sort(([a,x],[b,y])=>x.order-y.order || a.localeCompare(b,'it')).map(([key,group]) => {
+    const links=group.draws.sort((a,b)=>a.kindOrder-b.kindOrder || phaseOrder(a)-phaseOrder(b) || String(a.label).localeCompare(String(b.label),'it',{numeric:true})).map(row=>`<a class="type tournamentDrawLink ${row.color}" href="${esc(fitpInlineDrawHref(row.url))}" target="_blank" rel="noopener noreferrer" title="${esc([row.category,row.phase].filter(Boolean).join(' · '))}">${esc(row.label)}</a>`).join('');
+    return `<span class="fitpDrawAgeRow" data-fitp-draw-age="${esc(key)}"><b class="fitpDrawAgeLabel">${esc(group.label)}</b>${links}</span>`;
   }).join('') || 'Nessun tabellone diretto pubblicato';
 }
 function fitpInlineDrawSlot(t) {

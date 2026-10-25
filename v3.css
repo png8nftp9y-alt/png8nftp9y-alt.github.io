@@ -596,3 +596,10 @@ button,a,[role="link"],summary{touch-action:manipulation}
 .tournamentDraws [data-fitp-draw-links]{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
 .fitpDrawCategoryRow{display:flex;flex-wrap:wrap;align-items:center;gap:5px;width:100%}
 .tournamentDraws:has([data-fitp-draw-links]){align-items:flex-start;flex-wrap:nowrap}
+
+/* FITP_AGE_ROWS */
+.fitpDrawAgeRow{display:flex;flex-wrap:wrap;align-items:center;gap:5px;width:100%}
+.fitpDrawAgeLabel{min-width:65px;text-align:left;color:var(--muted);font-size:11px}
+.tournamentDrawLink.fitpDrawFemale{background:#fce7f3;color:#9d174d}
+.tournamentDrawLink.fitpDrawMale{background:#e7f2fb;color:#12629a}
+.tournamentDrawLink.fitpDrawMixed{background:#eee8fc;color:#624099}
