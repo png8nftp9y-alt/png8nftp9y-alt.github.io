@@ -55,6 +55,12 @@ test('resume after persisted rules uses exact key readback within D1 LIKE limit 
  const d=database({identityMapping:true});try{
   insert(d);
   for(const r of approvedRules())d.execute('INSERT INTO app_state(key,value,updated_at) VALUES(?,?,?)',[r.key,r.value,'2026-10-24']);
+  // Original retained names can differ from the old identity-link projection.
+  // Preflight reads l.display_name; the ordinary mapper reloads these originals.
+  for(const entry of approval.associations){
+   const wanted=entry.identities[0],source=actual.find(g=>g.name===entry.nameKey).sources.find(s=>s.circuit===wanted.circuit&&s.official_id.toLowerCase()===wanted.officialId.toLowerCase());
+   d.execute('UPDATE observed_players SET display_name=?,normalized_name=? WHERE source_key=?',[source.display_name+' Junior',(source.display_name+' Junior').toUpperCase(),source.source_key]);
+  }
   let ruleWrites=0,exactRead=false;
   const query=async sql=>{
    for(const m of sql.matchAll(/\b(?:LIKE|GLOB)\s+'([^']*)'/gi))if(Buffer.byteLength(m[1])>50)throw Error('D1 LIKE/GLOB pattern exceeds 50 bytes');

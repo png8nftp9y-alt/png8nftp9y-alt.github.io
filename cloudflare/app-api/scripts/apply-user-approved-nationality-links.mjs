@@ -8,12 +8,23 @@ import {sqlString} from '../../../src/v3/itf-draw-document-d1.mjs';
 export const approval=JSON.parse(await fs.readFile(new URL('../data/user-approved-nationality-links-20261025.json',import.meta.url),'utf8'));
 const marker='approvedNationalityIdentityAssociations:20261025:v1',keyOf=r=>r.circuit+'|'+String(r.official_id||r.officialId||'').toLowerCase();
 export function approvedRules(entries=approval.associations){return entries.flatMap(entry=>entry.identities.slice(1).map((id,i)=>({key:'confirmedPlayerCircuitLink:approved-nationalities-20261025:'+entry.nameKey.toLowerCase().replaceAll(' ','-')+':'+i,value:JSON.stringify({nameKey:entry.nameKey,identities:[entry.identities[0],id],reason:'Explicit numbered user confirmation 25 October 2026; exact approved native IDs',...(entry.currentNationality?{currentNationality:entry.currentNationality}:{})})})));}
-async function readSources(query,names){const rows=[];for(let i=0;i<names.length;i+=20)rows.push(...await query(`SELECT l.*,COALESCE(a.canonical_id,l.canonical_id) AS person_id,
+async function readSources(query,names){
+ const labels=new Map();
+ for(const entry of [...approval.associations,approval.emma])for(const id of [...entry.identities,...(entry.excludedIdentities||[])])labels.set(keyOf(id),entry.nameKey);
+ const rows=[];
+ for(let i=0;i<names.length;i+=20){
+  const chunk=names.slice(i,i+20),ids=[...approval.associations,approval.emma].filter(e=>chunk.includes(e.nameKey)).flatMap(e=>[...e.identities,...(e.excludedIdentities||[])]);
+  const exact=ids.map(id=>'(l.circuit='+sqlString(id.circuit)+' AND l.official_id IN ('+[...new Set([id.officialId,id.officialId.toLowerCase(),id.officialId.toUpperCase()])].map(sqlString).join(',')+'))');
+  rows.push(...await query(`SELECT l.*,COALESCE(a.canonical_id,l.canonical_id) AS person_id,
  CASE WHEN o.source_key IS NOT NULL THEN 'observed_players' WHEN s.source_key IS NOT NULL THEN 'search_acquired_players' ELSE '' END AS source_table,
  COALESCE(o.payload,s.payload) AS payload
  FROM player_circuit_identities l LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id
  LEFT JOIN observed_players o ON o.source_key=l.source_key LEFT JOIN search_acquired_players s ON s.source_key=l.source_key
- WHERE l.name_key IN (${names.slice(i,i+20).map(sqlString).join(',')}) ORDER BY l.name_key,l.source_key`));return rows;}
+ WHERE (l.name_key IN (${chunk.map(sqlString).join(',')})${exact.length?' OR '+exact.join(' OR '):''}) ORDER BY l.name_key,l.source_key`));
+ }
+ // Local review label follows the approved ID; original names and payloads stay unchanged.
+ return [...new Map(rows.map(r=>[r.source_key,{...r,name_key:labels.get(keyOf(r))||r.name_key}])).values()];
+}
 function verifyAssociation(entry,rows){const wanted=new Set(entry.identities.map(keyOf)),native=rows.filter(r=>wanted.has(keyOf(r))),seen=new Set(native.map(keyOf));
  if(seen.size!==wanted.size)throw Error('approved_identity_native_missing:'+entry.nameKey);
  if(new Set(native.map(r=>r.person_id||r.canonical_id)).size!==1)throw Error('approved_identity_not_unified:'+entry.nameKey);
@@ -61,6 +72,7 @@ export async function applyApprovedIdentityLinks(query,{reviewNames=approval.rev
  const persisted=await query(`SELECT key,value FROM app_state WHERE key IN (${rules.map(r=>sqlString(r.key)).join(',')}) ORDER BY key`);if(rules.some(r=>!persisted.some(p=>p.key===r.key&&p.value===r.value)))throw Error('approved_identity_rules_not_verified');
  const wantedKeys=new Set(approval.associations.flatMap(e=>e.identities.map(keyOf))),scope=before.filter(r=>wantedKeys.has(keyOf(r))&&r.source_table).map(r=>({source_table:r.source_table,source_key:r.source_key}));
  for(const r of scope)await query(`INSERT INTO player_identity_pending_sources(source_table,source_key,revision) VALUES(${sqlString(r.source_table)},${sqlString(r.source_key)},1) ON CONFLICT(source_table,source_key) DO NOTHING;`);
+ // The ordinary mapper follows the exact user-confirmed native IDs across retained name variants.
  await syncPlayerIdentities(query,{pendingSources:scope});
  const after=await readSources(query,names),verified=[];
  for(const entry of approval.associations){const saved=after.filter(r=>r.name_key===entry.nameKey),original=before.filter(r=>r.name_key===entry.nameKey);if(saved.length!==original.length||original.some(r=>!saved.some(s=>s.source_key===r.source_key)))throw Error('approved_identity_sources_lost');
@@ -71,7 +83,7 @@ export async function applyApprovedIdentityLinks(query,{reviewNames=approval.rev
  const emmaAfter=after.filter(r=>r.name_key===approval.emma.nameKey);
  if(!samePartition(emma,emmaAfter)||emma.some(r=>!emmaAfter.some(s=>s.source_key===r.source_key&&s.nationality===r.nationality&&s.payload===r.payload)))throw Error('approved_identity_emma_changed');
  if(!samePartition(daria,after.filter(r=>r.name_key===approval.keepSeparateName)))throw Error('approved_identity_daria_partition_changed');
- const rest=[];for(let i=0;i<reviewNames.length;i+=30)rest.push(...await query(`SELECT l.*,COALESCE(a.canonical_id,l.canonical_id) AS person_id FROM player_circuit_identities l LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE l.name_key IN (${reviewNames.slice(i,i+30).map(sqlString).join(',')}) ORDER BY l.name_key,l.source_key`));
+ const rest=after;
  const missing=reviewNames.filter(name=>!rest.some(r=>r.name_key===name));if(missing.length)throw Error('approved_identity_remainder_scope_missing:'+missing.join(','));
  const remaining=remainingProblemGroups(rest),summary={approvedAssociationsVerified:verified.length,nationalitiesVerified:verified.filter(r=>r.nationality).length,daria:'separate_partition_unchanged',emma:'separate_AUS_CAN_unchanged',remainingGroupsReviewed:remaining.groups.length,remainingByType:remaining.counts};
  const record={key:marker,value:JSON.stringify({status:'complete',summary})},plan=buildIncrementalSyncPlan({current:checkpoint,incoming:[record],keyOf:r=>r.key,sourceComplete:true});
