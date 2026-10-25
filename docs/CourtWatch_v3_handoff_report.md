@@ -9527,3 +9527,5 @@ FITP follow-up: historical evidence confirms successful provincial runs 39741701
 
 
 Validation: targeted Admin integration uses real SQLite release/chunks and verifies one current-document SELECT, zero writes/scans, current success replacing an old red, response authentication, no-store and safe rendering. Browser-loader VM test verifies one opening request, explicit clicks and zero retries on error. Existing Admin saved-page/review/scope regressions, runtime-reader and workflow queue checks; workflow collector tests. Full npm source checks run before delivery. No application data writes, recurring reruns or polling performed. One user-requested targeted failed-job recovery is initiated separately.
+
+ITF discovery 2026-10-25T21:19:44.888Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
