@@ -1309,7 +1309,7 @@ function participantLinkHtml(m, role, name, index, content, courtWatchClass = ""
         : m.opponentTeProfileIds || m.opponentSourceIds || [];
   return monitored
     ? `<button class="inlinePlayerLink ${courtWatchClass}" data-open-player="${esc(monitored.id)}">${content}</button>`
-    : `<button class="inlinePlayerLink opponentPlayerLink${role === "partner" ? " doublesPartnerLink" : ""}" data-open-current-opponent="${esc(profileIds[index] || "")}" data-opponent-name="${esc(readablePerson(name))}" data-opponent-event="${esc(m.event || m.draw || "")}">${content}</button>`;
+    : `<button class="inlinePlayerLink opponentPlayerLink${role === "partner" ? " doublesPartnerLink" : ""}" data-open-current-opponent="${esc(profileIds[index] || (role === "partner" ? m.partnerSourceIds?.[index] : m.opponentSourceIds?.[index]) || "")}" data-opponent-name="${esc(readablePerson(name))}" data-opponent-event="${esc(m.event || m.draw || "")}">${content}</button>`;
 }
 function partnerHtml(m) {
   const names = String(m.partner || "")

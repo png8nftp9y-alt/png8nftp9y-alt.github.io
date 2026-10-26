@@ -9611,3 +9611,11 @@ ITF discovery 2026-10-26T22:59:30.834Z: 0 newly discovered future tournaments; M
 - Caso Lorenzo Calandra, Bad Waltersdorf: acceptance BS16 W-7; ingresso WC nel tabellone confermato dall'utente. Le funzioni personal-live-entry davano precedenza al ritiro durante entrambi gli ordini di fusione.
 - Correzione: presenza certificata ITF/Europe mantiene official_draw e cancella i campi acceptance obsoleti nella proiezione, senza modificare i dati sorgente. Nessuna presenza inventata dal solo nome o WC. Tornei cancellati esclusi; FITP invariato.
 - Componenti: personal-live-entry.mjs e test omonimo. Verifica: 24 test verdi su merge, storia personale, elenco personale e presentazione tornei. Nessuna scrittura D1 o polling. Verifica live dopo deploy ancora necessaria.
+
+## 27 October 2026 — Resolve the same opponent identity from Agenda and Search
+
+Kateryna Ushchapovska has UKR, birthYear 2014 and an official Europe profile in the canonical registry. Search shows these, whereas Agenda can enter through a draw-local ID. searchIdentityProfile previously selected an exact observed source but returned its partial raw payload, ignoring its existing canonical mapping. Resolve that selected source through storedIdentity before raw fallback, retaining the canonical metadata and circuit profiles. This uses a registered source key, never name-only merging or nationality hardcoding. Refuse mismatched canonical names and unmatched local IDs as before.
+
+Agenda participant navigation also now falls back by participant to source IDs when the TE profile array is empty or sparse. The profile endpoint, age calculation, circuit links and rankings then consume the same identity as Search. No added D1 writes, discovery, polling or scheduling changes. Frontend cache version updated. This replaces the earlier nationality-through-route workaround; do not apply that earlier installer.
+
+Validation: real SQLite regression using Kateryna canonical evidence and a synthetic local draw ID verifies equal canonical/native IDs, UKR, birth 2014, unranked-u12, official Europe URL, rejection of an unrelated local ID and zero writes. Two frontend regressions cover empty profile arrays, doubles positions and native-ID priority. Production route confirmation remains required after deploy.
