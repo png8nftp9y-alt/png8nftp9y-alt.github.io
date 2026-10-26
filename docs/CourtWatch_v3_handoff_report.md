@@ -9584,3 +9584,5 @@ Validation: existing focused selection, status-precedence, refresh-button and cl
 - Componenti: tools/verify-shared-match-refresh-browser.mjs e cloudflare/app-api/test/navigation-query-load.test.mjs. Nessuna modifica al comportamento applicativo.
 - Verifica: 19 test Node verdi; browser Chromium completo verde per main e others. Il test controlla ranking aggiornato da 12 a 7, navigazione ricorsiva e conservazione storico.
 - Limiti: deploy e CRUD remoto saranno verificati dai nuovi run GitHub; nessun rilancio del vecchio commit.
+
+ITF discovery 2026-10-26T05:22:12.775Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
