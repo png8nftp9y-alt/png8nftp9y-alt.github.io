@@ -47,7 +47,7 @@ try {
         opponentRequests.set(id, (opponentRequests.get(id) || 0) + 1);
         if (holdOpponent && id === 'fixture-opponent-a') await new Promise(resolve => {releaseOpponent = resolve;});
         if (opponentOffline) return route.fulfill({status: 503, json: {error: 'offline'}});
-        return route.fulfill({json: {profile: {name: person, ranking: 12, category: 'GS14'}, tournaments: opponentPartial ? [] : [{...tournament, competitionId: 'opponent-event', historyKind: 'past', matches: [{id: id + '-match', date: '2026-01-03', event: 'GS14', round: 'Final', score: '6-4 6-3', won: true, status: 'completed', opponents: [{name: id === 'fixture-opponent-a' ? 'Opponent B' : 'Opponent C', profileId: id === 'fixture-opponent-a' ? 'fixture-opponent-b' : 'fixture-opponent-c'}]}]}]}});
+        return route.fulfill({json: {profile: {name: person, ranking: opponentRequests.get(id) > 1 ? 7 : 12, category: 'GS14'}, tournaments: opponentPartial ? [] : [{...tournament, competitionId: 'opponent-event', historyKind: 'past', matches: [{id: id + '-match', date: '2026-01-03', event: 'GS14', round: 'Final', score: '6-4 6-3', won: true, status: 'completed', opponents: [{name: id === 'fixture-opponent-a' ? 'Opponent B' : 'Opponent C', profileId: id === 'fixture-opponent-a' ? 'fixture-opponent-b' : 'fixture-opponent-c'}]}]}]}});
       }
       if (url.pathname.endsWith('/app-snapshot')) {
         requests++;
@@ -126,14 +126,16 @@ try {
     holdOpponent = false; releaseOpponent();
     await page.waitForFunction(() => document.querySelector('.opponentProfileHero h2')?.textContent === 'Opponent A');
     assert.equal(await page.locator('#opponentTournamentHistory .unifiedMatchRow').count(), 1);
-    assert.equal(opponentRequests.get('fixture-opponent-a'), 1, `${group}: ready opponent must not be fetched again on opening`);
+    await page.waitForFunction(() => document.querySelector('#opponentProfileRanking')?.textContent.includes('7 TE'));
+    assert.equal(opponentRequests.get('fixture-opponent-a'), 2, `${group}: opening checks the latest ranking once after prefetch`);
 
     // The opponent's own visible opponent is prepared by the same path.
     await page.waitForFunction(() => opponentHistoryCache.has(opponentHistoryKey('Opponent B', 'GS14', 'fixture-opponent-b').requestKey));
     await page.locator('[data-open-current-opponent="fixture-opponent-b"]').click();
     await page.waitForFunction(() => document.querySelector('.opponentProfileHero h2')?.textContent === 'Opponent B');
     assert.equal(await page.locator('#opponentTournamentHistory .unifiedMatchRow').count(), 1);
-    assert.equal(opponentRequests.get('fixture-opponent-b'), 1);
+    await page.waitForFunction(() => document.querySelector('#opponentProfileRanking')?.textContent.includes('7 TE'));
+    assert.equal(opponentRequests.get('fixture-opponent-b'), 2, `${group}: recursive opening also refreshes the current ranking once`);
     assert.equal(await page.evaluate(() => observedEmptyOpponent), false, `${group}: neither opponent page may be rendered empty`);
 
     opponentPartial = true;

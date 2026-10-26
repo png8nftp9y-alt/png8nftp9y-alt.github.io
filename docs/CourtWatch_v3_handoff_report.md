@@ -9571,3 +9571,9 @@ Validation: existing focused selection, status-precedence, refresh-button and cl
 - Solo intestazione pagina avversario: U14/U16 senza ranking -> "No ranking Europe"; U10/U12 -> "No ranking Europe U12". Anno corrente di nascita prioritario rispetto alla categoria di un vecchio match; categoria esplicita come fallback quando l'anno manca. Età o pubblicazione ignote non vengono dichiarate come assenza certa di ranking.
 - Nessun cambiamento ai ranking storici dei match, alle associazioni native o alla schedulazione dei motori.
 - Validazione: 55 test verdi SQLite/API e browser per ranking latest, cache, nazionalità, tutti i codici bandiera, omonimi, navigazione e aggiunta giocatori; verifica di sintassi e diff. Controlli reali post-deploy e disponibilità dell'ultima pubblicazione ufficiale dipendono dal normale sync ranking.
+
+### Chat 1 — 2026-10-26: allineamento test CRUD e browser al ranking corrente
+- Causa: il browser pretendeva zero richieste dopo il prefetch, mentre l'apertura ora verifica il ranking corrente. I due test VM CRUD non caricavano le nuove funzioni del profilo.
+- Componenti: tools/verify-shared-match-refresh-browser.mjs e cloudflare/app-api/test/navigation-query-load.test.mjs. Nessuna modifica al comportamento applicativo.
+- Verifica: 19 test Node verdi; browser Chromium completo verde per main e others. Il test controlla ranking aggiornato da 12 a 7, navigazione ricorsiva e conservazione storico.
+- Limiti: deploy e CRUD remoto saranno verificati dai nuovi run GitHub; nessun rilancio del vecchio commit.
