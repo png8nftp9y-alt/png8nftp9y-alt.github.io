@@ -9619,3 +9619,8 @@ Kateryna Ushchapovska has UKR, birthYear 2014 and an official Europe profile in 
 Agenda participant navigation also now falls back by participant to source IDs when the TE profile array is empty or sparse. The profile endpoint, age calculation, circuit links and rankings then consume the same identity as Search. No added D1 writes, discovery, polling or scheduling changes. Frontend cache version updated. This replaces the earlier nationality-through-route workaround; do not apply that earlier installer.
 
 Validation: real SQLite regression using Kateryna canonical evidence and a synthetic local draw ID verifies equal canonical/native IDs, UKR, birth 2014, unranked-u12, official Europe URL, rejection of an unrelated local ID and zero writes. Two frontend regressions cover empty profile arrays, doubles positions and native-ID priority. Production route confirmation remains required after deploy.
+
+### Chat 1 — 2026-10-27: ranking Europe nella pagina tornei futuri
+- Causa: il titolo del giocatore cercava playerTeRanking solo nelle partite, assenti nei tornei futuri.
+- Modifica: per tornei Europe futuri usa il servizio ranking corrente gia esistente, con ultima pubblicazione per categoria e vincoli di eta; assenza ranking indicata soltanto con NR. Riutilizza cache e richieste in corso. Nessun polling, nessuna scrittura D1. Storico dei tornei gia iniziati invariato; nessuna modifica ai messaggi della pagina avversario.
+- Componenti: v3.js, v3.html, nuovo test future-tournament-ranking e comando check. Test mirati eseguiti; verifica deploy e pagina reale ancora necessaria. Errori di rete non vengono rappresentati come NR.

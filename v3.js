@@ -500,6 +500,7 @@ async function loadCurrentPlayerRanking(player) {
     }
     if (target && location.hash === `#player/${encodeURIComponent(player.id)}`)
       target.textContent = labels.length ? ` · ${labels.join(" · ")}` : "";
+    return data;
   } catch {}
 }
 const normalizedDesignation = (value) => {
@@ -3783,6 +3784,23 @@ function fitpTournamentSubscriptionHtml(entry = {}) {
   return `<span class="fitpSubscriptionDate">${dates.map(date => `<time datetime="${esc(date)}">${esc(displayDate(date))}</time>`).join(" · ")}</span>`;
 }
 
+function futureTournamentEuropeRanking(player, data) {
+  if (!data) return '';
+  const current = {...player, tennisEuropeLatestRankingDates:data.latestRankingDates || {}};
+  const labels = currentPlayerRankingLabels(current, data.rankings || []).filter(label => label.includes(' TE'));
+  return labels.length ? labels.join(' · ') : 'NR';
+}
+async function loadFutureTournamentEuropeRankings(key, players) {
+  // Reuse the existing in-flight player ranking requests; no timers or polling.
+  for (const player of players) {
+    const data = await loadCurrentPlayerRanking(player);
+    if (location.hash !== '#tournament/' + encodeURIComponent(key)) return;
+    if (!data) continue; // A failed request is not evidence of no ranking.
+    for (const target of $('profileContent').querySelectorAll('[data-future-europe-ranking]'))
+      if (target.dataset.futureEuropeRanking === player.id)
+        target.textContent = ' · ' + futureTournamentEuropeRanking(player, data);
+  }
+}
 function renderTournament(key) {
   $("removeProfilePlayer").hidden = true;
   const t = groups(false).find((x) => tournamentKey(x) === key);
@@ -3829,6 +3847,7 @@ function renderTournament(key) {
     group.matches.push(m);
     byPlayer.set(m.playerId, group);
   }
+  const futureEurope = source === 'tennis-europe' && String(t.startDate || '') > iso(new Date());
   const multiPlayer = (t.playerIds || []).length > 1 || byPlayer.size > 1;
   const sections = [...byPlayer.values()]
     .map((group) => {
@@ -3869,7 +3888,7 @@ function renderTournament(key) {
               ? playerRecord?.ranking
               : "";
       const matchRows = matchHistorySectionsHtml(rows);
-      const playerHeading = `<button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button>`;
+      const playerHeading = `<button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${futureEurope ? `<span class="teRanking" data-future-europe-ranking="${esc(group.playerId)}">${playerRankingCache.has(String(group.playerId)) ? esc(" · " + futureTournamentEuropeRanking(playerRecord, playerRankingCache.get(String(group.playerId)))) : ""}</span>` : ""}${!futureEurope && playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button>`;
       return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}">${playerHeading}<span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}${source === "fitp" ? ` · ${fitpTournamentSubscriptionHtml({...group.entry, circuit:source})}` : ""}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
     })
     .join("");
@@ -3887,6 +3906,7 @@ function renderTournament(key) {
     surfaceLabel = tournamentSurfaceLabel(t);
   $("profileContent").innerHTML =
     `<div class="card tournamentHero"><div><h2>${title}</h2>${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(displayDate(t.startDate) || "data da pubblicare")} – ${esc(displayDate(t.endDate) || "data da pubblicare")}</p></div><div class="tournamentHeroActions">${acceptanceLink}<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div></div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
+  if (futureEurope) loadFutureTournamentEuropeRankings(key, [...byPlayer.keys()].map(id => (state.data.players || []).find(player => player.id === id)).filter(Boolean));
   if (source === "fitp") loadInlineFitpDrawLinks(t);
   bindParticipantNavigation($("profileContent"));
   if (multiPlayer)
