@@ -9562,3 +9562,12 @@ User asks to remove ITF future metadata bulk recovery, legacy App OOP and legacy
 Coverage remains unchanged: its counts/date read the stored sync document and its overall light reads diagnostics.overall, derived from critical source checks and operationalTargets. None of these three removed presentation entries is an operationalTargets critical workflow. Hiding their rows does not disable acquisition or alter the Coverage calculation. Coverage is a saved aggregate, not a certificate of complete archive contents.
 
 Validation: existing focused selection, status-precedence, refresh-button and client-request tests plus a regression proving all three failed non-routine rows are excluded and the actual ordinary/live/D1 flows remain present. Installer applies exact guarded contents only, normalizes final newlines, updates this report and runs the combined Admin regressions before publication.
+
+
+### Chat 1 — 2026-10-26: bandiere internazionali e ranking attuale avversari
+- Problema: mappa Paesi e SVG limitati; intestazione avversario perdeva nazionalità senza ranking; lookup ranking per nome cercava solo minuscole.
+- Aggiunti codici ISO/federazione e SVG locali mancanti (flag-icons, licenza MIT allegata). La funzione comune copre Cerca e schede; nazionalità alternativa e sorgenti della stessa identità sono recuperate senza abbinare omonimi o inventare nazioni.
+- Intestazione avversario: ranking solo dell'ultima pubblicazione acquisita per categoria; nuova verifica al click, nessun polling. Nazionalità e anno restano disponibili anche senza ranking.
+- Solo intestazione pagina avversario: U14/U16 senza ranking -> "No ranking Europe"; U10/U12 -> "No ranking Europe U12". Anno corrente di nascita prioritario rispetto alla categoria di un vecchio match; categoria esplicita come fallback quando l'anno manca. Età o pubblicazione ignote non vengono dichiarate come assenza certa di ranking.
+- Nessun cambiamento ai ranking storici dei match, alle associazioni native o alla schedulazione dei motori.
+- Validazione: 55 test verdi SQLite/API e browser per ranking latest, cache, nazionalità, tutti i codici bandiera, omonimi, navigazione e aggiunta giocatori; verifica di sintassi e diff. Controlli reali post-deploy e disponibilità dell'ultima pubblicazione ufficiale dipendono dal normale sync ranking.
