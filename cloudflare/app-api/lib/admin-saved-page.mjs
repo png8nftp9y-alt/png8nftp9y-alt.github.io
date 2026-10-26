@@ -17,7 +17,7 @@ async function read(env,view){
 export async function savedAdminPage(request,env,view,render){
  const cfg=spec[view];if(!cfg)return render();
  const force=new URL(request.url).searchParams.get(cfg.flag)==='1';
- if(!force){const saved=await read(env,view);if(saved)return saved.html;}
+ if(!force){const saved=await read(env,view);if(saved)return saved.html;if(env.ARCHIVE)return emptySavedPage(view,cfg);}
  const flightKey=new URL(request.url).origin+'|'+view;
  if(!force&&flights.has(flightKey))return flights.get(flightKey);
  const version=(versions.get(flightKey)||0)+1;versions.set(flightKey,version);
@@ -44,4 +44,8 @@ export async function prepareSavedIdPage(request,env,render){
  preparedIds.set(env.ARCHIVE,preparing);
  try{const html=await preparing;if(html.includes('Conteggi ID non disponibili')||html.includes('Questa lettura non è stata salvata'))preparedIds.delete(env.ARCHIVE);}
  catch(error){preparedIds.delete(env.ARCHIVE);throw error;}
+}
+
+function emptySavedPage(view,cfg){
+ return `<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Court Watch Admin</title><style>body{font:15px system-ui;background:#07111f;color:#e8eef7;margin:24px}nav{display:flex;gap:15px;flex-wrap:wrap}a{color:#86c9ff}.card{padding:16px;border:1px solid #29415d;border-radius:12px;margin:16px 0}table{width:100%;text-align:left}td,th{padding:8px}.pill{padding:4px;border-radius:5px}.ok{color:#74e4ad}.bad{color:#ff9da9}.warn,.muted{color:#ffd66b}</style></head><body><main><h1>Court Watch Admin</h1><nav><a href="/admin/diagnostica">Diagnostica</a><a href="/admin/cloudflare">Cloudflare</a><a href="/admin/id">ID</a><a href="/admin/itf">ITF</a><a href="/admin/utenti">Utenti</a></nav><div class="card"><form method="get" action="/admin/${view}"><button name="${cfg.flag}" value="1">${cfg.label}</button></form><p>Nessuna lettura dei conteggi salvata disponibile. Premi il pulsante per calcolarla.</p></div><div class="admin-page page-${view}">${view==='diagnostica'?'<section class="card"><h2>Workflow e watchdog</h2></section><section class="card"><h2>Diagnostica applicativa</h2></section>':''}</div></main></body></html>`;
 }

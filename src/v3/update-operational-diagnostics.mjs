@@ -1,32 +1,11 @@
 import fs from 'node:fs/promises';
-const targets=[
- ['Deploy watchdog Cloudflare','courtwatch-cloudflare-watchdog-deploy.yml',1e9],
- ['ITF sicurezza 120 giorni','courtwatch-v3-itf-safety-120d.yml',30*60],
- ['FITP pubblicazione catalogo','courtwatch-v3-fitp-tournaments-sharded.yml',1560],
- ['FITP motore live','courtwatch-v3-fitp-entries.yml',45],
- ['Europe motore live','courtwatch-v3-tennis-europe-live.yml',45],
- ['ITF discovery e R2','courtwatch-v3-itf-live.yml',45],
- ['ITF labels e R2','courtwatch-v3-itf-known-fast.yml',45],
- ['ITF T−1 e R2','courtwatch-v3-itf-t-minus-one.yml',45],
- ['Agenda/OOP Europe','courtwatch-tennis-europe-oop-live.yml',45],
- ['D1 generale','courtwatch-cloudflare-app-api.yml',45],
- ['D1 agenda Europe','courtwatch-tennis-europe-agenda.yml',45]
-];
-const compactRun=run=>run?Object.fromEntries(['id','name','path','status','conclusion','created_at','updated_at','html_url','display_title'].map(key=>[key,run[key]??null])):null;
-const items=await Promise.all(targets.map(async([label,workflow,maxAge])=>{
- try{
-  const response=await fetch(`https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/actions/workflows/${workflow}/runs?branch=main&per_page=30`,{headers:{Authorization:`Bearer ${process.env.GITHUB_TOKEN}`,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(20000)});
-  if(!response.ok)throw new Error('GitHub HTTP '+response.status);
-  const runs=(await response.json()).workflow_runs||[];
-  const completed=runs.find(r=>r.status==='completed'&&!['cancelled','skipped'].includes(r.conclusion));
-  const active=runs.find(r=>r.status!=='completed');
-  const age=completed?(Date.now()-Date.parse(completed.updated_at))/60000:Infinity;
-  const status=!completed?'yellow':completed.conclusion!=='success'?'red':age>maxAge?'yellow':'green';
-  return {label,status,critical:true,workflow,latestRun:compactRun(runs[0]),runId:completed?.id||null,url:completed?.html_url||null,generatedAt:completed?.updated_at||null,checkedAt:new Date().toISOString(),detail:`${completed?.conclusion||'nessuna verifica'} · ${Number.isFinite(age)?Math.round(age)+' min fa':'data n/d'}${active?' · nuova esecuzione in corso':''}`};
- }catch(error){return {label,status:'yellow',critical:true,workflow,detail:String(error)}}
-}));
-let runs=[],runsError=null;
-try{const response=await fetch(`https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/actions/runs?branch=main&per_page=50`,{headers:{Authorization:`Bearer ${process.env.GITHUB_TOKEN}`,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(20000)});if(!response.ok)throw new Error('GitHub HTTP '+response.status);runs=((await response.json()).workflow_runs||[]).map(compactRun)}catch(error){runsError=String(error)}
-await fs.mkdir('dist/v3',{recursive:true});
-await fs.writeFile('dist/v3/operational_status.json',JSON.stringify({generatedAt:new Date().toISOString(),items,runs,runsError},null,2)+'\n');
-console.log(JSON.stringify(items));
+import {collectWorkflowStatus} from './operational-workflow-status.mjs';
+const catalog=[];
+for(const workflow of (await fs.readdir('.github/workflows')).filter(p=>p.endsWith('.yml')||p.endsWith('.yaml')).sort()){
+ const source=await fs.readFile('.github/workflows/'+workflow,'utf8');const label=source.match(/^name:\s*(.+)$/m)?.[1]?.trim().replace(/^['"]|['"]$/g,'')||workflow;catalog.push({workflow,label});
+}
+const read=async(path,fallback)=>{try{return JSON.parse(await fs.readFile(path,'utf8'))}catch{return fallback}};
+const previous=await read('dist/v3/operational_status.json',{}),event=process.env.GITHUB_EVENT_PATH?await read(process.env.GITHUB_EVENT_PATH,{}):{};
+const report=await collectWorkflowStatus({catalog,previous,event,repo:process.env.GITHUB_REPOSITORY,token:process.env.GITHUB_TOKEN});
+await fs.mkdir('dist/v3',{recursive:true});await fs.writeFile('dist/v3/operational_status.json',JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({items:report.items,workflows:report.workflowStates.length,runsError:report.runsError}));
