@@ -9554,3 +9554,11 @@ Remove only the extra Aggiorna stati button from Diagnostics, retaining Aggiorna
 Validation: four focused tests cover exact operational selection, exclusion of temporary repairs, status precedence/missing evidence, one Diagnostics refresh control, retained ID control and button-free one-request/error rendering without retries. All 28 workflow filenames verified against current repository. Existing Admin panel test imports the new regression suite; installer runs the combined Admin regression tests before publication. Production deploy remains to verify after user push.
 
 Installer follow-up: apply the four exact intended files after a complete preflight against verified upstream contents; tolerate only trailing-newline differences. No 3-way blob dependency or context patch. Unexpected source changes stop before any file mutation. Idempotent replay and atomic preflight are tested. The previously failed worktree is left untouched.
+
+## 26 October 2026 — Remove three non-routine flows from operational diagnostics
+
+User asks to remove ITF future metadata bulk recovery, legacy App OOP and legacy App results from Diagnostics. Remove only courtwatch-all-itf-metadata.yml, courtwatch-v3-oop.yml and courtwatch-v3-results.yml from the presentation allowlist, leaving 25 operational flows. Preserve the workflow files, execution behavior, event triggers and schedules. The ordinary ITF metadata engine, live Europe OOP/results, Europe D1 Agenda and general D1 publisher remain visible.
+
+Coverage remains unchanged: its counts/date read the stored sync document and its overall light reads diagnostics.overall, derived from critical source checks and operationalTargets. None of these three removed presentation entries is an operationalTargets critical workflow. Hiding their rows does not disable acquisition or alter the Coverage calculation. Coverage is a saved aggregate, not a certificate of complete archive contents.
+
+Validation: existing focused selection, status-precedence, refresh-button and client-request tests plus a regression proving all three failed non-routine rows are excluded and the actual ordinary/live/D1 flows remain present. Installer applies exact guarded contents only, normalizes final newlines, updates this report and runs the combined Admin regressions before publication.
