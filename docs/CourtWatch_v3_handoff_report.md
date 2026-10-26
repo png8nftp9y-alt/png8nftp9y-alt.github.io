@@ -9598,3 +9598,5 @@ Keep Coverage's existing data/count/status calculation. Add directly beneath the
 Validation: 27 targeted real Worker/SQLite, saved-page, workflow selection and navigation tests pass. The new end-to-end fixture renders 2025-12-18/23/513 with a critical Europe failure and exact run 701, while separately exposing active run 702. After source state becomes green, a normal opening still shows the complete retained red reading with zero D1/HTTP reads; only explicit refresh changes both Coverage and workflow state to green, without D1 writes. Installer runs the full npm source check before publication. Application source edits use guarded semantic replacements to preserve unrelated concurrent changes; unknown module/test changes stop before any mutation. Production deploy and manual Diagnostics refresh remain to verify after user publication.
 
 ITF discovery 2026-10-26T13:38:03.311Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-10-26T22:59:30.834Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
