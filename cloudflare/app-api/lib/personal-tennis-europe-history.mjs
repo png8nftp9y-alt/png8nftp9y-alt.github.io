@@ -4,7 +4,7 @@ import {profileEvidence} from './player-profile-evidence.mjs';
 import {sourceNativeEvidence,hasConflictingNativeSource} from './native-player-source-fields.mjs';
 import {storedIdentities} from './player-identity-lookup.mjs';
 
-async function participantSourceKey(circuit,participant) {
+export async function participantSourceKey(circuit,participant) {
  const raw=parsed(participant.payload);
  const source={...raw,name:participant.display_name,source_player_id:participant.source_player_id,nationality:participant.nationality||raw.nationality};
  const metadata=playerSourceMetadata(source);

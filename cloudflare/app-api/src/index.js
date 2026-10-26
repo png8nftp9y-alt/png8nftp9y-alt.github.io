@@ -9,6 +9,7 @@ import {runtimeDocumentReader,FRONTEND_DOCUMENTS} from '../lib/runtime-document-
 import {adminRuntimeDocuments} from '../lib/admin-runtime-documents.mjs';
 import {playerLoadTiming} from '../lib/player-load-timing.mjs';
 import {storageUsageMetric,r2UsageRows} from '../lib/cloudflare-storage-usage.mjs';
+import {localEuropeOpponentIdentity} from '../lib/opponent-local-identity.mjs';
 import {linkedOpponentIdentity,tennisEuropeNativeId} from '../lib/opponent-linked-identity.mjs';
 import {opponentEuropeSources,opponentSelfParticipant} from '../lib/opponent-europe-sources.mjs';
 import {exactCurrentRankingRows} from '../lib/exact-current-ranking.mjs';
@@ -128,7 +129,7 @@ async function tennisEuropeOpponentHistory(env,{profileId,name,asOf,excludeMatch
   return{asOf:cutoff,profile,tournaments:[...groups.values()],form:{wins,losses,matches:wins+losses}};
 }
 async function universalOpponentHistory(env,options){
- const identity=await linkedOpponentIdentity(env.DB,options.profileId||'')||await searchIdentityProfile(env.DB,options.name,options.profileId||'');
+ const identity=await linkedOpponentIdentity(env.DB,options.profileId||'')||await localEuropeOpponentIdentity(env.DB,options)||await searchIdentityProfile(env.DB,options.name,options.profileId||'');
  if(identity?.sourcePlayerId)options={...options,profileId:identity.sourcePlayerId,sourceCircuit:identity.sourceCircuit};
  const asOf=/^\d{4}-\d{2}-\d{2}$/.test(options.asOf)?options.asOf:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()),request={...options,asOf};
  const te=playerCircuitIdentities(identity||{}).find(p=>p.circuit==='tennis-europe');

@@ -3321,7 +3321,7 @@ function renderOpponentHistory(data) {
 }
 function opponentHistoryKey(name, event = "", profileId = "") {
   const asOf = iso(new Date()),
-    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "played-history-v8-current-profile"].join("|");
+    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "played-history-v9-local-canonical"].join("|");
   return { asOf, requestKey };
 }
 function preparedOpponentHistory(name, event = "", profileId = "") {
