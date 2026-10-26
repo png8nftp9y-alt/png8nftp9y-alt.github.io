@@ -7,14 +7,8 @@ on:
         required: false
         default: '33324600811'
   workflow_run:
-    workflows: ['Court Watch Tennis Europe OOP historical backfill']
+    workflows: ['Court Watch Tennis Europe OOP historical backfill', 'Court Watch Tennis Europe OOP historical recovery']
     types: [completed]
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/courtwatch-tennis-europe-oop-merge.yml'
-      - 'src/v3/merge-tennis-europe-oop-backfill.mjs'
-      - 'src/v3/tennis-europe-oop-history-r2.sh'
 permissions:
   actions: read
   contents: read
@@ -32,6 +26,7 @@ jobs:
       - id: source
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   merge:
+    if: github.event_name != 'push'
     needs: [engine-source]
     runs-on: ubuntu-latest
     timeout-minutes: 20

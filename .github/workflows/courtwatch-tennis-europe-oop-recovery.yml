@@ -1,0 +1,62 @@
+name: Court Watch Tennis Europe OOP historical recovery
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: Backfill incompleto del 26 ottobre da recuperare
+        required: true
+        default: '40254818076'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-tennis-europe-oop-recovery.yml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: courtwatch-tennis-europe-oop-backfill
+  cancel-in-progress: false
+jobs:
+  recovery:
+    name: Recovery shard ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN: ${{ inputs.source_run_id || '40254818076' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate original acquisition and download checkpoint
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" --jq .head_sha)" = '0cfd3d7acf49944b6f5176f9121adadb26371446'
+          gh api "repos/$GITHUB_REPOSITORY/contents/history/tennis_europe_tournament_catalog.json?ref=0cfd3d7acf49944b6f5176f9121adadb26371446" --jq .content | base64 --decode > history/tennis_europe_tournament_catalog.json
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --name "tennis-europe-oop-backfill-$SHARD" --dir checkpoint
+          checkpoint="checkpoint/backfill-$(printf '%02d' "$SHARD").json"
+          test -s "$checkpoint"
+          echo "TE_OOP_RESUME_FILE=$checkpoint" >> "$GITHUB_ENV"
+      - name: Verify checkpoint and draw recovery
+        run: node --test src/v3/tennis-europe-backfill-resume.test.mjs src/v3/tennis-europe-draw-walkovers.test.mjs src/v3/tennis-europe-inline-draw-walkovers.test.mjs src/v3/tennis-europe-round-robin-endpoint.test.mjs
+      - name: Acquire only failed tournaments and retain completed records
+        env:
+          TE_OOP_SHARD: ${{ matrix.shard }}
+          TE_OOP_TOTAL: 16
+          TE_OOP_CUTOFF: '2025-12-18'
+        run: node src/v3/recover-tennis-europe-oop-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tennis-europe-oop-backfill-${{ matrix.shard }}
+          path: dist/v3/shards/tennis-europe-oop/backfill-*.json
+          overwrite: true
+          if-no-files-found: error
+          retention-days: 14
