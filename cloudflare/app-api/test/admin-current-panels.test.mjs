@@ -12,9 +12,9 @@ test('current D1 workflow fragment replaces retained red diagnostics, includes m
  const response=await worker.fetch(new Request('https://app/admin/diagnostica?currentPanels=1',{headers:auth}),env),panels=await response.json();assert.equal(response.status,200);assert.match(panels.workflows,/Acceptance/);assert.match(panels.workflows,/run 9/);assert.doesNotMatch(panels.application,/old failure/);assert.match(panels.application,/green/);assert.equal(reads,1);assert.equal(d.writes(),writes);
  }finally{d.close()}
 });
-test('cached diagnostic workflow and application sections are removed before showing new evidence; unrelated counts survive',()=>{
+test('Diagnostics preserves the complete saved reading until its explicit refresh',()=>{
  const raw='<html><nav></nav><section class="card"><h2>Workflow e watchdog</h2>OLD RED</section><section class="card"><h2>Diagnostica applicativa</h2>OLD FAILURE</section><div>COUNT 123</div></html>';
- const html=attachAdminPanels(raw,'diagnostica','https://app/admin/diagnostica');assert.doesNotMatch(html,/OLD RED|OLD FAILURE/);assert.match(html,/COUNT 123/);assert.match(html,/currentPanels=1/);assert.match(renderCurrentWorkflows(null),/non disponibili/);
+ const html=attachAdminPanels(raw,'diagnostica','https://app/admin/diagnostica');assert.equal(html,raw);assert.match(html,/OLD RED|OLD FAILURE/);assert.match(html,/COUNT 123/);assert.doesNotMatch(html,/currentPanels=1|panels.js/);assert.match(renderCurrentWorkflows(null),/non disponibili/);
 });
 test('client requests once on opening and once on click; errors never retry and source data is never executed',async()=>{
  let calls=0,handler,finish;const pending=new Promise(r=>{finish=r}),host={dataset:{url:'/admin/id?currentPanels=1'}},button={addEventListener(event,fn){assert.equal(event,'click');handler=fn}},error={},target={};
