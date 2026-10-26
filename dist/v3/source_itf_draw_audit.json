@@ -1,28 +1,28 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-26T11:50:27.445Z",
+  "generatedAt": "2026-10-26T11:56:25.618Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 1,
+    "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 0,
+    "pendingTournaments": 1,
     "declaredSections": 6,
     "requestedSections": 2,
-    "acquiredSections": 6,
+    "acquiredSections": 4,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 6,
-    "missingSections": 0,
-    "newSectionsCached": 2,
+    "resolvedSections": 4,
+    "missingSections": 2,
+    "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 0,
+    "retrySections": 2,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 0,
+    "notPublishedOrIncompleteSections": 2,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 507,
@@ -102,16 +102,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-LTU-2026-005",
-      "tournamentName": "J30 Vilnius",
-      "decision": "complete",
+      "competitionId": "J-J60-KOR-2026-003",
+      "tournamentName": "J60 Andong",
+      "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 6,
+      "acquiredSections": 4,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 6,
-      "missingSections": 0,
+      "resolvedSections": 4,
+      "missingSections": 2,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -130,9 +130,9 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "G-S-M-KO",
@@ -151,9 +151,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         }
       ],
       "families": [
@@ -185,14 +185,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
@@ -215,7 +215,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 18,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -224,14 +224,14 @@
         },
         {
           "family": "G-D-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 32,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         }
