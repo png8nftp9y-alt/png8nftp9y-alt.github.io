@@ -9514,3 +9514,19 @@ Validation: real seven-source D1 fixture with original two search results and sa
 D1 and Worker source checks were blocked by a stale assertion that the complete saved ID response never changes or queries D1. The ID page intentionally prepends current persisted suspicious-identity cases to unchanged saved counts. Update only the regression test: unauthorized requests read neither archive nor cases; authorized ID reads the bounded app_state case query, places reviews before count controls, preserves the exact saved HTML outside that section and performs no count rebuild or archive write. Diagnostics still returns its exact saved response with zero D1 reads. Existing review tests cover new cases appearing over a retained snapshot. No application logic, source data, schedules, discovery, polling or automatic reruns changed.
 
 Validation: focused Admin saved-page and identity-review tests passed (9). Full source checks are run before installer publication; production deploy remains to verify after user push.
+
+
+### Chat 1 — 2026-10-25: verifica copertura identità
+- Audit a blocchi: 133607 observed, 29329 acquired, 23 app_players e 50 aggiunte personali.
+- Due collegamenti personali mancanti: Andrea Tognolini e Pablo Jimenez Roman; sincronizzati e verificati con controllo mirato.
+- Audit eseguito su dati in evoluzione, non su snapshot unico; ricerca unica e correttezza generale degli abbinamenti non certificate da questo controllo.
+
+### 2026-10-26 — Audit W/O invariato: corretto endpoint asincrono dei gironi Europe
+
+- Audit letto dall'artefatto 12615001272 del run D1 40234599136, successivo al merge 40234512766 e al backfill 40231936382: 568 tornei controllati, 899 W/O già in OOP, 216 recuperati, 1 manuale; 28 pending; 1713 issues (1626 draw_content_endpoint_missing, 81 no_draws_discovered, 6 partecipanti/vincitore non verificabili). Conteggi identici all'audit precedente: non si dichiara miglioramento della copertura dopo la patch inline.
+- Verificati nei log il checkout del commit 370a2deb86e440594c421302cb138789ae8dadf7, i 21 test e la corretta selezione del backfill nel merge. Non è un report scelto da un vecchio run.
+- Causa riprodotta sul sito ufficiale: BS12 Group A, Memorial Gaio Camporesi, draw 1 del torneo 00523E1D-06C9-430A-B8B9-851B401381E3. L'HTML grezzo ha zero match cards e i form GetStandings e GetMatchesContent?tabindex=1. La risposta GetMatchesContent contiene sei match cards. Il browser le inserisce dopo il caricamento: la precedente ipotesi che fossero già inline nel corpo HTTP era insufficiente.
+- Il recupero ora scopre GetMatchesContent oltre a GetDrawContent, usando l'URL presente nel form e gli header AJAX/referer esistenti. Vincoli stringenti: host ufficiale e percorso esatto del medesimo torneo/draw. GetStandings non viene usato come fonte di risultati. Nessuna modifica alle regole date concordate, alla UI, all'importatore D1 o alle frequenze ordinarie.
+- Aggiunte due fixture HTML ricavate dalle risposte ufficiali (shell ridotta ai blocchi rilevanti, contenuto match completo) e sei test del collegamento al caricatore reale, compreso W/O sintetico inserito nella struttura acquisita, fallimento upstream, host/draw errati e sola classifica. Il W/O di questo test è sintetico, non un nuovo caso reale dichiarato recuperato.
+- Validazione: 27 test passati, regressioni Avvenire/Kufstein e regola data nei gironi incluse; sintassi YAML e installer verificati. Resta necessario leggere il nuovo audit dopo l'acquisizione per misurare quante segnalazioni vengono risolte. Non si presume che tutte le 1626 segnalazioni abbiano questa causa; i 28 casi senza riferimento data sufficiente restano aperti.
+- Il push attiva i workflow di acquisizione secondo i trigger esistenti e poi il flusso merge/import D1. Nessun polling, rilancio manuale o modifica della schedulazione.

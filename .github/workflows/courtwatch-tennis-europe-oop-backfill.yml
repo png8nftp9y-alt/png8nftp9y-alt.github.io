@@ -9,6 +9,9 @@ on:
       - 'src/v3/tennis-europe-draw-walkovers.mjs'
       - 'src/v3/tennis-europe-draw-walkovers.test.mjs'
       - 'src/v3/tennis-europe-inline-draw-walkovers.test.mjs'
+      - 'src/v3/tennis-europe-round-robin-endpoint.test.mjs'
+      - 'src/v3/fixtures/te-round-robin-raw-shell.html'
+      - 'src/v3/fixtures/te-round-robin-matches-content.html'
       - '.github/workflows/courtwatch-tennis-europe-oop-backfill.yml'
 permissions:
   contents: read
@@ -43,7 +46,7 @@ jobs:
         with:
           node-version: '22'
       - name: Verify draw walkover recovery
-        run: node --test src/v3/tennis-europe-draw-walkovers.test.mjs src/v3/tennis-europe-inline-draw-walkovers.test.mjs
+        run: node --test src/v3/tennis-europe-draw-walkovers.test.mjs src/v3/tennis-europe-inline-draw-walkovers.test.mjs src/v3/tennis-europe-round-robin-endpoint.test.mjs
       - name: Acquire every available historical OOP and result
         env:
           TE_OOP_SHARD: ${{ matrix.shard }}

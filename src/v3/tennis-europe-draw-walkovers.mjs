@@ -41,7 +41,7 @@ function previousDate(m,records,known,rounds){
 export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,startDate,endDate,sourceUrl,knownMatches=[],allowPolicyDates=true,roundRobin=false}){
  const source=String(html||''),heading=drawEvent(shell,event),issues=[],matches=[],pending=[],records=[];
  if(!/^[BG][SD]\d{2}\b/i.test(heading))return {matches,pending,issues:[{reason:'draw_event_unverified',competitionId,drawId,sourceUrl}],walkovers:0};
- // Group draws render dated match cards directly, without GetDrawContent.
+ // Group match cards can be inline or loaded through GetMatchesContent.
  // Reuse strict team/winner parsing; undated group W/O use a prior round anchor.
  if(!/\bjs-bracket\b/.test(source)&&/\bRound\s+Robin\b/i.test(text(shell||source))&&/\b(?:group|round\s*robin|pool|girone)\b/i.test(heading)){
   const starts=[...source.matchAll(/<div\b[^>]*>/gi)].filter(m=>attr(m[0],'class').split(/\s+/).includes('match')).map(m=>m.index),groups=new Map();
@@ -110,9 +110,9 @@ export async function recoverDrawWalkovers({tournament,matches,get,documents=[],
   try{
    const cached=documents.find(d=>drawNumber(d.url,id)===target.number),shell=cached?.html||await get(target.url);
    if(/name=["']CookiePurposes/i.test(shell))throw Error('cookie_wall');
-   const action=(shell.match(/<form\b[^>]*action=["']([^"']*\/GetDrawContent[^"']*)/i)||[])[1];
+   const action=(shell.match(/<form\b[^>]*action=["']([^"']*\/(?:GetDrawContent|GetMatchesContent)[^"']*)/i)||[])[1];
    let html=shell;
-   if(action){const url=new URL(decode(action),BASE);if(url.origin!==BASE||!url.pathname.toUpperCase().includes('/'+id.toUpperCase()+'/DRAW/'+target.number+'/GETDRAWCONTENT'))throw Error('unexpected_draw_endpoint');html=await get(url.href,{'x-requested-with':'XMLHttpRequest',referer:target.url});}
+   if(action){const url=new URL(decode(action),BASE);const expected='/TOURNAMENT/'+id.toUpperCase()+'/DRAW/'+target.number+'/';if(url.origin!==BASE||!['GETDRAWCONTENT','GETMATCHESCONTENT'].some(endpoint=>url.pathname.toUpperCase()===expected+endpoint))throw Error('unexpected_draw_endpoint');html=await get(url.href,{'x-requested-with':'XMLHttpRequest',referer:target.url});}
    else if(!/\bjs-bracket\b/.test(shell)&&!(/\bRound\s+Robin\b/i.test(text(shell))&&/class=["'][^"']*\bmatch\b/.test(shell))){issues.push({competitionId:id,drawId:target.number,sourceUrl:target.url,reason:'draw_content_endpoint_missing'});continue}
    const parsed=parseDrawWalkovers({html,shell,event:target.event,competitionId:id,drawId:target.number,startDate:tournament.startDate,endDate:tournament.endDate,sourceUrl:target.url,knownMatches:[...matches,...manualMatches]});issues.push(...parsed.issues);
    for(const m of parsed.pending){const key=drawMatchKey(m),old=existing.get(key),override=manual.get(key);if(old||override)cases.push({competitionId:id,tournamentName:tournament.tournamentName||'',matchId:old?.id||override.matchId,event:m.event,round:m.round,date:old?.date||override.date,dateSource:'existing_verified_record',players:m.players.map(p=>p.name),score:m.score,sourceUrl:m.sourceUrl,disposition:override?'already_in_manual_override':reconcile(old,m)});else pending.push(m)}
