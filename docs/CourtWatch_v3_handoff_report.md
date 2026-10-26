@@ -9606,3 +9606,8 @@ Validation: 27 targeted real Worker/SQLite, saved-page, workflow selection and n
 ITF discovery 2026-10-26T13:38:03.311Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-26T22:59:30.834Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+### Chat 1 — 2026-10-27: tabellone T-1 prevale sul ritiro acceptance
+- Caso Lorenzo Calandra, Bad Waltersdorf: acceptance BS16 W-7; ingresso WC nel tabellone confermato dall'utente. Le funzioni personal-live-entry davano precedenza al ritiro durante entrambi gli ordini di fusione.
+- Correzione: presenza certificata ITF/Europe mantiene official_draw e cancella i campi acceptance obsoleti nella proiezione, senza modificare i dati sorgente. Nessuna presenza inventata dal solo nome o WC. Tornei cancellati esclusi; FITP invariato.
+- Componenti: personal-live-entry.mjs e test omonimo. Verifica: 24 test verdi su merge, storia personale, elenco personale e presentazione tornei. Nessuna scrittura D1 o polling. Verifica live dopo deploy ancora necessaria.
