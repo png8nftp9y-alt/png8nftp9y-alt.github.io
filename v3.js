@@ -375,6 +375,7 @@ const IOC_REGION = {
   MEX: "MX",
   KAZ: "KZ",
 };
+const ALL_COUNTRY_REGIONS = {"ABW":"AW","AFG":"AF","AGO":"AO","AIA":"AI","ALA":"AX","ALB":"AL","AND":"AD","ARE":"AE","ARG":"AR","ARM":"AM","ASM":"AS","ATA":"AQ","ATF":"TF","ATG":"AG","AUS":"AU","AUT":"AT","AZE":"AZ","BDI":"BI","BEL":"BE","BEN":"BJ","BES":"BQ","BFA":"BF","BGD":"BD","BGR":"BG","BHR":"BH","BHS":"BS","BIH":"BA","BLM":"BL","BLR":"BY","BLZ":"BZ","BMU":"BM","BOL":"BO","BRA":"BR","BRB":"BB","BRN":"BN","BTN":"BT","BVT":"BV","BWA":"BW","CAF":"CF","CAN":"CA","CCK":"CC","CHE":"CH","CHL":"CL","CHN":"CN","CIV":"CI","CMR":"CM","COD":"CD","COG":"CG","COK":"CK","COL":"CO","COM":"KM","CPV":"CV","CRI":"CR","CUB":"CU","CUW":"CW","CXR":"CX","CYM":"KY","CYP":"CY","CZE":"CZ","DEU":"DE","DJI":"DJ","DMA":"DM","DNK":"DK","DOM":"DO","DZA":"DZ","ECU":"EC","EGY":"EG","ERI":"ER","ESH":"EH","ESP":"ES","EST":"EE","ETH":"ET","FIN":"FI","FJI":"FJ","FLK":"FK","FRA":"FR","FRO":"FO","FSM":"FM","GAB":"GA","GBR":"GB","GEO":"GE","GGY":"GG","GHA":"GH","GIB":"GI","GIN":"GN","GLP":"GP","GMB":"GM","GNB":"GW","GNQ":"GQ","GRC":"GR","GRD":"GD","GRL":"GL","GTM":"GT","GUF":"GF","GUM":"GU","GUY":"GY","HKG":"HK","HMD":"HM","HND":"HN","HRV":"HR","HTI":"HT","HUN":"HU","IDN":"ID","IMN":"IM","IND":"IN","IOT":"IO","IRL":"IE","IRN":"IR","IRQ":"IQ","ISL":"IS","ISR":"IL","ITA":"IT","JAM":"JM","JEY":"JE","JOR":"JO","JPN":"JP","KAZ":"KZ","KEN":"KE","KGZ":"KG","KHM":"KH","KIR":"KI","KNA":"KN","KOR":"KR","KWT":"KW","LAO":"LA","LBN":"LB","LBR":"LR","LBY":"LY","LCA":"LC","LIE":"LI","LKA":"LK","LSO":"LS","LTU":"LT","LUX":"LU","LVA":"LV","MAC":"MO","MAF":"MF","MAR":"MA","MCO":"MC","MDA":"MD","MDG":"MG","MDV":"MV","MEX":"MX","MHL":"MH","MKD":"MK","MLI":"ML","MLT":"MT","MMR":"MM","MNE":"ME","MNG":"MN","MNP":"MP","MOZ":"MZ","MRT":"MR","MSR":"MS","MTQ":"MQ","MUS":"MU","MWI":"MW","MYS":"MY","MYT":"YT","NAM":"NA","NCL":"NC","NER":"NE","NFK":"NF","NGA":"NG","NIC":"NI","NIU":"NU","NLD":"NL","NOR":"NO","NPL":"NP","NRU":"NR","NZL":"NZ","OMN":"OM","PAK":"PK","PAN":"PA","PCN":"PN","PER":"PE","PHL":"PH","PLW":"PW","PNG":"PG","POL":"PL","PRI":"PR","PRK":"KP","PRT":"PT","PRY":"PY","PSE":"PS","PYF":"PF","QAT":"QA","REU":"RE","ROU":"RO","RUS":"RU","RWA":"RW","SAU":"SA","SDN":"SD","SEN":"SN","SGP":"SG","SGS":"GS","SHN":"SH","SJM":"SJ","SLB":"SB","SLE":"SL","SLV":"SV","SMR":"SM","SOM":"SO","SPM":"PM","SRB":"RS","SSD":"SS","STP":"ST","SUR":"SR","SVK":"SK","SVN":"SI","SWE":"SE","SWZ":"SZ","SXM":"SX","SYC":"SC","SYR":"SY","TCA":"TC","TCD":"TD","TGO":"TG","THA":"TH","TJK":"TJ","TKL":"TK","TKM":"TM","TLS":"TL","TON":"TO","TTO":"TT","TUN":"TN","TUR":"TR","TUV":"TV","TWN":"TW","TZA":"TZ","UGA":"UG","UKR":"UA","UMI":"UM","URY":"UY","USA":"US","UZB":"UZ","VAT":"VA","VCT":"VC","VEN":"VE","VGB":"VG","VIR":"VI","VNM":"VN","VUT":"VU","WLF":"WF","WSM":"WS","YEM":"YE","ZAF":"ZA","ZMB":"ZM","ZWE":"ZW","BAH":"BS","BAN":"BD","BAR":"BB","BHU":"BT","BOT":"BW","BRU":"BN","BUL":"BG","BUR":"BF","CAM":"KH","CAY":"KY","CGO":"CG","CHA":"TD","CHI":"CL","CRC":"CR","CRO":"HR","DEN":"DK","ESA":"SV","FIJ":"FJ","GAM":"GM","GBS":"GW","GEQ":"GQ","GER":"DE","GRE":"GR","GRN":"GD","GUA":"GT","GUI":"GN","HAI":"HT","HON":"HN","INA":"ID","IRI":"IR","ISV":"VI","IVB":"VG","KOS":"XK","KUW":"KW","LAT":"LV","LBA":"LY","LIB":"LB","MAD":"MG","MAS":"MY","MAW":"MW","MGL":"MN","MON":"MC","MRI":"MU","MTN":"MR","MYA":"MM","NCA":"NI","NED":"NL","NEP":"NP","NGR":"NG","NIG":"NE","OMA":"OM","PAR":"PY","PHI":"PH","POR":"PT","PUR":"PR","RSA":"ZA","SEY":"SC","SKN":"KN","SLO":"SI","SOL":"SB","SRI":"LK","SUD":"SD","SUI":"CH","TAN":"TZ","TGA":"TO","TOG":"TG","TPE":"TW","UAE":"AE","URU":"UY","VAN":"VU","VIN":"VC","ZAM":"ZM","ZIM":"ZW","RTF":"RU","BTF":"BY","ENG":"GB","SCO":"GB","WAL":"GB","MGO":"ME"};
 const COUNTRY_NAME_REGION = {
   SERBIA: "RS",
   SRBIJA: "RS",
@@ -388,8 +389,15 @@ const countryCode = (value) =>
       .toUpperCase(),
   countryFlagCode = (value) => {
     const raw = countryCode(value),
-      code = IOC_REGION[raw] || COUNTRY_NAME_REGION[raw] || raw;
-    return /^[A-Z]{2}$/.test(code) ? code.toLowerCase() : "";
+      code = IOC_REGION[raw] || ALL_COUNTRY_REGIONS[raw] || COUNTRY_NAME_REGION[raw] || raw;
+    if (/^[A-Z]{2}$/.test(code)) return code.toLowerCase();
+    const normalize = text => String(text).normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toUpperCase();
+    for (const locale of ['en','it']) {
+      const names = new Intl.DisplayNames([locale], {type:'region'});
+      for (const region of new Set(Object.values(ALL_COUNTRY_REGIONS)))
+        if (normalize(names.of(region)) === normalize(raw)) return region.toLowerCase();
+    }
+    return "";
   };
 const nationalityHtml = (value) => {
   const code = countryCode(value);
@@ -3260,6 +3268,15 @@ function opponentTournamentStatusHtml(tournament) {
     return '';
   return '<span class="completedTournamentLabel">CONCLUSO</span>';
 }
+function opponentEuropeRankingText(profile) {
+  if (!profile) return '';
+  if (profile.ranking) {
+    const category = /14$/.test(profile.category || '') ? ' U14' : /16$/.test(profile.category || '') ? ' U16' : '';
+    return `n°${profile.ranking} TE${category}${profile.ranking_date ? ` · (ranking del ${displayDate(profile.ranking_date)})` : ''}`;
+  }
+  return profile.europeRankingStatus === 'unranked-u12' ? 'No ranking Europe U12'
+    : profile.europeRankingStatus === 'unranked' ? 'No ranking Europe' : '';
+}
 function renderOpponentHistory(data) {
   data = opponentHistoryProjection(data);
   const badges=$("opponentCircuitProfiles");if(badges)badges.innerHTML=playerCircuitLinksHtml(data.circuitProfiles||[]);
@@ -3267,15 +3284,9 @@ function renderOpponentHistory(data) {
     body = $("opponentTournamentHistory");
   const profileRanking = $("opponentProfileRanking"),
     profile = data.profile || null;
-  if(profileRanking){profileRanking.hidden=true;profileRanking.textContent="";}
-  if (profileRanking && profile?.ranking) {
-    const category = /14$/.test(profile.category || "")
-      ? " U14"
-      : /16$/.test(profile.category || "")
-        ? " U16"
-        : "";
-    profileRanking.textContent = `n°${profile.ranking} TE${category}${profile.ranking_date ? ` · (ranking del ${displayDate(profile.ranking_date)})` : ""}`;
-    profileRanking.hidden = false;
+  if (profileRanking) {
+    profileRanking.textContent = opponentEuropeRankingText(profile);
+    profileRanking.hidden = !profileRanking.textContent;
   }
   const nationality = $("opponentProfileCurrentNationality");
   if (nationality && profile?.nationality) {
@@ -3309,7 +3320,7 @@ function renderOpponentHistory(data) {
 }
 function opponentHistoryKey(name, event = "", profileId = "") {
   const asOf = iso(new Date()),
-    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "played-history-v7-live-europe"].join("|");
+    requestKey = [profileId || "", readablePerson(name), asOf, event || "", "played-history-v8-current-profile"].join("|");
   return { asOf, requestKey };
 }
 function preparedOpponentHistory(name, event = "", profileId = "") {
@@ -3432,7 +3443,7 @@ async function loadOpponentHistory(name, event = "", profileId = "") {
     cached = preparedOpponentHistory(name, event, profileId);
   if (cached) renderOpponentHistory(cached);
   try {
-    const data = await fetchOpponentHistory(name, event, profileId);
+    const data = await fetchOpponentHistory(name, event, profileId, true);
     if (activeOpponentRouteKey === routeKey) {
       saveActiveOpponent(requestKey, data);
       renderOpponentHistory(data);

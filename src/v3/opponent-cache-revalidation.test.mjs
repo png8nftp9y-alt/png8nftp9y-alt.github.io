@@ -41,7 +41,7 @@ test('concurrent intent and click share one request, and a failed update preserv
 test('old ID-reader revisions remain provisional and never prevent a current backend read',async()=>{
  let requests=0;const c=fixture(async()=>{requests++;return{ok:true,json:async()=>data(3)}});
  const current=c.opponentHistoryKey('Test Person','GS14','id').requestKey;
- const old=current.replace('played-history-v7-live-europe','linked-ids-v6-live-europe');
+ const old=current.replace('played-history-v8-current-profile','linked-ids-v6-live-europe');
  assert.notEqual(old,current);c.opponentHistoryCache.set(old,data(1));
  assert.equal(c.preparedOpponentHistory('Test Person','GS14','id').tournaments[0].matches.length,1);
  assert.equal((await c.fetchOpponentHistory('Test Person','GS14','id')).tournaments[0].matches.length,3);

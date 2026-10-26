@@ -50,7 +50,7 @@ print(json.dumps(out))`;
  const result=spawnSync('python3',['-c',python],{input:JSON.stringify({schema,rank,cases}),encoding:'utf8',maxBuffer:4*1024*1024});
  assert.equal(result.status,0,result.stderr);const data=JSON.parse(result.stdout);
  assert.deepEqual(data.rank.rows.map(r=>r.profile_id),['target']);
- assert.deepEqual(data.rank.rows,data.oldRank.rows);
+ assert.deepEqual(data.rank.rows,data.oldRank.rows.map(r=>({...r,nationality:null})));
  assert.ok(data.rank.steps<data.oldRank.steps/5);
  console.log('OPPONENT_RANK_FIXTURE '+JSON.stringify({beforeSteps:data.oldRank.steps,afterSteps:data.rank.steps}));
  assert.ok(data.rank.plan.some(p=>p.includes('SEARCH tennis_europe_ranking_history USING INDEX te_ranking_name_date')),data.rank.plan.join('\n'));

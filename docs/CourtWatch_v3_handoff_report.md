@@ -9562,3 +9562,25 @@ Installer follow-up: apply the four exact intended files after a complete prefli
 - Checkpoint convalidato per shard, numero shard, periodo, data di valutazione, insieme completo degli ID e date torneo; rifiuta buchi, sovrapposizioni e partite invalide. Mantiene la data di valutazione originale. Timeout GET progressivi 25/40/55/60 secondi, sempre massimo quattro tentativi per richiesta; nessun polling.
 - Il merge storico accetta il nuovo workflow solo se terminato con successo; restano tutti i controlli di completezza e il successivo import D1. UI, regole W/O e schedulazioni invariate. Il push attiva soltanto il recupero mirato: il runner ordinario resta invariato. Il merge non importa un vecchio archivio al push; attende la conclusione positiva dell'acquisizione.
 - Validazione: 33 test passati; checkpoint reali degli shard 11 e 12 verificati, 64 tornei riutilizzati e solo i cinque errori selezionati; sintassi JavaScript/YAML e installer verificati. Limiti: timeout upstream possono persistere e restano errori espliciti; la copertura W/O richiede ancora lettura dell'audit dopo merge/import. Non si dichiara copertura completa soltanto dai test.
+## 26 October 2026 — Remove three non-routine flows from operational diagnostics
+
+User asks to remove ITF future metadata bulk recovery, legacy App OOP and legacy App results from Diagnostics. Remove only courtwatch-all-itf-metadata.yml, courtwatch-v3-oop.yml and courtwatch-v3-results.yml from the presentation allowlist, leaving 25 operational flows. Preserve the workflow files, execution behavior, event triggers and schedules. The ordinary ITF metadata engine, live Europe OOP/results, Europe D1 Agenda and general D1 publisher remain visible.
+
+Coverage remains unchanged: its counts/date read the stored sync document and its overall light reads diagnostics.overall, derived from critical source checks and operationalTargets. None of these three removed presentation entries is an operationalTargets critical workflow. Hiding their rows does not disable acquisition or alter the Coverage calculation. Coverage is a saved aggregate, not a certificate of complete archive contents.
+
+Validation: existing focused selection, status-precedence, refresh-button and client-request tests plus a regression proving all three failed non-routine rows are excluded and the actual ordinary/live/D1 flows remain present. Installer applies exact guarded contents only, normalizes final newlines, updates this report and runs the combined Admin regressions before publication.
+
+
+### Chat 1 — 2026-10-26: bandiere internazionali e ranking attuale avversari
+- Problema: mappa Paesi e SVG limitati; intestazione avversario perdeva nazionalità senza ranking; lookup ranking per nome cercava solo minuscole.
+- Aggiunti codici ISO/federazione e SVG locali mancanti (flag-icons, licenza MIT allegata). La funzione comune copre Cerca e schede; nazionalità alternativa e sorgenti della stessa identità sono recuperate senza abbinare omonimi o inventare nazioni.
+- Intestazione avversario: ranking solo dell'ultima pubblicazione acquisita per categoria; nuova verifica al click, nessun polling. Nazionalità e anno restano disponibili anche senza ranking.
+- Solo intestazione pagina avversario: U14/U16 senza ranking -> "No ranking Europe"; U10/U12 -> "No ranking Europe U12". Anno corrente di nascita prioritario rispetto alla categoria di un vecchio match; categoria esplicita come fallback quando l'anno manca. Età o pubblicazione ignote non vengono dichiarate come assenza certa di ranking.
+- Nessun cambiamento ai ranking storici dei match, alle associazioni native o alla schedulazione dei motori.
+- Validazione: 55 test verdi SQLite/API e browser per ranking latest, cache, nazionalità, tutti i codici bandiera, omonimi, navigazione e aggiunta giocatori; verifica di sintassi e diff. Controlli reali post-deploy e disponibilità dell'ultima pubblicazione ufficiale dipendono dal normale sync ranking.
+
+### Chat 1 — 2026-10-26: allineamento test CRUD e browser al ranking corrente
+- Causa: il browser pretendeva zero richieste dopo il prefetch, mentre l'apertura ora verifica il ranking corrente. I due test VM CRUD non caricavano le nuove funzioni del profilo.
+- Componenti: tools/verify-shared-match-refresh-browser.mjs e cloudflare/app-api/test/navigation-query-load.test.mjs. Nessuna modifica al comportamento applicativo.
+- Verifica: 19 test Node verdi; browser Chromium completo verde per main e others. Il test controlla ranking aggiornato da 12 a 7, navigazione ricorsiva e conservazione storico.
+- Limiti: deploy e CRUD remoto saranno verificati dai nuovi run GitHub; nessun rilancio del vecchio commit.

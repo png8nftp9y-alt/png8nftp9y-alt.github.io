@@ -1,3 +1,4 @@
+import {opponentEuropeProfile} from '../lib/opponent-europe-profile.mjs';
 import {enrichFitpMetadata} from '../lib/fitp-player-metadata.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -21,6 +22,7 @@ function view(){
  courtWatchPlayerByName:()=>null,participantDesignationHtml:()=>'',nationalityHtml:()=>'',
  fullMatchRoundLabel:m=>m.round,displayDate:x=>x,opponentTournamentEventLinks:()=>'',
  tournamentOfficialUrl:()=>'',tournamentSurfaceLabel:()=>'',tournamentPlace:()=> 'Luogo da pubblicare',opponentTournamentDateLabel:()=>'',bindParticipantNavigation:()=>{}};
+ ctx.opponentEuropeProfile=opponentEuropeProfile;ctx.enrichIdentityNationalities=async()=>{};
  vm.createContext(ctx);
  vm.runInContext(slice(source,'const circuit =','const circuitRank =')+
  slice(source,'function agendaKey(','function mergeKnownMatches(')+
@@ -106,7 +108,8 @@ test('SQLite Europe history through the real API assembler renders current and p
    tennisEuropeTournamentMetadata:async()=>new Map(),searchIdentityProfile:async()=>({name:'Test Person',sourcePlayerId:'profile-test',sourceCircuit:'tennis-europe'}),playerCircuitIdentities:()=>[],
    playerEntryTournaments:async()=>[future,...[7,8,9].map(i=>({id:'entry'+i,circuit:'tennis-europe',startDate:'2026-10-0'+i,endDate:'2026-10-0'+i,matches:[]}))],otherCircuitOpponentHistory:async()=>[],resolveCircuitProfiles:async()=>new Map(),circuitProfiles:()=>[],enrichPersonalTournamentPresentation:async x=>x,
    currentTennisEuropePlayerRanking:async()=>({rankings:[]}),currentRankingCategoryAllowed:()=>true};
-  vm.createContext(ctx);
+  ctx.opponentEuropeProfile=opponentEuropeProfile;ctx.enrichIdentityNationalities=async()=>{};
+ vm.createContext(ctx);
   vm.runInContext(slice(worker,'function missingOptionalTable(','async function enrichTennisEuropeRankings(')+
    slice(worker,'const incompleteCompletedScore=','async function itfTournamentMetadata(')+
    slice(readFileSync(new URL('../lib/opponent-canonical-history.mjs',import.meta.url),'utf8'),'export async function boundedRows(','export async function otherCircuitOpponentHistory(').replace('export ','')+

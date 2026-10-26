@@ -62,6 +62,8 @@ test('real opponent API joins native matches and verified local aliases, keeps h
   const matches=body.tournaments.flatMap(t=>t.matches||[]);
   assert.deepEqual(new Set(matches.map(m=>m.matchId)),new Set(['native-match','local-match']));
   assert.ok(!body.profile?.ranking);
+  assert.equal(body.profile.nationality,'SLO');
+  assert.equal(body.profile.europeRankingStatus,'unranked');
   assert.ok(matches.every(m=>m.opponents[0].profileId===otherNative&&m.opponents[0].ranking===30&&m.opponents[0].rankingDate==='2026-10-01'));
   assert.ok(body.tournaments.some(t=>t.name==='Correct Upcoming'));
   assert.equal(body.tournaments.filter(t=>t.historyKind==='past').length,2);
