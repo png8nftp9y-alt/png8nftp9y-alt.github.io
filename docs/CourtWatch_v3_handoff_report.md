@@ -9529,3 +9529,13 @@ FITP follow-up: historical evidence confirms successful provincial runs 39741701
 Validation: targeted Admin integration uses real SQLite release/chunks and verifies one current-document SELECT, zero writes/scans, current success replacing an old red, response authentication, no-store and safe rendering. Browser-loader VM test verifies one opening request, explicit clicks and zero retries on error. Existing Admin saved-page/review/scope regressions, runtime-reader and workflow queue checks; workflow collector tests. Full npm source checks run before delivery. No application data writes, recurring reruns or polling performed. One user-requested targeted failed-job recovery is initiated separately.
 
 ITF discovery 2026-10-25T21:19:44.888Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 26 October 2026 — Only operational workflows and one Diagnostics refresh control
+
+User wants only workflows useful for the app and only the existing Aggiorna diagnostica button. Limit workflow presentation to 28 explicitly listed acquisition, identity, D1 publication, Worker/watchdog and routine verification flows. Exclude temporary player-association repairs, exploratory/manual historical audits and prior one-off recoveries. Preserve source workflow state collection, schedules, triggers, critical checks and all engine behavior. Missing operational evidence remains explicitly unavailable; both successful and failing operational runs remain visible.
+
+Remove only the extra Aggiorna stati button from Diagnostics, retaining Aggiorna diagnostica and the responsive saved-count page. The normal one-time current-panel read on opening remains; no timers or polling. Make the loader tolerate the removed button and direct Diagnostics errors to Aggiorna diagnostica. ID retains Aggiorna segnalazioni, exports and current suspicious-case handling.
+
+Validation: four focused tests cover exact operational selection, exclusion of temporary repairs, status precedence/missing evidence, one Diagnostics refresh control, retained ID control and button-free one-request/error rendering without retries. All 28 workflow filenames verified against current repository. Existing Admin panel test imports the new regression suite; installer runs the combined Admin regression tests before publication. Production deploy remains to verify after user push.
+
+Installer follow-up: apply the four exact intended files after a complete preflight against verified upstream contents; tolerate only trailing-newline differences. No 3-way blob dependency or context patch. Unexpected source changes stop before any file mutation. Idempotent replay and atomic preflight are tested. The previously failed worktree is left untouched.

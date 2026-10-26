@@ -27,3 +27,6 @@ test('panel script remains authenticated and no-store, and navigation never star
  const r=await worker.fetch(new Request('https://app/admin/panels.js',{headers:{Authorization:'Basic '+btoa('admin:secret')}}),env);assert.equal(r.status,200);assert.match(r.headers.get('Content-Type'),/javascript/);assert.equal(r.headers.get('Cache-Control'),'no-store');
  let background=0;const archive={get:async()=>null};const page=await worker.fetch(new Request('https://app/admin/diagnostica',{headers:{Authorization:'Basic '+btoa('admin:secret')}}),{...env,ARCHIVE:archive},{waitUntil(){background++}});assert.equal(page.status,200);assert.equal(background,0);assert.match(page.headers.get('Content-Security-Policy'),/script-src 'self'; connect-src 'self'/);
 });
+
+
+import './admin-essential-workflows.test.mjs';
