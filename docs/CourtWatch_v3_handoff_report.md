@@ -9584,3 +9584,10 @@ Validation: existing focused selection, status-precedence, refresh-button and cl
 - Componenti: tools/verify-shared-match-refresh-browser.mjs e cloudflare/app-api/test/navigation-query-load.test.mjs. Nessuna modifica al comportamento applicativo.
 - Verifica: 19 test Node verdi; browser Chromium completo verde per main e others. Il test controlla ranking aggiornato da 12 a 7, navigazione ricorsiva e conservazione storico.
 - Limiti: deploy e CRUD remoto saranno verificati dai nuovi run GitHub; nessun rilancio del vecchio commit.
+
+### 2026-10-26 — W/O dei gironi senza riferimento data: terzo giorno torneo
+
+- Richiesta esplicita: nei casi analoghi a Williams–Lohmus a Laagri, inserire il match nel terzo giorno del torneo. Implementato fallback generale per W/O round robin privi sia di data ufficiale sia di partita precedente datata utilizzabile.
+- Ordine: data ufficiale; precedente datata nello stesso draw + un giorno; solo in assenza di precedente, inizio torneo + due giorni. Il terzo giorno non viene dichiarato data ufficiale: dateSource=round_robin_third_day_fallback. Singolare e doppio, maschile e femminile; nessuna modifica alle regole KO.
+- Fallback vietato se manca inizio torneo o se il terzo giorno supera la fine. Se esiste una precedente datata ma il giorno successivo è fuori periodo, resta segnalazione invece di retrodatare il match. Convalida dei record recuperati estesa per permettere import D1 senza numero campo ufficiale; risultato, vincitore e identità restano verificati.
+- Test aggiornati: primo turno, assenza di riferimento valido, priorità data ufficiale e precedente+1, passaggio di mese, data oltre fine, inizio mancante, sequenza di W/O e rifiuto di record contraffatti/KO. Verificati test e installer, report incluso nello stesso commit. Il push attiva acquisizione secondo i trigger esistenti; nessun polling o rilancio aggiuntivo. I 28 KO e le altre segnalazioni di acquisizione restano attività distinte.

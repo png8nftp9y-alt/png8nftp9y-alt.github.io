@@ -19,7 +19,7 @@ export function drawMatchKey(m){
 export function isRecoveredDrawWalkover(m){
  if(m?.sourceKind!=='official_draw_walkover'||m.status!=='completed'||m.score!=='W/O'||!iso(m.date)||!drawNumber(m.sourceUrl,m.competitionId||'')||![2,4].includes(m.players?.length)||m.teams?.length!==2||![0,1].includes(m.winnerTeamIndex))return false;
  const people=new Set(m.players.map(p=>p.id)),teams=m.teams.flat(),winning=m.teams[m.winnerTeamIndex];
- const policy=m.dateSource==='official_draw_date'||m.dateSource==='tournament_end_date_final_policy'&&final(m.round)&&iso(m.date)===iso(m.tournamentEndDate)||m.dateSource==='tournament_start_date_first_round_policy'&&m.drawRoundIndex===0&&!final(m.round)&&iso(m.date)===iso(m.tournamentStartDate)||m.dateSource==='previous_match_plus_one_day'&&m.drawRoundIndex>0&&!final(m.round)&&m.previousMatchIds?.length>0&&iso(m.date)===nextDay(m.previousMatchDate)&&(!iso(m.tournamentEndDate)||m.date<=m.tournamentEndDate);
+ const policy=m.dateSource==='round_robin_third_day_fallback'&&m.roundRobin===true&&groupRound(m.round)!==null&&Boolean(iso(m.tournamentStartDate))&&iso(m.date)===nextDay(nextDay(m.tournamentStartDate))&&(!iso(m.tournamentEndDate)||iso(m.date)<=iso(m.tournamentEndDate))||m.dateSource==='official_draw_date'||m.dateSource==='tournament_end_date_final_policy'&&final(m.round)&&iso(m.date)===iso(m.tournamentEndDate)||m.dateSource==='tournament_start_date_first_round_policy'&&m.drawRoundIndex===0&&!final(m.round)&&iso(m.date)===iso(m.tournamentStartDate)||m.dateSource==='previous_match_plus_one_day'&&m.drawRoundIndex>0&&!final(m.round)&&m.previousMatchIds?.length>0&&iso(m.date)===nextDay(m.previousMatchDate)&&(!iso(m.tournamentEndDate)||m.date<=m.tournamentEndDate);
  return Boolean(teams.length===people.size&&teams.every(id=>people.has(id))&&winning.length===m.winnerPlayerIds?.length&&winning.every(id=>m.winnerPlayerIds.includes(id))&&policy);
 }
 function drawNumber(url,id){try{const u=new URL(decode(url),BASE);if(u.origin!==BASE)return'';const m=u.pathname.match(/^\/tournament\/([^/]+)\/draw\/(\d+)\/?$/i);if(m&&m[1].toUpperCase()===id.toUpperCase())return String(+m[2]);if(/^\/sport\/draw(?:\.aspx)?$/i.test(u.pathname)&&String(u.searchParams.get('id')).toUpperCase()===id.toUpperCase()&&/^\d+$/.test(u.searchParams.get('draw')||''))return String(+u.searchParams.get('draw'));return''}catch{return''}}
@@ -43,7 +43,7 @@ export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,
  if(!/^[BG][SD]\d{2}\b/i.test(heading))return {matches,pending,issues:[{reason:'draw_event_unverified',competitionId,drawId,sourceUrl}],walkovers:0};
  // Group match cards can be inline or loaded through GetMatchesContent.
  // Reuse strict team/winner parsing; undated group W/O use a prior round anchor.
- if(!/\bjs-bracket\b/.test(source)&&/\bRound\s+Robin\b/i.test(text(shell||source))&&/\b(?:group|round\s*robin|pool|girone)\b/i.test(heading)){
+ if(!/\bjs-bracket\b/.test(source)&&/\bRound\s+Robin\b/i.test(text(shell||source))){
   const starts=[...source.matchAll(/<div\b[^>]*>/gi)].filter(m=>attr(m[0],'class').split(/\s+/).includes('match')).map(m=>m.index),groups=new Map();
   if(!starts.length)return{matches,pending,issues:[{reason:'round_robin_match_cards_missing',competitionId,drawId,sourceUrl}],walkovers:0};
   for(let i=0;i<starts.length;i++){
@@ -79,7 +79,7 @@ export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,
  for(const record of records){
   if(!record.isWalkover)continue;
   if(!record.date&&(allowPolicyDates||roundRobin)){
-   if(roundRobin){const previous=previousDate(record,records,knownMatches,rounds);if(previous?.ids.length){const value=nextDay(previous.date);if((!iso(endDate)||value<=iso(endDate))&&(!iso(startDate)||value>=iso(startDate))){record.date=value;record.dateSource='previous_match_plus_one_day';record.previousMatchDate=previous.date;record.previousMatchIds=previous.ids}}}
+   if(roundRobin){const previous=previousDate(record,records,knownMatches,rounds);if(previous?.ids.length){const value=nextDay(previous.date);if((!iso(endDate)||value<=iso(endDate))&&(!iso(startDate)||value>=iso(startDate))){record.date=value;record.dateSource='previous_match_plus_one_day';record.previousMatchDate=previous.date;record.previousMatchIds=previous.ids}}else{const value=nextDay(nextDay(startDate));if(value&&(!iso(endDate)||value<=iso(endDate))){record.date=value;record.dateSource='round_robin_third_day_fallback'}}}
    else if(final(record.round)){record.date=iso(endDate);record.dateSource=record.date?'tournament_end_date_final_policy':''}
    else if(record.drawRoundIndex===0){record.date=iso(startDate);record.dateSource=record.date?'tournament_start_date_first_round_policy':''}
    else{const previous=previousDate(record,records,knownMatches,rounds);if(previous?.ids.length){const value=nextDay(previous.date);if((!iso(endDate)||value<=iso(endDate))&&(!iso(startDate)||value>=iso(startDate))){record.date=value;record.dateSource='previous_match_plus_one_day';record.previousMatchDate=previous.date;record.previousMatchIds=previous.ids}}}

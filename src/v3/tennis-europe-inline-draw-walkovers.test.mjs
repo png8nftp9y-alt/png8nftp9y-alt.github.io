@@ -12,8 +12,8 @@ const options={competitionId:id,drawId:'1',event:'BS12 - Group A',startDate:'202
 test('inline round robin uses official dates and marks the format',()=>{
  const html=shell(card(1)),p=parseDrawWalkovers({...options,html});assert.equal(p.matches.length,1);assert.deepEqual(p.issues,[]);assert.equal(p.matches[0].date,'2026-07-13');assert.equal(p.matches[0].dateSource,'official_draw_date');assert.equal(p.matches[0].roundRobin,true);assert.equal(p.matches[0].round,'Round 1');assert(isRecoveredDrawWalkover(p.matches[0]));
 });
-test('first group round without an earlier dated match stays pending',()=>{
- const p=parseDrawWalkovers({...options,html:shell(card(1,''))});assert.equal(p.matches.length,0);assert.equal(p.pending.length,1);assert.equal(p.pending[0].date,'');assert.equal(p.pending[0].reason,'round_robin_previous_match_date_missing_or_out_of_range');
+test('undated first group W/O without a prior dated match uses tournament day three',()=>{
+ const p=parseDrawWalkovers({...options,html:shell(card(1,''))});assert.equal(p.pending.length,0);assert.equal(p.matches[0].date,'2026-07-13');assert.equal(p.matches[0].dateSource,'round_robin_third_day_fallback');assert(isRecoveredDrawWalkover(p.matches[0]));
 });
 test('missing winner and malformed round stay unresolved',()=>{
  const noWinner=parseDrawWalkovers({...options,html:shell(card(1,undefined,''))});assert.equal(noWinner.matches.length,0);assert(noWinner.issues.some(x=>x.reason==='walkover_participants_or_winner_unverified'));
@@ -39,7 +39,7 @@ test('undated group W/O uses the previous dated round, even if only the current 
 test('same group and team required; later or other-circuit anchors cannot set a date',()=>{
  const previous=parseDrawWalkovers({...options,html:shell(card(1))}).matches[0];
  for(const altered of [{...previous,drawId:'99'},{...previous,competitionId:'OTHER'},{...previous,round:'Round 3'},{...previous,event:'GS12 - Group A'},{...previous,players:previous.players.map(p=>({...p,name:'Other '+p.name}))}]){
-  const p=parseDrawWalkovers({...options,html:shell(card(2,'')),knownMatches:[altered]});assert.equal(p.matches.length,0);assert.equal(p.pending.length,1);
+  const p=parseDrawWalkovers({...options,html:shell(card(2,'')),knownMatches:[altered]});assert.equal(p.pending.length,0);assert.equal(p.matches[0].date,'2026-07-13');assert.equal(p.matches[0].dateSource,'round_robin_third_day_fallback');
  }
 });
 test('official group date prevails and inferred date stays inside tournament bounds',()=>{
@@ -52,4 +52,17 @@ test('dated earlier card can anchor a later group W/O in the same document',()=>
 });
 test('reversed card order resolves consecutive undated rounds in ordinal order',()=>{
  const p=parseDrawWalkovers({...options,html:shell(card(3,'')+card(2,'')+card(1))});assert.equal(p.matches.length,3);assert.equal(p.matches.find(m=>m.round==='Round 2').date,'2026-07-14');assert.equal(p.matches.find(m=>m.round==='Round 3').date,'2026-07-15');
+});
+
+test('third day fallback handles month rollover and missing prior match in a later group round',()=>{
+ const p=parseDrawWalkovers({...options,startDate:'2026-07-30',endDate:'2026-08-05',html:shell(card(2,''))});assert.equal(p.matches[0].date,'2026-08-01');assert(isRecoveredDrawWalkover(p.matches[0]));
+});
+test('third day fallback never exceeds tournament end or accepts a missing start',()=>{
+ for(const patch of [{startDate:''},{endDate:'2026-07-12'}]){const p=parseDrawWalkovers({...options,...patch,html:shell(card(1,''))});assert.equal(p.matches.length,0);assert.equal(p.pending.length,1);}
+});
+test('fallback validator rejects forged date and knockout records',()=>{
+ const m=parseDrawWalkovers({...options,html:shell(card(1,''))}).matches[0];assert(!isRecoveredDrawWalkover({...m,date:'2026-07-14'}));assert(!isRecoveredDrawWalkover({...m,roundRobin:false}));
+});
+test('fallback seeds subsequent undated group rounds, preserving ordinal progression',()=>{
+ const p=parseDrawWalkovers({...options,html:shell(card(3,'')+card(2,'')+card(1,''))});assert.equal(p.matches.length,3);assert.deepEqual(p.matches.map(m=>m.date),['2026-07-13','2026-07-14','2026-07-15']);assert(p.matches.every(isRecoveredDrawWalkover));
 });
