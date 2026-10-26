@@ -8,8 +8,23 @@ const link=run=>{try{const u=new URL(run?.html_url);return u.protocol==='https:'
 export function renderCurrentWorkflows(doc){
  if(!doc||!Array.isArray(doc.items))return '<p class="pill warn">Stati workflow non disponibili. Non equivale a tutti verdi.</p>';
  const states=operationalWorkflowRows(doc);
- const rows=states.map(item=>{const run=item.latestRun,status=run?(run.status==='completed'?run.conclusion:run.status):'non disponibile';return `<tr><td><b>${esc(item.label||item.workflow)}</b></td><td><span class="pill ${tone(status)}">${esc(status)}</span>${item.error?'<br><small>Ultima acquisizione non disponibile</small>':''}</td><td>${esc(stamp(run?.updated_at||run?.created_at))}<br><small>Verificato: ${esc(stamp(item.checkedAt))}</small></td><td>${link(run)}</td></tr>`}).join('');
- return `<h2>Workflow e watchdog</h2><p class="muted">Solo acquisizioni, pubblicazioni e controlli operativi dell’app. Stati salvati dai normali motori, letti da D1 all’apertura. Evidenza del ${esc(stamp(doc.generatedAt))}. I conteggi conservano il loro aggiornamento manuale.</p><table><thead><tr><th>Flusso</th><th>Stato</th><th>Ultimo aggiornamento</th><th>Riferimento</th></tr></thead><tbody>${rows}</tbody></table>`;
+ const checks=new Map(doc.items.map(item=>[item.workflow,item]));
+ const rows=states.map(item=>{
+  const check=checks.get(item.workflow),latest=item.latestRun,failed=check?.status==='red';
+  const failedRun=check?.completedRun||item.completedRun||(check?.runId?{id:check.runId,html_url:check.url,updated_at:check.generatedAt,status:'completed',conclusion:'failure'}:null);
+  const run=failed?(failedRun||latest):latest,status=failed?'failure':run?(run.status==='completed'?run.conclusion:run.status):'non disponibile';
+  const active=latest&&latest.status!=='completed'?latest:null;
+  return `<tr><td><b>${esc(item.label||item.workflow)}</b></td><td><span class="pill ${tone(status)}">${esc(status)}</span>${failed?'<br><small>Questo fallimento determina il rosso complessivo.</small>':''}${item.error?'<br><small>Ultima acquisizione non disponibile</small>':''}</td><td>${esc(stamp(run?.updated_at||run?.created_at))}<br><small>Verificato: ${esc(stamp(item.checkedAt))}</small></td><td>${link(run)}${failed&&active?'<br><small>Nuova esecuzione '+esc(active.status)+' · '+link(active)+'</small>':''}</td></tr>`;
+ }).join('');
+ return `<h2>Workflow e watchdog</h2><p class="muted">Solo acquisizioni, pubblicazioni e controlli operativi dell’app. Stati acquisiti nella stessa lettura di Copertura e dei controlli applicativi. Evidenza del ${esc(stamp(doc.generatedAt))}. La pagina conserva questa lettura fino a Aggiorna diagnostica.</p><table><thead><tr><th>Flusso</th><th>Stato</th><th>Ultimo aggiornamento</th><th>Riferimento</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+export function renderCoverageCauses(diagnostics){
+ const issues=(diagnostics?.items||[]).filter(item=>item.critical&&['red','yellow'].includes(item.status));
+ if(!issues.length)return diagnostics?.overall==='green'?'':'<p class="pill warn">Il riepilogo non certifica uno stato verde, ma il dettaglio dei problemi non è disponibile nella lettura salvata.</p>';
+ return '<div class="coverage-causes"><p><b>Problemi che determinano lo stato complessivo:</b></p><ul>'+issues.map(item=>{
+  const run=item.completedRun||(item.runId?{id:item.runId,html_url:item.url}:null),reference=link(run);
+  return `<li><b>${esc(item.label)}</b> · <span class="pill ${tone(item.status)}">${esc(item.status)}</span><br>${esc(item.detail||'Dettaglio non registrato')}<br><small>Rilevato: ${esc(stamp(item.generatedAt))}</small><br>${reference==='—'?'<span class="muted">Run non registrato per questo controllo sui dati.</span>':reference}</li>`;
+ }).join('')+'</ul></div>';
 }
 export function renderCurrentApplication(doc,diagnostics){
  const workflowLabels=new Set((doc?.items||[]).map(x=>x.label));
@@ -25,7 +40,7 @@ export async function adminPanelResponse(view,env,url,headers){
  }catch{return new Response(JSON.stringify({error:'Lettura corrente non disponibile. Riapri la pagina o usa il pulsante di aggiornamento della sezione.'}),{status:503,headers:{...headers,'Content-Type':'application/json; charset=utf-8'}})}
 }
 export function attachAdminPanels(html,view,url){
- if(!['id','diagnostica'].includes(view))return html;
+ if(view!=='id')return html;
  const placeholder=(id,title)=>`<section class="card" id="admin-${id}"><h2>${title}</h2><p class="muted">Caricamento della lettura corrente…</p></section>`;
  if(view==='id')html=html.replace('</nav>','</nav>'+placeholder('review','Identità sospette da verificare'));
  else for(const [id,title] of [['workflows','Workflow e watchdog'],['application','Diagnostica applicativa']])html=html.replace(new RegExp('<section class="card"><h2>'+title+'</h2>[\\s\\S]*?</section>'),placeholder(id,title));

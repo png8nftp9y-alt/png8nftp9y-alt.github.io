@@ -90,3 +90,5 @@ assert len(c.execute(p['sql']).fetchone())==len(p['tables'])
   const fallback=await worker.fetch(req(),{ADMIN_TOKEN:'test-only',DB:db});assert.equal(fallback.status,200);assert.match(await fallback.text(),/Conteggi D1/);
  }finally{d.close();}
 });
+
+import './admin-diagnostics-snapshot.test.mjs';
