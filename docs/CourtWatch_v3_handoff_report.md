@@ -9639,3 +9639,5 @@ Validation: four SQLite/Worker regression tests reproduce the actual local ID 49
 - Verifica: 10 test verdi su iscrizioni FITP e ranking futuri Europe. Nuovi run remoti da verificare dopo push; nessun rilancio dei vecchi run.
 
 ITF discovery 2026-10-27T05:40:05.081Z: 2 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-10-27T05:41:03.686Z: attempted 2, acquired 2, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
