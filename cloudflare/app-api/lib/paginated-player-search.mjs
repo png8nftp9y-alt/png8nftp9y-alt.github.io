@@ -37,6 +37,10 @@ export async function searchIdentityProfile(db,name,identity){
  const n=normalizePlayerName(name),names=[...new Set([n,n.toLowerCase(),n.split(' ').reverse().join(' '),n.split(' ').reverse().join(' ').toLowerCase()])];
  const members=await select(db,`normalized_name IN (${names.map(()=>'?').join(',')})`,names);
  const selected=members.find(r=>r.source_key===identity||r.official_id===identity);if(!selected)return null;
+ // Draw-local IDs select an exact source row; recover its established canonical
+ // person before using partial raw metadata. Never join people by name alone.
+ const linked=await storedIdentity(db,selected.source_key);
+ if(linked&&nameKey(linked.name)===nameKey(name))return{...linked,sourceCircuit:linked.sourceCircuit||linked.circuit||selected.circuit,sourcePlayerId:linked.sourcePlayerId||''};
  const sameName=members.filter(r=>nameKey(r.display_name)===nameKey(name)),merged=unify(sameName,new Map()),person=merged.find(r=>r.sourceKeys?.includes(selected.source_key));
  return {name:selected.display_name,...candidate(selected),sourceKey:selected.source_key,sourceCircuit:selected.circuit,sourcePlayerId:selected.official_id||'',...(person?{nationality:person.nationality,birthYear:person.birthYear,circuitProfiles:person.circuitProfiles}:{circuitProfiles:[]})};
 }

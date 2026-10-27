@@ -33,12 +33,27 @@ test('certified draw presence survives acceptance refresh, scoped to player circ
  assert.equal(personalLiveEntry({...entries[0],drawUrl:'https://example.org/draw'}).calendarListLabel,'MD-2');
 });
 
-test('explicit withdrawal survives both a stale draw confirmation and subsequent history projection for every circuit',()=>{
-for(const circuit of ['itf','tennis-europe','fitp']){
+test('FITP withdrawal behavior remains unchanged',()=>{
+for(const circuit of ['fitp']){
  const prior={playerId:'one',circuit,competitionId:'T',calendarState:'draw_confirmed',entryStatus:'official_draw'};
  const withdrawn=mergePersonalLiveTournaments([prior],[{competitionId:'T',circuit,entryStatus:'withdrawn'}],'one')[0];
  assert.equal(withdrawn.entryStatus,'withdrawn');assert.equal(withdrawn.status,'withdrawn');
  assert.equal(mergePersonalHistoryTournament(prior,withdrawn).entryStatus,'withdrawn');
  assert.equal(personalLiveEntry({...prior,acceptanceCode:'W'}).entryStatus,'withdrawn');
 }
+});
+
+test('Calandra W-7 acceptance cannot hide certified WC draw presence, in either merge order',()=>{
+ for(const circuit of ['tennis-europe','itf']){
+  const draw={playerId:'calandra',circuit,competitionId:'304541B6-24C6-45A9-806E-633242627228',calendarState:'draw_confirmed',entryStatus:'official_draw',designation:'WC'};
+  const acceptance={...draw,calendarState:'pre_tournament_acceptance',entryStatus:'confirmed_on_acceptance_list',acceptanceCode:'W',acceptancePosition:7,acceptanceList:'Withdrawn',status:'withdrawn'};
+  const results=[mergePersonalHistoryTournament(draw,acceptance),mergePersonalLiveTournaments([draw],[acceptance],'calandra')[0],personalLiveEntry({...acceptance,calendarState:'draw_confirmed'})];
+  for(const row of results){assert.equal(row.entryStatus,'official_draw');assert.notEqual(row.status,'withdrawn');assert.equal(row.acceptanceList,'');assert.equal(row.acceptanceCode,'');assert.equal(row.calendarListLabel,'');assert.equal(row.designation,'WC');}
+  assert.equal(personalLiveEntry(acceptance).status,'withdrawn');
+ }
+});
+test('draw evidence never revives a cancelled tournament',()=>{
+ for(const cancellation of [{cancelled:true},{canceled:true},{tournamentStatus:'cancelled'},{status:'cancelled'}]){
+  const row=personalLiveEntry({circuit:'tennis-europe',calendarState:'draw_confirmed',entryStatus:'official_draw',...cancellation});assert.equal(row.status,'withdrawn');
+ }
 });

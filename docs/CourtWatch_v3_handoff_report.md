@@ -9623,3 +9623,41 @@ ITF discovery 2026-10-26T22:59:30.834Z: 0 newly discovered future tournaments; M
 - Eccezioni esatte per torneo, draw, categoria/fase, turno, tutti i giocatori e composizione delle coppie. Non si crea una regola generale a partire da queste due date; identità, vincitore e W/O continuano a essere verificati dalla fonte. La data è marcata user_confirmed_walkover_date, distinta dalla data ufficiale. Un'eventuale data ufficiale pubblicata successivamente mantiene precedenza.
 - Le eccezioni attraversano la normale acquisizione/merge/import D1, con la convalida dei recuperi estesa e deduplica esistente. Incluse nello stesso installer anche le modifiche precedente/successiva già autorizzate ma non ancora confermate pubblicate.
 - Validazione: test delle due date, scope e coppie errate, confini torneo, precedenza ufficiale e replay senza duplicati; regressioni W/O incluse. Report aggiornato nello stesso commit. Rimane necessaria verifica del nuovo audit dopo il push; nessun polling o avvio manuale di workflow.
+### Chat 1 — 2026-10-27: tabellone T-1 prevale sul ritiro acceptance
+- Caso Lorenzo Calandra, Bad Waltersdorf: acceptance BS16 W-7; ingresso WC nel tabellone confermato dall'utente. Le funzioni personal-live-entry davano precedenza al ritiro durante entrambi gli ordini di fusione.
+- Correzione: presenza certificata ITF/Europe mantiene official_draw e cancella i campi acceptance obsoleti nella proiezione, senza modificare i dati sorgente. Nessuna presenza inventata dal solo nome o WC. Tornei cancellati esclusi; FITP invariato.
+- Componenti: personal-live-entry.mjs e test omonimo. Verifica: 24 test verdi su merge, storia personale, elenco personale e presentazione tornei. Nessuna scrittura D1 o polling. Verifica live dopo deploy ancora necessaria.
+
+## 27 October 2026 — Resolve the same opponent identity from Agenda and Search
+
+Kateryna Ushchapovska has UKR, birthYear 2014 and an official Europe profile in the canonical registry. Search shows these, whereas Agenda can enter through a draw-local ID. searchIdentityProfile previously selected an exact observed source but returned its partial raw payload, ignoring its existing canonical mapping. Resolve that selected source through storedIdentity before raw fallback, retaining the canonical metadata and circuit profiles. This uses a registered source key, never name-only merging or nationality hardcoding. Refuse mismatched canonical names and unmatched local IDs as before.
+
+Agenda participant navigation also now falls back by participant to source IDs when the TE profile array is empty or sparse. The profile endpoint, age calculation, circuit links and rankings then consume the same identity as Search. No added D1 writes, discovery, polling or scheduling changes. Frontend cache version updated. This replaces the earlier nationality-through-route workaround; do not apply that earlier installer.
+
+Validation: real SQLite regression using Kateryna canonical evidence and a synthetic local draw ID verifies equal canonical/native IDs, UKR, birth 2014, unranked-u12, official Europe URL, rejection of an unrelated local ID and zero writes. Two frontend regressions cover empty profile arrays, doubles positions and native-ID priority. Production route confirmation remains required after deploy.
+
+### Chat 1 — 2026-10-27: ranking Europe nella pagina tornei futuri
+- Causa: il titolo del giocatore cercava playerTeRanking solo nelle partite, assenti nei tornei futuri.
+- Modifica: per tornei Europe futuri usa il servizio ranking corrente gia esistente, con ultima pubblicazione per categoria e vincoli di eta; assenza ranking indicata soltanto con NR. Riutilizza cache e richieste in corso. Nessun polling, nessuna scrittura D1. Storico dei tornei gia iniziati invariato; nessuna modifica ai messaggi della pagina avversario.
+- Componenti: v3.js, v3.html, nuovo test future-tournament-ranking e comando check. Test mirati eseguiti; verifica deploy e pagina reale ancora necessaria. Errori di rete non vengono rappresentati come NR.
+
+## 27 October 2026 — Resolve draw-local Europe opponent IDs through registered participant evidence
+
+Production Agenda link supplied by the user: opponent-profile/49/Kateryna Ushchapovska/GS14 - Girls Singles 14 Main Draw. ID 49 is local to a draw; it is not the official TE UUID or an observed global ID. Previous exact observed-row recovery therefore did not cover this route. Canonical D1 evidence already contains UKR, birthYear 2014, official UUID 5f12de40-51b6-4778-bb3e-66f1743374d0 and registered acquired source key acquired|tennis-europe|name:5acc64a9620bad07f20eee57.
+
+For short numeric local IDs only, read indexed match_participants evidence matching that ID, exact normalized name and Europe circuit. Reuse participantSourceKey from verified history aliases and resolve the resulting registered source keys with storedIdentities. Return the established person only if every selected source maps and all map to one canonical identity with an official TE profile. Otherwise refuse resolution: no name-only merging or hardcoded nationality. Use this resolver between existing exact ID lookup and raw-source fallback. Limit evidence to 250 rows and fail closed on overflow. No scans of all players, D1 writes, discovery, polling or schedules. Update opponent cache namespace and asset version so old partial profiles do not masquerade as current responses.
+
+Validation: four SQLite/Worker regression tests reproduce the actual local ID 49 and known source hash, assert equal API profile/circuit links/tournaments from Agenda and Search, UKR and unranked-u12, zero writes, indexed local-ID query plan, separation of different players sharing 49, refusal of two canonical homonyms and unmapped evidence. Production participant raw payload and browser route still require confirmation after deploy; fixture uses the canonical evidence supplied by the user and realistic local match rows. This completes the missing local-ID path rather than merely carrying a flag in the URL. Installer v2 tolerates unrelated frontend asset-version changes and only updates the single existing v3.js script version, preserving concurrent tournament-ranking edits.
+
+### Chat 1 — 2026-10-27: test pagina torneo con calendario deterministico
+- Deploy 40420804856 e D1 40420804831 bloccati dal test isolato fitp-subscription-dates: iso non definita dopo il nuovo controllo tornei futuri.
+- Correzione: aggiunta della funzione data al contesto VM e data fissa per rendere ripetibile il test storico delle iscrizioni. Nessuna modifica applicativa.
+- Verifica: 10 test verdi su iscrizioni FITP e ranking futuri Europe. Nuovi run remoti da verificare dopo push; nessun rilancio dei vecchi run.
+
+ITF discovery 2026-10-27T05:40:05.081Z: 2 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-10-27T05:41:03.686Z: attempted 2, acquired 2, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF discovery 2026-10-27T12:46:56.610Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-10-27T22:39:57.151Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
