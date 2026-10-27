@@ -10,16 +10,28 @@ const iso=v=>{const s=String(v||'').replace(/^(\d{4})(\d{2})(\d{2})$/,'$1-$2-$3'
 const final=v=>/^(?:final|finale|f)$/i.test(text(v));
 const groupRound=v=>{const m=text(v).match(/^Round\s+(\d+)$/i);return m?Number(m[1]):null};
 const nextDay=v=>iso(v)?new Date(Date.parse(iso(v)+'T00:00:00Z')+86400000).toISOString().slice(0,10):'';
+const previousDay=v=>iso(v)?new Date(Date.parse(iso(v)+'T00:00:00Z')-86400000).toISOString().slice(0,10):'';
 function eventKey(v){const code=(String(v||'').match(/\b[BG][SD]\d{2}\b/i)||[])[0]||norm(v),phase=/bonus|consolation/i.test(v)?'bonus':/qualif/i.test(v)?'qualifying':'main';return code.toUpperCase()+'|'+phase}
 function roundKey(v){const s=norm(v);return final(v)?'F':/semi/.test(s)?'SF':/quarter/.test(s)?'QF':s}
 export function drawMatchKey(m){
  const people=m.players?.map(p=>p.name)||[m.playerName,...String(m.partner||'').split('/'),...(m.opponentOptions||String(m.opponent||'').split('/'))];
  return [String(m.competitionId||'').toUpperCase(),eventKey(m.event||m.draw||''),roundKey(m.round),[...new Set(people.filter(Boolean).map(person))].sort().join('|')].join('~');
 }
+// Dates explicitly supplied by the user; these are not official schedule dates.
+const confirmedWalkoverDates=[
+ {competitionId:'368A617A-1B0A-4133-A14C-F19A25991E97',drawId:'2',event:'BS14 - Boys Singles 14 Qualifying',round:'Qualification round of 16',names:['Patryk ZUREK','Hubert RYBICKI'],date:'2026-05-25'},
+ {competitionId:'F065F194-9CF9-46A7-92C9-E97A47ECA6EA',drawId:'6',event:'GD14 - Girls Doubles 14 Main Draw',round:'Semi final',names:['Eva IANCU','Mara Elena MARINCEAN','Mara-Andreia DIACONU','Sofia Ioana STOICA'],date:'2026-02-18'}
+].map(entry=>({...entry,players:entry.names.map((name,index)=>({id:String(index),name})),teams:entry.names.length===2?[['0'],['1']]:[['0','1'],['2','3']]}));
+function confirmedWalkoverDate(m){
+ const number=String(Number(m.drawId||drawNumber(m.sourceUrl,m.competitionId||''))),key=drawMatchKey(m),teams=teamNames(m).sort();
+ const entry=confirmedWalkoverDates.find(entry=>entry.drawId===number&&drawMatchKey(entry)===key&&JSON.stringify(teamNames(entry).sort())===JSON.stringify(teams));
+ if(!entry||iso(m.tournamentStartDate)&&entry.date<iso(m.tournamentStartDate)||iso(m.tournamentEndDate)&&entry.date>iso(m.tournamentEndDate))return'';
+ return entry.date;
+}
 export function isRecoveredDrawWalkover(m){
  if(m?.sourceKind!=='official_draw_walkover'||m.status!=='completed'||m.score!=='W/O'||!iso(m.date)||!drawNumber(m.sourceUrl,m.competitionId||'')||![2,4].includes(m.players?.length)||m.teams?.length!==2||![0,1].includes(m.winnerTeamIndex))return false;
  const people=new Set(m.players.map(p=>p.id)),teams=m.teams.flat(),winning=m.teams[m.winnerTeamIndex];
- const policy=m.dateSource==='round_robin_third_day_fallback'&&m.roundRobin===true&&groupRound(m.round)!==null&&Boolean(iso(m.tournamentStartDate))&&iso(m.date)===nextDay(nextDay(m.tournamentStartDate))&&(!iso(m.tournamentEndDate)||iso(m.date)<=iso(m.tournamentEndDate))||m.dateSource==='official_draw_date'||m.dateSource==='tournament_end_date_final_policy'&&final(m.round)&&iso(m.date)===iso(m.tournamentEndDate)||m.dateSource==='tournament_start_date_first_round_policy'&&m.drawRoundIndex===0&&!final(m.round)&&iso(m.date)===iso(m.tournamentStartDate)||m.dateSource==='previous_match_plus_one_day'&&m.drawRoundIndex>0&&!final(m.round)&&m.previousMatchIds?.length>0&&iso(m.date)===nextDay(m.previousMatchDate)&&(!iso(m.tournamentEndDate)||m.date<=m.tournamentEndDate);
+ const policy=m.dateSource==='user_confirmed_walkover_date'&&iso(m.date)===confirmedWalkoverDate(m)||m.dateSource==='next_match_minus_one_day'&&!m.roundRobin&&m.drawRoundIndex>0&&!final(m.round)&&m.nextMatchIds?.length>0&&Boolean(iso(m.nextMatchDate))&&iso(m.date)===previousDay(m.nextMatchDate)&&(!iso(m.tournamentStartDate)||iso(m.date)>=iso(m.tournamentStartDate))&&(!iso(m.tournamentEndDate)||iso(m.date)<=iso(m.tournamentEndDate))||m.dateSource==='round_robin_third_day_fallback'&&m.roundRobin===true&&groupRound(m.round)!==null&&Boolean(iso(m.tournamentStartDate))&&iso(m.date)===nextDay(nextDay(m.tournamentStartDate))&&(!iso(m.tournamentEndDate)||iso(m.date)<=iso(m.tournamentEndDate))||m.dateSource==='official_draw_date'||m.dateSource==='tournament_end_date_final_policy'&&final(m.round)&&iso(m.date)===iso(m.tournamentEndDate)||m.dateSource==='tournament_start_date_first_round_policy'&&m.drawRoundIndex===0&&!final(m.round)&&iso(m.date)===iso(m.tournamentStartDate)||m.dateSource==='previous_match_plus_one_day'&&m.drawRoundIndex>0&&!final(m.round)&&m.previousMatchIds?.length>0&&iso(m.date)===nextDay(m.previousMatchDate)&&(!iso(m.tournamentEndDate)||m.date<=m.tournamentEndDate);
  return Boolean(teams.length===people.size&&teams.every(id=>people.has(id))&&winning.length===m.winnerPlayerIds?.length&&winning.every(id=>m.winnerPlayerIds.includes(id))&&policy);
 }
 function drawNumber(url,id){try{const u=new URL(decode(url),BASE);if(u.origin!==BASE)return'';const m=u.pathname.match(/^\/tournament\/([^/]+)\/draw\/(\d+)\/?$/i);if(m&&m[1].toUpperCase()===id.toUpperCase())return String(+m[2]);if(/^\/sport\/draw(?:\.aspx)?$/i.test(u.pathname)&&String(u.searchParams.get('id')).toUpperCase()===id.toUpperCase()&&/^\d+$/.test(u.searchParams.get('draw')||''))return String(+u.searchParams.get('draw'));return''}catch{return''}}
@@ -37,6 +49,20 @@ function previousDate(m,records,known,rounds){
  }
  const closest=[];for(const team of teams){const own=candidates.filter(c=>c.team===team),index=Math.max(-1,...own.map(c=>c.index));closest.push(...own.filter(c=>c.index===index))}
  if(!closest.length)return null;const date=closest.map(c=>c.date).sort().at(-1);return{date,ids:[...new Set(closest.filter(c=>c.date===date).map(c=>c.id).filter(Boolean))]};
+}
+function followingDate(m,records,known,rounds){
+ const teams=teamNames(m),candidates=[];
+ for(const next of [...records,...known]){
+  if(String(next.competitionId||'').toUpperCase()!==String(m.competitionId).toUpperCase()||eventKey(next.event||next.draw||'')!==eventKey(m.event))continue;
+  const nextDraw=String(next.drawId||drawNumber(next.drawUrl||next.sourceUrl,next.competitionId||''));if(nextDraw!==String(m.drawId))continue;
+  const index=rounds.findIndex(round=>roundKey(round)===roundKey(next.round));
+  if(index<=m.drawRoundIndex||!iso(next.date)||!(next.id||next.matchId))continue;
+  const nextTeams=teamNames(next);for(const team of teams)if(team&&nextTeams.includes(team))candidates.push({team,index,date:iso(next.date),id:next.id||next.matchId});
+ }
+ const closest=[];for(const team of teams){const own=candidates.filter(c=>c.team===team);if(!own.length)continue;const index=Math.min(...own.map(c=>c.index));closest.push(...own.filter(c=>c.index===index))}
+ if(!closest.length)return null;
+ // If both teams have a later dated match, remain before both of them.
+ const date=closest.map(c=>c.date).sort()[0];return{date,ids:[...new Set(closest.filter(c=>c.date===date).map(c=>c.id))]};
 }
 export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,startDate,endDate,sourceUrl,knownMatches=[],allowPolicyDates=true,roundRobin=false}){
  const source=String(html||''),heading=drawEvent(shell,event),issues=[],matches=[],pending=[],records=[];
@@ -72,6 +98,8 @@ export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,
    const winnerTeamIndex=winners.length===1?winners[0]:-1,winnerPlayerIds=winnerTeamIndex>=0?rows[winnerTeamIndex].players.map(p=>p.id):[],date=officialDate(block),dateSource=date?'official_draw_date':'';
    const key=drawMatchKey(evidence),id=['te-draw',competitionId.toUpperCase(),drawId,createHash('sha256').update(key).digest('hex').slice(0,24)].join('|');
    const match={id,...evidence,date,dateSource,tournamentStartDate:iso(startDate),tournamentEndDate:iso(endDate),time:'',court:'',courtMatchNumber:null,courtMatchNumberSource:'',notBefore:false,afterRest:false,followedBy:false,scheduleQualifier:'',teams:rows.map(r=>r.players.map(p=>p.id)),winnerTeamIndex,winnerPlayerIds,winnerPlayerId:winnerPlayerIds.length===1?winnerPlayerIds[0]:'',status:'completed',score:'W/O',drawUrl:sourceUrl,sourceKind:'official_draw_walkover',...(roundRobin?{roundRobin:true}:{})};
+   const confirmed=isWalkover&&!date?confirmedWalkoverDate(match):'';
+   if(confirmed){match.date=confirmed;match.dateSource='user_confirmed_walkover_date';match.dateOverrideReason='user_instruction_2026_10_27'}
    records.push({...match,isWalkover});
   }
  }
@@ -84,6 +112,18 @@ export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,
    else if(record.drawRoundIndex===0){record.date=iso(startDate);record.dateSource=record.date?'tournament_start_date_first_round_policy':''}
    else{const previous=previousDate(record,records,knownMatches,rounds);if(previous?.ids.length){const value=nextDay(previous.date);if((!iso(endDate)||value<=iso(endDate))&&(!iso(startDate)||value>=iso(startDate))){record.date=value;record.dateSource='previous_match_plus_one_day';record.previousMatchDate=previous.date;record.previousMatchIds=previous.ids}}}
   }
+ }
+ // Retry from later rounds after the existing first/final/previous-date policies.
+ // This also resolves a chain of undated W/O backwards from a dated later round.
+ if(allowPolicyDates&&!roundRobin)for(const record of [...records].sort((a,b)=>b.drawRoundIndex-a.drawRoundIndex||a.id.localeCompare(b.id))){
+  if(!record.isWalkover||record.date||record.drawRoundIndex===0||final(record.round))continue;
+  if(previousDate(record,records,knownMatches,rounds)?.ids.length)continue;
+  const next=followingDate(record,records,knownMatches,rounds);if(!next)continue;
+  const value=previousDay(next.date);
+  if((!iso(startDate)||value>=iso(startDate))&&(!iso(endDate)||value<=iso(endDate))){record.date=value;record.dateSource='next_match_minus_one_day';record.nextMatchDate=next.date;record.nextMatchIds=next.ids}
+ }
+ for(const record of records){
+  if(!record.isWalkover)continue;
   const {isWalkover,...match}=record;
   if(match.date)matches.push(match);else pending.push({...match,reason:roundRobin?'round_robin_previous_match_date_missing_or_out_of_range':match.drawRoundIndex===0?'tournament_start_date_missing':final(match.round)?'tournament_end_date_missing':'previous_match_date_missing_or_out_of_range'});
  }

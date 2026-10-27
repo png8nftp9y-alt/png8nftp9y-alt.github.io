@@ -9606,3 +9606,20 @@ Validation: 27 targeted real Worker/SQLite, saved-page, workflow selection and n
 ITF discovery 2026-10-26T13:38:03.311Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-26T22:59:30.834Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+### 2026-10-27 — W/O KO senza precedente datata: giorno prima della successiva
+
+- Richiesta esplicita: quando non è possibile trovare la precedente partita datata, inserire il W/O il giorno prima della successiva. Verifica precedente sui 28 pending: 27 con entrambi i giocatori/coppie provenienti da BYE; 1 semifinale Romania U14 con precedenti giocate ma prive di data.
+- Aggiunta next_match_minus_one_day per i turni intermedi KO senza precedente datata: solo stesso torneo, stesso draw, stessa categoria/fase e stesso giocatore o coppia completa. Se entrambe le squadre hanno una successiva, la data deve precederle entrambe; si usa il turno successivo più vicino per ciascuna. Conservati nextMatchDate e nextMatchIds come provenienza della data dedotta, senza presentarla come ufficiale.
+- Priorità invariate: data ufficiale, primo turno KO al giorno iniziale, finale al giorno finale, precedente datata + un giorno. La nuova regola interviene solo dove mancava il riferimento precedente. Un riferimento precedente fuori periodo resta segnalato invece di nascondere l'incongruenza. Date dedotte sempre entro inizio/fine. Resta invariata la regola del terzo giorno per i gironi.
+- Passaggio in ordine inverso dei turni per risolvere W/O consecutivi da un riferimento successivo datato, incluse finali già datate dalla policy esistente. Nessuna modifica a identità, punteggi, vincitori, UI, importatore D1 o frequenze. Convalida dei recuperi estesa alla nuova provenienza della data per permettere la normale importazione.
+- Validazione: 42 test passati, comprese precedenze, confini, cambi mese, coppie complete e alias ID locali, turno/draw/fase errati, catene e deduplica. Verificati record reali EXALCO (11 marzo, prima dell'ottavo del 12 marzo) e Werfring (25 giugno, prima della semifinale del 26), su HTML sintetico dichiarato tale e dati dell'archivio merge 40420542128. Installer e whitespace verificati, controllo negativo contro il parser precedente.
+- Controllo sui dati già importati: 26 dei 28 pending hanno un riferimento successivo datato nello stesso draw. Restano senza quel riferimento VARITEX Lodz (la partita successiva trovata è nel main draw, non nello stesso tabellone di qualificazione) e Romania U14 (nessuna successiva datata utilizzabile). Il dato 26 misura i riferimenti disponibili nell'archivio, non un import già completato: nuovo audit necessario dopo pubblicazione/acquisizione/merge/D1. Nessun polling o rilancio manuale effettuato.
+
+
+### 2026-10-27 — Date esplicite per gli ultimi due W/O
+
+- Su istruzione dell'utente: Zurek–Rybicki, VARITEX Lodz Cup, draw 2 qualificazioni turno delle 16, il 25 maggio 2026; Iancu/Marincean–Diaconu/Stoica, Romania U14, draw 6 semifinale doppio femminile, il 18 febbraio 2026.
+- Eccezioni esatte per torneo, draw, categoria/fase, turno, tutti i giocatori e composizione delle coppie. Non si crea una regola generale a partire da queste due date; identità, vincitore e W/O continuano a essere verificati dalla fonte. La data è marcata user_confirmed_walkover_date, distinta dalla data ufficiale. Un'eventuale data ufficiale pubblicata successivamente mantiene precedenza.
+- Le eccezioni attraversano la normale acquisizione/merge/import D1, con la convalida dei recuperi estesa e deduplica esistente. Incluse nello stesso installer anche le modifiche precedente/successiva già autorizzate ma non ancora confermate pubblicate.
+- Validazione: test delle due date, scope e coppie errate, confini torneo, precedenza ufficiale e replay senza duplicati; regressioni W/O incluse. Report aggiornato nello stesso commit. Rimane necessaria verifica del nuovo audit dopo il push; nessun polling o avvio manuale di workflow.
