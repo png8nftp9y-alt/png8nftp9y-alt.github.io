@@ -9637,3 +9637,5 @@ Validation: four SQLite/Worker regression tests reproduce the actual local ID 49
 - Deploy 40420804856 e D1 40420804831 bloccati dal test isolato fitp-subscription-dates: iso non definita dopo il nuovo controllo tornei futuri.
 - Correzione: aggiunta della funzione data al contesto VM e data fissa per rendere ripetibile il test storico delle iscrizioni. Nessuna modifica applicativa.
 - Verifica: 10 test verdi su iscrizioni FITP e ranking futuri Europe. Nuovi run remoti da verificare dopo push; nessun rilancio dei vecchi run.
+
+ITF discovery 2026-10-27T05:40:05.081Z: 2 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
