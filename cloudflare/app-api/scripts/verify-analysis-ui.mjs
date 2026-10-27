@@ -42,7 +42,7 @@ for(const scenario of [
  {source:'tennis-europe',futureEurope:false,rank:'23'},
  {source:'fitp',futureEurope:false,rank:'2.7'}
 ]) {
- const ctx={...scenario,group:{playerId:'player-test',playerName:'Test Person'},rows:[{designation:'WC'}],playerRecord:{},playerNationality:'UKR',playerRanking:scenario.rank,
+ const ctx={...scenario,europeCategories:['14'],group:{playerId:'player-test',playerName:'Test Person'},rows:[{designation:'WC'}],playerRecord:{},playerNationality:'UKR',playerRanking:scenario.rank,
   esc:value=>String(value??''),readablePerson:value=>value,readableText:value=>value,
   participantDesignation:row=>row?.designation||'',participantDesignationHtml:value=>value?'[DESIGNATION:'+value+']':'',nationalityHtml:value=>'[NATIONALITY:'+value+']',teRankHtml:value=>'[RANK:'+value+']',
   playerRankingCache:new Map([['player-test',{label:scenario.rank}]]),futureTournamentEuropeRanking:(_player,data)=>data.label};

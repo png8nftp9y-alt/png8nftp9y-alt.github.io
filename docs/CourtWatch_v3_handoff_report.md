@@ -9667,3 +9667,8 @@ ITF discovery 2026-10-27T22:39:57.151Z: 0 newly discovered future tournaments; M
 - verify-analysis-ui cercava una sequenza letterale interrotta dal nuovo campo ranking futuro. Ora verifica ordine designazione, nazionalita, ranking attuale e storico nella sola intestazione torneo. La verifica non viene rimossa.
 - Il test cache costruisce la revisione precedente sostituendo ultimo segmento, senza dipendere da v8 o v9.
 - Nessuna modifica funzionale. Verificati analysisUi green e 13 test mirati; npm run check completo obbligatorio prima della pubblicazione. Nessun polling o rilancio dei run precedenti.
+
+### Chat 1 — 2026-10-28: ranking della categoria iscritta nei tornei Europe futuri
+- Il ranking corrente in pagina torneo viene filtrato per categoria di iscrizione, con ripiego su categoria partita e torneo se assente; non deduce la categoria dalla nascita. U16 non mostra U14 e viceversa; ranking assente nella categoria richiesta: NR.
+- Cache immediata e aggiornamento asincrono applicano lo stesso filtro. Ultima pubblicazione esatta e controlli eta rimangono attivi. Dall inizio torneo rimane il ranking storico della prima partita disponibile; nessun congelamento nuovo alla data di inizio.
+- Aggiornati regressioni categoria, contesto della verifica UI e versione asset. Verificati 13 test mirati e verifica UI green; nessuna modifica D1, richiesta aggiuntiva, timer o polling. Pubblicazione e verifica live successive.
