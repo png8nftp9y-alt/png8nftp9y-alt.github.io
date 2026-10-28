@@ -9661,3 +9661,7 @@ ITF Meta ordinary 2026-10-27T05:41:03.686Z: attempted 2, acquired 2, ordinary 0,
 ITF discovery 2026-10-27T12:46:56.610Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-27T22:39:57.151Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-10-28 — Audit separato della copertura storica Tennis Europe
+
+Motivo: i run verdi di importazione e il recupero dei W/O noti non certificano tutti i tabelloni, OOP e incontri; SOUL CUP espone una lista legacy non acquisita. Aggiunti un workflow in sola lettura e moduli di confronto per ogni torneo concluso dal 18 dicembre 2025. Il controllo prova la lista moderna e, se priva di tabelloni, quella legacy, visita i tabelloni, rilegge le giornate OOP e confronta partecipanti, vincitore e punteggi con l’artefatto storico unificato. Output: completi, incompleti, mancanti, non verificati e competizioni a squadre rimandate. Nessuna scrittura D1/R2, deploy o recupero automatico. Validazione: quattro test locali e controllo sintattico. Limiti: confronto con archivio R2, non consultazione diretta D1; layout non supportati (inclusi gironi) restano non verificati; nessuna certificazione per documenti grezzi D1, tornei futuri o in corso. Classificazione squadre limitata a Winter/Summer Cups e Lampo Trophy noti; ulteriori casi da rivedere. Il conteggio finale dipende dalla lettura effettiva delle fonti nel run. Recupero successivo e verifica delle segnalazioni ancora da completare.

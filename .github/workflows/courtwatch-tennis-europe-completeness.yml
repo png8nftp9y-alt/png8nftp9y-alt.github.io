@@ -1,0 +1,90 @@
+name: Court Watch Tennis Europe completeness audit
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - src/v3/audit-tennis-europe-coverage.mjs
+      - src/v3/tennis-europe-coverage.mjs
+      - src/v3/tennis-europe-coverage-network.mjs
+      - src/v3/tennis-europe-coverage.test.mjs
+      - src/v3/merge-tennis-europe-coverage.mjs
+      - .github/workflows/courtwatch-tennis-europe-completeness.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: courtwatch-te-completeness-audit
+  cancel-in-progress: false
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.baseline.outputs.run }}
+      sha: ${{ steps.baseline.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/courtwatch-tennis-europe-oop-merge.yml/runs?status=success&per_page=1" > runs.json
+          RUN=$(node -e 'const j=require("./runs.json");const r=j.workflow_runs.find(x=>x.name==="Court Watch Tennis Europe OOP historical merge"&&x.conclusion==="success");if(!r)process.exit(1);console.log(r.id)')
+          echo "run=$RUN" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  audit:
+    needs: baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.baseline.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ needs.baseline.outputs.run }}
+          name: tennis-europe-oop-historical-merged
+          path: baseline
+      - run: node --test src/v3/tennis-europe-coverage.test.mjs
+      - name: Compare official draws and OOP with the historical archive
+        env:
+          TE_AUDIT_SHARD: ${{ matrix.shard }}
+        run: node src/v3/audit-tennis-europe-coverage.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: europe-coverage-${{ matrix.shard }}
+          path: coverage-results/*.json
+          if-no-files-found: error
+          retention-days: 14
+  report:
+    needs: [baseline,audit]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.baseline.outputs.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: europe-coverage-*
+          path: coverage-shards
+      - run: node src/v3/merge-tennis-europe-coverage.mjs
+      - run: cat coverage-report/coverage.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tennis-europe-completeness-report
+          path: coverage-report/
+          retention-days: 30
