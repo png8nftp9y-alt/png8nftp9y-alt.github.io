@@ -9690,3 +9690,5 @@ Normalize named qualification stages (quarter=8, semi=4, final=2) into the same 
 Validation: 13 Node tests pass, covering the exact D1 row and rendered opponent row, qualification ordinal sequence, mixed size/named stages, main-draw/category isolation, existing explicit ordinals, cache behavior and score presentation. Complete analysis UI verifier passes after adding the current europeCategories input to its isolated rendering fixture (concurrent category-ranking change). Asset version bumped; installer preserves unrelated source changes and appends this report in the same commit. Confirm UI after deployment.
 
 ITF discovery 2026-10-28T06:24:22.615Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-10-28T13:37:43.241Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
