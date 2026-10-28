@@ -3784,10 +3784,12 @@ function fitpTournamentSubscriptionHtml(entry = {}) {
   return `<span class="fitpSubscriptionDate">${dates.map(date => `<time datetime="${esc(date)}">${esc(displayDate(date))}</time>`).join(" · ")}</span>`;
 }
 
-function futureTournamentEuropeRanking(player, data) {
+function futureTournamentEuropeRanking(player, data, categories = []) {
   if (!data) return '';
   const current = {...player, tennisEuropeLatestRankingDates:data.latestRankingDates || {}};
-  const labels = currentPlayerRankingLabels(current, data.rankings || []).filter(label => label.includes(' TE'));
+  const allowed = new Set(categories);
+  const rows = (data.rankings || []).filter(row => allowed.has(String(row.category || '').toUpperCase().match(/(?:U|B|G)(14|16)$/)?.[1]));
+  const labels = currentPlayerRankingLabels(current, rows).filter(label => label.includes(' TE'));
   return labels.length ? labels.join(' · ') : 'NR';
 }
 async function loadFutureTournamentEuropeRankings(key, players) {
@@ -3798,8 +3800,18 @@ async function loadFutureTournamentEuropeRankings(key, players) {
     if (!data) continue; // A failed request is not evidence of no ranking.
     for (const target of $('profileContent').querySelectorAll('[data-future-europe-ranking]'))
       if (target.dataset.futureEuropeRanking === player.id)
-        target.textContent = ' · ' + futureTournamentEuropeRanking(player, data);
+        target.textContent = ' · ' + futureTournamentEuropeRanking(player, data, String(target.dataset.futureEuropeCategories || '').split(','));
   }
+}
+function futureTournamentEuropeCategories(entry, rows = [], tournament = {}) {
+  const read = item => [...new Set(['category','ageCategory','ageGroup','categoryCode','event','draw','eventType'].flatMap(field => {
+    const text = String(item?.[field] || '').toUpperCase();
+    return [...text.matchAll(/(?:\b(?:U|UNDER)\s*[- ]?|\b[BG](?:S|D)?\s*[- ]?)(10|12|14|16)\b|\b(10|12|14|16)\s*(?:&\s*UNDER|AND\s*UNDER|ANS)\b|^(10|12|14|16)$/g)].map(match => match[1] || match[2] || match[3]);
+  }))];
+  const registered = read(entry);
+  if (registered.length) return registered;
+  const played = [...new Set(rows.flatMap(read))];
+  return played.length ? played : read(tournament);
 }
 function renderTournament(key) {
   $("removeProfilePlayer").hidden = true;
@@ -3887,8 +3899,9 @@ function renderTournament(key) {
             : source === "fitp"
               ? playerRecord?.ranking
               : "";
+      const europeCategories = futureTournamentEuropeCategories(group.entry, rows, t);
       const matchRows = matchHistorySectionsHtml(rows);
-      const playerHeading = `<button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${futureEurope ? `<span class="teRanking" data-future-europe-ranking="${esc(group.playerId)}">${playerRankingCache.has(String(group.playerId)) ? esc(" · " + futureTournamentEuropeRanking(playerRecord, playerRankingCache.get(String(group.playerId)))) : ""}</span>` : ""}${!futureEurope && playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button>`;
+      const playerHeading = `<button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${futureEurope ? `<span class="teRanking" data-future-europe-ranking="${esc(group.playerId)}" data-future-europe-categories="${esc(europeCategories.join(","))}">${playerRankingCache.has(String(group.playerId)) ? esc(" · " + futureTournamentEuropeRanking(playerRecord, playerRankingCache.get(String(group.playerId)), europeCategories)) : ""}</span>` : ""}${!futureEurope && playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button>`;
       return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}">${playerHeading}<span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}${source === "fitp" ? ` · ${fitpTournamentSubscriptionHtml({...group.entry, circuit:source})}` : ""}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
     })
     .join("");

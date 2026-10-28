@@ -19,10 +19,18 @@ export async function savedAdminPage(request,env,view,render){
  const force=new URL(request.url).searchParams.get(cfg.flag)==='1';
  if(!force){const saved=await read(env,view);if(saved)return saved.html;if(env.ARCHIVE)return emptySavedPage(view,cfg);}
  const flightKey=new URL(request.url).origin+'|'+view;
- if(!force&&flights.has(flightKey))return flights.get(flightKey);
+ if(flights.has(flightKey))return flights.get(flightKey);
  const version=(versions.get(flightKey)||0)+1;versions.set(flightKey,version);
  const build=(async()=>{
-  const raw=await render(),checkedAt=new Date().toISOString();
+  let raw;
+  try{raw=await render();}
+  catch(error){
+   console.error('admin_snapshot_refresh_failed',view,error);
+   const saved=await read(env,view);
+   const warning='<div class="card" role="alert"><p><b>Aggiornamento non riuscito.</b> '+(saved?'È mostrata l’ultima lettura salvata; dati e stati non sono stati aggiornati.':'Nessuna lettura salvata disponibile; dati e stati non sono verificati.')+' Usa il pulsante di aggiornamento per riprovare.</p></div>';
+   return (saved?.html||emptySavedPage(view,cfg)).replace('</nav>','</nav>'+warning);
+  }
+  const checkedAt=new Date().toISOString();
   // Never replace a valid saved ID page with unavailable counts.
   const unavailable=view==='id'&&raw.includes('Conteggi ID non disponibili');
   const control=`<div class="card"><form method="get" action="/admin/${view}"><button type="submit" name="${cfg.flag}" value="1">${cfg.label}</button></form><p class="muted">Lettura del ${new Date(checkedAt).toLocaleString('it-IT',{timeZone:'Europe/Rome'})}. Rimane questa versione fino al prossimo aggiornamento manuale. Stati e freschezza si riferiscono a questa lettura.</p></div>`;

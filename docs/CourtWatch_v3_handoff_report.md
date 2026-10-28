@@ -9665,3 +9665,18 @@ ITF discovery 2026-10-27T22:39:57.151Z: 0 newly discovered future tournaments; M
 ## 2026-10-28 — Audit separato della copertura storica Tennis Europe
 
 Motivo: i run verdi di importazione e il recupero dei W/O noti non certificano tutti i tabelloni, OOP e incontri; SOUL CUP espone una lista legacy non acquisita. Aggiunti un workflow in sola lettura e moduli di confronto per ogni torneo concluso dal 18 dicembre 2025. Il controllo prova la lista moderna e, se priva di tabelloni, quella legacy, visita i tabelloni, rilegge le giornate OOP e confronta partecipanti, vincitore e punteggi con l’artefatto storico unificato. Output: completi, incompleti, mancanti, non verificati e competizioni a squadre rimandate. Nessuna scrittura D1/R2, deploy o recupero automatico. Validazione: quattro test locali e controllo sintattico. Limiti: confronto con archivio R2, non consultazione diretta D1; layout non supportati (inclusi gironi) restano non verificati; nessuna certificazione per documenti grezzi D1, tornei futuri o in corso. Classificazione squadre limitata a Winter/Summer Cups e Lampo Trophy noti; ulteriori casi da rivedere. Il conteggio finale dipende dalla lettura effettiva delle fonti nel run. Recupero successivo e verifica delle segnalazioni ancora da completare.
+
+### Chat 1 — 2026-10-27: controlli ranking tornei e revisione cache
+- verify-analysis-ui cercava una sequenza letterale interrotta dal nuovo campo ranking futuro. Ora verifica ordine designazione, nazionalita, ranking attuale e storico nella sola intestazione torneo. La verifica non viene rimossa.
+- Il test cache costruisce la revisione precedente sostituendo ultimo segmento, senza dipendere da v8 o v9.
+- Nessuna modifica funzionale. Verificati analysisUi green e 13 test mirati; npm run check completo obbligatorio prima della pubblicazione. Nessun polling o rilancio dei run precedenti.
+
+### Chat 1 — 2026-10-28: ranking della categoria iscritta nei tornei Europe futuri
+- Il ranking corrente in pagina torneo viene filtrato per categoria di iscrizione, con ripiego su categoria partita e torneo se assente; non deduce la categoria dalla nascita. U16 non mostra U14 e viceversa; ranking assente nella categoria richiesta: NR.
+- Cache immediata e aggiornamento asincrono applicano lo stesso filtro. Ultima pubblicazione esatta e controlli eta rimangono attivi. Dall inizio torneo rimane il ranking storico della prima partita disponibile; nessun congelamento nuovo alla data di inizio.
+- Aggiornati regressioni categoria, contesto della verifica UI e versione asset. Verificati 13 test mirati e verifica UI green; nessuna modifica D1, richiesta aggiuntiva, timer o polling. Pubblicazione e verifica live successive.
+
+### Chat 1 — 2026-10-28: errori del refresh diagnostica
+- Il rifiuto del ricalcolo manuale propagava fino alla risposta internal_error. Ora il percorso comune delle pagine salvate mantiene la lettura precedente con avviso esplicito di mancato aggiornamento; senza snapshot mostra indisponibilita e controllo manuale, senza dati o stati verdi inventati. L errore originale rimane nei log Worker.
+- Richieste manuali contemporanee condividono il ricalcolo; nessun retry, timer, polling o scrittura D1. Gli errori non sostituiscono lo snapshot R2.
+- Cinque regressioni locali verdi: errore con e senza snapshot per diagnostica/ID, condivisione e recupero successivo. L installer esegue anche i test delle pagine admin e conteggi SQLite correnti prima di pubblicare. La specifica eccezione di produzione non e stata osservata direttamente; questa patch protegge il percorso di errore, non certifica che tutte le letture D1 riescano.

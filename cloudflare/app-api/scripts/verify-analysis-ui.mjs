@@ -31,7 +31,25 @@ for (const marker of [
 assert.ok(hasSource('playerRankingSummary(p)'), 'player profile must render both FITP and Tennis Europe rankings');
 assert.doesNotMatch(source, /profileTitle\.append\(profileRankings\)/, 'player rankings must remain in the muted detail row');
 assert.ok(hasSource("source==='tennis-europe'?tournamentTeRanking:source==='fitp'?playerRecord?.ranking:''"), 'tournament page must use the ranking appropriate to that tournament');
-assert.ok(hasSource('${participantDesignationHtml(participantDesignation(rows.find(row=>participantDesignation(row,"player")),"player"))}${nationalityHtml(playerNationality)}${playerRanking?'), 'tournament page must place designation before nationality and ranking after nationality');
+// Check rendered output rather than the old template spelling: future Europe
+// rankings now use an asynchronously filled span between nationality and rank.
+const headingLines=source.split('\n').filter(line=>line.includes('const playerHeading = '));
+assert.equal(headingLines.length,1,'tournament participant heading must be unique');
+const headingExpression=headingLines[0].trim().replace(/^const playerHeading = /,'').replace(/;$/,'');
+for(const scenario of [
+ {source:'tennis-europe',futureEurope:true,rank:'n°23 TE'},
+ {source:'tennis-europe',futureEurope:true,rank:'NR'},
+ {source:'tennis-europe',futureEurope:false,rank:'23'},
+ {source:'fitp',futureEurope:false,rank:'2.7'}
+]) {
+ const ctx={...scenario,europeCategories:['14'],group:{playerId:'player-test',playerName:'Test Person'},rows:[{designation:'WC'}],playerRecord:{},playerNationality:'UKR',playerRanking:scenario.rank,
+  esc:value=>String(value??''),readablePerson:value=>value,readableText:value=>value,
+  participantDesignation:row=>row?.designation||'',participantDesignationHtml:value=>value?'[DESIGNATION:'+value+']':'',nationalityHtml:value=>'[NATIONALITY:'+value+']',teRankHtml:value=>'[RANK:'+value+']',
+  playerRankingCache:new Map([['player-test',{label:scenario.rank}]]),futureTournamentEuropeRanking:(_player,data)=>data.label};
+ const rendered=vm.runInNewContext(headingExpression,ctx);
+ const designation=rendered.indexOf('[DESIGNATION:WC]'),nationality=rendered.indexOf('[NATIONALITY:UKR]'),ranking=rendered.indexOf(scenario.rank,nationality);
+ assert.ok(designation>=0&&nationality>designation&&ranking>nationality,'tournament heading order: '+JSON.stringify(scenario));
+}
 assert.ok(hasSource('${esc(person.name)}${participantDesignationHtml(designation||person.designation)}${nationalityHtml(nationality)}${teRankHtml(ranking)}'), 'participant labels must place designation before nationality and ranking after nationality');
 assert.ok(hasSource('function tournamentSurfaceLabel(') && hasSource('[place,courtConditions].filter(Boolean).join'), 'agenda and player tournament headers must expose court conditions');
 assert.ok(hasSource('m.opponentDesignations||m.opponentEntryTypes||m.opponentSeeds') && hasSource('participantDesignation(m,"player")'), 'all match views must normalize seed, WC and Q aliases');
