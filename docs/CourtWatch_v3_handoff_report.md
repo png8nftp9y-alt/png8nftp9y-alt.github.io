@@ -9690,3 +9690,24 @@ Aggiunti workflow e moduli separati per recuperare solo i dieci eventi della bas
 La merge esistente accetta il nuovo workflow e, solo per questo recupero, applica i dieci record sopra la generazione corrente R2. Ogni incontro corrente deve rimanere identico; se un torneo bersaglio nel frattempo contiene nuovi incontri non coperti, la pubblicazione si ferma. Non vengono ricostruiti o sovrascritti alla cieca i 476 tornei acquisiti. Dopo merge e pubblicazione si usa la catena D1 esistente.
 
 Validazione: 54 test superati (8 nuovi e 46 W/O esistenti), controlli sintattici JS/YAML, selezione su baseline reale verificata in lavorazione (10 selezionati, 546 conservati, 58.230 incontri preservati) e installazione su checkout di prova. Limiti: acquisizione remota e import D1 da eseguire dopo pubblicazione; esito delle segnalazioni da misurare dopo i run. Questo recupero dedicato non modifica i motori ordinari ne certifica la completezza mondiale dei tornei. Artefatti baseline necessari e con scadenza; nessun polling.
+## 28 October 2026 — Preserve requested ordinal qualification round labels
+
+User D1 query confirms Kateryna Ushchapovska versus Vyara Popanastasova on 2026-10-24 is already saved as round "Qualification quarter final", event "GS14 - Girls Singles 14 Qualifying", draw 7, Haskovo 0EDF3889-7C03-4427-B261-E5C54EC3B579. The formatter matched "quarter" and returned "Quarter final", dropping qualification evidence. The historical handoff explicitly requires "Qualification round 1", "Qualification round 2", etc.; do not introduce a different quarter/semi/final qualification vocabulary.
+
+Normalize named qualification stages (quarter=8, semi=4, final=2) into the same descending-size ordinal sequence already used by qualification round-of-size labels. Include current stage in the context and exclude different event categories. Preserve explicit Q1/Q2 and Qualification round n labels. Ordinary main-draw matches remain ordinary even when the entrant has acceptanceCode Q. The shared formatter serves player/tournament/opponent rows. No D1 mutations, acquisitions, discoveries, schedules or polling. This repairs labeling of saved matches; it does not certify completeness of the acquired draw. Numbering uses available per-tournament/event round context, consistent with the pre-existing size-based formatter.
+
+Validation: 13 Node tests pass, covering the exact D1 row and rendered opponent row, qualification ordinal sequence, mixed size/named stages, main-draw/category isolation, existing explicit ordinals, cache behavior and score presentation. Complete analysis UI verifier passes after adding the current europeCategories input to its isolated rendering fixture (concurrent category-ranking change). Asset version bumped; installer preserves unrelated source changes and appends this report in the same commit. Confirm UI after deployment.
+
+ITF discovery 2026-10-28T06:24:22.615Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-10-28T13:37:43.241Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+### Chat 1 — 2026-10-28: Playoff nel Junior Masters Europe
+- Su richiesta per le partite di Mitchell/Conticello, visualizza Round 1 come Playoff solo nei tornei Tennis Europe il cui nome identifica Junior Masters. Turni marcati come girone restano Round robin/RR; semifinali e finali e altri tornei restano invariati. Nessuna riscrittura dati D1.
+- Stessa etichetta nelle righe partite condivise da profilo, torneo e avversario e nel codice turno agenda. Aggiornata versione browser. Tre regressioni locali verdi; installer esegue anche controlli UI e test ranking prima del push. Dati live dei due giocatori non letti direttamente, verifica visiva dopo deploy. Nessun polling o rilancio automatico.
+
+## 28 October 2026 — Chronological matches in opponent profiles
+
+Opponent history preserved insertion order after cached and fresh tournament matches were merged. A newly acquired older match could appear below newer matches. Sort the opponent renderer after deduplication by normalized date ascending, then time, with missing dates/times last. Keep singles and doubles-partner sections and stable order for ties. Only opponent-profile presentation changes; no player/agenda ordering, database, acquisition, polling or schedule changes. Bump the JavaScript asset version.
+
+Validation: regression tests cover Kateryna dates 24/26/27 October in mixed date formats, unchanged input, same-day times, missing dates and doubles grouping. Existing qualification, cache and score tests and analysis UI verification run with the installer. Production rendering still requires confirmation after deployment.

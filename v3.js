@@ -1958,6 +1958,8 @@ function agendaRoundCode(m) {
     upper = raw.toUpperCase();
   if (m.roundRobin || m.isRoundRobin || /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(`${raw} ${source}`))
     return "RR";
+  if (m.circuit === 'tennis-europe' && /junior[\s-]+masters/i.test(String(m.tournamentName || m.tournament?.name || '')) && /^round\s*1$/i.test(readableText(m.round || m.roundName || '')))
+    return 'Playoff';
   let code = "";
   const explicit = raw.match(/\bS?Q\s*(\d+)\b/i),
     qualSize = (raw.match(
@@ -3133,11 +3135,25 @@ function fullMatchRoundLabel(match, contextMatches = []) {
     label = (value) => bonus ? `Bonus ${value}` : value;
   if (match?.roundRobin || match?.isRoundRobin || /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(source))
     return label("Round robin");
+  if (match?.circuit === 'tennis-europe' && /junior[\s-]+masters/i.test(String(match?.tournamentName || match?.tournament?.name || '')) && /^round\s*1$/i.test(raw))
+    return 'Playoff';
   const explicitQualification = raw.match(/\bS?Q\s*(\d+)\b/i) || raw.match(/(?:qualification|qualifying)\s*round\s*(\d+)/i);
   if (explicitQualification) return label(`Qualification round ${explicitQualification[1]}`);
-  const qualificationSize = Number((raw.match(/QUALIF(?:YING|ICATION)?\s+ROUND\s+OF\s+(128|64|32|16|8)/i) || [])[1]);
+  const qualificationSizeOf = (item) => {
+    const round = readableText(item?.round || item?.roundName || item?.stage || item?.phase || item?.group || "");
+    const evidence = `${round} ${item?.event || ""} ${item?.draw || ""}`;
+    if (!/\bqualif(?:ication|ying|icazioni)\b/i.test(evidence)) return 0;
+    const size = Number((round.match(/(?:round\s+of|\br)\s*(128|64|32|16|8)\b/i) || [])[1]);
+    return size || (/quarter|\bqf\b/i.test(round) ? 8 : /semi|\bsf\b/i.test(round) ? 4 : /\bfinal\b|^f$/i.test(round) ? 2 : 0);
+  };
+  const qualificationSize = qualificationSizeOf(match);
   if (qualificationSize) {
-    const sizes = [...new Set(contextMatches.map((item) => Number((readableText(item?.round || item?.roundName || "").match(/QUALIF(?:YING|ICATION)?\s+ROUND\s+OF\s+(128|64|32|16|8)/i) || [])[1])).filter(Boolean))].sort((a, b) => b - a);
+    const code = (String(match?.event || match?.draw || "").match(/\b[BG][SD]\d{2}\b/i) || [])[0];
+    const peers = contextMatches.filter(item => {
+      const other = (String(item?.event || item?.draw || "").match(/\b[BG][SD]\d{2}\b/i) || [])[0];
+      return !code || !other || code.toUpperCase() === other.toUpperCase();
+    });
+    const sizes = [...new Set([qualificationSize, ...peers.map(qualificationSizeOf)].filter(Boolean))].sort((a, b) => b - a);
     return label(`Qualification round ${Math.max(0, sizes.indexOf(qualificationSize)) + 1}`);
   }
   if (/quarter|\bqf\b/i.test(raw)) return label("Quarter final");
@@ -3227,6 +3243,13 @@ function opponentHistoryMatchSectionsHtml(matches) {
     partner:(match.partners || []).map(person=>person.name).filter(Boolean).join(' / '),
   }));
   matches = mergeAgenda([],scoped).map(match=>matches[match.historyIndex]);
+  // Sort after merging: cached rows can precede newly acquired older matches.
+  const dateKey = match => {
+    const value = String(match.date || '').replaceAll('-', '').slice(0, 8);
+    return /^\d{8}$/.test(value) ? value : '99999999';
+  };
+  const timeKey = match => /^\d{2}:\d{2}$/.test(String(match.time || '')) ? match.time : '99:99';
+  matches.sort((a, b) => dateKey(a).localeCompare(dateKey(b)) || timeKey(a).localeCompare(timeKey(b)));
   return groupedMatchSections(
     matches,
     (match) => opponentHistoryMatchRowHtml(match, matches),
