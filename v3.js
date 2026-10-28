@@ -3243,6 +3243,13 @@ function opponentHistoryMatchSectionsHtml(matches) {
     partner:(match.partners || []).map(person=>person.name).filter(Boolean).join(' / '),
   }));
   matches = mergeAgenda([],scoped).map(match=>matches[match.historyIndex]);
+  // Sort after merging: cached rows can precede newly acquired older matches.
+  const dateKey = match => {
+    const value = String(match.date || '').replaceAll('-', '').slice(0, 8);
+    return /^\d{8}$/.test(value) ? value : '99999999';
+  };
+  const timeKey = match => /^\d{2}:\d{2}$/.test(String(match.time || '')) ? match.time : '99:99';
+  matches.sort((a, b) => dateKey(a).localeCompare(dateKey(b)) || timeKey(a).localeCompare(timeKey(b)));
   return groupedMatchSections(
     matches,
     (match) => opponentHistoryMatchRowHtml(match, matches),

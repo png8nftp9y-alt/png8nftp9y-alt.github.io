@@ -9696,3 +9696,9 @@ ITF discovery 2026-10-28T13:37:43.241Z: 0 newly discovered future tournaments; M
 ### Chat 1 — 2026-10-28: Playoff nel Junior Masters Europe
 - Su richiesta per le partite di Mitchell/Conticello, visualizza Round 1 come Playoff solo nei tornei Tennis Europe il cui nome identifica Junior Masters. Turni marcati come girone restano Round robin/RR; semifinali e finali e altri tornei restano invariati. Nessuna riscrittura dati D1.
 - Stessa etichetta nelle righe partite condivise da profilo, torneo e avversario e nel codice turno agenda. Aggiornata versione browser. Tre regressioni locali verdi; installer esegue anche controlli UI e test ranking prima del push. Dati live dei due giocatori non letti direttamente, verifica visiva dopo deploy. Nessun polling o rilancio automatico.
+
+## 28 October 2026 — Chronological matches in opponent profiles
+
+Opponent history preserved insertion order after cached and fresh tournament matches were merged. A newly acquired older match could appear below newer matches. Sort the opponent renderer after deduplication by normalized date ascending, then time, with missing dates/times last. Keep singles and doubles-partner sections and stable order for ties. Only opponent-profile presentation changes; no player/agenda ordering, database, acquisition, polling or schedule changes. Bump the JavaScript asset version.
+
+Validation: regression tests cover Kateryna dates 24/26/27 October in mixed date formats, unchanged input, same-day times, missing dates and doubles grouping. Existing qualification, cache and score tests and analysis UI verification run with the installer. Production rendering still requires confirmation after deployment.
