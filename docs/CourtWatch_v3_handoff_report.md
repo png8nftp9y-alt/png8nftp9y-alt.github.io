@@ -9672,3 +9672,8 @@ ITF discovery 2026-10-27T22:39:57.151Z: 0 newly discovered future tournaments; M
 - Il ranking corrente in pagina torneo viene filtrato per categoria di iscrizione, con ripiego su categoria partita e torneo se assente; non deduce la categoria dalla nascita. U16 non mostra U14 e viceversa; ranking assente nella categoria richiesta: NR.
 - Cache immediata e aggiornamento asincrono applicano lo stesso filtro. Ultima pubblicazione esatta e controlli eta rimangono attivi. Dall inizio torneo rimane il ranking storico della prima partita disponibile; nessun congelamento nuovo alla data di inizio.
 - Aggiornati regressioni categoria, contesto della verifica UI e versione asset. Verificati 13 test mirati e verifica UI green; nessuna modifica D1, richiesta aggiuntiva, timer o polling. Pubblicazione e verifica live successive.
+
+### Chat 1 — 2026-10-28: errori del refresh diagnostica
+- Il rifiuto del ricalcolo manuale propagava fino alla risposta internal_error. Ora il percorso comune delle pagine salvate mantiene la lettura precedente con avviso esplicito di mancato aggiornamento; senza snapshot mostra indisponibilita e controllo manuale, senza dati o stati verdi inventati. L errore originale rimane nei log Worker.
+- Richieste manuali contemporanee condividono il ricalcolo; nessun retry, timer, polling o scrittura D1. Gli errori non sostituiscono lo snapshot R2.
+- Cinque regressioni locali verdi: errore con e senza snapshot per diagnostica/ID, condivisione e recupero successivo. L installer esegue anche i test delle pagine admin e conteggi SQLite correnti prima di pubblicare. La specifica eccezione di produzione non e stata osservata direttamente; questa patch protegge il percorso di errore, non certifica che tutte le letture D1 riescano.

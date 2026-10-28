@@ -48,3 +48,5 @@ test('missing saved page offers explicit calculation instead of a heavy automati
 });
 
 import './admin-current-panels.test.mjs';
+
+import './admin-refresh-failure.test.mjs';
