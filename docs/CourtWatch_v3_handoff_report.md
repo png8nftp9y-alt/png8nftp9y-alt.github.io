@@ -9743,3 +9743,5 @@ Validation: tests preserve an unnamed high-cost group, redact literals, retain t
 - Test SQLite del nuovo applicatore verdi: partizioni e AUS, applicazione e chiusura casi, fonti invariate, replay zero scritture, delta successivo conserva associazioni, fonti mancanti fermano prima di scrivere. Workflow dedicato parte al push, usa serializzazione courtwatch-d1-writes ed esporta evidenza before/readback. Verifica produzione ancora da completare dopo run; nessun polling o rilancio automatico.
 
 ITF discovery 2026-10-28T22:56:55.296Z: 1 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-10-28T22:57:45.545Z: attempted 1, acquired 1, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
