@@ -1,3 +1,4 @@
+import {monradBoard} from './tennis-europe-monrad.mjs';
 import {createHash} from 'node:crypto';
 import {tennisEuropeParticipant} from './tennis-europe-metadata.mjs';
 const BASE='https://te.tournamentsoftware.com';
@@ -67,6 +68,12 @@ function followingDate(m,records,known,rounds){
 export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,startDate,endDate,sourceUrl,knownMatches=[],allowPolicyDates=true,roundRobin=false}){
  const source=String(html||''),heading=drawEvent(shell,event),issues=[],matches=[],pending=[],records=[];
  if(!/^[BG][SD]\d{2}\b/i.test(heading))return {matches,pending,issues:[{reason:'draw_event_unverified',competitionId,drawId,sourceUrl}],walkovers:0};
+ // Existing bracket and Round Robin paths stay unchanged. Only explicit Monrad shells enter here.
+ if(!/\bjs-bracket\b/.test(source)&&/\bMonrad\b/i.test(text(shell))){
+  const adapted=monradBoard({shell,html:source,event:heading,competitionId});
+  if(adapted?.error)return{matches,pending,issues:[{reason:adapted.error,competitionId,drawId,sourceUrl}],walkovers:0};
+  if(adapted)return parseDrawWalkovers({html:adapted.html,event:heading,competitionId,drawId,startDate,endDate,sourceUrl,knownMatches,allowPolicyDates:false});
+ }
  // Group match cards can be inline or loaded through GetMatchesContent.
  // Reuse strict team/winner parsing; undated group W/O use a prior round anchor.
  if(!/\bjs-bracket\b/.test(source)&&/\bRound\s+Robin\b/i.test(text(shell||source))){
@@ -153,7 +160,7 @@ export async function recoverDrawWalkovers({tournament,matches,get,documents=[],
    const action=(shell.match(/<form\b[^>]*action=["']([^"']*\/(?:GetDrawContent|GetMatchesContent)[^"']*)/i)||[])[1];
    let html=shell;
    if(action){const url=new URL(decode(action),BASE);const expected='/TOURNAMENT/'+id.toUpperCase()+'/DRAW/'+target.number+'/';if(url.origin!==BASE||!['GETDRAWCONTENT','GETMATCHESCONTENT'].some(endpoint=>url.pathname.toUpperCase()===expected+endpoint))throw Error('unexpected_draw_endpoint');html=await get(url.href,{'x-requested-with':'XMLHttpRequest',referer:target.url});}
-   else if(!/\bjs-bracket\b/.test(shell)&&!(/\bRound\s+Robin\b/i.test(text(shell))&&/class=["'][^"']*\bmatch\b/.test(shell))){issues.push({competitionId:id,drawId:target.number,sourceUrl:target.url,reason:'draw_content_endpoint_missing'});continue}
+   else if(!/\bMonrad\b/i.test(text(shell))&&!/\bjs-bracket\b/.test(shell)&&!(/\bRound\s+Robin\b/i.test(text(shell))&&/class=["'][^"']*\bmatch\b/.test(shell))){issues.push({competitionId:id,drawId:target.number,sourceUrl:target.url,reason:'draw_content_endpoint_missing'});continue}
    const parsed=parseDrawWalkovers({html,shell,event:target.event,competitionId:id,drawId:target.number,startDate:tournament.startDate,endDate:tournament.endDate,sourceUrl:target.url,knownMatches:[...matches,...manualMatches]});issues.push(...parsed.issues);
    for(const m of parsed.pending){const key=drawMatchKey(m),old=existing.get(key),override=manual.get(key);if(old||override)cases.push({competitionId:id,tournamentName:tournament.tournamentName||'',matchId:old?.id||override.matchId,event:m.event,round:m.round,date:old?.date||override.date,dateSource:'existing_verified_record',players:m.players.map(p=>p.name),score:m.score,sourceUrl:m.sourceUrl,disposition:override?'already_in_manual_override':reconcile(old,m)});else pending.push(m)}
    for(const m of parsed.matches){const key=drawMatchKey(m),old=existing.get(key),override=manual.get(key);const disposition=override?'already_in_manual_override':old?reconcile(old,m):'recovered';cases.push({competitionId:id,tournamentName:tournament.tournamentName||'',matchId:override?.matchId||old?.id||m.id,event:m.event,round:m.round,date:override?.date||old?.date||m.date,dateSource:old||override?'existing_verified_record':m.dateSource,players:m.players.map(p=>p.name),winnerPlayerIds:m.winnerPlayerIds,score:m.score,sourceUrl:m.sourceUrl,disposition});if(!old&&!override){matches.push(m);existing.set(key,m)}}
