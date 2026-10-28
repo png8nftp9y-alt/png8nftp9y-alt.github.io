@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-10-28T19:50:23.733Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-10-28T19:53:22.300Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -826713,14 +826713,14 @@
       "tournamentName": "J30 Douala",
       "startDate": "2026-10-26",
       "endDate": "2026-10-31",
-      "decision": "pending",
-      "checkedAt": "2026-10-28T19:21:30.778Z",
+      "decision": "complete",
+      "checkedAt": "2026-10-28T19:53:18.510Z",
       "playersFound": 0,
       "declaredSections": 5,
-      "acquiredSections": 3,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 3,
-      "missingSections": 2,
+      "resolvedSections": 5,
+      "missingSections": 0,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -826816,14 +826816,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -826855,14 +826855,14 @@
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -827552,6 +827552,194 @@
             "complete": true,
             "taskId": "J-J30-CMR-2026-004__G-D-M-KO",
             "storedAt": "2026-10-28T12:01:38.884Z"
+          }
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800631702",
+              "name": "Yarden Shalom Gamliel",
+              "givenName": "Yarden Shalom",
+              "familyName": "Gamliel",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/yarden-shalom-gamliel/800631702/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800816149",
+              "name": "Alexandre Nowak",
+              "givenName": "Alexandre",
+              "familyName": "Nowak",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/alexandre-nowak/800816149/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800699976",
+              "name": "Cedrick Lanyuy NDINKWA",
+              "givenName": "Cedrick Lanyuy",
+              "familyName": "NDINKWA",
+              "nationalityCode": "CMR",
+              "profileLink": "/en/players/cedrick-lanyuy-ndinkwa/800699976/cmr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800713434",
+              "name": "Manan Rai",
+              "givenName": "Manan",
+              "familyName": "Rai",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/manan--rai/800713434/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800689791",
+              "name": "Ori Taigman",
+              "givenName": "Ori",
+              "familyName": "Taigman",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/ori-taigman/800689791/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800714137",
+              "name": "Mithun Sendilkumar",
+              "givenName": "Mithun",
+              "familyName": "Sendilkumar",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/mithun-sendilkumar/800714137/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800849817",
+              "name": "Olive Victoire Divine Nkolo",
+              "givenName": "Olive Victoire Divine",
+              "familyName": "Nkolo",
+              "nationalityCode": "CMR",
+              "profileLink": "/en/players/olive-victoire-divine-nkolo/800849817/cmr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800732133",
+              "name": "Timo Monier Vinard",
+              "givenName": "Timo",
+              "familyName": "Monier Vinard",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/timo-monier-vinard/800732133/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-28T19:53:18.510Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-CMR-2026-004__B-S-M-KO",
+            "storedAt": "2026-10-28T19:53:18.510Z"
+          }
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800700767",
+              "name": "Delisle Manantsop",
+              "givenName": "Delisle",
+              "familyName": "Manantsop",
+              "nationalityCode": "CMR",
+              "profileLink": "/en/players/delisle-manantsop/800700767/cmr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800716818",
+              "name": "PRERANA SANTRA",
+              "givenName": "PRERANA",
+              "familyName": "SANTRA",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/prerana-santra/800716818/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777307",
+              "name": "Bi-Neh Awantang",
+              "givenName": "Bi-Neh",
+              "familyName": "Awantang",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/bi-neh-awantang/800777307/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751968",
+              "name": "Mbongta Awantang",
+              "givenName": "Mbongta",
+              "familyName": "Awantang",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/mbongta-awantang/800751968/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800727592",
+              "name": "Matila Klivia Morelle Ngo Ndje Ndjeng",
+              "givenName": "Matila Klivia Morelle",
+              "familyName": "Ngo Ndje Ndjeng",
+              "nationalityCode": "CMR",
+              "profileLink": "/en/players/matila-klivia-morelle-ngo-ndje-ndjeng/800727592/cmr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800740585",
+              "name": "Lauren Kwendou Tadoum",
+              "givenName": "Lauren Kwendou",
+              "familyName": "Tadoum",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/lauren-kwendou-tadoum/800740585/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800785368",
+              "name": "Sara Fengse",
+              "givenName": "Sara",
+              "familyName": "Fengse",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/sara-fengse/800785368/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800845502",
+              "name": "Leudeu Hapi Tameghe Paola",
+              "givenName": "Leudeu Hapi Tameghe",
+              "familyName": "Paola",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/leudeu-hapi-tameghe-paola/800845502/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-28T19:53:18.510Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-CMR-2026-004__G-S-M-KO",
+            "storedAt": "2026-10-28T19:53:18.510Z"
           }
         }
       }
@@ -830829,7 +831017,7 @@
       "startDate": "2026-10-26",
       "endDate": "2026-10-31",
       "decision": "pending",
-      "checkedAt": "2026-10-28T19:21:32.275Z",
+      "checkedAt": "2026-10-28T19:53:20.759Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -833983,7 +834171,7 @@
       "startDate": "2026-10-26",
       "endDate": "2026-10-31",
       "decision": "pending",
-      "checkedAt": "2026-10-28T19:21:32.759Z",
+      "checkedAt": "2026-10-28T19:53:21.296Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -837988,7 +838176,7 @@
       "startDate": "2026-10-26",
       "endDate": "2026-10-31",
       "decision": "pending",
-      "checkedAt": "2026-10-28T19:21:33.254Z",
+      "checkedAt": "2026-10-28T19:53:21.829Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 1,
@@ -846232,7 +846420,7 @@
       "startDate": "2026-10-26",
       "endDate": "2026-10-31",
       "decision": "pending",
-      "checkedAt": "2026-10-28T19:21:33.751Z",
+      "checkedAt": "2026-10-28T19:53:22.300Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -855709,7 +855897,7 @@
       "startDate": "2026-10-27",
       "endDate": "2026-11-01",
       "decision": "pending",
-      "checkedAt": "2026-10-28T19:21:31.301Z",
+      "checkedAt": "2026-10-28T19:53:19.792Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -856264,7 +856452,7 @@
       "startDate": "2026-10-27",
       "endDate": "2026-11-01",
       "decision": "pending",
-      "checkedAt": "2026-10-28T19:21:31.793Z",
+      "checkedAt": "2026-10-28T19:53:20.233Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
