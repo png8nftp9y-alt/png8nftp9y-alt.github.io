@@ -33,3 +33,5 @@ test('async header uses its own registration category on the shared ranking resp
  assert.equal(targets[0].textContent,' · n°42 TE U14');
  assert.equal(targets[1].textContent,' · n°135 TE U16');
 });
+
+import './junior-masters-playoff.test.mjs';

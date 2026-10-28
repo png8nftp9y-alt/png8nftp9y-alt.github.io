@@ -1958,6 +1958,8 @@ function agendaRoundCode(m) {
     upper = raw.toUpperCase();
   if (m.roundRobin || m.isRoundRobin || /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(`${raw} ${source}`))
     return "RR";
+  if (m.circuit === 'tennis-europe' && /junior[\s-]+masters/i.test(String(m.tournamentName || m.tournament?.name || '')) && /^round\s*1$/i.test(readableText(m.round || m.roundName || '')))
+    return 'Playoff';
   let code = "";
   const explicit = raw.match(/\bS?Q\s*(\d+)\b/i),
     qualSize = (raw.match(
@@ -3133,6 +3135,8 @@ function fullMatchRoundLabel(match, contextMatches = []) {
     label = (value) => bonus ? `Bonus ${value}` : value;
   if (match?.roundRobin || match?.isRoundRobin || /round\s*robin|robin|(?:^|\b)rr(?:\b|$)|group|girone|pool/i.test(source))
     return label("Round robin");
+  if (match?.circuit === 'tennis-europe' && /junior[\s-]+masters/i.test(String(match?.tournamentName || match?.tournament?.name || '')) && /^round\s*1$/i.test(raw))
+    return 'Playoff';
   const explicitQualification = raw.match(/\bS?Q\s*(\d+)\b/i) || raw.match(/(?:qualification|qualifying)\s*round\s*(\d+)/i);
   if (explicitQualification) return label(`Qualification round ${explicitQualification[1]}`);
   const qualificationSizeOf = (item) => {

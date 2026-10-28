@@ -9692,3 +9692,7 @@ Validation: 13 Node tests pass, covering the exact D1 row and rendered opponent 
 ITF discovery 2026-10-28T06:24:22.615Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-28T13:37:43.241Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+### Chat 1 — 2026-10-28: Playoff nel Junior Masters Europe
+- Su richiesta per le partite di Mitchell/Conticello, visualizza Round 1 come Playoff solo nei tornei Tennis Europe il cui nome identifica Junior Masters. Turni marcati come girone restano Round robin/RR; semifinali e finali e altri tornei restano invariati. Nessuna riscrittura dati D1.
+- Stessa etichetta nelle righe partite condivise da profilo, torneo e avversario e nel codice turno agenda. Aggiornata versione browser. Tre regressioni locali verdi; installer esegue anche controlli UI e test ranking prima del push. Dati live dei due giocatori non letti direttamente, verifica visiva dopo deploy. Nessun polling o rilancio automatico.
