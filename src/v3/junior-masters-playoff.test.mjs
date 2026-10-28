@@ -24,3 +24,12 @@ test('ordinary Europe and ITF first rounds and Masters final stages retain their
  assert.equal(ctx.fullMatchRoundLabel({...match,round:'Final'}),'Final');
  assert.equal(ctx.fullMatchRoundLabel({...match,round:'Round of 16'}),'Round of 16');
 });
+test('opponent history passes the parent tournament identity to nested matches',()=>{
+ const c={...ctx,mergeAgenda:(_old,rows)=>rows,groupedMatchSections:(rows,render)=>rows.map(render),opponentHistoryMatchRowHtml:(match,rows)=>ctx.fullMatchRoundLabel(match,rows)};
+ vm.createContext(c);vm.runInContext(extract('opponentHistoryMatchSectionsHtml'),c);
+ const rows=[{round:'Round 1',date:'2026-10-20'},{round:'Round Robin',date:'2026-10-19'}];
+ assert.deepEqual(Array.from(c.opponentHistoryMatchSectionsHtml(rows,{name:'Tennis Europe Junior Masters',circuit:'tennis-europe'})),['Round robin','Playoff']);
+ assert.deepEqual(Array.from(c.opponentHistoryMatchSectionsHtml(rows,{name:'Other tournament',circuit:'tennis-europe'})),['Round robin','Round 1']);
+ assert.equal(rows[0].tournamentName,undefined);
+ assert.ok(source.includes('opponentHistoryMatchSectionsHtml(tournament.matches || [], tournament)'));
+});
