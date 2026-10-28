@@ -3235,10 +3235,6 @@ function groupedMatchSections(matches, rowHtml, doublesKey, doublesIdentity = do
   return sections.join("");
 }
 function opponentHistoryMatchSectionsHtml(matches, tournament = {}) {
-  matches = matches.map(match => ({...match,
-    circuit: match.circuit || tournament.circuit || 'tennis-europe',
-    tournamentName: match.tournamentName || tournament.name || '',
-  }));
   // This renderer receives one player's matches within one tournament.
   const scoped = matches.map((match,index) => ({...match,
     id:`history-${index}`,matchId:`history-${index}`,historyIndex:index,
@@ -3256,7 +3252,10 @@ function opponentHistoryMatchSectionsHtml(matches, tournament = {}) {
   matches.sort((a, b) => dateKey(a).localeCompare(dateKey(b)) || timeKey(a).localeCompare(timeKey(b)));
   return groupedMatchSections(
     matches,
-    (match) => opponentHistoryMatchRowHtml(match, matches),
+    (match) => opponentHistoryMatchRowHtml({...match,
+      circuit: match.circuit || tournament.circuit || 'tennis-europe',
+      tournamentName: match.tournamentName || tournament.name || '',
+    }, matches),
     (match) =>
       (match.partners || []).length
         ? (match.partners || [])

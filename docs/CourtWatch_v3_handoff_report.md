@@ -9719,3 +9719,7 @@ I recovery 0 e 6 del run 40763440715 sono falliti con No official dates found in
 ### Chat 1 — 2026-10-28: contesto Junior Masters nella pagina avversario
 - La prima patch cercava nome e circuito nella partita, mentre lo storico avversario li conserva sul torneo. Passare il torneo alla funzione sezioni e completare le copie delle partite con quel contesto; mantenere i dati espliciti della partita.
 - Test di regressione con partite prive di nome torneo: Round 1 rende Playoff, i gironi restano Round robin, altro torneo resta Round 1. Quattro test locali verdi. Nessuna modifica dati o timer; verifica visiva dopo deploy ancora necessaria.
+
+### Chat 1 — 2026-10-28: regressione Browser dopo contesto Playoff
+- Run Browser 40764999448 fallito nel controllo Cernat di agenda-resolved-doubles: il contesto torneo aggiunto alle partite cambiava gli oggetti restituiti dalla riconciliazione. Passare il contesto solo alla riga visualizzata, mantenendo gli oggetti acquisiti durante deduplica e raggruppamento. Nessun test disabilitato o asserzione indebolita.
+- Sedici test locali verdi, inclusi placeholder Cernat e Junior Masters pagina avversario. Installer ripete il gruppo completo che falliva prima del push. Nessuna modifica D1, nessun polling o rilancio automatico. Deploy e verifica visiva successivi.
