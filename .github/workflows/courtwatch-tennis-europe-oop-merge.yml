@@ -7,7 +7,7 @@ on:
         required: false
         default: '33324600811'
   workflow_run:
-    workflows: ['Court Watch Tennis Europe OOP historical backfill', 'Court Watch Tennis Europe OOP historical recovery']
+    workflows: ['Court Watch Tennis Europe OOP historical backfill', 'Court Watch Tennis Europe OOP historical recovery', 'Court Watch Tennis Europe empty tournaments recovery']
     types: [completed]
 permissions:
   actions: read
@@ -80,6 +80,20 @@ jobs:
         env:
           TE_OOP_SOURCE_RUN_ID: ${{ steps.source.outputs.source_run_id }}
         run: node src/v3/merge-tennis-europe-oop-backfill.mjs
+      - name: Preserve the current R2 archive during targeted empty recovery
+        if: github.event.workflow_run.name == 'Court Watch Tennis Europe empty tournaments recovery'
+        run: |
+          set -euo pipefail
+          mkdir -p empty-current
+          endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
+          prefix="s3://$R2_BUCKET/tennis-europe/oop-history"
+          aws --endpoint-url "$endpoint" s3 cp "$prefix/pointers/current.json" empty-current/pointer.json --only-show-errors
+          generation="$(jq -r '.generation' empty-current/pointer.json)"
+          test -n "$generation" && test "$generation" != null
+          aws --endpoint-url "$endpoint" s3 cp "$prefix/generations/$generation/tennis_europe_oop_historical.json" empty-current/current-archive.json --only-show-errors
+          node src/v3/merge-tennis-europe-empty-current.mjs
+          aws --endpoint-url "$endpoint" s3 cp "$prefix/pointers/current.json" empty-current/pointer-again.json --only-show-errors
+          cmp empty-current/pointer.json empty-current/pointer-again.json
       - name: Publish verified historical generation to R2
         run: bash src/v3/tennis-europe-oop-history-r2.sh publish
       - uses: actions/upload-artifact@v4

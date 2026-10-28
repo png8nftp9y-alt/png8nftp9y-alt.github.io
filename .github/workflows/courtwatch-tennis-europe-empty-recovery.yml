@@ -1,0 +1,91 @@
+name: Court Watch Tennis Europe empty tournaments recovery
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - src/v3/tennis-europe-empty-recovery.mjs
+      - src/v3/recover-tennis-europe-empty.mjs
+      - src/v3/tennis-europe-empty-recovery.test.mjs
+      - src/v3/tennis-europe-empty-overlay.mjs
+      - src/v3/merge-tennis-europe-empty-current.mjs
+      - src/v3/report-tennis-europe-empty.mjs
+      - .github/workflows/courtwatch-tennis-europe-empty-recovery.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: courtwatch-tennis-europe-oop-backfill
+  cancel-in-progress: false
+jobs:
+  recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        shard: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_RUN: '40597720422'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore the successful baseline without reacquiring other tournaments
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" --jq .head_sha)" = '51498e17d8d883547f22dfd41af0267a7a49a5d9'
+          test "$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN" --jq .conclusion)" = 'success'
+          gh api "repos/$GITHUB_REPOSITORY/contents/history/tennis_europe_tournament_catalog.json?ref=51498e17d8d883547f22dfd41af0267a7a49a5d9" --jq .content | base64 --decode > history/tennis_europe_tournament_catalog.json
+          gh run download "$SOURCE_RUN" --repo "$GITHUB_REPOSITORY" --name "tennis-europe-oop-backfill-$SHARD" --dir checkpoint
+          checkpoint="checkpoint/backfill-$(printf '%02d' "$SHARD").json"
+          test -s "$checkpoint"
+          echo "TE_OOP_RESUME_FILE=$checkpoint" >> "$GITHUB_ENV"
+      - name: Verify recovery and existing W/O policies
+        run: node --test src/v3/tennis-europe-empty-recovery.test.mjs src/v3/tennis-europe-draw-walkovers.test.mjs src/v3/tennis-europe-inline-draw-walkovers.test.mjs src/v3/tennis-europe-round-robin-endpoint.test.mjs
+      - name: Recover played events and verify official cancellations or postponement
+        env:
+          TE_OOP_SHARD: ${{ matrix.shard }}
+          TE_OOP_TOTAL: 16
+          TE_OOP_CUTOFF: '2025-12-18'
+        run: node src/v3/recover-tennis-europe-empty.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tennis-europe-oop-backfill-${{ matrix.shard }}
+          path: dist/v3/shards/tennis-europe-oop/backfill-*.json
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tennis-europe-empty-source-documents-${{ matrix.shard }}
+          path: source-documents/*.html
+          if-no-files-found: ignore
+          retention-days: 14
+  report:
+    needs: recovery
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: tennis-europe-oop-backfill-*
+          path: empty-recovery-shards
+      - run: node src/v3/report-tennis-europe-empty.mjs
+      - run: cat empty-recovery-report/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tennis-europe-empty-recovery-report
+          path: empty-recovery-report/
+          retention-days: 30

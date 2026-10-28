@@ -1,0 +1,16 @@
+import {targetIds,playedIds} from './tennis-europe-empty-recovery.mjs';
+import {isRecoveredDrawWalkover} from './tennis-europe-draw-walkovers.mjs';
+export function overlayEmptyRecovery(current,candidate){
+ if(current.version!=='te-oop-historical-v1'||candidate.version!==current.version||current.status!=='green'||candidate.status!=='green')throw Error('Unverified archive cannot be overlaid');
+ const map=new Map(current.tournaments.map(t=>[t.competitionId.toUpperCase(),t]));
+ for(const t of candidate.tournaments){const id=t.competitionId.toUpperCase(),old=map.get(id);if(!targetIds.has(id))continue;if(old?.matches?.length){const ids=new Set(old.matches.map(m=>m.id));if((t.matches||[]).some(m=>!ids.has(m.id)))throw Error('Target already changed in current R2; rebase before replacing: '+id);continue;}if(t.matches?.length||t.sourceDisposition)map.set(id,t);else throw Error('Target was neither recovered nor officially classified: '+id);}
+ for(const id of playedIds)if(!map.get(id)?.matches?.length)throw Error('Played target still empty: '+id);
+ const tournaments=[...map.values()].sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))||a.competitionId.localeCompare(b.competitionId));
+ const matches=tournaments.flatMap(t=>t.matches||[]),byId=new Map();for(const m of matches){if(byId.has(m.id))throw Error('Duplicate match after overlay: '+m.id);byId.set(m.id,m);}
+ for(const old of current.matches||[]){const next=byId.get(old.id);if(!next||JSON.stringify(next)!==JSON.stringify(old))throw Error('Existing current match would change: '+old.id);}
+ const identities=new Map(),normalize=s=>String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
+ for(const m of matches)for(const p of m.players||[]){const key=(p.nationality||'')+'|'+normalize(p.name),r=identities.get(key)||{identityKey:key,name:p.name,nationality:p.nationality||'',occurrences:0,tournaments:new Set()};r.occurrences++;r.tournaments.add(m.competitionId);identities.set(key,r);}
+ const completed=matches.filter(m=>m.status==='completed'),scheduled=matches.filter(m=>m.status==='scheduled'),winnerUnresolved=completed.filter(m=>!m.winnerPlayerIds?.length).length,missingCourtMatchNumbers=matches.filter(m=>(!Number.isInteger(Number(m.courtMatchNumber))||Number(m.courtMatchNumber)<=0)&&!isRecoveredDrawWalkover(m)).length;
+ if(winnerUnresolved||missingCourtMatchNumbers)throw Error('Overlay violates match validity');
+ return{...candidate,generatedAt:new Date().toISOString(),preservedCurrentSourceRunId:current.sourceRunId,tournaments,matches:matches.sort((a,b)=>a.date.localeCompare(b.date)||a.id.localeCompare(b.id)),identities:[...identities.values()].map(r=>({...r,tournaments:[...r.tournaments].sort()})).sort((a,b)=>a.identityKey.localeCompare(b.identityKey)),counts:{...candidate.counts,tournaments:tournaments.length,withoutOop:tournaments.filter(t=>!t.dates?.length).length,matches:matches.length,completed:completed.length,scheduled:scheduled.length,singles:matches.filter(m=>m.players.length===2).length,doubles:matches.filter(m=>m.players.length===4).length,uniqueNominalIdentities:identities.size,winnerUnresolved,missingCourtMatchNumbers}};
+}
