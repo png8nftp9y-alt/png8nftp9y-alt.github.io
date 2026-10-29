@@ -1,3 +1,4 @@
+import {emptyBranchAdvance} from './tennis-europe-empty-advance.mjs';
 import {monradBoard} from './tennis-europe-monrad.mjs';
 import {createHash} from 'node:crypto';
 import {tennisEuropeParticipant} from './tennis-europe-metadata.mjs';
@@ -66,7 +67,7 @@ function followingDate(m,records,known,rounds){
  const date=closest.map(c=>c.date).sort()[0];return{date,ids:[...new Set(closest.filter(c=>c.date===date).map(c=>c.id))]};
 }
 export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,startDate,endDate,sourceUrl,knownMatches=[],allowPolicyDates=true,roundRobin=false}){
- const source=String(html||''),heading=drawEvent(shell,event),issues=[],matches=[],pending=[],records=[];
+ const source=String(html||''),heading=drawEvent(shell,event),issues=[],matches=[],pending=[],records=[],advancements=[];
  if(!/^[BG][SD]\d{2}\b/i.test(heading))return {matches,pending,issues:[{reason:'draw_event_unverified',competitionId,drawId,sourceUrl}],walkovers:0};
  // Existing bracket and Round Robin paths stay unchanged. Only explicit Monrad shells enter here.
  if(!/\bjs-bracket\b/.test(source)&&/\bMonrad\b/i.test(text(shell))){
@@ -101,10 +102,15 @@ export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,
    const rows=rowTags.map((m,i)=>({won:attr(m[0],'class').split(/\s+/).includes('has-won'),players:[...block.slice(m.index,rowTags[i+1]?.index||block.length).matchAll(/<a\b[^>]*data-player-id=["'][^"']+["'][^>]*>[\s\S]*?<\/a>/gi)].map(a=>tennisEuropeParticipant(a[0]))}));
    const teamSize=/^[BG]D/i.test(heading)?2:1,players=rows.flatMap(r=>r.players),winners=rows.map((r,i)=>r.won?i:-1).filter(i=>i>=0),round=rounds[index];
    const evidence={competitionId,drawId,event:heading,round,drawRoundIndex:roundRobin?groupRound(round)-1:index,sourceUrl,players};
-   if(rows.length!==2||rows.some(r=>r.players.length!==teamSize)||players.some(p=>!p.id||!p.name||/^bye$/i.test(p.name))||new Set(players.map(p=>p.id)).size!==teamSize*2||isWalkover&&winners.length!==1){if(isWalkover)issues.push({...evidence,reason:'walkover_participants_or_winner_unverified'});continue}
+   const advancementEvidence=isWalkover?emptyBranchAdvance({slides,index,cardIndex:n,teamSize,roundRobin}):null;
+   if(!advancementEvidence&&(rows.length!==2||rows.some(r=>r.players.length!==teamSize)||players.some(p=>!p.id||!p.name||/^bye$/i.test(p.name))||new Set(players.map(p=>p.id)).size!==teamSize*2||isWalkover&&winners.length!==1)){if(isWalkover)issues.push({...evidence,reason:'walkover_participants_or_winner_unverified'});continue}
    const winnerTeamIndex=winners.length===1?winners[0]:-1,winnerPlayerIds=winnerTeamIndex>=0?rows[winnerTeamIndex].players.map(p=>p.id):[],date=officialDate(block),dateSource=date?'official_draw_date':'';
    const key=drawMatchKey(evidence),id=['te-draw',competitionId.toUpperCase(),drawId,createHash('sha256').update(key).digest('hex').slice(0,24)].join('|');
    const match={id,...evidence,date,dateSource,tournamentStartDate:iso(startDate),tournamentEndDate:iso(endDate),time:'',court:'',courtMatchNumber:null,courtMatchNumberSource:'',notBefore:false,afterRest:false,followedBy:false,scheduleQualifier:'',teams:rows.map(r=>r.players.map(p=>p.id)),winnerTeamIndex,winnerPlayerIds,winnerPlayerId:winnerPlayerIds.length===1?winnerPlayerIds[0]:'',status:'completed',score:'W/O',drawUrl:sourceUrl,sourceKind:'official_draw_walkover',...(roundRobin?{roundRobin:true}:{})};
+   if(advancementEvidence){
+    match.id='te-advance|'+competitionId.toUpperCase()+'|'+drawId+'|'+index+'|'+n;
+    Object.assign(match,{agendaOnly:true,opponentPending:true,opponent:'Avversario non definito',status:'advancement',score:'',sourceKind:'official_draw_empty_advance',advancementEvidence});
+   }
    const confirmed=isWalkover&&!date?confirmedWalkoverDate(match):'';
    if(confirmed){match.date=confirmed;match.dateSource='user_confirmed_walkover_date';match.dateOverrideReason='user_instruction_2026_10_27'}
    records.push({...match,isWalkover});
@@ -132,14 +138,14 @@ export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,
  for(const record of records){
   if(!record.isWalkover)continue;
   const {isWalkover,...match}=record;
-  if(match.date)matches.push(match);else pending.push({...match,reason:roundRobin?'round_robin_previous_match_date_missing_or_out_of_range':match.drawRoundIndex===0?'tournament_start_date_missing':final(match.round)?'tournament_end_date_missing':'previous_match_date_missing_or_out_of_range'});
+  if(match.date)(match.agendaOnly?advancements:matches).push(match);else pending.push({...match,reason:roundRobin?'round_robin_previous_match_date_missing_or_out_of_range':match.drawRoundIndex===0?'tournament_start_date_missing':final(match.round)?'tournament_end_date_missing':'previous_match_date_missing_or_out_of_range'});
  }
  const markers=(source.replace(/<script\b[\s\S]*?<\/script>/gi,'').match(/\bWalkover\b|\bW\s*\/\s*O\b/gi)||[]).length;
  if(markers!==walkovers)issues.push({competitionId,drawId,sourceUrl,reason:'unparsed_walkover_markers',markers,walkovers});
- return{matches,pending,issues,walkovers};
+ return{matches,pending,issues,walkovers,advancements};
 }
 export async function recoverDrawWalkovers({tournament,matches,get,documents=[],manualMatches=[]}){
- const id=tournament.competitionId,issues=[],pending=[],cases=[],all=new Map(),existing=new Map(matches.map(m=>[drawMatchKey(m),m])),manual=new Map(manualMatches.filter(m=>String(m.competitionId).toUpperCase()===id.toUpperCase()).map(m=>[drawMatchKey(m),m]));
+ const id=tournament.competitionId,issues=[],pending=[],cases=[],advancements=[],all=new Map(),existing=new Map(matches.map(m=>[drawMatchKey(m),m])),manual=new Map(manualMatches.filter(m=>String(m.competitionId).toUpperCase()===id.toUpperCase()).map(m=>[drawMatchKey(m),m]));
  function reconcile(old,m){
   const incoming=teamNames(m)[m.winnerTeamIndex],teams=teamNames(old),index=teams.indexOf(incoming);
   if(JSON.stringify([...teams].sort())!==JSON.stringify(teamNames(m).sort())||index<0){issues.push({competitionId:id,matchId:old.id,reason:'walkover_team_conflict',sourceUrl:m.sourceUrl});return'needs_attention'}
@@ -161,10 +167,10 @@ export async function recoverDrawWalkovers({tournament,matches,get,documents=[],
    let html=shell;
    if(action){const url=new URL(decode(action),BASE);const expected='/TOURNAMENT/'+id.toUpperCase()+'/DRAW/'+target.number+'/';if(url.origin!==BASE||!['GETDRAWCONTENT','GETMATCHESCONTENT'].some(endpoint=>url.pathname.toUpperCase()===expected+endpoint))throw Error('unexpected_draw_endpoint');html=await get(url.href,{'x-requested-with':'XMLHttpRequest',referer:target.url});}
    else if(!/\bMonrad\b/i.test(text(shell))&&!/\bjs-bracket\b/.test(shell)&&!(/\bRound\s+Robin\b/i.test(text(shell))&&/class=["'][^"']*\bmatch\b/.test(shell))){issues.push({competitionId:id,drawId:target.number,sourceUrl:target.url,reason:'draw_content_endpoint_missing'});continue}
-   const parsed=parseDrawWalkovers({html,shell,event:target.event,competitionId:id,drawId:target.number,startDate:tournament.startDate,endDate:tournament.endDate,sourceUrl:target.url,knownMatches:[...matches,...manualMatches]});issues.push(...parsed.issues);
+   const parsed=parseDrawWalkovers({html,shell,event:target.event,competitionId:id,drawId:target.number,startDate:tournament.startDate,endDate:tournament.endDate,sourceUrl:target.url,knownMatches:[...matches,...manualMatches]});issues.push(...parsed.issues);advancements.push(...(parsed.advancements||[]));
    for(const m of parsed.pending){const key=drawMatchKey(m),old=existing.get(key),override=manual.get(key);if(old||override)cases.push({competitionId:id,tournamentName:tournament.tournamentName||'',matchId:old?.id||override.matchId,event:m.event,round:m.round,date:old?.date||override.date,dateSource:'existing_verified_record',players:m.players.map(p=>p.name),score:m.score,sourceUrl:m.sourceUrl,disposition:override?'already_in_manual_override':reconcile(old,m)});else pending.push(m)}
    for(const m of parsed.matches){const key=drawMatchKey(m),old=existing.get(key),override=manual.get(key);const disposition=override?'already_in_manual_override':old?reconcile(old,m):'recovered';cases.push({competitionId:id,tournamentName:tournament.tournamentName||'',matchId:override?.matchId||old?.id||m.id,event:m.event,round:m.round,date:override?.date||old?.date||m.date,dateSource:old||override?'existing_verified_record':m.dateSource,players:m.players.map(p=>p.name),winnerPlayerIds:m.winnerPlayerIds,score:m.score,sourceUrl:m.sourceUrl,disposition});if(!old&&!override){matches.push(m);existing.set(key,m)}}
   }catch(e){issues.push({competitionId:id,drawId:target.number,sourceUrl:target.url,reason:'draw_acquisition_failed',error:String(e.message)})}
  }
- return {status:issues.length||pending.length?'needs_attention':'checked',draws:all.size,cases,pending,issues};
+ return {status:issues.length||pending.length?'needs_attention':'checked',draws:all.size,cases,pending,issues,...(advancements.length?{advancements}:{})};
 }

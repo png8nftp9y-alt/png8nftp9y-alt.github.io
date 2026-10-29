@@ -1288,6 +1288,7 @@ function agendaLongCourt(m) {
   return agendaCourtName(m).length > 17;
 }
 function pendingOpponentHtml(m) {
+  if (m.agendaOnly === true) return "Avversario non definito";
   const possible = Array.isArray(m.possibleOpponents)
     ? m.possibleOpponents.map(readablePerson).filter(Boolean)
     : [];
@@ -1645,7 +1646,7 @@ function mergeAgenda(agenda, matches) {
   const hasEurope = matches.some((m) => circuit(m) === "tennis-europe"),
     byKey = new Map(matches.map((m) => [agendaKey(m), m]));
   for (const a of agenda || []) {
-    if (hasEurope && circuit(a) === "tennis-europe" && !a.manual) continue;
+    if (hasEurope && circuit(a) === "tennis-europe" && !a.manual && !a.agendaOnly) continue;
     const key = agendaKey(a),
       base = byKey.get(key) || {};
     byKey.set(key, { ...base, ...a });
@@ -2169,10 +2170,11 @@ function canonicalPlayerMatches(items) {
 }
 function normalizeMatchProjection(data) {
   if (!data) return data;
-  const matches = canonicalPlayerMatches(data.matches || []);
+  const matches = canonicalPlayerMatches((data.matches || []).filter(m => !m.agendaOnly));
+  const advances = (data.matches || []).filter(m => m.agendaOnly === true);
   return { ...data, matches,
-    agenda: canonicalPlayerMatches(mergeAgenda(data.agenda || [], matches)),
-    results: (data.results || []).filter(match => circuit(match) === "tennis-europe") };
+    agenda: canonicalPlayerMatches(mergeAgenda([...(data.agenda || []), ...advances], matches)),
+    results: (data.results || []).filter(match => circuit(match) === "tennis-europe" && !match.agendaOnly) };
 }
 function agendaMatchRows(matches) {
   const groups = [];
