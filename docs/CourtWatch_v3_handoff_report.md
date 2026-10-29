@@ -9779,3 +9779,8 @@ Validazione: 60 test, inclusi i 52 precedenti, le sei fonti ridotte con ancore r
 - La policy aveva respinto apply-five-reviewed-identities.mjs: ora saveExact usa buildIncrementalSyncPlan per inserire solo record nuovi, mantenendo i controlli sui conflitti e la verifica di rilettura. Il nuovo entry point apply-five-reviewed-identities.test.mjs riusa i test SQLite completi già presenti con il nome riconosciuto dalla policy.
 - Validazione locale: superati i test delle cinque revisioni, del piano incrementale e del recupero TE; passata la policy globale D1 con le regressioni SQLite. Replay senza scritture, preservazione sorgenti e blocco su fonti incomplete verificati.
 - Nessun rilancio manuale dei motori o modifica diretta al D1 remoto. L'applicazione dell'associazione e il ritorno Index verde richiedono il successivo ciclo ordinario; non ancora verificati in produzione.
+
+
+## 2026-10-29 — inventario acceptance ITF in sola lettura
+
+Richiesta utente: contare ed elencare tornei e acceptance ITF conservati. Nuovo workflow courtwatch-itf-acceptance-inventory.yml con script e due test superati. Legge solo puntatore corrente e cache partecipanti R2; nessun D1, scraping o rilancio motori, nessuna scrittura R2. Artifact JSON/Markdown con tornei, liste non vuote per sesso e sezioni MD/Q/A/ritirati, senza nomi dei partecipanti. Non ricostruisce liste vuote né versioni precedenti della stessa lista. Verifica remota da leggere al termine del run; nessun polling.

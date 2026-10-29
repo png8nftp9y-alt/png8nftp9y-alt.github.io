@@ -1,0 +1,44 @@
+name: Court Watch ITF acceptance inventory read only
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/courtwatch-itf-acceptance-inventory.yml
+      - tools/inspect-itf-acceptance-cache.mjs
+      - tools/inspect-itf-acceptance-cache.test.mjs
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-itf-acceptance-inventory
+  cancel-in-progress: false
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test tools/inspect-itf-acceptance-cache.test.mjs
+      - name: Read current ITF participant cache only
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet awscli
+          mkdir -p /tmp/itf-acceptance-read
+          endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/pointers/current.json" /tmp/itf-acceptance-read/pointer.json --only-show-errors
+          generation=$(jq -er '.generation | select(type=="string" and test("^[a-f0-9]{64}$"))' /tmp/itf-acceptance-read/pointer.json)
+          aws --endpoint-url "$endpoint" s3 cp "s3://$R2_BUCKET/itf/database/generations/$generation/itf_participant_cache.json.gz" /tmp/itf-acceptance-read/cache.json.gz --only-show-errors
+          node tools/inspect-itf-acceptance-cache.mjs /tmp/itf-acceptance-read/cache.json.gz /tmp/itf-acceptance-inventory
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-acceptance-inventory
+          path: /tmp/itf-acceptance-inventory
+          retention-days: 30
