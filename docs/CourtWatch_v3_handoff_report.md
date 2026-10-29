@@ -9784,3 +9784,5 @@ Validazione: 60 test, inclusi i 52 precedenti, le sei fonti ridotte con ancore r
 ## 2026-10-29 — inventario acceptance ITF in sola lettura
 
 Richiesta utente: contare ed elencare tornei e acceptance ITF conservati. Nuovo workflow courtwatch-itf-acceptance-inventory.yml con script e due test superati. Legge solo puntatore corrente e cache partecipanti R2; nessun D1, scraping o rilancio motori, nessuna scrittura R2. Artifact JSON/Markdown con tornei, liste non vuote per sesso e sezioni MD/Q/A/ritirati, senza nomi dei partecipanti. Non ricostruisce liste vuote né versioni precedenti della stessa lista. Verifica remota da leggere al termine del run; nessun polling.
+
+ITF discovery 2026-10-29T06:33:40.562Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
