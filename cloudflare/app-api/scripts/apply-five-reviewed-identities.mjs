@@ -1,3 +1,4 @@
+import {buildIncrementalSyncPlan} from '../lib/d1-incremental-sync.mjs';
 import fs from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
 import {buildIdentityMapping} from '../lib/player-identity-mapping.mjs';
@@ -37,7 +38,8 @@ export function verifyPartitions(rows){
 async function saveExact(query,row){
  const before=await query('SELECT value FROM app_state WHERE key='+sqlString(row.key));
  if(before.length&&before[0].value!==row.value)throw Error('review_rule_changed:'+row.key);
- if(!before.length)await query(`INSERT INTO app_state(key,value,updated_at) VALUES(${sqlString(row.key)},${sqlString(row.value)},${sqlString(new Date().toISOString())}) ON CONFLICT(key) DO NOTHING;`);
+ const plan=buildIncrementalSyncPlan({current:before.map(r=>({key:row.key,value:r.value})),incoming:[row],keyOf:r=>r.key,sourceComplete:true});
+ for(const insert of plan.inserts)await query(`INSERT INTO app_state(key,value,updated_at) VALUES(${sqlString(insert.key)},${sqlString(insert.value)},${sqlString(new Date().toISOString())}) ON CONFLICT(key) DO NOTHING;`);
  if((await query('SELECT value FROM app_state WHERE key='+sqlString(row.key)))[0]?.value!==row.value)throw Error('review_rule_readback_failed');
 }
 export async function applyFiveReviews(query){

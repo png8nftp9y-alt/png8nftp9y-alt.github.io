@@ -9771,3 +9771,11 @@ Importazione D1: valore app_state tennis_europe_agenda_advancements con scrittur
 Date dei sei casi, ottenute da righe DOM ufficiali e ancore dell'archivio: Kuijt/Lageveen 19 febbraio 2026 (precedente +1); Sekulic 14 giugno 2026 (ufficiale); Letsch 6 ottobre 2026 (precedente +1); Bunic/Kadric 10 settembre 2026 (precedente +1); Kyriacou/Liu e Charalampous/Christodoulidis 27 marzo 2026 (successiva -1). Le fixture sono riduzioni strutturali delle righe osservate, non copie HTML integrali.
 
 Validazione: 60 test, inclusi i 52 precedenti, le sei fonti ridotte con ancore reali, replay senza modifica dell'OOP, proiezione autorizzata e normalizzazione effettiva del frontend. Esecuzione locale del generatore SQL e prova SQLite: valore separato persistito, seconda esecuzione identica zero scritture. Nessuna modifica alle schedulazioni o alla logica OOP/Monrad, nessun polling. Dopo pubblicazione restano da verificare acquisizione storica/live, merge R2, import D1, deploy Worker e visualizzazione effettiva in app per un giocatore osservato coinvolto. La riuscita dei test locali non certifica già la pubblicazione remota.
+
+
+## 2026-10-29 — correzione Index Madina e policy D1 incrementale
+
+- Conferma utente: la sorgente esatta Madina RAKHMANOVA TUR è associata al profilo TE d7dfb0a8-8be8-4497-8e0a-b8e0006c9e16 nel commit 77d2fad25c44ee1206a54305fb4ad6074702191a. Nessuna associazione per solo nome.
+- La policy aveva respinto apply-five-reviewed-identities.mjs: ora saveExact usa buildIncrementalSyncPlan per inserire solo record nuovi, mantenendo i controlli sui conflitti e la verifica di rilettura. Il nuovo entry point apply-five-reviewed-identities.test.mjs riusa i test SQLite completi già presenti con il nome riconosciuto dalla policy.
+- Validazione locale: superati i test delle cinque revisioni, del piano incrementale e del recupero TE; passata la policy globale D1 con le regressioni SQLite. Replay senza scritture, preservazione sorgenti e blocco su fonti incomplete verificati.
+- Nessun rilancio manuale dei motori o modifica diretta al D1 remoto. L'applicazione dell'associazione e il ritorno Index verde richiedono il successivo ciclo ordinario; non ancora verificati in produzione.
