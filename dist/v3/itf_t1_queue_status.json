@@ -1,27 +1,27 @@
 {
   "version": 5,
-  "generatedAt": "2026-10-29T22:31:09.903Z",
-  "today": "2026-10-29",
-  "windowEnd": "2026-11-01",
+  "generatedAt": "2026-10-29T23:02:45.198Z",
+  "today": "2026-10-30",
+  "windowEnd": "2026-11-02",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
-  "readyForT1": true,
+  "readyForT1": false,
   "activation": "prepared_only",
   "coverage": {
     "catalogChecked": 1136,
-    "complete": 924,
+    "complete": 925,
     "cancelledNoDraws": 13,
-    "resolved": 937,
-    "missingDrawsTournaments": 1,
+    "resolved": 938,
+    "missingDrawsTournaments": 0,
     "unverifiable": 198,
     "declaredDraws": 5323,
-    "acquiredDraws": 5322,
-    "missingDraws": 1,
-    "actionableUnverifiable": 0,
-    "futureUnverifiable": 198,
+    "acquiredDraws": 5323,
+    "missingDraws": 0,
+    "actionableUnverifiable": 21,
+    "futureUnverifiable": 177,
     "ordinary": {
-      "total": 1,
-      "missingDraws": 1,
-      "inventoryRequired": 0
+      "total": 21,
+      "missingDraws": 0,
+      "inventoryRequired": 21
     },
     "extraordinaryA": {
       "total": 0,
@@ -34,9 +34,9 @@
       "inventoryRequired": 0
     },
     "waiting": {
-      "total": 198,
+      "total": 177,
       "missingDraws": 0,
-      "inventoryRequired": 198
+      "inventoryRequired": 177
     },
     "blocked": {
       "total": 0,
@@ -45,56 +45,6 @@
     }
   },
   "ordinary": {
-    "tournaments": [
-      {
-        "competitionId": "J-J30-GRE-2026-003",
-        "tournamentName": "J30 Athens",
-        "startDate": "2026-10-27",
-        "endDate": "2026-11-01",
-        "status": "missing",
-        "inventoryError": null,
-        "knownDraws": 6,
-        "acquiredDraws": 5,
-        "missingDraws": 1,
-        "missingEvents": [
-          {
-            "event": "B-S-M-KO",
-            "family": "B-S-M",
-            "structure": "KO",
-            "acquired": false,
-            "reasonCode": "draw_without_players",
-            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
-            "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-10-29T22:01:18.995Z",
-            "rowParity": null,
-            "sources": []
-          }
-        ],
-        "resolvedEvents": [],
-        "needsInventory": false,
-        "checkedAt": "2026-10-29T22:01:18.995Z",
-        "eligibleFrom": "2026-10-26"
-      }
-    ],
-    "total": 1,
-    "missingDraws": 1,
-    "acquiredDraws": 5,
-    "missingByReason": {
-      "draw_without_players": 1
-    },
-    "byStatus": {
-      "missing": 1
-    }
-  },
-  "extraordinary": {
-    "tournaments": [],
-    "total": 0,
-    "missingDraws": 0,
-    "acquiredDraws": 0,
-    "missingByReason": {},
-    "byStatus": {}
-  },
-  "waiting": {
     "tournaments": [
       {
         "competitionId": "J-J100-CHN-2026-006",
@@ -431,7 +381,26 @@
         "needsInventory": true,
         "checkedAt": "2026-10-01T21:21:46.918Z",
         "eligibleFrom": "2026-11-01"
-      },
+      }
+    ],
+    "total": 21,
+    "missingDraws": 0,
+    "acquiredDraws": 0,
+    "missingByReason": {},
+    "byStatus": {
+      "inventory_required": 21
+    }
+  },
+  "extraordinary": {
+    "tournaments": [],
+    "total": 0,
+    "missingDraws": 0,
+    "acquiredDraws": 0,
+    "missingByReason": {},
+    "byStatus": {}
+  },
+  "waiting": {
+    "tournaments": [
       {
         "competitionId": "J-J100-KOR-2026-001",
         "tournamentName": "J100 Andong",
@@ -3265,19 +3234,19 @@
         "eligibleFrom": "2027-08-22"
       }
     ],
-    "total": 198,
+    "total": 177,
     "missingDraws": 0,
     "acquiredDraws": 0,
     "missingByReason": {},
     "byStatus": {
-      "inventory_required": 198
+      "inventory_required": 177
     }
   },
   "audit": {
-    "urgentUnverifiable": 0,
+    "urgentUnverifiable": 21,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 0,
-    "futureUnverifiable": 198,
+    "actionableUnverifiable": 21,
+    "futureUnverifiable": 177,
     "blocked": 0
   }
 }
