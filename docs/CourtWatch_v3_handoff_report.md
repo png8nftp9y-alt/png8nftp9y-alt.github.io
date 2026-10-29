@@ -9788,3 +9788,13 @@ Richiesta utente: contare ed elencare tornei e acceptance ITF conservati. Nuovo 
 ITF discovery 2026-10-29T06:33:40.562Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-29T13:45:43.033Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 29 October 2026 — Required code safety before Cloudflare app publication
+
+The four app Worker publishers (hotfix, general D1/API, Europe agenda and Europe rankings) now depend on a shared reusable safety workflow before acquiring the D1 writer lease. The safety workflow runs the release guard, functional Shield, focused TCL/Altri regressions, read-only production D1 snapshots for both groups, and browser replay including TCL → Altri → TCL. It saves a successful certificate only after all checks pass. A fingerprint covers tracked app/runtime code, migrations, tests, dependencies and workflows; ordinary dist data/report updates preserve the certificate. This avoids repeating the heavy browser/D1 check on every engine data publication. A missing or evicted certificate reruns checks. No polling, schedules, engine retries or manual runs are added.
+
+Every app publisher checks out current main inside its existing writer queue and asserts its code fingerprint still matches the approved source before any configuration, imports or deployments. Data advances remain publishable; a code advance fails closed and requires approval for that code. The manual Pages workflow uses the same gate. Limitation: Pages automatic branch publication is a repository setting outside these workflow files; it is not made mandatory by this patch. Direct manual Wrangler deployments and deliberate removal of the gate also remain outside workflow enforcement. No universal claim that every future regression can be detected is made.
+
+Validation: 103 focused Node tests passed, including stable approval for data-only edits, invalidation for app/Worker/dependency/workflow edits, certificate rejection, all four publisher dependencies and pre-write assertions, writer queue behavior and replay 200/500 handling. YAML parsed for all six changed workflows. All 39 functional Shield checks and the group-switch browser check passed with controlled snapshots; production D1 read-only replay requires GitHub secrets and will run before deployment. No production write or engine rerun was performed while preparing this patch.
+
+Installer checks every target before any write. Browser checks with real D1 snapshots run on GitHub before deployment.

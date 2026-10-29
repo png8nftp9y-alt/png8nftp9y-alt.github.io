@@ -1,0 +1,90 @@
+name: Court Watch required code safety
+on:
+  workflow_call:
+    inputs:
+      source_sha:
+        required: true
+        type: string
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        required: true
+      CLOUDFLARE_ACCOUNT_ID:
+        required: true
+    outputs:
+      code_fingerprint:
+        value: ${{ jobs.fingerprint.outputs.code_fingerprint }}
+permissions:
+  contents: read
+jobs:
+  fingerprint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code_fingerprint: ${{ steps.code.outputs.code_fingerprint }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - id: code
+        run: node tools/release-code-fingerprint.mjs --github-output
+  verify:
+    needs: fingerprint
+    concurrency:
+      group: courtwatch-code-safety-${{ needs.fingerprint.outputs.code_fingerprint }}
+      cancel-in-progress: false
+      queue: max
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/cache/restore@v4
+        id: approved
+        with:
+          path: .courtwatch/release-safety-cache
+          key: courtwatch-code-safety-v1-${{ needs.fingerprint.outputs.code_fingerprint }}
+      - name: Validate previously approved exact code
+        if: steps.approved.outputs.cache-hit == 'true'
+        run: node tools/release-code-fingerprint.mjs --expect "${{ needs.fingerprint.outputs.code_fingerprint }}" --verify-certificate .courtwatch/release-safety-cache
+      - name: Install test browser for changed code
+        if: steps.approved.outputs.cache-hit != 'true'
+        run: npm ci --no-audit --no-fund && npx playwright install --with-deps chromium
+      - name: Required Shield and group regression checks
+        if: steps.approved.outputs.cache-hit != 'true'
+        run: |
+          node --test tools/courtwatch-refresh-contract.test.mjs tools/tests/release-safety.test.mjs
+          node tools/courtwatch-release-guard.mjs
+          node tools/courtwatch-functional-shield.mjs
+          node --test cloudflare/app-api/test/personal-player-read-retry.test.mjs cloudflare/app-api/test/replay-others-real-snapshot.test.mjs src/v3/others-independent-loader.test.mjs src/v3/player-addition-ui.test.mjs src/v3/calendar-startup.test.mjs cloudflare/app-api/test/app-snapshot-membership.test.mjs
+      - name: Required read-only real TCL and Others snapshots
+        if: steps.approved.outputs.cache-hit != 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          COURTWATCH_REPLAY_GROUP=main COURTWATCH_OTHERS_SNAPSHOT_PATH=/tmp/courtwatch-main-snapshot.json node tools/replay-others-real-snapshot.mjs
+          node tools/replay-others-real-snapshot.mjs
+          node tools/verify-others-real-snapshot-browser.mjs
+          node tools/verify-player-group-release-browser.mjs
+      - name: Certify only after all required tests succeeded
+        if: steps.approved.outputs.cache-hit != 'true'
+        run: node tools/release-code-fingerprint.mjs --expect "${{ needs.fingerprint.outputs.code_fingerprint }}" --write-certificate .courtwatch/release-safety-cache
+      - uses: actions/cache/save@v4
+        if: steps.approved.outputs.cache-hit != 'true'
+        with:
+          path: .courtwatch/release-safety-cache
+          key: courtwatch-code-safety-v1-${{ needs.fingerprint.outputs.code_fingerprint }}
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.approved.outputs.cache-hit != 'true'
+        with:
+          name: required-code-safety-${{ github.run_id }}-${{ github.job }}
+          path: artifacts/courtwatch-*.json
+          if-no-files-found: warn
+          retention-days: 14

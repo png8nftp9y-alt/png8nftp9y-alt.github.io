@@ -11,7 +11,15 @@ concurrency:
   group: pages
   cancel-in-progress: true
 jobs:
+  release-safety:
+    uses: ./.github/workflows/courtwatch-release-safety.yml
+    with:
+      source_sha: ${{ github.sha }}
+    secrets:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
   deploy:
+    needs: release-safety
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -25,20 +33,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: CourtWatch release guard
-        run: node tools/courtwatch-release-guard.mjs
-      - name: Install browser for functional shield
-        run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
-      - name: Verify complete app behavior before deploy
-        run: node tools/courtwatch-functional-shield.mjs
-      - name: Save guard report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: courtwatch-release-guard
-          path: artifacts/
-          if-no-files-found: error
-          retention-days: 30
+      - name: Require exact approved code before Pages upload
+        run: node tools/release-code-fingerprint.mjs --expect "${{ needs.release-safety.outputs.code_fingerprint }}"
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
