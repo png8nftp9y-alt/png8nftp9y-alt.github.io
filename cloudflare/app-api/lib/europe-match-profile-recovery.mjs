@@ -37,6 +37,7 @@ export function europePublicPages({fetchPage=fetch}={}){
 // Exact source-to-profile bindings supplied by the user on 2026-10-20 and 2026-10-25.
 // They are not name searches or inferred equivalences of federation codes.
 export const userConfirmedEuropeProfiles=Object.freeze([
+ ['5145358bf9fb6107df0d816c','Madina RAKHMANOVA','TUR','d7dfb0a8-8be8-4497-8e0a-b8e0006c9e16','2026-10-29'],
  ['9625837adb91e59c671b0786','Aye DIALLO','','98471900-d3d3-4468-ae75-a7738fd96356','2026-10-25'],
  ['a13740e659705eee53b3a7ef','Kristina DEMYANKO','ITF','9ab1a4e8-a38c-40ee-aecc-f6da91a50767'],
  ['9d640088a5e2ad49a1a7168a','Kristina DEMYANKO','BLR','9ab1a4e8-a38c-40ee-aecc-f6da91a50767'],
