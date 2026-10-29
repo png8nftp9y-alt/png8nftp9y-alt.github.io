@@ -26,6 +26,8 @@ function database({identityMapping=false}={}){
  schema+='\nCREATE TABLE match_analyses(match_key TEXT,analysis TEXT,updated_at TEXT);\n';
  schema+=['0012_single_account_ownership.sql','0024_user_player_removals.sql','0027_user_player_additions.sql','0035_other_player_list.sql'].map(name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8')).join('\n');
  if(identityMapping)schema+=['0028_acquired_player_search.sql','0029_player_circuit_identities.sql'].map(name=>readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8')).join('\n');
+ if(!identityMapping)schema+='\nCREATE TABLE player_identity_aliases(alias_id TEXT PRIMARY KEY,canonical_id TEXT NOT NULL);\n';
+ schema+=readFileSync(new URL('../migrations/0048_observed_player_birth_metadata.sql',import.meta.url),'utf8');
  call({schema});let writes=0;
  const db={prepare(sql){const statement={sql,values:[],first:async()=>call({statements:[{sql,values:[]}]}).rows[0]||null,all:async()=>({results:call({statements:[{sql,values:[]}]}).rows}),bind(...values){return {...statement,values,first:async()=>call({statements:[{sql,values}]}).rows[0]||null,all:async()=>({results:call({statements:[{sql,values}]}).rows})}}};return statement},async batch(statements){const result=call({statements});writes+=result.writes;return result}};
  const execute=(sql,values=[])=>call({statements:[{sql,values}]});
