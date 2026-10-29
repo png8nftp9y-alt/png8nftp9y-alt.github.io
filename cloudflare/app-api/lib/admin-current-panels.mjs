@@ -1,3 +1,4 @@
+import {loadObservedBirthAdmin,renderObservedBirthAdmin} from './admin-observed-birth.mjs';
 import {operationalWorkflowRows} from './admin-operational-workflows.mjs';
 import {adminRuntimeDocuments} from './admin-runtime-documents.mjs';
 import {loadIdentityReviewCases,renderIdentityReviewCases} from './admin-identity-review.mjs';
@@ -34,7 +35,7 @@ export function renderCurrentApplication(doc,diagnostics){
 export async function adminPanelResponse(view,env,url,headers){
  try{
   let panels;
-  if(view==='id')panels={review:renderIdentityReviewCases(await loadIdentityReviewCases(env.DB,url))};
+  if(view==='id'){const [review,birth]=await Promise.all([loadIdentityReviewCases(env.DB,url),loadObservedBirthAdmin(env.DB)]);panels={review:renderIdentityReviewCases(review),birth:renderObservedBirthAdmin(birth)};}
   else{const reader=adminRuntimeDocuments(env.DB);await reader.preload(['dist/v3/operational_status.json','dist/v3/diagnostics.json']);const [doc,diagnostics]=await Promise.all([reader.get('dist/v3/operational_status.json'),reader.get('dist/v3/diagnostics.json')]);panels={workflows:renderCurrentWorkflows(doc),application:renderCurrentApplication(doc,diagnostics)};}
   return new Response(JSON.stringify(panels),{headers:{...headers,'Content-Type':'application/json; charset=utf-8'}});
  }catch{return new Response(JSON.stringify({error:'Lettura corrente non disponibile. Riapri la pagina o usa il pulsante di aggiornamento della sezione.'}),{status:503,headers:{...headers,'Content-Type':'application/json; charset=utf-8'}})}
@@ -42,11 +43,11 @@ export async function adminPanelResponse(view,env,url,headers){
 export function attachAdminPanels(html,view,url){
  if(view!=='id')return html;
  const placeholder=(id,title)=>`<section class="card" id="admin-${id}"><h2>${title}</h2><p class="muted">Caricamento della lettura corrente…</p></section>`;
- if(view==='id')html=html.replace('</nav>','</nav>'+placeholder('review','Identità sospette da verificare'));
+ if(view==='id')html=html.replace('</nav>','</nav>'+placeholder('review','Identità sospette da verificare')+placeholder('birth','Osservati senza anno di nascita'));
  else for(const [id,title] of [['workflows','Workflow e watchdog'],['application','Diagnostica applicativa']])html=html.replace(new RegExp('<section class="card"><h2>'+title+'</h2>[\\s\\S]*?</section>'),placeholder(id,title));
  const endpoint=new URL('/admin/'+view,url);endpoint.searchParams.set('currentPanels','1');const cursor=new URL(url).searchParams.get('reviewAfter');if(view==='id'&&cursor)endpoint.searchParams.set('reviewAfter',cursor);
  const loader=`<div${view==='id'?' class="card"':''} id="admin-panel-loader" data-view="${view}" data-url="${esc(endpoint.pathname+endpoint.search)}">${view==='id'?'<button type="button" id="admin-panel-refresh">Aggiorna segnalazioni</button>':''}<p id="admin-panel-error" role="status"></p><noscript><a href="${esc(endpoint.pathname+endpoint.search)}">Apri la lettura corrente</a></noscript></div><script src="/admin/panels.js" defer></script>`;
  return html.replace('</nav>','</nav>'+loader);
 }
 // One request on opening or explicit click. No timers, polling, retries or discovery.
-export const ADMIN_PANEL_SCRIPT=`(()=>{const host=document.getElementById('admin-panel-loader'),button=document.getElementById('admin-panel-refresh'),error=document.getElementById('admin-panel-error');if(!host)return;let running=false;async function load(){if(running)return;running=true;if(button)button.disabled=true;try{const response=await fetch(host.dataset.url,{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(20000)});if(!response.ok)throw Error('Lettura corrente non disponibile');const panels=await response.json();for(const [key,html]of Object.entries(panels)){if(!['review','workflows','application'].includes(key)||typeof html!=='string')continue;const target=document.getElementById('admin-'+key);if(target)target.innerHTML=html;}error.textContent='';}catch(e){error.textContent=host.dataset.view==='diagnostica'?'Stati non disponibili. Usa Aggiorna diagnostica per riprovare.':'Segnalazioni non disponibili. Premi Aggiorna segnalazioni per riprovare.';}finally{running=false;if(button)button.disabled=false;}}if(button)button.addEventListener('click',load);load();})();`;
+export const ADMIN_PANEL_SCRIPT=`(()=>{const host=document.getElementById('admin-panel-loader'),button=document.getElementById('admin-panel-refresh'),error=document.getElementById('admin-panel-error');if(!host)return;let running=false;async function load(){if(running)return;running=true;if(button)button.disabled=true;try{const response=await fetch(host.dataset.url,{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(20000)});if(!response.ok)throw Error('Lettura corrente non disponibile');const panels=await response.json();for(const [key,html]of Object.entries(panels)){if(!['review','birth','workflows','application'].includes(key)||typeof html!=='string')continue;const target=document.getElementById('admin-'+key);if(target)target.innerHTML=html;}error.textContent='';}catch(e){error.textContent=host.dataset.view==='diagnostica'?'Stati non disponibili. Usa Aggiorna diagnostica per riprovare.':'Segnalazioni non disponibili. Premi Aggiorna segnalazioni per riprovare.';}finally{running=false;if(button)button.disabled=false;}}if(button)button.addEventListener('click',load);load();})();`;

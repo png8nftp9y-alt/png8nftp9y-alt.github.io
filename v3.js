@@ -638,16 +638,9 @@ function personalPlayerAffiliationHtml(player) {
  return country ? nationalityHtml(country) : esc(club || (playerHasFitpMembership(player) ? 'Tesseramento da completare' : ''));
 }
 function playerBirthLabel(player) {
-  const raw = String(player?.birthDate || player?.dateOfBirth || "").slice(
-    0,
-    10,
-  );
-  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-    const date = new Date(raw + "T12:00:00");
-    return `data di nascita ${new Intl.DateTimeFormat("it-IT", { day: "numeric", month: "short", year: "numeric" }).format(date).replace(".", "")}`;
-  }
+  if (player?.birthYearStatus === 'conflict') return '';
   const year = playerDemographics(player).birthYear;
-  return Number.isInteger(year) ? `anno di nascita ${year}` : "";
+  return Number.isInteger(year) ? `anno di nascita ${year}` : '';
 }
 const FITP_UPPER = new Set([
   "ASD",

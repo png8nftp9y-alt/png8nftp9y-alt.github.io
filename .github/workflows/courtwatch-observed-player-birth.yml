@@ -1,0 +1,60 @@
+# D1_WRITE_POLICY: incremental
+name: Court Watch observed player birth years
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-observed-player-birth.yml'
+      - 'cloudflare/app-api/lib/player-birth-metadata.mjs'
+      - 'cloudflare/app-api/lib/official-player-birth.mjs'
+      - 'cloudflare/app-api/scripts/sync-observed-player-birth.mjs'
+      - 'cloudflare/app-api/migrations/0048_observed_player_birth_metadata.sql'
+  workflow_run:
+    workflows: ['Court Watch acquired player search index']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      retry_unavailable:
+        description: Recheck sources without a verified birth year, including previous access failures
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-d1-writes
+  cancel-in-progress: false
+  queue: max
+jobs:
+  acquire:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: cloudflare/app-api
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_D1_DATABASE_ID: cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda
+      BIRTH_RETRY_UNAVAILABLE: ${{ github.event_name == 'workflow_dispatch' && inputs.retry_unavailable && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: main}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify years, source identity, personal scope, conflicts and zero-write replay
+        run: node --test test/sync-observed-player-birth.test.mjs
+      - name: Configure and apply additive schema
+        run: |
+          npm install
+          node scripts/configure-d1.mjs
+          npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+      - name: Acquire only unprocessed selected-player profiles
+        run: node scripts/sync-observed-player-birth.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: observed-birth-coverage
+          path: cloudflare/app-api/tmp/observed-birth-coverage.json
+          retention-days: 30
