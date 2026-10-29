@@ -1,3 +1,4 @@
+import {ensureRuntimeDocumentVersion} from '../lib/verify-runtime-version.mjs';
 import {assertRuntimeSourceOrder} from '../lib/runtime-source-order.mjs';
 // D1_WRITE_POLICY: incremental; buildIncrementalSyncPlan in runtime-document-plan.mjs.
 import fs from 'node:fs/promises';
@@ -33,15 +34,7 @@ const plan=releasePlan(documents,sourceCommit,previous);
 let insertedVersions=0,unchangedVersions=0;
 failureReport.stage='content_verification';
 for(const d of documents){
- const stored=await query('SELECT seq,data FROM runtime_document_chunks WHERE path=? AND content_hash=? ORDER BY seq',[d.path,d.hash]);
- const existing=stored.length?stored.map(r=>r.data):null;
- // A partial immutable version can resume only when every stored chunk agrees.
- if(existing&&stored.some(r=>d.chunks[r.seq]!==r.data))throw Error('Immutable runtime chunk conflict:'+d.path);
- const complete=existing&&stored.length===d.chunks.length;
- if(complete){decodeDocument({...d,chunks:d.chunks.length},existing);unchangedVersions++;}
- else{for(const sql of versionStatements(d,null))await query(sql);insertedVersions++;}
- const check=await query('SELECT seq,data FROM runtime_document_chunks WHERE path=? AND content_hash=? ORDER BY seq',[d.path,d.hash]);
- decodeDocument({...d,chunks:d.chunks.length},check.map(r=>r.data));
+ if(await ensureRuntimeDocumentVersion(query,d))insertedVersions++;else unchangedVersions++;
  failureReport.verifiedDocuments++;
 }
 // Publish one release pointer only AFTER every document's full-content readback.

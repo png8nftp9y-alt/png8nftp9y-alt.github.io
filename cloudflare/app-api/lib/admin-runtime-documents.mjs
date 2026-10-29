@@ -17,9 +17,10 @@ export function adminRuntimeDocuments(db){
 SELECT 'release' AS kind,'' AS path,-1 AS seq,value AS data FROM current
 UNION ALL
 SELECT 'chunk',c.path,c.seq,c.data FROM current
-JOIN json_each(current.value,'$.documents') d
-JOIN runtime_document_chunks c ON c.path=json_extract(d.value,'$.path') AND c.content_hash=json_extract(d.value,'$.hash')
-WHERE c.path IN (${paths.map(()=>'?').join(',')})`;
+CROSS JOIN json_each(current.value,'$.documents') d
+CROSS JOIN runtime_document_chunks c
+WHERE c.path=json_extract(d.value,'$.path') AND c.content_hash=json_extract(d.value,'$.hash')
+AND c.path IN (${paths.map(()=>'?').join(',')})`;
   let rows;try{rows=(await db.prepare(sql).bind(...paths).all()).results||[];}catch(error){reader={release:async()=>{throw error},get:async()=>{throw error}};throw error;}
   // Reuse the existing full hash/size/chunk verification against the pinned snapshot.
   reader=runtimeDocumentReader({prepare(){return{
