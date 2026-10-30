@@ -9813,3 +9813,5 @@ Installer checks every target before any write. Browser checks with real D1 snap
 - Verifica installer: suite acquisizione e aggiunte personali, verificatore UI e diff check prima del push. Resta separato il browser snapshot con una partita mancante, da verificare sul relativo run.
 
 ITF discovery 2026-10-30T06:32:18.505Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-10-30T13:36:10.730Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
