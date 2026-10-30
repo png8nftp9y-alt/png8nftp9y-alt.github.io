@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-10-30T23:25:05.449Z",
+  "generatedAt": "2026-10-30T23:29:14.061Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,12 +8,12 @@
     "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
-    "declaredSections": 6,
+    "declaredSections": 5,
     "requestedSections": 4,
-    "acquiredSections": 2,
+    "acquiredSections": 1,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 2,
+    "resolvedSections": 1,
     "missingSections": 4,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
@@ -27,9 +27,9 @@
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 527,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 66,
+    "globalPendingTotal": 69,
     "globalPendingTechnical": 33,
-    "globalPendingPublication": 33,
+    "globalPendingPublication": 36,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -98,20 +98,23 @@
       "J-J60-CYP-2026-003",
       "J-J60-KAZ-2026-005",
       "J-J60-KEN-2026-005",
-      "J-J60-PAK-2026-002"
+      "J-J60-PAK-2026-002",
+      "J-J100-KOR-2026-001",
+      "J-J200-TPE-2026-001",
+      "J-J30-GER-2026-001"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J60-BEL-2026-003",
-      "tournamentName": "J60 Heiveld",
+      "competitionId": "J-J60-PAK-2026-002",
+      "tournamentName": "J60 Islamabad",
       "decision": "pending",
       "playersFound": [],
-      "declaredSections": 6,
-      "acquiredSections": 2,
+      "declaredSections": 5,
+      "acquiredSections": 1,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 2,
+      "resolvedSections": 1,
       "missingSections": 4,
       "sections": [
         {
@@ -143,13 +146,6 @@
           "status": "pending"
         },
         {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
-        },
-        {
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "acquired": false,
@@ -177,7 +173,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 42,
+              "players": 10,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -207,19 +203,6 @@
               "error": "draw_not_published_or_incomplete",
               "failureType": "not_published_or_incomplete",
               "resolved": false
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
-          "populated": true,
-          "events": [
-            {
-              "event": "G-S-Q-KO",
-              "players": 10,
-              "error": null,
-              "failureType": null,
-              "resolved": true
             }
           ]
         },
