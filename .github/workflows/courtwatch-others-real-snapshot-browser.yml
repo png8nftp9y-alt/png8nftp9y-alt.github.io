@@ -25,4 +25,5 @@ jobs:
       - run: node tools/verify-agenda-layout-browser.mjs
       - run: node tools/verify-shared-match-refresh-browser.mjs
       - run: node tools/replay-others-real-snapshot.mjs
+      - run: node --test tools/tests/snapshot-match-coverage.test.mjs
       - run: node tools/verify-others-real-snapshot-browser.mjs

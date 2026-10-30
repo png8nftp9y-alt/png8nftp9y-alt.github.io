@@ -9815,3 +9815,8 @@ Installer checks every target before any write. Browser checks with real D1 snap
 ITF discovery 2026-10-30T06:32:18.505Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-10-30T13:36:10.730Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+### Chat 1 — 2026-10-30: controllo snapshot con avanzamenti solo agenda
+- Il run 40965401849 supera check-source ma lo scudo browser conta un elemento mancante. Il verificatore confrontava tutte le righe matches ricevute con lo storico normalizzato, includendo agendaOnly; la regola vigente le sposta intenzionalmente soltanto in agenda. Riprodotto il falso allarme con il caso ufficiale Letsch del 6 ottobre e la normalizzazione frontend reale. Il vecchio log non identifica il singolo elemento del run: non si attribuisce quel nome al run senza evidenza.
+- Il verificatore ora controlla separatamente partite reali nello storico e avanzamenti in agenda, e vieta avanzamenti nello storico e nei risultati anche se viene perso il flag. Nessun cambiamento di rendering, fonti, D1 o regole W/O. Mantiene tutti i controlli browser precedenti e aggiunge dettagli identificativi delle eventuali righe mancanti.
+- Otto regressioni locali verdi: falso positivo riprodotto, perdita partita reale, perdita avanzamento, contaminazione storico/risultati, W/O reale, flag perso, identita condivise e normalizzazione ripetuta. Test aggiunto sia al workflow browser sia allo scudo obbligatorio. Verifica reale D1/browser e deploy da confermare sul nuovo run; nessun polling o rilancio automatico.
