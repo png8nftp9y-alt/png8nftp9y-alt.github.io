@@ -29,7 +29,7 @@ test('recursive opponent renderer exposes official links without tournament loca
  vm.createContext(ctx);
  for(const [a,b] of [['function tournamentOfficialUrl(','function tournamentDrawUrl('],['function tournamentPlace(','function agendaOrderOfPlayUrl('],['function tournamentMapsUrl(','function tournamentSurfaceLabel('],['function opponentTournamentWindow(','function opponentHistoryKey(']])vm.runInContext(ui.slice(ui.indexOf(a),ui.indexOf(b)),ctx);
  for(const circuit of ['itf','fitp','tennis-europe']){
-  ctx.renderOpponentHistory({tournaments:[{circuit,competitionId:'EXACT',name:'Event',startDate:'2026-10-01',endDate:'2026-10-07',matches:circuit==='tennis-europe'?[{matchId:'played',circuit}]:[],sourceUrl:'https://official.invalid/event',venueName:'Official Club',address:'Via Uno 1',location:'City'}]});
+  ctx.renderOpponentHistory({tournaments:[{circuit,competitionId:'EXACT',name:'Event',startDate:'2026-10-01',endDate:'2026-10-07',matches:['tennis-europe','itf'].includes(circuit)?[{matchId:'played',circuit}]:[],sourceUrl:'https://official.invalid/event',venueName:'Official Club',address:'Via Uno 1',location:'City'}]});
   assert.ok(!body.innerHTML.includes('https://www.google.com/maps/search/?api=1'));
   assert.ok(!body.innerHTML.includes('Official Club'));assert.ok(!body.innerHTML.includes('Via Uno 1'));assert.ok(!body.innerHTML.includes('📍'));
   assert.ok(body.innerHTML.includes('target="_blank"'));

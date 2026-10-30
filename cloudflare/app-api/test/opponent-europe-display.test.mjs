@@ -48,6 +48,8 @@ test('legacy Europe matches survive rendering; FITP and ITF matches remain exclu
  v.ctx.renderOpponentHistory({tournaments:rows});
  assert.equal((v.html().match(/class="opponentHistoryMatch unifiedMatchRow"/g)||[]).length,1);
  assert.ok(v.html().includes('class="loss">6-2 6-3'));assert.ok(!v.html().includes('2-6 3-6'));
+ const projected=v.ctx.opponentHistoryProjection({tournaments:rows});assert.ok(projected.tournaments.some(t=>t.id==='i'&&t.historyMatchCount===1));
+ assert.ok(v.ctx.opponentHistoryProjection(projected).tournaments.some(t=>t.id==='i'));
  const pending=v.ctx.opponentHistoryMatchRowHtml({...match,score:'',status:'scheduled',won:undefined});assert.ok(!pending.includes('class="loss"'));assert.ok(!pending.includes('class="win"'));
 });
 test('fresh neutral outcome clears an obsolete loss in persisted opponent matches',()=>{
@@ -126,4 +128,11 @@ test('SQLite Europe history through the real API assembler renders current and p
   assert.ok(v.html().includes('Doppio con'));assert.ok(v.html().includes('Partner Player'));assert.ok(v.html().includes('class="loss">6-2 6-3'));assert.ok(!v.html().includes('Prossimo torneo programmato'));
   const matchQuery=queries.find(q=>q.includes('m.payload AS match_payload'));assert.ok(!matchQuery.includes('COALESCE(t.end_date,t.start_date,m.played_date)<?'));
  }finally{rmSync(directory,{recursive:true,force:true})}
+});
+
+test('browser excludes old ITF withdrawals without losing genuinely played ITF tournaments',()=>{
+ const v=view(),base={circuit:'itf',startDate:'2026-10-01',endDate:'2026-10-07'};
+ const data=v.ctx.opponentHistoryProjection({tournaments:[{...base,id:'withdrawn',entryStatus:'withdrawn',matches:[]},{...base,id:'played',entryStatus:'withdrawn',matches:[{matchId:'itf-played',circuit:'itf',status:'completed',score:'6-2 6-3'}]}]});
+ assert.deepEqual(Array.from(data.tournaments,t=>t.id),['played']);
+ assert.equal(data.tournaments[0].historyMatchCount,1);
 });

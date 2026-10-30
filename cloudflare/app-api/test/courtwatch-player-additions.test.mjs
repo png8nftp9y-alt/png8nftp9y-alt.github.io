@@ -90,7 +90,7 @@ test('Others-only addition does not create a main membership; invalid groups do 
  }finally{d.close()}
 });
 test('protected snapshots and removals are scoped; main removal does not hide Others',async()=>{
- const d=database();try{
+ const d=database({identityMapping:true});try{
   const id='configured-test',player={id,name:'Test Player',worldTennisId:'101'};
   d.execute('INSERT INTO app_players(seq,id,payload) VALUES(?,?,?)',[1,id,JSON.stringify(player)]);
   await addCourtWatchPlayer(d.env,user,{courtwatchId:id});
