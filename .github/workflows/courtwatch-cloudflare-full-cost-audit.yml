@@ -8,6 +8,8 @@ on:
       - '.github/scripts/cloudflare-full-cost-audit.mjs'
       - 'cloudflare/app-api/lib/cloudflare-storage-usage.mjs'
       - 'cloudflare/app-api/test/cloudflare-storage-usage.test.mjs'
+      - 'cloudflare/app-api/lib/cloudflare-observability-usage.mjs'
+      - 'cloudflare/app-api/test/cloudflare-observability-usage.test.mjs'
 permissions:
   contents: read
 concurrency:
@@ -24,10 +26,11 @@ jobs:
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      CLOUDFLARE_BILLING_READ_TOKEN: ${{ secrets.CLOUDFLARE_BILLING_READ_TOKEN }}
       CLOUDFLARE_BILLING_DAY: '15'
     steps:
       - uses: actions/checkout@v4
       - name: Verify storage and counter metrics
-        run: node --test cloudflare/app-api/test/cloudflare-storage-usage.test.mjs
+        run: node --test cloudflare/app-api/test/cloudflare-storage-usage.test.mjs cloudflare/app-api/test/cloudflare-observability-usage.test.mjs
       - name: Read Cloudflare account usage
         run: node .github/scripts/cloudflare-full-cost-audit.mjs

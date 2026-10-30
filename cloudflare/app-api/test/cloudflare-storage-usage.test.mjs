@@ -33,7 +33,7 @@ test('counter forecasts retain the existing elapsed-cycle formula and genuine re
 test('the real audit snapshot uses inventory levels for storage and forecasts for counters',()=>{
  const ctx=auditContext();
  Object.assign(ctx,{now:new Date('2026-10-15T00:13:07Z'),from:'2026-10-15',target:'2026-11-15',billingDay:15,
-  subscriptionRows:[],safeList:x=>x||[],inventory:{d1StoredBytes:2491805696},d1:{success:true},d1Totals:{rowsRead:594215,rowsWritten:680},d1Groups:[],
+  observability:null,subscriptionRows:[],safeList:x=>x||[],inventory:{d1StoredBytes:2491805696},d1:{success:true},d1Totals:{rowsRead:594215,rowsWritten:680},d1Groups:[],
   workers:{success:true},workerTotals:{requests:8,duration:1.09},workerGroups:[],r2Operations:{success:true},r2Structure:{success:true,bytes:911664258},r2Totals:{requests:308},r2Groups:[{dimensions:{actionType:'GetObject',date:'2026-10-15'},sum:{requests:308}}],
   daily:()=>[],subscriptions:{status:200},databases:{status:200},buckets:{status:200},kv:{status:200},queues:{status:200},scripts:{status:200}});
  const start=audit.indexOf('const snapshot='),end=audit.indexOf('const persisted=',start);

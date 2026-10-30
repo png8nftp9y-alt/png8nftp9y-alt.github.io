@@ -1,3 +1,4 @@
+import {observabilityUsage} from '../../cloudflare/app-api/lib/cloudflare-observability-usage.mjs';
 // R2 semantic audit rerun after ITF archive recovery.
 import { spawnSync } from 'node:child_process';
 import { gunzipSync } from 'node:zlib';
@@ -21,8 +22,8 @@ const elapsedDays = Math.max(1 / 24, (now - cycle.start) / 86400000);
 const cycleDays = (cycle.end - cycle.start) / 86400000;
 const remainingDays = Math.max(0, (cycle.end - now) / 86400000);
 
-async function api(path, { method = 'GET', body } = {}) {
-  const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+async function api(path, { method = 'GET', body, readToken } = {}) {
+  const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}${path}`, { method, headers:readToken?{...headers,Authorization:`Bearer ${readToken}`}:headers, body: body ? JSON.stringify(body) : undefined, signal:AbortSignal.timeout(30000) });
   const payload = await response.json().catch(() => ({}));
   return { status: response.status, success: Boolean(payload.success), result: payload.result ?? null, errors: payload.errors ?? [] };
 }
@@ -34,7 +35,8 @@ async function graphql(name, query) {
 const d1 = await graphql('d1', `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){d1AnalyticsAdaptiveGroups(limit:10000,filter:{date_geq:$from,date_leq:$to}){dimensions{date databaseId}sum{rowsRead rowsWritten}}}}}`);
 const workers = await graphql('workers', `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){workersInvocationsAdaptive(limit:10000,filter:{date_geq:$from,date_leq:$to}){dimensions{date scriptName status}sum{requests errors subrequests duration}}}}}`);
 const r2Operations = await graphql('r2_operations', `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){r2OperationsAdaptiveGroups(limit:10000,filter:{date_geq:$from,date_leq:$to}){dimensions{date bucketName actionType}sum{requests responseBytes}}}}}`);
-const [subscriptions, databases, buckets, kv, queues, scripts] = await Promise.all([api('/subscriptions'),api('/d1/database?per_page=100'),api('/r2/buckets'),api('/storage/kv/namespaces?per_page=100'),api('/queues?per_page=100'),api('/workers/scripts')]);
+const [subscriptions, databases, buckets, kv, queues, scripts, observabilityBilling] = await Promise.all([api('/subscriptions'),api('/d1/database?per_page=100'),api('/r2/buckets'),api('/storage/kv/namespaces?per_page=100'),api('/queues?per_page=100'),api('/workers/scripts'),api('/billable-usage',{readToken:process.env.CLOUDFLARE_BILLING_READ_TOKEN}).catch(()=>({success:false,status:null,result:null}))]);
+const observability=observabilityUsage(observabilityBilling,{now});
 const safeList = value => Array.isArray(value) ? value : [];
 const accountData = result => result.data?.viewer?.accounts?.[0] || {};
 const sumGroups = (groups, fields) => { const out=Object.fromEntries(fields.map(field=>[field,0]));for(const group of groups||[])for(const field of fields)out[field]+=Number(group.sum?.[field]||0);return out };
@@ -90,7 +92,7 @@ function persistR2Snapshot(snapshot){
   return{success:result.status===0,status:result.status,reason:result.status===0?null:'r2_upload_failed',stderr:String(result.stderr||'').slice(0,500)};
 }
 const r2Structure=auditR2Structure(),subscriptionRows=safeList(subscriptions.result);
-const snapshot={schemaVersion:1,generatedAt:now.toISOString(),cycle:{start:from,end:target,billingDay,elapsedDays,remainingDays},subscriptions:{active:subscriptionRows.filter(row=>String(row.status).toLowerCase()==='active').length,listed:subscriptionRows.length,recurringPrice:Number(subscriptionRows.reduce((sum,row)=>sum+Number(row.price||0),0).toFixed(2)),currencies:[...new Set(subscriptionRows.map(row=>row.rate_plan?.currency).filter(Boolean))]},d1:{success:d1.success,totals:d1Totals,daily:daily(d1Groups,['rowsRead','rowsWritten']),storedBytes:inventory.d1StoredBytes,rowsRead:project(d1Totals.rowsRead,25_000_000_000),rowsWritten:project(d1Totals.rowsWritten,50_000_000),storage:storageUsageMetric(inventory.d1StoredBytes,5_000_000_000)},workers:{success:workers.success,totals:workerTotals,daily:daily(workerGroups,['requests','errors','subrequests','duration']),requests:project(workerTotals.requests,10_000_000),cpu:project(workerTotals.duration,30_000_000)},r2:{success:r2Operations.success&&r2Structure.success,totals:r2Totals,daily:daily(r2Groups,['requests','responseBytes']),structure:r2Structure,operationClasses:r2OperationUsage(r2Groups,project),storage:storageUsageMetric(r2Structure.bytes||0,10_000_000_000),note:'Standard R2: Class A and B have separate monthly allowances. Free and unknown actions are reported separately; analytics forecasts are estimates, not an invoice.'},inventory,endpoints:{subscriptions:subscriptions.status,databases:databases.status,buckets:buckets.status,kv:kv.status,queues:queues.status,scripts:scripts.status}};
+const snapshot={observability,schemaVersion:1,generatedAt:now.toISOString(),cycle:{start:from,end:target,billingDay,elapsedDays,remainingDays},subscriptions:{active:subscriptionRows.filter(row=>String(row.status).toLowerCase()==='active').length,listed:subscriptionRows.length,recurringPrice:Number(subscriptionRows.reduce((sum,row)=>sum+Number(row.price||0),0).toFixed(2)),currencies:[...new Set(subscriptionRows.map(row=>row.rate_plan?.currency).filter(Boolean))]},d1:{success:d1.success,totals:d1Totals,daily:daily(d1Groups,['rowsRead','rowsWritten']),storedBytes:inventory.d1StoredBytes,rowsRead:project(d1Totals.rowsRead,25_000_000_000),rowsWritten:project(d1Totals.rowsWritten,50_000_000),storage:storageUsageMetric(inventory.d1StoredBytes,5_000_000_000)},workers:{success:workers.success,totals:workerTotals,daily:daily(workerGroups,['requests','errors','subrequests','duration']),requests:project(workerTotals.requests,10_000_000),cpu:project(workerTotals.duration,30_000_000)},r2:{success:r2Operations.success&&r2Structure.success,totals:r2Totals,daily:daily(r2Groups,['requests','responseBytes']),structure:r2Structure,operationClasses:r2OperationUsage(r2Groups,project),storage:storageUsageMetric(r2Structure.bytes||0,10_000_000_000),note:'Standard R2: Class A and B have separate monthly allowances. Free and unknown actions are reported separately; analytics forecasts are estimates, not an invoice.'},inventory,endpoints:{subscriptions:subscriptions.status,databases:databases.status,buckets:buckets.status,kv:kv.status,queues:queues.status,scripts:scripts.status}};
 const persisted=persistR2Snapshot(snapshot);
 console.log('CLOUDFLARE_USAGE_SNAPSHOT='+JSON.stringify(snapshot));
 console.log('CLOUDFLARE_USAGE_PERSISTED='+JSON.stringify({...persisted,key:'monitoring/cloudflare-usage/current.json'}));
