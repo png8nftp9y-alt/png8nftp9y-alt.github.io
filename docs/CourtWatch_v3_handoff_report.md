@@ -9811,3 +9811,5 @@ Installer checks every target before any write. Browser checks with real D1 snap
 - La policy richiede anche un entry point con il nome della workflow: aggiunto courtwatch-observed-player-birth.test.mjs che esegue le stesse regressioni SQLite incrementali, senza disabilitare controlli.
 - La fixture di courtwatch-player-additions per snapshot protetti non installava player_identity_aliases: aggiunta la tabella quando manca il mapping e applicata la migrazione annuale reale. Nessun cambiamento a codice produzione, dati D1 o scheduler.
 - Verifica installer: suite acquisizione e aggiunte personali, verificatore UI e diff check prima del push. Resta separato il browser snapshot con una partita mancante, da verificare sul relativo run.
+
+ITF discovery 2026-10-30T06:32:18.505Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
