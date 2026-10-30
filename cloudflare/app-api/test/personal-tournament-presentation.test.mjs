@@ -66,3 +66,16 @@ test('unavailable official data never erases a stored verified ITF venue or borr
  const out=mergeTournamentPresentation({circuit:'itf',venueName:'Saved club',location:'Saved city'},map.get('itf|MISSING'));
  assert.equal(out.venueName,'Saved club');assert.equal(out.location,'Saved city');
 });
+
+test('public presentation maps reuse verified content across requests but check the release and immediately follow changed hashes',async()=>{
+ const {storedPresentationLoaders}=await import('../lib/personal-tournament-presentation.mjs');
+ let reads=0,releases=0,version=1,unavailable=false;
+ const documents=()=>({release:async()=>{releases++;return {documents:['dist/v3/source_fitp_tournaments.json','dist/v3/tournaments.json'].map(path=>({path,hash:'presentation-cache-fixture-'+version,bytes:500,chunks:1}))};},get:async()=>{reads++;if(unavailable)throw Error('injected_catalogue_failure');return {tournaments:[{circuit:'fitp',competitionId:'CACHE-EXACT',club:'Club '+version,location:'Official city'}]};}});
+ const first=await storedPresentationLoaders(documents()).fitp();assert.equal(first.get('fitp|CACHE-EXACT').venueName,'Club 1');assert.equal(reads,2);
+ const second=await storedPresentationLoaders(documents()).fitp();assert.deepEqual(second,first);assert.equal(reads,2);assert.equal(releases,2);
+ const rendered=mergeTournamentPresentation({circuit:'fitp',competitionId:'CACHE-EXACT',entryStatus:'withdrawn'},second.get('fitp|CACHE-EXACT'));rendered.venueName='User-specific change';
+ assert.equal((await storedPresentationLoaders(documents()).fitp()).get('fitp|CACHE-EXACT').venueName,'Club 1');
+ version=2;const updated=await storedPresentationLoaders(documents()).fitp();assert.equal(updated.get('fitp|CACHE-EXACT').venueName,'Club 2');assert.equal(reads,4);
+ version=3;unavailable=true;await assert.rejects(storedPresentationLoaders(documents()).fitp(),/injected_catalogue_failure/);unavailable=false;
+ const recovered=await storedPresentationLoaders(documents()).fitp();assert.equal(recovered.get('fitp|CACHE-EXACT').venueName,'Club 3');assert.equal(reads,8);
+});

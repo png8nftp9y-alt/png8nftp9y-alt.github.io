@@ -45,11 +45,33 @@ export async function fetchTournamentPresentation(c,fetcher){
  }
  return map;
 }
+// Share only verified public presentation fields. Every request first reads the
+// current D1 release; a changed source hash selects a new map immediately.
+const presentationMaps=new Map(),pendingPresentationMaps=new Map();
+const presentationMapBudget=8*1024*1024;let presentationMapBytes=0;
+function keepPresentationMap(signature,map){
+ const bytes=JSON.stringify([...map]).length*2+map.size*64;
+ if(bytes>presentationMapBudget)return;
+ while(presentationMapBytes+bytes>presentationMapBudget&&presentationMaps.size){const oldest=presentationMaps.keys().next().value;presentationMapBytes-=presentationMaps.get(oldest).bytes;presentationMaps.delete(oldest);}
+ presentationMaps.set(signature,{map,bytes});presentationMapBytes+=bytes;
+}
 export function storedPresentationLoaders(documents){
  if(!documents)throw Error('runtime_document_reader_required');
  return Object.fromEntries(Object.keys(sources).map(c=>[c,async()=>{
-  const docs=new Map(await Promise.all(sources[c].map(async path=>[path,await documents.get(path)])));
-  return fetchTournamentPresentation(c,async url=>({ok:true,json:async()=>docs.get(new URL(url).pathname.slice(1))}));
+  const snapshot=typeof documents.release==='function'?await documents.release():null;
+  const signature=snapshot?JSON.stringify(sources[c].map(path=>{const record=snapshot.documents.find(row=>row.path===path);if(!record)throw Error('runtime_document_not_published:'+path);return [path,record.hash,record.bytes,record.chunks];})):null;
+  const cached=signature&&presentationMaps.get(signature);
+  if(cached){presentationMaps.delete(signature);presentationMaps.set(signature,cached);return cached.map;}
+  if(signature&&pendingPresentationMaps.has(signature))return pendingPresentationMaps.get(signature);
+  const load=(async()=>{
+   const docs=new Map(await Promise.all(sources[c].map(async path=>[path,await documents.get(path)])));
+   const map=await fetchTournamentPresentation(c,async url=>({ok:true,json:async()=>docs.get(new URL(url).pathname.slice(1))}));
+   if(signature&&!presentationMaps.has(signature))keepPresentationMap(signature,map);
+   return map;
+  })();
+  const shared=signature&&pendingPresentationMaps.size<8&&!pendingPresentationMaps.has(signature);
+  if(shared)pendingPresentationMaps.set(signature,load);
+  try{return await load;}finally{if(shared&&pendingPresentationMaps.get(signature)===load)pendingPresentationMaps.delete(signature);}
  }]));
 }
 // Request-local promises keep one catalogue load per circuit, including empty results.

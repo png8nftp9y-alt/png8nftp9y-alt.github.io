@@ -1,3 +1,4 @@
+import {boundedPlayerMap} from '../lib/bounded-player-map.mjs';
 import {agendaAdvancementRows} from '../lib/tennis-europe-agenda-advances.mjs';
 import {enrichIdentityNationalities} from '../lib/identity-nationality.mjs';
 import {opponentEuropeProfile} from '../lib/opponent-europe-profile.mjs';
@@ -6,8 +7,8 @@ import {appendIdentityReviewCases,loadIdentityReviewCases} from '../lib/admin-id
 import {loadFitpDrawLinks} from '../lib/fitp-draw-links.mjs';
 import {personalPlayerList} from '../lib/personal-player-list.mjs';
 import {loadObservedBirthAdmin} from '../lib/admin-observed-birth.mjs';
-import {enrichPlayerBirthMetadata} from '../lib/player-birth-metadata.mjs';
-import {enrichFitpMetadata} from '../lib/fitp-player-metadata.mjs';
+import {enrichPlayerBirthMetadata,playerBirthMetadataRows} from '../lib/player-birth-metadata.mjs';
+import {enrichFitpMetadata,fitpMetadataRows} from '../lib/fitp-player-metadata.mjs';
 import {runtimeDocumentReader,FRONTEND_DOCUMENTS} from '../lib/runtime-document-reader.mjs';
 import {adminRuntimeDocuments} from '../lib/admin-runtime-documents.mjs';
 import {playerLoadTiming} from '../lib/player-load-timing.mjs';
@@ -32,7 +33,7 @@ import {savedAdminPage} from '../lib/admin-saved-page.mjs';
 import {selectOpponentEntryProfiles} from '../lib/opponent-entry-native-aliases.mjs';
 import {sharedTournamentMetadata} from '../lib/tournament-metadata-cache.mjs';
 import {paginatedPlayerSearch,searchIdentityProfile} from '../lib/paginated-player-search.mjs';
-import {resolveCircuitProfiles,circuitProfiles,playerCircuitIdentities} from '../lib/player-circuit-profiles.mjs';
+import {circuitProfileRows,resolveCircuitProfiles,circuitProfiles,playerCircuitIdentities} from '../lib/player-circuit-profiles.mjs';
 import {opponentTournamentWindow} from '../lib/opponent-tournament-window.mjs';
 import {otherCircuitOpponentHistory,boundedRows} from '../lib/opponent-canonical-history.mjs';
 import {mergePersonalLiveTournaments,mergePersonalHistoryTournament} from '../lib/personal-live-entry.mjs';
@@ -236,24 +237,28 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
       timing.measure('identity',()=>personalPlayerAdditions(env,user.id,group,playerId)).catch(error=>{if(!missingOptionalTable(error))throw error;return []})
     ]);
     const playerMap=new Map(players.map(player=>[player.id,player]));for(const player of added)playerMap.set(player.id,{...playerMap.get(player.id),...player});players.splice(0,players.length,...playerMap.values());
-    const presentation=playerId?tournamentPresentationContext(undefined,timing.measure,env.RUNTIME_DOCUMENTS):null;
+    const presentation=tournamentPresentationContext(undefined,timing.measure,env.RUNTIME_DOCUMENTS);
     presentation?.prepare(tournaments);
     const prepare=rows=>{presentation.prepare(rows);return rows};
-    const scopedData=playerId?await Promise.all([
-      timing.measure('entries',()=>exactPersonalEntryProfiles(env.DB,added).then(profiles=>Promise.all(added.filter(p=>p.sourceKey).map(async player=>{
+    const scopedData=await Promise.all([
+      timing.measure('entries',()=>exactPersonalEntryProfiles(env.DB,added).then(profiles=>boundedPlayerMap(added.filter(p=>p.sourceKey),async player=>{
         const entries=await playerEntryTournaments(env,player,{entryRows:profiles.get(player.id)});
         return [player.id,prepare(entries)];
-      })))),
+      }))),
       timing.measure('native_tournaments',()=>personalUnreleasedTournamentHistory(env.DB,added).then(async rows=>{
         prepare(rows);
         return [rows,rows.some(t=>t.circuit==='itf')?await itfTournamentMetadata(env):new Map()];
       })),
-      timing.measure('match_history',()=>Promise.all(added.map(async player=>{
+      timing.measure('match_history',()=>boundedPlayerMap(added,async player=>{
         const history=await personalCircuitHistory(env.DB,player);prepare(history.tournaments);return history;
-      }))),
-      timing.measure('rankings_read',()=>preparedTennisEuropeRankingData(env,[...new Set(players.map(p=>p.id))])).then(data=>({data}),error=>({error}))
-    ]):null;
-    // All branches read independently, but preserve the established merge order.
+      })),
+      timing.measure('rankings_read',()=>preparedTennisEuropeRankingData(env,[...new Set(players.map(p=>p.id))])).then(data=>({data}),error=>({error})),
+      timing.measure('fitp_metadata_read',()=>fitpMetadataRows(env.DB,players)),
+      timing.measure('birth_metadata_read',()=>playerBirthMetadataRows(env.DB,players)),
+      timing.measure('profile_mapping_read',()=>circuitProfileRows(env.DB,players))
+    ]);
+    // Full and single-player snapshots share independent reads and the same merge order.
+    // Each player branch is bounded; no source is fetched twice.
     const entryProfiles=scopedData?null:await exactPersonalEntryProfiles(env.DB,added);
     const entrySets=scopedData?new Map(scopedData[0]):null;
     for(const player of added.filter(player=>player.sourceKey)){
@@ -281,12 +286,12 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
     // use the already merged players/matches, so neither must wait for catalogues.
     const [presented,,linkedProfiles,advancementSource]=await Promise.all([
       timing.measure('presentation_wait',()=>(presentation?presentation.enrich(tournaments):enrichPersonalTournamentPresentation(tournaments,env.RUNTIME_DOCUMENTS))),
-      rankPlayers(),timing.measure('profile_links',()=>resolveCircuitProfiles(env.DB,players)),
+      rankPlayers(),timing.measure('profile_links',()=>resolveCircuitProfiles(env.DB,players,scopedData[6])),
       env.DB.prepare("SELECT value FROM app_state WHERE key='tennis_europe_agenda_advancements'").first()
     ]);
     tournaments.splice(0,tournaments.length,...presented);
     const agendaAdvances=agendaAdvancementRows(advancementSource?JSON.parse(advancementSource.value):[],players,matches);
-    for(const player of players)player.circuitProfiles=linkedProfiles.get(player)||[];await enrichFitpMetadata(env.DB,players);await enrichPlayerBirthMetadata(env.DB,players);const selectedIds=new Set(players.map(p=>p.id));const scoped=(rows,field)=>(playerId||group==='others')?rows.filter(row=>selectedIds.has(row[field])):rows;return privateJson({group,...(playerId?{playerId}:{}),membershipIds,generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players:scoped(applyOverrides(players,overrides,'player'),'id'),tournaments:scoped(applyOverrides(tournaments,overrides,'tournament'),'playerId'),matches:[...matches,...agendaAdvances]})}
+    for(const player of players)player.circuitProfiles=linkedProfiles.get(player)||[];await enrichFitpMetadata(env.DB,players,scopedData[4]);await enrichPlayerBirthMetadata(env.DB,players,scopedData[5]);const selectedIds=new Set(players.map(p=>p.id));const scoped=(rows,field)=>(playerId||group==='others')?rows.filter(row=>selectedIds.has(row[field])):rows;return privateJson({group,...(playerId?{playerId}:{}),membershipIds,generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players:scoped(applyOverrides(players,overrides,'player'),'id'),tournaments:scoped(applyOverrides(tournaments,overrides,'tournament'),'playerId'),matches:[...matches,...agendaAdvances]})}
   if(apiPath==='/match-analysis-status'&&request.method==='GET'){const rows=await optionalRows(env.DB.prepare('SELECT match_key,updated_at FROM user_match_analyses WHERE user_id=? ORDER BY updated_at DESC').bind(user.id));return privateJson({matches:rows.map(row=>({matchKey:row.match_key,updatedAt:row.updated_at}))})}
   if(apiPath==='/match-analysis'){const matchKey=String(url.searchParams.get('matchKey')||'').trim().slice(0,240);if(request.method==='GET'){if(!matchKey)return privateJson({error:'match_key_required'},400);const row=await env.DB.prepare('SELECT match_key,analysis,updated_at FROM user_match_analyses WHERE user_id=? AND match_key=?').bind(user.id,matchKey).first();return privateJson(row?{matchKey:row.match_key,analysis:row.analysis,updatedAt:row.updated_at}:{matchKey,analysis:'',updatedAt:null})}if(request.method==='PUT'){const body=await request.json().catch(()=>null),key=String(body?.matchKey||'').trim().slice(0,240),analysis=String(body?.analysis||'').trim();if(!key||!analysis||analysis.length>20000)return privateJson({error:'invalid_analysis'},400);const now=new Date().toISOString();await env.DB.prepare('INSERT INTO user_match_analyses(user_id,match_key,analysis,updated_at) VALUES(?,?,?,?) ON CONFLICT(user_id,match_key) DO UPDATE SET analysis=excluded.analysis,updated_at=excluded.updated_at').bind(user.id,key,analysis,now).run();return privateJson({matchKey:key,analysis,updatedAt:now})}if(request.method==='DELETE'){if(!matchKey)return privateJson({error:'match_key_required'},400);await env.DB.prepare('DELETE FROM user_match_analyses WHERE user_id=? AND match_key=?').bind(user.id,matchKey).run();return privateJson({success:true,matchKey})}return privateJson({error:'method_not_allowed'},405)}
   return privateJson({error:'not_found'},404)

@@ -2791,6 +2791,12 @@ async function addCourtWatchPlayerFromUi(result, button) {
     confirmedCourtWatchPlayers.set(data.playerId,data.player);
     state.data.players = [...(state.data.players || []).filter(p => p.id !== data.playerId),data.player];
     state.selected.add(data.playerId);
+    // Start the HTTP read before synchronous cache serialization and rendering.
+    // An older full load cannot overwrite this selection epoch.
+    // Enrich only this player immediately, without waiting for that load.
+    refreshAfterPlayerAddition(state.playerSelectionEpoch, additionGroup, data.playerId).catch(error => {
+      console.warn('player_addition_refresh_failed', error);
+    });
     saveUiState();
     Promise.resolve(saveCachedData(state.data)).catch(error => console.warn("Archivio locale non disponibile", error));
     playerRemovalMode = false;
@@ -2805,11 +2811,6 @@ async function addCourtWatchPlayerFromUi(result, button) {
       } else openProfile(data.playerId);
     }
     recordPlayerLoadTiming('addition_render',renderStarted);
-    // An older full load cannot overwrite this selection epoch.
-    // Enrich only this player immediately, without waiting for that load.
-    refreshAfterPlayerAddition(state.playerSelectionEpoch, additionGroup, data.playerId).catch(error => {
-      console.warn('player_addition_refresh_failed', error);
-    });
   })();
   playerAdditionsInFlight.set(key,operation);
   try { await operation; }

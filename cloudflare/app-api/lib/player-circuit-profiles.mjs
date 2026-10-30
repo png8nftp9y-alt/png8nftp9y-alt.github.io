@@ -58,8 +58,12 @@ export function circuitProfiles(player,rows=[]){
  }
  return ['fitp','tennis-europe','itf'].filter(c=>result.has(c)).map(c=>result.get(c));
 }
-export async function resolveCircuitProfiles(db,players){
- const stored=await mappedProfiles(db,players),results=new Map(stored),pending=players.filter(p=>!stored.has(p));
+export async function circuitProfileRows(db,players){
+ const stored=await mappedProfiles(db,players);
+ return new Map(players.filter(p=>stored.has(p)).map(p=>[p.id,stored.get(p)]));
+}
+export async function resolveCircuitProfiles(db,players,prepared){
+ const stored=prepared===undefined?await mappedProfiles(db,players):new Map(players.filter(p=>prepared.has(p.id)).map(p=>[p,prepared.get(p.id)])),results=new Map(stored),pending=players.filter(p=>!stored.has(p));
  for(let offset=0;offset<pending.length;offset+=20){const batch=pending.slice(offset,offset+20),names=[...new Set(batch.flatMap(p=>{const n=normalizePlayerName(p.name),reverse=n.split(' ').reverse().join(' ');return[n,n.toLowerCase(),reverse,reverse.toLowerCase()]}).filter(Boolean))],rows=[];
   if(names.length){
    const pages=await Promise.all(['observed_players','search_acquired_players'].map(async table=>{

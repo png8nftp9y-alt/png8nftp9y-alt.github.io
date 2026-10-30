@@ -16,14 +16,18 @@ export function applyBirthEvidence(player,rows){
  else if(rows.length)player.birthYearStatus=rows.some(r=>r.status==='source_error')?'source_error':'not_available';
  return player;
 }
-export async function enrichPlayerBirthMetadata(db,players){
+export async function playerBirthMetadataRows(db,players){
  const ids=[...new Set(players.map(p=>String(p.canonicalId||p.id||'')).filter(Boolean))];
- if(!ids.length)return players;
+ if(!ids.length)return new Map();
  const evidence=new Map();
  try{for(let i=0;i<ids.length;i+=80){
   const rows=(await db.prepare(`SELECT ids.value AS player_id,b.* FROM json_each(?) ids LEFT JOIN player_identity_aliases a ON a.alias_id=ids.value JOIN player_birth_metadata b ON b.canonical_id=COALESCE(a.canonical_id,ids.value)`).bind(JSON.stringify(ids.slice(i,i+80))).all()).results||[];
   for(const row of rows){const list=evidence.get(row.player_id)||[];list.push(row);evidence.set(row.player_id,list);}
- }}catch(e){if(/no such table: (?:main\.)?player_birth_metadata/i.test(e.message))return players;throw e;}
+ }}catch(e){if(/no such table: (?:main\.)?player_birth_metadata/i.test(e.message))return evidence;throw e;}
+ return evidence;
+}
+export async function enrichPlayerBirthMetadata(db,players,prepared){
+ const evidence=prepared??await playerBirthMetadataRows(db,players);
  for(const player of players){const rows=evidence.get(String(player.canonicalId||player.id||''));if(rows?.length)applyBirthEvidence(player,rows);}
  return players;
 }

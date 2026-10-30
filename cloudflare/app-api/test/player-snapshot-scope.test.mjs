@@ -1,3 +1,4 @@
+import './bounded-player-map.test.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {database} from './search-sqlite-fixture.mjs';
@@ -109,11 +110,50 @@ test('final profile resolution overlaps a pending catalogue and preserves exact 
   function wrap(s,sql,values=[]){return new Proxy(s,{get(t,k){const v=t[k];if(k==='bind')return(...args)=>wrap(v.apply(t,args),sql,args);
    if(k==='all')return async(...args)=>{
     if(sql.includes('runtime_document_chunks')&&values[0]==='dist/v3/tournaments.json'&&!held){held=true;return new Promise((resolve,reject)=>{release=()=>Promise.resolve(v.apply(t,args)).then(resolve,reject);timer=setTimeout(()=>{release();release=null},5000)})}
-    if(sql.includes('WITH requested AS')&&held&&release){overlap=true;clearTimeout(timer);release();release=null;}
+    if(sql.includes('FROM observed_players WHERE normalized_name')&&held&&release){overlap=true;clearTimeout(timer);release();release=null;}
     return v.apply(t,args);
    };return typeof v==='function'?v.bind(t):v;}})}
   const db={prepare:sql=>wrap(d.db.prepare(sql),sql),batch:s=>d.db.batch(s)};
   const response=await request(db,'others','cw-target-0');assert.equal(response.status,200);
   const result=await response.json();assert.equal(overlap,true);assert.deepEqual({...result,generatedAt:null},{...expected,generatedAt:null});assert.equal(d.writes(),before);
  }finally{clearTimeout(timer);d.close()}
+});
+
+test('full group overlaps independent entries/history and bounds histories to three players, with unchanged membership and zero writes', {timeout:60000}, async()=>{
+ const d=database({identityMapping:true}),original=globalThis.fetch;globalThis.fetch=async()=>({ok:true,json:async()=>({tournaments:[]})});
+ try{seed(d,5);let active=0,peak=0,releaseEntries,overlap=false;
+  function wrap(statement,sql){return new Proxy(statement,{get(target,key){const value=target[key];if(key==='bind')return(...args)=>wrap(value.apply(target,args),sql);
+   if(key==='all')return async(...args)=>{
+    if(sql.includes('JOIN opponent_entry_profiles'))return new Promise((resolve,reject)=>{releaseEntries=()=>Promise.resolve(value.apply(target,args)).then(resolve,reject)});
+    if(sql.includes('WITH candidate_matches AS MATERIALIZED')){
+     peak=Math.max(peak,++active);await new Promise(resolve=>setImmediate(resolve));
+     if(releaseEntries){overlap=true;releaseEntries();releaseEntries=null;}
+     try{return await value.apply(target,args)}finally{active--;}
+    }
+    return value.apply(target,args);
+   };return typeof value==='function'?value.bind(target):value;}});}
+  const before=d.writes(),response=await request({prepare:sql=>wrap(d.db.prepare(sql),sql),batch:s=>d.db.batch(s)},'others');
+  assert.equal(response.status,200);const body=await response.json();assert.equal(body.players.length,5);assert.equal(body.matches.length,5);assert.equal(overlap,true);assert(peak>1&&peak<=3,String(peak));assert.equal(d.writes(),before);
+ }finally{globalThis.fetch=original;d.close();}
+});
+
+test('new-player FITP and birth reads start before history completes and apply the same final data with zero writes', {timeout:60000}, async()=>{
+ const d=database({identityMapping:true});
+ try{seed(d,1);const row=d.execute("SELECT payload FROM user_app_player_additions WHERE courtwatch_id='cw-target-0'")[0];const player={...JSON.parse(row.payload),membershipCard:'1234567'};d.execute("UPDATE user_app_player_additions SET payload=? WHERE courtwatch_id='cw-target-0'",[JSON.stringify(player)]);
+  d.execute('CREATE TABLE fitp_player_metadata(membership_card TEXT PRIMARY KEY,canonical_id TEXT,club TEXT,ranking TEXT,updated_at TEXT)');
+  d.execute('CREATE TABLE player_birth_metadata(source_key TEXT PRIMARY KEY,canonical_id TEXT,circuit TEXT,official_id TEXT,birth_year INTEGER,status TEXT,source_url TEXT,checked_at TEXT,error TEXT)');
+  d.execute('INSERT INTO fitp_player_metadata VALUES(?,?,?,?,?)',['1234567',player.id,'Verified Club','3.4','2026-10-30']);
+  d.execute('INSERT INTO player_birth_metadata VALUES(?,?,?,?,?,?,?,?,?)',['fitp|id:1234567',player.id,'fitp','1234567',2012,'year_only','https://www.fitp.it/','2026-10-30','']);
+  const expected=await (await request(d.db,'others','cw-target-0')).json();let fitp=false,birth=false,overlap=false;const held=[];
+  function wrap(statement,sql){return new Proxy(statement,{get(target,key){const value=target[key];if(key==='bind')return(...args)=>wrap(value.apply(target,args),sql);
+   if(key==='all')return async(...args)=>{
+    if(sql.includes('WITH candidate_matches AS MATERIALIZED'))return new Promise((resolve,reject)=>{held.push(()=>Promise.resolve(value.apply(target,args)).then(resolve,reject));if(fitp&&birth){overlap=true;for(const finish of held.splice(0))finish();}});
+    if(sql.includes('LEFT JOIN fitp_player_metadata'))fitp=true;
+    if(sql.includes('JOIN player_birth_metadata'))birth=true;
+    if(fitp&&birth&&held.length){overlap=true;for(const finish of held.splice(0))finish();}
+    return value.apply(target,args);
+   };return typeof value==='function'?value.bind(target):value;}});}
+  const before=d.writes(),response=await request({prepare:sql=>wrap(d.db.prepare(sql),sql),batch:s=>d.db.batch(s)},'others','cw-target-0');assert.equal(response.status,200);const result=await response.json();
+  assert.equal(overlap,true);assert.equal(d.writes(),before);assert.deepEqual({...result,generatedAt:null},{...expected,generatedAt:null});assert.equal(result.players[0].club,'Verified Club');assert.equal(result.players[0].ranking,'3.4');assert.equal(result.players[0].birthYear,2012);
+ }finally{d.close();}
 });

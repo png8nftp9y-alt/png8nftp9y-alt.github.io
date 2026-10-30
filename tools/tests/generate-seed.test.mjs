@@ -28,3 +28,31 @@ test('actual generator omits unchanged catalogue operations using only completed
   const changed=rows.map((r,i)=>i===100?{...r,name:'changed'}:r);r=await generate(changed);assert.equal(r.status,0,r.stderr);planned=await sql();assert.match(planned,/INSERT INTO tournaments/);assert.doesNotMatch(planned,/DELETE FROM entries|INSERT INTO players/);
  }finally{if(before===undefined)delete process.env.D1_REMOTE_GENERATION_FILE;else process.env.D1_REMOTE_GENERATION_FILE=before;}
 }));
+
+test('observation-only syncs keep stored timestamps and write no entries/tournaments; a real withdrawal or registration change writes only its row',()=>fixture(async({rows,generate,sql,write})=>{
+ const d=database();
+ const entries=Array.from({length:2},(_,i)=>({id:'e'+i,tournamentId:'t'+i,playerId:'p0',circuit:'fitp',state:'active',lastObservedAt:'2026-10-29T00:00:00Z',subscriptionRegistrations:[{category:'SM14',subscriptionDate:'2026-10-01'}]}));
+ const app=Array.from({length:2},(_,i)=>({id:'app'+i,playerId:'p0',circuit:'fitp',competitionId:'source'+i,lastV3EntrySync:'2026-10-29T00:00:00Z',subscriptionRegistrations:[{category:'SM14',subscriptionDate:'2026-10-01'}]}));
+ const inputs=async(e,t)=>{await write('dist/v3/universal/players.json',{players:[{id:'p0',displayName:'Case Player'}]});await write('players.json',{players:[{id:'p0',name:'Case Player'}]});await write('dist/v3/universal/entries.json',{entries:e});await write('dist/v3/tournaments.json',{tournaments:t});};
+ try{
+  await inputs(entries,app);let r=await generate(rows);assert.equal(r.status,0,r.stderr);const initial=JSON.parse(r.stdout).counts;await d.query(await sql());
+  d.execute('CREATE TABLE observation_changes(kind TEXT,id TEXT)');
+  d.execute("CREATE TRIGGER observation_entry_update AFTER UPDATE ON entries BEGIN INSERT INTO observation_changes VALUES('entry',new.id); END");
+  d.execute("CREATE TRIGGER observation_tournament_update AFTER UPDATE ON app_tournaments BEGIN INSERT INTO observation_changes VALUES('tournament',new.competition_id); END");
+  const newerEntries=entries.map(x=>({...x,lastObservedAt:'2026-10-30T22:00:00Z'})),newerApp=app.map(x=>({...x,lastV3EntrySync:'2026-10-30T22:00:00Z'}));
+  await inputs(newerEntries,newerApp);r=await generate(rows);assert.equal(r.status,0,r.stderr);assert.equal(JSON.parse(r.stdout).counts.importHash,initial.importHash);await d.query(await sql());assert.deepEqual(d.execute('SELECT * FROM observation_changes'),[]);
+  assert.equal(JSON.parse(d.execute("SELECT payload FROM entries WHERE id='e0'")[0].payload).lastObservedAt,entries[0].lastObservedAt);
+  assert.equal(JSON.parse(d.execute('SELECT payload FROM app_tournaments WHERE seq=1')[0].payload).lastV3EntrySync,app[0].lastV3EntrySync);
+  newerEntries[1].state='withdrawn';newerApp[1].subscriptionRegistrations[0]={category:'SF14',subscriptionDate:'2026-10-02'};
+  await inputs(newerEntries,newerApp);r=await generate(rows);assert.equal(r.status,0,r.stderr);assert.notEqual(JSON.parse(r.stdout).counts.importHash,initial.importHash);await d.query(await sql());
+  assert.deepEqual(d.execute('SELECT * FROM observation_changes ORDER BY kind'),[{kind:'entry',id:'e1'},{kind:'tournament',id:'source1'}]);
+  assert.equal(JSON.parse(d.execute("SELECT payload FROM entries WHERE id='e1'")[0].payload).lastObservedAt,newerEntries[1].lastObservedAt);
+  assert.equal(d.execute("SELECT state FROM entries WHERE id='e1'")[0].state,'withdrawn');
+  const before=d.execute('SELECT COUNT(*) AS n FROM observation_changes')[0].n;await d.query(await sql());assert.equal(d.execute('SELECT COUNT(*) AS n FROM observation_changes')[0].n,before);
+  newerEntries.push({...entries[0],id:'e2',tournamentId:'t2'});newerApp.push({...app[0],id:'app2',competitionId:'source2'});
+  await inputs(newerEntries,newerApp);r=await generate(rows);assert.equal(r.status,0,r.stderr);await d.query(await sql());assert.equal(d.execute("SELECT state FROM entries WHERE id='e2'")[0].state,'active');
+  await inputs(newerEntries.filter(x=>x.id!=='e0'),newerApp.filter(x=>x.id!=='app0'));r=await generate(rows);assert.equal(r.status,0,r.stderr);await d.query(await sql());assert.deepEqual(d.execute('SELECT id FROM entries ORDER BY id'),[{id:'e1'},{id:'e2'}]);assert.deepEqual(d.execute('SELECT competition_id FROM app_tournaments ORDER BY seq'),[{competition_id:'source1'},{competition_id:'source2'}]);
+  d.execute("UPDATE entries SET payload='invalid-json' WHERE id='e1'");d.execute("UPDATE app_tournaments SET payload='invalid-json' WHERE seq=1");await d.query(await sql());assert.equal(JSON.parse(d.execute("SELECT payload FROM entries WHERE id='e1'")[0].payload).state,'withdrawn');assert.equal(JSON.parse(d.execute('SELECT payload FROM app_tournaments WHERE seq=1')[0].payload).competitionId,'source1');
+
+ }finally{d.close();}
+}));

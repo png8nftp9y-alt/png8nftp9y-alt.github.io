@@ -210,3 +210,11 @@ test('pending synchronized player shows loading on a previously complete snapsho
  assert.doesNotMatch(ctx.playerTournamentsEmptyHtml('new'),/Nessun torneo/);
  ctx.state.data.players[0].membershipPending=false;assert.match(ctx.playerTournamentsEmptyHtml('new'),/Nessun torneo/);
 });
+
+test('confirmed addition starts exactly one targeted read before local cache serialization or rendering',async()=>{
+ const player={id:'cw-test',name:'Test Player'},c=context({ok:true,json:async()=>({added:true,playerId:player.id,player})}),events=[];
+ c.context.fetchProjection=url=>{assert.ok(c.state.data.players.some(p=>p.id===player.id));assert.ok(c.state.selected.has(player.id));events.push('snapshot');assert.ok(url.endsWith('playerId=cw-test'));return new Promise(()=>{});};
+ c.context.saveCachedData=()=>events.push('cache');c.context.renderHome=()=>events.push('render');c.context.route=()=>events.push('profile');
+ await c.context.addCourtWatchPlayerFromUi({identity:'101',name:player.name},c.button);
+ assert.deepEqual(events,['snapshot','cache','render','profile']);assert.equal(c.button.disabled,false);assert.equal(c.state.data.personalProjectionComplete,false);
+});
