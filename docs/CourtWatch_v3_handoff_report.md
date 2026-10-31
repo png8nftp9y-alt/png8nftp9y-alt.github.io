@@ -9918,3 +9918,5 @@ One telemetry read in the existing audit. No polling, retries or scheduling chan
 ITF discovery 2026-10-31T06:21:37.581Z: 1 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-10-31T06:22:26.171Z: attempted 1, acquired 1, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-31T06:23:16.667Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
