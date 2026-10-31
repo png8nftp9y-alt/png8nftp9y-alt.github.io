@@ -9964,6 +9964,11 @@ ITF discovery 2026-10-31T13:09:28.847Z: 0 newly discovered future tournaments; M
 - Validazione locale: 9 regressioni del controllo unificato e conservazione della pagina su errore; 6 regressioni SQLite con 23 identita su entrambe le liste, altri account/rimossi esclusi, conflitti, readback runtime, delta reali e replay zero scritture. Installer esegue inoltre suite acquisizione, Admin e verificatore UI sulla main corrente prima del push. Deploy e applicazione effettiva dei dati da verificare nei nuovi run.
 
 
+## 2026-10-31 — Chat 1: complete Admin unified-refresh regression coverage
+
+The birth/Admin commit 4aec7ff9d1 was blocked in source checks of CRUD 41219292670, D1/API 41219292762 and Worker 41219292771 by four tests still expecting pre-unification controls. Update the Diagnostics snapshot assertion to allow the authenticated script while continuing to forbid automatic panel requests and retaining exact saved HTML, zero D1/HTTP reads, failure links, write counts and manual-refresh behavior. The cold ID scope test checks the new single icon while preserving zero reads and remote independence. Identity review keeps authorization, export and no-write assertions and now verifies saved-page opening does not automatically load cases. The Worker assembly check follows unifiedIdentityReport rather than the old direct ID renderer.
+
+Add a real Worker/SQLite regression: unauthorized unified refresh performs zero reads/writes; authenticated refresh persists all three complete sections exactly once; subsequent ID opening reads only the saved snapshot. No production, workflow, source-data or database mutation changes. Acquisition run 41219292740 succeeded: 23 curated records written and verified, 64/64 active observed players have year_only evidence. Worker/Admin deployment remains pending the new release checks. Validation: complete npm run check passed with 691 tests and zero failures; verify-analysis-ui returned green; git diff --check passed. The real Worker/SQLite refresh regression also passed in its dedicated run. The installer repeats the complete check on the fetched main before committing. No workflow rerun or polling introduced.
 ## 2026-10-31 — chat 1: separazione e correzione audit pagine ITF
 - Run 41189830435: zero differenze, 15 giocatori/60 presenze, 145 identita non confermate, 107 alternate non verificabili, fonti cambiate; zero scritture D1.
 - Corretto controllo identita: circuitProfiles espone URL ufficiali, non profileId. Usa parser identita esistente con host e ID verificati; nessuna associazione basata sul solo nome.
@@ -9987,3 +9992,11 @@ Focused ongoing-withdrawal and startup fix. Existing engine schedules and app re
 - Run CRUD 41229120742 e hotfix 41229120856 fermati sugli stessi quattro test Admin, prima del deploy. Aspettative precedenti all’introduzione del refresh identità unificato: script panels assente, vecchio refreshIds e review automatica.
 - Allineate le regressioni al controllo manuale corrente senza cambiare il runtime: pagina salvata resta invariata, nessuna lettura DB/HTTP all’apertura, refresh accessibile, export autorizzato e read-only, caricamento esplicito della review e uso del report unificato.
 - Nessuna modifica alla correzione set corti, acquisizione o D1. Validazione test Admin mirati e npm run check completo; esito remoto da verificare dopo il push. Nessun polling né rilancio.
+
+## 2026-10-31 — chat 1: alternate futuri e prove storiche separate
+- Analisi artifact 13049816694 del run 41220333830: i 107 casi riguardano 21 tornei. Nel catalogo 104 casi/20 tornei iniziano a novembre; 3 casi riguardano J60 Pescara concluso il 3 ottobre.
+- La copia acquisita di Pescara contiene 32 giocatori nel doppio maschile B-D-M-KO ma non la relativa acquisitionProof. Non viene inventata una certificazione dai soli conteggi.
+- Audit: evidenza incompleta di torneo futuro con date valide viene separata in pendingAlternates; una esclusione senza prova resta errore. Tornei gia iniziati, conclusi o senza date valide mantengono la segnalazione.
+- Per le prove mancanti legge e allega i checks del registro ufficiale R2 coverage-v3-current, senza trasformarli automaticamente in certificazione della cache. Controlla che il registro non cambi durante la lettura.
+- Validazione: tre test temporali, regressioni audit/identita e sintassi. Nessuna scrittura D1/R2 o chiamata di acquisizione ITF. Un solo audit su push.
+- Limiti: confronto remoto Pescara ancora da eseguire; eventuale riparazione dati dipende dall'evidenza. Non dichiarata completezza globale o chiusura dei tre casi storici.

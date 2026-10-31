@@ -1,3 +1,4 @@
+import {pendingFutureAlternate} from './lib/itf-alternate-timing.mjs';
 // D1_READ_ONLY: guarded
 import fs from 'node:fs/promises';import path from 'node:path';import http from 'node:http';import {execFileSync} from 'node:child_process';import {gunzipSync} from 'node:zlib';
 import worker from '../cloudflare/app-api/src/index.js';
@@ -85,6 +86,11 @@ try{
   report.opponents.push(record);if(bad.length)issue('opponent_acceptance_in_past',record);
  }
  await opponentPage.close();
+ const catalogueReader=runtimeDocumentReader(db),auditCatalogue=(await catalogueReader.get('dist/v3/source_itf_tournaments.json')).tournaments||[],catalogueById=new Map(auditCatalogue.map(t=>[competitionKey(t),t]));
+ report.pendingAlternates=[];
+ const coverageBytes=r2('itf/audits/official-draw-parity/coverage-v3-current.json'),coverageAudit=parse(coverageBytes.toString());
+ report.alternateCoverageEvidence={criterion:coverageAudit.criterion,generatedAt:coverageAudit.generatedAt};
+ const coverageById=new Map((coverageAudit.tournaments||[]).map(t=>[competitionKey(t),t]));
  const entryProfiles=new Map();const allIds=[...scopedIds];
  for(let i=0;i<allIds.length;i+=30){const ids=allIds.slice(i,i+30);for(const row of await query(`SELECT source_player_id,payload FROM opponent_entry_profiles WHERE circuit='itf' AND source_player_id IN (${ids.map(()=>'?').join(',')})`,ids))entryProfiles.set(String(row.source_player_id),parse(row.payload));}
  const sourceByCompetition=new Map(Object.values(draws.tournaments).map(t=>[competitionKey(t),t]));
@@ -93,13 +99,20 @@ try{
   const record={nativeId:id,name:p.name||p.playerName||'',competitionId,expected,storedStatus:stored?.entryStatus||'missing',excluded,confirmed};report.alternates.push(record);
   if(expected.state==='absent'&&(!stored||!excluded))issue('alternate_absent_but_not_excluded',record);
   if(expected.state==='present'&&(!stored||excluded||!confirmed))issue('alternate_presence_not_preserved',record);
-  if(expected.state==='unverifiable')report.unverifiable.push({...record,reason:'alternate_draw_coverage_unverifiable'});
+  if(expected.state==='unverifiable'){
+   const t=catalogueById.get(competitionId),future=pendingFutureAlternate(t,today),row=coverageById.get(competitionId);
+   record.tournamentDates={startDate:t?.startDate||null,endDate:t?.endDate||null};
+   record.authoritativeCoverage=row?{classification:row.classification,checks:row.checks||[],missingEvents:row.missingEvents||[]}:null;
+   if(future){record.verification='awaiting_future_draw_evidence';report.pendingAlternates.push(record);if(excluded)issue('future_alternate_excluded_without_complete_draw_evidence',record);}
+   else report.unverifiable.push({...record,reason:'alternate_draw_coverage_unverifiable'});
+  }
  }
- const reader=runtimeDocumentReader(db),catalogue=(await reader.get('dist/v3/source_itf_tournaments.json')).tournaments||[];
+ const catalogue=auditCatalogue;
  report.drawCoverage={scope:'ITF catalogue tournaments concluded since 2026-09-01; cache inventory presence only, not a claim of complete acquisition',tournaments:catalogue.filter(t=>String(t.endDate||'')>= '2026-09-01'&&String(t.endDate||'')<today).map(t=>({competitionId:competitionKey(t),inventoried:Boolean(sourceByCompetition.get(competitionKey(t))?.eventInventory?.length)}))};
  report.drawCoverage.missingInventoryCount=report.drawCoverage.tournaments.filter(t=>!t.inventoried).length;
  if(!report.players.length)throw Error('no_verified_itf_player_audited');
- const after=await markers(),generationAfter=parse(r2('itf/database/pointers/current.json').toString()).generation;report.sourceMarkersAfter=JSON.parse(after);report.sourceChanges={d1:before!==after,r2:generationAfter!==generation,generationBefore:generation,generationAfter};report.concurrentSourceChanged=report.sourceChanges.d1||report.sourceChanges.r2;report.problemGroups={identity:report.unverifiable.filter(x=>x.reason==='opponent_identity_not_confirmed'),alternates:report.alternates.filter(x=>x.expected.state==='unverifiable'),zeroPresence:report.players.filter(x=>!x.expected.length),excludedPlayers:report.playerCoverage.filter(x=>x.status!=='audited')};
+ report.alternateCoverageEvidence.changedDuringAudit=!coverageBytes.equals(r2('itf/audits/official-draw-parity/coverage-v3-current.json'));
+ const after=await markers(),generationAfter=parse(r2('itf/database/pointers/current.json').toString()).generation;report.sourceMarkersAfter=JSON.parse(after);report.sourceChanges={d1:before!==after,r2:generationAfter!==generation,generationBefore:generation,generationAfter};report.concurrentSourceChanged=report.sourceChanges.d1||report.sourceChanges.r2||report.alternateCoverageEvidence.changedDuringAudit;report.problemGroups={identity:report.unverifiable.filter(x=>x.reason==='opponent_identity_not_confirmed'),alternates:report.alternates.filter(x=>x.expected.state==='unverifiable'),zeroPresence:report.players.filter(x=>!x.expected.length),excludedPlayers:report.playerCoverage.filter(x=>x.status!=='audited')};
  report.status=report.concurrentSourceChanged?'inconclusive_concurrent_source_change':report.issues.length?'differences_found':report.unverifiable.length||presence.unidentified.length||report.drawCoverage.missingInventoryCount?'checked_scope_matches_with_unverifiable_cases':'checked_scope_matches';
 }catch(error){report.status='audit_failed';report.error=String(error.message).replace(/[\w.+-]+@[\w.-]+/g,'[email]').slice(0,1200);process.exitCode=1;}
 finally{await browser?.close();server?.close();report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');console.log('ITF_PAGE_AUDIT='+JSON.stringify({status:report.status,players:report.players.length,opponents:report.opponents.length,alternates:report.alternates.length,issues:report.issues.length,unverifiable:report.unverifiable.length,metrics:report.metrics,error:report.error}));for(const row of report.players)console.log('ITF_PLAYER_AUDIT='+JSON.stringify({group:row.group,name:row.name,nativeId:row.nativeId,expected:row.scoped.expected,missingSnapshot:row.scoped.missing,missingBrowser:row.browser?.missing}));for(const row of report.issues)console.log('ITF_PAGE_DIFFERENCE='+JSON.stringify(row));}
