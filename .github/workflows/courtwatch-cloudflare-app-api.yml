@@ -106,12 +106,12 @@ jobs:
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 1}
+        with: {ref: main, fetch-depth: 2}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Block deployment unless exact code passed required safety
         working-directory: .
-        run: node tools/release-code-fingerprint.mjs --expect "${{ needs.release-safety.outputs.code_fingerprint }}"
+        run: node tools/ensure-release-safety.mjs --expect "${{ needs.release-safety.outputs.code_fingerprint }}"
       - name: Configure private R2 reads
         env:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -124,6 +124,7 @@ jobs:
           python -m pip install --disable-pip-version-check --quiet awscli
       - run: npm install
       - name: Recheck source only when code advanced during the wait
+        if: env.COURTWATCH_RELEASE_RECHECKED != 'true'
         env:
           CHECKED_SHA: ${{ needs.check-source.outputs.source_sha }}
         run: |

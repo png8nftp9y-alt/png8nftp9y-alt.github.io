@@ -25,6 +25,9 @@ on:
       - '.github/workflows/courtwatch-cloudflare-app-hotfix.yml'
       - '.github/workflows/courtwatch-release-safety.yml'
       - 'tools/release-code-fingerprint.mjs'
+      - 'tools/ensure-release-safety.mjs'
+      - 'tools/run-release-safety.mjs'
+      - 'tools/tests/ensure-release-safety.test.mjs'
       - 'tools/verify-player-group-release-browser.mjs'
       - 'tools/tests/release-safety.test.mjs'
       - 'v3.js'
@@ -82,14 +85,15 @@ jobs:
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 1}
+        with: {ref: main, fetch-depth: 2}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Block deployment unless exact code passed required safety
         working-directory: .
-        run: node tools/release-code-fingerprint.mjs --expect "${{ needs.release-safety.outputs.code_fingerprint }}"
+        run: node tools/ensure-release-safety.mjs --expect "${{ needs.release-safety.outputs.code_fingerprint }}"
       - run: npm install
       - name: Recheck source only when code advanced during the wait
+        if: env.COURTWATCH_RELEASE_RECHECKED != 'true'
         env:
           CHECKED_SHA: ${{ needs.check-source.outputs.source_sha }}
         run: |

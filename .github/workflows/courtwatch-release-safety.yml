@@ -58,22 +58,13 @@ jobs:
         run: npm ci --no-audit --no-fund && npx playwright install --with-deps chromium
       - name: Required Shield and group regression checks
         if: steps.approved.outputs.cache-hit != 'true'
-        run: |
-          node --test tools/courtwatch-refresh-contract.test.mjs tools/tests/release-safety.test.mjs
-          node --test tools/tests/snapshot-match-coverage.test.mjs
-          node tools/courtwatch-release-guard.mjs
-          node tools/courtwatch-functional-shield.mjs
-          node --test cloudflare/app-api/test/personal-player-read-retry.test.mjs cloudflare/app-api/test/replay-others-real-snapshot.test.mjs src/v3/others-independent-loader.test.mjs src/v3/player-addition-ui.test.mjs src/v3/calendar-startup.test.mjs cloudflare/app-api/test/app-snapshot-membership.test.mjs
+        run: node tools/run-release-safety.mjs --phase local
       - name: Required read-only real TCL and Others snapshots
         if: steps.approved.outputs.cache-hit != 'true'
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          COURTWATCH_REPLAY_GROUP=main COURTWATCH_OTHERS_SNAPSHOT_PATH=/tmp/courtwatch-main-snapshot.json node tools/replay-others-real-snapshot.mjs
-          node tools/replay-others-real-snapshot.mjs
-          node tools/verify-others-real-snapshot-browser.mjs
-          node tools/verify-player-group-release-browser.mjs
+        run: node tools/run-release-safety.mjs --phase live
       - name: Certify only after all required tests succeeded
         if: steps.approved.outputs.cache-hit != 'true'
         run: node tools/release-code-fingerprint.mjs --expect "${{ needs.fingerprint.outputs.code_fingerprint }}" --write-certificate .courtwatch/release-safety-cache
