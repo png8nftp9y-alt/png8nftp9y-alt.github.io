@@ -9981,3 +9981,9 @@ Startup previously awaited both IndexedDB projection and opponent restoration be
 Validation: 92 focused tests for actual loaders, startup, additions, membership and opponent caching. Added PC-empty-cache versus phone-stale-cache convergence, ongoing/current withdrawals, unavailable-source retention, delayed disk startup and stale restore races. Local release guard and browser functional Shield passed, including both player groups. A separate actual Chromium test (desktop and mobile viewport with stale Quanta cache and blocked IndexedDB) confirmed both converge to the same fresh historical-only tournament list with one full snapshot request per client. Published CI must still verify the new code before deploy. No direct measurement on the user's physical phone and no claim that all network/server latency is eliminated. Bump v3.js URL so devices request this corrected client.
 
 Focused ongoing-withdrawal and startup fix. Existing engine schedules and app refresh cadence unchanged; no workflow polling or automatic rerun.
+
+## 2026-10-31 — Sblocca controlli Admin per deploy ritiro set corti
+
+- Run CRUD 41229120742 e hotfix 41229120856 fermati sugli stessi quattro test Admin, prima del deploy. Aspettative precedenti all’introduzione del refresh identità unificato: script panels assente, vecchio refreshIds e review automatica.
+- Allineate le regressioni al controllo manuale corrente senza cambiare il runtime: pagina salvata resta invariata, nessuna lettura DB/HTTP all’apertura, refresh accessibile, export autorizzato e read-only, caricamento esplicito della review e uso del report unificato.
+- Nessuna modifica alla correzione set corti, acquisizione o D1. Validazione test Admin mirati e npm run check completo; esito remoto da verificare dopo il push. Nessun polling né rilancio.

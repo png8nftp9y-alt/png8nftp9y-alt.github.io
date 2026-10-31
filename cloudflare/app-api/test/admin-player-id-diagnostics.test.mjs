@@ -52,7 +52,7 @@ test('pending mapping is visible and diagnostics refresh only on page load',asyn
   const html=renderPlayerIdDiagnostics(await loadPlayerIdDiagnostics(d.db));assert.match(html,/1 fonti in attesa/);assert.match(html,/Aggiorna conteggi/);assert.doesNotMatch(html,/<script|http-equiv|Same Name/);
  }finally{d.close()}
  const source=readFileSync(new URL('../src/index.js',import.meta.url),'utf8');
- assert.match(source,/view==='id'\?renderPlayerIdDiagnostics/);
+ assert.match(source,/view==='id'\?await unifiedIdentityReport\(env,url\)/);
  assert.ok(source.includes("${['diagnostica','id'].includes(view)?'':'<meta http-equiv=\"refresh\" content=\"300\">'}"));
 });
 

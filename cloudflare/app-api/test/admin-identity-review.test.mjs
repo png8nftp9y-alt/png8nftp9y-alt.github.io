@@ -20,7 +20,7 @@ test('HTML escapes source data and rejects arbitrary profile links',()=>{
  const c=buildIdentityReviewCase(name,links);c.nameKey='<script>alert(1)</script>';c.identities[0].names=['<img src=x onerror=alert(1)>'];c.identities[0].profileUrl='javascript:alert(1)';
  const html=renderIdentityReviewCases({available:true,cases:[c]});assert.ok(html.includes('&lt;script&gt;'));assert.doesNotMatch(html,/<script|<img|href="javascript:/);
 });
-test('new cases appear even with a previously saved ID page; authorized JSON export is read-only and unauthorized requests do not expose data',async()=>{
+test('saved ID page stays unchanged until explicit review request; authorized export is read-only and unauthorized requests do not expose data',async()=>{
  const d=database({identityMapping:true});try{
  const old='<html><body><main><nav></nav><div class="admin-page page-id">CACHED COUNTS</div></main></body></html>';
  const archive={async get(){return{async json(){return{version:1,view:'id',checkedAt:'2026-10-25T17:00:00Z',html:old}}}},async put(){throw Error('must not overwrite ID snapshot')}};
@@ -28,7 +28,7 @@ test('new cases appear even with a previously saved ID page; authorized JSON exp
  let reads=0;const guarded={prepare(sql){reads++;return d.db.prepare(sql)}};
  const noauth=await worker.fetch(new Request('https://app/admin/id?reviewExport=1'),{...env,DB:guarded});assert.equal(noauth.status,401);assert.equal(reads,0);
  save(d);const writes=d.writes(),authorization='Basic '+btoa('admin:secret'),headers={Authorization:authorization};
- const page=await worker.fetch(new Request('https://app/admin/id',{headers}),env),initial=await page.text();assert.match(initial,/CACHED COUNTS/);assert.match(initial,/admin-review/);const fragment=await worker.fetch(new Request('https://app/admin/id?currentPanels=1',{headers}),env),html=initial+(await fragment.json()).review;assert.equal(page.status,200);assert.match(html,/CACHED COUNTS/);assert.match(html,/EXAMPLE PLAYER/);assert.ok(initial.indexOf('id="admin-review"')<initial.indexOf('CACHED COUNTS'),'review section must precede cached ID counts');assert.equal(d.writes(),writes);
+ const page=await worker.fetch(new Request('https://app/admin/id',{headers}),{...env,DB:guarded}),initial=await page.text();assert.match(initial,/CACHED COUNTS/);assert.match(initial,/id="admin-identity-refresh"/);assert.doesNotMatch(initial,/EXAMPLE PLAYER|currentPanels=1|admin-panel-loader/);assert.equal(reads,0);const fragment=await worker.fetch(new Request('https://app/admin/id?currentPanels=1',{headers}),env),html=initial+(await fragment.json()).review;assert.equal(page.status,200);assert.match(html,/CACHED COUNTS/);assert.match(html,/EXAMPLE PLAYER/);assert.equal(d.writes(),writes);
  const exported=await worker.fetch(new Request('https://app/admin/id?reviewExport=1',{headers}),env);assert.equal(exported.status,200);assert.equal((await exported.json()).cases.length,1);assert.equal(d.writes(),writes);
  }finally{d.close()}
 });
