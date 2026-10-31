@@ -16,7 +16,9 @@ export function comparePresence(expected,actual){
 }
 export function alternateExpectation(p,state){
  const gender=String(p.gender||p.playerTypeCode||'').toUpperCase(),sex=/^(G|GIRLS?|FEMALE)$/.test(gender)?'G':/^(B|BOYS?|MALE)$/.test(gender)?'B':'';
- if(!sex||!state||state.inventoryError)return {state:'unverifiable',reason:'missing_gender_or_inventory'};
+ if(!sex)return {state:'unverifiable',reason:'missing_gender'};
+ if(!state)return {state:'unverifiable',reason:'missing_tournament_inventory'};
+ if(state.inventoryError)return {state:'unverifiable',reason:'inventory_read_error'};
  const inventory=(state.eventInventory||[]).filter(e=>e.event?.startsWith(sex+'-')).map(e=>({...e,family:e.event.split('-').slice(0,3).join('-'),structure:e.event.split('-').at(-1)}));
  if(!inventory.some(e=>e.family===sex+'-S-M')||!inventory.some(e=>e.family===sex+'-S-Q'))return {state:'unverifiable',reason:'main_or_qualifying_not_inventoried'};
  const events=requiredAuditEvents(inventory),proof=p=>p?.complete===true&&p.criterion===AUDIT_CRITERION;
