@@ -9937,3 +9937,13 @@ Validation: focused Observability/storage/Admin tests, syntax and installer pref
 
 
 Dedicated monitoring token preferred. No polling, retries or scheduling changes.
+
+
+## 2026-10-31 — chat 1: audit sola lettura presenza ITF e pagine
+
+- Richiesta: dimostrare la corrispondenza reale tra tornei acquisiti e pagine, senza confondere run verdi o acceptance disponibili con completezza dei tabelloni.
+- Nuovo audit singolo su push dei soli file audit o avvio manuale, senza schedule, motori di acquisizione, riparazioni, deploy o scritture D1/R2. Usa il client D1 read-only esistente e mostra contatori Cloudflare.
+- Fonti: pointer ITF current in R2, cache acceptance e tabelloni della stessa generazione, query D1 indicizzate per ID nativo e snapshot reale Worker per entrambe le liste dell'account configurato. Confronto indipendente delle presenze nei tabelloni e nei match acquisiti con snapshot completo, scoped e DOM della pagina giocatore in Chromium.
+- Avversari e compagni: profili per ID nativo presenti negli incontri ITF acquisiti dei giocatori delle due liste; esclusi gli altri utenti e avversari non correlati. Verifica che gli slot storici ITF non contengano sole acceptance senza match. Alternates confrontati con le prove di tutte le sezioni pertinenti e payload D1 corrente. Gli ID locali o non confermati e le prove incomplete restano non verificabili.
+- Copertura: elenca anche tornei ITF del catalogo conclusi da settembre senza inventario in cache. Tale inventario non certifica da solo l'acquisizione completa. Nessuna promessa di tutti i tabelloni ITF acquisiti. Cambi di puntatore R2 o release/hash indice D1 durante l'audit rendono il risultato inconclusivo; non è una transazione globale. Replay del codice corrente su D1 e browser locale, non sessione HTTP del Worker pubblicato.
+- Cinque test puri superati: dati mancanti con conteggi uguali, omonimi/ID e deduplica tabelloni, completezza singolare/doppio, presenza in ogni tipo di tabellone, acceptance indebita nello storico. Sintassi JS e workflow YAML verificati. Credenziali remote disponibili soltanto nel runner GitHub: esecuzione reale e relativo risultato ancora da raccogliere. Il verdetto ambiguo/differenze produce run rosso dopo salvataggio del report JSON.
