@@ -10,7 +10,9 @@ test('every acquisition motor retains D1 publication, with general imports conso
    const triggers=(completion.match(/^      - .+$/gm)||[]).map(line=>line.slice(8));
    assert.deepEqual(triggers,['Court Watch Tennis Europe agenda D1'],route.id+': general imports must follow only Agenda');
    const writer=bridge.slice(bridge.indexOf('  migrate-import-verify-deploy:'));
-   assert.match(writer,/with: \{ref: main, fetch-depth: 1\}/,route.id+': consolidation must read current data after the writer lease');
+   const checkout=writer.match(/with: \{ref: main, fetch-depth: (\d+)\}/);
+   assert.ok(checkout,route.id+': consolidation must read current data after the writer lease');
+   assert.ok(Number(checkout[1])>=2,route.id+': release guard must have HEAD^ available');
   }else assert.ok(completion.includes(name),route.id+': no explicit D1 completion bridge for '+name);
   const packageScripts=JSON.parse(read('cloudflare/app-api/package.json')).scripts;
   assert.ok(bridge.includes(route.script)||(bridge.includes('npm run seed')&&packageScripts.seed.includes(route.script)),route.id+': missing importer');
