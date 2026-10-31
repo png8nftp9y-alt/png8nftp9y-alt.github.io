@@ -10017,3 +10017,12 @@ mancanti, identità sospette e anni già acquisiti. Aggiornati i test
 di presenza/assenza dell'icona; mantenuti i controlli su letture salvate,
 autenticazione e assenza di richieste automatiche.
 Test mirati obbligatori prima del commit. Deploy remoto da verificare.
+
+## 2026-10-31 — chat 1: audit D1 con letture deduplicate e alternate prima degli avversari
+- Run 41234611100 e 41236110070 interrotti da HTTP 500/codice 7500 della API D1 su query diverse, dopo oltre mille letture remote; importazione D1 41234611124 riuscita. Causa Cloudflare non dimostrata, nessun errore Pescara dedotto dai run interrotti.
+- Solo audit: memoizzazione per SQL e parametri, condivisione di richieste identiche, risultato clonato per ogni chiamante, esecuzione remota serializzata e intervallo minimo 100 ms. Nessun retry, polling o scrittura; guardia read-only mantenuta e fallimenti propagati.
+- Marker D1 finali letti direttamente dalla sorgente, senza cache; controlli R2 e copertura rimangono invariati. Un cambiamento concorrente continua a invalidare il verdetto.
+- Verifica alternate spostata prima dei profili avversari, con checkpoint JSON e riepilogo Pescara dichiarato provvisorio fino ai controlli sorgente finali. Un errore successivo non cancella le prove gia raccolte e non rende verde un audit incompleto.
+- Errori registrano hash della query, contatori e profilo in elaborazione, senza SQL o parametri. Contatori query effettive e cache hit disponibili nel report.
+- Validazione: 18 test passati su sessione letture, selettore alternate, Pescara, generatore reale e confronto audit. Il workflow esegue anche i nuovi test. Sintassi verificata.
+- Nessuna modifica applicativa o al client D1 generale. Esecuzione reale della nuova versione ancora da confermare; un errore Cloudflare ulteriore resta bloccante.

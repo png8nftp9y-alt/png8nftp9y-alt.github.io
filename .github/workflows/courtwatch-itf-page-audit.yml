@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Validate missing presence and incomplete evidence detection
-        run: node --test tools/tests/itf-page-audit.test.mjs
+        run: node --test tools/tests/itf-page-audit.test.mjs tools/tests/itf-audit-read-session.test.mjs
       - run: npm install
       - run: npx playwright install --with-deps chromium
       - run: python -m pip install --disable-pip-version-check --quiet awscli
