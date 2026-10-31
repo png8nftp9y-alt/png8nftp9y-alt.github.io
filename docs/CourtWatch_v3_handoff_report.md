@@ -9938,6 +9938,13 @@ Validation: focused Observability/storage/Admin tests, syntax and installer pref
 
 Dedicated monitoring token preferred. No polling, retries or scheduling changes.
 
+## 2026-10-31 — Europe: nessun ritiro dedotto dai soli set corti
+
+- Caso segnalato Grimoldi–Jor: 4-2 4-1 riceveva Rit. perché la regola contava soltanto set da almeno sei game.
+- Browser e Worker ora non deducono un ritiro dai soli punteggi con set fino a cinque game. Le prove esplicite di ritiro restano prioritarie; non si inventa il formato né si trasforma automaticamente ogni set da quattro in un set regolare.
+- Nessuna modifica acquisitori, D1, esiti, orientamento punteggi o W/O. La funzione condivisa di presentazione resta coerente nei due ambienti; nuova versione JavaScript per distribuire la correzione.
+- Validazione: regressione del caso 4-2 4-1 e inverso, tie-break corti, punteggio corto ambiguo, ritiro esplicito, W/O e precedente deduzione su set standard; test display browser/Worker e sintassi. Esito remoto da verificare dopo pubblicazione.
+- Limite: sui set corti senza indicazione ufficiale il solo punteggio non viene utilizzato per affermare un ritiro. Non è una verifica dell’effettivo referto Grimoldi–Jor.
 
 ## 2026-10-31 — chat 1: audit sola lettura presenza ITF e pagine
 
@@ -9962,3 +9969,20 @@ ITF discovery 2026-10-31T13:09:28.847Z: 0 newly discovered future tournaments; M
 The birth/Admin commit 4aec7ff9d1 was blocked in source checks of CRUD 41219292670, D1/API 41219292762 and Worker 41219292771 by four tests still expecting pre-unification controls. Update the Diagnostics snapshot assertion to allow the authenticated script while continuing to forbid automatic panel requests and retaining exact saved HTML, zero D1/HTTP reads, failure links, write counts and manual-refresh behavior. The cold ID scope test checks the new single icon while preserving zero reads and remote independence. Identity review keeps authorization, export and no-write assertions and now verifies saved-page opening does not automatically load cases. The Worker assembly check follows unifiedIdentityReport rather than the old direct ID renderer.
 
 Add a real Worker/SQLite regression: unauthorized unified refresh performs zero reads/writes; authenticated refresh persists all three complete sections exactly once; subsequent ID opening reads only the saved snapshot. No production, workflow, source-data or database mutation changes. Acquisition run 41219292740 succeeded: 23 curated records written and verified, 64/64 active observed players have year_only evidence. Worker/Admin deployment remains pending the new release checks. Validation: complete npm run check passed with 691 tests and zero failures; verify-analysis-ui returned green; git diff --check passed. The real Worker/SQLite refresh regression also passed in its dedicated run. The installer repeats the complete check on the fetched main before committing. No workflow rerun or polling introduced.
+## 2026-10-31 — chat 1: separazione e correzione audit pagine ITF
+- Run 41189830435: zero differenze, 15 giocatori/60 presenze, 145 identita non confermate, 107 alternate non verificabili, fonti cambiate; zero scritture D1.
+- Corretto controllo identita: circuitProfiles espone URL ufficiali, non profileId. Usa parser identita esistente con host e ID verificati; nessuna associazione basata sul solo nome.
+- Alternate: distingue genere assente, inventario assente, errore inventario, sezioni main/quali mancanti e prova incompleta. Non elimina alternate senza prove.
+- Elenca tutti i giocatori nelle due liste con esito selezione, registra zero presenze come dato informativo senza penalizzare il verdetto e gruppi separati per identita, alternate e giocatori esclusi. Registra prima/dopo dei marker D1 e generazione R2.
+- Verifica: cinque test audit esistenti e tre regressioni mirate, controllo sintassi. Non modifica app, dati o protezioni; il push avvia un singolo nuovo audit con il controllo corretto, senza polling o rilanci dei motori.
+- Restano da verificare sul runner le identita e classificare i 107 casi. La completezza assoluta dei tornei disputati non e certificata. Le modifiche concorrenti restano inconclusive; nessuna conversione artificiale in verde.
+
+## 2026-10-31 — Consistent ongoing FITP removals and nonblocking mobile startup
+
+User reported Manuel Natale removed from Rodeo Quanta on PC but still visible on phone, plus slow/stale mobile startup. Confirmed browser defect: cached tournaments were unconditionally retained once startDate <= today, even when a successful complete newer snapshot omitted the registration. Use endDate (officialEndDate/startDate fallback) instead, preserving concluded history while replacing ongoing and future registrations for the authoritative covered players. Failed, partial, older or undated sources still preserve valid cached data. No upstream FITP/D1 deletion or engine behavior changed. Historical match merging remains intact.
+
+Startup previously awaited both IndexedDB projection and opponent restoration before starting the API and routing. Start them concurrently: local-storage view renders immediately, network starts without waiting for disk. Durable restoration captures group, selection epoch and complete-projection version so a late disk result cannot undo an API update or group change. Existing 30-second app refresh contract remains unchanged after validating the Shield requirement; no new polling, workflow reruns, timers, discovery, D1 queries or scheduling changes. The earlier plan to remove this existing app refresh was not included.
+
+Validation: 92 focused tests for actual loaders, startup, additions, membership and opponent caching. Added PC-empty-cache versus phone-stale-cache convergence, ongoing/current withdrawals, unavailable-source retention, delayed disk startup and stale restore races. Local release guard and browser functional Shield passed, including both player groups. A separate actual Chromium test (desktop and mobile viewport with stale Quanta cache and blocked IndexedDB) confirmed both converge to the same fresh historical-only tournament list with one full snapshot request per client. Published CI must still verify the new code before deploy. No direct measurement on the user's physical phone and no claim that all network/server latency is eliminated. Bump v3.js URL so devices request this corrected client.
+
+Focused ongoing-withdrawal and startup fix. Existing engine schedules and app refresh cadence unchanged; no workflow polling or automatic rerun.
