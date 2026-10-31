@@ -1,5 +1,5 @@
 import {appendFileSync} from 'node:fs';
-import {readObservabilityUsage} from '../../cloudflare/app-api/lib/cloudflare-observability-usage.mjs';
+import {readObservabilityTelemetry} from '../../cloudflare/app-api/lib/cloudflare-observability-usage.mjs';
 // R2 semantic audit rerun after ITF archive recovery.
 import { spawnSync } from 'node:child_process';
 import { gunzipSync } from 'node:zlib';
@@ -36,7 +36,7 @@ async function graphql(name, query) {
 const d1 = await graphql('d1', `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){d1AnalyticsAdaptiveGroups(limit:10000,filter:{date_geq:$from,date_leq:$to}){dimensions{date databaseId}sum{rowsRead rowsWritten}}}}}`);
 const workers = await graphql('workers', `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){workersInvocationsAdaptive(limit:10000,filter:{date_geq:$from,date_leq:$to}){dimensions{date scriptName status}sum{requests errors subrequests duration}}}}}`);
 const r2Operations = await graphql('r2_operations', `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){r2OperationsAdaptiveGroups(limit:10000,filter:{date_geq:$from,date_leq:$to}){dimensions{date bucketName actionType}sum{requests responseBytes}}}}}`);
-const [subscriptions, databases, buckets, kv, queues, scripts, observabilityBilling] = await Promise.all([api('/subscriptions'),api('/d1/database?per_page=100'),api('/r2/buckets'),api('/storage/kv/namespaces?per_page=100'),api('/queues?per_page=100'),api('/workers/scripts'),readObservabilityUsage(path=>api(path,{readToken:process.env.CLOUDFLARE_BILLING_READ_TOKEN}),{now,window:cycle})]);
+const [subscriptions, databases, buckets, kv, queues, scripts, observabilityBilling] = await Promise.all([api('/subscriptions'),api('/d1/database?per_page=100'),api('/r2/buckets'),api('/storage/kv/namespaces?per_page=100'),api('/queues?per_page=100'),api('/workers/scripts'),readObservabilityTelemetry(path=>api(path),{now,window:cycle})]);
 const observability=observabilityBilling;
 const safeList = value => Array.isArray(value) ? value : [];
 const accountData = result => result.data?.viewer?.accounts?.[0] || {};
