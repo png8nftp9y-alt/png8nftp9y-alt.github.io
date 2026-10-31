@@ -1,4 +1,5 @@
-import {observabilityUsage} from '../../cloudflare/app-api/lib/cloudflare-observability-usage.mjs';
+import {appendFileSync} from 'node:fs';
+import {readObservabilityUsage} from '../../cloudflare/app-api/lib/cloudflare-observability-usage.mjs';
 // R2 semantic audit rerun after ITF archive recovery.
 import { spawnSync } from 'node:child_process';
 import { gunzipSync } from 'node:zlib';
@@ -35,8 +36,8 @@ async function graphql(name, query) {
 const d1 = await graphql('d1', `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){d1AnalyticsAdaptiveGroups(limit:10000,filter:{date_geq:$from,date_leq:$to}){dimensions{date databaseId}sum{rowsRead rowsWritten}}}}}`);
 const workers = await graphql('workers', `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){workersInvocationsAdaptive(limit:10000,filter:{date_geq:$from,date_leq:$to}){dimensions{date scriptName status}sum{requests errors subrequests duration}}}}}`);
 const r2Operations = await graphql('r2_operations', `query($accountTag:String!,$from:Date!,$to:Date!){viewer{accounts(filter:{accountTag:$accountTag}){r2OperationsAdaptiveGroups(limit:10000,filter:{date_geq:$from,date_leq:$to}){dimensions{date bucketName actionType}sum{requests responseBytes}}}}}`);
-const [subscriptions, databases, buckets, kv, queues, scripts, observabilityBilling] = await Promise.all([api('/subscriptions'),api('/d1/database?per_page=100'),api('/r2/buckets'),api('/storage/kv/namespaces?per_page=100'),api('/queues?per_page=100'),api('/workers/scripts'),api('/billable-usage',{readToken:process.env.CLOUDFLARE_BILLING_READ_TOKEN}).catch(()=>({success:false,status:null,result:null}))]);
-const observability=observabilityUsage(observabilityBilling,{now});
+const [subscriptions, databases, buckets, kv, queues, scripts, observabilityBilling] = await Promise.all([api('/subscriptions'),api('/d1/database?per_page=100'),api('/r2/buckets'),api('/storage/kv/namespaces?per_page=100'),api('/queues?per_page=100'),api('/workers/scripts'),readObservabilityUsage(path=>api(path,{readToken:process.env.CLOUDFLARE_BILLING_READ_TOKEN}),{now,window:cycle})]);
+const observability=observabilityBilling;
 const safeList = value => Array.isArray(value) ? value : [];
 const accountData = result => result.data?.viewer?.accounts?.[0] || {};
 const sumGroups = (groups, fields) => { const out=Object.fromEntries(fields.map(field=>[field,0]));for(const group of groups||[])for(const field of fields)out[field]+=Number(group.sum?.[field]||0);return out };
@@ -97,3 +98,10 @@ const persisted=persistR2Snapshot(snapshot);
 console.log('CLOUDFLARE_USAGE_SNAPSHOT='+JSON.stringify(snapshot));
 console.log('CLOUDFLARE_USAGE_PERSISTED='+JSON.stringify({...persisted,key:'monitoring/cloudflare-usage/current.json'}));
 if(!d1.success||!workers.success||!r2Operations.success||!persisted.success)process.exitCode=2;
+
+const observabilityComplete=Boolean(observability.ingestion&&observability.storage);
+if(process.env.GITHUB_STEP_SUMMARY){
+ const metric=(key,unit)=>observability[key]?observability[key].total+' '+unit:'non disponibile';
+ appendFileSync(process.env.GITHUB_STEP_SUMMARY,'\n## Observability\n\n| Risorsa | Consumo | Soglia |\n|---|---:|---:|\n| Acquisizione | '+metric('ingestion','GB')+' | 50 GB/ciclo |\n| Conservazione | '+metric('storage','GB-mese')+' | 10 GB-mese/ciclo |\n\n'+(observabilityComplete?'Entrambi i contatori acquisiti.':'Verifica incompleta: '+observability.reason+'. Nessuno zero presunto.')+'\n');
+}
+if(!observabilityComplete){console.log('::error::Observability counters not acquired: '+observability.reason+'; existing D1/Workers/R2 measurements were retained in the snapshot.');process.exitCode=2;}

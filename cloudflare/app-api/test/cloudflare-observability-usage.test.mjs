@@ -30,7 +30,7 @@ test('daily values exist only for daily source rows, and storage GB-month never 
 });
 test('audit reads one bounded billing response with existing or dedicated read token and does not make Admin query Cloudflare',()=>{
  const audit=readFileSync(new URL('../../../.github/scripts/cloudflare-full-cost-audit.mjs',import.meta.url),'utf8'),worker=readFileSync(new URL('../src/index.js',import.meta.url),'utf8'),workflow=readFileSync(new URL('../../../.github/workflows/courtwatch-cloudflare-full-cost-audit.yml',import.meta.url),'utf8');
- assert.equal((audit.match(/api\('\/billable-usage'/g)||[]).length,1);assert.match(audit,/observabilityUsage\(observabilityBilling,\{now\}\)/);assert.match(audit,/const snapshot=\{observability,/);assert.match(audit,/CLOUDFLARE_BILLING_READ_TOKEN/);assert.match(workflow,/cloudflare-observability-usage.test.mjs/);assert.match(worker,/observabilityUsageRows\(cloudflareUsage.observability/);assert.doesNotMatch(worker,/\/billable-usage/);
+ assert.match(audit,/readObservabilityUsage\(path=>api\(path,/);assert.match(audit,/const observability=observabilityBilling/);assert.match(audit,/const snapshot=\{observability,/);assert.match(audit,/CLOUDFLARE_BILLING_READ_TOKEN/);assert.match(workflow,/cloudflare-observability-usage.test.mjs/);assert.match(worker,/observabilityUsageRows\(cloudflareUsage.observability/);assert.doesNotMatch(worker,/\/billable-usage/);
 });
 
 test('actual authenticated Cloudflare page displays both independent meters from one R2 read with zero D1/HTTP calls',async()=>{
@@ -43,4 +43,34 @@ test('actual authenticated Cloudflare page displays both independent meters from
   assert.equal(response.status,200);const html=await response.text();assert.equal(reads,1);
   assert.match(html,/Observability · acquisizione log e tracce/);assert.match(html,/Observability · conservazione log e tracce/);assert.match(html,/10 GB-mese/);assert.match(html,/pill bad/);assert.match(html,/pill ok/);assert.match(html,/dati al/);
  }finally{globalThis.fetch=previous;}
+});
+
+import {readObservabilityUsage} from '../lib/cloudflare-observability-usage.mjs';
+const window={start:new Date('2026-12-01T00:00:00Z'),end:new Date('2027-01-01T00:00:00Z')};
+const v2=(kind,value,extra={})=>({x_ProductFamilyName:'Observability',x_BillableMetricId:'observability-'+kind,x_BillableMetricName:kind==='ingestion'?'Logs ingestion':'Logs storage',ConsumedQuantity:value,ConsumedUnit:kind==='ingestion'?'GB':'GB-months',ChargePeriodStart:'2026-12-01T00:00:00Z',ChargePeriodEnd:'2026-12-16T00:00:00Z',...extra});
+test('official V2 metric/family fields work without V1 service fields; one bounded call suffices and free usage is retained',async()=>{
+ const calls=[];const result=await readObservabilityUsage(async path=>{calls.push(path);return {success:true,status:200,result:[v2('ingestion',.46),v2('storage',.10)]}},{now,window});
+ assert.deepEqual(calls,['/billable/usage?from=2026-12-01&to=2026-12-16']);assert.equal(result.source,'cloudflare_metered_usage_v2');assert.equal(result.ingestion.total,.46);assert.equal(result.storage.total,.1);assert.equal(result.cycleSource,'configured_audit_window');assert.equal(result.sources.length,1);assert.equal(result.sources[0].catalog[0].name,'Logs ingestion');
+});
+test('restricted V2 can fall back once to a valid V1 without suppressing the restriction or double counting',async()=>{
+ const calls=[];const result=await readObservabilityUsage(async path=>{calls.push(path);return path.includes('/billable/usage?')?{success:false,status:403}:{success:true,status:200,result:[row('ingestion',1),row('storage',2)]}},{now,window});
+ assert.equal(calls.length,2);assert.equal(result.source,'cloudflare_billable_usage');assert.equal(result.ingestion.total,1);assert.equal(result.sources[0].httpStatus,403);assert.equal(result.sources[1].status,'available');
+});
+test('partial source sets are never combined; empty responses expose a safe name/unit catalog without account, quantity or credential fields',async()=>{
+ let calls=0;const result=await readObservabilityUsage(async()=>({success:true,status:200,result:++calls===1?[v2('ingestion',2)]:[row('storage',3)]}),{now,window});assert.equal(calls,2);assert.equal(Boolean(result.ingestion&&result.storage),false);
+ const empty=await readObservabilityUsage(async()=>({success:true,status:200,result:[{ServiceName:'D1',ConsumedUnit:'Rows',ConsumedQuantity:999,BillingAccountId:'private-account',BillingAccountName:'private-name'}]}),{now,window});assert.equal(empty.ingestion,null);assert.equal(empty.sources.length,2);const safe=JSON.stringify(empty);assert.doesNotMatch(safe,/private-account|private-name|999/);assert.match(safe,/D1/);
+});
+test('V2 authoritative billing end is used and inconsistent end dates are rejected',()=>{
+ const report=observabilityUsage({success:true,result:[v2('ingestion',1,{BillingPeriodStart:'2026-12-01T00:00:00Z',BillingPeriodEnd:'2026-12-31T00:00:00Z'})]},{now,window,source:'cloudflare_metered_usage_v2'});assert.equal(report.cycle.end,'2026-12-31');assert.equal(report.ingestion.projected,2);
+ const invalid=observabilityUsage({success:true,result:[v2('ingestion',1,{BillingPeriodStart:'2026-12-01T00:00:00Z',BillingPeriodEnd:'2026-12-31T00:00:00Z'}),v2('storage',1,{BillingPeriodStart:'2026-12-01T00:00:00Z',BillingPeriodEnd:'2027-01-01T00:00:00Z'})]},{now,window,source:'cloudflare_metered_usage_v2'});assert.equal(invalid.ingestion,null);
+});
+
+import vm from 'node:vm';
+test('audit summary never certifies missing meters as success and preserves a complete meter result',()=>{
+ const source=readFileSync(new URL('../../../.github/scripts/cloudflare-full-cost-audit.mjs',import.meta.url),'utf8');
+ for(const complete of [false,true]){
+  const chunks=[];const context={observability:complete?{ingestion:{total:.46},storage:{total:.1}}:{ingestion:null,storage:null,reason:'volume_meters_not_reported'},process:{env:{GITHUB_STEP_SUMMARY:'fixture'}},appendFileSync:(file,text)=>chunks.push(text),console:{log:()=>{}}};
+  vm.runInNewContext(source.slice(source.indexOf('const observabilityComplete=')),context);
+  assert.equal(context.process.exitCode,complete?undefined:2);assert.match(chunks.join(''),complete?/0.46 GB/:/non disponibile/);
+ }
 });
