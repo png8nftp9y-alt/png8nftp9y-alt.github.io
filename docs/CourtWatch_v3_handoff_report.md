@@ -9920,3 +9920,12 @@ ITF discovery 2026-10-31T06:21:37.581Z: 1 newly discovered future tournaments; M
 ITF Meta ordinary 2026-10-31T06:22:26.171Z: attempted 1, acquired 1, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-10-31T06:23:16.667Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+## 2026-10-31 — Observability credential selection
+
+Audit job 124432112996 returned HTTP 403 while all other Cloudflare measurements and R2 persistence succeeded. The user screenshot of token "nuovo limit audit" shows Workers Observability Read and Billing Read on the correct account. The dedicated monitoring secret CLOUDFLARE_BILLING_READ_TOKEN was previously configured, but the new telemetry code unconditionally used CLOUDFLARE_API_TOKEN. Prefer the dedicated monitoring token for the telemetry GET; retain the existing API token as fallback only when the dedicated secret is absent. No token values are read or logged. No permission expansion, scheduling, polling, retries, D1 reads or engine changes.
+
+Validation: focused Observability/storage/Admin tests, syntax and installer preflight/repeat checks. Production access remains to be confirmed by the next audit; the screenshot does not prove which token value is stored in either GitHub secret. This corrects credential selection, not an assertion that a 403 always means missing permission.
+
+
+Dedicated monitoring token preferred. No polling, retries or scheduling changes.

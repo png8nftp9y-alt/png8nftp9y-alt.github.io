@@ -28,9 +28,9 @@ test('daily values exist only for daily source rows, and storage GB-month never 
  const o=get([row('ingestion',2,{ChargePeriodStart:'2026-12-15T00:00:00Z'}),row('storage',.2,{ChargePeriodStart:'2026-12-15T00:00:00Z'})]);const calls=[];
  const html=observabilityUsageRows(o,(...args)=>{calls.push(args);return '<tr><td><b>'+args[0]+'</b></td></tr>';},'2026-12-15');assert.equal(calls[0][2],2);assert.equal(calls[1][2],.2);assert.equal(calls[1][3],' GB-mese');assert.equal(calls[1][4],undefined);assert.match(html,/Ciclo 2026-12-01/);assert.match(html,/dati al/);
 });
-test('audit reads one bounded telemetry response with main token and does not make Admin query Cloudflare',()=>{
+test('audit reads one bounded telemetry response with dedicated token and main-token fallback and does not make Admin query Cloudflare',()=>{
  const audit=readFileSync(new URL('../../../.github/scripts/cloudflare-full-cost-audit.mjs',import.meta.url),'utf8'),worker=readFileSync(new URL('../src/index.js',import.meta.url),'utf8'),workflow=readFileSync(new URL('../../../.github/workflows/courtwatch-cloudflare-full-cost-audit.yml',import.meta.url),'utf8');
- assert.match(audit,/readObservabilityTelemetry\(path=>api\(path\)/);assert.match(audit,/const observability=observabilityBilling/);assert.match(audit,/const snapshot=\{observability,/);assert.doesNotMatch(audit,/process.env.CLOUDFLARE_BILLING_READ_TOKEN/);assert.match(workflow,/cloudflare-observability-usage.test.mjs/);assert.match(worker,/observabilityUsageRows\(cloudflareUsage.observability/);assert.doesNotMatch(worker,/\/billable-usage/);
+ assert.match(audit,/readObservabilityTelemetry\(path=>api\(path,\{readToken:process.env.CLOUDFLARE_BILLING_READ_TOKEN\|\|token\}/);assert.match(audit,/const observability=observabilityBilling/);assert.match(audit,/const snapshot=\{observability,/);assert.match(audit,/readToken:process.env.CLOUDFLARE_BILLING_READ_TOKEN\|\|token/);assert.match(workflow,/cloudflare-observability-usage.test.mjs/);assert.match(worker,/observabilityUsageRows\(cloudflareUsage.observability/);assert.doesNotMatch(worker,/\/billable-usage/);
 });
 
 test('actual authenticated Cloudflare page displays both independent meters from one R2 read with zero D1/HTTP calls',async()=>{
