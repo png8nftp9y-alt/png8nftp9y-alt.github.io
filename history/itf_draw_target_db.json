@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-10-31T15:32:42.199Z",
+  "generatedAt": "2026-10-31T15:38:13.088Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
@@ -870546,7 +870546,7 @@
       "startDate": "2026-11-02",
       "endDate": "2026-11-07",
       "decision": "pending",
-      "checkedAt": "2026-10-31T14:38:21.768Z",
+      "checkedAt": "2026-10-31T15:38:11.268Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -870564,7 +870564,7 @@
       "startDate": "2026-11-02",
       "endDate": "2026-11-08",
       "decision": "pending",
-      "checkedAt": "2026-10-31T14:38:22.220Z",
+      "checkedAt": "2026-10-31T15:38:11.719Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -870715,8 +870715,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -870728,8 +870728,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -870754,14 +870754,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -871299,17 +871299,554 @@
       "startDate": "2026-11-02",
       "endDate": "2026-11-07",
       "decision": "pending",
-      "checkedAt": "2026-10-31T14:38:22.675Z",
+      "checkedAt": "2026-10-31T15:38:12.164Z",
       "playersFound": 0,
-      "declaredSections": 0,
-      "acquiredSections": 0,
+      "declaredSections": 6,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 0,
-      "eventInventory": [],
-      "families": [],
-      "eventFailure": null,
-      "eventCache": {}
+      "resolvedSections": 2,
+      "missingSections": 4,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "competitionId": "J-J60-KAZ-2026-005",
+            "event": "B-S-M-KO",
+            "tournamentId": 1100205011,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-aktobe/kaz/2026/j-j60-kaz-2026-005/",
+            "family": "B-S-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "competitionId": "J-J60-KAZ-2026-005",
+            "event": "B-S-Q-KO",
+            "tournamentId": 1100205011,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-aktobe/kaz/2026/j-j60-kaz-2026-005/",
+            "family": "B-S-Q",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "competitionId": "J-J60-KAZ-2026-005",
+            "event": "B-D-M-KO",
+            "tournamentId": 1100205011,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-aktobe/kaz/2026/j-j60-kaz-2026-005/",
+            "family": "B-D-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "competitionId": "J-J60-KAZ-2026-005",
+            "event": "G-S-M-KO",
+            "tournamentId": 1100205011,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-aktobe/kaz/2026/j-j60-kaz-2026-005/",
+            "family": "G-S-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "competitionId": "J-J60-KAZ-2026-005",
+            "event": "G-S-Q-KO",
+            "tournamentId": 1100205011,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-aktobe/kaz/2026/j-j60-kaz-2026-005/",
+            "family": "G-S-Q",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "competitionId": "J-J60-KAZ-2026-005",
+            "event": "G-D-M-KO",
+            "tournamentId": 1100205011,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j60-aktobe/kaz/2026/j-j60-kaz-2026-005/",
+            "family": "G-D-M",
+            "structure": "KO"
+          }
+        }
+      ],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 16,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 16,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
+            }
+          ]
+        }
+      ],
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800782753",
+              "name": "Egor Deryavsky",
+              "givenName": "Egor",
+              "familyName": "Deryavsky",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/egor-deryavsky/800782753/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800790741",
+              "name": "Batyrkhan Sadvakassov",
+              "givenName": "Batyrkhan",
+              "familyName": "Sadvakassov",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/batyrkhan-sadvakassov/800790741/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800724492",
+              "name": "Daniel Vilsim",
+              "givenName": "Daniel",
+              "familyName": "Vilsim",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/daniel-vilsim/800724492/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800675830",
+              "name": "Gleb Samenkov",
+              "givenName": "Gleb",
+              "familyName": "Samenkov",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/gleb-samenkov/800675830/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800704522",
+              "name": "Nurislam Musa",
+              "givenName": "Nurislam",
+              "familyName": "Musa",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/nurislam-musa/800704522/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800627442",
+              "name": "Mansur Kakambetov",
+              "givenName": "Mansur",
+              "familyName": "Kakambetov",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/mansur-kakambetov/800627442/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800664363",
+              "name": "Damir Niyazov",
+              "givenName": "Damir",
+              "familyName": "Niyazov",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/damir-niyazov/800664363/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800747646",
+              "name": "Aleksandr Rogachev",
+              "givenName": "Aleksandr",
+              "familyName": "Rogachev",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/aleksandr-rogachev/800747646/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743623",
+              "name": "boyin Zhang",
+              "givenName": "boyin",
+              "familyName": "Zhang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/boyin-zhang/800743623/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800824223",
+              "name": "Rafael Sharapov",
+              "givenName": "Rafael",
+              "familyName": "Sharapov",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/rafael-sharapov/800824223/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800704486",
+              "name": "Raphael Kalyuzhnov",
+              "givenName": "Raphael",
+              "familyName": "Kalyuzhnov",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/raphael-kalyuzhnov/800704486/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800721563",
+              "name": "Artem Shalygin",
+              "givenName": "Artem",
+              "familyName": "Shalygin",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/artem-shalygin/800721563/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800675912",
+              "name": "Erlan Ospanov",
+              "givenName": "Erlan",
+              "familyName": "Ospanov",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/erlan-ospanov/800675912/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800709321",
+              "name": "Lev Klimov",
+              "givenName": "Lev",
+              "familyName": "Klimov",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/lev-klimov/800709321/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800681486",
+              "name": "Matsvei Shumilau",
+              "givenName": "Matsvei",
+              "familyName": "Shumilau",
+              "nationalityCode": "BLR",
+              "profileLink": "/en/players/matsvei-shumilau/800681486/blr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800710305",
+              "name": "Lev Yugay",
+              "givenName": "Lev",
+              "familyName": "Yugay",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/lev-yugay/800710305/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-31T15:38:12.164Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-KAZ-2026-005__B-S-Q-KO",
+            "storedAt": "2026-10-31T15:38:12.164Z"
+          }
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800779844",
+              "name": "Julia Andreyeva",
+              "givenName": "Julia",
+              "familyName": "Andreyeva",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/julia-andreyeva/800779844/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800784196",
+              "name": "Dilnaz Amandossova",
+              "givenName": "Dilnaz",
+              "familyName": "Amandossova",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/dilnaz-amandossova/800784196/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800715159",
+              "name": "Ekaterina Orlovskaya",
+              "givenName": "Ekaterina",
+              "familyName": "Orlovskaya",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/ekaterina-orlovskaya/800715159/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800780345",
+              "name": "Salima Izhan",
+              "givenName": "Salima",
+              "familyName": "Izhan",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/salima-izhan/800780345/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800661258",
+              "name": "Dayana Zhakypbayeva",
+              "givenName": "Dayana",
+              "familyName": "Zhakypbayeva",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/dayana-zhakypbayeva/800661258/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800629344",
+              "name": "Zinira Zhunusova",
+              "givenName": "Zinira",
+              "familyName": "Zhunusova",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/zinira-zhunusova/800629344/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800794038",
+              "name": "Alexandra Kolesnikova",
+              "givenName": "Alexandra",
+              "familyName": "Kolesnikova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/alexandra-kolesnikova/800794038/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800674606",
+              "name": "Viktoriya Bitiyeva",
+              "givenName": "Viktoriya",
+              "familyName": "Bitiyeva",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/viktoriya-bitiyeva/800674606/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800779466",
+              "name": "Vlada Lebedeva",
+              "givenName": "Vlada",
+              "familyName": "Lebedeva",
+              "nationalityCode": "BLR",
+              "profileLink": "/en/players/vlada-lebedeva/800779466/blr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800818439",
+              "name": "Dariya Yesseyeva",
+              "givenName": "Dariya",
+              "familyName": "Yesseyeva",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/dariya-yesseyeva/800818439/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800652378",
+              "name": "Maria Borodacheva",
+              "givenName": "Maria",
+              "familyName": "Borodacheva",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/maria-borodacheva/800652378/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800735578",
+              "name": "Aruzhan Zhaubatyrova",
+              "givenName": "Aruzhan",
+              "familyName": "Zhaubatyrova",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/aruzhan-zhaubatyrova/800735578/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800737141",
+              "name": "Alana Maratkyzy",
+              "givenName": "Alana",
+              "familyName": "Maratkyzy",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/alana-maratkyzy/800737141/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800782800",
+              "name": "Aiary Adilbek",
+              "givenName": "Aiary",
+              "familyName": "Adilbek",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/aiary-adilbek/800782800/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800675589",
+              "name": "Violetta Volkova",
+              "givenName": "Violetta",
+              "familyName": "Volkova",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/violetta-volkova/800675589/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800758913",
+              "name": "Kamilla Kayumova",
+              "givenName": "Kamilla",
+              "familyName": "Kayumova",
+              "nationalityCode": "UZB",
+              "profileLink": "/en/players/kamilla-kayumova/800758913/uzb/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-10-31T15:38:12.164Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-KAZ-2026-005__G-S-Q-KO",
+            "storedAt": "2026-10-31T15:38:12.164Z"
+          }
+        }
+      }
     },
     "J-J60-KEN-2026-005": {
       "competitionId": "J-J60-KEN-2026-005",
@@ -871317,7 +871854,7 @@
       "startDate": "2026-11-02",
       "endDate": "2026-11-07",
       "decision": "pending",
-      "checkedAt": "2026-10-31T14:38:23.130Z",
+      "checkedAt": "2026-10-31T15:38:12.630Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -871335,7 +871872,7 @@
       "startDate": "2026-11-02",
       "endDate": "2026-11-08",
       "decision": "pending",
-      "checkedAt": "2026-10-31T14:38:23.582Z",
+      "checkedAt": "2026-10-31T15:38:13.088Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 1,
@@ -871625,7 +872162,7 @@
       "startDate": "2026-11-03",
       "endDate": "2026-11-08",
       "decision": "pending",
-      "checkedAt": "2026-10-31T14:38:20.141Z",
+      "checkedAt": "2026-10-31T15:38:09.881Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -872450,7 +872987,7 @@
       "startDate": "2026-11-03",
       "endDate": "2026-11-08",
       "decision": "pending",
-      "checkedAt": "2026-10-31T14:38:20.868Z",
+      "checkedAt": "2026-10-31T15:38:10.360Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -873085,7 +873622,7 @@
       "startDate": "2026-11-03",
       "endDate": "2026-11-08",
       "decision": "pending",
-      "checkedAt": "2026-10-31T14:38:21.321Z",
+      "checkedAt": "2026-10-31T15:38:10.815Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
