@@ -10000,3 +10000,11 @@ Focused ongoing-withdrawal and startup fix. Existing engine schedules and app re
 - Per le prove mancanti legge e allega i checks del registro ufficiale R2 coverage-v3-current, senza trasformarli automaticamente in certificazione della cache. Controlla che il registro non cambi durante la lettura.
 - Validazione: tre test temporali, regressioni audit/identita e sintassi. Nessuna scrittura D1/R2 o chiamata di acquisizione ITF. Un solo audit su push.
 - Limiti: confronto remoto Pescara ancora da eseguire; eventuale riparazione dati dipende dall'evidenza. Non dichiarata completezza globale o chiusura dei tre casi storici.
+
+## 2026-10-31 — chat 1: certificazione Pescara applicata alla regola alternate
+- Run 41229902755: 104 alternate su tornei futuri separati; tre casi Pescara non verificabili per mancata acquisitionProof nel doppio maschile. Il registro ufficiale certifica gia 16/16 coppie e la stessa certificazione e presente in itf-known-match-only-draws.mjs.
+- Correzione produzione: il generatore dell'indice alternate riconosce la certificazione esplicita per coppia competitionId/event oltre alla prova in cache. Audit usa la stessa fonte di certificazione, mantenendo il proprio confronto indipendente dei partecipanti.
+- Nessuna certificazione inventata o riacquisizione. Cache non vuota, popolata, priva di errori e con ID partecipanti restano obbligatorie; mancanza di altre sezioni, errore o ID ignoto impediscono esclusioni. Certificazione non trasferibile ad altri tornei; conflitto di ID torneo blocca il controllo.
+- Copia acquisita Pescara: Mastropasqua 800687485 e Rusca 800697548 presenti; Ceschin 800710276 assente dalle sezioni maschili. Il generatore reale di test mantiene i primi due ed esclude il terzo; replay identico.
+- Validazione locale: 22 test superati, fra cui generatore reale, pagina iscrizioni, import incrementale, replay zero modifiche e protezioni fonte incompleta. Regressioni Pescara aggiunte a npm run check. Non aggiunte letture runtime D1 o nuove schedulazioni.
+- Il push attiva D1 esistente e audit. Chiusura solo dopo import indice e verifica remota dei tre casi; un audit concorrente all'importazione puo non essere conclusivo. Nessun polling o rilancio automatico.

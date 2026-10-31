@@ -1,3 +1,4 @@
+import {certifiedCachedItfDraw} from '../../../src/v3/itf-cached-draw-certification.mjs';
 import {AUDIT_CRITERION,requiredAuditEvents} from '../../../src/v3/itf-audit-acquisition-policy.mjs';
 
 // Negative evidence requires the complete, certified inventory for this sex.
@@ -9,6 +10,7 @@ export function itfAlternateDrawDecision(player,state){
  const gender=String(player.playerTypeCode||player.gender||'').toUpperCase();
  const sex=/^(B|BOYS?|MALE)$/.test(gender)?'B':/^(G|GIRLS?|FEMALE)$/.test(gender)?'G':'';
  if(!id||!sex||!state||state.inventoryError)return null;
+ if(player.competitionId&&state.competitionId&&String(player.competitionId).toUpperCase()!==String(state.competitionId).toUpperCase())return null;
  const inventory=(state.eventInventory||[]).filter(e=>String(e.event||'').startsWith(sex+'-')).map(e=>({...e,family:e.event.split('-').slice(0,3).join('-'),structure:e.event.split('-').at(-1)}));
  if(!inventory.some(e=>e.family===sex+'-S-M')||!inventory.some(e=>e.family===sex+'-S-Q'))return null;
  const required=requiredAuditEvents(inventory);
@@ -21,7 +23,7 @@ export function itfAlternateDrawDecision(player,state){
    if(!draw.resolutionProof.mainEvents?.length||!draw.resolutionProof.mainEvents.every(event=>required.some(e=>e.event===event)))return null;
    continue;
   }
-  if(draw?.populated!==true||!certified(draw.acquisitionProof)||!Array.isArray(draw.players)||!draw.players.length)return null;
+  if(draw?.populated!==true||!certifiedCachedItfDraw({competitionId:state.competitionId||player.competitionId,event:section.event,draw})||!Array.isArray(draw.players)||!draw.players.length)return null;
   // An unidentified participant could be the alternate: do not infer absence.
   if(draw.players.some(p=>!String(p.id||p.playerId||'')))return null;
   if(draw.players.some(p=>String(p.id||p.playerId)===id))present=true;
