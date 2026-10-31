@@ -59,13 +59,13 @@ export function observabilityUsage(response,{now=new Date(),window=null,source='
  if(!result.ingestion||!result.storage){result.status='partial';result.reason='volume_meters_incomplete';}
  return result;
 }
-const reasons={billing_read_required:'Il token del monitoraggio richiede il permesso Billing Read.',billing_api_unavailable:'API consumi Cloudflare non disponibile.',volume_meters_not_reported:'Cloudflare non ha ancora restituito i contatori di volume Observability.',billing_period_unverified:'Periodo di fatturazione non verificabile.',unsupported_or_incomplete_meter:'Contatore non utilizzabile: unità non in GB/GB-mese, dati incompleti o duplicati.',volume_meter_not_reported:'Contatore di volume non ancora restituito da Cloudflare.'};
+const reasons={observability_read_required:'Il token del monitoraggio richiede Workers Observability Read (il solo Billing Read non basta).',telemetry_api_unavailable:'API volumi Observability non disponibile.',telemetry_payload_invalid:'Risposta volumi Observability incompleta o non valida.',billing_read_required:'Il token del monitoraggio richiede il permesso Billing Read.',billing_api_unavailable:'API consumi Cloudflare non disponibile.',volume_meters_not_reported:'Cloudflare non ha ancora restituito i contatori di volume Observability.',billing_period_unverified:'Periodo di fatturazione non verificabile.',unsupported_or_incomplete_meter:'Contatore non utilizzabile: unità non in GB/GB-mese, dati incompleti o duplicati.',volume_meter_not_reported:'Contatore di volume non ancora restituito da Cloudflare.'};
 export function observabilityUsageRows(data,render,today,escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))){
  const cycle=data?.cycle?`${data.cycle.start} → ${data.cycle.end}`:'periodo non disponibile';
  return [['ingestion','Observability · acquisizione log e tracce',' GB'],['storage','Observability · conservazione log e tracce',' GB-mese']].map(([kind,label,unit])=>{
   const metric=data?.[kind];
   if(!metric)return `<tr><td><b>${label}</b></td><td colspan="4">${escape(reasons[data?.[kind+'Reason']||data?.reason]||'In attesa del prossimo audit Cloudflare.')}</td><td><span class="pill warn">non disponibile</span></td></tr>`;
-  const detail=`<small>Ciclo ${escape(cycle)}${data.cycleSource==='configured_audit_window'?' (finestra audit configurata)':''} · dati al ${escape(metric.asOf||'—')}${metric.stale?' · dati non recenti':''}</small>`;
+  const detail=`<small>Ciclo ${escape(cycle)}${data.cycleSource==='configured_audit_window'?' (finestra audit configurata)':''} · dati al ${escape(metric.asOf||'—')}${metric.stale?' · dati non recenti':''}${data.source==='cloudflare_observability_daily_bytes'?' · '+(kind==='storage'?'stima con conservazione di 7 giorni, come nel pannello Cloudflare':'volumi giornalieri Cloudflare'):''}</small>`;
   const value=data.daily?.find(row=>row.date===today)?.[kind]??null;
   return render(label,metric,value,unit).replace('</b></td>','</b><br>'+detail+'</td>');
  }).join('');
@@ -86,4 +86,44 @@ export async function readObservabilityUsage(read,{now=new Date(),window}={}){
  const score=r=>Number(Boolean(r.ingestion))+Number(Boolean(r.storage));
  const selected=results.reduce((best,r)=>score(r)>score(best)||(score(r)===score(best)&&r.reason!=='billing_read_required'&&best.reason==='billing_read_required')?r:best);
  return {...selected,sources:attempted};
+}
+
+// Cloudflare OpenAPI: GET /accounts/{account_id}/workers/observability/usage.
+// Dashboard cf-router.B0aW-PJE.js (2026-10-31): storage is the sum of
+// daily 7-day retained GB divided by 30. This is a dashboard estimate, not an invoice.
+const DAY=864e5;
+export function observabilityTelemetryUsage(response,{now=new Date(),window}={}){
+ const start=+new Date(window?.start),end=+new Date(window?.end),today=Math.floor(+now/DAY)*DAY;
+ const base={checkedAt:now.toISOString(),effectiveFrom:EFFECTIVE,scope:'account',source:'cloudflare_observability_daily_bytes',updateFrequency:'daily',cycle:{start:new Date(start).toISOString().slice(0,10),end:new Date(end).toISOString().slice(0,10)},cycleSource:'configured_audit_window',ingestion:null,storage:null};
+ const bad=reason=>({...base,status:'unavailable',reason,httpStatus:response?.status??null});
+ if(!response?.success)return bad([401,403].includes(response?.status)?'observability_read_required':'telemetry_api_unavailable');
+ const payload=response.result;
+ if(!payload||!Array.isArray(payload.breakdown)||!finite(payload.events)||!Number.isFinite(start)||!Number.isFinite(end)||start%DAY||end%DAY||end<=start||+now<start||+now>=end)return bad('telemetry_payload_invalid');
+ const days=new Map(),seen=new Set();let events=0;
+ for(const row of payload.breakdown){
+  const raw=String(row.bin||'').replace(' ','T'),time=Date.parse(/(?:Z|[+-]\d\d:\d\d)$/.test(raw)?raw:raw+'Z');
+  const key=JSON.stringify([time,row.dataset,row.service]);
+  if(!finite(row.eventSize)||!finite(row.count)||typeof row.dataset!=='string'||typeof row.service!=='string'||!Number.isFinite(time)||time%DAY||time<start-6*DAY||time>today||seen.has(key))return bad('telemetry_payload_invalid');
+  seen.add(key);events+=Number(row.count);days.set(time,(days.get(time)||0)+Number(row.eventSize)/1e9);
+ }
+ if(Math.abs(events-Number(payload.events))>Math.max(1,events)*1e-6)return bad('telemetry_payload_invalid');
+ const elapsed=Math.floor((today-start)/DAY)+1,cycleDays=Math.round((end-start)/DAY),daily=[];
+ const value=day=>days.get(day)||0;
+ let ingestion=0,storage=0;
+ for(let day=start;day<=today;day+=DAY){let retained=0;for(let i=0;i<7;i++)retained+=value(day-i*DAY);ingestion+=value(day);storage+=retained/30;daily.push({date:new Date(day).toISOString().slice(0,10),ingestion:value(day),storage:retained/30});}
+ const sample=Math.min(7,elapsed-1);
+ let pace=sample?0:ingestion/elapsed;
+ for(let i=1;i<=sample;i++)pace+=value(today-i*DAY)/sample;
+ const projectedIngestion=ingestion+pace*(cycleDays-elapsed);
+ let projectedStorage=storage;
+ const forecast=day=>day<=today?value(day):pace;
+ for(let day=today+DAY;day<end;day+=DAY){let retained=0;for(let i=0;i<7;i++)retained+=forecast(day-i*DAY);projectedStorage+=retained/30;}
+ const metric=(total,projected,limit,unit)=>({kind:'counter',total,projected,limit,unit,utilization:total/limit,projectedUtilization:projected/limit,last24hBudget:Math.max(0,limit-total)/Math.max(1,cycleDays-elapsed),dailyAverage:total/elapsed,status:total>limit?'red':projected<=limit*.8?'green':projected<=limit?'yellow':'red',asOf:now.toISOString(),stale:false});
+ return {...base,status:'available',reason:null,daily,retentionDays:7,storageMethod:'dashboard_7_day_retention_estimate',ingestion:metric(ingestion,projectedIngestion,50,'GB'),storage:metric(storage,projectedStorage,10,'GB-mese')};
+}
+export async function readObservabilityTelemetry(read,{now=new Date(),window}={}){
+ const from=+new Date(window.start)-6*DAY,to=+now;
+ const path='/workers/observability/usage?'+new URLSearchParams({from:String(from),to:String(to),tz:'UTC'});
+ let response;try{response=await read(path)}catch{response={success:false,status:null}}
+ return observabilityTelemetryUsage(response,{now,window});
 }

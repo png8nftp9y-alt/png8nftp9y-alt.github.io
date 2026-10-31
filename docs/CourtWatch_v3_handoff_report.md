@@ -9913,3 +9913,27 @@ Il test continua a richiedere il checkout di main nel writer dopo il lease, ma v
 - Nessun cambiamento ITF/FITP, schema D1, date W/O, selezione giocatori, schedulazione o rilanci. Nessun polling.
 - Verifica: test source-discovery, empty-recovery, draw-walkovers, inline e round-robin; controllo sintassi e diff. I workflow Europe live/backfill includono la regressione.
 - Limite: previene i due difetti di individuazione accertati; non certifica formati futuri sconosciuti né riesegue acquisizioni o importazioni. Verifica remota dopo pubblicazione dell’utente.
+## 2026-10-31 — Observability: daily bytes instead of unavailable billing meters
+
+The billing V2 response was 403 and V1 returned eight unrelated products, so neither could populate Observability. Switched the cost audit to the official GET /accounts/{account_id}/workers/observability/usage, using the main API token (Workers Observability Read), one GET per existing audit, UTC with six preceding days for retained-byte carry. No polling, retries, engine runs, D1 reads or scheduling changes. Billing-only token is not used for telemetry.
+
+Source: Cloudflare official api-schemas/main/openapi.json, operation usage.get (eventSize bytes by day/dataset/service). Independently inspected public dashboard assets on 2026-10-31: /assets/cf-router.B0aW-PJE.js functions co, ao, oo, bo: ingestion sums daily eventSize / 1e9; retained storage sums the last seven days per cycle day / 30. Dashboard estimates use a seven-completed-day average for forecasts. Admin labels the storage calculation as an estimate with seven-day retention, not a measured invoice counter. Missing fields, malformed or duplicate bins, mismatched event totals and denied requests remain unavailable, never zero. A valid successful empty breakdown is zero.
+
+Validation: focused counter, storage, admin-scope and new telemetry tests; direct parity check against the extracted dashboard calculation. Production access and displayed totals still require the next published audit; a 403 now explicitly names Workers Observability Read instead of Billing Read. Existing cycle day 15 retained.
+
+One telemetry read in the existing audit. No polling, retries or scheduling changes. Production access still requires Workers Observability Read on the main API token.
+
+ITF discovery 2026-10-31T06:21:37.581Z: 1 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-10-31T06:22:26.171Z: attempted 1, acquired 1, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-10-31T06:23:16.667Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+## 2026-10-31 — Observability credential selection
+
+Audit job 124432112996 returned HTTP 403 while all other Cloudflare measurements and R2 persistence succeeded. The user screenshot of token "nuovo limit audit" shows Workers Observability Read and Billing Read on the correct account. The dedicated monitoring secret CLOUDFLARE_BILLING_READ_TOKEN was previously configured, but the new telemetry code unconditionally used CLOUDFLARE_API_TOKEN. Prefer the dedicated monitoring token for the telemetry GET; retain the existing API token as fallback only when the dedicated secret is absent. No token values are read or logged. No permission expansion, scheduling, polling, retries, D1 reads or engine changes.
+
+Validation: focused Observability/storage/Admin tests, syntax and installer preflight/repeat checks. Production access remains to be confirmed by the next audit; the screenshot does not prove which token value is stored in either GitHub secret. This corrects credential selection, not an assertion that a 403 always means missing permission.
+
+
+Dedicated monitoring token preferred. No polling, retries or scheduling changes.
