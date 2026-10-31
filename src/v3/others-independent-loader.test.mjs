@@ -237,15 +237,16 @@ for (const group of ['main','others']) {
 }
 
 for (const group of ['main', 'others']) {
-  test(`${group}: fresh authoritative list removes withdrawn future registration but preserves history`, async () => {
+  test(`${group}: fresh authoritative list removes future and ongoing withdrawals but preserves concluded history`, async () => {
     const future = {playerId: 'a', circuit: 'fitp', competitionId: 'A62D829E-687A-4DC8-A2F8-FBEFEB690167', startDate: '2099-10-17'};
     const past = {...future, competitionId: 'past', startDate: '2020-10-01'};
     const current = {...future, competitionId: 'current', startDate: new Date().toISOString().slice(0,10)};
-    const cached = {group, personalProjectionComplete: true, generatedAt: '2026-10-15T20:00:00Z', players: [player], tournaments: [future, past, current], matches: []};
+    const started = {...future, competitionId: '24654291-5A49-4D39-BCA8-6F4608CAB3A1', startDate: '2026-10-30', endDate: '2099-11-01'};
+    const cached = {group, personalProjectionComplete: true, generatedAt: '2026-10-15T20:00:00Z', players: [player], tournaments: [future, past, current, started], matches: []};
     const confirmed = {...future, competitionId: 'confirmed', name: 'Updated tournament'};
     const c = setup(group, {group, generatedAt: '2026-10-16T00:00:00Z', players: [player], tournaments: [confirmed], matches: []}, {cached});
     await c.ctx.load();
-    assert.deepEqual(Array.from(c.saved().tournaments, t => t.competitionId), ['past', 'current', 'confirmed']);
+    assert.deepEqual(Array.from(c.saved().tournaments, t => t.competitionId), ['past', 'confirmed']);
   });
   for (const [label, response] of [
     ['failed', new Error('offline')],
@@ -254,7 +255,7 @@ for (const group of ['main', 'others']) {
     ['partial', {generatedAt: '2026-10-16T00:00:00Z', partial: true, tournaments: []}],
     ['missing tournament list', {generatedAt: '2026-10-16T00:00:00Z'}],
   ]) test(`${group}: ${label} response retains cached registration`, async () => {
-    const future = {playerId: 'a', circuit: 'fitp', competitionId: 'brescia', startDate: '2099-10-17'};
+    const future = {playerId: 'a', circuit: 'fitp', competitionId: 'brescia', startDate: '2026-10-30', endDate: '2099-11-01'};
     const cached = {group, personalProjectionComplete: true, generatedAt: '2026-10-15T20:00:00Z', players: [player], tournaments: [future], matches: []};
     const projection = response instanceof Error ? response : {group, players: [player], matches: [], ...response};
     const c = setup(group, projection, {cached});
@@ -272,4 +273,16 @@ test('main: fresh static list removes TCL withdrawal without removing personal r
   }});
   await c.ctx.load();
   assert.deepEqual(Array.from(c.saved().tournaments, t => t.playerId), ['a']);
+});
+
+for (const group of ['main', 'others']) test(`${group}: PC empty cache and phone stale ongoing registration converge after the same full D1 response`, async()=>{
+ const old={playerId:player.id,circuit:'fitp',competitionId:'quanta',startDate:'2026-10-30',endDate:'2099-11-01'};
+ const played={...old,competitionId:'played',startDate:'2026-09-01',endDate:'2026-09-07'};
+ const match={playerId:player.id,circuit:'tennis-europe',competitionId:'played',matchId:'m-played',date:'2026-09-02',status:'completed',score:'6-2 6-3'};
+ const fresh={group,generatedAt:'2026-10-31T12:00:00Z',players:[player],tournaments:[played],matches:[match]};
+ const phone=setup(group,fresh,{cached:{group,personalProjectionComplete:true,generatedAt:'2026-10-30T12:00:00Z',players:[player],tournaments:[old,played],matches:[match]}});
+ const pc=setup(group,fresh);await Promise.all([phone.ctx.load(),pc.ctx.load()]);
+ assert.deepEqual(Array.from(phone.ctx.state.data.tournaments,t=>t.competitionId),Array.from(pc.ctx.state.data.tournaments,t=>t.competitionId));
+ assert.equal(phone.ctx.state.data.tournaments.some(t=>t.competitionId==='quanta'),false);
+ assert.equal(phone.ctx.state.data.matches[0].score,'6-2 6-3');
 });

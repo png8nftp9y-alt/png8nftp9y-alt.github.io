@@ -52,20 +52,23 @@ test('cached personal players and tournaments exist before the first route witho
  assert.ok(boot.indexOf('restoreCachedProjectionBeforeFirstRender();')<boot.indexOf('route();'));
  assert.ok(boot.indexOf('restoreDurableProjection()')<boot.indexOf('route();'));
 });
-test('bootstrap restores durable player and opponent data before routing without awaiting the API',async()=>{
+test('mobile startup starts API and route while durable storage is still pending',async()=>{
  const calls=[],state={data:{players:[{id:'a'}],tournaments:[],matches:[]}};
+ let releasePlayer,releaseOpponent;
  const ctx={state,restoreCachedProjectionBeforeFirstRender:()=>calls.push('web'),wire:()=>{},wireAccount:()=>{},
- restoreDurableProjection:async()=>{state.data.matches=[{id:'saved'}];calls.push('durable-player');},
- restoreDurableOpponents:async()=>calls.push('durable-opponent'),load:()=>{calls.push('api-start');return new Promise(()=>{});},
- route:()=>{assert.equal(state.data.matches[0].id,'saved');calls.push('route');},renderDataSignature:()=>'',syncLabel:()=>{},restoreUiScroll:()=>{},
+ restoreDurableProjection:()=>new Promise(resolve=>{releasePlayer=()=>{calls.push('durable-player');resolve(true);};}),
+ restoreDurableOpponents:()=>new Promise(resolve=>{releaseOpponent=resolve;}),load:()=>{calls.push('api-start');return new Promise(()=>{});},
+ route:()=>calls.push('route'),renderDataSignature:()=>'',syncLabel:()=>{},restoreUiScroll:()=>{},
  loadAccount:()=>{},refreshMatchAnalysisStatus:()=>{},setInterval:()=>{}};
  vm.createContext(ctx);
  const boot=source.slice(source.indexOf('async function startCourtWatch()'),source.lastIndexOf('startCourtWatch();'));
  vm.runInContext(boot+'\nglobalThis.testBoot=startCourtWatch();',ctx);
  await ctx.testBoot;
- assert.ok(calls.indexOf('durable-player')<calls.indexOf('route'));
- assert.ok(calls.indexOf('durable-opponent')<calls.indexOf('route'));
- assert.ok(calls.includes('api-start'));
+ assert.ok(calls.includes('api-start'));assert.ok(calls.includes('route'));
+ assert.equal(calls.includes('durable-player'),false);
+ releasePlayer();releaseOpponent();await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(calls.filter(x=>x==='api-start').length,1);
+ assert.equal(calls.filter(x=>x==='route').length,2);
 });
 test('restoring cache preserves deselect all and an explicit player subset',()=>{
  const saved={players:[{id:'a'},{id:'b'}],tournaments:[]};
@@ -97,7 +100,7 @@ test('select-deselect calendar chips are alphabetical and keep the chosen IDs',(
 const cacheSource=source.slice(source.indexOf('let durableProjectionFallback'),source.indexOf('function syncLabel('));
 function cacheContext(initial={},quota=Infinity) {
  const values=new Map(Object.entries(initial));
- const ctx={circuit:m=>m.circuit||"fitp",agendaKey:m=>`${m.playerId}|${m.matchId||m.id}`,Promise,validProjection:d=>d&&Array.isArray(d.players)&&Array.isArray(d.tournaments),LAST_GOOD_CACHE:'full',CALENDAR_CACHE:'calendar',console:{warn(){}},Date,
+ const ctx={PLAYER_GROUP:"main",circuit:m=>m.circuit||"fitp",agendaKey:m=>`${m.playerId}|${m.matchId||m.id}`,Promise,validProjection:d=>d&&Array.isArray(d.players)&&Array.isArray(d.tournaments),LAST_GOOD_CACHE:'full',CALENDAR_CACHE:'calendar',console:{warn(){}},Date,
  iso:date=>date.toISOString().slice(0,10),add:(date,days)=>new Date(date.getTime()+days*86400000),
  state:{data:null,selected:new Set()},uiSelectionRestored:false,
  localStorage:{getItem:key=>values.get(key)||null,removeItem:key=>values.delete(key),
@@ -173,4 +176,16 @@ test('queued projection writes keep the original group key after a group switch'
  ctx.LAST_GOOD_CACHE='other-group';
  await saved;
  assert.deepEqual(writes,[{group:'main',key:'full'}]);
+});
+
+for(const change of ['fresh API','group switch','selection change'])test(`late IndexedDB restore cannot undo ${change}`,async()=>{
+ const {ctx}=cacheContext();let release;
+ ctx.readDurableProjection=()=>new Promise(resolve=>{release=resolve;});
+ ctx.state.data={players:[{id:'fresh'}],tournaments:[],matches:[]};
+ const pending=ctx.restoreDurableProjection();
+ if(change==='fresh API')ctx.state.completeProjectionVersion=1;
+ if(change==='group switch')ctx.PLAYER_GROUP='others';
+ if(change==='selection change')ctx.state.playerSelectionEpoch=1;
+ release({players:[{id:'old'}],tournaments:[{playerId:'old',competitionId:'quanta'}],cachedAt:999999});
+ assert.equal(await pending,false);assert.equal(ctx.state.data.players[0].id,'fresh');
 });

@@ -1032,7 +1032,12 @@ async function readDurableProjection(key = LAST_GOOD_CACHE) {
   });
 }
 async function restoreDurableProjection() {
+  const group = PLAYER_GROUP, epoch = state.playerSelectionEpoch || 0,
+    version = state.completeProjectionVersion || 0;
   const saved = await readDurableProjection();
+  // An old disk read must never overwrite an API update or another group.
+  if (group !== PLAYER_GROUP || epoch !== (state.playerSelectionEpoch || 0) ||
+      version !== (state.completeProjectionVersion || 0)) return false;
   const current = cachedData();
   if (!saved) return false;
   const newer = current && (current.cachedAt || 0) >= (saved.cachedAt || 0) ? current : saved;
@@ -4893,7 +4898,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       const diagnostics = docs.diagnostics ||
         previous.diagnostics || { overall: "yellow", items: [] };
 
-      // A successful full list replaces future registrations, including removals.
+      // A successful full list replaces future and ongoing registrations, including removals.
       // Keep past tournaments and cache-only players when their source is unavailable.
       const previousGeneration = Date.parse(previous.generatedAt || "") || 0;
       const freshApiTournaments = Array.isArray(projection?.tournaments) &&
@@ -4906,7 +4911,8 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
         staticGeneration >= previousGeneration;
       const today = iso(new Date());
       const retainedTournaments = (previous.tournaments || []).filter(t => {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(t.startDate || "") || t.startDate <= today) return true;
+        const end = String(t.endDate || t.officialEndDate || t.startDate || "").slice(0,10);
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(end) || end < today) return true;
         if (universalProjectionFresh && freshApiTournaments && projectedPlayers.has(t.playerId)) return false;
         if (!universalProjectionFresh && freshApiTournaments && projectedPlayers.get(t.playerId)?.userAdded) return false;
         return !(freshStaticTournaments && staticPlayers.some(p => p.id === t.playerId && !p.userAdded));
@@ -5294,7 +5300,8 @@ async function startCourtWatch() {
   restoreCachedProjectionBeforeFirstRender();
   wire();
   wireAccount();
-  await Promise.all([restoreDurableProjection(), restoreDurableOpponents()]);
+  // Start the network immediately; mobile IndexedDB may take seconds to open.
+  const restoring = Promise.all([restoreDurableProjection(), restoreDurableOpponents()]);
   initialProjectionRequest = load(null,null,true);
   route();
   if (state.data) {
@@ -5304,6 +5311,13 @@ async function startCourtWatch() {
   }
   loadAccount();
   refreshMatchAnalysisStatus();
+  restoring.then(([restored]) => {
+    if (!restored) return;
+    route();
+    renderedDataSignature = renderDataSignature(state.data);
+    syncLabel(state.data, true);
+    restoreUiScroll();
+  }).catch(error => console.warn("Ripristino locale non disponibile", error));
   setInterval(() => {
     if (!/^#opponent(?:-profile)?\//.test(location.hash)) load();
   }, 30000);
