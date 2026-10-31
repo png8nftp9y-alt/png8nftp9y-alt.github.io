@@ -9916,3 +9916,5 @@ Validation: focused counter, storage, admin-scope and new telemetry tests; direc
 One telemetry read in the existing audit. No polling, retries or scheduling changes. Production access still requires Workers Observability Read on the main API token.
 
 ITF discovery 2026-10-31T06:21:37.581Z: 1 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-10-31T06:22:26.171Z: attempted 1, acquired 1, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
