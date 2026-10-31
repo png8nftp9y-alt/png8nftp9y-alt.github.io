@@ -1,4 +1,5 @@
 import {boundedPlayerMap} from '../lib/bounded-player-map.mjs';
+import {snapshotHistoryPlayers,snapshotEntryPlayer} from '../lib/snapshot-history-players.mjs';
 import {agendaAdvancementRows} from '../lib/tennis-europe-agenda-advances.mjs';
 import {enrichIdentityNationalities} from '../lib/identity-nationality.mjs';
 import {opponentEuropeProfile} from '../lib/opponent-europe-profile.mjs';
@@ -39,7 +40,7 @@ import {otherCircuitOpponentHistory,boundedRows} from '../lib/opponent-canonical
 import {mergePersonalLiveTournaments,mergePersonalHistoryTournament} from '../lib/personal-live-entry.mjs';
 import {exactPersonalEntryProfiles} from '../lib/personal-entry-profiles.mjs';
 import {personalUnreleasedTournamentHistory} from '../lib/personal-unreleased-tournaments.mjs';
-import {personalCircuitHistory} from '../lib/personal-tennis-europe-history.mjs';
+import {personalCircuitHistory,personalItfHistory} from '../lib/personal-tennis-europe-history.mjs';
 import {personalPlayerMetadata} from '../lib/personal-player-metadata.mjs';
 import {addCourtWatchPlayer,personalPlayerAdditions} from '../lib/courtwatch-player-additions.mjs';
 import { loadAdminRemote, ADMIN_REMOTE_FILES_BY_VIEW } from '../lib/admin-remote.mjs';
@@ -237,11 +238,15 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
       timing.measure('identity',()=>personalPlayerAdditions(env,user.id,group,playerId)).catch(error=>{if(!missingOptionalTable(error))throw error;return []})
     ]);
     const playerMap=new Map(players.map(player=>[player.id,player]));for(const player of added)playerMap.set(player.id,{...playerMap.get(player.id),...player});players.splice(0,players.length,...playerMap.values());
+    const enrichment=await timing.measure('history_identities',()=>snapshotHistoryPlayers(env.DB,players,added));
+    const historyPlayers=enrichment.players,nativePlayers=historyPlayers.map(p=>snapshotEntryPlayer(p,enrichment.configuredIds));
+    const entryPlayers=nativePlayers.filter(p=>enrichment.configuredIds.has(p.id)||p.sourceKey);
+    const readHistory=p=>enrichment.configuredIds.has(p.id)?personalItfHistory(env.DB,p):personalCircuitHistory(env.DB,p);
     const presentation=tournamentPresentationContext(undefined,timing.measure,env.RUNTIME_DOCUMENTS);
     presentation?.prepare(tournaments);
     const prepare=rows=>{presentation.prepare(rows);return rows};
     const scopedData=await Promise.all([
-      timing.measure('entries',()=>exactPersonalEntryProfiles(env.DB,added).then(profiles=>boundedPlayerMap(added.filter(p=>p.sourceKey),async player=>{
+      timing.measure('entries',()=>exactPersonalEntryProfiles(env.DB,entryPlayers).then(profiles=>boundedPlayerMap(entryPlayers,async player=>{
         const entries=await playerEntryTournaments(env,player,{entryRows:profiles.get(player.id)});
         return [player.id,prepare(entries)];
       }))),
@@ -249,8 +254,8 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
         prepare(rows);
         return [rows,rows.some(t=>t.circuit==='itf')?await itfTournamentMetadata(env):new Map()];
       })),
-      timing.measure('match_history',()=>boundedPlayerMap(added,async player=>{
-        const history=await personalCircuitHistory(env.DB,player);prepare(history.tournaments);return history;
+      timing.measure('match_history',()=>boundedPlayerMap(historyPlayers,async player=>{
+        const history=await readHistory(player);prepare(history.tournaments);return history;
       })),
       timing.measure('rankings_read',()=>preparedTennisEuropeRankingData(env,[...new Set(players.map(p=>p.id))])).then(data=>({data}),error=>({error})),
       timing.measure('fitp_metadata_read',()=>fitpMetadataRows(env.DB,players)),
@@ -259,9 +264,9 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
     ]);
     // Full and single-player snapshots share independent reads and the same merge order.
     // Each player branch is bounded; no source is fetched twice.
-    const entryProfiles=scopedData?null:await exactPersonalEntryProfiles(env.DB,added);
+    const entryProfiles=scopedData?null:await exactPersonalEntryProfiles(env.DB,entryPlayers);
     const entrySets=scopedData?new Map(scopedData[0]):null;
-    for(const player of added.filter(player=>player.sourceKey)){
+    for(const player of entryPlayers){
       const entries=scopedData?entrySets.get(player.id):await playerEntryTournaments(env,player,{entryRows:entryProfiles.get(player.id)});
       const live=mergePersonalLiveTournaments(tournaments,entries.map(t=>({...t,playerName:player.name})),player.id);
       tournaments.splice(0,tournaments.length,...live);
@@ -271,8 +276,8 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
     const allHistory=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
     for(const t of unreleasedHistory){const official=officialItf.get(String(t.competitionId||'').toUpperCase())||{};const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;allHistory.set(key,mergePersonalHistoryTournament({...t,location:t.location||official.location||'',startDate:t.startDate||official.startDate||'',endDate:t.endDate||official.endDate||''},allHistory.get(key)));}
     tournaments.splice(0,tournaments.length,...allHistory.values());
-    for(const player of added){
-      const history=scopedData?scopedData[2][added.indexOf(player)]:await personalCircuitHistory(env.DB,player);
+    for(const player of historyPlayers){
+      const history=scopedData?scopedData[2][historyPlayers.indexOf(player)]:await readHistory(player);
       const position=players.findIndex(p=>p.id===player.id);if(position>=0)players[position]=personalPlayerMetadata({...history.player,sourceCircuit:player.sourceCircuit});
       const tournamentMap=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
       for(const t of history.tournaments){const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;tournamentMap.set(key,mergePersonalHistoryTournament(t,tournamentMap.get(key)));}

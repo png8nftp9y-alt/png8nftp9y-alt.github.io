@@ -114,3 +114,6 @@ export async function personalCircuitHistory(db,player){
  const histories=await Promise.all(circuits.map(c=>personalHistory(db,player,c)));
  return {player:histories.reduce((p,h)=>({...p,...h.player}),player),tournaments:histories.flatMap(h=>h.tournaments),matches:histories.flatMap(h=>h.matches)};
 }
+
+// Configured players reuse the complete native ITF history without changing other circuits.
+export async function personalItfHistory(db,player){return personalHistory(db,player,'itf');}
