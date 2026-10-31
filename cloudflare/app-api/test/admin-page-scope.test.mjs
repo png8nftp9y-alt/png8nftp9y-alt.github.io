@@ -42,7 +42,7 @@ test('ID is independent of remote diagnostics and backup availability',async()=>
   const r=await open('id',{remoteFailure:true});
   assert.deepEqual(r.sql,[]);assert.deepEqual(r.urls,[]);assert.deepEqual(r.objects,['monitoring/admin-pages/id/current.json']);
   assert.ok(!r.sql.some(query=>/SELECT \* FROM generations|FROM app_user_devices|FROM manual_overrides|FROM app_players ORDER BY seq/.test(query)));
-  assert.match(r.html,/refreshIds/);
+  assert.match(r.html,/id="admin-identity-refresh"/);assert.doesNotMatch(r.html,/currentPanels=1|admin-panel-loader/);
 });
 test('Diagnostics without a saved reading offers manual counts and current panels without database scans',async()=>{
   const r=await open('diagnostica');
