@@ -9914,3 +9914,5 @@ Source: Cloudflare official api-schemas/main/openapi.json, operation usage.get (
 Validation: focused counter, storage, admin-scope and new telemetry tests; direct parity check against the extracted dashboard calculation. Production access and displayed totals still require the next published audit; a 403 now explicitly names Workers Observability Read instead of Billing Read. Existing cycle day 15 retained.
 
 One telemetry read in the existing audit. No polling, retries or scheduling changes. Production access still requires Workers Observability Read on the main API token.
+
+ITF discovery 2026-10-31T06:21:37.581Z: 1 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
