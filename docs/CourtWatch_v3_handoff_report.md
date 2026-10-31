@@ -9904,3 +9904,12 @@ Il test continua a richiedere il checkout di main nel writer dopo il lease, ma v
 - Assenza certificata emette stato excluded nel payload corrente, senza cancellare gli archivi acceptance. Il selettore avversario condiviso Worker/browser esclude tale stato; merge della pagina giocatore usa l'esclusione esistente. Prove reali di presenza già acquisite restano prioritarie. Nessun timeout o cut-off basato sulla sola data.
 - Test: cinque nuovi casi comprendono generatore reale --prepare con cache dei tre circuiti, incompletezza singolare e doppio, errori/prove mancanti, qualificazione vuota certificata, presenza per ID nei tre tipi di tabellone, omonimia, sesso diverso, entrambe le pagine e stabilità replay. Altri 35 test mirati superati. Policy nuove feature D1 verde: nessuna lettura runtime o scansione aggiunta; aggiornamenti tramite sincronizzazione incrementale già esistente, nessun motore/polling nuovo.
 - Limiti: inventari/prove legacy non certificati mantengono conservativamente A; lo stato diventa visibile dopo rigenerazione e importazione dell'indice da parte della pipeline esistente. Functional shield locale ancora bloccato dall'assenza dell'eseguibile Chromium, non dichiarato superato.
+
+## 2026-10-31 — Europe: prevenzione ordinaria dei vuoti già recuperati
+
+- Causa: date OOP in select Date e listing legacy gestiti soltanto dal recupero dedicato; il motore ordinario poteva ripetere le omissioni.
+- Estratto il lettore già verificato in tennis-europe-source-discovery.mjs; condiviso da live, backfill, recovery, coverage e prova parser. Conservati tab, validazione date, deduplicazione e fixture HTML reali SOUL/HTV.
+- Fallback legacy integrato nel lettore tabelloni condiviso, soltanto se il listing moderno fallisce o non espone tabelloni. Risoluzione link relativi mantenendo vincoli host e torneo. Il recupero dedicato riusa ora lo stesso percorso.
+- Nessun cambiamento ITF/FITP, schema D1, date W/O, selezione giocatori, schedulazione o rilanci. Nessun polling.
+- Verifica: test source-discovery, empty-recovery, draw-walkovers, inline e round-robin; controllo sintassi e diff. I workflow Europe live/backfill includono la regressione.
+- Limite: previene i due difetti di individuazione accertati; non certifica formati futuri sconosciuti né riesegue acquisizioni o importazioni. Verifica remota dopo pubblicazione dell’utente.

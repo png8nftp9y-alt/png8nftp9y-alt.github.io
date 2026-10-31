@@ -1,3 +1,4 @@
+import {absoluteDrawLinks} from './tennis-europe-source-discovery.mjs';
 import {emptyBranchAdvance} from './tennis-europe-empty-advance.mjs';
 import {monradBoard} from './tennis-europe-monrad.mjs';
 import {createHash} from 'node:crypto';
@@ -156,7 +157,14 @@ export async function recoverDrawWalkovers({tournament,matches,get,documents=[],
   }
   const ids=old.teams[index];Object.assign(old,{status:'completed',score:'W/O',winnerTeamIndex:index,winnerPlayerIds:[...ids],winnerPlayerId:ids.length===1?ids[0]:'',resultSourceUrl:m.sourceUrl});return'updated_oop_result_from_draw';
  }
- try{for(const target of discoverDraws(await get(BASE+'/tournament/'+id+'/draws'),id))all.set(target.number,target)}catch(e){issues.push({competitionId:id,reason:'draw_discovery_failed',error:String(e.message)})}
+ // Preserve the modern path and request the legacy listing only when needed.
+ const listing=BASE+'/tournament/'+id+'/draws';
+ let listingError;
+ try{for(const target of discoverDraws(absoluteDrawLinks(await get(listing),listing),id))all.set(target.number,target)}catch(e){listingError=e}
+ if(!all.size){
+  const legacy=BASE+'/sport/draws.aspx?id='+id;
+  try{for(const target of discoverDraws(absoluteDrawLinks(await get(legacy),legacy),id))all.set(target.number,target)}catch(e){issues.push({competitionId:id,reason:'draw_discovery_failed',error:String(e.message),...(listingError?{canonicalError:String(listingError.message)}:{})})}
+ }
  for(const m of matches){const number=drawNumber(m.drawUrl,id);if(number&&!all.has(number))all.set(number,{number,url:BASE+'/tournament/'+id+'/draw/'+number,event:m.event})}
  if(!all.size)issues.push({competitionId:id,reason:'no_draws_discovered'});
  for(const target of all.values()){

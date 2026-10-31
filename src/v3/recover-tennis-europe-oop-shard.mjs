@@ -1,3 +1,4 @@
+import {tennisEuropeOopDates} from './tennis-europe-source-discovery.mjs';
 import fs from 'node:fs/promises';
 import {recoverDrawWalkovers,isRecoveredDrawWalkover} from './tennis-europe-draw-walkovers.mjs';
 import {applyTennisEuropeDesignations,tennisEuropeDesignationIndex,tennisEuropeParticipant} from './tennis-europe-metadata.mjs';
@@ -14,7 +15,7 @@ async function raw(method,url,{body=null,headers={},timeoutMs=25000}={}){const r
 async function consent(){const first=await raw('GET',BASE+'/tournaments');COOKIE=mergeCookie(COOKIE,first.setCookie);if(first.location&&/cookiewall/i.test(first.location)){const wall=await raw('GET',new URL(first.location,BASE));COOKIE=mergeCookie(COOKIE,wall.setCookie);const body=new URLSearchParams({ReturnUrl:'/tournaments',SettingsOpen:'false'});for(const value of ['1','2','3','4'])body.append('CookiePurposes',value);const saved=await raw('POST',BASE+'/cookiewall/Save',{body:body.toString()});COOKIE=mergeCookie(COOKIE,saved.setCookie)}}
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function get(url,headers={}){let lastError;for(let attempt=1;attempt<=4;attempt++){let current=String(url);try{for(let hop=0;hop<8;hop++){const page=await raw('GET',current,{headers,timeoutMs:[25000,40000,55000,60000][attempt-1]});COOKIE=mergeCookie(COOKIE,page.setCookie);if(page.status===200)return page.text;if(page.status>=300&&page.status<400&&page.location){current=String(new URL(page.location,current));continue}throw new Error(page.status+' '+current)}throw new Error('redirect_limit '+url)}catch(error){lastError=error;const message=String(error?.message||error);if(attempt===4||!/(?:^|\b)(?:403|429|5\d\d)(?:\b|\s)|fetch failed|timeout|socket|ECONNRESET/i.test(message))break;await wait(500*attempt)}}throw lastError}
-function dates(html){const out=[];for(const m of String(html||'').matchAll(/<a\b([^>]*)>/gi)){if(!/js-date-selection-tab/i.test(m[1]))continue;const value=attr(m[1],'data-value');if(/^20\d{6}$/.test(value))out.push(value)}return[...new Set(out)]}
+const dates=tennisEuropeOopDates;
 const positiveMatchNumber=value=>{const number=Number(value);return Number.isInteger(number)&&number>0?number:0};
 function scheduleQualifier(label){const value=clean(label),match=value.match(/\b(after\s+rest|not\s*before|N\.?B\.?|followed\s+by|starting(?:\s+at)?|court(?:\s+(?:and|&))?\s+time\s+tba|time\s+tba)\b/i);if(!match)return'';const key=match[1].toLowerCase().replace(/\s+/g,' ');if(key==='after rest')return'After rest';if(key==='not before'||/^n\.?b\.?$/.test(key))return'Not before';if(key==='followed by')return'Followed by';if(key.startsWith('starting'))return'Starting at';if(key.startsWith('court'))return'Court and time TBA';return'Time TBA'}
 function officialSchedule(context){
