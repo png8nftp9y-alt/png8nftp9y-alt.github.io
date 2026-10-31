@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {presenceIndex,comparePresence,alternateExpectation,forbiddenPast} from '../lib/itf-page-audit.mjs';
+import {AUDIT_CRITERION} from '../../src/v3/itf-audit-acquisition-policy.mjs';
+const player={worldTennisId:'8001',gender:'Girls'};
+const state=()=>({eventInventory:['G-S-M-KO','G-S-Q-KO','G-D-M-KO'].map(event=>({event})),eventCache:Object.fromEntries(['G-S-M-KO','G-S-Q-KO','G-D-M-KO'].map(event=>[event,{populated:true,acquisitionProof:{criterion:AUDIT_CRITERION,complete:true},players:[{id:'8002'}]}]))});
+test('audit finds missing tournament despite same number of source and page rows',()=>{assert.deepEqual(comparePresence([{competitionId:'A'},{competitionId:'B'}],[{competitionId:'A'},{competitionId:'C'}]).missing,['B']);});
+test('native IDs separate homonyms and repeated draws do not inflate presence',()=>{const s=state();for(const d of Object.values(s.eventCache))d.players.push({id:'8001',name:'Same Name'});s.competitionId='T';const x=presenceIndex({tournaments:{T:s}});assert.equal(x.players.get('8001').size,1);assert.equal(x.players.get('8002').size,1);});
+test('unknown, unproven and failed sections never certify alternate absence',()=>{const s=state();assert.equal(alternateExpectation(player,s).state,'absent');delete s.eventCache['G-D-M-KO'].acquisitionProof;assert.equal(alternateExpectation(player,s).state,'unverifiable');assert.equal(alternateExpectation({...player,gender:''},state()).state,'unverifiable');});
+test('qualifying, main and doubles native presence prevent a false exclusion',()=>{for(const event of Object.keys(state().eventCache)){const s=state();s.eventCache[event].players.push({id:'8001'});assert.equal(alternateExpectation(player,s).state,'present');}});
+test('past acceptance is invalid history; a real match keeps a retired participant tournament',()=>{assert.equal(forbiddenPast({circuit:'itf',historyKind:'past',entryStatus:'withdrawn',matches:[]}),true);assert.equal(forbiddenPast({circuit:'itf',historyKind:'past',matches:[{id:'m'}]}),false);});

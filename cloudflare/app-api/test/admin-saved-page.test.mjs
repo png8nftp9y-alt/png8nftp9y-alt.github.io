@@ -40,7 +40,7 @@ test('saved Admin opens before blocked D1 reads; authentication and no-store rem
  assert.equal((await worker.fetch(d.request(),d.env)).status,401);assert.equal(dbReads,0);
  const response=await worker.fetch(new Request(d.request().url,{headers:{Authorization:'Basic '+btoa('admin:test-only')}}),d.env);
  const html=await response.text();assert.equal(response.status,200);assert.equal(response.headers.get('Cache-Control'),'no-store');
- assert.match(html,/revision 1/);if(view==='id')assert.match(html,/panels.js/);else assert.doesNotMatch(html,/panels.js|currentPanels=1/);assert.equal(dbReads,0);assert.equal(d.builds(),1);assert.equal(d.writes(),1);
+ assert.match(html,/revision 1/);assert.match(html,/panels.js/);assert.doesNotMatch(html,/currentPanels=1/);assert.equal(dbReads,0);assert.equal(d.builds(),1);assert.equal(d.writes(),1);
  }
 });
 test('missing saved page offers explicit calculation instead of a heavy automatic rebuild',async()=>{

@@ -1,3 +1,4 @@
+import {confirmedObservedBirthYear} from './confirmed-observed-birth.mjs';
 // D1_WRITE_POLICY: read-only; exact selected identities, no external HTTP.
 export function birthDate(value){
  const text=String(value||'').trim();
@@ -9,7 +10,7 @@ export function birthDate(value){
 export function birthYear(value){const n=Number(value);return Number.isInteger(n)&&n>=1900&&n<=new Date().getUTCFullYear()?n:null;}
 export function applyBirthEvidence(player,rows){
  const retainedDate=birthDate(player.birthDate||player.dateOfBirth);
- const years=new Set([birthYear(player.birthYear),birthYear(retainedDate.slice(0,4)),...rows.map(r=>birthYear(r.birth_year))].filter(Boolean));
+ const years=new Set([confirmedObservedBirthYear(player),birthYear(player.birthYear),birthYear(retainedDate.slice(0,4)),...rows.map(r=>birthYear(r.birth_year))].filter(Boolean));
  player.birthYearSources=rows.filter(r=>r.birth_year).map(r=>({circuit:r.circuit,url:r.source_url,checkedAt:r.checked_at}));
  if(years.size>1||rows.some(r=>r.status==='conflict')){player.birthYearStatus='conflict';delete player.birthYear;return player;}
  if(years.size){player.birthYear=[...years][0];player.birthYearStatus='year_only';}

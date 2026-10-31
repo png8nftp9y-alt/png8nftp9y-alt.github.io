@@ -14,8 +14,8 @@ test('workflow states override old critical items; missing evidence remains expl
 });
 test('diagnostics has only its existing refresh button, while ID retains its separate review control',()=>{
  const source='<html><nav></nav><form><button name="refreshDiagnostics" value="1">Aggiorna diagnostica</button></form><section class="card"><h2>Workflow e watchdog</h2>old</section><section class="card"><h2>Diagnostica applicativa</h2>old</section></html>';
- const html=attachAdminPanels(source,'diagnostica','https://app/admin/diagnostica');assert.match(html,/Aggiorna diagnostica/);assert.doesNotMatch(html,/Aggiorna stati|id="admin-panel-refresh"/);assert.doesNotMatch(html,/panels.js|currentPanels=1/);assert.equal(html,source);
- assert.match(attachAdminPanels('<html><nav></nav></html>','id','https://app/admin/id'),/Aggiorna segnalazioni/);
+ const html=attachAdminPanels(source,'diagnostica','https://app/admin/diagnostica');assert.match(html,/Aggiorna diagnostica/);assert.doesNotMatch(html,/Aggiorna stati|id="admin-panel-refresh"/);assert.match(html,/panels.js/);assert.doesNotMatch(html,/currentPanels=1/);assert.equal((html.match(/id="admin-identity-refresh"/g)||[]).length,1);assert.match(html,/Workflow e watchdog/);assert.match(html,/Diagnostica applicativa/);
+ assert.match(attachAdminPanels('<html><nav></nav></html>','id','https://app/admin/id'),/id="admin-identity-refresh"/);
 });
 test('without the removed button diagnostics makes one request on opening, succeeds and never retries',async()=>{
  let calls=0;const host={dataset:{url:'/admin/diagnostica?currentPanels=1',view:'diagnostica'}},error={},target={};

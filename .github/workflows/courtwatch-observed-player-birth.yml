@@ -8,6 +8,9 @@ on:
       - 'cloudflare/app-api/lib/player-birth-metadata.mjs'
       - 'cloudflare/app-api/lib/official-player-birth.mjs'
       - 'cloudflare/app-api/scripts/sync-observed-player-birth.mjs'
+      - 'cloudflare/app-api/scripts/apply-reviewed-player-birth.mjs'
+      - 'cloudflare/app-api/lib/reviewed-player-birth.mjs'
+      - 'cloudflare/app-api/data/reviewed-player-birth-years.json'
       - 'cloudflare/app-api/migrations/0048_observed_player_birth_metadata.sql'
   workflow_run:
     workflows: ['Court Watch acquired player search index']
@@ -50,11 +53,15 @@ jobs:
           npm install
           node scripts/configure-d1.mjs
           npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+      - name: Apply researched birth years to currently observed identities only
+        run: node scripts/apply-reviewed-player-birth.mjs
       - name: Acquire only unprocessed selected-player profiles
         run: node scripts/sync-observed-player-birth.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: observed-birth-coverage
-          path: cloudflare/app-api/tmp/observed-birth-coverage.json
+          path: |
+            cloudflare/app-api/tmp/observed-birth-coverage.json
+            cloudflare/app-api/tmp/reviewed-birth-coverage.json
           retention-days: 30
