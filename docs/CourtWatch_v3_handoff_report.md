@@ -9986,3 +9986,12 @@ Startup previously awaited both IndexedDB projection and opponent restoration be
 Validation: 92 focused tests for actual loaders, startup, additions, membership and opponent caching. Added PC-empty-cache versus phone-stale-cache convergence, ongoing/current withdrawals, unavailable-source retention, delayed disk startup and stale restore races. Local release guard and browser functional Shield passed, including both player groups. A separate actual Chromium test (desktop and mobile viewport with stale Quanta cache and blocked IndexedDB) confirmed both converge to the same fresh historical-only tournament list with one full snapshot request per client. Published CI must still verify the new code before deploy. No direct measurement on the user's physical phone and no claim that all network/server latency is eliminated. Bump v3.js URL so devices request this corrected client.
 
 Focused ongoing-withdrawal and startup fix. Existing engine schedules and app refresh cadence unchanged; no workflow polling or automatic rerun.
+
+
+## 2026-10-31 — chat 1: alternate futuri e prove storiche separate
+- Analisi artifact 13049816694 del run 41220333830: i 107 casi riguardano 21 tornei. Nel catalogo 104 casi/20 tornei iniziano a novembre; 3 casi riguardano J60 Pescara concluso il 3 ottobre.
+- La copia acquisita di Pescara contiene 32 giocatori nel doppio maschile B-D-M-KO ma non la relativa acquisitionProof. Non viene inventata una certificazione dai soli conteggi.
+- Audit: evidenza incompleta di torneo futuro con date valide viene separata in pendingAlternates; una esclusione senza prova resta errore. Tornei gia iniziati, conclusi o senza date valide mantengono la segnalazione.
+- Per le prove mancanti legge e allega i checks del registro ufficiale R2 coverage-v3-current, senza trasformarli automaticamente in certificazione della cache. Controlla che il registro non cambi durante la lettura.
+- Validazione: tre test temporali, regressioni audit/identita e sintassi. Nessuna scrittura D1/R2 o chiamata di acquisizione ITF. Un solo audit su push.
+- Limiti: confronto remoto Pescara ancora da eseguire; eventuale riparazione dati dipende dall'evidenza. Non dichiarata completezza globale o chiusura dei tre casi storici.
