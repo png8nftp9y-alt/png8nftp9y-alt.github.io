@@ -10008,3 +10008,12 @@ Focused ongoing-withdrawal and startup fix. Existing engine schedules and app re
 - Copia acquisita Pescara: Mastropasqua 800687485 e Rusca 800697548 presenti; Ceschin 800710276 assente dalle sezioni maschili. Il generatore reale di test mantiene i primi due ed esclude il terzo; replay identico.
 - Validazione locale: 22 test superati, fra cui generatore reale, pagina iscrizioni, import incrementale, replay zero modifiche e protezioni fonte incompleta. Regressioni Pescara aggiunte a npm run check. Non aggiunte letture runtime D1 o nuove schedulazioni.
 - Il push attiva D1 esistente e audit. Chiusura solo dopo import indice e verifica remota dei tre casi; un audit concorrente all'importazione puo non essere conclusivo. Nessun polling o rilancio automatico.
+
+
+## Chat 1 — Icona aggiornamento soltanto in ID
+Richiesta: rimuovere l'icona identità dalla Diagnostica.
+Il controllo rimane solo in ID e continua ad aggiornare insieme ID
+mancanti, identità sospette e anni già acquisiti. Aggiornati i test
+di presenza/assenza dell'icona; mantenuti i controlli su letture salvate,
+autenticazione e assenza di richieste automatiche.
+Test mirati obbligatori prima del commit. Deploy remoto da verificare.

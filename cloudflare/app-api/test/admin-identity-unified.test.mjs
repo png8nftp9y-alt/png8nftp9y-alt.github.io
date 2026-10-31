@@ -18,7 +18,7 @@ test('partial failure cannot be published as a complete updated reading',async()
 });
 test('Diagnostics and ID have exactly one accessible identity refresh icon; old separate controls are removed',()=>{
  const html='<html><nav></nav><form method="get" action="/admin/id"><button name="refreshIds">Aggiorna conteggi</button></form><form action="/admin/id#id-circuiti"><button>Aggiorna conteggi</button></form><a href="/admin/id#identita-sospette">Aggiorna segnalazioni</a></html>';
- for(const view of ['id','diagnostica']){const output=attachIdentityRefresh(html,view);assert.equal((output.match(/id="admin-identity-refresh"/g)||[]).length,1);assert.match(output,/aria-label="Aggiorna ID, identità sospette e anni di nascita"/);assert.doesNotMatch(output,/Aggiorna conteggi|Aggiorna segnalazioni/);}
+ assert.equal(attachIdentityRefresh(html,'diagnostica'),html); for(const view of ['id']){const output=attachIdentityRefresh(html,view);assert.equal((output.match(/id="admin-identity-refresh"/g)||[]).length,1);assert.match(output,/aria-label="Aggiorna ID, identità sospette e anni di nascita"/);assert.doesNotMatch(output,/Aggiorna conteggi|Aggiorna segnalazioni/);}
 });
 test('icon makes no automatic request, shares simultaneous clicks, and never polls or retries',async()=>{
  let click,finish,calls=0,reloads=0;const pending=new Promise(r=>finish=r),button={dataset:{view:'id'},addEventListener:(event,fn)=>{click=fn}},status={};

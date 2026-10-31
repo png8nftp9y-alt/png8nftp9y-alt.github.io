@@ -12,7 +12,7 @@ export async function unifiedIdentityReport(env,url,loaders={}){
 }
 export const IDENTITY_REFRESH_CLIENT=`const identityButton=document.getElementById('admin-identity-refresh'),identityStatus=document.getElementById('admin-identity-refresh-status');let identityRunning=false;if(identityButton)identityButton.addEventListener('click',async()=>{if(identityRunning)return;identityRunning=true;identityButton.disabled=true;try{const response=await fetch('/admin/id?refreshIdentity=1',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(120000)});if(!response.ok)throw Error('identity_refresh_failed');const result=await response.json();if(result.updated!==true)throw Error('identity_refresh_incomplete');identityStatus.textContent='ID, identità sospette e anni di nascita aggiornati.';if(identityButton.dataset.view==='id')location.reload();}catch{identityStatus.textContent='Aggiornamento non riuscito. Rimane la precedente lettura dei tre controlli.';}finally{identityRunning=false;identityButton.disabled=false;}});`;
 export function attachIdentityRefresh(html,view){
- if(!['id','diagnostica'].includes(view))return html;
+ if(view!=='id')return html;
  html=html.replace(/<form\b[^>]*action="\/admin\/id(?:#id-circuiti)?"[^>]*>[\s\S]*?<\/form>/g,'');
  html=html.replace(/<a href="\/admin\/id#identita-sospette">Aggiorna segnalazioni<\/a>\s*·?\s*/g,'');
  html=html.replaceAll('Aggiorna conteggi','l’icona ↻');
