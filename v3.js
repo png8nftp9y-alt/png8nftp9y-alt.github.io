@@ -3082,6 +3082,8 @@ function bindParticipantNavigation(root) {
 function incompleteCompletedScore(value, status, decided = false) {
   const sets = String(value || "").match(/\d+(?:\(\d+\))?-\d+(?:\(\d+\))?/g) || [];
   if (!sets.length) return false;
+  // Short-set formats cannot establish retirement from the score alone.
+  if (sets.every(set => Math.max(...set.replace(/\(\d+\)/g, "").split("-").map(Number)) <= 5)) return false;
   let left = 0, right = 0;
   for (const set of sets) {
     const points = set.match(/^(\d+)(?:\(\d+\))?-(\d+)/);

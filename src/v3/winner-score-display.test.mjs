@@ -84,3 +84,17 @@ test('agenda and player/tournament rows retain win/loss colors with winner-first
     }
   }
 });
+
+test('short-set scores never invent retirement; official retirement still wins in browser and Worker', () => {
+  const worker=readFileSync(new URL('../../cloudflare/app-api/src/index.js',import.meta.url),'utf8');
+  const line=worker.split('\n').find(line=>line.startsWith('const incompleteCompletedScore='));
+  const infer=vm.runInNewContext(line+';incompleteCompletedScore');
+  for(const score of ['4-2 4-1','2-4 1-4','4-3(5) 4-2','4-2 2-1']){
+    assert.equal(infer(score,'completed',true),false);
+    assert.equal(context.incompleteCompletedScore(score,'completed',true),false);
+    assert.equal(context.matchResultText({score,won:true,status:'completed'}),score);
+    assert.equal(context.matchResultText({score,won:true,status:'completed',retired:true}),score+' Rit.');
+  }
+  assert.equal(infer('6-4 2-1','completed',true),true);
+  assert.equal(context.matchResultText({score:'W/O',won:true,status:'completed'}),'W/O');
+});

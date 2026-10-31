@@ -9937,3 +9937,11 @@ Validation: focused Observability/storage/Admin tests, syntax and installer pref
 
 
 Dedicated monitoring token preferred. No polling, retries or scheduling changes.
+
+## 2026-10-31 — Europe: nessun ritiro dedotto dai soli set corti
+
+- Caso segnalato Grimoldi–Jor: 4-2 4-1 riceveva Rit. perché la regola contava soltanto set da almeno sei game.
+- Browser e Worker ora non deducono un ritiro dai soli punteggi con set fino a cinque game. Le prove esplicite di ritiro restano prioritarie; non si inventa il formato né si trasforma automaticamente ogni set da quattro in un set regolare.
+- Nessuna modifica acquisitori, D1, esiti, orientamento punteggi o W/O. La funzione condivisa di presentazione resta coerente nei due ambienti; nuova versione JavaScript per distribuire la correzione.
+- Validazione: regressione del caso 4-2 4-1 e inverso, tie-break corti, punteggio corto ambiguo, ritiro esplicito, W/O e precedente deduzione su set standard; test display browser/Worker e sintassi. Esito remoto da verificare dopo pubblicazione.
+- Limite: sui set corti senza indicazione ufficiale il solo punteggio non viene utilizzato per affermare un ritiro. Non è una verifica dell’effettivo referto Grimoldi–Jor.
