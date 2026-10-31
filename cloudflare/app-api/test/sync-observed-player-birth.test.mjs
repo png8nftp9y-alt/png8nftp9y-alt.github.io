@@ -3,3 +3,7 @@
 // D1_TEST_IDENTICAL_ZERO_WRITES / D1_TEST_INCOMPLETE_SOURCE_GUARD
 import './observed-player-birth.test.mjs';
 import './admin-observed-birth.test.mjs';
+
+import './apply-reviewed-player-birth.test.mjs';
+
+import './admin-identity-unified.test.mjs';

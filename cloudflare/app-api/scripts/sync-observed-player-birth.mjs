@@ -50,6 +50,8 @@ export async function syncObservedBirth({query,write=query,fetchProfile=fetchOff
  for(const key of new Set(links.map(nativeKey)))if(new Set(links.filter(l=>nativeKey(l)===key).map(l=>l.canonical_id)).size>1)throw Error('birth_ambiguous_native_identity');
  const sourceKeys=[...new Set([...links.map(nativeKey),...ids.map(id=>'courtwatch|'+id)])];
  for(let i=0;i<sourceKeys.length;i+=50)current.push(...await query('SELECT b.* FROM json_each(?) ids JOIN player_birth_metadata b ON b.source_key=ids.value',[JSON.stringify(sourceKeys.slice(i,i+50))]));
+ const reviewed=[];
+ for(let i=0;i<ids.length;i+=50)reviewed.push(...await query("SELECT b.* FROM json_each(?) ids JOIN player_birth_metadata b ON b.canonical_id=ids.value WHERE b.source_key LIKE 'reviewed-web|%'",[JSON.stringify(ids.slice(i,i+50))]));
  const byKey=new Map(current.map(r=>[r.source_key,r])),incoming=[],external=[];
  for(const id of ids){
   const players=selected.filter(p=>p.canonical_id===id),groupLinks=links.filter(l=>l.canonical_id===id),groupKeys=new Set(groupLinks.map(l=>l.source_key));
@@ -62,7 +64,7 @@ export async function syncObservedBirth({query,write=query,fetchProfile=fetchOff
   const source_key=nativeKey(link),old=byKey.get(source_key);
   if(old&&old.canonical_id===link.canonical_id&&(!retryUnavailable||old.status==='year_only')){incoming.push(old);continue;}
   const retainedYear=incoming.find(r=>r.source_key==='courtwatch|'+link.canonical_id);
-  if(!retryUnavailable&&retainedYear?.status==='year_only'){if(old)incoming.push(old);continue;}
+  if(!retryUnavailable&&(retainedYear?.status==='year_only'||reviewed.some(r=>r.canonical_id===link.canonical_id&&r.status==='year_only'&&r.birth_year))){if(old)incoming.push(old);continue;}
   let result;
   try{result=await fetchProfile(link);}catch(e){result={birth_year:old?.birth_year||null,status:'source_error',source_url:link.profile_url||'',error:String(e.message).slice(0,180)};}
   // A temporary unavailable field never erases a previously verified year.
@@ -81,7 +83,7 @@ export async function syncObservedBirth({query,write=query,fetchProfile=fetchOff
  const saved=[];for(let i=0;i<sourceKeys.length;i+=50)saved.push(...await query('SELECT b.* FROM json_each(?) ids JOIN player_birth_metadata b ON b.source_key=ids.value',[JSON.stringify(sourceKeys.slice(i,i+50))]));
  const found=new Map(saved.map(r=>[r.source_key,view(r)]));
  if(incoming.some(r=>JSON.stringify(found.get(r.source_key))!==JSON.stringify(view(r))))throw Error('birth_write_readback_failed');
- const players=selected.map(r=>{const p=applyBirthEvidence({...parse(r.payload)},saved.filter(b=>b.canonical_id===r.canonical_id));return{id:r.courtwatch_id,name:p.name,birthYear:p.birthYear||null,status:p.birthYearStatus,sources:p.birthYearSources};});
+ const players=selected.map(r=>{const p=applyBirthEvidence({...parse(r.payload)},[...saved,...reviewed].filter(b=>b.canonical_id===r.canonical_id));return{id:r.courtwatch_id,name:p.name,birthYear:p.birthYear||null,status:p.birthYearStatus,sources:p.birthYearSources};});
  const counts={};for(const p of players)counts[p.status]=(counts[p.status]||0)+1;
  return {status:'acquisition_complete',selected:players.length,writes:plan.inserts.length+plan.updates.length,counts,players,sourceErrors:saved.filter(r=>r.status==='source_error').map(r=>({sourceKey:r.source_key,error:r.error}))};
 }
