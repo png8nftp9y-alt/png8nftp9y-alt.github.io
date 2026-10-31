@@ -10026,3 +10026,11 @@ Test mirati obbligatori prima del commit. Deploy remoto da verificare.
 - Errori registrano hash della query, contatori e profilo in elaborazione, senza SQL o parametri. Contatori query effettive e cache hit disponibili nel report.
 - Validazione: 18 test passati su sessione letture, selettore alternate, Pescara, generatore reale e confronto audit. Il workflow esegue anche i nuovi test. Sintassi verificata.
 - Nessuna modifica applicativa o al client D1 generale. Esecuzione reale della nuova versione ancora da confermare; un errore Cloudflare ulteriore resta bloccante.
+
+## 2026-10-31 — Complete ongoing registration removal in scoped player refresh
+
+User confirmed Quanta only persisted on phone and provided the Natale profile screenshot: LOMB. 1212 QUANTA CLUB, 2026-10-30 to 2026-11-01. The previous device-freshness patch corrected full-group load but missed refreshAfterPlayerAddition, also used by scoped membership enrichment. Verified the publicly served Worker v3.js still had this second predicate: startDate <= today unconditionally retained the old registration. A complete scoped response without Quanta therefore could not remove the cached row.
+
+Apply the same end-date policy already used by full load: preserve concluded cached tournaments and other players, replace ongoing/future registrations owned by the refreshed player. Match history merging remains unchanged. Bump script URL to force the corrected client to be requested. No D1 queries, engine/import/identity/Admin changes or schedules/timers/reruns are introduced.
+
+Validation: exact Oct 30-Nov 1 regression with as-of Oct 31 for main and others; unrelated player, legitimate future tournament, concluded history and historical score preserved. Actual Chromium desktop/mobile simulation holds the full request pending, then resolves scoped data: phone loses Quanta, desktop remains correct, and the later full response cannot resurrect it. Focused 91 tests and local release-safety/functional browser Shield passed. Full npm run check completed successfully (exit 0), including the Admin regressions that previously blocked deployment. The authenticated production player snapshot cannot be read from this environment (302 to sign-in); this proves and corrects the missed client path, while the physical phone result still requires confirmation after deployment.

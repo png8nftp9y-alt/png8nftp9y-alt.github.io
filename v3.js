@@ -2743,8 +2743,13 @@ async function refreshAfterPlayerAddition(epoch, group, playerId, {membershipSyn
       throw Error('Snapshot del giocatore errato');
     const renderStarted=Date.now();
     const previous = state.data, today = iso(new Date());
-    const retained = (previous.tournaments || []).filter(t => t.playerId !== playerId ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(t.startDate || '') || t.startDate <= today);
+    // A scoped refresh owns this player's ongoing/future registrations too.
+    // Preserve confirmed past history and every other player's tournaments.
+    const retained = (previous.tournaments || []).filter(t => {
+      if (t.playerId !== playerId) return true;
+      const end = String(t.endDate || t.officialEndDate || t.startDate || '').slice(0,10);
+      return !/^\d{4}-\d{2}-\d{2}$/.test(end) || end < today;
+    });
     const tournaments = [...new Map([...retained, ...data.tournaments].map(t =>
       [[t.playerId,t.circuit,t.competitionId || t.id].join('|'),t])).values()];
     const hash = location.hash, y = typeof scrollY === 'number' ? scrollY : null;
