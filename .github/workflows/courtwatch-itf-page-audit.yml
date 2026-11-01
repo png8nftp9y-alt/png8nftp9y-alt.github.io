@@ -24,8 +24,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Validate missing presence and incomplete evidence detection
-        run: node --test tools/tests/itf-page-audit.test.mjs tools/tests/itf-audit-read-session.test.mjs
+        run: node --test tools/tests/itf-page-audit.test.mjs tools/tests/itf-audit-read-session.test.mjs tools/tests/itf-audit-frozen-d1.test.mjs
       - run: npm install
+      - run: npm --prefix cloudflare/app-api install
       - run: npx playwright install --with-deps chromium
       - run: python -m pip install --disable-pip-version-check --quiet awscli
       - name: Audit acquired ITF presence against real D1 snapshots and browser without writes
@@ -38,7 +39,9 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: auto
-        run: node tools/audit-itf-pages.mjs
+        run: |
+          node tools/prepare-itf-audit-snapshot.mjs
+          ITF_AUDIT_FROZEN_DIR="$RUNNER_TEMP/courtwatch-itf-audit-snapshot" node tools/audit-itf-pages.mjs
       - name: Publish audit verdict in run summary
         if: always()
         run: |
@@ -47,7 +50,7 @@ jobs:
           const p='artifacts/itf-page-audit.json';
           if(!fs.existsSync(p))process.exit(0);
           const r=JSON.parse(fs.readFileSync(p,'utf8'));
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,`ITF page audit: **${r.status}**\n\nPlayers: ${r.players.length}; opponent profiles: ${r.opponents.length}; alternates: ${r.alternates.length}; differences: ${r.issues.length}; unverifiable cases: ${r.unverifiable.length}.\n\nD1 rows read: ${r.metrics.rowsRead}; rows written: ${r.metrics.rowsWritten}.\n\nSee artifact for names, competitions and source gaps. This is not a claim of complete ITF acquisition.\n`);
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,`ITF page audit of frozen inputs (not current live state): **${r.status}**\n\nPlayers: ${r.players.length}; opponent profiles: ${r.opponents.length}; alternates: ${r.alternates.length}; differences: ${r.issues.length}; unverifiable cases: ${r.unverifiable.length}.\n\nD1 export read cost: not measured; local queries: ${r.localReadMetrics?.localQueries}; remote rows written: ${r.metrics.rowsWritten}.\n\nSee artifact for names, competitions and source gaps. This is not a claim of complete ITF acquisition.\n`);
           JS
       - uses: actions/upload-artifact@v4
         if: always()
@@ -61,5 +64,8 @@ jobs:
           node --input-type=module <<'JS'
           import fs from 'node:fs';
           const r=JSON.parse(fs.readFileSync('artifacts/itf-page-audit.json','utf8'));
-          if(r.status!=='checked_scope_matches')process.exit(1);
+          if(r.status!=='checked_frozen_scope_matches'||r.snapshot?.scope!=='frozen_input_comparison_not_current_live_state')process.exit(1);
           JS
+      - name: Remove private snapshot from runner
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/courtwatch-itf-audit-snapshot"

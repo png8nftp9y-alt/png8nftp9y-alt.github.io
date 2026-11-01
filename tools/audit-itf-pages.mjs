@@ -1,26 +1,32 @@
+import {openFrozenAuditD1} from './lib/itf-audit-frozen-d1.mjs';
 import {auditReadSession} from './lib/itf-audit-read-session.mjs';
 import {pendingFutureAlternate} from './lib/itf-alternate-timing.mjs';
 // D1_READ_ONLY: guarded
 import fs from 'node:fs/promises';import path from 'node:path';import http from 'node:http';import {execFileSync} from 'node:child_process';import {gunzipSync} from 'node:zlib';
 import worker from '../cloudflare/app-api/src/index.js';
-import {openReadOnlyD1} from '../cloudflare/app-api/lib/read-only-d1-client.mjs';
 import {playerCircuitIdentities} from '../cloudflare/app-api/lib/player-circuit-profiles.mjs';
 import {runtimeDocumentReader} from '../cloudflare/app-api/lib/runtime-document-reader.mjs';
 import {presenceIndex,comparePresence,alternateExpectation,forbiddenPast,competitionKey} from './lib/itf-page-audit.mjs';
 const root=process.cwd(),output='artifacts/itf-page-audit.json',today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date());
-const report={startedAt:new Date().toISOString(),sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),status:'running',metrics:{queries:0,rowsRead:0,rowsWritten:0},playerCoverage:[],players:[],opponents:[],alternates:[],issues:[],unverifiable:[],limitations:['Worker replay uses real read-only D1 and actual browser rendering, not the public deployed HTTP session.','Scope: both lists of the configured account and native-ID opponents/partners in their acquired ITF matches. Other users and unrelated opponents are outside scope.','Fresh browser context; existing private caches on user devices are not read.','No external ITF acquisition. Missing source draws cannot be certified as absent participation.','Concurrent ingestion is not a database-wide transaction; source markers are checked before and after.']};
-let browser,server;
+const report={startedAt:new Date().toISOString(),sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),status:'running',metrics:{queries:0,rowsRead:0,rowsWritten:0},playerCoverage:[],players:[],opponents:[],alternates:[],issues:[],unverifiable:[],limitations:['Worker and browser replay a native D1 export and pinned ITF generation. Verdict certifies captured inputs, not current live state or atomic cross-service capture.','Scope: both lists of the configured account and native-ID opponents/partners in their acquired ITF matches. Other users and unrelated opponents are outside scope.','Fresh browser context; existing private caches on user devices are not read.','No external ITF acquisition. Missing source draws cannot be certified as absent participation.','D1 export and R2 capture have separate timestamps; no atomic D1/R2 transaction is claimed. Live updates after capture do not change frozen inputs.']};
+let browser,server,frozenClient;
 const parse=x=>typeof x==='string'?JSON.parse(x):x;
 const native=p=>playerCircuitIdentities(p).find(x=>x.circuit==='itf')?.profileId||(p.circuitProfiles||[]).find(x=>x.circuit==='itf')?.profileId;
 const r2=key=>execFileSync('aws',['s3','cp',`s3://${process.env.R2_BUCKET}/${key}`,'-','--endpoint-url',`https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`],{maxBuffer:250*1024*1024,stdio:['ignore','pipe','pipe']});
 const itf=t=>String(t.circuit||t.sourceId||'').toLowerCase()==='itf';
 const issue=(kind,data)=>report.issues.push({kind,...data});
 try{
- const remote=await openReadOnlyD1({onMetrics:rows=>{for(const row of rows){report.metrics.queries++;report.metrics.rowsRead+=Number(row.meta?.rows_read)||0;report.metrics.rowsWritten+=Number(row.meta?.rows_written)||0;if(Number(row.meta?.rows_written)>0)throw Error('audit_write_detected');}}});
- const session=auditReadSession(remote.query,{onFailure:failure=>{report.d1Failure=failure;}}),{query,db}=session;report.readSessionMetrics=session.metrics;
+ const frozenDir=process.env.ITF_AUDIT_FROZEN_DIR;
+ if(!frozenDir)throw Error('audit_frozen_snapshot_required');
+ report.snapshot=JSON.parse(await fs.readFile(path.join(frozenDir,'manifest.json'),'utf8'));
+ frozenClient=openFrozenAuditD1(path.join(frozenDir,'database.sqlite'));
+ if(frozenClient.fingerprint!==report.snapshot.databaseSha256)throw Error('audit_snapshot_fingerprint_mismatch');
+ const remote=frozenClient;report.localReadMetrics=frozenClient.metrics;report.metrics.rowsRead=null;report.metrics.remoteReadCost='native_export_not_measured';
+ const session=auditReadSession(remote.query,{minimumIntervalMs:0,onFailure:failure=>{report.d1Failure=failure;}}),{query,db}=session;report.readSessionMetrics=session.metrics;
  const markers=async()=>JSON.stringify(await remote.query("SELECT key,value FROM app_state WHERE key IN ('runtimeDocumentRelease','opponentEntryHash') ORDER BY key"));
  const before=await markers();report.sourceMarkersBefore=JSON.parse(before);
- const pointer=parse(r2('itf/database/pointers/current.json').toString()),generation=pointer.generation;
+ const pointer=parse(await fs.readFile(path.join(frozenDir,'pointer.json'),'utf8')),generation=pointer.generation;
+ if(generation!==report.snapshot.itfGeneration)throw Error('audit_snapshot_generation_mismatch');
  if(!generation||!/^[A-Za-z0-9_.-]+$/.test(generation))throw Error('invalid_current_itf_generation');
  report.itfGeneration=generation;
  const draws=parse(r2(`itf/database/generations/${generation}/itf_draw_target_db.json`).toString());
@@ -73,7 +79,7 @@ try{
  const scopedIds=new Set([...people.keys(),...opponentIds.keys()]);
  const catalogueReader=runtimeDocumentReader(db),auditCatalogue=(await catalogueReader.get('dist/v3/source_itf_tournaments.json')).tournaments||[],catalogueById=new Map(auditCatalogue.map(t=>[competitionKey(t),t]));
  report.pendingAlternates=[];
- const coverageBytes=r2('itf/audits/official-draw-parity/coverage-v3-current.json'),coverageAudit=parse(coverageBytes.toString());
+ const coverageBytes=await fs.readFile(path.join(frozenDir,'coverage.json')),coverageAudit=parse(coverageBytes.toString());
  report.alternateCoverageEvidence={criterion:coverageAudit.criterion,generatedAt:coverageAudit.generatedAt};
  const coverageById=new Map((coverageAudit.tournaments||[]).map(t=>[competitionKey(t),t]));
  const entryProfiles=new Map();const allIds=[...scopedIds];
@@ -116,8 +122,8 @@ try{
  report.drawCoverage={scope:'ITF catalogue tournaments concluded since 2026-09-01; cache inventory presence only, not a claim of complete acquisition',tournaments:catalogue.filter(t=>String(t.endDate||'')>= '2026-09-01'&&String(t.endDate||'')<today).map(t=>({competitionId:competitionKey(t),inventoried:Boolean(sourceByCompetition.get(competitionKey(t))?.eventInventory?.length)}))};
  report.drawCoverage.missingInventoryCount=report.drawCoverage.tournaments.filter(t=>!t.inventoried).length;
  if(!report.players.length)throw Error('no_verified_itf_player_audited');
- report.alternateCoverageEvidence.changedDuringAudit=!coverageBytes.equals(r2('itf/audits/official-draw-parity/coverage-v3-current.json'));
- const after=await markers(),generationAfter=parse(r2('itf/database/pointers/current.json').toString()).generation;report.sourceMarkersAfter=JSON.parse(after);report.sourceChanges={d1:before!==after,r2:generationAfter!==generation,generationBefore:generation,generationAfter};report.concurrentSourceChanged=report.sourceChanges.d1||report.sourceChanges.r2||report.alternateCoverageEvidence.changedDuringAudit;report.problemGroups={identity:report.unverifiable.filter(x=>x.reason==='opponent_identity_not_confirmed'),alternates:report.alternates.filter(x=>x.expected.state==='unverifiable'),zeroPresence:report.players.filter(x=>!x.expected.length),excludedPlayers:report.playerCoverage.filter(x=>x.status!=='audited')};
- report.status=report.concurrentSourceChanged?'inconclusive_concurrent_source_change':report.issues.length?'differences_found':report.unverifiable.length||presence.unidentified.length||report.drawCoverage.missingInventoryCount?'checked_scope_matches_with_unverifiable_cases':'checked_scope_matches';
+ report.alternateCoverageEvidence.changedDuringAudit=false;report.alternateCoverageEvidence.source='frozen_capture';
+ const after=await markers(),generationAfter=generation;report.sourceMarkersAfter=JSON.parse(after);report.sourceChanges={d1:before!==after,r2:generationAfter!==generation,generationBefore:generation,generationAfter};report.concurrentSourceChanged=report.sourceChanges.d1||report.sourceChanges.r2||report.alternateCoverageEvidence.changedDuringAudit;report.problemGroups={identity:report.unverifiable.filter(x=>x.reason==='opponent_identity_not_confirmed'),alternates:report.alternates.filter(x=>x.expected.state==='unverifiable'),zeroPresence:report.players.filter(x=>!x.expected.length),excludedPlayers:report.playerCoverage.filter(x=>x.status!=='audited')};
+ report.status=report.concurrentSourceChanged?'inconclusive_concurrent_source_change':report.issues.length?'differences_found':report.unverifiable.length||presence.unidentified.length||report.drawCoverage.missingInventoryCount?'checked_scope_matches_with_unverifiable_cases':'checked_frozen_scope_matches';
 }catch(error){report.status='audit_failed';report.error=String(error.message).replace(/[\w.+-]+@[\w.-]+/g,'[email]').slice(0,1200);process.exitCode=1;}
-finally{await browser?.close();server?.close();report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');console.log('ITF_PAGE_AUDIT='+JSON.stringify({status:report.status,players:report.players.length,opponents:report.opponents.length,alternates:report.alternates.length,issues:report.issues.length,unverifiable:report.unverifiable.length,metrics:report.metrics,readSession:report.readSessionMetrics,d1Failure:report.d1Failure,error:report.error}));for(const row of report.players)console.log('ITF_PLAYER_AUDIT='+JSON.stringify({group:row.group,name:row.name,nativeId:row.nativeId,expected:row.scoped.expected,missingSnapshot:row.scoped.missing,missingBrowser:row.browser?.missing}));for(const row of report.issues)console.log('ITF_PAGE_DIFFERENCE='+JSON.stringify(row));}
+finally{await browser?.close();server?.close();frozenClient?.close();report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');console.log('ITF_PAGE_AUDIT='+JSON.stringify({status:report.status,players:report.players.length,opponents:report.opponents.length,alternates:report.alternates.length,issues:report.issues.length,unverifiable:report.unverifiable.length,metrics:report.metrics,readSession:report.readSessionMetrics,localReadMetrics:report.localReadMetrics,snapshot:report.snapshot,d1Failure:report.d1Failure,error:report.error}));for(const row of report.players)console.log('ITF_PLAYER_AUDIT='+JSON.stringify({group:row.group,name:row.name,nativeId:row.nativeId,expected:row.scoped.expected,missingSnapshot:row.scoped.missing,missingBrowser:row.browser?.missing}));for(const row of report.issues)console.log('ITF_PAGE_DIFFERENCE='+JSON.stringify(row));}
