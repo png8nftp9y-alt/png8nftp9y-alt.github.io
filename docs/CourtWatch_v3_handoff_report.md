@@ -10175,3 +10175,5 @@ Validazione: 72 test frontend e 11 test snapshot backend superati, inclusa parit
 - Estesa solo la mappa frontend con 79 sigle sportive/territoriali e relative bandiere gia presenti. Coperti ALG/DZ, KSA/SA e altre sigle dei circuiti: conversione di visualizzazione, codice originale conservato nel testo. Revisione v3.js in v3.html incrementata per acquisire il codice corretto.
 - Tre regressioni locali sul codice frontend reale passate: HTML ALG/KSA, ISO/alias precedenti/nomi Paesi, valori assenti o sconosciuti. Tutti i 79 SVG verificati nell'inventario GitHub. Quarto test di esistenza asset incluso e da eseguire sul checkout completo con gli SVG, insieme ai tre precedenti. Test incluso in npm run check, nessun controllo rimosso.
 - Installer esegue quattro test e sintassi prima del push; workflow hotfix esistente conserva tutti i controlli, Shield e deploy. Pubblicazione e visibilita effettiva dopo deploy ancora da confermare. Report e correzione nello stesso commit.
+
+Correzione misura avvio: intestazioni HTTP opzionali; 82 test frontend superati, inclusi i tre che bloccavano il deploy. Lentezza ancora da misurare.

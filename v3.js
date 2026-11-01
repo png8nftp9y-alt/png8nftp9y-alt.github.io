@@ -992,7 +992,7 @@ async function requestProjection(url, timeoutMs, group = PLAYER_GROUP) {
       }, group),
     );
     timingResponse=response;
-    if (typeof recordStartupTiming === "function") recordStartupTiming("snapshot_headers", timingStarted, {status:response.status,serverTiming:response.headers.get("Server-Timing") || ""});
+    if (typeof recordStartupTiming === "function") recordStartupTiming("snapshot_headers", timingStarted, {status:response.status,serverTiming:response.headers?.get?.("Server-Timing") || ""});
     if (!response.ok) throw Error("API Court Watch non disponibile: " + response.status);
     const data = await response.json();
     if (
