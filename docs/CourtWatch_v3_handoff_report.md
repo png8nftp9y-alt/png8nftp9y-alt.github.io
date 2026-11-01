@@ -10144,3 +10144,5 @@ Verifiche: 105 test mirati su primo accesso, membership, aggiunte, cache, gruppi
 - Sei test passati: presenze e assenze alternate, ritiro, prove incomplete, fonti errate, profili mancanti/extra, stati/date diversi con conteggi uguali, duplicati e timestamp irrilevanti. Run remoto ancora da eseguire: non dichiarato verde in anticipo.
 
 ITF discovery 2026-11-01T18:11:57.992Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-11-01T22:31:18.631Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
