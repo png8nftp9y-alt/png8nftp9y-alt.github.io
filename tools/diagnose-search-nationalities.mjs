@@ -1,0 +1,23 @@
+// D1_READ_ONLY: guarded; bounded inspection of two reported names, no writes or acquisition.
+import fs from 'node:fs/promises';import worker from '../cloudflare/app-api/src/index.js';import {openReadOnlyD1} from '../cloudflare/app-api/lib/read-only-d1-client.mjs';
+const report={status:'running',commit:process.env.GITHUB_SHA,startedAt:new Date().toISOString(),metrics:{queries:0,rowsRead:0,rowsWritten:0},cases:[],limitations:['Diagnosis only. Green means inspection completed, not that flags are fixed.','Worker replay against current D1, not a browser or production HTTP session.']};
+const parse=s=>{try{return typeof s==='string'?JSON.parse(s):s||{}}catch{return{}}};
+const metadata=p=>({name:p.name||p.displayName||'',nationality:p.nationality||'',nationalityCode:p.nationalityCode||'',countryCode:p.countryCode||'',country:p.country||'',canonicalId:p.canonicalId||'',sourcePlayerId:p.sourcePlayerId||'',worldTennisId:p.worldTennisId||'',profileUrl:p.profileUrl||p.playerProfileUrl||p.profileSync?.itf?.url||'',circuitProfiles:p.circuitProfiles||[]});
+try{
+ const remote=await openReadOnlyD1({onMetrics:rows=>{for(const r of rows){report.metrics.queries++;report.metrics.rowsRead+=Number(r.meta?.rows_read)||0;report.metrics.rowsWritten+=Number(r.meta?.rows_written)||0;if(Number(r.meta?.rows_written))throw Error('write_detected');}}});
+ const code=await fs.readFile('cloudflare/app-api/src/index.js','utf8'),email=code.match(/email:\s*['"]([^'"]+)['"]/)?.[1];if(!email)throw Error('owner_missing');
+ for(const test of [{name:'Zakaria Mohammed Abidat',searches:['Zakaria Mohammed Abidat'],terms:['ABIDAT']},{name:'Mohammed Aliyami / Alyami',searches:['Mohammed Aliyami','Mohammed Alyami'],terms:['ALIYAMI','ALYAMI']}]){
+  const record={name:test.name,api:[],rawSources:[],canonical:[],links:[],matchNationalities:[]};report.cases.push(record);
+  for(const q of test.searches){const u=new URL('https://diagnosis.invalid/app/api/player-search');u.searchParams.set('q',q);const r=await worker.fetch(new Request(u,{headers:{'Cf-Access-Authenticated-User-Email':email}}),{DB:remote.db},{});if(r.status!==200)throw Error('search_http_'+r.status);const d=await r.json();if(!Array.isArray(d.results))throw Error('search_response_invalid');record.api.push({query:q,results:d.results.map(p=>({...metadata(p),sourceKey:p.sourceKey||'',identity:p.identity||''}))});}
+  for(const term of test.terms){for(const table of ['observed_players','search_acquired_players'])for(const r of await remote.query(`SELECT source_key,circuit,official_id,display_name,payload FROM ${table} WHERE normalized_name LIKE ? LIMIT 20`,['%'+term+'%']))record.rawSources.push({table,sourceKey:r.source_key,circuit:r.circuit,officialId:r.official_id,...metadata(parse(r.payload)),name:r.display_name});
+   for(const r of await remote.query('SELECT canonical_id,payload FROM player_identity_people WHERE name_key LIKE ? LIMIT 20',['%'+term+'%']))record.canonical.push({id:r.canonical_id,...metadata(parse(r.payload))});
+  }
+  const canonical=[...new Set([...record.canonical.map(p=>p.id),...record.api.flatMap(q=>q.results.map(p=>p.canonicalId))].filter(Boolean))],keys=[...new Set(record.rawSources.map(p=>p.sourceKey))],native=[...new Set(record.rawSources.filter(p=>p.circuit==='itf').map(p=>p.officialId).filter(Boolean))];
+  for(const [column,values]of [['canonical_id',canonical],['source_key',keys]])for(let i=0;i<values.length;i+=30){const ids=values.slice(i,i+30);record.links.push(...await remote.query(`SELECT source_key,canonical_id,circuit,official_id,profile_url,nationality FROM player_circuit_identities WHERE ${column} IN (${ids.map(()=>'?').join(',')})`,ids));}
+  const ids=[...new Set([...native,...record.links.filter(r=>r.circuit==='itf').map(r=>r.official_id)].filter(Boolean))];
+  for(let i=0;i<ids.length;i+=30){const batch=ids.slice(i,i+30);record.matchNationalities.push(...await remote.query(`SELECT DISTINCT p.source_player_id,p.nationality FROM match_participants p CROSS JOIN matches m ON m.id=p.match_id WHERE m.circuit='itf' AND p.source_player_id IN (${batch.map(()=>'?').join(',')}) AND p.nationality<>'' LIMIT 60`,batch));}
+  record.apiMissingNationality=record.api.flatMap(q=>q.results).filter(p=>!p.nationality).map(p=>({name:p.name,canonicalId:p.canonicalId,identity:p.identity}));
+ }
+ report.status='diagnosis_complete';
+}catch(e){report.status='diagnosis_failed';report.error=String(e.message).slice(0,800);}
+finally{report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile('artifacts/search-nationality-diagnosis.json',JSON.stringify(report,null,2)+'\n');console.log('SEARCH_NATIONALITY_DIAGNOSIS='+JSON.stringify(report));if(report.status!=='diagnosis_complete')process.exitCode=1;}

@@ -10146,3 +10146,9 @@ Verifiche: 105 test mirati su primo accesso, membership, aggiunte, cache, gruppi
 ITF discovery 2026-11-01T18:11:57.992Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-11-01T22:31:18.631Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-11-02 — chat 1: diagnosi bandierine prima della correzione
+- Patch applicativa courtwatch-bandiere-cerca.py sospesa: due lacune individuate nel codice non dimostrano ancora la causa nei record Abidat/Alyami. Non applicarla senza riscontro reale.
+- Aggiunto solo diagnostico read-only: API Cerca corrente per Zakaria Mohammed Abidat e varianti Mohammed Aliyami/Alyami, metadati dei record sorgente observed/acquired, identita canoniche, collegamenti per ID/chiave e nazionalita dei partecipanti ITF con gli stessi ID.
+- Output distingue quattro campi nazionalita e URL ufficiali; consente di localizzare perdita in acquisizione, mapping o risposta Cerca. Nessuna nazionalita assegnata per nome, nessuna correzione o scrittura D1, nessun deploy/motore/acquisizione, export completo, polling o retry.
+- Verde significa diagnosi completata, non bandiere risolte. La correzione deve dipendere dai risultati reali, ancora da raccogliere. Sintassi del diagnostico verificata.
