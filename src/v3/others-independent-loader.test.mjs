@@ -286,3 +286,12 @@ for (const group of ['main', 'others']) test(`${group}: PC empty cache and phone
  assert.equal(phone.ctx.state.data.tournaments.some(t=>t.competitionId==='quanta'),false);
  assert.equal(phone.ctx.state.data.matches[0].score,'6-2 6-3');
 });
+
+for(const group of ['main','others'])test(`${group}: a live read is authoritative despite an older seed generation and newer unrelated cache timestamp`,async()=>{
+ const quanta={playerId:player.id,circuit:'fitp',competitionId:'quanta',startDate:'2026-10-30',endDate:'2099-11-01'};
+ const cached={group,personalProjectionComplete:true,generatedAt:'2026-10-31T23:00:00Z',players:[player],tournaments:[quanta],matches:[]};
+ const projection={group,snapshotReadAt:'2026-11-01T00:00:00Z',generatedAt:'2026-10-30T00:00:00Z',players:[player],tournaments:[],matches:[]};
+ const c=setup(group,projection,{cached});await c.ctx.load();
+ assert.equal(c.ctx.state.data.tournaments.length,0);
+ assert.equal(c.saved().snapshotReadAt,projection.snapshotReadAt);
+});

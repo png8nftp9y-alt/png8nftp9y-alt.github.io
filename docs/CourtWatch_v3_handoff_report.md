@@ -10045,3 +10045,17 @@ ITF discovery 2026-10-31T21:57:54.283Z: 0 newly discovered future tournaments; M
 - Esportazione nativa gia usata dal backup del progetto; puo serializzare temporaneamente le richieste D1. Nessun polling applicativo personalizzato o rilancio automatico; il comando nativo gestisce il proprio completamento.
 - SQL/database privati restano nella directory temporanea runner e vengono rimossi anche su fallimento. Artifact contiene solo report con hash, orari e risultati. Costo remoto esportazione non misurato dall'audit e non dichiarato zero; contatori delle query locali separati.
 - Validazione: 20 test passati, incluse copie stabili dopo modifica della sorgente, rifiuto scritture, file assente, letture deduplicate, generatore Pescara e audit. YAML e sintassi JS verificati. Export remoto e replay su DB reale ancora da eseguire.
+
+## 2026-11-01 — Lettura live distinta dalla generazione e richieste complete condivise
+
+Ambito: caricamento browser TCL/Altri e iscrizioni ritirate; nessuna modifica a motori, D1, Admin o schedulazioni.
+
+Dopo il deploy 5c0cc17000 l'utente segnala ancora Quanta nella cache del telefono e il messaggio «Elenco disponibile; tornei temporaneamente non disponibili» in una sessione privata. Il browser di verifica autenticato ha completato il caricamento degli Altri (37 giocatori) e la scheda Manuel Natale non mostra Quanta. Questo non certifica il comportamento del telefono. Il replay Actions leggeva D1 via REST nello script, poi riproduceva la risposta nel browser: non verifica il tempo della richiesta HTTP al Worker pubblicato.
+
+Riprodotti due difetti ulteriori: due chiamanti contemporanei (cambio sezione e aggiornamento) possono richiedere due snapshot completi dello stesso gruppo; inoltre `generatedAt` deriva dalla generazione pubblicata e il confronto con la data cumulativa della cache può conservare una vecchia iscrizione anche dopo una risposta live completa. I test aggiunti falliscono sul codice precedente.
+
+La funzione di lettura condivide solo la richiesta completa in corso per gruppo e URL e la rimuove a conclusione o errore. Nessuna cache di risposte, polling o ritentativo nuovo. Alle risposte validate assegna `snapshotReadAt`, data di avvio della richiesta effettiva senza cache HTTP; questa data, distinta dalla generazione dei dati, governa la sostituzione delle iscrizioni attive ed è conservata nella proiezione locale. Restano le protezioni su risposte incomplete, gruppo errato, storico concluso e risposte antecedenti. I vecchi formati senza data di lettura conservano le regole precedenti. Il messaggio di errore del cambio sezione riporta ora timeout oppure errore HTTP invece di nascondere la causa.
+
+Verifiche: test su richieste condivise e su cache con timestamp cumulativo successivo alla generazione; suite mirata browser/caricamento; sintassi, verifica UI e Shield. Limitazione: i due difetti sono riproducibili, ma non abbiamo ancora catturato la risposta fallita del telefono; nessuna promessa di risoluzione di un eventuale errore del Worker o della rete. La prova sul dispositivo dopo deploy resta necessaria.
+
+Test mirati locali; Shield obbligatorio nel deploy. Nessun cambiamento a motori, D1, Admin, polling o rilanci.

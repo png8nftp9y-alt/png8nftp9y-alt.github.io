@@ -864,6 +864,18 @@ function recordPlayerLoadTiming(stage,started,response=null){
   } catch {} // Diagnostics must never interrupt a player operation.
 }
 async function fetchProjection(url, timeoutMs, group = PLAYER_GROUP) {
+  // A group switch and its background load must share the same live read.
+  // Keep only in-flight requests: completed data is never cached here.
+  if (/[?&]playerId=/.test(url)) return requestProjection(url, timeoutMs, group);
+  const requests = fetchProjection.requests || (fetchProjection.requests = new Map());
+  const key = group + '|' + url;
+  if (requests.has(key)) return requests.get(key);
+  const pending = requestProjection(url, timeoutMs, group);
+  requests.set(key, pending);
+  try { return await pending; }
+  finally { if (requests.get(key) === pending) requests.delete(key); }
+}
+async function requestProjection(url, timeoutMs, group = PLAYER_GROUP) {
   const timingStarted=Date.now(),timingEnabled=/[?&]playerId=/.test(url);
   let timingResponse;
   const controller = new AbortController(),
@@ -889,7 +901,8 @@ async function fetchProjection(url, timeoutMs, group = PLAYER_GROUP) {
     )
       throw Error("Proiezione API incompleta");
     if ((data.group && data.group !== group) || (group === "others" && data.group !== group)) throw Error("Sezione richiesta non ancora disponibile");
-    return data;
+    // generatedAt describes the seed, not these freshly queried registrations.
+    return {...data, snapshotReadAt: new Date(timingStarted).toISOString()};
   } finally {
     if(timingEnabled)recordPlayerLoadTiming('snapshot_http',timingStarted,timingResponse);
     clearTimeout(timer);
@@ -982,7 +995,7 @@ function calendarCacheSnapshot(data, cachedAt) {
     agenda: (data.agenda || []).filter(match => circuit(match) === "tennis-europe" && !keys.has(agendaKey(match))),
     results: (data.results || []).filter(match => circuit(match) === "tennis-europe"),
     opponents: [], tournamentEntries: [], generatedAt: data.generatedAt,
-    personalProjectionComplete: data.personalProjectionComplete, personalEnrichedPlayerIds:data.personalEnrichedPlayerIds, cachedAt,
+    personalProjectionComplete: data.personalProjectionComplete, snapshotReadAt:data.snapshotReadAt, personalEnrichedPlayerIds:data.personalEnrichedPlayerIds, cachedAt,
   };
 }
 function openProjectionDatabase() {
@@ -4474,7 +4487,7 @@ async function changePlayerGroup(targetGroup, fromHistory = false) {
       console.warn('Caricamento dati della sezione non disponibile',error);
       if(PLAYER_GROUP===targetGroup&&switchEpoch===state.playerSelectionEpoch&&state.data?.membershipOnly){
         $('dataAlert').hidden=false;
-        $('dataAlert').textContent='Elenco disponibile; tornei temporaneamente non disponibili. Ricarica per riprovare.';
+        $('dataAlert').textContent='Elenco disponibile; tornei temporaneamente non disponibili. ' + (error.name==='AbortError' ? 'La richiesta completa ha superato 45 secondi.' : String(error.message || 'Errore di caricamento.'));
       }
     });
     updatePlayerGroupControls();
@@ -4910,7 +4923,9 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       const previousGeneration = Date.parse(previous.generatedAt || "") || 0;
       const freshApiTournaments = Array.isArray(projection?.tournaments) &&
         projection.partial !== true && projection.complete !== false &&
-        Number.isFinite(apiGeneration) && apiGeneration >= previousGeneration;
+        (Number.isFinite(Date.parse(projection.snapshotReadAt || ""))
+          ? Date.parse(projection.snapshotReadAt) >= (Date.parse(previous.snapshotReadAt || "") || 0)
+          : Number.isFinite(apiGeneration) && apiGeneration >= previousGeneration);
       const staticGeneration = Date.parse(docs.tournaments?.generatedAt || "");
       const freshStaticTournaments = PLAYER_GROUP === "main" && staticPlayers.length > 0 &&
         staticTournaments !== null && docs.tournaments.partial !== true &&
@@ -4928,6 +4943,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       state.data = {
         group: PLAYER_GROUP,
         personalProjectionComplete: Boolean(projection) || previous.personalProjectionComplete === true,
+        snapshotReadAt: freshApiTournaments ? projection.snapshotReadAt : previous.snapshotReadAt,
         players: visiblePlayers,
         tournaments: [...new Map([
           ...retainedTournaments,

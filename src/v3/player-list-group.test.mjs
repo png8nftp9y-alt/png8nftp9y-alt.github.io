@@ -106,3 +106,24 @@ test('failed lightweight endpoint falls back to complete snapshot without switch
  release({group:'others',players:[{id:'new'}],tournaments:[],matches:[]});
  await switching;await ctx.initialProjectionRequest;assert.equal(ctx.PLAYER_GROUP,'others');
 });
+
+test('group switch and background load share one complete snapshot request without retries',async()=>{
+ const {c}=groupContext('main');c.activeProjectionController=null; let release,reads=0;const gate=new Promise(r=>release=r);
+ c.fetch=async()=>{reads++;await gate;return {ok:true,json:async()=>({group:'others',players:[],tournaments:[],matches:[],generatedAt:'2026-10-30T00:00:00Z'})}};
+ vm.runInContext(source.slice(source.indexOf('function recordPlayerLoadTiming('),source.indexOf('async function apiProjection(')),c);
+ const first=c.fetchProjection('/app/api/app-snapshot',45000,'others');
+ const second=c.fetchProjection('/app/api/app-snapshot',45000,'others');
+ release();const [a,b]=await Promise.all([first,second]);assert.equal(reads,1);assert.equal(a,b);
+ assert.ok(Number.isFinite(Date.parse(a.snapshotReadAt)));
+});
+
+test('failed shared snapshot is cleared with no automatic retry and another group stays independent',async()=>{
+ const {c}=groupContext('main');c.activeProjectionController=null;let reads=0;
+ c.fetch=async()=>{reads++;return {ok:false,status:503}};
+ vm.runInContext(source.slice(source.indexOf('function recordPlayerLoadTiming('),source.indexOf('async function apiProjection(')),c);
+ const results=await Promise.allSettled([c.fetchProjection('/snapshot',45000,'others'),c.fetchProjection('/snapshot',45000,'others')]);
+ assert.equal(reads,1);assert.ok(results.every(r=>r.status==='rejected'&&/503/.test(r.reason.message)));
+ assert.equal(c.fetchProjection.requests.size,0);
+ c.fetch=async()=>{reads++;return {ok:true,json:async()=>({players:[],tournaments:[],matches:[]})}};
+ await c.fetchProjection('/snapshot',45000,'main');assert.equal(reads,2);
+});
