@@ -10135,3 +10135,10 @@ Verifiche: 105 test mirati su primo accesso, membership, aggiunte, cache, gruppi
 ### Correzione dipendenza nel test storico avversario Europe
 - Il contesto VM carica opponentItfDocumentHistory dal modulo reale.
 - Verifica mirata: 6 test passati; nessuna modifica alla logica applicativa.
+
+## 2026-11-01 — chat 1: verifica finale delle iscrizioni ITF
+- Consultato report: precedente audit 41236865413 con 17 giocatori, 154 avversari, 161 alternate, zero differenze/non verificabili, ma verdetto inconclusivo per cambi concorrenti. Pescara 41320672492 verde; deploy Worker 41328861295 verde.
+- Aggiunto confronto indipendente degli stati iscrizione, codici acceptance, conferme tabellone e date fra cache acceptance/tabelloni acquisiti e intero indice ITF opponent_entry_profiles, quindi anche profili osservati e avversari presenti nell'indice. Rileva profili/tornei mancanti, aggiunti e differenze a conteggi uguali. Mantiene regola alternate: assenza solo dopo prove complete; prove incomplete restano pending, non assenza.
+- Fonti da generazione R2 fissata; indice letto due volte con paginazione di 100 righe per circuito/ID. Se cambia la generazione rilegge le nuove fonti e confronta gli stati semantici. Cambi effettivi durante lettura restano inconclusivi; timestamp e nomi non invalidano iscrizioni invariate.
+- Solo letture D1/R2, nessun export D1, migrazione, riparazione, motore, deploy, timer, polling o retry. Report artifact con differenze, contatori letture/scritture, generazioni e limiti. Nessuna certificazione di dati non acquisiti o tutte le pagine renderizzate; FITP/Europe fuori perimetro di questo controllo ITF.
+- Sei test passati: presenze e assenze alternate, ritiro, prove incomplete, fonti errate, profili mancanti/extra, stati/date diversi con conteggi uguali, duplicati e timestamp irrilevanti. Run remoto ancora da eseguire: non dichiarato verde in anticipo.

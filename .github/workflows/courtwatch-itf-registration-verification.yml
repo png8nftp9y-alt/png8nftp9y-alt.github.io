@@ -1,0 +1,45 @@
+name: Court Watch ITF registration verification
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/verify-itf-registrations.mjs'
+      - 'tools/lib/itf-registration-verification.mjs'
+      - 'tools/tests/itf-registration-verification.test.mjs'
+      - '.github/workflows/courtwatch-itf-registration-verification.yml'
+permissions:
+  contents: read
+concurrency:
+  group: courtwatch-itf-registration-verification
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}', fetch-depth: 1}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - run: node --test tools/tests/itf-registration-verification.test.mjs
+      - run: python -m pip install --disable-pip-version-check --quiet awscli
+      - name: Compare acquired sources and entire ITF registration index, read only
+        timeout-minutes: 7
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_D1_DATABASE_ID: cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: node tools/verify-itf-registrations.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-registration-verification
+          path: artifacts/itf-registration-verification.json
+          if-no-files-found: error
+          retention-days: 14
