@@ -5,13 +5,14 @@ import {pathToFileURL} from 'node:url';
 import {releaseCodeFingerprint} from './release-code-fingerprint.mjs';
 import {runReleaseSafety} from './run-release-safety.mjs';
 // Never publish a newly checked-out revision using another revision's approval.
-export function ensureReleaseSafety(expected,{root=process.cwd(),fingerprint=()=>releaseCodeFingerprint(root),run=(command,args)=>execFileSync(command,args,{cwd:root,stdio:'inherit'}),verify=()=>runReleaseSafety('all',{root})}={}){
+export function ensureReleaseSafety(expected,{root=process.cwd(),fingerprint=()=>releaseCodeFingerprint(root),run=(command,args)=>execFileSync(command,args,{cwd:root,stdio:'inherit',...(command==='npx'?{timeout:300000}:{})}),verify=()=>runReleaseSafety('all',{root})}={}){
  if(!/^[a-f0-9]{64}$/.test(expected||''))throw Error('invalid_expected_release_fingerprint');
  const actual=fingerprint();
  if(actual===expected)return {rechecked:false,codeFingerprint:actual};
  console.log('Release code advanced during queue wait; running required checks for '+actual);
  run('npm',['--prefix','cloudflare/app-api','run','check']);
  run('npm',['ci','--no-audit','--no-fund']);
+ run('sudo',['python3','tools/prepare-ci-browser-apt.py']);
  run('npx',['playwright','install','--with-deps','chromium']);
  verify();
  if(fingerprint()!==actual)throw Error('release_code_changed_during_required_checks');

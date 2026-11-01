@@ -7,10 +7,10 @@ test('identical approved code adds no installation, test, live read or write ope
 });
 test('advanced main requires source, dependencies, browser and all shared checks before approval',()=>{
  const calls=[];let checks=0;const result=ensureReleaseSafety(approved,{fingerprint:()=>advanced,run:(command,args)=>calls.push([command,...args]),verify:()=>checks++});
- assert.deepEqual(calls,[['npm','--prefix','cloudflare/app-api','run','check'],['npm','ci','--no-audit','--no-fund'],['npx','playwright','install','--with-deps','chromium']]);assert.equal(checks,1);assert.deepEqual(result,{rechecked:true,codeFingerprint:advanced});
+ assert.deepEqual(calls,[['npm','--prefix','cloudflare/app-api','run','check'],['npm','ci','--no-audit','--no-fund'],['sudo','python3','tools/prepare-ci-browser-apt.py'],['npx','playwright','install','--with-deps','chromium']]);assert.equal(checks,1);assert.deepEqual(result,{rechecked:true,codeFingerprint:advanced});
 });
 test('source, browser or mandatory checks failure never produces approval, and changing code during tests is rejected',()=>{
- for(const failAt of [0,1,2,3]){let count=0;const error=Error('required check failed');assert.throws(()=>ensureReleaseSafety(approved,{fingerprint:()=>advanced,run:()=>{if(count++===failAt)throw error;},verify:()=>{if(count++===failAt)throw error;}}),e=>e===error);assert.equal(count,failAt+1);}
+ for(const failAt of [0,1,2,3,4]){let count=0;const error=Error('required check failed');assert.throws(()=>ensureReleaseSafety(approved,{fingerprint:()=>advanced,run:()=>{if(count++===failAt)throw error;},verify:()=>{if(count++===failAt)throw error;}}),e=>e===error);assert.equal(count,failAt+1);}
  let count=0;assert.throws(()=>ensureReleaseSafety(approved,{fingerprint:()=>count++?approved:advanced,run:()=>{},verify:()=>{}}),/changed_during_required_checks/);
  assert.throws(()=>ensureReleaseSafety('',{fingerprint:()=>assert.fail('invalid approval must stop first')}),/invalid_expected/);
 });

@@ -55,7 +55,11 @@ jobs:
         run: node tools/release-code-fingerprint.mjs --expect "${{ needs.fingerprint.outputs.code_fingerprint }}" --verify-certificate .courtwatch/release-safety-cache
       - name: Install test browser for changed code
         if: steps.approved.outputs.cache-hit != 'true'
-        run: npm ci --no-audit --no-fund && npx playwright install --with-deps chromium
+        timeout-minutes: 5
+        run: |
+          sudo python3 tools/prepare-ci-browser-apt.py
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
       - name: Required Shield and group regression checks
         if: steps.approved.outputs.cache-hit != 'true'
         run: node tools/run-release-safety.mjs --phase local

@@ -10085,3 +10085,18 @@ Test mirati locali; Shield obbligatorio nel deploy. Nessun cambiamento a motori,
 - Si rimuove soltanto la segnalazione retirement_winner_unverified della partita effettivamente risolta; gli altri problemi restano. Nessuna modifica W/O, date, FITP, ITF, D1 o regole di certificazione.
 - Verifica: 61 regressioni superate, inclusi fixture del caso reale e generatore SQL; rielaborazione dell’artifact reale 13064667291: un vincitore risolto, winnerUnresolved da 1 a 0 e nessun ritiro invalido nell’audit. Nessuna nuova acquisizione o pubblicazione eseguita dall’assistente.
 - Agenda 41258665079 annullata prima della creazione di job: nessun errore SQL registrato in quel run. Live 41258665100 e parser 41258664999 conclusi verdi. Nessun polling o rilancio; risultati remoti dopo push da verificare.
+## 2026-11-01 — Sblocco installazione browser Shield su runner Ubuntu
+
+Evidenza: il job 124702689664 del run Worker 41256909599 resta nel passo Install test browser for changed code. Il log fornito dall'utente riporta Ign ripetuti per http://azure.archive.ubuntu.com/ubuntu, mentre scarica con Get da https://archive.ubuntu.com/ubuntu. I test Shield e il deploy non erano ancora iniziati: non è un fallimento della correzione mobile.
+
+La preparazione CI sostituisce soltanto il mirror Ubuntu Azure con quello ufficiale HTTPS in entrambi i formati apt (.list e .sources), mantenendo suite, componenti e chiavi. Gli altri repository non cambiano. Apt usa zero ritentativi e timeout di rete di 20 secondi; l'installazione browser ha un limite di cinque minuti. Applicato alla Release Safety riusabile, allo Shield diretto e al ricontrollo del codice avanzato nel publisher. I test obbligatori, le prove live, il controllo fingerprint e il divieto di approvare dopo un errore restano invariati. Nessuna modifica all'app, D1, dati, motori o schedulazioni. Nessuna cancellazione o rilancio automatico del vecchio run.
+
+Validazione: nove test verdi su entrambi i formati apt, conservazione dei repository terzi e dei metadati, idempotenza, sequenza di approvazione e arresto su ogni errore; YAML dei due workflow valido. Il mirror ufficiale risulta raggiungibile nel log originale, ma l'esito del nuovo runner resta da verificare dopo la pubblicazione dell'utente. Il nuovo workflow non modifica un job già in esecuzione.
+
+Correzione limitata alla preparazione browser CI. Nessun polling, rilancio automatico o modifica ai dati.
+
+## 2026-11-01 — chat 1: data di verifica dello storico Pescara
+- Run 41258380653: 42 secondi, 59 query, 10887 righe lette, zero scritture/errori D1, prove Pescara stabili. Indice corretto per tutti e tre; assenza Pescara dai profili di Mastropasqua e Rusca causa il rosso.
+- Errore nel test: asOf era 2026-10-03, data fine torneo. La query otherCircuitOpponentHistory richiede endDate < asOf, quindi lo storico di un torneo che termina quel giorno non viene caricato. La pretesa di presenza nello storico era prematura; nessuna correzione applicativa dedotta dal solo rosso.
+- Test spostato al giorno successivo alla fine, validando data e passaggio anno. Aggiunto report delle date indice e dei tornei selezionati dal Worker per distinguere eventuali ulteriori problemi di finestra/mapping da un errore nelle aspettative.
+- Cinque test mirati passati con il selettore reale delle finestre; sintassi JS verificata. Nessuna modifica all'app, regola alternate o D1. Run reale necessario per confermare se il cambio data spiega interamente le due assenze: non dichiarato risolto in anticipo.

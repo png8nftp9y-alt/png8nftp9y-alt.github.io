@@ -40,7 +40,11 @@ jobs:
       - name: Run CourtWatch release guard
         run: node --test tools/courtwatch-refresh-contract.test.mjs && node tools/courtwatch-release-guard.mjs
       - name: Install browser for functional shield
-        run: npm ci --no-audit --no-fund && npx playwright install --with-deps chromium
+        timeout-minutes: 5
+        run: |
+          sudo python3 tools/prepare-ci-browser-apt.py
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
       - name: Run complete functional shield
         run: node tools/courtwatch-functional-shield.mjs
       - name: Save detailed guard report
