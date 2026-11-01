@@ -1,0 +1,21 @@
+// D1_READ_ONLY: guarded. Full ITF registration index, no export or application writes.
+import fs from 'node:fs/promises';import {execFileSync} from 'node:child_process';import {gunzipSync} from 'node:zlib';import {createHash} from 'node:crypto';
+import {openReadOnlyD1} from '../cloudflare/app-api/lib/read-only-d1-client.mjs';
+import {alternateExpectation} from './lib/itf-page-audit.mjs';
+import {expectedRegistrations,compareRegistrations,indexFingerprint} from './lib/itf-registration-verification.mjs';
+const report={startedAt:new Date().toISOString(),commit:process.env.GITHUB_SHA,status:'running',scope:'all_itf_opponent_entry_profiles_including_observed_and_opponents',metrics:{queries:0,rowsRead:0,rowsWritten:0},limitations:['Certifies registration state and tournament dates against acquired sources, not missing acquisitions or every rendered page.','Pending alternate evidence is retained; it is not certified as absence.','No atomic D1/R2 transaction is claimed; relevant semantic inputs are compared before and after.']};
+const r2=key=>execFileSync('aws',['s3','cp',`s3://${process.env.R2_BUCKET}/${key}`,'-','--endpoint-url',`https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`],{timeout:60000,maxBuffer:250*1024*1024,stdio:['ignore','pipe','pipe']});
+const pointer=()=>{const p=JSON.parse(r2('itf/database/pointers/current.json'));if(!/^[A-Za-z0-9_.-]+$/.test(p.generation||''))throw Error('generation_invalid');return p.generation;};
+const source=g=>({acceptance:JSON.parse(gunzipSync(r2(`itf/database/generations/${g}/itf_participant_cache.json.gz`))),draws:JSON.parse(r2(`itf/database/generations/${g}/itf_draw_target_db.json`))});
+const hash=value=>createHash('sha256').update(value).digest('hex');
+const semantic=e=>hash(JSON.stringify([...e.profiles].map(([id,ts])=>[id,[...ts.values()].sort((a,b)=>a.competitionId.localeCompare(b.competitionId))]).sort((a,b)=>a[0].localeCompare(b[0]))));
+try{
+ console.log('REGISTRATION_PHASE=read_pinned_sources');const generation=pointer(),beforeSource=source(generation),expected=expectedRegistrations(beforeSource.acceptance,beforeSource.draws,alternateExpectation);report.generationBefore=generation;report.sourceProfiles=expected.profiles.size;report.pendingEvidenceAlternates=expected.unresolvedAlternates;
+ const remote=await openReadOnlyD1({onMetrics:rows=>{for(const r of rows){report.metrics.queries++;report.metrics.rowsRead+=Number(r.meta?.rows_read)||0;report.metrics.rowsWritten+=Number(r.meta?.rows_written)||0;if(Number(r.meta?.rows_written))throw Error('write_detected');}}});
+ async function readIndex(){const rows=[];let after='';for(;;){const page=await remote.query("SELECT source_player_id,payload FROM opponent_entry_profiles WHERE circuit='itf' AND source_player_id>? ORDER BY source_player_id LIMIT 100",[after]);if(!page.length)break;for(const row of page){if(String(row.source_player_id)<=after)throw Error('index_cursor_invalid');after=String(row.source_player_id);rows.push(row);}if(page.length<100)break;}return rows;}
+ console.log('REGISTRATION_PHASE=compare_entire_itf_index');const before=await readIndex();Object.assign(report,compareRegistrations(expected.profiles,before));
+ console.log('REGISTRATION_PHASE=recheck_semantic_inputs');const after=await readIndex(),next=pointer(),afterExpected=next===generation?expected:(()=>{const s=source(next);return expectedRegistrations(s.acceptance,s.draws,alternateExpectation);})();
+ report.generationAfter=next;report.relevantEvidenceChanged={index:hash(indexFingerprint(before))!==hash(indexFingerprint(after)),source:semantic(expected)!==semantic(afterExpected)};
+ report.status=Object.values(report.relevantEvidenceChanged).some(Boolean)?'inconclusive_registrations_changed':report.differences.length?'differences_found':'all_itf_registrations_match_acquired_sources';
+}catch(e){report.status='verification_failed';report.error=String(e.message).slice(0,800);}
+finally{report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile('artifacts/itf-registration-verification.json',JSON.stringify(report,null,2)+'\n');console.log('ITF_REGISTRATION_RESULT='+JSON.stringify({...report,differences:report.differences?.slice(0,20)}));if(report.status!=='all_itf_registrations_match_acquired_sources')process.exitCode=1;}

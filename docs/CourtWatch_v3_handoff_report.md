@@ -10141,3 +10141,19 @@ Verifiche: 105 test mirati su primo accesso, membership, aggiunte, cache, gruppi
 - Solo storico: massimo 25 match per batch invece di 100. Conservati cambio rilevato, pulizia figli e inserimenti nello stesso batch; live invariato. Nessun retry automatico o polling.
 - Importatore distingue messaggi CPU, memoria, quota giornaliera letture/scritture, coda e rate limit senza stampare payload, SQL o credenziali.
 - Test mirati storico/replay e trasporto; conferma remota del superamento 7429 ancora necessaria. Nessuna dichiarazione di storico completato in D1.
+## 2026-11-01 — chat 1: verifica finale delle iscrizioni ITF
+- Consultato report: precedente audit 41236865413 con 17 giocatori, 154 avversari, 161 alternate, zero differenze/non verificabili, ma verdetto inconclusivo per cambi concorrenti. Pescara 41320672492 verde; deploy Worker 41328861295 verde.
+- Aggiunto confronto indipendente degli stati iscrizione, codici acceptance, conferme tabellone e date fra cache acceptance/tabelloni acquisiti e intero indice ITF opponent_entry_profiles, quindi anche profili osservati e avversari presenti nell'indice. Rileva profili/tornei mancanti, aggiunti e differenze a conteggi uguali. Mantiene regola alternate: assenza solo dopo prove complete; prove incomplete restano pending, non assenza.
+- Fonti da generazione R2 fissata; indice letto due volte con paginazione di 100 righe per circuito/ID. Se cambia la generazione rilegge le nuove fonti e confronta gli stati semantici. Cambi effettivi durante lettura restano inconclusivi; timestamp e nomi non invalidano iscrizioni invariate.
+- Solo letture D1/R2, nessun export D1, migrazione, riparazione, motore, deploy, timer, polling o retry. Report artifact con differenze, contatori letture/scritture, generazioni e limiti. Nessuna certificazione di dati non acquisiti o tutte le pagine renderizzate; FITP/Europe fuori perimetro di questo controllo ITF.
+- Sei test passati: presenze e assenze alternate, ritiro, prove incomplete, fonti errate, profili mancanti/extra, stati/date diversi con conteggi uguali, duplicati e timestamp irrilevanti. Run remoto ancora da eseguire: non dichiarato verde in anticipo.
+
+ITF discovery 2026-11-01T18:11:57.992Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-11-01T22:31:18.631Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-11-02 — chat 1: diagnosi bandierine prima della correzione
+- Patch applicativa courtwatch-bandiere-cerca.py sospesa: due lacune individuate nel codice non dimostrano ancora la causa nei record Abidat/Alyami. Non applicarla senza riscontro reale.
+- Aggiunto solo diagnostico read-only: API Cerca corrente per Zakaria Mohammed Abidat e varianti Mohammed Aliyami/Alyami, metadati dei record sorgente observed/acquired, identita canoniche, collegamenti per ID/chiave e nazionalita dei partecipanti ITF con gli stessi ID.
+- Output distingue quattro campi nazionalita e URL ufficiali; consente di localizzare perdita in acquisizione, mapping o risposta Cerca. Nessuna nazionalita assegnata per nome, nessuna correzione o scrittura D1, nessun deploy/motore/acquisizione, export completo, polling o retry.
+- Verde significa diagnosi completata, non bandiere risolte. La correzione deve dipendere dai risultati reali, ancora da raccogliere. Sintassi del diagnostico verificata.
