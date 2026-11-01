@@ -50,7 +50,9 @@ export async function importSeeds({directory='seed-tennis-europe-oop',config='wr
   let body;try{body=await response.json();}catch{throw Error('TE_QUERY_INVALID_RESPONSE: '+name+' HTTP '+response.status);}
   if(!response.ok||body.success!==true||!Array.isArray(body.result)||!body.result.length||body.result.some(r=>r.success!==true)){
    const codes=(body.errors||[]).map(e=>e.code).join(',');
-   throw Error('TE_QUERY_FAILED: '+name+' HTTP '+response.status+' codes='+codes);
+   const detail=JSON.stringify([body.errors,...(body.result||[]).map(r=>r.error||r.errors)]).toLowerCase();
+   const reason=/cpu/.test(detail)?'cpu_limit':/memory/.test(detail)?'memory_limit':/daily.*read|read.*daily/.test(detail)?'daily_read_limit':/daily.*writ|writ.*daily/.test(detail)?'daily_write_limit':/overload|queue/.test(detail)?'overloaded':/rate.limit|too many requests/.test(detail)?'rate_limit':'unclassified';
+   throw Error('TE_QUERY_FAILED: '+name+' HTTP '+response.status+' codes='+codes+' reason='+reason);
   }
   for(const row of body.result){
    if(!Number.isFinite(row.meta?.rows_read)||!Number.isFinite(row.meta?.rows_written))throw Error('TE_QUERY_METRICS_MISSING: '+name);

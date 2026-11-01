@@ -10135,3 +10135,9 @@ Verifiche: 105 test mirati su primo accesso, membership, aggiunte, cache, gruppi
 ### Correzione dipendenza nel test storico avversario Europe
 - Il contesto VM carica opponentItfDocumentHistory dal modulo reale.
 - Verifica mirata: 6 test passati; nessuna modifica alla logica applicativa.
+
+## 2026-11-02 — Europe: batch storico limitato e diagnosi 7429
+- Run 41331308110 full_archive fallito su 03-matches-142.sql con HTTP 429/codice 7429. Il log precedente scartava il messaggio: causa CPU/quota/rate non certificabile dal solo codice.
+- Solo storico: massimo 25 match per batch invece di 100. Conservati cambio rilevato, pulizia figli e inserimenti nello stesso batch; live invariato. Nessun retry automatico o polling.
+- Importatore distingue messaggi CPU, memoria, quota giornaliera letture/scritture, coda e rate limit senza stampare payload, SQL o credenziali.
+- Test mirati storico/replay e trasporto; conferma remota del superamento 7429 ancora necessaria. Nessuna dichiarazione di storico completato in D1.

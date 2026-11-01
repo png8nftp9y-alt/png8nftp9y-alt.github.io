@@ -44,3 +44,10 @@ test('transport timeout is not automatically replayed',async t=>{
  const f=await fixture(t);let calls=0;await fs.writeFile(path.join(f.directory,'00-reset.sql'),'SELECT 1;');
  await assert.rejects(importSeeds({...f,request:async()=>{calls++;throw Error('timeout');}}),/timeout/);assert.equal(calls,1);
 });
+
+test('CPU rejection is distinguished from request rate limiting and never retried',async t=>{
+ const f=await fixture(t);let calls=0;
+ await fs.writeFile(path.join(f.directory,'03-shard.sql'),'SELECT 1;');
+ await assert.rejects(importSeeds({...f,request:async()=>{calls++;return {ok:false,status:429,json:async()=>({success:false,errors:[{code:7429,message:'D1 DB exceeded its CPU time limit and was reset.'}]})};}}),/codes=7429 reason=cpu_limit/);
+ assert.equal(calls,1);
+});

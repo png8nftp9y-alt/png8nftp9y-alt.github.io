@@ -48,6 +48,7 @@ test('full archive repairs missing children and preserves existing and unrelated
  db.prepare('INSERT INTO matches VALUES(?,?,?,?,?)').run('unrelated','other','fitp','2026-06-07','{}');
  db.prepare('INSERT INTO tournaments VALUES(?,?,?,?,?,?)').run('unrelated','fitp','other','','','{}');
  assert.equal(f.manifest.imported.matches,201);assert.equal(f.manifest.historicalSync,true);
+ for(const sql of f.sql){const n=(sql.match(/INSERT OR IGNORE INTO tennis_europe_changed_matches/g)||[]).length;assert.ok(n<=25,'historical batch exceeds 25 matches');}
  assert.equal(f.sql[0].trim(),'PRAGMA foreign_keys=ON;');
  const apply=()=>{for(const sql of f.sql)db.exec('BEGIN;\n'+sql+'\nCOMMIT;');};apply();
  assert.equal(db.prepare("SELECT count(*) n FROM matches WHERE circuit='tennis-europe'").get().n,201);
