@@ -26,8 +26,11 @@ async function fixture(t,env){
  const historical={status:'green',tournaments:[tournament],matches:Array.from({length:201},(_,i)=>match(i))},live={status:'green',tournaments:[tournament],matches:[match(200)]};
  for(const [name,data] of [['historical',historical],['live',live]])await fs.writeFile(path.join(root,'dist/v3/tennis_europe_oop_'+name+'.json'),JSON.stringify(data));
  const generator=new URL('../scripts/generate-tennis-europe-oop-seed.mjs',import.meta.url);
- await fs.copyFile(generator,path.join(cwd,'generate.mjs'));
- const run=spawnSync(process.execPath,['generate.mjs'],{cwd,env:{...process.env,TE_INCREMENTAL:'1',TE_SYNC_HISTORICAL:'0',...env},encoding:'utf8'});
+ await fs.mkdir(path.join(cwd,'scripts'),{recursive:true});
+ await fs.mkdir(path.join(root,'src/v3'),{recursive:true});
+ await fs.copyFile(new URL('../../../src/v3/tennis-europe-retirement.mjs',import.meta.url),path.join(root,'src/v3/tennis-europe-retirement.mjs'));
+ await fs.copyFile(generator,path.join(cwd,'scripts/generate.mjs'));
+ const run=spawnSync(process.execPath,['scripts/generate.mjs'],{cwd,env:{...process.env,TE_INCREMENTAL:'1',TE_SYNC_HISTORICAL:'0',...env},encoding:'utf8'});
  assert.equal(run.status,0,run.stderr);
  const directory=path.join(cwd,'seed-tennis-europe-oop');
  const sql=[];for(const name of (await fs.readdir(directory)).filter(n=>n.endsWith('.sql')).sort())sql.push(await fs.readFile(path.join(directory,name),'utf8'));

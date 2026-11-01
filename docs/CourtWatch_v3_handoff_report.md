@@ -10100,3 +10100,8 @@ Correzione limitata alla preparazione browser CI. Nessun polling, rilancio autom
 - Errore nel test: asOf era 2026-10-03, data fine torneo. La query otherCircuitOpponentHistory richiede endDate < asOf, quindi lo storico di un torneo che termina quel giorno non viene caricato. La pretesa di presenza nello storico era prematura; nessuna correzione applicativa dedotta dal solo rosso.
 - Test spostato al giorno successivo alla fine, validando data e passaggio anno. Aggiunto report delle date indice e dei tornei selezionati dal Worker per distinguere eventuali ulteriori problemi di finestra/mapping da un errore nelle aspettative.
 - Cinque test mirati passati con il selettore reale delle finestre; sintassi JS verificata. Nessuna modifica all'app, regola alternate o D1. Run reale necessario per confermare se il cambio data spiega interamente le due assenze: non dichiarato risolto in anticipo.
+
+### Europe: correzione fixture import storico
+- La fixture conserva il generatore in scripts e copia il modulo ritiri in src/v3.
+- Risolve ERR_MODULE_NOT_FOUND prima dell'importazione D1.
+- Verifica mirata: 9 test passati. Import remoto da confermare dopo pubblicazione.
