@@ -924,7 +924,10 @@ async function refreshPlayerMembership(group,epoch,isSnapshotComplete) {
     const hash=location.hash,y=typeof scrollY==='number'?scrollY:null;
     renderIfDataChanged();
     if(y!==null&&location.hash===hash)scrollTo({top:y,behavior:'auto'});
-    for(const p of players.filter(p=>!old.has(p.id)&&p.membershipPending))
+    // On first access, the complete group snapshot already owns every history.
+    // Scoped enrichment is only for new members of an existing complete projection.
+    const incremental = previous.personalProjectionComplete === true && previous.membershipOnly !== true;
+    for(const p of players.filter(p=>incremental&&!old.has(p.id)&&p.membershipPending))
       refreshAfterPlayerAddition(epoch,group,p.id,{membershipSync:true}).catch(error=>console.warn('Tornei del nuovo giocatore non ancora disponibili',error));
   } catch(error){console.warn('Sincronizzazione elenco non disponibile; conservo la lista precedente',error);}
 }

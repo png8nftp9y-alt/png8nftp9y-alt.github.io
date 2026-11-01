@@ -10122,3 +10122,13 @@ ITF discovery 2026-11-01T06:52:28.977Z: 0 newly discovered future tournaments; M
 
 ## 2026-11-01 — Fixture navigazione avversario
 - Run 41321362157: due ReferenceError nelle fixture VM di navigation-query-load. Collegata la funzione reale opponentItfDocumentHistory in entrambi i contesti; controlli di letture e parallelismo conservati. Verifica Pescara verde; deploy ancora da confermare.
+
+## 2026-11-01 — Primo accesso dopo Cloudflare: eliminata moltiplicazione delle richieste storico
+
+Problema ancora aperto segnalato dall'utente: la riapertura con proiezione salvata è immediata e aggiornata, ma il primo caricamento dopo il codice Cloudflare resta lento. La precedente conferma su cache già popolata non verificava questo percorso.
+
+Causa riprodotta: startCourtWatch avvia contemporaneamente il full snapshot e la lista leggera. Se la lista arriva per prima senza una proiezione precedente, refreshPlayerMembership considera nuovi tutti i membri e invoca refreshAfterPlayerAddition per ciascuno. Il test con 37 giocatori riproduce 37 snapshot individuali oltre al full già in corso. Un test Chromium con contesto nuovo riproduce la stessa duplicazione prima della modifica; non è necessaria una richiesta reale al telefono per dimostrare questo difetto del percorso di avvio.
+
+La sincronizzazione incrementale ora avvia lo storico individuale soltanto quando esiste già una proiezione completa precedente, non nel primo accesso o su una lista membershipOnly. Il full snapshot già in corso resta proprietario di tutte le storie iniziali. Rimangono immediati elenco e navigazione; nuovi giocatori aggiunti su un secondo dispositivo con proiezione completa continuano a usare il refresh mirato. Nessuna modifica alle richieste D1 del server, ai dati restituiti, a ranking, storico, motori, Admin, intervallo esistente o schedulazioni. Non viene aggiunto polling né un meccanismo di ritentativo.
+
+Verifiche: 105 test mirati su primo accesso, membership, aggiunte, cache, gruppi e ritiri; confronto prima/dopo con 37 membri in TCL/Altri. Nuovo browser test di primo accesso senza cache su quattro combinazioni desktop/mobile e TCL/Altri: una richiesta completa, zero richieste individuali automatiche, calendario, agenda, tornei e classifica visibili. Il test viene eseguito all'interno dello Shield obbligatorio, prima di dichiararlo superato. Restano le dieci letture dei documenti esistenti: non è stata introdotta la risposta combinata valutata durante l'analisi. Da confermare sul telefono dopo deploy con un nuovo accesso Cloudflare, non con una riapertura dalla cache; nessuna stima inventata del tempo di rete reale.

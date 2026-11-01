@@ -138,3 +138,16 @@ test('scoped refresh coalesces duplicate requests and failed history retains pen
  await c.ctx.refreshAfterPlayerAddition(0,'others','b',{membershipSync:true});assert.equal(reads,1);
  reject(Error('offline'));await assert.rejects(first,/offline/);assert.equal(c.ctx.state.data.players[1].membershipPending,true);
 });
+
+for(const group of ['main','others'])test(`${group}: cold access does not fan out one scoped history request for every member while the full group is pending`,async()=>{
+ const players=Array.from({length:37},(_,i)=>({id:'cold-'+i,name:'Cold '+i}));
+ const projection={group,membershipIds:players.map(p=>p.id),players,tournaments:[],matches:[]};
+ const c=setup(group,projection);live(c);let release,scoped=0;
+ c.ctx.apiProjection=()=>new Promise(resolve=>release=resolve);
+ c.ctx.fetch=async()=>({ok:true,json:async()=>({group,membershipIds:players.map(p=>p.id),players})});
+ c.ctx.refreshAfterPlayerAddition=async()=>{scoped++;};
+ const loading=c.ctx.load(null,null,true);await new Promise(resolve=>setImmediate(resolve));
+ const before=scoped;release(projection);await loading;
+ assert.equal(before,0,'first access must use its existing complete group request, not 37 additional scoped snapshots');
+ assert.equal(c.ctx.state.data.players.length,37);
+});
