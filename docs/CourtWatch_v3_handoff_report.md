@@ -10077,3 +10077,13 @@ Test mirati locali; Shield obbligatorio nel deploy. Nessun cambiamento a motori,
 - Rendering profili rigiocato alla fine di Pescara per evitare falsa assenza dovuta alla finestra degli ultimi tre tornei; indice D1 verificato nello stato corrente. Data e limiti dichiarati nel report.
 - Stesso gruppo concurrency con cancel-in-progress true: il nuovo push sostituisce il vecchio run, nessun ciclo di polling o rilancio identico. Timeout verifica 4 minuti, job 8 minuti. Progressi per fase e artifact mirato sempre salvato; errori, differenze o evidenza pertinente cambiata restano rossi.
 - Validazione locale: quattro test fingerprint/decisioni superati, sintassi JS e workflow YAML verificati. Regressioni Pescara esistenti vengono rieseguite dall'installazione e dal runner. Replay reale e verdetto remoto ancora da confermare.
+
+## 2026-11-01 — Sblocco installazione browser Shield su runner Ubuntu
+
+Evidenza: il job 124702689664 del run Worker 41256909599 resta nel passo Install test browser for changed code. Il log fornito dall'utente riporta Ign ripetuti per http://azure.archive.ubuntu.com/ubuntu, mentre scarica con Get da https://archive.ubuntu.com/ubuntu. I test Shield e il deploy non erano ancora iniziati: non è un fallimento della correzione mobile.
+
+La preparazione CI sostituisce soltanto il mirror Ubuntu Azure con quello ufficiale HTTPS in entrambi i formati apt (.list e .sources), mantenendo suite, componenti e chiavi. Gli altri repository non cambiano. Apt usa zero ritentativi e timeout di rete di 20 secondi; l'installazione browser ha un limite di cinque minuti. Applicato alla Release Safety riusabile, allo Shield diretto e al ricontrollo del codice avanzato nel publisher. I test obbligatori, le prove live, il controllo fingerprint e il divieto di approvare dopo un errore restano invariati. Nessuna modifica all'app, D1, dati, motori o schedulazioni. Nessuna cancellazione o rilancio automatico del vecchio run.
+
+Validazione: nove test verdi su entrambi i formati apt, conservazione dei repository terzi e dei metadati, idempotenza, sequenza di approvazione e arresto su ogni errore; YAML dei due workflow valido. Il mirror ufficiale risulta raggiungibile nel log originale, ma l'esito del nuovo runner resta da verificare dopo la pubblicazione dell'utente. Il nuovo workflow non modifica un job già in esecuzione.
+
+Correzione limitata alla preparazione browser CI. Nessun polling, rilancio automatico o modifica ai dati.
