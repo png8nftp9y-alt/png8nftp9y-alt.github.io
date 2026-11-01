@@ -10157,3 +10157,13 @@ ITF discovery 2026-11-01T22:31:18.631Z: 0 newly discovered future tournaments; M
 - Aggiunto solo diagnostico read-only: API Cerca corrente per Zakaria Mohammed Abidat e varianti Mohammed Aliyami/Alyami, metadati dei record sorgente observed/acquired, identita canoniche, collegamenti per ID/chiave e nazionalita dei partecipanti ITF con gli stessi ID.
 - Output distingue quattro campi nazionalita e URL ufficiali; consente di localizzare perdita in acquisizione, mapping o risposta Cerca. Nessuna nazionalita assegnata per nome, nessuna correzione o scrittura D1, nessun deploy/motore/acquisizione, export completo, polling o retry.
 - Verde significa diagnosi completata, non bandiere risolte. La correzione deve dipendere dai risultati reali, ancora da raccogliere. Sintassi del diagnostico verificata.
+
+## 2026-11-02 — Misura del primo caricamento ancora lento
+
+La rimozione delle richieste individuali duplicate non ha risolto il primo accesso Safari privato segnalato dall’utente. La risposta completa main osservata nel browser autenticato ha richiesto circa 2,4 secondi (1,54 milioni di caratteri, 29 giocatori, 681 tornei, 300 match); questa prova non riproduce il primo accesso dell’iPhone.
+
+Esteso Server-Timing alle snapshot complete, con le stesse misure delle snapshot individuali. Aggiunta vista temporanea opt-in `loadTiming=1`: tempi dei documenti, ricezione intestazioni e corpo della snapshot, elaborazione/visualizzazione e parte sincrona della cache. Misure nel solo DOM della scheda, senza nomi, payload, token, salvataggi o invii diagnostici. Nessun nuovo polling, retry, discovery, cambiamento dei dati o motori.
+
+Questa modifica misura il collo di bottiglia; non costituisce una correzione della lentezza. Il caso rimane aperto finché non vengono misurati il percorso lento reale e la successiva correzione.
+
+Validazione: 72 test frontend e 11 test snapshot backend superati, inclusa parità dei dati e zero scritture aggiuntive; sintassi, analysis UI e release guard superati. Applicazione e idempotenza dell’installer verificate. Prova Chromium locale non eseguita: browser binario non disponibile; la misura sul primo accesso Safari resta necessaria.

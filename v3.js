@@ -1,3 +1,21 @@
+// Opt-in, request-local startup measurements: no payloads, identities or persistence.
+const startupTimingOrigin = Date.now();
+function recordStartupTiming(stage, started, detail = {}) {
+  try {
+    if (new URLSearchParams(location.search).get('loadTiming') !== '1') return;
+    let panel = document.getElementById('courtwatchLoadTiming');
+    if (!panel) {
+      panel = document.createElement('details');
+      panel.id = 'courtwatchLoadTiming'; panel.open = true;
+      panel.style.cssText = 'position:fixed;bottom:8px;left:8px;right:8px;z-index:99999;background:#fff;color:#111;border:2px solid #555;padding:8px;max-height:40vh;overflow:auto;font:12px monospace';
+      const title = document.createElement('summary'); title.textContent = 'Tempi caricamento (ms)'; panel.append(title, document.createElement('pre'));
+      document.body.append(panel);
+    }
+    const output = panel.querySelector('pre');
+    const line = JSON.stringify({stage,fromScriptMs:Date.now()-startupTimingOrigin,elapsedMs:Date.now()-started,...detail});
+    output.textContent = (output.textContent + line + '\n').split('\n').slice(-41).join('\n');
+  } catch {} // Measurement must not interrupt startup.
+}
 const V3 = location.origin + "/app/api/documents/";
 // Release contracts: location.origin+'/app/api' and background refresh outside opponent profiles.
 // Functional-shield contracts retained across formatting:
@@ -842,6 +860,7 @@ function agendaVenueLocation(t, fallback = "") {
 }
 
 async function v3json(path) {
+  const started = Date.now();
   const controller = new AbortController(),
     timer = setTimeout(() => controller.abort(), 12000);
   try {
@@ -854,6 +873,7 @@ async function v3json(path) {
     if (!r.ok) throw Error("File v3 mancante: " + path);
     return await r.json();
   } finally {
+    if (typeof recordStartupTiming === "function") recordStartupTiming("document:" + path, started);
     clearTimeout(timer);
   }
 }
@@ -892,6 +912,7 @@ async function requestProjection(url, timeoutMs, group = PLAYER_GROUP) {
       }, group),
     );
     timingResponse=response;
+    if (typeof recordStartupTiming === "function") recordStartupTiming("snapshot_headers", timingStarted, {status:response.status,serverTiming:response.headers.get("Server-Timing") || ""});
     if (!response.ok) throw Error("API Court Watch non disponibile: " + response.status);
     const data = await response.json();
     if (
@@ -905,6 +926,7 @@ async function requestProjection(url, timeoutMs, group = PLAYER_GROUP) {
     return {...data, snapshotReadAt: new Date(timingStarted).toISOString()};
   } finally {
     if(timingEnabled)recordPlayerLoadTiming('snapshot_http',timingStarted,timingResponse);
+    if (typeof recordStartupTiming === "function") recordStartupTiming("snapshot_body", timingStarted, {status:timingResponse?.status ?? null});
     clearTimeout(timer);
     if (activeProjectionController === controller) activeProjectionController = null;
   }
@@ -4837,6 +4859,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       const viewHash = typeof location === "undefined" ? null : location.hash,
         viewY = state.data && typeof scrollY === "number" ? scrollY : null;
       const previous = state.data || cachedData() || {};
+      const publicationStarted = Date.now();
       // Only membership is group-specific. Data loading, merging and rendering are shared.
       if (projection && PLAYER_GROUP === "others" && projection.group !== "others")
         throw Error("Snapshot del gruppo errato");
@@ -4993,9 +5016,12 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
         );
       syncLabel(state.data, optionalFailures > 0);
       renderIfDataChanged();
+      if (typeof recordStartupTiming === "function") recordStartupTiming("projection_render", publicationStarted, {complete:Boolean(projection)});
       if (viewY !== null && viewHash !== null && location.hash === viewHash && typeof scrollTo === "function")
         scrollTo({top: viewY, behavior: "auto"});
+      const persistenceStarted = Date.now();
       Promise.resolve(saveCachedData(state.data)).catch(error => console.warn("Archivio locale non disponibile", error));
+      if (typeof recordStartupTiming === "function") recordStartupTiming("cache_sync", persistenceStarted);
     }
     const projectionPromise = (preparedProjection ? Promise.resolve(preparedProjection) : apiProjection()).catch((error) => {
       console.warn("Fallback JSON Court Watch attivo", error);
