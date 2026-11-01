@@ -10010,3 +10010,47 @@ Focused ongoing-withdrawal and startup fix. Existing engine schedules and app re
 - Nuovo audit JSON su live, ogni shard storico e archivio storico consolidato: casi ufficiali, copertura del controllo, legacy ancora non verificato e problemi di lettura tabelloni. Un audit incompleto resta tale anche se l’acquisizione termina; evidenza di ritiro internamente invalida impedisce la prosecuzione. I documenti mancanti o i formati sconosciuti non sono certificati. Nessuna modifica ITF/FITP né polling o dispatch esterno.
 - Recupero storico tramite il backfill esistente, attivato dai normali trigger del push dei suoi sorgenti; merge R2 e import D1 conservano la catena esistente. Gli aggiornamenti dei nuovi campi richiedono scritture una tantum; test SQL di replay identico verificano zero riscritture. Non si dichiara già recuperato lo storico prima dei run remoti.
 - Validazione: 87 regressioni source discovery, W/O, gironi, recupero vuoti, messaggi ritiri, vincitore ufficiale e rendering; prova reale generatori SQL e app con 149 incontri, lettura matches/results e replay senza scritture. Audit sul baseline: 59.217 non verificati, non zero ritiri. Controllo completo Worker concluso con exit 0: 699 test superati e zero fallimenti. Installatore provato su copia pulita; esito e casi remoti da leggere dopo pubblicazione dell’utente.
+## 2026-10-31 — chat 1: certificazione Pescara applicata alla regola alternate
+- Run 41229902755: 104 alternate su tornei futuri separati; tre casi Pescara non verificabili per mancata acquisitionProof nel doppio maschile. Il registro ufficiale certifica gia 16/16 coppie e la stessa certificazione e presente in itf-known-match-only-draws.mjs.
+- Correzione produzione: il generatore dell'indice alternate riconosce la certificazione esplicita per coppia competitionId/event oltre alla prova in cache. Audit usa la stessa fonte di certificazione, mantenendo il proprio confronto indipendente dei partecipanti.
+- Nessuna certificazione inventata o riacquisizione. Cache non vuota, popolata, priva di errori e con ID partecipanti restano obbligatorie; mancanza di altre sezioni, errore o ID ignoto impediscono esclusioni. Certificazione non trasferibile ad altri tornei; conflitto di ID torneo blocca il controllo.
+- Copia acquisita Pescara: Mastropasqua 800687485 e Rusca 800697548 presenti; Ceschin 800710276 assente dalle sezioni maschili. Il generatore reale di test mantiene i primi due ed esclude il terzo; replay identico.
+- Validazione locale: 22 test superati, fra cui generatore reale, pagina iscrizioni, import incrementale, replay zero modifiche e protezioni fonte incompleta. Regressioni Pescara aggiunte a npm run check. Non aggiunte letture runtime D1 o nuove schedulazioni.
+- Il push attiva D1 esistente e audit. Chiusura solo dopo import indice e verifica remota dei tre casi; un audit concorrente all'importazione puo non essere conclusivo. Nessun polling o rilancio automatico.
+
+
+## Chat 1 — Icona aggiornamento soltanto in ID
+Richiesta: rimuovere l'icona identità dalla Diagnostica.
+Il controllo rimane solo in ID e continua ad aggiornare insieme ID
+mancanti, identità sospette e anni già acquisiti. Aggiornati i test
+di presenza/assenza dell'icona; mantenuti i controlli su letture salvate,
+autenticazione e assenza di richieste automatiche.
+Test mirati obbligatori prima del commit. Deploy remoto da verificare.
+
+## 2026-10-31 — chat 1: audit D1 con letture deduplicate e alternate prima degli avversari
+- Run 41234611100 e 41236110070 interrotti da HTTP 500/codice 7500 della API D1 su query diverse, dopo oltre mille letture remote; importazione D1 41234611124 riuscita. Causa Cloudflare non dimostrata, nessun errore Pescara dedotto dai run interrotti.
+- Solo audit: memoizzazione per SQL e parametri, condivisione di richieste identiche, risultato clonato per ogni chiamante, esecuzione remota serializzata e intervallo minimo 100 ms. Nessun retry, polling o scrittura; guardia read-only mantenuta e fallimenti propagati.
+- Marker D1 finali letti direttamente dalla sorgente, senza cache; controlli R2 e copertura rimangono invariati. Un cambiamento concorrente continua a invalidare il verdetto.
+- Verifica alternate spostata prima dei profili avversari, con checkpoint JSON e riepilogo Pescara dichiarato provvisorio fino ai controlli sorgente finali. Un errore successivo non cancella le prove gia raccolte e non rende verde un audit incompleto.
+- Errori registrano hash della query, contatori e profilo in elaborazione, senza SQL o parametri. Contatori query effettive e cache hit disponibili nel report.
+- Validazione: 18 test passati su sessione letture, selettore alternate, Pescara, generatore reale e confronto audit. Il workflow esegue anche i nuovi test. Sintassi verificata.
+- Nessuna modifica applicativa o al client D1 generale. Esecuzione reale della nuova versione ancora da confermare; un errore Cloudflare ulteriore resta bloccante.
+
+## 2026-10-31 — Complete ongoing registration removal in scoped player refresh
+
+User confirmed Quanta only persisted on phone and provided the Natale profile screenshot: LOMB. 1212 QUANTA CLUB, 2026-10-30 to 2026-11-01. The previous device-freshness patch corrected full-group load but missed refreshAfterPlayerAddition, also used by scoped membership enrichment. Verified the publicly served Worker v3.js still had this second predicate: startDate <= today unconditionally retained the old registration. A complete scoped response without Quanta therefore could not remove the cached row.
+
+Apply the same end-date policy already used by full load: preserve concluded cached tournaments and other players, replace ongoing/future registrations owned by the refreshed player. Match history merging remains unchanged. Bump script URL to force the corrected client to be requested. No D1 queries, engine/import/identity/Admin changes or schedules/timers/reruns are introduced.
+
+Validation: exact Oct 30-Nov 1 regression with as-of Oct 31 for main and others; unrelated player, legitimate future tournament, concluded history and historical score preserved. Actual Chromium desktop/mobile simulation holds the full request pending, then resolves scoped data: phone loses Quanta, desktop remains correct, and the later full response cannot resurrect it. Focused 91 tests and local release-safety/functional browser Shield passed. Full npm run check completed successfully (exit 0), including the Admin regressions that previously blocked deployment. The authenticated production player snapshot cannot be read from this environment (302 to sign-in); this proves and corrects the missed client path, while the physical phone result still requires confirmation after deployment.
+
+ITF discovery 2026-10-31T21:57:54.283Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-10-31 — chat 1: audit su copia D1 e generazione ITF fissate
+- Run 41236865413 completato senza errori D1: 17 giocatori, 154 avversari, 161 casi alternate, zero differenze/non verificabili. Pescara: Mastropasqua e Rusca official_draw, Ceschin excluded. Fonti D1/R2 e registro copertura cambiate durante la lettura: verdetto globale inconclusivo.
+- Nuova modalita esplicita frozen_input_comparison_not_current_live_state: singola esportazione nativa D1 con Wrangler, import solo in SQLite temporaneo e lettura immutabile read-only; R2 resta sulla generazione fissata, registro copertura acquisito una volta.
+- Tutti i confronti Worker/browser/alternate restano. Nessuna certificazione dello stato live successivo o atomicita fra servizi: cattura D1 e cattura R2 hanno tempi distinti registrati. Eventuali differenze fra input catturati restano rosse.
+- Verifiche integrita SQLite, hash copia, marker locali invariati e guardia SQL read-only. Database assente o export fallito bloccano senza retry. Nessuna query remota D1 durante i confronti lunghi, nessuna lettura del puntatore R2 live usata per invalidare una copia deliberatamente fissata.
+- Esportazione nativa gia usata dal backup del progetto; puo serializzare temporaneamente le richieste D1. Nessun polling applicativo personalizzato o rilancio automatico; il comando nativo gestisce il proprio completamento.
+- SQL/database privati restano nella directory temporanea runner e vengono rimossi anche su fallimento. Artifact contiene solo report con hash, orari e risultati. Costo remoto esportazione non misurato dall'audit e non dichiarato zero; contatori delle query locali separati.
+- Validazione: 20 test passati, incluse copie stabili dopo modifica della sorgente, rifiuto scritture, file assente, letture deduplicate, generatore Pescara e audit. YAML e sintassi JS verificati. Export remoto e replay su DB reale ancora da eseguire.

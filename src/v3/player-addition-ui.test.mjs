@@ -218,3 +218,19 @@ test('confirmed addition starts exactly one targeted read before local cache ser
  await c.context.addCourtWatchPlayerFromUi({identity:'101',name:player.name},c.button);
  assert.deepEqual(events,['snapshot','cache','render','profile']);assert.equal(c.button.disabled,false);assert.equal(c.state.data.personalProjectionComplete,false);
 });
+
+for(const group of ['main','others'])test(`${group}: scoped refresh removes Natale Quanta Oct 30-Nov 1 on Oct 31, including stale phone cache`,async()=>{
+ const c=context(null),player={id:'manuel-natale',userAdded:true};c.context.PLAYER_GROUP=group;c.context.iso=()=> '2026-10-31';
+ const quanta={playerId:player.id,circuit:'fitp',competitionId:'24654291-5A49-4D39-BCA8-6F4608CAB3A1',startDate:'2026-10-30',endDate:'2026-11-01'};
+ const past={...quanta,competitionId:'past',startDate:'2026-10-16',endDate:'2026-10-18'},future={...quanta,competitionId:'future',startDate:'2026-11-13',endDate:'2026-11-15'},other={...quanta,playerId:'another'};
+ c.state.data.players=[player,{id:'another'}];c.state.data.matches=[{playerId:player.id,circuit:'tennis-europe',id:'played',competitionId:'past',score:'6-4 6-3'}];c.state.data.tournaments=[quanta,past,future,other];
+ c.context.fetchProjection=async()=>({group,playerId:player.id,players:[player],tournaments:[future],matches:[]});
+ await c.context.refreshAfterPlayerAddition(1,group,player.id);
+ assert.equal(c.state.data.tournaments.some(t=>t.playerId===player.id&&t.competitionId===quanta.competitionId),false);
+ assert.equal(c.state.data.tournaments.filter(t=>t.playerId===player.id).length,2);
+ assert.equal(c.state.data.tournaments.some(t=>t.playerId==='another'),true);
+ assert.equal(c.state.data.matches[0].score,'6-4 6-3');
+ // A later group load must not resurrect the withdrawn registration from disk.
+ let saved;c.context.saveCachedData=data=>{saved=data;};await c.context.refreshAfterPlayerAddition(1,group,player.id);
+ assert.equal(saved.tournaments.some(t=>t.playerId===player.id&&t.competitionId===quanta.competitionId),false);
+});

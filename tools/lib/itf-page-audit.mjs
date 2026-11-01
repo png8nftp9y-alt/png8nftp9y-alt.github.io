@@ -1,3 +1,4 @@
+import {certifiedCachedItfDraw} from '../../src/v3/itf-cached-draw-certification.mjs';
 import {AUDIT_CRITERION,requiredAuditEvents} from '../../src/v3/itf-audit-acquisition-policy.mjs';
 export const competitionKey=x=>String(x?.competitionId||x?.sourceTournamentId||x||'').toUpperCase();
 export function presenceIndex(state){
@@ -18,6 +19,7 @@ export function alternateExpectation(p,state){
  const gender=String(p.gender||p.playerTypeCode||'').toUpperCase(),sex=/^(G|GIRLS?|FEMALE)$/.test(gender)?'G':/^(B|BOYS?|MALE)$/.test(gender)?'B':'';
  if(!sex)return {state:'unverifiable',reason:'missing_gender'};
  if(!state)return {state:'unverifiable',reason:'missing_tournament_inventory'};
+ if(p.competitionId&&state.competitionId&&String(p.competitionId).toUpperCase()!==String(state.competitionId).toUpperCase())return {state:'unverifiable',reason:'tournament_identity_mismatch'};
  if(state.inventoryError)return {state:'unverifiable',reason:'inventory_read_error'};
  const inventory=(state.eventInventory||[]).filter(e=>e.event?.startsWith(sex+'-')).map(e=>({...e,family:e.event.split('-').slice(0,3).join('-'),structure:e.event.split('-').at(-1)}));
  if(!inventory.some(e=>e.family===sex+'-S-M')||!inventory.some(e=>e.family===sex+'-S-Q'))return {state:'unverifiable',reason:'main_or_qualifying_not_inventoried'};
@@ -26,7 +28,7 @@ export function alternateExpectation(p,state){
  for(const e of events){const d=state.eventCache?.[e.event];
   if(d?.error||d?.failureType)return {state:'unverifiable',reason:'failed_draw',event:e.event};
   if(d?.resolution==='empty_singles_qualification'&&proof(d.resolutionProof)&&d.resolutionProof.mainEvents?.length&&d.resolutionProof.mainEvents.every(x=>events.some(e=>e.event===x)))continue;
-  if(!proof(d?.acquisitionProof)||d?.populated!==true||!d.players?.length||d.players.some(x=>!String(x.id||x.playerId||'')))return {state:'unverifiable',reason:'draw_not_fully_certified',event:e.event};
+  if(!certifiedCachedItfDraw({competitionId:state.competitionId||p.competitionId,event:e.event,draw:d})||d?.populated!==true||!d.players?.length||d.players.some(x=>!String(x.id||x.playerId||'')))return {state:'unverifiable',reason:'draw_not_fully_certified',event:e.event};
   if(d.players.some(x=>String(x.id||x.playerId)===String(p.worldTennisId||p.id||p.playerId)))found=true;
  }
  return {state:found?'present':'absent',events:events.map(e=>e.event)};
