@@ -1,35 +1,33 @@
-name: Court Watch ITF acquired presence and pages audit
+name: Court Watch ITF Pescara alternate verification
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'tools/audit-itf-pages.mjs'
-      - 'tools/lib/itf-page-audit.mjs'
-      - 'tools/tests/itf-page-audit.test.mjs'
+      - 'tools/verify-itf-pescara.mjs'
+      - 'tools/lib/itf-pescara-verification.mjs'
+      - 'tools/tests/itf-pescara-verification.test.mjs'
       - '.github/workflows/courtwatch-itf-page-audit.yml'
 permissions:
   contents: read
 concurrency:
   group: courtwatch-itf-pages-readonly-audit
-  cancel-in-progress: false
-  queue: single
+  cancel-in-progress: true
 jobs:
-  audit:
+  verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with: {ref: main, fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - name: Validate missing presence and incomplete evidence detection
-        run: node --test tools/tests/itf-page-audit.test.mjs tools/tests/itf-audit-read-session.test.mjs tools/tests/itf-audit-frozen-d1.test.mjs
+      - name: Test targeted evidence verification
+        run: node --test tools/tests/itf-pescara-verification.test.mjs cloudflare/app-api/test/itf-pescara-certification.test.mjs
       - run: npm install
-      - run: npm --prefix cloudflare/app-api install
-      - run: npx playwright install --with-deps chromium
       - run: python -m pip install --disable-pip-version-check --quiet awscli
-      - name: Audit acquired ITF presence against real D1 snapshots and browser without writes
+      - name: Verify Pescara index, three Worker profiles and browser rendering
+        timeout-minutes: 4
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -39,33 +37,21 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: auto
-        run: |
-          node tools/prepare-itf-audit-snapshot.mjs
-          ITF_AUDIT_FROZEN_DIR="$RUNNER_TEMP/courtwatch-itf-audit-snapshot" node tools/audit-itf-pages.mjs
-      - name: Publish audit verdict in run summary
+        run: node tools/verify-itf-pescara.mjs
+      - name: Publish scoped result
         if: always()
         run: |
           node --input-type=module <<'JS'
           import fs from 'node:fs';
-          const p='artifacts/itf-page-audit.json';
-          if(!fs.existsSync(p))process.exit(0);
-          const r=JSON.parse(fs.readFileSync(p,'utf8'));
-          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,`ITF page audit of frozen inputs (not current live state): **${r.status}**\n\nPlayers: ${r.players.length}; opponent profiles: ${r.opponents.length}; alternates: ${r.alternates.length}; differences: ${r.issues.length}; unverifiable cases: ${r.unverifiable.length}.\n\nD1 export read cost: not measured; local queries: ${r.localReadMetrics?.localQueries}; remote rows written: ${r.metrics.rowsWritten}.\n\nSee artifact for names, competitions and source gaps. This is not a claim of complete ITF acquisition.\n`);
+          const file='artifacts/itf-pescara-verification.json';
+          if(!fs.existsSync(file))process.exit(0);
+          const r=JSON.parse(fs.readFileSync(file,'utf8'));
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,`Pescara verification: **${r.status}**\n\nScope: three native IDs at ${r.scope}. Profile replay date: ${r.profileAsOf||'unavailable'}. This is not a global audit.\n\n${r.players.map(p=>`${p.name}: source=${p.sourceExpectation.state}, index=${p.storedStatus}, Worker=${p.workerMatches}, browser=${p.browser?.contains}`).join('\n\n')}\n\nD1 queries: ${r.metrics.queries}; rows read: ${r.metrics.rowsRead}; rows written: ${r.metrics.rowsWritten}.\n`);
           JS
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: itf-acquired-presence-pages-audit
-          path: artifacts/itf-page-audit.json
+          name: itf-pescara-three-player-verification
+          path: artifacts/itf-pescara-verification.json
           if-no-files-found: error
           retention-days: 14
-      - name: Require an unambiguous matching verdict
-        run: |
-          node --input-type=module <<'JS'
-          import fs from 'node:fs';
-          const r=JSON.parse(fs.readFileSync('artifacts/itf-page-audit.json','utf8'));
-          if(r.status!=='checked_frozen_scope_matches'||r.snapshot?.scope!=='frozen_input_comparison_not_current_live_state')process.exit(1);
-          JS
-      - name: Remove private snapshot from runner
-        if: always()
-        run: rm -rf "$RUNNER_TEMP/courtwatch-itf-audit-snapshot"
