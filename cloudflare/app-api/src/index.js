@@ -37,6 +37,7 @@ import {sharedTournamentMetadata} from '../lib/tournament-metadata-cache.mjs';
 import {paginatedPlayerSearch,searchIdentityProfile} from '../lib/paginated-player-search.mjs';
 import {circuitProfileRows,resolveCircuitProfiles,circuitProfiles,playerCircuitIdentities} from '../lib/player-circuit-profiles.mjs';
 import {opponentTournamentWindow} from '../lib/opponent-tournament-window.mjs';
+import {opponentItfDocumentHistory} from '../lib/opponent-itf-document-history.mjs';
 import {otherCircuitOpponentHistory,boundedRows} from '../lib/opponent-canonical-history.mjs';
 import {mergePersonalLiveTournaments,mergePersonalHistoryTournament} from '../lib/personal-live-entry.mjs';
 import {exactPersonalEntryProfiles} from '../lib/personal-entry-profiles.mjs';
@@ -141,6 +142,7 @@ async function universalOpponentHistory(env,options){
  const asOf=/^\d{4}-\d{2}-\d{2}$/.test(options.asOf)?options.asOf:new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()),request={...options,asOf};
  const te=playerCircuitIdentities(identity||{}).find(p=>p.circuit==='tennis-europe');
  const [history,entries,other,configured]=await Promise.all([tennisEuropeOpponentHistory(env,{...request,profileId:te?.profileId||request.profileId,identity}),playerEntryTournaments(env,identity||{name:request.name,sourceCircuit:request.sourceCircuit||(tennisEuropeNativeId(request.profileId)?'tennis-europe':''),sourcePlayerId:request.profileId},request),otherCircuitOpponentHistory(env.DB,{...request,identity:identity||(tennisEuropeNativeId(request.profileId)?{sourceCircuit:'tennis-europe',sourcePlayerId:request.profileId}:null)}),env.DB.prepare('SELECT payload FROM app_players WHERE id=?').bind(options.profileId||'').first()]);
+ const acquiredItf=await opponentItfDocumentHistory(env.DB,{identity:identity||{sourceCircuit:request.sourceCircuit,sourcePlayerId:request.profileId},entries,existing:[...history.tournaments,...other],asOf,excludeMatchId:request.excludeMatchId});
  const person={name:options.name,circuits:[],nationality:history.profile?.nationality||''};
  if(configured){let p={};try{p=JSON.parse(configured.payload)}catch{}if(tennisEuropeNameKey(p.name)===tennisEuropeNameKey(options.name))Object.assign(person,p,{name:options.name});}
  const identityRows=[];if(!identity)for(const table of ['observed_players','search_acquired_players'])identityRows.push(...await optionalRows(env.DB.prepare(`SELECT circuit,official_id,display_name,payload FROM ${table} WHERE official_id=? OR source_key=?`).bind(options.profileId||'',options.profileId||'')));
@@ -152,7 +154,7 @@ async function universalOpponentHistory(env,options){
  // These reads are independent once the exact person has been resolved.
  const [profiles,presented,current]=await Promise.all([
   resolveCircuitProfiles(env.DB,[person]),
-  enrichPersonalTournamentPresentation([...entries,...history.tournaments,...other],env.RUNTIME_DOCUMENTS),
+  enrichPersonalTournamentPresentation([...entries,...history.tournaments,...other,...acquiredItf],env.RUNTIME_DOCUMENTS),
   currentTennisEuropePlayerRanking(env,{playerId:person.canonicalId||person.id||options.profileId,name:person.name,identity:person}),
   enrichFitpMetadata(env.DB,[person])
  ]);

@@ -10105,3 +10105,13 @@ Correzione limitata alla preparazione browser CI. Nessun polling, rilancio autom
 - La fixture conserva il generatore in scripts e copia il modulo ritiri in src/v3.
 - Risolve ERR_MODULE_NOT_FOUND prima dell'importazione D1.
 - Verifica mirata: 9 test passati. Import remoto da confermare dopo pubblicazione.
+ITF discovery 2026-11-01T06:52:28.977Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-11-01 — chat 1: storico avversario dai documenti ITF acquisiti
+- Run 41258858733, commit c2846ecdab05a0c22adb275422825666bb5142ea: rosso in 40 secondi. La correzione della data non basta. Indice corretto e stabile per i tre ID; Mastropasqua e Rusca ancora senza Pescara nella risposta Worker e nel browser. Zero errori D1 e zero scritture.
+- Il percorso storico normalizzato dipende da matches/match_participants; le presenze in opponent_entry_profiles provengono invece dai tabelloni acquisiti. Il rosso prova la divergenza, non distingue da solo quale proiezione normalizzata sia mancante.
+- Aggiunto recupero delle partite dai documenti acquisiti in itf_draw_documents e relativi chunk, per i tornei ITF conclusi con presenza official_draw/drawConfirmed e ID nativo verificato, se non gia restituiti dalla proiezione normalizzata. Nessuna associazione per nome, nessuna partita inventata o uso della sola acceptance list.
+- Letture per competition_id e chiave/versione documento, ultima versione per evento, controllo checksum SHA-256, dimensione e chunk contigui. Errori di integrita restano errori. Scartati match futuri e match escluso; punteggio orientato, partner e avversari vengono dal documento. Date delle partite mancanti restano vuote.
+- Dopo il recupero viene applicata la normale finestra degli ultimi tre tornei: nessun torneo aggiunto fuori finestra. Evitate letture quando tre tornei piu recenti hanno gia partite o il torneo e gia presente nello storico normalizzato.
+- Sette regressioni locali passate su SQLite reale, inclusa assenza completa delle tabelle normalizzate, omonimo con ID diverso, esclusioni, checksum errato, ultima versione e finestra cronologica. La verifica remota mantiene i tre esiti richiesti ed esige ora anche partite reali per le due presenze. Riporta historyEvidence e usa checkout del commit del run.
+- Patch applicativa Worker, non sola modifica audit. Nessuna migrazione o scrittura D1 introdotta. Il workflow hotfix esistente pubblica il Worker dopo i controlli e Shield; il test mirato verifica il codice contro D1 corrente e browser. Esito reale ancora da confermare, non dichiarato risolto prima del run.

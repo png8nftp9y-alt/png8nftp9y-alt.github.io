@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
     paths:
+      - 'cloudflare/app-api/lib/opponent-itf-document-history.mjs'
+      - 'cloudflare/app-api/test/opponent-itf-document-history.test.mjs'
       - 'tools/verify-itf-pescara.mjs'
       - 'tools/lib/itf-pescara-verification.mjs'
       - 'tools/tests/itf-pescara-verification.test.mjs'
@@ -19,11 +21,11 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-        with: {ref: main, fetch-depth: 1}
+        with: {ref: '${{ github.sha }}', fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Test targeted evidence verification
-        run: node --test tools/tests/itf-pescara-verification.test.mjs cloudflare/app-api/test/itf-pescara-certification.test.mjs
+        run: node --test cloudflare/app-api/test/opponent-itf-document-history.test.mjs tools/tests/itf-pescara-verification.test.mjs cloudflare/app-api/test/itf-pescara-certification.test.mjs
       - run: npm install
       - run: python -m pip install --disable-pip-version-check --quiet awscli
       - name: Verify Pescara index, three Worker profiles and browser rendering
