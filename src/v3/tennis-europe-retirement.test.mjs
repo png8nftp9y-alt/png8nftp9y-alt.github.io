@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs/promises';import vm from 'node:vm';
-import {officialRetirement,auditRetirements} from './tennis-europe-retirement.mjs';
+import {officialRetirement,auditRetirements,resolveRetirementWinners} from './tennis-europe-retirement.mjs';
 import {parseDrawWalkovers} from './tennis-europe-draw-walkovers.mjs';
 const msg=label=>`<span class="tag--warning tag match__message">${label}</span>`;
 test('only match-local explicit retirement messages establish retirement; W/O/default and names do not',()=>{
@@ -27,4 +27,19 @@ test('audit never certifies legacy data without a source check, and rejects reti
  assert.equal(auditRetirements({matches:[{id:'legacy'}]}).status,'incomplete');
  const m={id:'ret',...officialRetirement(msg('Retired'),'official'),status:'completed',winnerPlayerIds:['1']};assert.equal(auditRetirements({matches:[m]}).status,'checked');
  assert.equal(auditRetirements({matches:[{...m,winnerPlayerIds:[]}]}).invalid.length,1);
+});
+
+test('official later-round participation resolves a missing retirement winner, never the partial score',()=>{
+ const retired={id:'ret',competitionId:'T',event:'BS14 Main',round:'Round of 32',date:'20260831',drawUrl:'https://te.tournamentsoftware.com/sport/draw.aspx?id=T&draw=1',players:[{id:'17'},{id:'16'}],teams:[['17'],['16']],score:'7-6 4-6 2-5',retired:true,retirementSource:'official_match_message',winnerPlayerIds:[]};
+ const next={id:'quarter',competitionId:'T',event:'BS14 Main',round:'Quarter final',date:'20260902',drawUrl:'https://te.tournamentsoftware.com/tournament/T/draw/1',sourceUrl:'https://te.tournamentsoftware.com/tournament/T/matches/20260902',teams:[['16'],['34']]};
+ for(const changes of [{competitionId:'OTHER'},{event:'BD14 Main'},{drawUrl:'https://te.tournamentsoftware.com/tournament/T/draw/2'},{round:'Round 2'},{sourceUrl:'https://evil.example'},{date:'20260801'}]){const m=structuredClone(retired);assert.equal(resolveRetirementWinners([m,{...next,...changes}]),0);assert.deepEqual(m.winnerPlayerIds,[]);}
+ const ambiguous=structuredClone(retired);assert.equal(resolveRetirementWinners([ambiguous,next,{...next,id:'other',teams:[['17'],['99']]}]),0);
+ const match=structuredClone(retired),issues=[{...retired,reason:'retirement_winner_unverified'},{...retired,reason:'other_issue'}];assert.equal(resolveRetirementWinners([match,next],issues),1);assert.deepEqual(match.winnerPlayerIds,['16']);assert.equal(match.retirementWinnerMatchId,'quarter');assert.deepEqual(issues.map(i=>i.reason),['other_issue']);assert.equal(resolveRetirementWinners([match,next],issues),0);
+});
+
+test('actual failing JC SPORT CUP artifact resolves Mrazek without score inference',async()=>{
+ const source=JSON.parse(await fs.readFile(new URL('./fixtures/te-jc-sport-retirement-winner.json',import.meta.url),'utf8'));
+ assert.equal(source.matches.length,2);assert.equal(resolveRetirementWinners(source.matches),1);
+ const m=source.matches.find(m=>m.retired);assert.deepEqual(m.winnerPlayerIds,['16']);assert.equal(m.retirementWinnerSource,'official_later_round_participation');assert.equal(m.score,'7-6 4-6 2-5');
+ assert.equal(auditRetirements(source).invalid.length,0);
 });

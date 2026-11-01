@@ -1,4 +1,4 @@
-import {officialRetirement} from './tennis-europe-retirement.mjs';
+import {officialRetirement,resolveRetirementWinners} from './tennis-europe-retirement.mjs';
 import {absoluteDrawLinks} from './tennis-europe-source-discovery.mjs';
 import {emptyBranchAdvance} from './tennis-europe-empty-advance.mjs';
 import {monradBoard} from './tennis-europe-monrad.mjs';
@@ -192,5 +192,6 @@ export async function recoverDrawWalkovers({tournament,matches,get,documents=[],
    for(const m of parsed.matches){const key=drawMatchKey(m),old=existing.get(key),override=manual.get(key);const disposition=override?'already_in_manual_override':old?reconcile(old,m):'recovered';cases.push({competitionId:id,tournamentName:tournament.tournamentName||'',matchId:override?.matchId||old?.id||m.id,event:m.event,round:m.round,date:override?.date||old?.date||m.date,dateSource:old||override?'existing_verified_record':m.dateSource,players:m.players.map(p=>p.name),winnerPlayerIds:m.winnerPlayerIds,score:m.score,sourceUrl:m.sourceUrl,disposition});if(!old&&!override){matches.push(m);existing.set(key,m)}}
   }catch(e){issues.push({competitionId:id,drawId:target.number,sourceUrl:target.url,reason:'draw_acquisition_failed',error:String(e.message)})}
  }
+ resolveRetirementWinners(matches,issues);
  return {status:issues.length||pending.length?'needs_attention':'checked',draws:all.size,cases,pending,issues,...(advancements.length?{advancements}:{})};
 }

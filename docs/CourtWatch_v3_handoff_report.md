@@ -10077,3 +10077,11 @@ Test mirati locali; Shield obbligatorio nel deploy. Nessun cambiamento a motori,
 - Rendering profili rigiocato alla fine di Pescara per evitare falsa assenza dovuta alla finestra degli ultimi tre tornei; indice D1 verificato nello stato corrente. Data e limiti dichiarati nel report.
 - Stesso gruppo concurrency con cancel-in-progress true: il nuovo push sostituisce il vecchio run, nessun ciclo di polling o rilancio identico. Timeout verifica 4 minuti, job 8 minuti. Progressi per fase e artifact mirato sempre salvato; errori, differenze o evidenza pertinente cambiata restano rossi.
 - Validazione locale: quattro test fingerprint/decisioni superati, sintassi JS e workflow YAML verificati. Regressioni Pescara esistenti vengono rieseguite dall'installazione e dal runner. Replay reale e verdetto remoto ancora da confermare.
+
+## 2026-11-01 — Europe: vincitore mancante nei ritiri ufficiali
+
+- Run 41258665040, shard 5: 35 tornei e 3.976 incontri acquisiti, nessuna richiesta fallita; un solo vincitore non risolto bloccava la certificazione. Caso Leon Miarka–Richard Mrazek, JC SPORT CUP 14U, 31 agosto: Retired ufficiale, 7-6 4-6 2-5, nessun has-won nella riga OOP né nel relativo incontro del tabellone.
+- Evidenza nello stesso artifact originale: Mrazek compare il 2 settembre nei quarti del medesimo singolare/tabellone 1. Resolver condiviso usa soltanto partecipazione ufficiale successiva con stessa competizione, tabellone, categoria e intera squadra. Non sceglie dal punteggio; gironi, altri tabelloni, date precedenti, host estranei e prove contraddittorie restano esclusi. Fonte e match di prova vengono conservati nei payload.
+- Si rimuove soltanto la segnalazione retirement_winner_unverified della partita effettivamente risolta; gli altri problemi restano. Nessuna modifica W/O, date, FITP, ITF, D1 o regole di certificazione.
+- Verifica: 61 regressioni superate, inclusi fixture del caso reale e generatore SQL; rielaborazione dell’artifact reale 13064667291: un vincitore risolto, winnerUnresolved da 1 a 0 e nessun ritiro invalido nell’audit. Nessuna nuova acquisizione o pubblicazione eseguita dall’assistente.
+- Agenda 41258665079 annullata prima della creazione di job: nessun errore SQL registrato in quel run. Live 41258665100 e parser 41258664999 conclusi verdi. Nessun polling o rilancio; risultati remoti dopo push da verificare.
