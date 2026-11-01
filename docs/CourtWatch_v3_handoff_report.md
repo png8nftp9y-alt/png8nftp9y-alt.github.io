@@ -10068,3 +10068,12 @@ La funzione di lettura condivide solo la richiesta completa in corso per gruppo 
 Verifiche: test su richieste condivise e su cache con timestamp cumulativo successivo alla generazione; suite mirata browser/caricamento; sintassi, verifica UI e Shield. Limitazione: i due difetti sono riproducibili, ma non abbiamo ancora catturato la risposta fallita del telefono; nessuna promessa di risoluzione di un eventuale errore del Worker o della rete. La prova sul dispositivo dopo deploy resta necessaria.
 
 Test mirati locali; Shield obbligatorio nel deploy. Nessun cambiamento a motori, D1, Admin, polling o rilanci.
+
+## 2026-11-01 — chat 1: sostituzione export completo con verifica mirata Pescara
+- Run 41256225918 ancora in esecuzione dopo oltre 20 minuti nel passaggio combinato. Log non disponibile via API: nessuna attribuzione dimostrata all'export rispetto al replay. Il workflow precedente non offre progressi intermedi sufficienti.
+- Sostituito il percorso automatico pesante con controllo esplicitamente limitato a Pescara e tre ID: Mastropasqua 800687485, Ceschin 800710276, Rusca 800697548. Non e una certificazione globale delle pagine o dell'acquisizione.
+- Nessun export D1, SQLite completo, installazione dipendenze di sistema o migrazione. Due SELECT indicizzate dei tre profili, prima/dopo, e tre replay Worker sul client read-only con cache di sessione. Browser usa Chrome gia installato sul runner.
+- Confronta presenze/prove nei tabelloni della generazione R2 fissata; se cambia la generazione ricontrolla solo evidenza Pescara. Fingerprint delle sole decisioni Pescara e delle sezioni pertinenti: nuove iscrizioni in altri tornei non invalidano, cambi di roster, sezioni, errori o certificazioni si.
+- Rendering profili rigiocato alla fine di Pescara per evitare falsa assenza dovuta alla finestra degli ultimi tre tornei; indice D1 verificato nello stato corrente. Data e limiti dichiarati nel report.
+- Stesso gruppo concurrency con cancel-in-progress true: il nuovo push sostituisce il vecchio run, nessun ciclo di polling o rilancio identico. Timeout verifica 4 minuti, job 8 minuti. Progressi per fase e artifact mirato sempre salvato; errori, differenze o evidenza pertinente cambiata restano rossi.
+- Validazione locale: quattro test fingerprint/decisioni superati, sintassi JS e workflow YAML verificati. Regressioni Pescara esistenti vengono rieseguite dall'installazione e dal runner. Replay reale e verdetto remoto ancora da confermare.
