@@ -439,7 +439,7 @@ export default{
       if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors});
       const url=new URL(request.url),path=url.pathname.replace(/\/$/,'');
       if(path==='/app'||path.startsWith('/app-api/')||path.startsWith('/app/api/')){
-        const api=path.replace(/^\/app(?:-api|\/api)/,''),enabled=(request.method==='GET'&&(api==='/player-search'||api==='/app-snapshot'&&url.searchParams.has('playerId')))||(request.method==='POST'&&api==='/courtwatch-player');
+        const api=path.replace(/^\/app(?:-api|\/api)/,''),enabled=(request.method==='GET'&&(api==='/player-search'||api==='/app-snapshot'))||(request.method==='POST'&&api==='/courtwatch-player');
         const timing=playerLoadTiming(enabled);
         return timing.response(await timing.measure('total',()=>protectedApp(request,env,path,url,timing)));
       }
