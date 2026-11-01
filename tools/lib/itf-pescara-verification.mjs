@@ -7,3 +7,8 @@ const canonical=x=>Array.isArray(x)?x.map(canonical):x&&typeof x==='object'?Obje
 const hash=x=>createHash('sha256').update(JSON.stringify(canonical(x))).digest('hex');
 export function relevantSourceFingerprint(t){return hash({competitionId:t?.competitionId,inventory:(t?.eventInventory||[]).filter(x=>x.event?.startsWith('B-')).map(x=>x.event).sort(),sections:Object.fromEntries(Object.entries(t?.eventCache||{}).filter(([event])=>event.startsWith('B-')).sort().map(([event,d])=>[event,{populated:d.populated,error:d.error||null,failureType:d.failureType||null,resolution:d.resolution||null,acquisitionProof:d.acquisitionProof?{criterion:d.acquisitionProof.criterion,complete:d.acquisitionProof.complete}:null,resolutionProof:d.resolutionProof?{criterion:d.resolutionProof.criterion,complete:d.resolutionProof.complete,mainEvents:d.resolutionProof.mainEvents}:null,ids:(d.players||[]).map(p=>String(p.id||p.playerId||'')).sort()}]))});}
 export function relevantIndexFingerprint(rows){return hash(PLAYERS.map(p=>{const t=storedPescara(rows,p.id);return{id:p.id,tournament:t?{competitionId:t.competitionId,entryStatus:t.entryStatus,calendarState:t.calendarState,drawConfirmed:t.drawConfirmed,acceptanceCode:t.acceptanceCode,alternateDrawDecision:t.alternateDrawDecision,drawDecisionEvents:t.drawDecisionEvents}:null};}));}
+export function historicalVerificationDate(endDate){
+ const value=String(endDate||'').slice(0,10),date=new Date(value+'T00:00:00Z');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||!Number.isFinite(date.getTime())||date.toISOString().slice(0,10)!==value)throw Error('pescara_end_date_invalid');
+ date.setUTCDate(date.getUTCDate()+1);return date.toISOString().slice(0,10);
+}

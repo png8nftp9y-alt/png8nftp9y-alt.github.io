@@ -10087,3 +10087,9 @@ La preparazione CI sostituisce soltanto il mirror Ubuntu Azure con quello uffici
 Validazione: nove test verdi su entrambi i formati apt, conservazione dei repository terzi e dei metadati, idempotenza, sequenza di approvazione e arresto su ogni errore; YAML dei due workflow valido. Il mirror ufficiale risulta raggiungibile nel log originale, ma l'esito del nuovo runner resta da verificare dopo la pubblicazione dell'utente. Il nuovo workflow non modifica un job già in esecuzione.
 
 Correzione limitata alla preparazione browser CI. Nessun polling, rilancio automatico o modifica ai dati.
+
+## 2026-11-01 — chat 1: data di verifica dello storico Pescara
+- Run 41258380653: 42 secondi, 59 query, 10887 righe lette, zero scritture/errori D1, prove Pescara stabili. Indice corretto per tutti e tre; assenza Pescara dai profili di Mastropasqua e Rusca causa il rosso.
+- Errore nel test: asOf era 2026-10-03, data fine torneo. La query otherCircuitOpponentHistory richiede endDate < asOf, quindi lo storico di un torneo che termina quel giorno non viene caricato. La pretesa di presenza nello storico era prematura; nessuna correzione applicativa dedotta dal solo rosso.
+- Test spostato al giorno successivo alla fine, validando data e passaggio anno. Aggiunto report delle date indice e dei tornei selezionati dal Worker per distinguere eventuali ulteriori problemi di finestra/mapping da un errore nelle aspettative.
+- Cinque test mirati passati con il selettore reale delle finestre; sintassi JS verificata. Nessuna modifica all'app, regola alternate o D1. Run reale necessario per confermare se il cambio data spiega interamente le due assenze: non dichiarato risolto in anticipo.
