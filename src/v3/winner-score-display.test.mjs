@@ -98,3 +98,10 @@ test('short-set scores never invent retirement; official retirement still wins i
   assert.equal(infer('6-4 2-1','completed',true),true);
   assert.equal(context.matchResultText({score:'W/O',won:true,status:'completed'}),'W/O');
 });
+
+test('official source check overrides score inference; explicit retirement survives all scoring formats',()=>{
+ for(const score of ['6-0','6-0 3-0','4-2 4-1','4-1','0-6 0-3']){
+  assert.equal(context.matchResultText({score,status:'completed',won:true,retirementChecked:true,retired:false}),score);
+  assert.equal(context.matchResultText({score,status:'completed',won:true,retirementChecked:true,retired:true}),score+' Rit.');
+ }
+});

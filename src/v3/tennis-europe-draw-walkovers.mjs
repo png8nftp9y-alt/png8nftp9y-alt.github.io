@@ -1,3 +1,4 @@
+import {officialRetirement} from './tennis-europe-retirement.mjs';
 import {absoluteDrawLinks} from './tennis-europe-source-discovery.mjs';
 import {emptyBranchAdvance} from './tennis-europe-empty-advance.mjs';
 import {monradBoard} from './tennis-europe-monrad.mjs';
@@ -106,6 +107,17 @@ export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,
    const advancementEvidence=isWalkover?emptyBranchAdvance({slides,index,cardIndex:n,teamSize,roundRobin}):null;
    if(!advancementEvidence&&(rows.length!==2||rows.some(r=>r.players.length!==teamSize)||players.some(p=>!p.id||!p.name||/^bye$/i.test(p.name))||new Set(players.map(p=>p.id)).size!==teamSize*2||isWalkover&&winners.length!==1)){if(isWalkover)issues.push({...evidence,reason:'walkover_participants_or_winner_unverified'});continue}
    const winnerTeamIndex=winners.length===1?winners[0]:-1,winnerPlayerIds=winnerTeamIndex>=0?rows[winnerTeamIndex].players.map(p=>p.id):[],date=officialDate(block),dateSource=date?'official_draw_date':'';
+   const retirement=officialRetirement(block,sourceUrl);
+   if(retirement.retired){
+    const old=knownMatches.find(m=>drawMatchKey(m)===drawMatchKey(evidence));
+    if(!old)issues.push({...evidence,reason:'official_retirement_not_in_oop'});
+    else if(winners.length!==1)issues.push({...evidence,reason:'retirement_winner_unverified'});
+    else{
+     const officialWinners=new Set(winnerPlayerIds),oldWinner=(old.teams||[]).findIndex(team=>team.length===officialWinners.size&&team.every(id=>officialWinners.has(id)));
+     if(oldWinner<0)issues.push({...evidence,reason:'retirement_team_conflict'});
+     else Object.assign(old,retirement,{status:'completed',winnerTeamIndex:oldWinner,winnerPlayerIds:[...winnerPlayerIds],winnerPlayerId:winnerPlayerIds.length===1?winnerPlayerIds[0]:''});
+    }
+   }
    const key=drawMatchKey(evidence),id=['te-draw',competitionId.toUpperCase(),drawId,createHash('sha256').update(key).digest('hex').slice(0,24)].join('|');
    const match={id,...evidence,date,dateSource,tournamentStartDate:iso(startDate),tournamentEndDate:iso(endDate),time:'',court:'',courtMatchNumber:null,courtMatchNumberSource:'',notBefore:false,afterRest:false,followedBy:false,scheduleQualifier:'',teams:rows.map(r=>r.players.map(p=>p.id)),winnerTeamIndex,winnerPlayerIds,winnerPlayerId:winnerPlayerIds.length===1?winnerPlayerIds[0]:'',status:'completed',score:'W/O',drawUrl:sourceUrl,sourceKind:'official_draw_walkover',...(roundRobin?{roundRobin:true}:{})};
    if(advancementEvidence){

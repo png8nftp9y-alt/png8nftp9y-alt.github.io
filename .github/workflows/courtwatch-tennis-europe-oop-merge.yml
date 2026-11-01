@@ -94,12 +94,16 @@ jobs:
           node src/v3/merge-tennis-europe-empty-current.mjs
           aws --endpoint-url "$endpoint" s3 cp "$prefix/pointers/current.json" empty-current/pointer-again.json --only-show-errors
           cmp empty-current/pointer.json empty-current/pointer-again.json
+      - name: Audit consolidated historical retirement evidence
+        run: node src/v3/audit-tennis-europe-retirements.mjs dist/v3/tennis_europe_oop_historical.json
       - name: Publish verified historical generation to R2
         run: bash src/v3/tennis-europe-oop-history-r2.sh publish
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: tennis-europe-oop-historical-merged
-          path: dist/v3/tennis_europe_oop_historical.json
+          path: |
+            dist/v3/tennis_europe_oop_historical.json
+            dist/v3/tennis_europe_retirement_audit.json
           if-no-files-found: error
           retention-days: 14
