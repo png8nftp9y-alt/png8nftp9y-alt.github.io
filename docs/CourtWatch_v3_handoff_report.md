@@ -10119,3 +10119,6 @@ ITF discovery 2026-11-01T06:52:28.977Z: 0 newly discovered future tournaments; M
 ## 2026-11-01 — Correzione test Europe
 - Verifica Pescara 41320672492 verde: Mastropasqua 4 partite, Rusca 5, Ceschin escluso.
 - Aggiunta la funzione reale opponentItfDocumentHistory al contesto VM del test Europe che bloccava il deploy. Nessun controllo rimosso; deploy da confermare.
+
+## 2026-11-01 — Fixture navigazione avversario
+- Run 41321362157: due ReferenceError nelle fixture VM di navigation-query-load. Collegata la funzione reale opponentItfDocumentHistory in entrambi i contesti; controlli di letture e parallelismo conservati. Verifica Pescara verde; deploy ancora da confermare.
