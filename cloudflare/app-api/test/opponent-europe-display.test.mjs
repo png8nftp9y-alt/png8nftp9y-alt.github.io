@@ -111,6 +111,7 @@ test('SQLite Europe history through the real API assembler renders current and p
    tennisEuropeTournamentMetadata:async()=>new Map(),searchIdentityProfile:async()=>({name:'Test Person',sourcePlayerId:'profile-test',sourceCircuit:'tennis-europe'}),playerCircuitIdentities:()=>[],
    playerEntryTournaments:async()=>[future,...[7,8,9].map(i=>({id:'entry'+i,circuit:'tennis-europe',startDate:'2026-10-0'+i,endDate:'2026-10-0'+i,matches:[]}))],otherCircuitOpponentHistory:async()=>[],resolveCircuitProfiles:async()=>new Map(),circuitProfiles:()=>[],enrichPersonalTournamentPresentation:async x=>x,
    currentTennisEuropePlayerRanking:async()=>({rankings:[]}),currentRankingCategoryAllowed:()=>true};
+  ctx.opponentItfDocumentHistory=(await import('../lib/opponent-itf-document-history.mjs')).opponentItfDocumentHistory;
   ctx.opponentEuropeProfile=opponentEuropeProfile;ctx.enrichIdentityNationalities=async()=>{};
  vm.createContext(ctx);
   vm.runInContext(slice(worker,'function missingOptionalTable(','async function enrichTennisEuropeRankings(')+

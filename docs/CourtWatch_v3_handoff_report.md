@@ -10115,3 +10115,7 @@ ITF discovery 2026-11-01T06:52:28.977Z: 0 newly discovered future tournaments; M
 - Dopo il recupero viene applicata la normale finestra degli ultimi tre tornei: nessun torneo aggiunto fuori finestra. Evitate letture quando tre tornei piu recenti hanno gia partite o il torneo e gia presente nello storico normalizzato.
 - Sette regressioni locali passate su SQLite reale, inclusa assenza completa delle tabelle normalizzate, omonimo con ID diverso, esclusioni, checksum errato, ultima versione e finestra cronologica. La verifica remota mantiene i tre esiti richiesti ed esige ora anche partite reali per le due presenze. Riporta historyEvidence e usa checkout del commit del run.
 - Patch applicativa Worker, non sola modifica audit. Nessuna migrazione o scrittura D1 introdotta. Il workflow hotfix esistente pubblica il Worker dopo i controlli e Shield; il test mirato verifica il codice contro D1 corrente e browser. Esito reale ancora da confermare, non dichiarato risolto prima del run.
+
+## 2026-11-01 — Correzione test Europe
+- Verifica Pescara 41320672492 verde: Mastropasqua 4 partite, Rusca 5, Ceschin escluso.
+- Aggiunta la funzione reale opponentItfDocumentHistory al contesto VM del test Europe che bloccava il deploy. Nessun controllo rimosso; deploy da confermare.
