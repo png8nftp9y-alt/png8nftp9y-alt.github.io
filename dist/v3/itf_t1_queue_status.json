@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-01T17:53:40.039Z",
+  "generatedAt": "2026-11-01T18:06:26.682Z",
   "today": "2026-11-01",
   "windowEnd": "2026-11-04",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -11,17 +11,17 @@
     "complete": 925,
     "cancelledNoDraws": 13,
     "resolved": 938,
-    "missingDrawsTournaments": 24,
-    "unverifiable": 175,
-    "declaredDraws": 5462,
-    "acquiredDraws": 5371,
-    "missingDraws": 91,
-    "actionableUnverifiable": 2,
+    "missingDrawsTournaments": 25,
+    "unverifiable": 174,
+    "declaredDraws": 5468,
+    "acquiredDraws": 5373,
+    "missingDraws": 95,
+    "actionableUnverifiable": 1,
     "futureUnverifiable": 173,
     "ordinary": {
       "total": 26,
-      "missingDraws": 91,
-      "inventoryRequired": 2
+      "missingDraws": 95,
+      "inventoryRequired": 1
     },
     "extraordinaryA": {
       "total": 0,
@@ -1519,15 +1519,64 @@
         "tournamentName": "J60 Hammam Sousse",
         "startDate": "2026-11-03",
         "endDate": "2026-11-08",
-        "status": "inventory_empty",
-        "inventoryError": "empty_inventory",
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "status": "missing",
+        "inventoryError": null,
+        "knownDraws": 6,
+        "acquiredDraws": 2,
+        "missingDraws": 4,
+        "missingEvents": [
+          {
+            "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-01T17:55:00.285Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-01T17:55:00.285Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-01T17:55:00.285Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-01T17:55:00.285Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-11-01T16:34:55.118Z",
+        "needsInventory": false,
+        "checkedAt": "2026-11-01T17:55:00.285Z",
         "eligibleFrom": "2026-11-02"
       },
       {
@@ -1549,7 +1598,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-01T16:35:29.197Z",
+            "lastAttemptAt": "2026-11-01T17:54:59.363Z",
             "rowParity": null,
             "sources": []
           },
@@ -1561,7 +1610,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-01T16:35:29.197Z",
+            "lastAttemptAt": "2026-11-01T17:54:59.363Z",
             "rowParity": null,
             "sources": []
           },
@@ -1573,7 +1622,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-01T16:35:29.197Z",
+            "lastAttemptAt": "2026-11-01T17:54:59.363Z",
             "rowParity": null,
             "sources": []
           },
@@ -1585,27 +1634,27 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-01T16:35:29.197Z",
+            "lastAttemptAt": "2026-11-01T17:54:59.363Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-01T16:35:29.197Z",
+        "checkedAt": "2026-11-01T17:54:59.363Z",
         "eligibleFrom": "2026-11-03"
       }
     ],
     "total": 26,
-    "missingDraws": 91,
-    "acquiredDraws": 48,
+    "missingDraws": 95,
+    "acquiredDraws": 50,
     "missingByReason": {
-      "draw_without_players": 90,
+      "draw_without_players": 94,
       "incapsula_blocked": 1
     },
     "byStatus": {
-      "missing": 24,
-      "inventory_empty": 2
+      "missing": 25,
+      "inventory_empty": 1
     }
   },
   "extraordinary": {
@@ -4396,9 +4445,9 @@
     }
   },
   "audit": {
-    "urgentUnverifiable": 2,
+    "urgentUnverifiable": 1,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 2,
+    "actionableUnverifiable": 1,
     "futureUnverifiable": 173,
     "blocked": 0
   }
