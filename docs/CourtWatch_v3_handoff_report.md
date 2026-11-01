@@ -10142,3 +10142,5 @@ Verifiche: 105 test mirati su primo accesso, membership, aggiunte, cache, gruppi
 - Fonti da generazione R2 fissata; indice letto due volte con paginazione di 100 righe per circuito/ID. Se cambia la generazione rilegge le nuove fonti e confronta gli stati semantici. Cambi effettivi durante lettura restano inconclusivi; timestamp e nomi non invalidano iscrizioni invariate.
 - Solo letture D1/R2, nessun export D1, migrazione, riparazione, motore, deploy, timer, polling o retry. Report artifact con differenze, contatori letture/scritture, generazioni e limiti. Nessuna certificazione di dati non acquisiti o tutte le pagine renderizzate; FITP/Europe fuori perimetro di questo controllo ITF.
 - Sei test passati: presenze e assenze alternate, ritiro, prove incomplete, fonti errate, profili mancanti/extra, stati/date diversi con conteggi uguali, duplicati e timestamp irrilevanti. Run remoto ancora da eseguire: non dichiarato verde in anticipo.
+
+ITF discovery 2026-11-01T18:11:57.992Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
