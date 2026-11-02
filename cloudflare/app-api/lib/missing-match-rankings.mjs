@@ -1,3 +1,4 @@
+import {boundedPlayerMap} from './bounded-player-map.mjs';
 import {currentRankingCategoryAllowed} from './current-ranking-category.mjs';
 const normalize=v=>String(v||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
 const variants=v=>{const n=normalize(v);return [...new Set([n,n.split(' ').reverse().join(' ')].filter(Boolean))];};
@@ -23,7 +24,12 @@ export async function completeAppRankings(db,players,matches,latestDates,today=n
  }
  if(!targets.length)return;
  const names=[...new Set(targets.flatMap(t=>variants(t.name)))],rows=[];
- for(let i=0;i<names.length;i+=80){const batch=names.slice(i,i+80);rows.push(...((await db.prepare('SELECT profile_id,normalized_name,nationality,category,ranking,ranking_date FROM tennis_europe_ranking_history WHERE normalized_name IN (SELECT value FROM json_each(?)) ORDER BY ranking_date DESC').bind(JSON.stringify(batch)).all()).results||[]));}
+ const batches=[];for(let i=0;i<names.length;i+=80)batches.push(names.slice(i,i+80));
+ // Independent SELECT pages may overlap, but flatten in original page order:
+ // homonym checks and normal/reversed-name precedence must remain identical.
+ const pages=await boundedPlayerMap(batches,async batch=>
+  (await db.prepare('SELECT profile_id,normalized_name,nationality,category,ranking,ranking_date FROM tennis_europe_ranking_history WHERE normalized_name IN (SELECT value FROM json_each(?)) ORDER BY ranking_date DESC').bind(JSON.stringify(batch)).all()).results||[],4);
+ rows.push(...pages.flat());
  // Index the fetched rows once. Keep original positions so normal/reversed
  // names and multiple query pages retain exactly the existing precedence.
  const indexed=new Map();
