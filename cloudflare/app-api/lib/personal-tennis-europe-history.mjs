@@ -61,7 +61,10 @@ async function personalHistory(db,player,circuit){
     ? (includeNative?'SELECT match_id FROM match_participants WHERE source_player_id=? AND match_id>? UNION SELECT value AS match_id FROM json_each(?) WHERE value>?':'SELECT value AS match_id FROM json_each(?) WHERE value>?')
     : `SELECT DISTINCT match_id FROM match_participants WHERE lower(normalized_name) IN (${variants.map(()=>'?').join(',')}) AND match_id>?`;
    const values=native?(includeNative?[native,last,JSON.stringify(aliasMatches),last]:[JSON.stringify(aliasMatches),last]):[...variants,last];
-   const batch=await rows(db,`WITH candidate_matches AS MATERIALIZED (${candidates}) SELECT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id FROM candidate_matches ids CROSS JOIN matches m ON m.id=ids.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...values,circuit,last]);
+   const batch=await rows(db,`WITH candidate_matches AS MATERIALIZED (${candidates}) SELECT m.id AS match_id,m.tournament_id,m.played_date,m.payload AS match_payload,t.payload AS tournament_payload,t.source_tournament_id,
+    (SELECT json_group_array(json_object('match_id',hp.match_id,'participant_key',hp.participant_key,'source_player_id',hp.source_player_id,'display_name',hp.display_name,'normalized_name',hp.normalized_name,'nationality',hp.nationality,'team_index',hp.team_index,'is_winner',hp.is_winner,'payload',hp.payload))
+     FROM (SELECT match_id,participant_key,source_player_id,display_name,normalized_name,nationality,team_index,is_winner,payload FROM match_participants WHERE match_id=m.id ORDER BY team_index,participant_key) hp) AS history_participants
+    FROM candidate_matches ids CROSS JOIN matches m ON m.id=ids.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE m.circuit=? AND m.id>? ORDER BY m.id LIMIT 250`,[...values,circuit,last]);
    sources.push(...batch);if(batch.length<250)break;
    const next=batch.at(-1).match_id;if(next<=last)throw Error('personal_history_pagination_failed');last=next;
   }
@@ -73,12 +76,9 @@ async function personalHistory(db,player,circuit){
  const known=new Set(nativeSources.map(row=>row.match_id));
  const aliasMatches=[...new Set([...aliases].map(key=>JSON.parse(key)[0]))].filter(id=>!known.has(id));
  const sources=[...nativeSources,...(aliasMatches.length?await readSources(aliasMatches,false):[])].sort((a,b)=>a.match_id<b.match_id?-1:a.match_id>b.match_id?1:0);
- const participants=[];
- // At most four independent participant pages in flight; flatten in source order.
- for(let offset=0;offset<sources.length;offset+=160){
-  const pages=[];for(let i=offset;i<Math.min(offset+160,sources.length);i+=40){const ids=sources.slice(i,i+40).map(x=>x.match_id);pages.push(rows(db,`SELECT match_id,participant_key,source_player_id,display_name,normalized_name,nationality,team_index,is_winner,payload FROM match_participants WHERE match_id IN (${ids.map(()=>'?').join(',')}) ORDER BY match_id,team_index,participant_key`,ids));}
-  participants.push(...(await Promise.all(pages)).flat());
- }
+ // Participants are read by the same indexed match lookup as the source row.
+ // No per-player/per-40-match HTTP round trips and no incomplete history cap.
+ const participants=sources.flatMap(source=>JSON.parse(source.history_participants||'[]'));
  const isSelf=p=>native?(String(p.source_player_id).toLowerCase()===native.toLowerCase()||aliases.has(JSON.stringify([p.match_id,p.participant_key]))):nameKey(p.normalized_name||p.display_name)===nameKey(player.name);
  const selfRows=participants.filter(isSelf);
  const countries=[...new Set(selfRows.map(p=>String(p.nationality||'').toUpperCase()).filter(Boolean))];

@@ -4,7 +4,7 @@ import {playerCircuitIdentities} from './player-circuit-profiles.mjs';
 import {itfMatchParticipants,itfMatchScore} from '../../../src/v3/itf-match-participants.mjs';
 const date=value=>String(value||'').slice(0,10);
 const key=value=>String(value||'').toUpperCase();
-export async function opponentItfDocumentHistory(db,{identity,entries=[],existing=[],asOf,excludeMatchId=''}){
+export async function opponentItfDocumentHistory(db,{identity,entries=[],existing=[],asOf,excludeMatchId='',onIncomplete}){
  const native=playerCircuitIdentities(identity||{}).find(p=>p.circuit==='itf')?.profileId;
  if(!native)return[];
  const present=new Set(existing.filter(t=>t.circuit==='itf'&&t.matches?.length).map(t=>key(t.competitionId)));
@@ -21,7 +21,12 @@ export async function opponentItfDocumentHistory(db,{identity,entries=[],existin
    if(chunks.length!==Number(version.chunk_count)||chunks.some((x,i)=>Number(x.chunk_index)!==i))throw Error('itf_history_document_chunks_missing');
    const text=chunks.map(x=>x.content).join(''),bytes=new TextEncoder().encode(text),hash=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');
    if(hash!==version.content_sha256||bytes.length!==Number(version.content_bytes))throw Error('itf_history_document_integrity_failed');
-   const doc=JSON.parse(text);if(doc.error||doc.failureType)throw Error('itf_history_document_source_error');if(key(doc.competitionId)!==competitionId||doc.event!==version.event)throw Error('itf_history_document_identity_mismatch');
+   const doc=JSON.parse(text);if(key(doc.competitionId)!==competitionId||doc.event!==version.event)throw Error('itf_history_document_identity_mismatch');
+   if(doc.error||doc.failureType){
+    if(typeof onIncomplete!=='function')throw Error('itf_history_document_source_error');
+    onIncomplete({circuit:'itf',sourcePlayerId:native,competitionId,event:version.event,reason:'itf_source_document_unavailable',failureType:String(doc.failureType||'source_error').replace(/[^a-zA-Z0-9_-]/g,'').slice(0,80),contentSha256:version.content_sha256});
+    continue;
+   }
    for(const [index,raw] of (doc.matches||[]).entries()){
     const people=itfMatchParticipants({...raw,id:''}),self=people.find(p=>p.source_player_id===native);
     if(!self)continue;

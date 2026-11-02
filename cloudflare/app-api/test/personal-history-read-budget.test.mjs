@@ -60,7 +60,8 @@ test('three costly history queries preserve exact rows and seek player indexes o
  assert.equal(r.status,0,r.stderr);
  const results=JSON.parse(r.stdout);
  for(const [index,[before,after]] of results.entries()){
-  const sorted=rows=>rows.map(row=>JSON.stringify(row)).sort();
+  const sorted=rows=>rows.map(({history_participants,...row})=>JSON.stringify(row)).sort();
+  if(index===1)assert.ok(after.rows.every(row=>JSON.parse(row.history_participants).length===2),'source query preserves both participants');
   assert.deepEqual(sorted(after.rows),sorted(before.rows),`query ${index+1} parity`);
   assert.ok(after.plan.some(p=>/SEARCH (?:p|match_participants) USING (?:COVERING )?INDEX match_participants_(?:source_match|name_match_key|name)/.test(p)),after.plan.join('\n'));
   assert.ok(!after.plan.some(p=>/SCAN (?:m|p|self)(?:$| )/.test(p)),after.plan.join('\n'));
@@ -70,7 +71,7 @@ test('three costly history queries preserve exact rows and seek player indexes o
 });
 
 import {database} from './search-sqlite-fixture.mjs';
-test('native-ID history skips redundant canonical alias reads and loads participant pages with bounded concurrency', {timeout:5000}, async()=>{
+test('native-ID history reads all participants within source query without separate participant pages', {timeout:5000}, async()=>{
  const d=database({identityMapping:true});
  try{
   const native='12345678-1234-1234-1234-123456789abc',player={id:'cw-native',name:'Case Player',sourceCircuit:'tennis-europe',profileSync:{tennisEurope:{profileId:native}}};
@@ -96,7 +97,7 @@ test('native-ID history skips redundant canonical alias reads and loads particip
   assert.equal(result.matches.length,100);assert.equal(result.tournaments.length,1);
   assert.deepEqual(result.matches.map(m=>m.matchId),Array.from({length:100},(_,i)=>'m'+String(i).padStart(3,'0')));
   assert.ok(result.matches.every(m=>m.advances&&m.score==='6-1 6-2'));
-  assert.equal(aliasLookups,0);assert.equal(maximum,3);assert.ok(maximum<=4);assert.equal(d.writes(),before);
+  assert.equal(aliasLookups,0);assert.equal(maximum,0);assert.equal(d.writes(),before);
  }finally{d.close()}
 });
 

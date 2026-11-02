@@ -3469,6 +3469,7 @@ function renderOpponentHistory(data) {
         )
         .join("")
     : '<div class="empty">Nessun torneo precedente disponibile prima di questo incontro.</div>';
+  if (data.itfDocumentHistoryComplete === false) body.insertAdjacentHTML('afterbegin', '<p class="opponentHistoryIncomplete" role="status">Storico ITF parzialmente disponibile.</p>');
   bindParticipantNavigation(body);
 }
 function opponentHistoryKey(name, event = "", profileId = "") {
