@@ -110,6 +110,8 @@ try{
   report.activeOpponent={nativeId:id,name};console.log('ITF_OPPONENT_PROGRESS='+JSON.stringify({checked:report.opponents.length,total:opponentIds.size}));
   const result=await api('opponent-profile?profileId='+encodeURIComponent(id)+'&name='+encodeURIComponent(name)+'&asOf='+today);
   if(!Array.isArray(result.tournaments))throw Error('opponent_snapshot_incomplete');
+  for(const detail of result.itfHistoryIssues||[])report.unverifiable.push({nativeId:id,name,...detail});
+  if(result.itfDocumentHistoryComplete===false)console.log('ITF_OPPONENT_INCOMPLETE='+JSON.stringify({nativeId:id,name,documents:result.itfHistoryIssues||[]}));
   if(!playerCircuitIdentities({circuitProfiles:result.circuitProfiles||[]}).some(p=>p.circuit==='itf'&&String(p.profileId)===id))report.unverifiable.push({nativeId:id,name,reason:'opponent_identity_not_confirmed'});
   const nativeCheck=checkOpponentNativeHistory(await rawHistory(id),result.tournaments,today);if(nativeCheck.missingTournaments.length||nativeCheck.missingMatches.length)issue('opponent_native_history_missing',{nativeId:id,...nativeCheck});report.unverifiable.push(...nativeCheck.unverifiable.map(x=>({nativeId:id,...x})));
   const selected=result.tournaments.filter(itf),bad=selected.filter(forbiddenPast),record={nativeId:id,name,selected:selected.map(t=>({competitionId:t.competitionId,historyKind:t.historyKind,matches:t.matches?.length||0,historyMatchCount:t.historyMatchCount||0})),invalidPast:bad.map(competitionKey)};
