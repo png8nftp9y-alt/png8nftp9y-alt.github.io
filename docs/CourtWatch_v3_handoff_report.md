@@ -10200,3 +10200,5 @@ Misura avvio: aggiornata la versione dello script dopo la correzione delle intes
 - Test mirati: 27 passati, inclusi assemblatore Worker reale, errore e evento valido nello stesso torneo, ultima versione fallita senza resurrezione precedente, integrita sempre bloccante e avviso browser che si rimuove a risposta completa. Verifica UI verde. Controllo completo locale superato: 714 test, zero fallimenti. Il controllo completo viene richiesto dall'installatore prima del push; deploy Shield e prova remota successivi restano necessari. Questa correzione risolve il 500 del percorso source-error, non certifica il documento mancante come recuperato.
 
 ITF discovery 2026-11-02T06:54:57.960Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-11-02T22:05:23.762Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
