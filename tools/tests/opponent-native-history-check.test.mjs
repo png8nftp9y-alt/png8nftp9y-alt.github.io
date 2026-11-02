@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {checkOpponentNativeHistory as check} from '../lib/opponent-native-history-check.mjs';
+const row={id:'m',played_date:'2026-10-01',tournament_payload:JSON.stringify({competitionId:'X',endDate:'2026-10-03'}),payload:'{}'},selected={circuit:'itf',competitionId:'X',endDate:'2026-10-03',historyKind:'past',matches:[{matchId:'m'}]};
+test('same tournament counts cannot hide lost native match',()=>{assert.equal(check([row],[{...selected,matches:[{matchId:'other'}]}],'2026-10-10').missingMatches.length,1);assert.deepEqual(check([row],[selected],'2026-10-10').missingMatches,[]);});
+test('missing recent tournament fails while three genuinely newer tournaments keep older history outside window',()=>{assert.deepEqual(check([row],[],'2026-10-10').missingTournaments,['X']);const newer=[4,5,6].map(i=>({circuit:'fitp',competitionId:String(i),endDate:'2026-10-0'+i,historyKind:'past'}));assert.deepEqual(check([row],newer,'2026-10-10').missingTournaments,[]);});
+test('current matches do not become required history; missing dates stay explicitly unverifiable',()=>{assert.deepEqual(check([row],[],'2026-10-03').missingTournaments,[]);assert.equal(check([{...row,tournament_payload:'{}'}],[],'2026-10-10').unverifiable.length,1);});
