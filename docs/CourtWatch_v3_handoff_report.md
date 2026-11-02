@@ -10191,3 +10191,9 @@ Misura avvio: aggiornata la versione dello script dopo la correzione delle intes
 
 ## 2026-11-02 — Versione cache dopo correzione diagnostica
 - Run 41364915528: check-source verde; release-safety bloccato da cache-v3.js dopo la modifica delle intestazioni nel commit 802e035a31. Incrementata la revisione JS in v3.html. Controlli conservati e correzione delle 79 sigle bandiera mantenuta. Deploy da confermare.
+
+## 2026-11-02 — Conferma utente Domenico Ursino
+- Caso ID-5D00EF71938D: stessa persona confermata dall utente, FITP 6475901439 ed Europe c243df28-a1b5-4014-ad7f-be25c6c53d26.
+- Regola persistente per gli ID esatti e sync ordinario limitato alle sorgenti approvate, readback obbligatorio della persona unificata e chiusura del caso. Nessuna scelta della nazionalita ITA/SUI, payload originali preservati. Nuovo ID omonimo blocca la procedura.
+- 21 test passati inclusi SQLite, replay zero scritture e gruppi incompleti; test rafforzato con caso aperto e poi rimosso. Nessun polling, retry o discovery.
+- Applicazione D1 e readback remoto da confermare nel workflow Court Watch approved Ursino FITP Europe link; non ancora dichiarato applicato.
