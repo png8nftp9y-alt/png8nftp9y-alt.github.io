@@ -2,10 +2,21 @@ import {createHash} from 'node:crypto';
 import {createReadOnlyD1Client} from '../../cloudflare/app-api/lib/read-only-d1-client.mjs';
 const hash=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
 // Evidence contains hashes only; SQL, private parameters and rows are never published.
-export function auditReadEvidence(execute){
+export function auditReadEvidence(execute,{recoverD1Reset:recoverAllReads=false,recoveryBudget=1,wait:recoveryWait=ms=>new Promise(r=>setTimeout(r,ms)),onRecovery:recoveryNotice=()=>{}}={}){
+ if(!Number.isInteger(recoveryBudget)||recoveryBudget<0||recoveryBudget>3)throw Error('invalid_audit_recovery_budget');
+ const recoveryMetrics={used:0,budget:recoveryBudget};
+ async function executeRead(sql,params,phase){
+  try{return await execute(sql,params);}catch(error){
+   if(!recoverAllReads||recoveryMetrics.used>=recoveryBudget||String(error?.message)!=='diagnostic_d1_request_failed:http_500:codes_7500')throw error;
+   recoveryMetrics.used++;
+   recoveryNotice({phase,queryHash:hash(JSON.stringify([sql,params])),attempt:recoveryMetrics.used,reason:'D1_7500'});
+   await recoveryWait(250);
+   return execute(sql,params);
+  }
+ }
  const reads=new Map();
  const {query,db}=createReadOnlyD1Client(async(sql,params=[])=>{
-  const rows=await execute(sql,params),key=JSON.stringify([sql,params]);
+  const rows=await executeRead(sql,params,'capture'),key=JSON.stringify([sql,params]);
   if(!reads.has(key))reads.set(key,{sql,params:structuredClone(params),hash:hash(rows)});
   return rows;
  });
@@ -14,8 +25,8 @@ export function auditReadEvidence(execute){
   for(const [key,r] of reads){
    if(checked)await wait(100);
    let rows;
-   try{rows=await execute(r.sql,r.params);}catch(error){
-    if(!recoverD1Reset||recoveries!==0||String(error.message)!=='diagnostic_d1_request_failed:http_500:codes_7500')throw error;
+   try{rows=await executeRead(r.sql,r.params,'verification');}catch(error){
+    if(recoverAllReads||!recoverD1Reset||recoveries!==0||String(error.message)!=='diagnostic_d1_request_failed:http_500:codes_7500')throw error;
     recoveries++;onRecovery({queryHash:hash(key),attempt:recoveries,reason:'D1_7500'});
     await wait(250);
     rows=await execute(r.sql,r.params);
@@ -23,7 +34,7 @@ export function auditReadEvidence(execute){
    if(hash(rows)!==r.hash)changed.push(hash(key));
    checked++;if(checked%100===0)onProgress({checked,total:reads.size});
   }
-  return{checked,changedQueries:changed,stable:changed.length===0,recoveries};
+  return{checked,changedQueries:changed,stable:changed.length===0,recoveries:recoverAllReads?recoveryMetrics.used:recoveries};
  }
- return{query,db,verify};
+ return{query,db,verify,recoveryMetrics};
 }
