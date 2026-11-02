@@ -6,7 +6,7 @@ import {pathToFileURL} from 'node:url';
 export const releaseSafetyCommands={
  local:[
   ['node','--test','tools/courtwatch-refresh-contract.test.mjs','tools/tests/release-safety.test.mjs'],
-  ['node','--test','tools/tests/snapshot-match-coverage.test.mjs'],
+  ['node','--test','tools/tests/snapshot-match-coverage.test.mjs','tools/tests/release-cache-version.test.mjs'],
   ['node','tools/courtwatch-release-guard.mjs'],
   ['node','tools/courtwatch-functional-shield.mjs'],
   ['node','--test','cloudflare/app-api/test/personal-player-read-retry.test.mjs','cloudflare/app-api/test/replay-others-real-snapshot.test.mjs','src/v3/others-independent-loader.test.mjs','src/v3/player-addition-ui.test.mjs','src/v3/calendar-startup.test.mjs','cloudflare/app-api/test/app-snapshot-membership.test.mjs']
