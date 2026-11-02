@@ -10167,3 +10167,6 @@ Esteso Server-Timing alle snapshot complete, con le stesse misure delle snapshot
 Questa modifica misura il collo di bottiglia; non costituisce una correzione della lentezza. Il caso rimane aperto finché non vengono misurati il percorso lento reale e la successiva correzione.
 
 Validazione: 72 test frontend e 11 test snapshot backend superati, inclusa parità dei dati e zero scritture aggiuntive; sintassi, analysis UI e release guard superati. Applicazione e idempotenza dell’installer verificate. Prova Chromium locale non eseguita: browser binario non disponibile; la misura sul primo accesso Safari resta necessaria.
+
+### Versione cache dopo correzione intestazioni
+- Aggiornato il riferimento v3.js per distribuire la correzione e superare il controllo cache obbligatorio.
