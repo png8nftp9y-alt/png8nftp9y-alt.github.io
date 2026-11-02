@@ -10186,3 +10186,6 @@ Correzione misura avvio: intestazioni HTTP opzionali; 82 test frontend superati,
 - Validazione locale: 16 test passati su guardia read-only, ricontrollo input, variazioni a conteggi uguali, errori senza retry, omonimi, alternate e confronto incontri/finestra storico. Sintassi verificata. Esecuzione remota con credenziali disponibile nel runner: ancora da eseguire, non dichiarata conclusa.
 
 Misura avvio: aggiornata la versione dello script dopo la correzione delle intestazioni. Risolto il blocco cache-v3.js dello Shield; lentezza ancora da misurare.
+
+## 2026-11-02 — Versione cache dopo correzione diagnostica
+- Run 41364915528: check-source verde; release-safety bloccato da cache-v3.js dopo la modifica delle intestazioni nel commit 802e035a31. Incrementata la revisione JS in v3.html. Controlli conservati e correzione delle 79 sigle bandiera mantenuta. Deploy da confermare.
