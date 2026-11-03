@@ -10,7 +10,7 @@ import {playerCircuitIdentities} from '../cloudflare/app-api/lib/player-circuit-
 import {runtimeDocumentReader} from '../cloudflare/app-api/lib/runtime-document-reader.mjs';
 import {presenceIndex,comparePresence,alternateExpectation,forbiddenPast,competitionKey} from './lib/itf-page-audit.mjs';
 const root=process.cwd(),output='artifacts/itf-opponent-verification.json',today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date());
-const report={startedAt:new Date().toISOString(),sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),status:'running',metrics:{queries:0,rowsRead:0,rowsWritten:0},playerCoverage:[],players:[],opponents:[],alternates:[],issues:[],unverifiable:[],limitations:['Worker/browser replay captured read-only D1 results and a pinned acquired ITF generation; every distinct D1 query is rechecked uncached within its observed-player or opponent checkpoint. Checkpoints are independent and do not certify one common instant for all players. This is not an atomic cross-service snapshot or certification of all circuits.','Scope: both lists of the configured account and native-ID opponents/partners in their acquired ITF matches. Other users and unrelated opponents are outside scope.','Fresh browser context; existing private caches on user devices are not read.','No external ITF acquisition. Missing source draws cannot be certified as absent participation.','R2 acquired generation is pinned; later acquisitions are outside scope. Changes in any rechecked D1 input or coverage evidence keep the result inconclusive.']};
+const report={startedAt:new Date().toISOString(),sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),status:'running',metrics:{queries:0,rowsRead:0,rowsWritten:0},playerCoverage:[],players:[],opponents:[],alternates:[],issues:[],unverifiable:[],limitations:['Worker/browser replay captured read-only D1 results and a pinned acquired ITF generation; every distinct D1 query is rechecked uncached within its observed-player or opponent checkpoint. Hash-verified immutable draw chunks are reused after their first successful read checkpoint; mutable selectors and profiles are refreshed for every checkpoint. Checkpoints are independent and do not certify one common instant for all players. This is not an atomic cross-service snapshot or certification of all circuits.','Scope: both lists of the configured account and native-ID opponents/partners in their acquired ITF matches. Other users and unrelated opponents are outside scope.','Fresh browser context; existing private caches on user devices are not read.','No external ITF acquisition. Missing source draws cannot be certified as absent participation.','R2 acquired generation is pinned; later acquisitions are outside scope. Changes in any rechecked D1 input or coverage evidence keep the result inconclusive.']};
 let browser,server,frozenClient;
 const parse=x=>typeof x==='string'?JSON.parse(x):x;
 const native=p=>playerCircuitIdentities(p).find(x=>x.circuit==='itf')?.profileId||(p.circuitProfiles||[]).find(x=>x.circuit==='itf')?.profileId;
@@ -25,9 +25,9 @@ try{
  report.readCheckpoints=[];let checkpointStartedAt=new Date().toISOString();
  async function checkpoint(scope){
   const startedAt=checkpointStartedAt;
-  const result=await evidence.verify({clearAfterVerification:true,onProgress:p=>console.log('ITF_READ_RECHECK='+JSON.stringify({scope,...p}))});
+  const result=await evidence.verify({clearAfterVerification:true,concurrency:4,onProgress:p=>console.log('ITF_READ_RECHECK='+JSON.stringify({scope,...p}))});
   report.readCheckpoints.push({scope,startedAt,finishedAt:new Date().toISOString(),...result});
-  session.clear();rawById.clear();checkpointStartedAt=new Date().toISOString();
+  session.clear({retainVerifiedDraws:result.stable});rawById.clear();checkpointStartedAt=new Date().toISOString();
   console.log('ITF_READ_CHECKPOINT='+JSON.stringify({scope,checked:result.checked,stable:result.stable}));
  }
 

@@ -20,10 +20,15 @@ export function auditReadEvidence(execute,{recoverD1Reset:recoverAllReads=false,
   if(!reads.has(key))reads.set(key,{sql,params:structuredClone(params),hash:hash(rows)});
   return rows;
  });
- async function verify({wait=ms=>new Promise(r=>setTimeout(r,ms)),onProgress=()=>{},recoverD1Reset=false,onRecovery=()=>{},clearAfterVerification=false}={}){
+ async function verify({wait=ms=>new Promise(r=>setTimeout(r,ms)),onProgress=()=>{},recoverD1Reset=false,onRecovery=()=>{},clearAfterVerification=false,concurrency=1}={}){
+  if(!Number.isInteger(concurrency)||concurrency<1||concurrency>4)throw Error('invalid_verification_concurrency');
   const changed=[],changedReads=[];let checked=0,recoveries=0;
-  for(const [key,r] of reads){
-   if(checked)await wait(100);
+  const pending=[...reads];let cursor=0,failure;
+  async function work(){while(!failure&&cursor<pending.length){
+   const index=cursor++,[key,r]=pending[index];
+   if(index)await wait(100);
+   if(failure)return;
+   try{
    let rows;
    try{rows=await executeRead(r.sql,r.params,'verification');}catch(error){
     if(recoverAllReads||!recoverD1Reset||recoveries!==0||String(error.message)!=='diagnostic_d1_request_failed:http_500:codes_7500')throw error;
@@ -33,7 +38,10 @@ export function auditReadEvidence(execute,{recoverD1Reset:recoverAllReads=false,
    }
    if(hash(rows)!==r.hash){const queryHash=hash(key);changed.push(queryHash);changedReads.push({queryHash,tables:[...new Set([...r.sql.replace(/'(?:''|[^'])*'|--[^\n]*|\/\*[\s\S]*?\*\//g,' ').matchAll(/\b(?:FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_]*)/gi)].map(m=>m[1]))].sort()});}
    checked++;if(checked%100===0)onProgress({checked,total:reads.size});
-  }
+   }catch(error){failure??=error;}
+  }}
+  await Promise.all(Array.from({length:Math.min(concurrency,pending.length)},()=>work()));
+  if(failure)throw failure;
   if(clearAfterVerification)reads.clear();
   return{checked,changedQueries:changed,changedReads,stable:changed.length===0,recoveries:recoverAllReads?recoveryMetrics.used:recoveries};
  }
