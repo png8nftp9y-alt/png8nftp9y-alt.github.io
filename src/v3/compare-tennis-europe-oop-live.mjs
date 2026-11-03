@@ -1,4 +1,4 @@
-import {unexplainedOopRemovals} from './tennis-europe-oop-completeness.mjs';
+import {unexplainedOopRemovals,resolvedPendingReplacements} from './tennis-europe-oop-removals.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -14,5 +14,5 @@ for(const [id,match] of after){const old=before.get(id);if(!old){transitions.pus
 for(const [id,match] of before)if(!after.has(id))transitions.push({type:'removed_from_source',matchId:id,before:match,after:null});
 const count=type=>transitions.filter(x=>x.type===type).length;
 const unexplainedRemovals=unexplainedOopRemovals(previous,current);
-const result={unexplainedRemovals,version:'te-oop-live-transitions-v1',generatedAt:new Date().toISOString(),status:current.status==='green'&&!unexplainedRemovals.length?'green':'red',baseline:!previous,previousGeneratedAt:previous?.generatedAt||null,currentGeneratedAt:current.generatedAt,counts:{previousMatches:before.size,currentMatches:after.size,transitions:transitions.length,newScheduled:count('new_scheduled'),newCompleted:count('new_completed'),scheduledToCompleted:count('scheduled_to_completed'),statusChanged:count('status_changed'),resultChanged:count('result_changed'),scheduleChanged:count('schedule_changed'),removedFromSource:count('removed_from_source')},transitions};
+const result={resolvedPendingReplacements:resolvedPendingReplacements(previous,current),unexplainedRemovals,version:'te-oop-live-transitions-v1',generatedAt:new Date().toISOString(),status:current.status==='green'&&!unexplainedRemovals.length?'green':'red',baseline:!previous,previousGeneratedAt:previous?.generatedAt||null,currentGeneratedAt:current.generatedAt,counts:{previousMatches:before.size,currentMatches:after.size,transitions:transitions.length,newScheduled:count('new_scheduled'),newCompleted:count('new_completed'),scheduledToCompleted:count('scheduled_to_completed'),statusChanged:count('status_changed'),resultChanged:count('result_changed'),scheduleChanged:count('schedule_changed'),removedFromSource:count('removed_from_source')},transitions};
 await fs.mkdir(path.dirname(OUTPUT),{recursive:true});await fs.writeFile(OUTPUT,JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify({status:result.status,baseline:result.baseline,counts:result.counts},null,2));if(result.status!=='green')throw new Error('Tennis Europe OOP transition comparison failed');
