@@ -113,7 +113,9 @@ for (const file of affected) {
   if (source.includes("D1_READ_ONLY: guarded")) {
     const trusted = file === "cloudflare/app-api/lib/read-only-d1-client.mjs"
       ? source.includes("assertReadOnlyQuery(sql)")
-      : /import\s*\{openReadOnlyD1\}\s*from ['"]\.\.\/lib\/read-only-d1-client\.mjs['"]/.test(source);
+      : file === "tools/replay-others-real-snapshot.mjs"
+        ? source.includes("import {readOnlyReplayDb} from './read-only-replay-db.mjs';") && source.includes("const DB=readOnlyReplayDb(") && source.includes("if(DB.failure)throw DB.failure")
+        : /import\s*\{openReadOnlyD1\}\s*from ['"]\.\.\/lib\/read-only-d1-client\.mjs['"]/.test(source);
     const stem = basename(file, extname(file));
     const testFile = tests.find(path => basename(path).startsWith(stem + ".test."));
     if (!trusted || !testFile) {

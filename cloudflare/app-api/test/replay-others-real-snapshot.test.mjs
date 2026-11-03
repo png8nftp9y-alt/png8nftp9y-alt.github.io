@@ -1,3 +1,5 @@
+// D1_TEST_READ_ONLY_TRANSPORT
+// D1_TEST_MUTATIONS_REJECTED
 import '../../../tools/tests/read-only-replay-db.test.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';

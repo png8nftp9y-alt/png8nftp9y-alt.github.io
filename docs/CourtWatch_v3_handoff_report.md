@@ -10295,3 +10295,10 @@ Validazione: 18 test superati su limite concorrenza, ordine/bind esatti, nessun 
 - Certificazione esplicitamente per checkpoint indipendenti, non una fotografia atomica globale. Un cambiamento durante un checkpoint mantiene esito inconcludente. Budget globale massimo tre recuperi 7500 invariato; nessun rilancio o polling.
 - I 16 casi non vengono promossi a verificati: ora ogni caso e relativo motivo sono emessi anche nei log. Il run resta non verde se mancano prove/documenti o inventari. Nessuna modifica al Worker, alle pagine, alle identità o ai motori di acquisizione. Zero scritture D1 previste.
 - Validazione: 48 test mirati passati, inclusi cache fresca tra checkpoint e cambiamenti realmente rilevati; controllo sintattico dello script. Verifica remota e costo delle riletture da confermare dopo pubblicazione: svuotare la cache per fase può aumentare le letture condivise; nessuna promessa di riduzione del consumo.
+
+## Policy D1: replay Altri di sola lettura
+La policy riconosce lo specifico replay tramite client protetto e controllo
+degli errori. Richiede ed esegue i test che bloccano le scritture.
+Nessuna modifica a runtime, motori o schedulazioni; nessun retry introdotto.
+Validazione: 18 test superati e policy D1 verde.
+Il run Altri 41730993116 è riuscito; assenza futura di 7500 non garantita.

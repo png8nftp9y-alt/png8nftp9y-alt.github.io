@@ -1,3 +1,4 @@
+// D1_READ_ONLY: guarded
 import {readOnlyReplayDb} from './read-only-replay-db.mjs';
 import worker from '../cloudflare/app-api/src/index.js';
 import fs from 'node:fs/promises';
