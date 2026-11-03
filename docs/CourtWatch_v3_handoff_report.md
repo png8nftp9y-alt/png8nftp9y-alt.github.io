@@ -10351,3 +10351,35 @@ report bloccati. Sei test superati. Motori, dati e schedulazioni invariati.
 - Salvataggio dell'artefatto dopo ciascun avversario, ID ancora da verificare emessi nel log finale. Input manuale opponent_ids facoltativo: selezione solo di ID presenti nello scope corrente, controllo interamente fresco. Esito checked_targeted_scope_matches distinto dalla certificazione completa: non riusa e non somma automaticamente vecchi risultati. Default e push restano audit completo. Nessun polling o rilancio automatico.
 - I cambiamenti concorrenti, i documenti mancanti e gli altri casi non verificabili restano bloccanti. Timeout invariato. La cache content-addressed precedente viene conservata con le sue verifiche di hash. Nessuna modifica ai dati o alle pagine applicative.
 - Validazione: 66 test mirati passati, comprese batch 17 SELECT in 5 richieste senza perdere il confronto, fallimento 7500 senza retry, risposta parziale respinta, scritture bloccate prima della rete e ID estranei respinti. Sintassi e diff controllati. Tempi, costi e completamento remoto da confermare dopo pubblicazione; stato non ancora risolto.
+## 2026-11-04 — Europe: risoluzione avversario con cambio campo e merge da upstream annullato
+- Run live 41735878225/job 126264916690: acquisizione riuscita, 19/19 tornei, 2254 incontri, due posti opponentPending; proiezione riuscita, pubblicazione R2 fermata dal confronto. Le 14 rimozioni di ID contengono 13 incontri ancora riconosciuti dalla chiave stabile e un solo falso allarme: Arya Ekmekci ID 92, bonus GS14 ottavi del 4 novembre, torneo 8D96D7A4-AD04-4FAA-977A-EC491BEA6CFF. Il posto pending AtikSem 3 n.1 diventa Kizilova ID7-Ekmekci ID92, AtikSem 2 n.2, ore11. L incontro esiste nello snapshot acquisito; il vecchio confronto pretendeva campo e numero invariati.
+- Confronto live in modulo dedicato: sostituzione consentita solo per precedente singolo programmato senza risultato, con un ID noto e avversario in attesa, quando esiste un unico nuovo incontro completo di due ID con stesso torneo nativo, giorno, evento/fase, turno e URL ufficiale, campo e numero ufficiali presenti. Risoluzione e spostamento riportati esplicitamente. Nessuna ricerca per solo nome, nessuna esenzione per slot assente/ambiguo/altro evento o vecchio risultato. Incontri normali mancanti continuano a bloccare. Modulo storico/completezza invariato: nessun nuovo backfill completo attivato da questi percorsi.
+- Merge 41735887258/job 126264943017 proveniva dal recupero vuoti 41735878267 cancellato, non dal nuovo backfill. Gating di entrambi i job prima di checkout/merge quando un workflow_run upstream non e riuscito. Guardie di validazione della sorgente conservate; esecuzione manuale resta disponibile. Un upstream annullato non produce piu un tentativo di merge e un errore artificiale per artifact assente.
+- Validazione: 98 test passati, inclusi quattro nuovi sul record reale e comando compare completo, identita/date/evento/turno diversi, candidato assente/ambiguo, risultati preesistenti e scope live. Replay snapshot reale con precedente ricostruito dalle transizioni: 2053->2254 incontri, 377 transizioni e 14 cambi ID conservati, zero rimozioni inspiegate e una sostituzione pending documentata. YAML live/merge validi. Fixture reali conservate, report stesso commit.
+- Limiti: pubblicazione remota R2 e agenda/D1 restano da verificare dopo push; non dichiarati gia risolti in produzione. Il nuovo backfill 41735878362 ha esito indipendente dal merge annullato indicato. Audit ritiri del run live indica cinque record unchecked; nessuna certificazione globale aggiunta. Nessun polling, rilancio, cancellazione workflow o scrittura D1 eseguiti dall assistente.
+
+## 2026-11-04 — Agenda Europe D1: richieste live piu piccole dopo 7429 overloaded
+- Run 41738515052/job 126274662234: Shield, ripristino archivi e generazione SQL riusciti. Import iniziato, precedenti file confermati, errore su 03-matches-13.sql HTTP429 codice7429 reason=overloaded (617 istruzioni). Parita D1, conferma hash, deploy e verifica agenda saltati: run non certifica import completo. Nessun esito del file rifiutato dedotto e nessun replay automatico aggiunto.
+- Causa del carico correggibile nel generatore: storico gia limitato a25 incontri per batch, live ancora a100. Limite25 anche per live, riportato nel manifest. Restano nello stesso file/richiesta la rilevazione dei cambiamenti, pulizia dei figli e scrittura di incontri, programmi, risultati e partecipanti. Importer/timeout/retry invariati: nessuno spezzamento SQL nel trasporto, nessuna riscrittura forzata o reset archivio.
+- Validazione: regressione live con201 incontri fallisce prima sul limite; dopo passano12 test mirati (generatore SQLite, import query e sync storico/live), incluse201 partite,201 programmi/risultati e402 partecipanti, replay senza scritture di dominio, rollback atomico dopo errore, blocco su risposta provider fallita/timeout senza retry. Diff check pulito. Report stesso commit, nessun check API completo nel programma di installazione.
+- Limiti: riduce il carico per richiesta, non garantisce assenza futura di sovraccarico Cloudflare. Il nuovo import verifica la parita prima di hash/deploy; produzione non ancora certificata. Il push attiva il workflow agenda esistente. Nessun polling, dispatch, cancellazione o scrittura D1 eseguiti dall assistente.
+
+## 2026-11-04 — Piccoli batch di letture dello storico al primo accesso
+
+Misura utente Altri: storico 7993 ms, prima visualizzazione completa 10957 ms,
+classifiche separate a 13238 ms. Il trasporto dello storico raggruppa fino a sei
+SELECT già pronti in una sola chiamata D1 batch, con un solo batch in corso.
+SQL, parametri, paginazione, partecipanti e verifiche identità restano invariati.
+Le letture opzionali delle identità rimangono isolate per conservarne la gestione
+errori; nessun dato è memorizzato fra richieste, nessun retry o polling aggiunto.
+Il replay REST conserva il limite di due SELECT effettive e il divieto di scrivere.
+Test: 251 partite e paginazione esattamente identiche; 18 query immutate in tre
+richieste native simulate; errori interrompono la coda senza successo parziale.
+Verifiche snapshot TCL/Altri e avvio progressivo eseguite prima della consegna.
+Limite: il guadagno sui tempi di produzione va misurato dopo deploy verde;
+nessuna promessa di tempo finale sulla base dei soli test locali.
+
+Verifica browser: i due scenari di primo accesso generano date UTC nel processo
+Node; fissato esplicitamente UTC anche nei contesti Chromium per evitare che,
+fra mezzanotte italiana e mezzanotte UTC, la partita sintetica cada ieri rispetto
+alla giornata del browser. Correzione solo dei test, nessuna modifica alle date app.

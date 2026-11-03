@@ -22,5 +22,5 @@ export function readOnlyReplayDb(execute,{limit=2,log=()=>{}}={}){
   return new Promise((resolve,reject)=>{queue.push({sql,params:[...params],queuedAt:Date.now(),resolve,reject});pump()});
  }
  function statement(sql,params=[]){return{bind:(...values)=>statement(sql,values),all:()=>select(sql,params),first:async()=>(await select(sql,params)).results?.[0]||null,run(){throw Error('read_only_guard')}};}
- return {prepare:sql=>statement(sql),batch(){throw Error('read_only_guard')},get queries(){return queries},get failure(){return failure}};
+ return {prepare:sql=>statement(sql),readOnlyBatch:statements=>Promise.all(statements.map(s=>s.all())),batch(){throw Error('read_only_guard')},get queries(){return queries},get failure(){return failure}};
 }

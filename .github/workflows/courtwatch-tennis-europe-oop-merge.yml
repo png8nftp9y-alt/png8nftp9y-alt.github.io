@@ -17,6 +17,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   engine-source:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     outputs:
       sha: ${{ steps.source.outputs.sha }}
@@ -26,7 +27,7 @@ jobs:
       - id: source
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   merge:
-    if: github.event_name != 'push'
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     needs: [engine-source]
     runs-on: ubuntu-latest
     timeout-minutes: 20

@@ -18,12 +18,12 @@ CREATE TABLE app_match_candidates(match_id);
 CREATE TABLE app_state(key PRIMARY KEY,value,updated_at);
 CREATE TABLE mutations(kind);
 `;
-async function fixture(t,env){
+async function fixture(t,env,liveCount=1){
  const root=await fs.mkdtemp(path.join(os.tmpdir(),'te-historical-sync-'));t.after(()=>fs.rm(root,{recursive:true,force:true}));
  const cwd=path.join(root,'cloudflare/app-api');await fs.mkdir(cwd,{recursive:true});await fs.mkdir(path.join(root,'dist/v3'),{recursive:true});
  const tournament={competitionId:'A',startDate:'2026-06-01',endDate:'2026-06-07'};
  const match=i=>({id:'match:'+i,competitionId:'A',date:'20260607',status:'completed',round:'Final',score:'W/O',winnerTeamIndex:0,winnerPlayerIds:['1'],teams:[['1'],['2']],players:[{id:'1',name:"O'Brien; A",nationality:'ITA'},{id:'2',name:'B',nationality:'ITA'}]});
- const historical={status:'green',tournaments:[tournament],matches:Array.from({length:201},(_,i)=>match(i))},live={status:'green',tournaments:[tournament],matches:[match(200)]};
+ const historical={status:'green',tournaments:[tournament],matches:Array.from({length:201},(_,i)=>match(i))},live={status:'green',tournaments:[tournament],matches:Array.from({length:liveCount},(_,i)=>match(200+i))};
  for(const [name,data] of [['historical',historical],['live',live]])await fs.writeFile(path.join(root,'dist/v3/tennis_europe_oop_'+name+'.json'),JSON.stringify(data));
  const generator=new URL('../scripts/generate-tennis-europe-oop-seed.mjs',import.meta.url);
  await fs.mkdir(path.join(cwd,'scripts'),{recursive:true});
@@ -63,4 +63,20 @@ test('full archive repairs missing children and preserves existing and unrelated
 });
 test('legacy full mode also uses guarded sync and emits no archive reset',async t=>{
  const f=await fixture(t,{TE_INCREMENTAL:'0'});assert.equal(f.manifest.incremental,true);assert.equal(f.manifest.historicalSync,true);assert.equal(f.manifest.imported.matches,201);assert.equal(f.sql[0].trim(),'PRAGMA foreign_keys=ON;');
+});
+
+test('ordinary live imports bound each atomic request to 25 matches and preserve every child and zero-write replay',async t=>{
+ const f=await fixture(t,{},201),db=new DatabaseSync(':memory:');t.after(()=>db.close());db.exec(schema);
+ assert.equal(f.manifest.historicalSync,false);assert.equal(f.manifest.imported.matches,201);
+ const batches=f.sql.filter(sql=>sql.includes('DELETE FROM tennis_europe_changed_matches;'));
+ assert.ok(batches.length>0);
+ for(const sql of batches){const count=(sql.match(/INSERT OR IGNORE INTO tennis_europe_changed_matches/g)||[]).length;assert.ok(count<=25,'live atomic request exceeds 25 matches');assert.ok(sql.includes('DELETE FROM match_participants WHERE match_id IN'));assert.ok(sql.includes('INSERT INTO matches'));}
+ for(const table of ['tournaments','matches','tennis_europe_players','schedules','results','match_participants','app_match_candidates','app_state'])for(const action of ['INSERT','UPDATE','DELETE'])db.exec(`CREATE TRIGGER watch_${table}_${action} AFTER ${action} ON ${table} BEGIN INSERT INTO mutations VALUES('${table}:${action}'); END;`);
+ const apply=()=>{for(const sql of f.sql)db.exec('BEGIN;\n'+sql+'\nCOMMIT;');};apply();
+ assert.equal(db.prepare('SELECT count(*) n FROM matches').get().n,201);
+ for(const table of ['results','schedules'])assert.equal(db.prepare('SELECT count(*) n FROM '+table).get().n,201);
+ assert.equal(db.prepare('SELECT count(*) n FROM match_participants').get().n,402);
+ db.exec('DELETE FROM mutations');apply();assert.equal(db.prepare('SELECT count(*) n FROM mutations').get().n,0);
+ // The match change detection, cleanup and insertion stay one transaction.
+ const fresh=new DatabaseSync(':memory:');try{fresh.exec(schema);assert.throws(()=>fresh.exec('BEGIN;'+batches[0]+'INSERT INTO missing_table VALUES(1);COMMIT;'));fresh.exec('ROLLBACK;');assert.equal(fresh.prepare('SELECT count(*) n FROM matches').get().n,0);assert.equal(fresh.prepare('SELECT count(*) n FROM tennis_europe_changed_matches').get().n,0);}finally{fresh.close();}
 });

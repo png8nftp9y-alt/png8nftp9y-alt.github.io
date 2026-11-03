@@ -16,7 +16,7 @@ export function database({identityMapping=false,readChecks=false}={}){
  const release=releasePlan(docs,'fixture');
  run({schema:'CREATE TABLE runtime_document_chunks(path TEXT,content_hash TEXT,seq INTEGER,data TEXT,PRIMARY KEY(path,content_hash,seq)) WITHOUT ROWID;'+docs.flatMap(d=>versionStatements(d,null)).join('\n')+release.sql.join('\n')});
  let writes=0;const execute=(sql,values=[])=>{const r=run({statements:[{sql,values}]});writes+=r.writes;return r.rows};
- const db={prepare(sql){return {sql,values:[],bind(...values){return {sql,values,all:async()=>({results:execute(sql,values)}),first:async()=>execute(sql,values)[0]||null}},all:async()=>({results:execute(sql)}),first:async()=>execute(sql)[0]||null}},batch:async statements=>{const result=run({statements});writes+=result.writes;return result}};
+ const db={prepare(sql){return {sql,values:[],bind(...values){return {sql,values,all:async()=>({results:execute(sql,values)}),first:async()=>execute(sql,values)[0]||null}},all:async()=>({results:execute(sql)}),first:async()=>execute(sql)[0]||null}},batch:async statements=>{if(statements.every(s=>/^\s*(SELECT|WITH)\b/i.test(s.sql)))return Promise.all(statements.map(s=>s.all()));const result=run({statements});writes+=result.writes;return result}};
  // Split only statement boundaries; semicolons inside quoted source payloads are preserved.
  const query=async sql=>{const statements=sql.match(/(?:[^';]|'(?:''|[^'])*')+;?/g).filter(x=>x.trim()).map(x=>({sql:x.replace(/;$/,''),values:[]}));const r=run({statements});writes+=r.writes;return r.rows};
  let currentRelease=release.value;
