@@ -27,11 +27,18 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
  const issues=[],days=[],resolutions=[];
  if(!pages.length&&asOf&&String(tournament.startDate).slice(0,10)>asOf&&/\bNo matches found\b/i.test(clean(listingHtml)))return {version:1,status:'not_published',competitionId:tournament.competitionId,days:[],issues:[],reason:'future_tournament_official_empty_listing'};
  if(!pages.length)issues.push({reason:'no_verified_oop_days',competitionId:tournament.competitionId});
- for(const page of pages){let byes=0,covered=0;
+ for(const page of pages){let byes=0,covered=0,pendingOpponents=0;
   if(!page.cards.length&&!page.explicitEmpty)issues.push({reason:'unrecognized_or_unavailable_oop_page',date:page.date,sourceHash:page.sourceHash});
   for(const card of page.cards){if(card.bye){byes++;continue;}
    const resolution=oopUserResolution(card);if(resolution?.kind==='walkover'){resolutions.push({kind:'walkover_without_identified_opponent',date:card.date,event:card.event,round:card.round,player:card.players[0],score:'W/O',sourceUrl:card.sourceUrl,sourceHash:card.sourceHash,confirmedBy:resolution.confirmedBy,confirmedOn:resolution.confirmedOn});continue;}
    const size=/^[BG]D\d{2}\b/i.test(card.event)?4:/^[BG]S\d{2}\b/i.test(card.event)?2:0;
+   // A future/current scheduled slot may legitimately await its opponent.
+   // Require the exact acquired slot, not merely an empty side in the source.
+   if(size===2&&card.players.length===1&&card.round&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>=iso(asOf)){
+    const acquired=(index.get(key(card))||[]).some(m=>m.opponentPending===true&&m.status==='scheduled'&&!m.score&&!m.winnerPlayerIds?.length&&iso(m.date)===iso(card.date)&&m.sourceUrl===card.sourceUrl&&m.court&&Number.isInteger(m.courtMatchNumber)&&m.courtMatchNumber>0&&m.courtMatchNumberSource==='official_schedule_subheader');
+    if(acquired){covered++;pendingOpponents++;continue;}
+   }
+
    let reason='';
    if(!size||!card.round)reason='unsupported_oop_card';
    else if(card.players.length!==size)reason='incomplete_native_participants';
@@ -44,7 +51,7 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
    }
    if(reason)issues.push({reason,...card});
   }
-  days.push({date:page.date,sourceHash:page.sourceHash,cards:page.cards.length,byes,covered,explicitEmpty:page.explicitEmpty});
+  days.push({date:page.date,sourceHash:page.sourceHash,cards:page.cards.length,byes,covered,pendingOpponents,explicitEmpty:page.explicitEmpty});
  }
  return {version:1,status:issues.length?'incomplete':'complete',resolutions,scope:'Every discovered official OOP card, including Not scheduled; not a universal draw/catalogue certification',competitionId:tournament.competitionId,days,issues};
 }

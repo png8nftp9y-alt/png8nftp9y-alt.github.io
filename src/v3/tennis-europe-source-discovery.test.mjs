@@ -1,3 +1,5 @@
+import './tennis-europe-historical-winners.test.mjs';
+import './tennis-europe-oop-pending.test.mjs';
 import './tennis-europe-oop-real-html.test.mjs';
 import './tennis-europe-oop-scope.test.mjs';
 import './tennis-europe-oop-completeness.test.mjs';
