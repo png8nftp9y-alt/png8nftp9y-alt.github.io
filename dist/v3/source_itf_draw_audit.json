@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-11-03T15:13:51.454Z",
+  "generatedAt": "2026-11-03T15:39:36.806Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -20,10 +20,10 @@
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
     "retrySections": 4,
-    "technicalErrorSections": 3,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 1,
-    "confirmedInDraw": 1,
+    "notPublishedOrIncompleteSections": 4,
+    "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 540,
     "globalCancelledNoDraws": 13,
@@ -95,12 +95,10 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-SUI-2026-006",
-      "tournamentName": "J30 Agno",
+      "competitionId": "J-J60-TUN-2026-006",
+      "tournamentName": "J60 Hammam Sousse",
       "decision": "pending",
-      "playersFound": [
-        "martina-danesi"
-      ],
+      "playersFound": [],
       "declaredSections": 6,
       "acquiredSections": 2,
       "unusedAlternativeSections": 0,
@@ -171,7 +169,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 16,
+              "players": 24,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -185,8 +183,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -198,8 +196,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -210,7 +208,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 16,
+              "players": 17,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -224,14 +222,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
