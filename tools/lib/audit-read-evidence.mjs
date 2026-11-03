@@ -21,7 +21,7 @@ export function auditReadEvidence(execute,{recoverD1Reset:recoverAllReads=false,
   return rows;
  });
  async function verify({wait=ms=>new Promise(r=>setTimeout(r,ms)),onProgress=()=>{},recoverD1Reset=false,onRecovery=()=>{}}={}){
-  const changed=[];let checked=0,recoveries=0;
+  const changed=[],changedReads=[];let checked=0,recoveries=0;
   for(const [key,r] of reads){
    if(checked)await wait(100);
    let rows;
@@ -31,10 +31,10 @@ export function auditReadEvidence(execute,{recoverD1Reset:recoverAllReads=false,
     await wait(250);
     rows=await execute(r.sql,r.params);
    }
-   if(hash(rows)!==r.hash)changed.push(hash(key));
+   if(hash(rows)!==r.hash){const queryHash=hash(key);changed.push(queryHash);changedReads.push({queryHash,tables:[...new Set([...r.sql.replace(/'(?:''|[^'])*'|--[^\n]*|\/\*[\s\S]*?\*\//g,' ').matchAll(/\b(?:FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_]*)/gi)].map(m=>m[1]))].sort()});}
    checked++;if(checked%100===0)onProgress({checked,total:reads.size});
   }
-  return{checked,changedQueries:changed,stable:changed.length===0,recoveries:recoverAllReads?recoveryMetrics.used:recoveries};
+  return{checked,changedQueries:changed,changedReads,stable:changed.length===0,recoveries:recoverAllReads?recoveryMetrics.used:recoveries};
  }
  return{query,db,verify,recoveryMetrics};
 }

@@ -13,7 +13,7 @@ export function checkOpponentNativeHistory(rows,tournaments,asOf){
  const missingTournaments=[],missingMatches=[];
  for(const g of groups.values()){
   const selected=past.find(t=>t.circuit==='itf'&&key(t)===g.id);
-  if(!selected){if(!cutoff||g.end>cutoff)missingTournaments.push(g.id);else if(g.end===cutoff)unverifiable.push({competitionId:g.id,reason:'history_boundary_tie'});continue;}
+  if(!selected){if(!cutoff||g.end>cutoff)missingTournaments.push(g.id);else if(g.end===cutoff){const boundary=past.filter(t=>String(t.endDate||t.startDate||'').slice(0,10)===cutoff).map(t=>(t.circuit||'tennis-europe')+'|'+key(t)).sort((a,b)=>a.localeCompare(b)).at(-1);if(('itf|'+g.id).localeCompare(boundary)<0)missingTournaments.push(g.id);}continue;}
   const got=new Set((selected.matches||[]).map(m=>m.matchId));
   for(const id of g.matches)if(!got.has(id))missingMatches.push({competitionId:g.id,matchId:id});
  }
