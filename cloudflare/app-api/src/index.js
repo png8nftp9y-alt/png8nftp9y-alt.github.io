@@ -1,4 +1,5 @@
 import {progressiveSnapshot} from '../lib/progressive-snapshot.mjs';
+import {historyReadDb} from '../lib/history-read-batch.mjs';
 import {boundedPlayerMap} from '../lib/bounded-player-map.mjs';
 import {snapshotHistoryPlayers,snapshotEntryPlayer} from '../lib/snapshot-history-players.mjs';
 import {agendaAdvancementRows} from '../lib/tennis-europe-agenda-advances.mjs';
@@ -246,7 +247,8 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
     const enrichment=await timing.measure('history_identities',()=>snapshotHistoryPlayers(env.DB,players,added));
     const historyPlayers=enrichment.players,nativePlayers=historyPlayers.map(p=>snapshotEntryPlayer(p,enrichment.configuredIds));
     const entryPlayers=nativePlayers.filter(p=>enrichment.configuredIds.has(p.id)||p.sourceKey);
-    const readHistory=p=>enrichment.configuredIds.has(p.id)?personalItfHistory(env.DB,p):personalCircuitHistory(env.DB,p);
+    const historyDb=historyReadDb(env.DB);
+    const readHistory=p=>enrichment.configuredIds.has(p.id)?personalItfHistory(historyDb,p):personalCircuitHistory(historyDb,p);
     const presentation=tournamentPresentationContext(undefined,timing.measure,env.RUNTIME_DOCUMENTS);
     presentation?.prepare(tournaments);
     const prepare=rows=>{presentation.prepare(rows);return rows};

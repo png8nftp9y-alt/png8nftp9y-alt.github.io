@@ -19,7 +19,7 @@ await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
 const browser=await chromium.launch({headless:true}),results=[];
 try{
  for(const mobile of [false,true])for(const group of ['main','others']){
-  const context=await browser.newContext({viewport:{width:mobile?390:1280,height:900},isMobile:mobile,hasTouch:mobile});
+  const context=await browser.newContext({timezoneId:'UTC',viewport:{width:mobile?390:1280,height:900},isMobile:mobile,hasTouch:mobile});
   const page=await context.newPage();await page.addInitScript(()=>{window.setInterval=()=>0;});
   const date=new Date().toISOString().slice(0,10),player={id:'cold-player',name:'Cold Player',userAdded:true,nationality:'ITA',club:'Verified Club',ranking:'3.2',membershipCard:'1234567890'};
   const tournament={playerId:player.id,circuit:'tennis-europe',competitionId:'cold-tournament',name:'Cold Tournament',startDate:date,endDate:date};

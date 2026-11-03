@@ -10357,3 +10357,23 @@ report bloccati. Sei test superati. Motori, dati e schedulazioni invariati.
 - Causa del carico correggibile nel generatore: storico gia limitato a25 incontri per batch, live ancora a100. Limite25 anche per live, riportato nel manifest. Restano nello stesso file/richiesta la rilevazione dei cambiamenti, pulizia dei figli e scrittura di incontri, programmi, risultati e partecipanti. Importer/timeout/retry invariati: nessuno spezzamento SQL nel trasporto, nessuna riscrittura forzata o reset archivio.
 - Validazione: regressione live con201 incontri fallisce prima sul limite; dopo passano12 test mirati (generatore SQLite, import query e sync storico/live), incluse201 partite,201 programmi/risultati e402 partecipanti, replay senza scritture di dominio, rollback atomico dopo errore, blocco su risposta provider fallita/timeout senza retry. Diff check pulito. Report stesso commit, nessun check API completo nel programma di installazione.
 - Limiti: riduce il carico per richiesta, non garantisce assenza futura di sovraccarico Cloudflare. Il nuovo import verifica la parita prima di hash/deploy; produzione non ancora certificata. Il push attiva il workflow agenda esistente. Nessun polling, dispatch, cancellazione o scrittura D1 eseguiti dall assistente.
+
+## 2026-11-04 — Piccoli batch di letture dello storico al primo accesso
+
+Misura utente Altri: storico 7993 ms, prima visualizzazione completa 10957 ms,
+classifiche separate a 13238 ms. Il trasporto dello storico raggruppa fino a sei
+SELECT già pronti in una sola chiamata D1 batch, con un solo batch in corso.
+SQL, parametri, paginazione, partecipanti e verifiche identità restano invariati.
+Le letture opzionali delle identità rimangono isolate per conservarne la gestione
+errori; nessun dato è memorizzato fra richieste, nessun retry o polling aggiunto.
+Il replay REST conserva il limite di due SELECT effettive e il divieto di scrivere.
+Test: 251 partite e paginazione esattamente identiche; 18 query immutate in tre
+richieste native simulate; errori interrompono la coda senza successo parziale.
+Verifiche snapshot TCL/Altri e avvio progressivo eseguite prima della consegna.
+Limite: il guadagno sui tempi di produzione va misurato dopo deploy verde;
+nessuna promessa di tempo finale sulla base dei soli test locali.
+
+Verifica browser: i due scenari di primo accesso generano date UTC nel processo
+Node; fissato esplicitamente UTC anche nei contesti Chromium per evitare che,
+fra mezzanotte italiana e mezzanotte UTC, la partita sintetica cada ieri rispetto
+alla giornata del browser. Correzione solo dei test, nessuna modifica alle date app.
