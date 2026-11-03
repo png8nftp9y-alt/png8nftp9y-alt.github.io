@@ -11,5 +11,5 @@ export function auditReadSession(execute,{minimumIntervalMs=100,wait=ms=>new Pro
   return task.then(structuredClone);
  };
  const {query,db}=createReadOnlyD1Client(perform);
- return{query,db,metrics};
+ return{query,db,metrics,clear:()=>cache.clear()};
 }

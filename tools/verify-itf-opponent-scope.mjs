@@ -10,7 +10,7 @@ import {playerCircuitIdentities} from '../cloudflare/app-api/lib/player-circuit-
 import {runtimeDocumentReader} from '../cloudflare/app-api/lib/runtime-document-reader.mjs';
 import {presenceIndex,comparePresence,alternateExpectation,forbiddenPast,competitionKey} from './lib/itf-page-audit.mjs';
 const root=process.cwd(),output='artifacts/itf-opponent-verification.json',today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date());
-const report={startedAt:new Date().toISOString(),sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),status:'running',metrics:{queries:0,rowsRead:0,rowsWritten:0},playerCoverage:[],players:[],opponents:[],alternates:[],issues:[],unverifiable:[],limitations:['Worker/browser replay captured read-only D1 results and a pinned acquired ITF generation; every distinct D1 query is rechecked uncached. This is not an atomic cross-service snapshot or certification of all circuits.','Scope: both lists of the configured account and native-ID opponents/partners in their acquired ITF matches. Other users and unrelated opponents are outside scope.','Fresh browser context; existing private caches on user devices are not read.','No external ITF acquisition. Missing source draws cannot be certified as absent participation.','R2 acquired generation is pinned; later acquisitions are outside scope. Changes in any rechecked D1 input or coverage evidence keep the result inconclusive.']};
+const report={startedAt:new Date().toISOString(),sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),status:'running',metrics:{queries:0,rowsRead:0,rowsWritten:0},playerCoverage:[],players:[],opponents:[],alternates:[],issues:[],unverifiable:[],limitations:['Worker/browser replay captured read-only D1 results and a pinned acquired ITF generation; every distinct D1 query is rechecked uncached within its observed-player or opponent checkpoint. Checkpoints are independent and do not certify one common instant for all players. This is not an atomic cross-service snapshot or certification of all circuits.','Scope: both lists of the configured account and native-ID opponents/partners in their acquired ITF matches. Other users and unrelated opponents are outside scope.','Fresh browser context; existing private caches on user devices are not read.','No external ITF acquisition. Missing source draws cannot be certified as absent participation.','R2 acquired generation is pinned; later acquisitions are outside scope. Changes in any rechecked D1 input or coverage evidence keep the result inconclusive.']};
 let browser,server,frozenClient;
 const parse=x=>typeof x==='string'?JSON.parse(x):x;
 const native=p=>playerCircuitIdentities(p).find(x=>x.circuit==='itf')?.profileId||(p.circuitProfiles||[]).find(x=>x.circuit==='itf')?.profileId;
@@ -20,9 +20,17 @@ const issue=(kind,data)=>report.issues.push({kind,...data});
 try{
  console.log('ITF_VERIFICATION_PHASE=read_indexed_inputs');
  const live=await openReadOnlyD1({onMetrics:rows=>{for(const row of rows){report.metrics.queries++;report.metrics.rowsRead+=Number(row.meta?.rows_read)||0;report.metrics.rowsWritten+=Number(row.meta?.rows_written)||0;if(Number(row.meta?.rows_written))throw Error('audit_write_detected');}}});
- const evidence=auditReadEvidence(live.query,{recoverD1Reset:true,recoveryBudget:3,onRecovery:detail=>{(report.readTransportRecoveries??=[]).push({...detail,failedRequestReadCost:'unavailable'});console.log('ITF_READ_RECOVERY='+JSON.stringify(detail));}}),remote=evidence;
+ const evidence=auditReadEvidence(live.query,{recoverD1Reset:true,recoveryBudget:3,onRecovery:detail=>{(report.readTransportRecoveries??=[]).push({...detail,failedRequestReadCost:'unavailable'});console.log('ITF_READ_RECOVERY='+JSON.stringify(detail));}});
  const session=auditReadSession(evidence.query,{minimumIntervalMs:100,onFailure:failure=>{report.d1Failure=failure;}}),{query,db}=session;report.readSessionMetrics=session.metrics;
- const markers=async()=>JSON.stringify(await remote.query("SELECT key,value FROM app_state WHERE key IN ('runtimeDocumentRelease','opponentEntryHash') ORDER BY key"));
+ report.readCheckpoints=[];let checkpointStartedAt=new Date().toISOString();
+ async function checkpoint(scope){
+  const startedAt=checkpointStartedAt;
+  const result=await evidence.verify({clearAfterVerification:true,onProgress:p=>console.log('ITF_READ_RECHECK='+JSON.stringify({scope,...p}))});
+  report.readCheckpoints.push({scope,startedAt,finishedAt:new Date().toISOString(),...result});
+  session.clear();rawById.clear();checkpointStartedAt=new Date().toISOString();
+  console.log('ITF_READ_CHECKPOINT='+JSON.stringify({scope,checked:result.checked,stable:result.stable}));
+ }
+
 
  const pointer=parse(r2('itf/database/pointers/current.json').toString()),generation=pointer.generation;
 
@@ -98,6 +106,8 @@ try{
   }
  }
  report.alternateCheckpoint={status:'checked_pending_final_source_validation',cases:report.alternates.length,issues:report.issues.length,pending:report.pendingAlternates.length,unverifiable:report.unverifiable.length};console.log('ITF_ALTERNATE_CHECKPOINT='+JSON.stringify({checkpoint:report.alternateCheckpoint,pescara:report.alternates.filter(x=>x.competitionId==='J-J60-ITA-2026-001')}));
+ report.alternateCoverageEvidence.changedDuringAudit=coverageBytes.toString()!==r2('itf/audits/official-draw-parity/coverage-v3-current.json').toString();
+ await checkpoint('observed_players_and_alternates');
  await fs.mkdir('artifacts',{recursive:true});await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');
  const opponentPage=await browser.newPage({timezoneId:'Europe/Rome'});
  await opponentPage.route('**/app/api/**',route=>route.fulfill({json:new URL(route.request().url()).pathname.endsWith('/app-snapshot')?snapshots.get('main'):{user:{displayName:'Audit',role:'admin'},rankings:[],matches:[]}}));
@@ -117,16 +127,17 @@ try{
   const selected=result.tournaments.filter(itf),bad=selected.filter(forbiddenPast),record={nativeId:id,name,selected:selected.map(t=>({competitionId:t.competitionId,historyKind:t.historyKind,matches:t.matches?.length||0,historyMatchCount:t.historyMatchCount||0})),invalidPast:bad.map(competitionKey)};
   record.browser=await opponentPage.evaluate(data=>{const projected=opponentHistoryProjection(data),again=opponentHistoryProjection(projected);renderOpponentHistory(data);return {selected:projected.tournaments.filter(t=>circuit(t)==='itf').map(t=>({competitionId:t.competitionId,historyKind:t.historyKind,historyMatchCount:t.historyMatchCount||0,matches:t.matches?.length||0})),sections:document.querySelectorAll('#opponentTournamentHistory .opponentHistoryTournament').length,expectedSections:projected.tournaments.length,stable:JSON.stringify(projected.tournaments.map(t=>[t.circuit,t.competitionId,t.historyKind]))===JSON.stringify(again.tournaments.map(t=>[t.circuit,t.competitionId,t.historyKind]))};},result);
   if(!record.browser.stable||record.browser.sections!==record.browser.expectedSections||record.browser.selected.some(forbiddenPast))issue('opponent_browser_projection_mismatch',record);
-  report.opponents.push(record);delete report.activeOpponent;if(bad.length)issue('opponent_acceptance_in_past',record);
+  report.opponents.push(record);if(bad.length)issue('opponent_acceptance_in_past',record);
+  await checkpoint('opponent:'+id);delete report.activeOpponent;
  }
  await opponentPage.close();
  const catalogue=auditCatalogue;
  report.drawCoverage={scope:'ITF catalogue tournaments concluded since 2026-09-01; cache inventory presence only, not a claim of complete acquisition',tournaments:catalogue.filter(t=>String(t.endDate||'')>= '2026-09-01'&&String(t.endDate||'')<today).map(t=>({competitionId:competitionKey(t),inventoried:Boolean(sourceByCompetition.get(competitionKey(t))?.eventInventory?.length)}))};
  report.drawCoverage.missingInventoryCount=report.drawCoverage.tournaments.filter(t=>!t.inventoried).length;
  if(!report.players.length)throw Error('no_verified_itf_player_audited');
- report.alternateCoverageEvidence.changedDuringAudit=coverageBytes.toString()!==r2('itf/audits/official-draw-parity/coverage-v3-current.json').toString();report.alternateCoverageEvidence.source='captured_acquired_sources';
- console.log('ITF_VERIFICATION_PHASE=recheck_used_d1_reads');report.readEvidence=await evidence.verify({onProgress:p=>console.log('ITF_READ_RECHECK='+JSON.stringify(p))});
+ report.alternateCoverageEvidence.source='captured_acquired_sources';
+ report.readEvidence={checked:report.readCheckpoints.reduce((n,x)=>n+x.checked,0),stable:report.readCheckpoints.every(x=>x.stable),changedReads:report.readCheckpoints.flatMap(x=>x.changedReads),changedQueries:report.readCheckpoints.flatMap(x=>x.changedQueries),recoveries:evidence.recoveryMetrics.used};
  report.sourceChanges={d1:!report.readEvidence.stable,pinnedItfGeneration:generation};report.concurrentSourceChanged=report.sourceChanges.d1||report.alternateCoverageEvidence.changedDuringAudit;report.problemGroups={identity:report.unverifiable.filter(x=>x.reason==='opponent_identity_not_confirmed'),alternates:report.alternates.filter(x=>x.expected.state==='unverifiable'),zeroPresence:report.players.filter(x=>!x.expected.length),excludedPlayers:report.playerCoverage.filter(x=>x.status!=='audited')};
  report.status=report.concurrentSourceChanged?'inconclusive_concurrent_source_change':report.issues.length?'differences_found':report.unverifiable.length||presence.unidentified.length||report.drawCoverage.missingInventoryCount?'checked_scope_matches_with_unverifiable_cases':'checked_captured_scope_matches';
 }catch(error){report.status='audit_failed';report.error=String(error.message).replace(/[\w.+-]+@[\w.-]+/g,'[email]').slice(0,1200);process.exitCode=1;}
-finally{await browser?.close();server?.close();frozenClient?.close();if(report.status!=='checked_captured_scope_matches')process.exitCode=1;report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');console.log('ITF_PAGE_AUDIT='+JSON.stringify({status:report.status,players:report.players.length,opponents:report.opponents.length,alternates:report.alternates.length,issues:report.issues.length,unverifiable:report.unverifiable.length,metrics:report.metrics,readSession:report.readSessionMetrics,localReadMetrics:report.localReadMetrics,snapshot:report.snapshot,d1Failure:report.d1Failure,error:report.error}));for(const row of report.players)console.log('ITF_PLAYER_AUDIT='+JSON.stringify({group:row.group,name:row.name,nativeId:row.nativeId,expected:row.scoped.expected,missingSnapshot:row.scoped.missing,missingBrowser:row.browser?.missing}));for(const row of report.issues)console.log('ITF_PAGE_DIFFERENCE='+JSON.stringify(row));}
+finally{await browser?.close();server?.close();frozenClient?.close();if(report.status!=='checked_captured_scope_matches')process.exitCode=1;report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');console.log('ITF_PAGE_AUDIT='+JSON.stringify({status:report.status,players:report.players.length,opponents:report.opponents.length,alternates:report.alternates.length,issues:report.issues.length,unverifiable:report.unverifiable.length,metrics:report.metrics,readSession:report.readSessionMetrics,localReadMetrics:report.localReadMetrics,snapshot:report.snapshot,d1Failure:report.d1Failure,error:report.error}));for(const row of report.players)console.log('ITF_PLAYER_AUDIT='+JSON.stringify({group:row.group,name:row.name,nativeId:row.nativeId,expected:row.scoped.expected,missingSnapshot:row.scoped.missing,missingBrowser:row.browser?.missing}));for(const row of report.unverifiable)console.log('ITF_UNVERIFIABLE='+JSON.stringify(row));for(const row of report.issues)console.log('ITF_PAGE_DIFFERENCE='+JSON.stringify(row));}
