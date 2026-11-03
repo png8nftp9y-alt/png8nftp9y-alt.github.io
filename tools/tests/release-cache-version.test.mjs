@@ -26,3 +26,23 @@ test('an asset change without HTML cache update remains blocked',()=>{const f=fi
 test('large CSS revisions and ordinary numeric JS revisions use the same strict guard',()=>{for(const [before,after,asset]of [['1793578378465339000','1793578378465339001','v3.css'],['2026110200','2026110201','v3.js']]){const f=fixture(before,after,{asset});try{assert.equal(f.run().status,0);}finally{f.close();}}});
 
 test('shared release safety executes the real cache regression before the guard and retains Shield/live checks',async()=>{const {runReleaseSafety}=await import('../run-release-safety.mjs'),calls=[];runReleaseSafety('all',{run:(command,args,env)=>calls.push({command,args,env})});const at=calls.findIndex(c=>c.args.includes('tools/tests/release-cache-version.test.mjs')),guardAt=calls.findIndex(c=>c.args.includes('tools/courtwatch-release-guard.mjs'));assert.ok(at>=0&&at<guardAt);assert.ok(calls.some(c=>c.args.includes('tools/courtwatch-functional-shield.mjs')));assert.equal(calls.filter(c=>c.args.includes('tools/replay-others-real-snapshot.mjs')).length,2);assert.ok(calls.some(c=>c.args.includes('tools/verify-player-group-release-browser.mjs')));});
+
+test('data JSON is not JavaScript; source still requires report',()=>{
+ for(const name of ['players.json','tournaments.json','players.js','players.mjs','cloudflare/app-api/lib/example.mjs']){
+  const f=fixture('100','101');
+  try{
+   const target=path.join(f.dir,name);
+   fs.mkdirSync(path.dirname(target),{recursive:true});
+   fs.writeFileSync(target,name.endsWith('.json')?'{}':'// changed source');
+   const git=(...args)=>execFileSync('git',args,{cwd:f.dir,stdio:'pipe'});
+   git('add','-f',name);
+   git('-c','user.name=Fixture','-c','user.email=fixture@example.invalid',
+       '-c','commit.gpgsign=false','-c','core.hooksPath=/dev/null',
+       'commit','-qm','change without report');
+   const result=f.run();
+   assert.equal(result.report.results.find(r=>r.name==='report-same-commit').status,
+                name.endsWith('.json')?'pass':'fail',name);
+   assert.equal(result.status,name.endsWith('.json')?0:1,name);
+  }finally{f.close();}
+ }
+});

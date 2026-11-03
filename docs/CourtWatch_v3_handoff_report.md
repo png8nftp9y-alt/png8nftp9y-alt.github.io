@@ -10317,3 +10317,10 @@ Il run Altri 41730993116 è riuscito; assenza futura di 7500 non garantita.
 - La paginazione limita la risposta, senza garanzia di risolvere un indisponibilita globale D1. I test verificano piano SQLite indicizzato, nessuna scansione/ordinamento temporaneo, parita degli incontri, pagine multiple, blocchi mancanti/extra/corrotti e errore D1 che resta bloccante senza diventare una risposta vuota riuscita. 22 test passati; la regressione del limite fallisce sul lettore precedente. Installer richiede il check API completo prima del commit.
 - Soukup 800755392, J-J30-GER-2026-001 (Leimen): discrepanza fotografata alle 22:14-22:15 UTC. Lo stesso commit ha poi importato gli indici: job 126242743965, ripristino fonti ITF dalle 22:19 UTC, generazione delta alle 22:22 UTC e job concluso con successo. Il confronto precedeva quell importazione e non prova un errore persistente della regola. Verifica locale della regola attuale sui tabelloni pubblicati Leimen: excluded, absent_from_complete_draws, tre eventi maschili certificati. Nessuna modifica manuale o eccezione nominale. Readback D1 del singolo profilo resta richiesto prima di dichiarare il caso chiuso.
 - Considerata la patch checkpoint gia preparata nell altra chat (courtwatch-scope-checkpoint.py); questo installatore non ne sovrascrive i file. Nessuna seconda implementazione di checkpoint, rilancio workflow o motori. Verifica remota del limite D1 e completamento dei 160 avversari restano aperti dopo pubblicazione.
+
+## Shield: distinzione corretta tra JSON e JavaScript
+Il controllo report-same-commit interpretava players.json come players.js
+perché mancava il vincolo di fine nome nell'espressione regolare.
+Corretto il riconoscimento delle estensioni, senza esenzioni per il codice.
+Test del vero guard: JSON consentito; JS, MJS e codice Cloudflare senza
+report bloccati. Sei test superati. Motori, dati e schedulazioni invariati.
