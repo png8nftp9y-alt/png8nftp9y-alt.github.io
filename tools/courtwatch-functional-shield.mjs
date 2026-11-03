@@ -183,6 +183,7 @@ try{
   await page.locator('#brandHome').click();await page.locator('#homeView.active').waitFor({state:'visible'});
   requireCheck(errors.length===0,'nessun errore browser',errors.join(' | '));
   await import('./verify-cold-start-browser.mjs');
+  await import('./verify-progressive-rankings-browser.mjs');
   requireCheck(true,'primo accesso senza cache: una sola richiesta storico in TCL/Altri su desktop/mobile');
   await page.screenshot({path:path.join(artifacts,'courtwatch-shield-ui.png'),fullPage:true});
   await fs.writeFile(path.join(artifacts,'courtwatch-shield-ui.json'),JSON.stringify({generatedAt:new Date().toISOString(),passed:true,checks},null,2)+'\n');

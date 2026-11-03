@@ -963,6 +963,79 @@ function recordPlayerLoadTiming(stage,started,response=null){
     console.info('courtwatch_player_timing '+JSON.stringify({stage,elapsedMs:Math.max(0,Date.now()-started),status:response?.status??null,serverTiming:value}));
   } catch {} // Diagnostics must never interrupt a player operation.
 }
+function mergeProgressiveRankingFields(target, patch) {
+  const playerKeys=['tennisEuropeRankings','tennisEuropeRankingDates','tennisEuropeRanking','tennisEuropeLatestRankingDates'];
+  const matchField=key=>/^(?:player|partner|opponent)Te/.test(key);
+  let changed=false;
+  function replace(row,next,keys){
+    const before=JSON.stringify(keys.map(key=>row[key]));
+    for(const key of keys){delete row[key];if(Object.prototype.hasOwnProperty.call(next,key))row[key]=next[key];}
+    if(before!==JSON.stringify(keys.map(key=>row[key])))changed=true;
+  }
+  const players=new Map((patch.players||[]).map(p=>[p.id,p]));
+  for(const row of target.players||[]){const next=players.get(row.id);if(next)replace(row,next,playerKeys);}
+  const key=row=>JSON.stringify([row.playerId,row.matchId||row.id]);
+  const matches=new Map((patch.matches||[]).map(row=>[key(row),row]));
+  for(const field of ['matches','agenda','results'])for(const row of target[field]||[]){
+    const next=matches.get(key(row));if(next)replace(row,next,[...new Set([...Object.keys(row),...Object.keys(next)].filter(matchField))]);
+  }
+  return changed;
+}
+function applyPendingProgressiveRankings() {
+  const pending=applyPendingProgressiveRankings.pending;
+  if(!pending||!state.data)return;
+  for(const [key,job] of pending){
+    if(job.group!==PLAYER_GROUP)continue;
+    const current=state.data.snapshotReadAt||'';
+    if(current>job.readAt){pending.delete(key);continue;}
+    if(current!==job.readAt)continue;
+    pending.delete(key);
+    const changed=mergeProgressiveRankingFields(state.data,job.patch);
+    if(!changed&&!job.coreChanged)continue;
+    if(typeof playerRankingCache!=='undefined')for(const player of job.patch.players||[]){
+      const rankings=Object.entries(player.tennisEuropeRankings||{}).map(([category,ranking])=>({category:category==='u14'?'U14':category==='u16'?'U16':category,ranking,ranking_date:player.tennisEuropeRankingDates?.[category]}));
+      playerRankingCache.set(String(player.id),{playerId:player.id,latestRankingDates:player.tennisEuropeLatestRankingDates||{},rankings});
+    }
+    const hash=location.hash,y=typeof scrollY==='number'?scrollY:null;
+    renderIfDataChanged();
+    if(y!==null&&location.hash===hash&&typeof scrollTo==='function')scrollTo({top:y,behavior:'auto'});
+    Promise.resolve(saveCachedData(state.data)).catch(error=>console.warn('Archivio locale non disponibile',error));
+  }
+}
+async function readProgressiveProjection(response,started,group,controller,timeoutMs) {
+  const reader=response.body.getReader(),decoder=new TextDecoder();let buffer='',ended=false;
+  async function packet(){
+    while(true){
+      const newline=buffer.indexOf('\n');
+      if(newline>=0){const line=buffer.slice(0,newline);buffer=buffer.slice(newline+1);if(line.trim())return JSON.parse(line);continue;}
+      if(ended){if(buffer.trim()){const line=buffer;buffer='';return JSON.parse(line)}return null;}
+      const chunk=await reader.read();ended=chunk.done;buffer+=decoder.decode(chunk.value||new Uint8Array(),{stream:!ended});
+    }
+  }
+  let initial;
+  try{
+    initial=await packet();
+    if(initial?.type!=='snapshot'||initial.data?.group!==group||!['players','tournaments','matches'].every(key=>Array.isArray(initial.data[key])))throw Error('Proiezione progressiva incompleta');
+  }catch(error){await reader.cancel().catch(()=>{});throw error;}
+  const data=initial.data,readAt=new Date(started).toISOString();
+  const timer=setTimeout(()=>{controller.abort();reader.cancel().catch(()=>{});},timeoutMs);
+  // Continue the SAME response after returning complete tournament/match data.
+  // No second history request, polling, retry or cross-request data cache.
+  (async()=>{
+    const frame=await packet();
+    if(frame?.type!=='rankings'||frame.data?.group!==group)throw Error('Classifiche progressive non disponibili');
+    const coreChanged=mergeProgressiveRankingFields(data,frame.data);
+    const pending=applyPendingProgressiveRankings.pending||(applyPendingProgressiveRankings.pending=new Map());
+    pending.set(group+'|'+readAt,{group,readAt,patch:frame.data,coreChanged});
+    while(pending.size>4)pending.delete(pending.keys().next().value);
+    applyPendingProgressiveRankings();
+    if(typeof recordStartupTiming==='function')recordStartupTiming('rankings_ready',started,{serverMs:frame.durationMs});
+  })().catch(error=>{
+    console.warn('Classifiche non completate; tornei e partite restano disponibili',error);
+    if(typeof recordStartupTiming==='function')recordStartupTiming('rankings_unavailable',started);
+  }).finally(()=>{clearTimeout(timer);reader.cancel().catch(()=>{});});
+  return data;
+}
 async function fetchProjection(url, timeoutMs, group = PLAYER_GROUP) {
   // A group switch and its background load must share the same live read.
   // Keep only in-flight requests: completed data is never cached here.
@@ -983,7 +1056,7 @@ async function requestProjection(url, timeoutMs, group = PLAYER_GROUP) {
   if (group === PLAYER_GROUP && !timingEnabled) activeProjectionController = controller;
   try {
     const response = await fetch(
-      url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(),
+      url + (url.includes("?") ? "&" : "?") + (!timingEnabled && typeof ReadableStream === "function" && typeof TextDecoder === "function" ? "streamRankings=1&" : "") + "t=" + Date.now(),
       privateApiOptions({
         cache: "no-store",
         mode: "cors",
@@ -994,7 +1067,8 @@ async function requestProjection(url, timeoutMs, group = PLAYER_GROUP) {
     timingResponse=response;
     if (typeof recordStartupTiming === "function") recordStartupTiming("snapshot_headers", timingStarted, {status:response.status,serverTiming:response.headers?.get?.("Server-Timing") || ""});
     if (!response.ok) throw Error("API Court Watch non disponibile: " + response.status);
-    const data = await response.json();
+    const streamed=/application\/x-ndjson/i.test(response.headers?.get?.("Content-Type") || "") && response.body?.getReader;
+    const data = streamed ? await readProgressiveProjection(response,timingStarted,group,controller,timeoutMs) : await response.json();
     if (
       !Array.isArray(data.players) ||
       !Array.isArray(data.tournaments) ||
@@ -5100,6 +5174,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       if (typeof recordStartupTiming === "function") recordStartupTiming("projection_render", publicationStarted, {complete:Boolean(projection)});
       if (viewY !== null && viewHash !== null && location.hash === viewHash && typeof scrollTo === "function")
         scrollTo({top: viewY, behavior: "auto"});
+      if (typeof applyPendingProgressiveRankings === "function") applyPendingProgressiveRankings();
       const persistenceStarted = Date.now();
       Promise.resolve(saveCachedData(state.data)).catch(error => console.warn("Archivio locale non disponibile", error));
       if (typeof recordStartupTiming === "function") recordStartupTiming("cache_sync", persistenceStarted);

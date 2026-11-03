@@ -1,3 +1,4 @@
+import {progressiveSnapshot} from '../lib/progressive-snapshot.mjs';
 import {boundedPlayerMap} from '../lib/bounded-player-map.mjs';
 import {snapshotHistoryPlayers,snapshotEntryPlayer} from '../lib/snapshot-history-players.mjs';
 import {agendaAdvancementRows} from '../lib/tennis-europe-agenda-advances.mjs';
@@ -232,7 +233,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
     const overrides=await optionalRows(env.DB.prepare("SELECT entity_type,entity_id,action,payload FROM manual_overrides WHERE active=1 AND entity_type='player' ORDER BY updated_at"));
     return privateJson({group,generatedAt:new Date().toISOString(),membershipIds:list.membershipIds,players:applyOverrides(list.players,overrides,'player').filter(p=>list.membershipIds.includes(p.id))});
   }
-  if(apiPath==='/app-snapshot'&&request.method==='GET'){const playerId=url.searchParams.get('playerId')||'';
+  if(apiPath==='/app-snapshot'&&request.method==='GET'){const playerId=url.searchParams.get('playerId')||'',progressive=!url.searchParams.has('playerId')&&url.searchParams.get('streamRankings')==='1';
     if(url.searchParams.has('playerId')&&(!playerId||playerId.length>160))return privateJson({error:'invalid_player'},400);
     const membershipIds=await timing.measure('membership',()=>appSnapshotMembership(env.DB,memberSelection,user.id));
     if(playerId&&!membershipIds.includes(playerId))return privateJson({error:'player_not_in_your_list'},404);
@@ -290,17 +291,17 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
       for(const m of history.matches)matchMap.set(`${m.playerId}|${m.matchId||m.id}`,{...matchMap.get(`${m.playerId}|${m.matchId||m.id}`),...m});
       matches.splice(0,matches.length,...matchMap.values());
     }
-    const rankPlayers=async()=>{try{await timing.measure('rankings',()=>applyPreparedTennisEuropeRankings(env,players,matches,[...new Set(players.map(p=>p.id))],scopedData?.[3]))}catch(error){console.error('prepared_tennis_europe_projection_failed',error)}};
+    const rankPlayers=async()=>{try{await timing.measure('rankings',()=>applyPreparedTennisEuropeRankings(env,players,matches,[...new Set(players.map(p=>p.id))],scopedData?.[3]));return true}catch(error){console.error('prepared_tennis_europe_projection_failed',error);return false}};
     // Tournament presentation changes only tournaments; rankings and profile links
     // use the already merged players/matches, so neither must wait for catalogues.
     const [presented,,linkedProfiles,advancementSource]=await Promise.all([
       timing.measure('presentation_wait',()=>(presentation?presentation.enrich(tournaments):enrichPersonalTournamentPresentation(tournaments,env.RUNTIME_DOCUMENTS))),
-      rankPlayers(),timing.measure('profile_links',()=>resolveCircuitProfiles(env.DB,players,scopedData[6])),
+      progressive?undefined:rankPlayers(),timing.measure('profile_links',()=>resolveCircuitProfiles(env.DB,players,scopedData[6])),
       env.DB.prepare("SELECT value FROM app_state WHERE key='tennis_europe_agenda_advancements'").first()
     ]);
     tournaments.splice(0,tournaments.length,...presented);
     const agendaAdvances=agendaAdvancementRows(advancementSource?JSON.parse(advancementSource.value):[],players,matches);
-    for(const player of players)player.circuitProfiles=linkedProfiles.get(player)||[];await enrichFitpMetadata(env.DB,players,scopedData[4]);await enrichPlayerBirthMetadata(env.DB,players,scopedData[5]);const selectedIds=new Set(players.map(p=>p.id));const scoped=(rows,field)=>(playerId||group==='others')?rows.filter(row=>selectedIds.has(row[field])):rows;return privateJson({group,...(playerId?{playerId}:{}),membershipIds,generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players:scoped(applyOverrides(players,overrides,'player'),'id'),tournaments:scoped(applyOverrides(tournaments,overrides,'tournament'),'playerId'),matches:[...matches,...agendaAdvances]})}
+    for(const player of players)player.circuitProfiles=linkedProfiles.get(player)||[];await enrichFitpMetadata(env.DB,players,scopedData[4]);await enrichPlayerBirthMetadata(env.DB,players,scopedData[5]);const selectedIds=new Set(players.map(p=>p.id));const scoped=(rows,field)=>(playerId||group==='others')?rows.filter(row=>selectedIds.has(row[field])):rows;const snapshot=()=>({group,...(playerId?{playerId}:{}),membershipIds,generatedAt:manifest?.generated_at||new Date().toISOString(),schemaVersion:manifest?.schema_version||'',players:scoped(applyOverrides(players,overrides,'player'),'id'),tournaments:scoped(applyOverrides(tournaments,overrides,'tournament'),'playerId'),matches:[...matches,...agendaAdvances]});return progressive?progressiveSnapshot(snapshot(),async()=>{if(!await rankPlayers())throw Error('rankings_unavailable');return snapshot()}):privateJson(snapshot())}
   if(apiPath==='/match-analysis-status'&&request.method==='GET'){const rows=await optionalRows(env.DB.prepare('SELECT match_key,updated_at FROM user_match_analyses WHERE user_id=? ORDER BY updated_at DESC').bind(user.id));return privateJson({matches:rows.map(row=>({matchKey:row.match_key,updatedAt:row.updated_at}))})}
   if(apiPath==='/match-analysis'){const matchKey=String(url.searchParams.get('matchKey')||'').trim().slice(0,240);if(request.method==='GET'){if(!matchKey)return privateJson({error:'match_key_required'},400);const row=await env.DB.prepare('SELECT match_key,analysis,updated_at FROM user_match_analyses WHERE user_id=? AND match_key=?').bind(user.id,matchKey).first();return privateJson(row?{matchKey:row.match_key,analysis:row.analysis,updatedAt:row.updated_at}:{matchKey,analysis:'',updatedAt:null})}if(request.method==='PUT'){const body=await request.json().catch(()=>null),key=String(body?.matchKey||'').trim().slice(0,240),analysis=String(body?.analysis||'').trim();if(!key||!analysis||analysis.length>20000)return privateJson({error:'invalid_analysis'},400);const now=new Date().toISOString();await env.DB.prepare('INSERT INTO user_match_analyses(user_id,match_key,analysis,updated_at) VALUES(?,?,?,?) ON CONFLICT(user_id,match_key) DO UPDATE SET analysis=excluded.analysis,updated_at=excluded.updated_at').bind(user.id,key,analysis,now).run();return privateJson({matchKey:key,analysis,updatedAt:now})}if(request.method==='DELETE'){if(!matchKey)return privateJson({error:'match_key_required'},400);await env.DB.prepare('DELETE FROM user_match_analyses WHERE user_id=? AND match_key=?').bind(user.id,matchKey).run();return privateJson({success:true,matchKey})}return privateJson({error:'method_not_allowed'},405)}
   return privateJson({error:'not_found'},404)
