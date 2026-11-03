@@ -17,7 +17,14 @@ export async function opponentItfDocumentHistory(db,{identity,entries=[],existin
   const competitionId=key(entry.competitionId),versions=(await db.prepare('SELECT draw_key,content_sha256,competition_id,event,chunk_count,content_bytes FROM itf_draw_documents WHERE competition_id=? ORDER BY event,observed_at DESC,content_sha256 DESC').bind(competitionId).all()).results||[],events=new Set(),matches=[],unavailable=[],verifiedSex=new Set();
   for(const version of versions){
    if(events.has(version.event))continue;events.add(version.event);
-   const chunks=(await db.prepare('SELECT chunk_index,content FROM itf_draw_document_chunks WHERE draw_key=? AND content_sha256=? ORDER BY chunk_index').bind(version.draw_key,version.content_sha256).all()).results||[];
+   const chunks=[],expectedChunks=Number(version.chunk_count);
+   if(!Number.isSafeInteger(expectedChunks)||expectedChunks<1)throw Error('itf_history_document_chunks_missing');
+   for(;;){
+    const page=(await db.prepare('SELECT chunk_index,content FROM itf_draw_document_chunks WHERE draw_key=? AND content_sha256=? AND chunk_index>=? ORDER BY chunk_index LIMIT 8').bind(version.draw_key,version.content_sha256,chunks.length).all()).results||[];
+    if(page.length>8||chunks.length+page.length>expectedChunks||page.some((x,i)=>Number(x.chunk_index)!==chunks.length+i))throw Error('itf_history_document_chunks_missing');
+    chunks.push(...page);
+    if(page.length<8)break;
+   }
    if(chunks.length!==Number(version.chunk_count)||chunks.some((x,i)=>Number(x.chunk_index)!==i))throw Error('itf_history_document_chunks_missing');
    const text=chunks.map(x=>x.content).join(''),bytes=new TextEncoder().encode(text),hash=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');
    if(hash!==version.content_sha256||bytes.length!==Number(version.content_bytes))throw Error('itf_history_document_integrity_failed');
