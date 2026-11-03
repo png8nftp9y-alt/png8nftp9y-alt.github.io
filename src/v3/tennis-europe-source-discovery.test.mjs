@@ -1,3 +1,5 @@
+import './tennis-europe-oop-real-html.test.mjs';
+import './tennis-europe-oop-scope.test.mjs';
 import './tennis-europe-oop-completeness.test.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
