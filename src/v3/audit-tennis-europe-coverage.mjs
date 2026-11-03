@@ -1,3 +1,4 @@
+import {inventoryOopPage,auditOopCompleteness} from './tennis-europe-oop-completeness.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
@@ -14,7 +15,7 @@ const clean=s=>String(s||'').replace(/<[^>]+>/g,' ').replace(/&amp;/g,'&').repla
 function pageOK(html){if(/404\s*-\s*Page not found|name=["']CookiePurposes|Verify you are human/i.test(html))throw Error('source_not_available');return html;}
 await consent();
 for(const tournament of queue){
- const id=tournament.competitionId,stored=byTournament.get(id.toUpperCase())||[],r={competitionId:id,tournamentName:tournament.tournamentName,startDate:tournament.startDate,endDate:tournament.endDate,storedMatches:stored.length,draws:[],days:[],issues:[],missing:[],conflicts:[],checkedAt:new Date().toISOString()};
+ const id=tournament.competitionId,stored=byTournament.get(id.toUpperCase())||[],r={competitionId:id,tournamentName:tournament.tournamentName,startDate:tournament.startDate,endDate:tournament.endDate,storedMatches:stored.length,draws:[],days:[],issues:[],oopPages:[],missing:[],conflicts:[],checkedAt:new Date().toISOString()};
  if(/winter\s*cups?|summer\s*cups?|lampo\s*trophy/i.test(tournament.tournamentName||'')){r.status='deferred_team';results.push(r);continue;}
  try{
   let listing='',listingUrl=BASE+'/tournament/'+id+'/draws';
@@ -38,11 +39,11 @@ for(const tournament of queue){
   let dayHtml='',dayList=[];try{dayHtml=pageOK(await get(BASE+'/tournament/'+id+'/matches'));dayList=dates(dayHtml);}catch{}
   if(!dayList.length){try{dayHtml=pageOK(await get(BASE+'/sport/matches.aspx?id='+id));dayList=dates(dayHtml);}catch(e){r.issues.push('oop_listing:'+e.message);}}
   if(!dayList.length)r.issues.push('no_verified_oop_days');
-  for(const day of dayList){const d={date:day,issues:[]};r.days.push(d);try{const html=pageOK(await get(BASE+'/tournament/'+id+'/matches/'+day)),parsed=parsePage(html,id,day);d.sha256=createHash('sha256').update(html).digest('hex');d.matches=parsed.length;const cards=[...html.matchAll(/<div\b[^>]*class=["'][^"']*\bmatch\s+match--list\b[^"']*["'][^>]*>/gi)].length;if(cards!==parsed.length)d.issues.push('unparsed_oop_cards:'+cards+':'+parsed.length);if(parsed.some(m=>m.status!=='completed'))d.issues.push('unresolved_oop_results');if(!parsed.length)d.issues.push('no_verified_oop_matches');const c=compareMatches(parsed.filter(m=>m.status==='completed'),stored);r.missing.push(...c.missing);r.conflicts.push(...c.conflicts);}catch(e){d.issues.push(e.message);}r.issues.push(...d.issues.map(message=>({day,message})));}
+  for(const day of dayList){const d={date:day,issues:[]};r.days.push(d);try{const html=pageOK(await get(BASE+'/tournament/'+id+'/matches/'+day));r.oopPages.push(inventoryOopPage(html,id,day));const parsed=parsePage(html,id,day);d.sha256=createHash('sha256').update(html).digest('hex');d.matches=parsed.length;const cards=[...html.matchAll(/<div\b[^>]*class=["'][^"']*\bmatch\s+match--list\b[^"']*["'][^>]*>/gi)].length;if(cards!==parsed.length)d.issues.push('unparsed_oop_cards:'+cards+':'+parsed.length);if(parsed.some(m=>m.status!=='completed'))d.issues.push('unresolved_oop_results');if(!parsed.length)d.issues.push('no_verified_oop_matches');const c=compareMatches(parsed.filter(m=>m.status==='completed'),stored);r.missing.push(...c.missing);r.conflicts.push(...c.conflicts);}catch(e){d.issues.push(e.message);}r.issues.push(...d.issues.map(message=>({day,message})));}
   r.officialDrawMatches=official.length;
   r.status=coverageStatus({matches:stored.length,draws:r.draws.length,days:r.days.length,issues:r.issues.length,missing:r.missing.length,conflicts:r.conflicts.length});
  }catch(e){r.issues.push(String(e.message));r.status='unverified';}
- results.push(r);console.log(JSON.stringify({id,status:r.status,stored:stored.length,draws:r.draws.length,days:r.days.length,missing:r.missing.length,issues:r.issues.length}));
+ r.oopCompleteness=auditOopCompleteness({tournament,pages:r.oopPages,matches:stored});delete r.oopPages;results.push(r);console.log(JSON.stringify({id,status:r.status,stored:stored.length,draws:r.draws.length,days:r.days.length,missing:r.missing.length,issues:r.issues.length}));
 }
 await fs.mkdir('coverage-results',{recursive:true});
 await fs.writeFile(path.join('coverage-results','coverage-'+shard+'.json'),JSON.stringify({version:1,scope:'Tennis Europe ended tournaments; named team events deferred',baselineSourceRunId:baseline.sourceRunId,catalogGeneratedAt:catalog.generatedAt,cutoff,today,shard,total,queued:queue.length,results},null,2)+'\n');
