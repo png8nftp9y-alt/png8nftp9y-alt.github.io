@@ -3,7 +3,7 @@ name: Court Watch Others real snapshot browser
 on:
   push:
     branches: [main]
-    paths: ['src/v3/agenda-court-label.test.mjs', 'v3.css', 'tools/verify-agenda-layout-browser.mjs', 'v3.html', 'tools/replay-others-real-snapshot.mjs', 'cloudflare/app-api/lib/courtwatch-player-additions.mjs', 'cloudflare/app-api/lib/d1-read-retry.mjs', 'cloudflare/app-api/test/personal-player-read-retry.test.mjs', 'cloudflare/app-api/test/replay-others-real-snapshot.test.mjs', 'tools/verify-shared-match-refresh-browser.mjs', 'tools/verify-others-real-snapshot-browser.mjs', 'v3.js', 'cloudflare/app-api/src/index.js', 'cloudflare/app-api/lib/personal-*.mjs', 'cloudflare/app-api/lib/app-snapshot-membership.mjs', '.github/workflows/courtwatch-others-real-snapshot-browser.yml']
+    paths: ['src/v3/agenda-court-label.test.mjs', 'v3.css', 'tools/verify-agenda-layout-browser.mjs', 'v3.html', 'tools/replay-others-real-snapshot.mjs', 'tools/read-only-replay-db.mjs', 'tools/tests/read-only-replay-db.test.mjs', 'cloudflare/app-api/lib/courtwatch-player-additions.mjs', 'cloudflare/app-api/lib/d1-read-retry.mjs', 'cloudflare/app-api/test/personal-player-read-retry.test.mjs', 'cloudflare/app-api/test/replay-others-real-snapshot.test.mjs', 'tools/verify-shared-match-refresh-browser.mjs', 'tools/verify-others-real-snapshot-browser.mjs', 'v3.js', 'cloudflare/app-api/src/index.js', 'cloudflare/app-api/lib/personal-*.mjs', 'cloudflare/app-api/lib/app-snapshot-membership.mjs', '.github/workflows/courtwatch-others-real-snapshot-browser.yml']
   workflow_dispatch:
 permissions:
   contents: read
