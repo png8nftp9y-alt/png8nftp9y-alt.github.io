@@ -1,11 +1,20 @@
 name: Court Watch ITF opponent scope verification
 on:
   workflow_dispatch:
+    inputs:
+      opponent_ids:
+        description: 'Optional comma-separated native IDs: fresh targeted check, not a full-scope certificate'
+        type: string
+        default: ''
   push:
     branches: [main]
     paths:
       - 'tools/verify-itf-opponent-scope.mjs'
       - 'tools/lib/audit-read-evidence.mjs'
+      - 'tools/lib/audit-d1-batch.mjs'
+      - 'tools/lib/audit-opponent-selection.mjs'
+      - 'tools/tests/audit-opponent-selection.test.mjs'
+      - 'tools/tests/audit-d1-batch.test.mjs'
       - 'tools/lib/itf-audit-read-session.mjs'
       - 'tools/tests/itf-audit-read-session.test.mjs'
       - 'tools/lib/opponent-native-history-check.mjs'
@@ -27,12 +36,13 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Test targeted evidence verification
-        run: node --test tools/tests/opponent-native-history-check.test.mjs tools/tests/audit-read-evidence.test.mjs tools/tests/itf-page-audit.test.mjs tools/tests/itf-audit-read-session.test.mjs cloudflare/app-api/test/opponent-itf-document-history.test.mjs
+        run: node --test tools/tests/audit-opponent-selection.test.mjs tools/tests/audit-d1-batch.test.mjs tools/tests/opponent-native-history-check.test.mjs tools/tests/audit-read-evidence.test.mjs tools/tests/itf-page-audit.test.mjs tools/tests/itf-audit-read-session.test.mjs cloudflare/app-api/test/opponent-itf-document-history.test.mjs
       - run: npm install
       - run: python -m pip install --disable-pip-version-check --quiet awscli
       - name: Verify scoped opponents, source inputs and browser rendering
         timeout-minutes: 30
         env:
+          ITF_AUDIT_OPPONENT_IDS: ${{ inputs.opponent_ids || '' }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_D1_DATABASE_ID: cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda

@@ -1,5 +1,7 @@
 import {checkOpponentNativeHistory} from './lib/opponent-native-history-check.mjs';
 import {openReadOnlyD1} from '../cloudflare/app-api/lib/read-only-d1-client.mjs';
+import {auditOpponentSelection} from './lib/audit-opponent-selection.mjs';
+import {auditD1Batch} from './lib/audit-d1-batch.mjs';
 import {auditReadEvidence} from './lib/audit-read-evidence.mjs';
 import {auditReadSession} from './lib/itf-audit-read-session.mjs';
 import {pendingFutureAlternate} from './lib/itf-alternate-timing.mjs';
@@ -19,13 +21,14 @@ const itf=t=>String(t.circuit||t.sourceId||'').toLowerCase()==='itf';
 const issue=(kind,data)=>report.issues.push({kind,...data});
 try{
  console.log('ITF_VERIFICATION_PHASE=read_indexed_inputs');
- const live=await openReadOnlyD1({onMetrics:rows=>{for(const row of rows){report.metrics.queries++;report.metrics.rowsRead+=Number(row.meta?.rows_read)||0;report.metrics.rowsWritten+=Number(row.meta?.rows_written)||0;if(Number(row.meta?.rows_written))throw Error('audit_write_detected');}}});
+ const onD1Metrics=rows=>{for(const row of rows){report.metrics.queries++;report.metrics.rowsRead+=Number(row.meta?.rows_read)||0;report.metrics.rowsWritten+=Number(row.meta?.rows_written)||0;if(Number(row.meta?.rows_written))throw Error('audit_write_detected');}};
+ const live=await openReadOnlyD1({onMetrics:onD1Metrics}),verification=auditD1Batch({onMetrics:onD1Metrics});report.batchVerification=verification.metrics;
  const evidence=auditReadEvidence(live.query,{recoverD1Reset:true,recoveryBudget:3,onRecovery:detail=>{(report.readTransportRecoveries??=[]).push({...detail,failedRequestReadCost:'unavailable'});console.log('ITF_READ_RECOVERY='+JSON.stringify(detail));}});
  const session=auditReadSession(evidence.query,{minimumIntervalMs:100,onFailure:failure=>{report.d1Failure=failure;}}),{query,db}=session;report.readSessionMetrics=session.metrics;
- report.readCheckpoints=[];let checkpointStartedAt=new Date().toISOString();
+ report.readCheckpoints=[];report.pendingOpponentIds=[];let checkpointStartedAt=new Date().toISOString();
  async function checkpoint(scope){
   const startedAt=checkpointStartedAt;
-  const result=await evidence.verify({clearAfterVerification:true,concurrency:4,onProgress:p=>console.log('ITF_READ_RECHECK='+JSON.stringify({scope,...p}))});
+  const result=await evidence.verify({clearAfterVerification:true,batch:verification.batch,onProgress:p=>console.log('ITF_READ_RECHECK='+JSON.stringify({scope,...p}))});
   report.readCheckpoints.push({scope,startedAt,finishedAt:new Date().toISOString(),...result});
   session.clear({retainVerifiedDraws:result.stable});rawById.clear();checkpointStartedAt=new Date().toISOString();
   console.log('ITF_READ_CHECKPOINT='+JSON.stringify({scope,checked:result.checked,stable:result.stable}));
@@ -115,7 +118,9 @@ try{
  await opponentPage.waitForFunction(()=>typeof state!=='undefined'&&Array.isArray(state.data?.players));
  await opponentPage.evaluate(()=>{const box=document.createElement('div');box.id='opponentTournamentHistory';document.body.append(box);});
  for(const [id,p]of people)if(!opponentIds.has(id))opponentIds.set(id,p.name);
- for(const [id,name]of opponentIds){
+ const selectedScope=auditOpponentSelection(opponentIds,process.env.ITF_AUDIT_OPPONENT_IDS||'');report.opponentSelection={kind:selectedScope.kind,requested:selectedScope.requested,total:selectedScope.opponents.size};
+ report.pendingOpponentIds=[...selectedScope.opponents.keys()].filter(id=>/^\d+$/.test(id));
+ for(const [id,name]of selectedScope.opponents){
   if(!/^\d+$/.test(id)){report.unverifiable.push({nativeId:id,name,reason:'draw_local_id_requires_verified_mapping'});continue;}
   report.activeOpponent={nativeId:id,name};console.log('ITF_OPPONENT_PROGRESS='+JSON.stringify({checked:report.opponents.length,total:opponentIds.size}));
   const result=await api('opponent-profile?profileId='+encodeURIComponent(id)+'&name='+encodeURIComponent(name)+'&asOf='+today);
@@ -128,7 +133,8 @@ try{
   record.browser=await opponentPage.evaluate(data=>{const projected=opponentHistoryProjection(data),again=opponentHistoryProjection(projected);renderOpponentHistory(data);return {selected:projected.tournaments.filter(t=>circuit(t)==='itf').map(t=>({competitionId:t.competitionId,historyKind:t.historyKind,historyMatchCount:t.historyMatchCount||0,matches:t.matches?.length||0})),sections:document.querySelectorAll('#opponentTournamentHistory .opponentHistoryTournament').length,expectedSections:projected.tournaments.length,stable:JSON.stringify(projected.tournaments.map(t=>[t.circuit,t.competitionId,t.historyKind]))===JSON.stringify(again.tournaments.map(t=>[t.circuit,t.competitionId,t.historyKind]))};},result);
   if(!record.browser.stable||record.browser.sections!==record.browser.expectedSections||record.browser.selected.some(forbiddenPast))issue('opponent_browser_projection_mismatch',record);
   report.opponents.push(record);if(bad.length)issue('opponent_acceptance_in_past',record);
-  await checkpoint('opponent:'+id);delete report.activeOpponent;
+  await checkpoint('opponent:'+id);if(report.readCheckpoints.at(-1)?.stable)report.pendingOpponentIds=report.pendingOpponentIds.filter(x=>x!==id);delete report.activeOpponent;
+  await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');
  }
  await opponentPage.close();
  const catalogue=auditCatalogue;
@@ -139,5 +145,6 @@ try{
  report.readEvidence={checked:report.readCheckpoints.reduce((n,x)=>n+x.checked,0),stable:report.readCheckpoints.every(x=>x.stable),changedReads:report.readCheckpoints.flatMap(x=>x.changedReads),changedQueries:report.readCheckpoints.flatMap(x=>x.changedQueries),recoveries:evidence.recoveryMetrics.used};
  report.sourceChanges={d1:!report.readEvidence.stable,pinnedItfGeneration:generation};report.concurrentSourceChanged=report.sourceChanges.d1||report.alternateCoverageEvidence.changedDuringAudit;report.problemGroups={identity:report.unverifiable.filter(x=>x.reason==='opponent_identity_not_confirmed'),alternates:report.alternates.filter(x=>x.expected.state==='unverifiable'),zeroPresence:report.players.filter(x=>!x.expected.length),excludedPlayers:report.playerCoverage.filter(x=>x.status!=='audited')};
  report.status=report.concurrentSourceChanged?'inconclusive_concurrent_source_change':report.issues.length?'differences_found':report.unverifiable.length||presence.unidentified.length||report.drawCoverage.missingInventoryCount?'checked_scope_matches_with_unverifiable_cases':'checked_captured_scope_matches';
+ if(report.status==='checked_captured_scope_matches'&&report.opponentSelection.kind!=='full')report.status='checked_targeted_scope_matches';
 }catch(error){report.status='audit_failed';report.error=String(error.message).replace(/[\w.+-]+@[\w.-]+/g,'[email]').slice(0,1200);process.exitCode=1;}
-finally{await browser?.close();server?.close();frozenClient?.close();if(report.status!=='checked_captured_scope_matches')process.exitCode=1;report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');console.log('ITF_PAGE_AUDIT='+JSON.stringify({status:report.status,players:report.players.length,opponents:report.opponents.length,alternates:report.alternates.length,issues:report.issues.length,unverifiable:report.unverifiable.length,metrics:report.metrics,readSession:report.readSessionMetrics,localReadMetrics:report.localReadMetrics,snapshot:report.snapshot,d1Failure:report.d1Failure,error:report.error}));for(const row of report.players)console.log('ITF_PLAYER_AUDIT='+JSON.stringify({group:row.group,name:row.name,nativeId:row.nativeId,expected:row.scoped.expected,missingSnapshot:row.scoped.missing,missingBrowser:row.browser?.missing}));for(const row of report.unverifiable)console.log('ITF_UNVERIFIABLE='+JSON.stringify(row));for(const row of report.issues)console.log('ITF_PAGE_DIFFERENCE='+JSON.stringify(row));}
+finally{await browser?.close();server?.close();frozenClient?.close();if(!['checked_captured_scope_matches','checked_targeted_scope_matches'].includes(report.status))process.exitCode=1;report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');console.log('ITF_PAGE_AUDIT='+JSON.stringify({status:report.status,players:report.players.length,opponents:report.opponents.length,alternates:report.alternates.length,issues:report.issues.length,unverifiable:report.unverifiable.length,metrics:report.metrics,readSession:report.readSessionMetrics,localReadMetrics:report.localReadMetrics,snapshot:report.snapshot,d1Failure:report.d1Failure,error:report.error}));console.log('ITF_PENDING_OPPONENT_IDS='+JSON.stringify(report.pendingOpponentIds));console.log('ITF_BATCH_VERIFICATION='+JSON.stringify(report.batchVerification));for(const row of report.players)console.log('ITF_PLAYER_AUDIT='+JSON.stringify({group:row.group,name:row.name,nativeId:row.nativeId,expected:row.scoped.expected,missingSnapshot:row.scoped.missing,missingBrowser:row.browser?.missing}));for(const row of report.unverifiable)console.log('ITF_UNVERIFIABLE='+JSON.stringify(row));for(const row of report.issues)console.log('ITF_PAGE_DIFFERENCE='+JSON.stringify(row));}

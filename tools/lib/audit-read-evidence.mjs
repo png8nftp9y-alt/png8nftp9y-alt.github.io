@@ -20,10 +20,24 @@ export function auditReadEvidence(execute,{recoverD1Reset:recoverAllReads=false,
   if(!reads.has(key))reads.set(key,{sql,params:structuredClone(params),hash:hash(rows)});
   return rows;
  });
- async function verify({wait=ms=>new Promise(r=>setTimeout(r,ms)),onProgress=()=>{},recoverD1Reset=false,onRecovery=()=>{},clearAfterVerification=false,concurrency=1}={}){
+ async function verify({wait=ms=>new Promise(r=>setTimeout(r,ms)),onProgress=()=>{},recoverD1Reset=false,onRecovery=()=>{},clearAfterVerification=false,concurrency=1,batch}={}){
   if(!Number.isInteger(concurrency)||concurrency<1||concurrency>4)throw Error('invalid_verification_concurrency');
   const changed=[],changedReads=[];let checked=0,recoveries=0;
+  function compare(key,r,rows){
+if(hash(rows)!==r.hash){const queryHash=hash(key);changed.push(queryHash);changedReads.push({queryHash,tables:[...new Set([...r.sql.replace(/'(?:''|[^'])*'|--[^\n]*|\/\*[\s\S]*?\*\//g,' ').matchAll(/\b(?:FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_]*)/gi)].map(m=>m[1]))].sort()});}
+  }
   const pending=[...reads];let cursor=0,failure;
+  if(batch){
+   // One REST request at a time, up to four independent SELECTs, no fallback/retry.
+   for(let offset=0;offset<pending.length;offset+=4){
+    if(offset)await wait(100);
+    const group=pending.slice(offset,offset+4),rows=await batch(group.map(([,r])=>({sql:r.sql,params:r.params})));
+    if(!Array.isArray(rows)||rows.length!==group.length||rows.some(r=>!Array.isArray(r)))throw Error('audit_invalid_batch_result');
+    group.forEach(([key,r],i)=>compare(key,r,rows[i]));checked+=group.length;onProgress({checked,total:pending.length});
+   }
+   if(clearAfterVerification)reads.clear();
+   return{checked,changedQueries:changed,changedReads,stable:changed.length===0,recoveries:recoveryMetrics.used};
+  }
   async function work(){while(!failure&&cursor<pending.length){
    const index=cursor++,[key,r]=pending[index];
    if(index)await wait(100);
@@ -36,7 +50,7 @@ export function auditReadEvidence(execute,{recoverD1Reset:recoverAllReads=false,
     await wait(250);
     rows=await execute(r.sql,r.params);
    }
-   if(hash(rows)!==r.hash){const queryHash=hash(key);changed.push(queryHash);changedReads.push({queryHash,tables:[...new Set([...r.sql.replace(/'(?:''|[^'])*'|--[^\n]*|\/\*[\s\S]*?\*\//g,' ').matchAll(/\b(?:FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_]*)/gi)].map(m=>m[1]))].sort()});}
+   compare(key,r,rows);
    checked++;if(checked%100===0)onProgress({checked,total:reads.size});
    }catch(error){failure??=error;}
   }}
