@@ -1,3 +1,10 @@
+## 2026-11-04 — Correzione audit D1: dump oltre 512 MB
+
+Il run 41913673787, job D1 126867730082, si è fermato con download_size_limit prima dell'analisi (coverage vuota). Non indica presenza di dati personali riservati. Il download del solo dump D1 ora viene scritto a blocchi su disco privato del runner, senza limite aggregato di 512 MB in RAM. Il dump viene importato in SQLite locale una istruzione per volta, preservando transazioni, stringhe con punto e virgola e commenti; ATTACH/DETACH ed estensioni restano vietati. Guardie HTTPS/host, budget, spazio disco e limite per singola istruzione rimangono espliciti. I dati grezzi non vengono pubblicati. Aggiunti contatori byte scaricati, istruzioni importate e righe analizzate.
+
+I push dell'audit avviano ora solo D1; R2 resta disponibile da avvio manuale e il run R2 già attivo non viene cancellato o duplicato. Concorrenza separata per scope, nessun monitoraggio/rilancio automatico dei workflow. Nessuna richiesta FITP o modifica ai dati di produzione. Validazione: 18 test sintetici superati, inclusi trasferimento oltre cap RAM simulato, transazioni/multilinea, SQL incompleto e blocco ATTACH; YAML e diff verificati. Audit D1 reale ancora da completare dopo pubblicazione.
+
+
 ## 2026-11-04 — Audit mirato presenza dati D1/R2 (sola lettura)
 
 Nuovo workflow indipendente `courtwatch-data-presence-audit.yml`: esportazione D1 verso copia temporanea del runner e analisi di tutti gli oggetti R2 ancora conservati, inclusi backup e generazioni. Nessuna richiesta FITP, nessuna modifica ai dati di produzione, nessun ripristino Time Travel e nessun rilancio automatico. Nessuna variazione ai motori o alla UI. Dipendenze Python dirette fissate. Rapporti e checkpoint contengono conteggi, identificatori opachi e lacune di copertura; non nomi, recapiti, chiavi oggetto o contenuti grezzi. Copie grezze non vengono caricate come artefatti.

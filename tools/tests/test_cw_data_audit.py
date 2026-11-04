@@ -78,10 +78,38 @@ class AuditTests(unittest.TestCase):
   class H:
    def request(inner,url,token=None,body=None,download=False):
     calls.append((url,token,body))
-    if download:return b'CREATE TABLE sample(payload TEXT); INSERT INTO sample VALUES(\'{"phone":null}\');'
     return {'result':{'status':'complete','result':{'signed_url':'https://fixture.r2.cloudflarestorage.com/dump'}}}
+   def download_to(inner,url,path):
+    calls.append((url,None,None));path.write_bytes(b'CREATE TABLE sample(payload TEXT); INSERT INTO sample VALUES(\'{"phone":null}\');')
   with patch.dict(os.environ,{'R2_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SENTINEL'}):m.audit_d1(self.a,H())
   self.assertTrue(calls[0][0].endswith('/export'));self.assertIsNone(calls[1][1])
   self.assertEqual(self.a.report['coverage']['rows'],1)
+
+ def test_streaming_dump_handles_transactions_multiline_and_semicolons(self):
+  p=pathlib.Path(self.temp.name)/'snapshot.sql'
+  p.write_text("BEGIN TRANSACTION;CREATE TABLE people(payload TEXT);\nINSERT INTO people VALUES('{\"phone\":\"3331234567\",\"note\":\"a;b\"}');\nCOMMIT;\n-- trailing comment")
+  with patch.object(m,'MAX_BYTES',16):self.a.sql_file(p,'snapshot')
+  self.assertEqual(self.a.report['coverage']['rows'],1)
+  self.assertEqual(self.a.report['indicators']['field_phone_nonempty'],1)
+  self.assertFalse(self.a.report['gaps'])
+ def test_streaming_dump_rejects_incomplete_tail(self):
+  p=pathlib.Path(self.temp.name)/'bad.sql';p.write_text('CREATE TABLE test(x TEXT); INSERT INTO test VALUES(')
+  with self.assertRaises(m.Incomplete):self.a.sql_file(p,'snapshot')
+ def test_streaming_dump_blocks_attach(self):
+  p=pathlib.Path(self.temp.name)/'bad.sql';p.write_text("ATTACH DATABASE '/tmp/not-created-cw-audit' AS other;")
+  with self.assertRaises(m.Incomplete):self.a.sql_file(p,'snapshot')
+ def test_download_stream_bypasses_memory_item_cap(self):
+  class Response:
+   status_code=200;ok=True;headers={'Content-Length':'100'}
+   def __enter__(self):return self
+   def __exit__(self,*args):pass
+   def iter_content(self,*args):
+    for _ in range(10):yield b'x'*10
+  p=pathlib.Path(self.temp.name)/'download.sql'
+  with patch.object(m.requests,'get',return_value=Response()),patch.object(m,'MAX_BYTES',16):
+   size=m.HTTP(self.a).download_to('https://fixture.r2.cloudflarestorage.com/export',p)
+  self.assertEqual(size,100);self.assertEqual(p.stat().st_size,100)
+ def test_stream_download_does_not_accept_source_hosts(self):
+  with self.assertRaises(m.Incomplete):m.HTTP(self.a).download_to('https://www.fitp.it/',pathlib.Path(self.temp.name)/'x')
 
 if __name__=='__main__':unittest.main()

@@ -28,10 +28,6 @@ permissions:
   contents: read
   actions: read
 
-concurrency:
-  group: courtwatch-data-presence-audit
-  cancel-in-progress: false
-
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -43,6 +39,9 @@ jobs:
       - run: python -m pip install --quiet -r tools/cw_data_audit_requirements.txt
       - run: python -m unittest discover -s tools/tests -p 'test_cw_data_audit.py'
   audit:
+    concurrency:
+      group: courtwatch-data-presence-audit-${{ matrix.scope }}
+      cancel-in-progress: false
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 340
@@ -50,7 +49,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        scope: ${{ fromJSON(inputs.scope == 'd1' && '["d1"]' || inputs.scope == 'r2' && '["r2"]' || '["d1","r2"]') }}
+        scope: ${{ fromJSON(github.event_name == 'push' && '["d1"]' || inputs.scope == 'd1' && '["d1"]' || inputs.scope == 'r2' && '["r2"]' || '["d1","r2"]') }}
     env:
       AUDIT_SCOPE: ${{ matrix.scope }}
       AUDIT_MINUTES: ${{ inputs.minutes || '300' }}
