@@ -22,6 +22,12 @@ export function alternateExpectation(p,state){
  if(p.competitionId&&state.competitionId&&String(p.competitionId).toUpperCase()!==String(state.competitionId).toUpperCase())return {state:'unverifiable',reason:'tournament_identity_mismatch'};
  if(state.inventoryError)return {state:'unverifiable',reason:'inventory_read_error'};
  const inventory=(state.eventInventory||[]).filter(e=>e.event?.startsWith(sex+'-')).map(e=>({...e,family:e.event.split('-').slice(0,3).join('-'),structure:e.event.split('-').at(-1)}));
+ // A verified exact native-ID presence is positive evidence on its own.
+ // Missing other draws block absence, not an already demonstrated participation.
+ const native=String(p.worldTennisId||p.id||p.playerId||'');
+ for(const e of inventory){const d=state.eventCache?.[e.event];
+  if(native&&d?.populated===true&&!d.error&&!d.failureType&&certifiedCachedItfDraw({competitionId:state.competitionId||p.competitionId,event:e.event,draw:d})&&d.players?.some(x=>String(x.id||x.playerId||'')===native))return {state:'present',events:[e.event],evidence:'certified_exact_native_presence'};
+ }
  if(!inventory.some(e=>e.family===sex+'-S-M')||!inventory.some(e=>e.family===sex+'-S-Q'))return {state:'unverifiable',reason:'main_or_qualifying_not_inventoried'};
  const events=requiredAuditEvents(inventory),proof=p=>p?.complete===true&&p.criterion===AUDIT_CRITERION;
  let found=false;
