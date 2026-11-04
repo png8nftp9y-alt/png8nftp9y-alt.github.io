@@ -17,6 +17,7 @@ jobs:
     outputs:
       run: ${{ steps.baseline.outputs.run }}
       sha: ${{ steps.baseline.outputs.sha }}
+      today: ${{ steps.baseline.outputs.today }}
     steps:
       - uses: actions/checkout@v4
       - id: baseline
@@ -31,6 +32,7 @@ jobs:
             gh api "repos/$GITHUB_REPOSITORY/actions/workflows/courtwatch-tennis-europe-oop-merge.yml/runs?status=success&per_page=1" > runs.json
           fi
           RUN=$(node -e 'const j=require("./runs.json");const r=j.workflow_runs.find(x=>x.name==="Court Watch Tennis Europe OOP historical merge"&&x.conclusion==="success");if(!r)process.exit(1);console.log(r.id)')
+          echo "today=$(date -u +%F)" >> "$GITHUB_OUTPUT"
           echo "run=$RUN" >> "$GITHUB_OUTPUT"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   audit:
@@ -55,9 +57,10 @@ jobs:
           run-id: ${{ needs.baseline.outputs.run }}
           name: tennis-europe-oop-historical-merged
           path: baseline
-      - run: node --test src/v3/tennis-europe-coverage.test.mjs
+      - run: node --test src/v3/tennis-europe-coverage.test.mjs src/v3/tennis-europe-coverage-audit.test.mjs
       - name: Compare official draws and OOP with the historical archive
         env:
+          TE_AUDIT_TODAY: ${{ needs.baseline.outputs.today }}
           TE_AUDIT_SHARD: ${{ matrix.shard }}
         run: node src/v3/audit-tennis-europe-coverage.mjs
       - uses: actions/upload-artifact@v4
@@ -67,6 +70,7 @@ jobs:
           if-no-files-found: error
           retention-days: 14
   report:
+    if: ${{ always() && needs.baseline.result == 'success' }}
     needs: [baseline,audit]
     runs-on: ubuntu-latest
     steps:

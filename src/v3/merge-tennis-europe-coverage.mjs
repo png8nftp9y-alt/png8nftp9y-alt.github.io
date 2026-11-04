@@ -1,10 +1,17 @@
+import {validateCoverageShards} from './tennis-europe-coverage-audit.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 async function files(dir){return(await Promise.all((await fs.readdir(dir,{withFileTypes:true})).map(async e=>e.isDirectory()?files(path.join(dir,e.name)):[path.join(dir,e.name)]))).flat();}
-const paths=(await files('coverage-shards')).filter(p=>/coverage-\d+\.json$/.test(p)),docs=await Promise.all(paths.map(async p=>JSON.parse(await fs.readFile(p,'utf8'))));
-if(docs.length!==16||new Set(docs.map(d=>d.shard)).size!==16||docs.some(d=>d.total!==16||d.queued!==d.results.length)||new Set(docs.map(d=>d.baselineSourceRunId+'|'+d.catalogGeneratedAt+'|'+d.today)).size!==1)throw Error('Audit missing shards or inconsistent baseline: certification refused');
+const paths=(await files('coverage-shards').catch(e=>{if(e.code==='ENOENT')return [];throw e;})).filter(p=>/coverage-\d+\.json$/.test(p)),docs=await Promise.all(paths.map(async p=>JSON.parse(await fs.readFile(p,'utf8'))));
+const errors=validateCoverageShards(docs);
+await fs.mkdir('coverage-report',{recursive:true});
+if(errors.length){
+ const diagnostic={version:3,status:'invalid',errors,generatedAt:new Date().toISOString(),shards:docs.map(d=>({shard:d.shard,total:d.total,queued:d.queued,baselineSourceRunId:d.baselineSourceRunId,catalogGeneratedAt:d.catalogGeneratedAt,today:d.today,cutoff:d.cutoff}))};
+ await fs.writeFile('coverage-report/coverage.json',JSON.stringify(diagnostic,null,2)+'\n');
+ await fs.writeFile('coverage-report/coverage.md','# Tennis Europe: verifica non valida\n\nCertificazione rifiutata: '+errors.join(', ')+'. Vedere coverage.json per le date e le baseline dei singoli shard. Nessun risultato aggregato certificato.\n');
+ throw Error('Audit missing shards or inconsistent baseline: certification refused; diagnostic report written');
+}
 const results=docs.flatMap(d=>d.results).sort((a,b)=>a.competitionId.localeCompare(b.competitionId));
-if(new Set(results.map(r=>r.competitionId)).size!==results.length)throw Error('Repeated tournament: certification refused');
 const counts={};for(const r of results)counts[r.status]=(counts[r.status]||0)+1;
 const oopCounts={};for(const r of results){const status=r.oopCompleteness?.status||'unverified';oopCounts[status]=(oopCounts[status]||0)+1;}
 const report={version:2,status:results.every(r=>r.status==='complete'&&r.oopCompleteness?.status==='complete')?'complete':'incomplete',oopCounts,generatedAt:new Date().toISOString(),storage:'R2 historical merged artifact; NOT a direct D1 inspection',baselineSourceRunId:docs[0].baselineSourceRunId,scope:docs[0].scope,cutoff:docs[0].cutoff,today:docs[0].today,counts,total:results.length,results};

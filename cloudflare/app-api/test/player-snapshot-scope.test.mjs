@@ -26,7 +26,7 @@ test('scoped snapshot returns the exact full-snapshot player, entries and match 
    assert.equal(scoped.playerId,'cw-target-1');assert.equal(scoped.group,group);
    for(const [key,field] of [['players','id'],['tournaments','playerId'],['matches','playerId']])assert.deepEqual(scoped[key],full[key].filter(r=>r[field]==='cw-target-1'),key);
    assert.equal(scoped.matches.length,1);assert.equal(scoped.tournaments.length,1);
-   assert.ok(scopedCounter.calls()<fullCounter.calls());console.log(JSON.stringify({group,fullQueries:fullCounter.calls(),scopedQueries:scopedCounter.calls()}));
+   assert.ok(scopedCounter.calls()<=fullCounter.calls(),'full grouped reads may share a request without increasing scoped work');console.log(JSON.stringify({group,fullQueries:fullCounter.calls(),scopedQueries:scopedCounter.calls()}));
   }assert.equal(d.writes(),before);
  }finally{globalThis.fetch=original;d.close()}
 });
@@ -126,9 +126,9 @@ test('full group overlaps independent entries/history and bounds histories to th
    if(key==='all')return async(...args)=>{
     if(sql.includes('JOIN opponent_entry_profiles'))return new Promise((resolve,reject)=>{releaseEntries=()=>Promise.resolve(value.apply(target,args)).then(resolve,reject)});
     if(sql.includes('WITH candidate_matches AS MATERIALIZED')){
-     peak=Math.max(peak,++active);await new Promise(resolve=>setImmediate(resolve));
+     const logicalReads=(sql.match(/WITH candidate_matches AS MATERIALIZED/g)||[]).length;active+=logicalReads;peak=Math.max(peak,active);await new Promise(resolve=>setImmediate(resolve));
      if(releaseEntries){overlap=true;releaseEntries();releaseEntries=null;}
-     try{return await value.apply(target,args)}finally{active--;}
+     try{return await value.apply(target,args)}finally{active-=logicalReads;}
     }
     return value.apply(target,args);
    };return typeof value==='function'?value.bind(target):value;}});}

@@ -10412,3 +10412,58 @@ alla giornata del browser. Correzione solo dei test, nessuna modifica alle date 
 - Il limite non accelera magicamente una verifica completa e puo richiedere piu controlli mirati manuali; nessun rilancio automatico, nessun riuso di vecchie certificazioni e nessun verde se il controllo e parziale. Nessuna modifica all'app, ai motori o ai dati.
 - Validazione: 80 test mirati passati, incluse presenza in qualificazioni con main incompleto, assenza sempre bloccata con copertura incompleta, interruzione delle richieste dopo scadenza e propagazione della cancellazione. Sintassi e diff controllati.
 - Recupero delle fonti ancora da eseguire/confermare: J30 Villena (J-J30-ESP-2026-008), J30 Agno (J-J30-SUI-2026-006), qualificazioni maschili J100 Cochabamba (J-J100-BOL-2026-002) e J100 Mendoza (J-J100-ARG-2026-001). Il workflow T-1 esistente accetta competition_id separati da virgola e seleziona i mancanti; non e stato rilanciato in questa sessione. Nessuna dichiarazione di recupero o chiusura completa senza nuove prove.
+ITF discovery 2026-11-04T07:07:25.615Z: 5 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-04T07:08:28.688Z: attempted 5, acquired 5, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+## 2026-11-04 — Storico: rimossa barriera globale dei batch
+
+Misura reale dopo il primo raggruppamento: storico 14415 ms e prima
+visualizzazione 17323 ms, rispetto a 7993 e 10957 ms precedenti. Il codice
+introduceva una barriera globale: nessuna lettura successiva partiva finché
+il batch corrente non era terminato. Il dato reale non prova da solo quanto
+pesi questa barriera, ma il suo blocco è riprodotto con letture controllate.
+
+Sostituito il batch seriale con raggruppamento delle sole SELECT identiche già
+pronte nello stesso turno: ogni SELECT originale resta una sottoquery con
+parametri e paginazione invariati; UNION ALL assegna ciascuna riga alla sua
+lettura. Massimo sei sottoquery e 90 parametri; gruppi indipendenti non aspettano
+il completamento degli altri. Nessun uso del batch transazionale D1, nuovo timer,
+retry, polling, cache o modifica a motori/dati. I controlli SQL di sola lettura
+restano obbligatori. Il replay REST conserva il limite di due richieste effettive.
+
+Test: un gruppo sospeso non blocca un altro giocatore; limiti e parametri esatti;
+risposte errate e 7500 non producono successi parziali; dati freschi a ogni lettura.
+Confronto su SQLite reale con oltre 250 partite, alias locale, partecipanti e
+paginazione: output esattamente identico e zero scritture. Snapshot TCL/Altri,
+classifiche progressive e Shield browser verificati prima della consegna.
+La latenza di produzione resta da misurare dopo deploy, senza stime garantite.
+
+ITF discovery 2026-11-04T20:05:59.648Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-11-04 — Europe: audit storico, data comune e fonti indipendenti
+- Run audit 41742887548: tutti i 16 shard riusciti, riepilogo rifiutato correttamente per today divergente: primi shard 2026-11-03, successivi 2026-11-04. Baseline sourceRunId 41735878362 e catalogGeneratedAt 2026-11-03T23:47:13.871Z comuni; 567 tornei distinti. Ora una sola data UTC dal job baseline e passata a tutti gli shard; CLI senza env usa generatedAt dell archivio, validato. Guardie su baseline/data/scope e unicita conservate.
+- Verificata pagina ufficiale JC Sport B63AC692-6B21-4BCE-BD55-0DDA745AFF30: sport/draws.aspx restituisce href relativi draw.aspx. Audit prima risolveva fuori da /sport, perdendo tutti i target legacy. Applicato helper absoluteDrawLinks gia usato dall acquisizione: trovati i cinque tabelloni 1,4,7,8,9; dominio e ID torneo restano vincolanti.
+- Confronto OOP dopo acquisizione di tutte le giornate: recupero Not scheduled con giorno unico, W/O utente e Bye tramite inventario indipendente gia esistente. Ritiri senza marker vincitore risolti soltanto dalla partecipazione ufficiale a turno successivo nello stesso draw, mai dal vincitore memorizzato. Rimossi conteggi grezzi carte/parse che classificavano Bye e giornate esplicitamente vuote come perdite. Inventario completo, fonti sconosciute, risultati irrisolti e conflitti continuano a impedire certificazione.
+- Scope condiviso: squadre senza date esplicitamente deferred_team, date pubblicate sempre controllate; annullamenti/rinvio richiedono conferma attuale sulla fonte ufficiale. Nessuna gara inventata, nessuna esclusione silenziosa. Riepilogo globale rimane incompleto se scope non verificato.
+- Riepilogo eseguito anche con shard falliti: mismatch o shard mancanti producono coverage.json/coverage.md diagnostici prima di uscire con errore; nessun verde forzato. Non cambiano acquisizione, calendario live, scritture o query D1.
+- Stato remoto letto: storico 41735878362 tutti16 shard riusciti e merge 41742734076 riuscito; agenda live D1 41741684844 riuscita. Storico D1 41742887540/job126288794697: log conferma 2609 file,425186 istruzioni,856822 righe lette,47504 scritte; subito dopo operation canceled, prima della parita/deploy. Questi totali non certificano parita D1. Import storico e certificazione finale ancora aperti.
+- Validazione:33 test mirati verdi, sintassi CLI e merge, YAML e diff check. Link legacy reale letto e verificato. Limite: patch audit testata localmente; nuovo esito remoto e completezza di tutti i tabelloni ancora da verificare. Nessun polling, dispatch, rilancio, cancellazione, push o scrittura D1 da parte dell assistente.
+
+## 2026-11-04 — Limite workerd delle SELECT composte nello storico
+
+I run Worker 41828625301 e D1/API 41828625286 hanno superato sorgenti e Shield,
+ma il replay reale Altri ha restituito codice 7500 con causa SQL esplicita:
+"too many terms in compound SELECT". Il gruppo TCL era riuscito. Deploy bloccato.
+La correzione precedente usava sei termini esterni, mentre workerd imposta
+SQLITE_LIMIT_COMPOUND_SELECT a cinque. Il precedente test SQLite usava il limite
+predefinito più alto e non rappresentava questo vincolo di produzione.
+
+Ridotto il massimo a cinque e rifiutate configurazioni superiori. Nessun ritorno
+alla coda globale: gruppi indipendenti, paginazione, dati e classifiche progressive
+restano invariati. Nessun retry, polling o modifica alle schedulazioni.
+Nuovo test su SQLite reale con setlimit(...,5): riproduce l'errore della versione
+con sei termini, poi verifica dodici letture in gruppi 5/5/2 con tutti i dati esatti;
+verifica anche CTE originali con UNION interne. Test caricato dal normale check API.
+Resta obbligatoria la verifica remota prima del deploy e una nuova misura dei tempi.
+Fonte limite: https://github.com/cloudflare/workerd/blob/main/src/workerd/util/sqlite.c%2B%2B
