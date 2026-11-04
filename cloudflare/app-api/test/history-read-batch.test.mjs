@@ -1,3 +1,4 @@
+import './history-compound-limit.test.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {historyReadDb} from '../lib/history-read-batch.mjs';
@@ -14,13 +15,13 @@ test('slow first group does not block another player or the next page; no native
  d.calls[0].resolve({results:[{__cw_history_slot:1,display_name:'b'},{__cw_history_slot:0,display_name:'a'}]});
  assert.deepEqual((await a).map(r=>r.results[0].display_name),['a','b']);assert.deepEqual(d.calls[0].params,['a','b']);
 });
-test('six-read and bind limits split ready groups without an in-flight barrier',async()=>{
+test('five-read and bind limits split ready groups without an in-flight barrier',async()=>{
  const d=deferredDb(),db=historyReadDb(d.db);const p=Promise.all(Array.from({length:18},(_,i)=>db.prepare(sql).bind(i).all()));await tick();
- assert.equal(d.calls.length,3);assert.ok(d.calls.every(c=>c.params.length===6));
+ assert.equal(d.calls.length,4);assert.deepEqual(d.calls.map(c=>c.params.length),[5,5,5,3]);
  for(const c of d.calls)c.resolve({results:c.params.map((p,i)=>({__cw_history_slot:i,display_name:p}))});
  assert.deepEqual((await p).map(r=>r.results[0].display_name),Array.from({length:18},(_,i)=>i));
  const many='SELECT display_name FROM match_participants WHERE source_player_id IN ('+Array(50).fill('?').join(',')+')';
- const q=Promise.all([db.prepare(many).bind(...Array(50).fill(1)).all(),db.prepare(many).bind(...Array(50).fill(2)).all()]);await tick();assert.equal(d.calls.length,5);assert.ok(d.calls.slice(3).every(c=>c.params.length===50));for(const c of d.calls.slice(3))c.resolve({results:[]});await q;
+ const q=Promise.all([db.prepare(many).bind(...Array(50).fill(1)).all(),db.prepare(many).bind(...Array(50).fill(2)).all()]);await tick();assert.equal(d.calls.length,6);assert.ok(d.calls.slice(4).every(c=>c.params.length===50));for(const c of d.calls.slice(4))c.resolve({results:[]});await q;
 });
 test('failed or malformed grouped responses reject all affected reads without partial success or retry',async()=>{
  for(const invalid of [null,{results:[{display_name:'missing slot'}]}]){

@@ -1,7 +1,7 @@
 import {assertReadOnlyQuery} from './read-only-d1-query.mjs';
 // Snapshot-local grouping only. No in-flight barrier, cache, timer or retry.
-export function historyReadDb(db,{limit=6}={}){
- if(!Number.isInteger(limit)||limit<1)throw Error('history_batch_limit');
+export function historyReadDb(db,{limit=5}={}){
+ if(!Number.isInteger(limit)||limit<1||limit>5)throw Error('history_batch_limit');
  const ready=new Map();let scheduled=false;
  async function dispatch(sql,jobs){
   try{

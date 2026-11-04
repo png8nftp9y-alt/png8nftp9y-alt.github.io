@@ -10442,3 +10442,21 @@ ITF discovery 2026-11-04T20:05:59.648Z: 0 newly discovered future tournaments; M
 - Riepilogo eseguito anche con shard falliti: mismatch o shard mancanti producono coverage.json/coverage.md diagnostici prima di uscire con errore; nessun verde forzato. Non cambiano acquisizione, calendario live, scritture o query D1.
 - Stato remoto letto: storico 41735878362 tutti16 shard riusciti e merge 41742734076 riuscito; agenda live D1 41741684844 riuscita. Storico D1 41742887540/job126288794697: log conferma 2609 file,425186 istruzioni,856822 righe lette,47504 scritte; subito dopo operation canceled, prima della parita/deploy. Questi totali non certificano parita D1. Import storico e certificazione finale ancora aperti.
 - Validazione:33 test mirati verdi, sintassi CLI e merge, YAML e diff check. Link legacy reale letto e verificato. Limite: patch audit testata localmente; nuovo esito remoto e completezza di tutti i tabelloni ancora da verificare. Nessun polling, dispatch, rilancio, cancellazione, push o scrittura D1 da parte dell assistente.
+
+## 2026-11-04 — Limite workerd delle SELECT composte nello storico
+
+I run Worker 41828625301 e D1/API 41828625286 hanno superato sorgenti e Shield,
+ma il replay reale Altri ha restituito codice 7500 con causa SQL esplicita:
+"too many terms in compound SELECT". Il gruppo TCL era riuscito. Deploy bloccato.
+La correzione precedente usava sei termini esterni, mentre workerd imposta
+SQLITE_LIMIT_COMPOUND_SELECT a cinque. Il precedente test SQLite usava il limite
+predefinito più alto e non rappresentava questo vincolo di produzione.
+
+Ridotto il massimo a cinque e rifiutate configurazioni superiori. Nessun ritorno
+alla coda globale: gruppi indipendenti, paginazione, dati e classifiche progressive
+restano invariati. Nessun retry, polling o modifica alle schedulazioni.
+Nuovo test su SQLite reale con setlimit(...,5): riproduce l'errore della versione
+con sei termini, poi verifica dodici letture in gruppi 5/5/2 con tutti i dati esatti;
+verifica anche CTE originali con UNION interne. Test caricato dal normale check API.
+Resta obbligatoria la verifica remota prima del deploy e una nuova misura dei tempi.
+Fonte limite: https://github.com/cloudflare/workerd/blob/main/src/workerd/util/sqlite.c%2B%2B
