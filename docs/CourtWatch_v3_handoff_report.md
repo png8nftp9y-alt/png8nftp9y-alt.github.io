@@ -10406,3 +10406,5 @@ alla giornata del browser. Correzione solo dei test, nessuna modifica alle date 
 - Validazione: 75 test mirati passati, inclusi 31 payload grandi con parita integrale, omonimi di altro circuito separati, piano SEARCH su indice senza scansione, errore 7429 propagato senza leggere ID successivi. Sintassi e diff controllati. Completamento remoto ancora da certificare.
 
 ITF discovery 2026-11-04T07:07:25.615Z: 5 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-04T07:08:28.688Z: attempted 5, acquired 5, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
