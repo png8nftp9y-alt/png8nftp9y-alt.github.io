@@ -162,6 +162,8 @@ jobs:
         if: always()
         with:
           name: tennis-europe-draw-walkover-audit
-          path: cloudflare/app-api/seed-tennis-europe-oop/draw-walkover-audit.json
+          path: |
+            cloudflare/app-api/seed-tennis-europe-oop/draw-walkover-audit.json
+            cloudflare/app-api/seed-tennis-europe-oop/import-report.json
           if-no-files-found: warn
           retention-days: 14
