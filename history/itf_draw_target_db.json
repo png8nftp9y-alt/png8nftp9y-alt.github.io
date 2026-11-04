@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-04T13:03:58.914Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-04T13:06:37.947Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -883447,7 +883447,7 @@
       "startDate": "2026-11-02",
       "endDate": "2026-11-08",
       "decision": "pending",
-      "checkedAt": "2026-11-04T12:00:34.255Z",
+      "checkedAt": "2026-11-04T13:06:36.990Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 3,
@@ -890787,13 +890787,13 @@
       "startDate": "2026-11-02",
       "endDate": "2026-11-07",
       "decision": "pending",
-      "checkedAt": "2026-11-04T12:00:34.755Z",
+      "checkedAt": "2026-11-04T13:06:37.474Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 4,
+      "acquiredSections": 5,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 4,
-      "missingSections": 2,
+      "resolvedSections": 5,
+      "missingSections": 1,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -890912,8 +890912,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -890946,14 +890946,14 @@
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -890984,7 +890984,7 @@
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -891980,6 +891980,100 @@
             "complete": true,
             "taskId": "J-J60-KAZ-2026-005__G-D-M-KO",
             "storedAt": "2026-11-04T08:42:10.062Z"
+          }
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800573301",
+              "name": "Kristina Kruchenko",
+              "givenName": "Kristina",
+              "familyName": "Kruchenko",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/kristina-kruchenko/800573301/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800715159",
+              "name": "Ekaterina Orlovskaya",
+              "givenName": "Ekaterina",
+              "familyName": "Orlovskaya",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/ekaterina-orlovskaya/800715159/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800661089",
+              "name": "Ekaterina Kiryushenko",
+              "givenName": "Ekaterina",
+              "familyName": "Kiryushenko",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/ekaterina-kiryushenko/800661089/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791276",
+              "name": "Kristina Kamolova",
+              "givenName": "Kristina",
+              "familyName": "Kamolova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/kristina-kamolova/800791276/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800653019",
+              "name": "Valeria Galyaeva",
+              "givenName": "Valeria",
+              "familyName": "Galyaeva",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/valeria-galyaeva/800653019/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800655103",
+              "name": "Alina Alibekova",
+              "givenName": "Alina",
+              "familyName": "Alibekova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/alina-alibekova/800655103/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800580088",
+              "name": "Evelina Balaganskaya",
+              "givenName": "Evelina",
+              "familyName": "Balaganskaya",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/evelina-balaganskaya/800580088/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800645387",
+              "name": "Radmila Rakhmatullina",
+              "givenName": "Radmila",
+              "familyName": "Rakhmatullina",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/radmila-rakhmatullina/800645387/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-04T13:06:37.474Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-KAZ-2026-005__G-S-M-KO",
+            "storedAt": "2026-11-04T13:06:37.474Z"
           }
         }
       }
@@ -901760,7 +901854,7 @@
       "startDate": "2026-11-03",
       "endDate": "2026-11-08",
       "decision": "pending",
-      "checkedAt": "2026-11-04T12:00:35.240Z",
+      "checkedAt": "2026-11-04T13:06:37.947Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
