@@ -10431,3 +10431,5 @@ Confronto su SQLite reale con oltre 250 partite, alias locale, partecipanti e
 paginazione: output esattamente identico e zero scritture. Snapshot TCL/Altri,
 classifiche progressive e Shield browser verificati prima della consegna.
 La latenza di produzione resta da misurare dopo deploy, senza stime garantite.
+
+ITF discovery 2026-11-04T20:05:59.648Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
