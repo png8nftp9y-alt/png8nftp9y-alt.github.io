@@ -10467,3 +10467,11 @@ con sei termini, poi verifica dodici letture in gruppi 5/5/2 con tutti i dati es
 verifica anche CTE originali con UNION interne. Test caricato dal normale check API.
 Resta obbligatoria la verifica remota prima del deploy e una nuova misura dei tempi.
 Fonte limite: https://github.com/cloudflare/workerd/blob/main/src/workerd/util/sqlite.c%2B%2B
+
+## 2026-11-04 — Scope ITF: riduzione controlli duplicati per blocchi verificati
+- Run 41911368697: interrotto artificialmente a 360 secondi; 17 osservati, 22 avversari con checkpoint completo su 164, 142 ancora pendenti. Nessun errore D1; 586367 righe lette, zero scritte. Non era una correzione della velocita.
+- Lavoro ora sequenziale per blocchi fino a 8 avversari; controllo anticipato tra profili quando il blocco raggiunge 30 secondi. Query comuni memoizzate solo nel blocco e tutte ricontrollate dal vivo al checkpoint; la cache mutabile viene poi svuotata. I blocchi non certificano un unico istante atomico e la finestra include il tempo del singolo profilo e del ricontrollo.
+- Nessun profilo saltato, nessun aumento di richieste parallele, nessuna ripresa automatica. Gli ID sono rimossi dai pendenti soltanto dopo verifica stabile dell'intero blocco. Errori e variazioni mantengono pendenti tutti gli ID coinvolti; nessun verde con ID pendenti. Ultimo blocco parziale verificato esplicitamente.
+- Rimosso il taglio obbligato a 6 minuti: tetto di sicurezza script 20 minuti, step 22, job 25. Non e una promessa di durata; l'ottimizzazione consiste nel riuso e ricontrollo unico delle query condivise, non nell'aumento del timeout. Da misurare sul prossimo run; nessuna garanzia anticipata di riduzione complessiva.
+- Validazione locale: 84 test mirati passati. Test con 8 profili e una query comune: 1 acquisizione + 1 ricontrollo nel blocco, nuova lettura nel blocco successivo; sorgente variata, errore di verifica e trasporto non certificano gli ID. Sintassi e diff controllati.
+- Nessuna modifica ad app, motori acquisitori o dati D1; rimangono separate le segnalazioni di documenti ITF mancanti (incluso main maschile Agno). Nessun polling, dispatch o rilancio effettuato.

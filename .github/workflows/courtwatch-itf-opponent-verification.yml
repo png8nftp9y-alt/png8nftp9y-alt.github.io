@@ -13,6 +13,8 @@ on:
       - 'tools/lib/audit-read-evidence.mjs'
       - 'tools/lib/audit-d1-batch.mjs'
       - 'tools/lib/audit-time-budget.mjs'
+      - 'tools/lib/audit-opponent-checkpoints.mjs'
+      - 'tools/tests/audit-opponent-checkpoints.test.mjs'
       - 'tools/lib/itf-page-audit.mjs'
       - 'tools/tests/audit-time-budget.test.mjs'
       - 'tools/tests/itf-page-audit.test.mjs'
@@ -39,18 +41,18 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with: {ref: '${{ github.sha }}', fetch-depth: 1}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Test targeted evidence verification
-        run: node --test tools/tests/audit-time-budget.test.mjs tools/tests/audit-itf-entry-profiles.test.mjs tools/tests/audit-latest-itf-documents.test.mjs tools/tests/audit-opponent-failure.test.mjs tools/tests/audit-opponent-selection.test.mjs tools/tests/audit-d1-batch.test.mjs tools/tests/opponent-native-history-check.test.mjs tools/tests/audit-read-evidence.test.mjs tools/tests/itf-page-audit.test.mjs tools/tests/itf-audit-read-session.test.mjs cloudflare/app-api/test/opponent-itf-document-history.test.mjs
+        run: node --test tools/tests/audit-opponent-checkpoints.test.mjs tools/tests/audit-time-budget.test.mjs tools/tests/audit-itf-entry-profiles.test.mjs tools/tests/audit-latest-itf-documents.test.mjs tools/tests/audit-opponent-failure.test.mjs tools/tests/audit-opponent-selection.test.mjs tools/tests/audit-d1-batch.test.mjs tools/tests/opponent-native-history-check.test.mjs tools/tests/audit-read-evidence.test.mjs tools/tests/itf-page-audit.test.mjs tools/tests/itf-audit-read-session.test.mjs cloudflare/app-api/test/opponent-itf-document-history.test.mjs
       - run: npm install
       - run: python -m pip install --disable-pip-version-check --quiet awscli
       - name: Verify scoped opponents, source inputs and browser rendering
-        timeout-minutes: 8
+        timeout-minutes: 22
         env:
           ITF_AUDIT_OPPONENT_IDS: ${{ inputs.opponent_ids || '' }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
