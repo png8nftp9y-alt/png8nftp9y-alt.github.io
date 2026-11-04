@@ -10404,3 +10404,5 @@ alla giornata del browser. Correzione solo dei test, nessuna modifica alle date 
 - Sostituita nel solo Scope con ricerche esatte circuito ITF + source_player_id, un ID alla volta e LIMIT 2 per respingere identita duplicate. Payload originale interamente conservato, nessuna riduzione dei tornei verificati. Le riletture di conferma continuano a registrare le query reali con batch massimo quattro.
 - Nessun retry su 7429, nessuna risposta vuota sostitutiva, nessuna scrittura, migrazione o modifica all'app. Si riduce il numero di payload per singola query, non si promette una riduzione del numero totale di richieste.
 - Validazione: 75 test mirati passati, inclusi 31 payload grandi con parita integrale, omonimi di altro circuito separati, piano SEARCH su indice senza scansione, errore 7429 propagato senza leggere ID successivi. Sintassi e diff controllati. Completamento remoto ancora da certificare.
+
+ITF discovery 2026-11-04T07:07:25.615Z: 5 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
