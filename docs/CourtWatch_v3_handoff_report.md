@@ -1,3 +1,13 @@
+## 2026-11-04 — Audit mirato presenza dati D1/R2 (sola lettura)
+
+Nuovo workflow indipendente `courtwatch-data-presence-audit.yml`: esportazione D1 verso copia temporanea del runner e analisi di tutti gli oggetti R2 ancora conservati, inclusi backup e generazioni. Nessuna richiesta FITP, nessuna modifica ai dati di produzione, nessun ripristino Time Travel e nessun rilancio automatico. Nessuna variazione ai motori o alla UI. Dipendenze Python dirette fissate. Rapporti e checkpoint contengono conteggi, identificatori opachi e lacune di copertura; non nomi, recapiti, chiavi oggetto o contenuti grezzi. Copie grezze non vengono caricate come artefatti.
+
+Scansione campi e valori JSON, gzip, ZIP, dump SQL, SQLite e testo PDF; binari, immagini, cifrati, file oltre limite e cambiamenti dell'inventario R2 producono lacune esplicite. Esiti distinti: nessun candidato nell'ambito verificato, candidati da esaminare, controllo incompleto. Un candidato non prova la raccolta di dati riservati: numeri tessera e fixture possono corrispondere ai pattern. Un esito negativo non attribuisce l'incidente FITP e non prova l'assenza storica. Budget per scope e checkpoint R2 con prosecuzione solo manuale. Lo storico dei log GitHub è escluso da questa verifica mirata.
+
+Validazione: test sintetici su rilevamento, redazione, archivi annidati, dump/database, SQL ATTACH vietato, limiti, checkpoint, guardie rete e rimozione credenziali dai redirect; YAML e diff verificati. Esecuzione su credenziali reali e copertura effettiva ancora da verificare dopo pubblicazione.
+
+
+
 ## 2026-10-25 — chat 1: associazione Aye Diallo confermata
 
 Associata la sorgente acquisita esatta di Aye DIALLO al profilo Europe 98471900-d3d3-4468-ae75-a7738fd96356, su conferma utente. Nazionalità sorgente preservata. Recovery incrementale esistente, guardie identità e conflitti mantenute; data conferma per binding. Test recovery e Index verificati localmente. Salvataggio D1 al prossimo Index sulla nuova versione; esito remoto ancora da verificare. Nessun polling.
