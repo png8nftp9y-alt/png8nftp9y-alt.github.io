@@ -1,4 +1,5 @@
 import {progressiveSnapshot} from '../lib/progressive-snapshot.mjs';
+import {historyReadProfile} from '../lib/history-read-profile.mjs';
 import {historyReadDb} from '../lib/history-read-batch.mjs';
 import {boundedPlayerMap} from '../lib/bounded-player-map.mjs';
 import {snapshotHistoryPlayers,snapshotEntryPlayer} from '../lib/snapshot-history-players.mjs';
@@ -247,7 +248,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
     const enrichment=await timing.measure('history_identities',()=>snapshotHistoryPlayers(env.DB,players,added));
     const historyPlayers=enrichment.players,nativePlayers=historyPlayers.map(p=>snapshotEntryPlayer(p,enrichment.configuredIds));
     const entryPlayers=nativePlayers.filter(p=>enrichment.configuredIds.has(p.id)||p.sourceKey);
-    const historyDb=historyReadDb(env.DB);
+    const historyProfile=historyReadProfile(env.DB),historyDb=historyReadDb(historyProfile.db);
     const readHistory=p=>enrichment.configuredIds.has(p.id)?personalItfHistory(historyDb,p):personalCircuitHistory(historyDb,p);
     const presentation=tournamentPresentationContext(undefined,timing.measure,env.RUNTIME_DOCUMENTS);
     presentation?.prepare(tournaments);
@@ -261,9 +262,11 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
         prepare(rows);
         return [rows,rows.some(t=>t.circuit==='itf')?await itfTournamentMetadata(env):new Map()];
       })),
-      timing.measure('match_history',()=>boundedPlayerMap(historyPlayers,async player=>{
-        const history=await readHistory(player);prepare(history.tournaments);return history;
-      })),
+      timing.measure('match_history',async()=>{
+        try{return await boundedPlayerMap(historyPlayers,async player=>{
+          const history=await historyProfile.player(()=>readHistory(player));prepare(history.tournaments);return history;
+        })}finally{historyProfile.report(timing)}
+      }),
       timing.measure('rankings_read',()=>preparedTennisEuropeRankingData(env,[...new Set(players.map(p=>p.id))])).then(data=>({data}),error=>({error})),
       timing.measure('fitp_metadata_read',()=>fitpMetadataRows(env.DB,players)),
       timing.measure('birth_metadata_read',()=>playerBirthMetadataRows(env.DB,players)),

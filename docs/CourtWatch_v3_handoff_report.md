@@ -10485,3 +10485,31 @@ Fonte limite: https://github.com/cloudflare/workerd/blob/main/src/workerd/util/s
 - Rimosso il taglio obbligato a 6 minuti: tetto di sicurezza script 20 minuti, step 22, job 25. Non e una promessa di durata; l'ottimizzazione consiste nel riuso e ricontrollo unico delle query condivise, non nell'aumento del timeout. Da misurare sul prossimo run; nessuna garanzia anticipata di riduzione complessiva.
 - Validazione locale: 84 test mirati passati. Test con 8 profili e una query comune: 1 acquisizione + 1 ricontrollo nel blocco, nuova lettura nel blocco successivo; sorgente variata, errore di verifica e trasporto non certificano gli ID. Sintassi e diff controllati.
 - Nessuna modifica ad app, motori acquisitori o dati D1; rimangono separate le segnalazioni di documenti ITF mancanti (incluso main maschile Agno). Nessun polling, dispatch o rilancio effettuato.
+
+## 2026-11-04 — Misurazione dettagliata delle letture storico
+
+Ultima misura utente: storico 8180 ms, prima visualizzazione 11425 ms. Il problema
+velocità resta aperto. Aggiunte esclusivamente misure alle operazioni già presenti,
+senza nuove query, timer, cache, retry o variazioni al limite di parallelismo.
+
+Il wrapper osserva le richieste effettive dopo il raggruppamento SQL esistente:
+partite, verifiche alias locali, identità e altre letture. Espone nel Server-Timing
+somma delle durate client, conteggio richieste/sottoquery, massimo, durata D1 e
+righe lette quando presenti nei metadati della stessa risposta. dbSamples e
+rowSamples distinguono informazioni mancanti da valori misurati pari a zero.
+Le somme possono sovrapporsi: non vanno sommate al totale dello storico.
+
+hist_last_start misura il ritardo di avvio dell'ultimo lavoro giocatore rispetto
+alla creazione del profiler; hist_job_max il lavoro giocatore più lungo. Sono
+riportati anche picchi di concorrenza, errori e richieste ancora aperte. Solo
+riepiloghi numerici della singola richiesta: nessun SQL, parametro, nome, ID,
+payload, messaggio errore o scrittura nei log/archivi. Il pannello loadTiming già
+esistente visualizza questi campi senza modifiche al client.
+
+Verifiche: identità di query/parametri/risultati e raggruppamenti con e senza
+profilazione; richieste concorrenti non bloccate; errori propagati senza retry;
+metadati assenti non certificati come zero; snapshot TCL/Altri e classifiche
+progressive invariati. Test del vero Worker controllano la presenza dei nuovi
+campi e l'assenza di identificatori. Test inclusi nel normale check API.
+Questa modifica misura il collo di bottiglia, non dichiara un miglioramento dei
+tempi: occorre una nuova misura di primo accesso dopo deploy verde.

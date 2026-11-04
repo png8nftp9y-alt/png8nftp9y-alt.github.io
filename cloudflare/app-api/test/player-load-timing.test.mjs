@@ -1,3 +1,4 @@
+import './history-read-profile.test.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
@@ -32,4 +33,9 @@ test('browser diagnostics contain timings only and cannot fail an application op
  context.recordPlayerLoadTiming('search_http',100,{status:200,headers:new Headers({'Server-Timing':'search;dur=20.0'})});
  assert.deepEqual(JSON.parse(logs[0].slice('courtwatch_player_timing '.length)),{stage:'search_http',elapsedMs:25,status:200,serverTiming:'search;dur=20.0'});
  context.console.info=()=>{throw Error('console unavailable')};assert.doesNotThrow(()=>context.recordPlayerLoadTiming('snapshot_http',100));
+});
+
+test('aggregate details are numeric-safe, bounded and disabled with ordinary timing',()=>{
+ const timing=playerLoadTiming(true);timing.record('hist_matches',25,'requests=2 reads=6 maxMs=20.0');timing.record('hist_bad',10,'private\r\nvalue');
+ const header=timing.response(new Response()).headers.get('Server-Timing');assert.match(header,/hist_matches;dur=25.0;desc="requests=2 reads=6 maxMs=20.0"/);assert.ok(!header.includes('private'));const off=playerLoadTiming(false);off.record('hist_matches',25,'requests=2');assert.equal(off.response(new Response()).headers.get('Server-Timing'),null);
 });
