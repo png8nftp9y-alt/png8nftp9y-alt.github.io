@@ -1,47 +1,63 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {historyReadDb} from '../lib/history-read-batch.mjs';
-import {readOnlyReplayDb} from '../../../tools/read-only-replay-db.mjs';
-import {personalCircuitHistory} from '../lib/personal-tennis-europe-history.mjs';
-const sql='SELECT payload FROM match_participants WHERE source_player_id=?';
-function binding({fail=false}={}){
- const calls=[];let requests=0,active=0,max=0;
- const db={prepare(sql){
-  const make=params=>({bind:(...p)=>make(p),all:async()=>{requests++;calls.push({sql,params});return{results:[{id:params[0]}]}}});
-  return make([]);
- },async batch(statements){
-  requests++;active++;max=Math.max(max,active);await new Promise(r=>setImmediate(r));
-  try{if(fail)throw Error('7500');const before=requests,result=[];for(const s of statements)result.push(await s.all());requests=before;return result}finally{active--}
- }};
- return{db,calls,get requests(){return requests},get max(){return max}};
-}
-test('18 unchanged queries use three bounded requests, preserve parameters and complete row ordering',async()=>{
- const b=binding(),db=historyReadDb(b.db);const prepared=db.prepare(sql);
- const result=await Promise.all(Array.from({length:18},(_,i)=>prepared.bind(i).all()));
- assert.equal(b.requests,3);assert.equal(b.max,1);assert.equal(b.calls.length,18);
- assert.deepEqual(b.calls.map(c=>c.params[0]),Array.from({length:18},(_,i)=>i));
- assert.deepEqual(result.map(r=>r.results[0].id),Array.from({length:18},(_,i)=>i));
+import {personalCircuitHistory,participantSourceKey} from '../lib/personal-tennis-europe-history.mjs';
+import {database} from './search-sqlite-fixture.mjs';
+const tick=()=>new Promise(resolve=>setImmediate(resolve));
+const sql='SELECT display_name FROM match_participants WHERE source_player_id=?';
+function deferredDb(){const calls=[];return{calls,db:{prepare(sql){const make=params=>({bind:(...p)=>make(p),all(){return new Promise((resolve,reject)=>calls.push({sql,params,resolve,reject}))}});return make([])},batch(){throw Error('native_batch_must_not_be_used')}}}}
+test('slow first group does not block another player or the next page; no native batch or retry',async()=>{
+ const d=deferredDb(),db=historyReadDb(d.db);
+ const a=Promise.all([db.prepare(sql).bind('a').all(),db.prepare(sql).bind('b').all()]);await tick();assert.equal(d.calls.length,1);
+ const b=db.prepare(sql).bind('c').all();await tick();assert.equal(d.calls.length,2);
+ d.calls[1].resolve({results:[{display_name:'c'}]});assert.equal((await b).results[0].display_name,'c');
+ d.calls[0].resolve({results:[{__cw_history_slot:1,display_name:'b'},{__cw_history_slot:0,display_name:'a'}]});
+ assert.deepEqual((await a).map(r=>r.results[0].display_name),['a','b']);assert.deepEqual(d.calls[0].params,['a','b']);
 });
-test('failed batch stops queued history, propagates error, never retries or returns partial success',async()=>{
- const b=binding({fail:true}),db=historyReadDb(b.db);
- const results=await Promise.allSettled(Array.from({length:18},(_,i)=>db.prepare(sql).bind(i).all()));
- assert.ok(results.every(r=>r.status==='rejected'&&r.reason.message==='7500'));assert.equal(b.requests,1);
- await assert.rejects(db.prepare(sql).all(),/7500/);assert.equal(b.requests,1);
+test('six-read and bind limits split ready groups without an in-flight barrier',async()=>{
+ const d=deferredDb(),db=historyReadDb(d.db);const p=Promise.all(Array.from({length:18},(_,i)=>db.prepare(sql).bind(i).all()));await tick();
+ assert.equal(d.calls.length,3);assert.ok(d.calls.every(c=>c.params.length===6));
+ for(const c of d.calls)c.resolve({results:c.params.map((p,i)=>({__cw_history_slot:i,display_name:p}))});
+ assert.deepEqual((await p).map(r=>r.results[0].display_name),Array.from({length:18},(_,i)=>i));
+ const many='SELECT display_name FROM match_participants WHERE source_player_id IN ('+Array(50).fill('?').join(',')+')';
+ const q=Promise.all([db.prepare(many).bind(...Array(50).fill(1)).all(),db.prepare(many).bind(...Array(50).fill(2)).all()]);await tick();assert.equal(d.calls.length,5);assert.ok(d.calls.slice(3).every(c=>c.params.length===50));for(const c of d.calls.slice(3))c.resolve({results:[]});await q;
 });
-test('single SELECT and optional identity lookups retain their original semantics; writes rejected',async()=>{
- const b=binding(),db=historyReadDb(b.db);assert.deepEqual((await db.prepare(sql).bind(3).all()).results,[{id:3}]);
- assert.deepEqual(await db.prepare('SELECT payload FROM player_identity_people').bind(9).first(),{id:9});
- await assert.rejects(db.prepare('DELETE FROM match_participants').all(),/history_read_only/);await assert.rejects(db.prepare('WITH x AS (SELECT 1) DELETE FROM match_participants').all(),/history_read_only/);await assert.rejects(db.prepare('SELECT 1; DELETE FROM match_participants').all(),/history_read_only/);assert.throws(()=>db.prepare(sql).run(),/history_read_only/);assert.equal(b.requests,2);
+test('failed or malformed grouped responses reject all affected reads without partial success or retry',async()=>{
+ for(const invalid of [null,{results:[{display_name:'missing slot'}]}]){
+ const d=deferredDb(),db=historyReadDb(d.db),done=Promise.allSettled([db.prepare(sql).all(),db.prepare(sql).all()]);await tick();
+ if(invalid)d.calls[0].resolve(invalid);else d.calls[0].reject(Error('7500'));
+ const result=await done;assert.ok(result.every(r=>r.status==='rejected'));assert.equal(d.calls.length,1);
+ }
 });
-test('REST diagnostic keeps its two-request guard and executes each queued read once',async()=>{
- let calls=0;const db=historyReadDb(readOnlyReplayDb(async()=>{calls++;return{results:[]}}));
- await Promise.all(Array.from({length:18},()=>db.prepare(sql).all()));assert.equal(calls,18);
+test('writes are blocked, optional identity reads stay isolated, repeated reads remain fresh',async()=>{
+ const d=deferredDb(),db=historyReadDb(d.db);
+ for(const s of ['DELETE FROM match_participants','WITH x AS (SELECT 1) DELETE FROM match_participants','SELECT 1; DELETE FROM match_participants'])await assert.rejects(db.prepare(s).all(),/history_read_only/);
+ assert.throws(()=>db.prepare(sql).run(),/history_read_only/);assert.equal(d.calls.length,0);
+ const identity=db.prepare('SELECT payload FROM player_identity_people').all();assert.equal(d.calls.length,1);d.calls[0].resolve({results:[]});await identity;
+ for(const name of ['before','after']){const result=db.prepare(sql).all();await tick();d.calls.at(-1).resolve({results:[{display_name:name}]});assert.equal((await result).results[0].display_name,name)}
+ assert.equal(d.calls.length,3);
 });
-test('no batch binding keeps existing adapters compatible',()=>{const db={prepare(){}};assert.equal(historyReadDb(db),db)});
-test('real history output and complete pagination are identical with and without transport batching',async()=>{
- const player={id:'p',name:'Player Example',sourceCircuit:'tennis-europe',sourcePlayerId:'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'};
- const sources=Array.from({length:251},(_,i)=>({match_id:String(i+1).padStart(4,'0'),tournament_id:'t',played_date:'2026-11-01',match_payload:JSON.stringify({score:'6-0 6-0',event:'Singles'}),tournament_payload:JSON.stringify({name:'Tournament'}),history_participants:JSON.stringify([{match_id:String(i+1).padStart(4,'0'),participant_key:'a',source_player_id:'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',display_name:'Player Example',nationality:'ITA',team_index:0,is_winner:1},{match_id:String(i+1).padStart(4,'0'),participant_key:'b',display_name:'Opponent',nationality:'FRA',team_index:1,is_winner:0}])}));
- function make(){let requests=0;const reads=[];const db={prepare(sql){const statement=params=>({bind:(...p)=>statement(p),all:async()=>{requests++;reads.push([sql,params]);return{results:sql.includes('WITH candidate_matches')?sources.filter(s=>s.match_id>params.at(-1)).slice(0,250):[]}}});return statement([])},async batch(statements){const before=requests;const result=await Promise.all(statements.map(s=>s.all()));requests=before+1;return result}};return{db,reads,get requests(){return requests}}}
- const a=make(),b=make();const before=await personalCircuitHistory(a.db,player),after=await personalCircuitHistory(historyReadDb(b.db),player);
- assert.equal(after.matches.length,251);assert.deepEqual(after,before);assert.deepEqual(b.reads,a.reads);assert.ok(b.requests<a.requests);
+test('real SQLite: complete multi-player histories, native IDs, aliases, 250-row pagination and participants stay identical with zero writes',async()=>{
+ const d=database({identityMapping:true});
+ const native='aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
+ const players=[{id:'a',name:'Alice Example',sourceCircuit:'tennis-europe',sourcePlayerId:native},{id:'b',name:'Bob Example',sourceCircuit:'fitp',sourcePlayerId:'1234567'}];
+ try{
+ d.execute("INSERT INTO tournaments(id,circuit,source_tournament_id,start_date,end_date,payload) VALUES('t','tennis-europe','T','2026-01-01','2026-01-08','{\"name\":\"Tournament\"}')");
+ // Seed all fixtures in one SQL call to keep this regression bounded.
+ d.execute(`WITH RECURSIVE n(i) AS (SELECT 0 UNION ALL SELECT i+1 FROM n WHERE i<260) INSERT INTO matches(id,tournament_id,circuit,played_date,payload) SELECT printf('m%04d',i),'t','tennis-europe','2026-01-02','{"event":"GS14","score":"6-2 6-3"}' FROM n`);
+ d.execute(`INSERT INTO match_participants SELECT id,'self',?,'Alice Example','alice example','ITA',0,1,'{}' FROM matches`,[native]);
+ d.execute(`INSERT INTO match_participants SELECT id,'opponent','other','Opponent','opponent','FRA',1,0,'{}' FROM matches`);
+ d.execute(`INSERT INTO matches(id,tournament_id,circuit,played_date,payload) VALUES('m0261','t','tennis-europe','2026-01-03','{"event":"GS14","score":"6-0 6-0"}')`);
+ d.execute(`INSERT INTO match_participants VALUES('m0261','self','49','Alice Example','alice example','ITA',0,1,'{}')`);
+ d.execute(`INSERT INTO match_participants VALUES('m0261','opponent','other','Opponent','opponent','FRA',1,0,'{}')`);
+ players[0].sourceKey=await participantSourceKey('tennis-europe',{payload:'{}',display_name:'Alice Example',source_player_id:'49',nationality:'ITA'});
+ const baseline=d.writes(),directReads=[],groupedReads=[];
+ function counted(log){return{prepare(sql){const stmt=params=>({bind:(...p)=>stmt(p),all:async()=>{log.push({sql,params});return d.db.prepare(sql).bind(...params).all()}});return stmt([])},batch(){throw Error('no native batches')}}}
+ const direct=await Promise.all(players.map(p=>personalCircuitHistory(counted(directReads),p)));
+ const shared=historyReadDb(counted(groupedReads));const grouped=await Promise.all(players.map(p=>personalCircuitHistory(shared,p)));
+ assert.deepEqual(grouped,direct);assert.equal(grouped[0].matches.length,262);assert.equal(d.writes(),baseline);
+ assert.ok(groupedReads.length<directReads.length);assert.ok(groupedReads.some(r=>r.sql.includes('__cw_history_slot')));
+ // A grouped request stays within the D1 bind limit.
+ for(const r of groupedReads)assert.ok(r.params.length<=90);
+ }finally{d.close()}
 });

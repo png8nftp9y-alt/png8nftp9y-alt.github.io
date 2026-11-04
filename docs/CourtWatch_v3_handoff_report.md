@@ -10408,3 +10408,26 @@ alla giornata del browser. Correzione solo dei test, nessuna modifica alle date 
 ITF discovery 2026-11-04T07:07:25.615Z: 5 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-11-04T07:08:28.688Z: attempted 5, acquired 5, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+## 2026-11-04 — Storico: rimossa barriera globale dei batch
+
+Misura reale dopo il primo raggruppamento: storico 14415 ms e prima
+visualizzazione 17323 ms, rispetto a 7993 e 10957 ms precedenti. Il codice
+introduceva una barriera globale: nessuna lettura successiva partiva finché
+il batch corrente non era terminato. Il dato reale non prova da solo quanto
+pesi questa barriera, ma il suo blocco è riprodotto con letture controllate.
+
+Sostituito il batch seriale con raggruppamento delle sole SELECT identiche già
+pronte nello stesso turno: ogni SELECT originale resta una sottoquery con
+parametri e paginazione invariati; UNION ALL assegna ciascuna riga alla sua
+lettura. Massimo sei sottoquery e 90 parametri; gruppi indipendenti non aspettano
+il completamento degli altri. Nessun uso del batch transazionale D1, nuovo timer,
+retry, polling, cache o modifica a motori/dati. I controlli SQL di sola lettura
+restano obbligatori. Il replay REST conserva il limite di due richieste effettive.
+
+Test: un gruppo sospeso non blocca un altro giocatore; limiti e parametri esatti;
+risposte errate e 7500 non producono successi parziali; dati freschi a ogni lettura.
+Confronto su SQLite reale con oltre 250 partite, alias locale, partecipanti e
+paginazione: output esattamente identico e zero scritture. Snapshot TCL/Altri,
+classifiche progressive e Shield browser verificati prima della consegna.
+La latenza di produzione resta da misurare dopo deploy, senza stime garantite.

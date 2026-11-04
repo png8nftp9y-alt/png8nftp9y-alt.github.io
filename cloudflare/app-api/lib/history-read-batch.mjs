@@ -1,30 +1,36 @@
 import {assertReadOnlyQuery} from './read-only-d1-query.mjs';
-// One snapshot only: group ready history SELECTs, never cache data or retry.
+// Snapshot-local grouping only. No in-flight barrier, cache, timer or retry.
 export function historyReadDb(db,{limit=6}={}){
  if(!Number.isInteger(limit)||limit<1)throw Error('history_batch_limit');
- const batch=typeof db.readOnlyBatch==='function'?s=>db.readOnlyBatch(s):typeof db.batch==='function'?s=>db.batch(s):null;
- if(!batch)return db;
- const queue=[];let scheduled=false,active=false,failure=null;
- const schedule=()=>{if(!scheduled&&!active&&queue.length){scheduled=true;queueMicrotask(flush)}};
- async function flush(){
-  scheduled=false;if(active||!queue.length)return;active=true;
-  const jobs=queue.splice(0,limit);
+ const ready=new Map();let scheduled=false;
+ async function dispatch(sql,jobs){
   try{
-   const results=jobs.length===1?[await jobs[0].statement.all()]:await batch(jobs.map(j=>j.statement));
-   if(!Array.isArray(results)||results.length!==jobs.length||results.some(r=>!r||r.success===false||!Array.isArray(r.results)))throw Error('history_batch_incomplete');
-   jobs.forEach((job,i)=>job.resolve(results[i]));
-  }catch(error){failure=error;for(const job of [...jobs,...queue.splice(0)])job.reject(error)}
-  finally{active=false;schedule()}
+   if(jobs.length===1){jobs[0].resolve(await db.prepare(sql).bind(...jobs[0].params).all());return}
+   const combined=jobs.map((_,i)=>`SELECT ${i} AS __cw_history_slot,h.* FROM (${sql}) h`).join(' UNION ALL ');
+   const result=await db.prepare(combined).bind(...jobs.flatMap(j=>j.params)).all();
+   if(result.success===false||!Array.isArray(result.results))throw Error('history_group_incomplete');
+   const rows=jobs.map(()=>[]);
+   for(const item of result.results){const {__cw_history_slot:slot,...row}=item;if(!Number.isInteger(slot)||!rows[slot])throw Error('history_group_incomplete');rows[slot].push(row)}
+   jobs.forEach((job,i)=>job.resolve({success:true,results:rows[i]}));
+  }catch(error){for(const job of jobs)job.reject(error)}
  }
- function statement(sql,values=[]){
-  const original=()=>db.prepare(sql).bind(...values);
-  return{bind:(...params)=>statement(sql,[...params]),all(){
+ function flush(){
+  scheduled=false;const groups=[...ready];ready.clear();
+  for(const [sql,jobs]of groups){
+   let group=[],params=0;
+   for(const job of jobs){
+    if(group.length&&(group.length>=limit||params+job.params.length>90||(sql.length+80)*(group.length+1)>80000)){void dispatch(sql,group);group=[];params=0}
+    group.push(job);params+=job.params.length;
+   }
+   if(group.length)void dispatch(sql,group);
+  }
+ }
+ function statement(sql,params=[]){return{
+  bind:(...values)=>statement(sql,[...values]),all(){
    try{assertReadOnlyQuery(sql)}catch{return Promise.reject(Error('history_read_only'))}
-   // Optional identity lookups keep their original isolated error semantics.
-   if(!/\bFROM match_participants\b/.test(sql))return original().all();
-   if(failure)return Promise.reject(failure);
-   return new Promise((resolve,reject)=>{queue.push({statement:original(),resolve,reject});schedule()});
-  },async first(){return(await this.all()).results[0]||null},run(){throw Error('history_read_only')}};
- }
+   if(!/\bFROM match_participants\b/.test(sql))return db.prepare(sql).bind(...params).all();
+   return new Promise((resolve,reject)=>{const jobs=ready.get(sql)||[];jobs.push({params,resolve,reject});ready.set(sql,jobs);if(!scheduled){scheduled=true;queueMicrotask(flush)}});
+  },async first(){return(await this.all()).results[0]||null},run(){throw Error('history_read_only')}
+ }};
  return{prepare:sql=>statement(sql)};
 }
