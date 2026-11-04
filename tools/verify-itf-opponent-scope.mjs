@@ -1,5 +1,6 @@
 import {checkOpponentNativeHistory} from './lib/opponent-native-history-check.mjs';
 import {openReadOnlyD1} from '../cloudflare/app-api/lib/read-only-d1-client.mjs';
+import {auditItfEntryProfiles} from './lib/audit-itf-entry-profiles.mjs';
 import {auditOpponentFailures} from './lib/audit-opponent-failure.mjs';
 import {auditLatestItfDocuments} from './lib/audit-latest-itf-documents.mjs';
 import {auditOpponentSelection} from './lib/audit-opponent-selection.mjs';
@@ -95,8 +96,8 @@ try{
  const coverageBytes=r2('itf/audits/official-draw-parity/coverage-v3-current.json'),coverageAudit=parse(coverageBytes.toString());
  report.alternateCoverageEvidence={criterion:coverageAudit.criterion,generatedAt:coverageAudit.generatedAt};
  const coverageById=new Map((coverageAudit.tournaments||[]).map(t=>[competitionKey(t),t]));
- const entryProfiles=new Map();const allIds=[...scopedIds];
- for(let i=0;i<allIds.length;i+=30){const ids=allIds.slice(i,i+30);for(const row of await query(`SELECT source_player_id,payload FROM opponent_entry_profiles WHERE circuit='itf' AND source_player_id IN (${ids.map(()=>'?').join(',')})`,ids))entryProfiles.set(String(row.source_player_id),parse(row.payload));}
+ console.log('ITF_VERIFICATION_PHASE=read_exact_entry_profiles');
+ const entryProfiles=await auditItfEntryProfiles(query,[...scopedIds]);
  const sourceByCompetition=new Map(Object.values(draws.tournaments).map(t=>[competitionKey(t),t]));
  for(const p of acceptance.participants){const id=String(p.worldTennisId||p.id||p.playerId||'');if(!scopedIds.has(id))continue;const code=String(p.acceptanceCode||'').toUpperCase();if(!/^(A(?:-\d+)?|ALTERNATES?)$/.test(code))continue;
   const competitionId=competitionKey(p),expected=alternateExpectation(p,sourceByCompetition.get(competitionId)),stored=entryProfiles.get(id)?.tournaments?.find(t=>competitionKey(t)===competitionId),excluded=/withdraw|excluded|removed/i.test(stored?.entryStatus||''),confirmed=/official_draw|draw_confirmed/.test([stored?.entryStatus,stored?.calendarState].join(' '))||stored?.drawConfirmed===true;
