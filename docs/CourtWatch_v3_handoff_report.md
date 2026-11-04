@@ -10383,3 +10383,11 @@ Verifica browser: i due scenari di primo accesso generano date UTC nel processo
 Node; fissato esplicitamente UTC anche nei contesti Chromium per evitare che,
 fra mezzanotte italiana e mezzanotte UTC, la partita sintetica cada ieri rispetto
 alla giornata del browser. Correzione solo dei test, nessuna modifica alle date app.
+
+## 2026-11-04 — Scope ITF: selettore versioni e isolamento dei profili illeggibili
+- Identificata esattamente la query del fallimento 7500 nel run 41741325669: hash SQL acefd7329ca0a3a1, selezione di tutte le versioni itf_draw_documents per competition_id. Il codice 7500 da solo non prova che il numero di versioni sia la causa interna del provider.
+- Solo nell'adattatore di lettura Scope, la selezione legacy viene tradotta in una selezione dell'ultima versione per draw_key usando gli indici esistenti torneo e latest, mantenendo ordinamento per evento, osservazione e hash. Selettore e risultati effettivi continuano a essere registrati e riletti nei checkpoint. Nessun indice nuovo, migrazione, scrittura D1 o modifica al Worker.
+- La parita della selezione e testata su oltre 600 versioni, parita temporali, chiavi legacy multiple dello stesso evento e torneo estraneo. Test del lettore reale: match e segnalazioni di documenti indisponibili identici.
+- 7500 isolato durante un profilo: checkpoint esplicitamente fallito, ID conservato nei mancanti, cache e letture parziali scartate. Si procede agli altri profili senza ripetere quel profilo. Tre profili consecutivi falliti interrompono per guasto persistente. Errori di integrita, autorizzazione e 500 non attribuibili alla lettura corrente restano immediatamente bloccanti. I recuperi di trasporto gia esistenti non sono aumentati.
+- failedOpponents non vuoto mantiene esito incomplete_transport_failures e codice di uscita non zero. Nessuna promozione dei documenti mancanti o certificazione parziale come completa. ID rimanenti e artefatto persistono per controllo manuale mirato con dati freschi.
+- Validazione: 72 test mirati passati, sintassi e diff controllati. La risoluzione remota e la durata restano da verificare dopo pubblicazione: un guasto interno Cloudflare non e eliminabile per garanzia dal solo codice dell'audit.

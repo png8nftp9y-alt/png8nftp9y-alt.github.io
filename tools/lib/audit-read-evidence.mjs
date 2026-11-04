@@ -59,5 +59,5 @@ if(hash(rows)!==r.hash){const queryHash=hash(key);changed.push(queryHash);change
   if(clearAfterVerification)reads.clear();
   return{checked,changedQueries:changed,changedReads,stable:changed.length===0,recoveries:recoverAllReads?recoveryMetrics.used:recoveries};
  }
- return{query,db,verify,recoveryMetrics};
+ return{query,db,verify,recoveryMetrics,discard:()=>reads.clear()};
 }
