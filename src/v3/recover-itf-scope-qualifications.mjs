@@ -25,6 +25,15 @@ export function requireRecoveredQualification(doc){
  if(!record||record.acquisitionState!=='complete')throw Error('Qualification NOT recovered: '+doc.competitionId+' '+JSON.stringify({status:doc.status,players:doc.players?.length||0,matches:doc.matches?.length||0,error:doc.error||''}));
  return record;
 }
+export function acquireQualifications(tasks,{run=spawnSync,env=process.env}={}){
+ let status=0;
+ for(const task of tasks){
+  const result=run(process.execPath,['src/v3/acquire-itf-history-tournament-tasks.mjs'],{stdio:'inherit',env:{...env,ITF_REQUIRE_POPULATED_DRAW:'1',ITF_TOURNAMENT_TASKS_JSON:JSON.stringify([task])}});
+  if(result.error)throw result.error;
+  if(result.status!==0)status=result.status??1;
+ }
+ return status;
+}
 if(process.argv[1]===fileURLToPath(import.meta.url)){
  if(process.argv[2]==='verify'){
   for(const target of TARGETS){
@@ -33,7 +42,6 @@ if(process.argv[1]===fileURLToPath(import.meta.url)){
   }
  }else{
   const tasks=recoveryTasks(JSON.parse(await fs.readFile('src/v3/itf-audit-baseline-20261001.json','utf8')));
-  const result=spawnSync(process.execPath,['src/v3/acquire-itf-history-tournament-tasks.mjs'],{stdio:'inherit',env:{...process.env,ITF_REQUIRE_POPULATED_DRAW:'1',ITF_TOURNAMENT_TASKS_JSON:JSON.stringify(tasks)}});
-  if(result.error)throw result.error;process.exitCode=result.status??1;
+  process.exitCode=acquireQualifications(tasks);
  }
 }
