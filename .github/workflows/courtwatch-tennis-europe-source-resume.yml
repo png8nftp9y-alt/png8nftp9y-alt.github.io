@@ -1,0 +1,67 @@
+name: Court Watch Tennis Europe source resume
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: courtwatch-te-source-resume-20261105
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Load original audit inputs and successful shards
+        run: |
+          set -euo pipefail
+          gh run download 41951074150 --repo "$GITHUB_REPOSITORY" --pattern 'europe-coverage-*' --dir coverage-shards
+          gh run download 41950921170 --repo "$GITHUB_REPOSITORY" --name tennis-europe-oop-historical-merged --dir baseline
+          gh api "repos/$GITHUB_REPOSITORY/contents/history/tennis_europe_tournament_catalog.json?ref=1b4be4736327fb35b816760defaedfd83660feef" --jq .content | base64 --decode > history/tennis_europe_tournament_catalog.json
+          node src/v3/prepare-tennis-europe-source-resume.mjs audit
+      - name: Audit shard 9 and check the combined report
+        run: |
+          set -euo pipefail
+          node src/v3/audit-tennis-europe-coverage.mjs
+          cp coverage-results/coverage-9.json coverage-shards/coverage-9.json
+          node src/v3/merge-tennis-europe-coverage.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tennis-europe-completeness-report
+          path: coverage-report/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: europe-coverage-resumed
+          path: coverage-shards/
+          retention-days: 14
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Load shard 7 checkpoint and exact source catalogue
+        run: |
+          set -euo pipefail
+          gh run download 41950602324 --repo "$GITHUB_REPOSITORY" --name tennis-europe-oop-backfill-7 --dir checkpoint
+          gh api "repos/$GITHUB_REPOSITORY/contents/history/tennis_europe_tournament_catalog.json?ref=f5dcda72f436a59bcc29a82c0122f2df8aeb1dbf" --jq .content | base64 --decode > history/tennis_europe_tournament_catalog.json
+          node src/v3/prepare-tennis-europe-source-resume.mjs backfill
+      - name: Recover Zabrze and Ptolemaida
+        run: node src/v3/recover-tennis-europe-oop-shard.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: tennis-europe-oop-backfill-7
+          path: dist/v3/shards/tennis-europe-oop/backfill-07.json
+          retention-days: 14

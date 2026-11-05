@@ -10608,3 +10608,11 @@ a motori, schedulazioni, cache client, polling, retry o protezione di pubblicazi
 ITF discovery 2026-11-05T07:27:23.413Z: 6 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-11-05T07:28:37.523Z: attempted 6, acquired 6, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+## 2026-11-05 — Ripresa mirata delle fonti Tennis Europe
+
+Il merge 41950921170 ha pubblicato 58 risultati senza data e conservato il W/O manuale di Kufstein. L’audit 41951074150 ha prodotto 15 shard. Lo shard 9 ha superato i 25 secondi della richiesta iniziale a Tennis Europe. Nel backfill 41950602324 lo shard 7 ha salvato 33 tornei e registrato due letture fallite, Zabrze Cup e Ptolemaida Juniors.
+
+Il workflow manuale source resume usa l’archivio, i cataloghi e la data dei run originali. Verifica la composizione dei 15 shard dell’audit prima di acquisire il 9 e produrre il riepilogo completo. Verifica il checkpoint dello shard 7 e riacquisisce solo i due tornei mancanti. I checkpoint degli altri shard restano disponibili nel run originale. Il timeout di ciascuna richiesta di apertura sessione passa da 25 a 60 secondi per audit e recovery. Le verifiche delle fonti e del riepilogo continuano a bloccare risultati incompleti.
+
+Verifica locale con il checkpoint reale dello shard 7 e il suo catalogo. Verificati anche lo shard 0 reale dell’audit, il catalogo originale e un insieme di prova per gli altri shard. Passati i 14 test esistenti su ripresa e audit. I risultati remoti della ripresa restano da verificare. D1 41951074283 è stato cancellato durante l’import, prima della parità. Il workflow di ripresa produce artefatti di verifica e non pubblica una generazione R2 o D1.
