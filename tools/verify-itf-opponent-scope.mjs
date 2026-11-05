@@ -1,3 +1,4 @@
+import {recoverPendingOpponents,resolveOpponentCheckpoints} from './lib/audit-pending-opponents.mjs';
 import {auditOpponentCheckpoints} from './lib/audit-opponent-checkpoints.mjs';
 import {checkOpponentNativeHistory} from './lib/opponent-native-history-check.mjs';
 import {openReadOnlyD1} from '../cloudflare/app-api/lib/read-only-d1-client.mjs';
@@ -133,12 +134,12 @@ try{
  report.pendingOpponentIds=[...selectedScope.opponents.keys()].filter(id=>/^\d+$/.test(id));
  const groups=auditOpponentCheckpoints({verify:checkpoint,onVerified:ids=>{const done=new Set(ids);report.pendingOpponentIds=report.pendingOpponentIds.filter(id=>!done.has(id));}});
  report.opponentCheckpointPolicy={maxProfiles:8,maxAgeMs:30000,sequential:true};
- for(const [id,name]of selectedScope.opponents){
-  if(!/^\d+$/.test(id)){report.unverifiable.push({nativeId:id,name,reason:'draw_local_id_requires_verified_mapping'});continue;}
+ async function auditOpponent(id,name,recovery=false){
+  if(!/^\d+$/.test(id)){report.unverifiable.push({nativeId:id,name,reason:'draw_local_id_requires_verified_mapping'});return;}
   report.activeOpponent={nativeId:id,name};console.log('ITF_OPPONENT_PROGRESS='+JSON.stringify({checked:report.opponents.length,total:opponentIds.size}));
   await opponentAttempts.run({transportFailures:()=>transportFailures,onTransportFailure:async error=>{
    report.failedOpponents.push({nativeId:id,name,error:String(error.message),reason:'D1_7500'});
-   report.readCheckpoints.push({scope:'opponent:'+id,stable:false,status:'transport_failed',checked:0,changedReads:[],changedQueries:[]});
+   report.readCheckpoints.push({scope:'opponent:'+id,members:[id],recovery,stable:false,status:'transport_failed',checked:0,changedReads:[],changedQueries:[]});
    groups.discard();evidence.discard();session.clear();rawById.clear();checkpointStartedAt=new Date().toISOString();
    console.log('ITF_OPPONENT_TRANSPORT_FAILURE='+JSON.stringify({nativeId:id,reason:'D1_7500'}));
    await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');
@@ -152,19 +153,25 @@ try{
   const selected=result.tournaments.filter(itf),bad=selected.filter(forbiddenPast),record={nativeId:id,name,selected:selected.map(t=>({competitionId:t.competitionId,historyKind:t.historyKind,matches:t.matches?.length||0,historyMatchCount:t.historyMatchCount||0})),invalidPast:bad.map(competitionKey)};
   record.browser=await opponentPage.evaluate(data=>{const projected=opponentHistoryProjection(data),again=opponentHistoryProjection(projected);renderOpponentHistory(data);return {selected:projected.tournaments.filter(t=>circuit(t)==='itf').map(t=>({competitionId:t.competitionId,historyKind:t.historyKind,historyMatchCount:t.historyMatchCount||0,matches:t.matches?.length||0})),sections:document.querySelectorAll('#opponentTournamentHistory .opponentHistoryTournament').length,expectedSections:projected.tournaments.length,stable:JSON.stringify(projected.tournaments.map(t=>[t.circuit,t.competitionId,t.historyKind]))===JSON.stringify(again.tournaments.map(t=>[t.circuit,t.competitionId,t.historyKind]))};},result);
   if(!record.browser.stable||record.browser.sections!==record.browser.expectedSections||record.browser.selected.some(forbiddenPast))issue('opponent_browser_projection_mismatch',record);
-  report.opponents.push(record);if(bad.length)issue('opponent_acceptance_in_past',record);
-  groups.add(id);if(groups.due())await groups.flush();delete report.activeOpponent;
+  const existing=report.opponents.findIndex(row=>row.nativeId===id);if(existing<0)report.opponents.push(record);else report.opponents[existing]=record;if(bad.length)issue('opponent_acceptance_in_past',record);
+  if(recovery){const verified=await checkpoint('opponent:'+id,[id]);report.readCheckpoints.at(-1).recovery=true;if(verified.stable)report.pendingOpponentIds=report.pendingOpponentIds.filter(x=>x!==id);}else{groups.add(id);if(groups.due())await groups.flush();}delete report.activeOpponent;
   await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');
   }});
  }
+ for(const [id,name]of selectedScope.opponents)await auditOpponent(id,name);
  await groups.flush();
+ report.pendingRecovery=await recoverPendingOpponents({pending:report.pendingOpponentIds,reset:()=>{evidence.discard();session.clear();rawById.clear();checkpointStartedAt=new Date().toISOString();},check:id=>auditOpponent(id,selectedScope.opponents.get(id),true),onProgress:p=>console.log('ITF_PENDING_RECOVERY='+JSON.stringify(p))});
+ report.recoveredTransportFailures=report.failedOpponents.filter(row=>!report.pendingOpponentIds.includes(row.nativeId));
+ report.failedOpponents=report.failedOpponents.filter(row=>report.pendingOpponentIds.includes(row.nativeId));
+ report.readCheckpoints=resolveOpponentCheckpoints(report.readCheckpoints);
+ report.unverifiable=[...new Map(report.unverifiable.map(row=>[JSON.stringify(row),row])).values()];
  await opponentPage.close();
  const catalogue=auditCatalogue;
  report.drawCoverage={scope:'ITF catalogue tournaments concluded since 2026-09-01; cache inventory presence only, not a claim of complete acquisition',tournaments:catalogue.filter(t=>String(t.endDate||'')>= '2026-09-01'&&String(t.endDate||'')<today).map(t=>({competitionId:competitionKey(t),inventoried:Boolean(sourceByCompetition.get(competitionKey(t))?.eventInventory?.length)}))};
  report.drawCoverage.missingInventoryCount=report.drawCoverage.tournaments.filter(t=>!t.inventoried).length;
  if(!report.players.length)throw Error('no_verified_itf_player_audited');
  report.alternateCoverageEvidence.source='captured_acquired_sources';
- report.readEvidence={checked:report.readCheckpoints.reduce((n,x)=>n+x.checked,0),stable:report.readCheckpoints.every(x=>x.stable),changedReads:report.readCheckpoints.flatMap(x=>x.changedReads),changedQueries:report.readCheckpoints.flatMap(x=>x.changedQueries),recoveries:evidence.recoveryMetrics.used};
+ report.readEvidence={checked:report.readCheckpoints.reduce((n,x)=>n+x.checked,0),stable:report.readCheckpoints.every(x=>x.stable||x.supersededBy?.length),changedReads:report.readCheckpoints.flatMap(x=>x.changedReads),changedQueries:report.readCheckpoints.flatMap(x=>x.changedQueries),recoveries:evidence.recoveryMetrics.used};
  report.sourceChanges={d1:!report.readEvidence.stable,pinnedItfGeneration:generation};report.concurrentSourceChanged=report.sourceChanges.d1||report.alternateCoverageEvidence.changedDuringAudit;report.problemGroups={identity:report.unverifiable.filter(x=>x.reason==='opponent_identity_not_confirmed'),alternates:report.alternates.filter(x=>x.expected.state==='unverifiable'),zeroPresence:report.players.filter(x=>!x.expected.length),excludedPlayers:report.playerCoverage.filter(x=>x.status!=='audited')};
  report.status=report.failedOpponents.length?'incomplete_transport_failures':report.pendingOpponentIds.length?'incomplete_opponent_checkpoints':report.concurrentSourceChanged?'inconclusive_concurrent_source_change':report.issues.length?'differences_found':report.unverifiable.length||presence.unidentified.length||report.drawCoverage.missingInventoryCount?'checked_scope_matches_with_unverifiable_cases':'checked_captured_scope_matches';
  if(report.status==='checked_captured_scope_matches'&&report.opponentSelection.kind!=='full')report.status='checked_targeted_scope_matches';
