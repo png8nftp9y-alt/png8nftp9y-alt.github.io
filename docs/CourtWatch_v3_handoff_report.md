@@ -10626,3 +10626,7 @@ Il workflow manuale riusa il run 42024562917 per leggere gli oggetti nuovi o sco
 Il report del run 42100028210 indica 20 risultati dei gironi di qualificazione di Sanxenxo e uno di TE 12 Ireland 1 assenti dall’archivio. Il confronto con le cinque liste ufficiali conferma partecipanti, turni, punteggi e vincitori. La data di gioco è assente in tutti i casi.
 
 Nel merge manuale, coverage_run_id=42100028210 seleziona l’archivio pubblicato dal merge 41950921170, verificato con SHA-256, e il report della ripresa. L’integrazione conserva i 58 risultati precedenti. La pubblicazione richiede 21 aggiunte senza data e verifica la generazione corrente R2 prima del publish. Se R2 è avanzato, il workflow si ferma per proteggere i dati più recenti. I consueti controlli di audit e parità D1 restano da verificare sui run a valle.
+
+## 5 novembre 2026 — Bandierine in Cerca
+
+La ricerca conserva anche nationalityCode e countryCode dalle fonti ITF e Tennis Europe, così può mostrare la bandierina quando la nazionalità è presente in uno di questi campi. Verifica in produzione dopo il deploy.
