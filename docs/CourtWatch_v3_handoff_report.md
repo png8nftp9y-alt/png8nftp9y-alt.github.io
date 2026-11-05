@@ -10604,3 +10604,5 @@ a motori, schedulazioni, cache client, polling, retry o protezione di pubblicazi
 - Run41955194161/job127008319743 fallito prima delle richieste sorgente: ITF_tasks_must_share_competitionId. Errore introdotto nel nuovo wrapper: il motore esistente accetta eventi di un solo torneo per processo, non Cochabamba e Mendoza nella stessa lista.
 - Wrapper corretto: due invocazioni sequenziali distinte, una per torneo, ciascuna con un solo evento B-S-Q-KO. Il fallimento del primo tentativo non salta il secondo; il risultato aggregato resta non zero se uno fallisce. Nessun cambiamento all'acquisitore esistente o alle verifiche di documento completo.
 - Validazione:21 test passati, incluso test dell'invocazione figlio che esegue lo stesso vincolo del motore e verifica il secondo tentativo dopo il fallimento del primo. Recupero remoto e importD1 non ancora riusciti/certificati; il push della correzione avvia il workflow tramite trigger esistente, senza rerun aggiuntivi.
+
+ITF discovery 2026-11-05T07:27:23.413Z: 6 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
