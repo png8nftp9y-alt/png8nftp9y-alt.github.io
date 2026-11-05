@@ -1,0 +1,33 @@
+name: CourtWatch R2 checkpoint review
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    env:
+      GH_TOKEN: ${{ github.token }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_EC2_METADATA_DISABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: python -m pip install --quiet -r tools/cw_data_audit_requirements.txt
+      - run: python tools/cw_r2_checkpoint_review.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cw-r2-checkpoint-review
+          path: audit-review/report.json
+          if-no-files-found: error
+          retention-days: 30
