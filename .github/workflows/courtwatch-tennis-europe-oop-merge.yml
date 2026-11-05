@@ -45,6 +45,7 @@ jobs:
         with:
           node-version: '22'
       - name: Resolve successful backfill run
+        if: github.event_name != 'workflow_dispatch' || inputs.coverage_run_id != '42100028210'
         id: source
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -78,10 +79,12 @@ jobs:
           echo "AWS_DEFAULT_REGION=auto" >> "$GITHUB_ENV"
           python -m pip install --disable-pip-version-check --quiet awscli
       - name: Download every validated backfill shard
+        if: github.event_name != 'workflow_dispatch' || inputs.coverage_run_id != '42100028210'
         run: |
           mkdir -p dist/v3/downloaded-tennis-europe-oop
           gh run download "${{ steps.source.outputs.source_run_id }}" --repo "${{ github.repository }}" --dir dist/v3/downloaded-tennis-europe-oop --pattern 'tennis-europe-oop-backfill-*'
       - name: Merge and certify the complete historical archive
+        if: github.event_name != 'workflow_dispatch' || inputs.coverage_run_id != '42100028210'
         env:
           TE_OOP_SOURCE_RUN_ID: ${{ steps.source.outputs.source_run_id }}
         run: node src/v3/merge-tennis-europe-oop-backfill.mjs
@@ -99,6 +102,15 @@ jobs:
           node src/v3/merge-tennis-europe-empty-current.mjs
           aws --endpoint-url "$endpoint" s3 cp "$prefix/pointers/current.json" empty-current/pointer-again.json --only-show-errors
           cmp empty-current/pointer.json empty-current/pointer-again.json
+      - name: Load the published archive for the 21-result repair
+        if: github.event_name == 'workflow_dispatch' && inputs.coverage_run_id == '42100028210'
+        run: |
+          set -euo pipefail
+          gh run download 41950921170 --repo "$GITHUB_REPOSITORY" --name tennis-europe-oop-historical-merged --dir dist/v3
+          archive=dist/v3/tennis_europe_oop_historical.json
+          expected=$(sha256sum "$archive" | cut -d' ' -f1)
+          test "$expected" = 97c4ef63611bd6aace79ab9475e6060bac729a34940a77134e58ba73e28198b3
+          echo "TE_REPAIR_EXPECTED_GENERATION=$expected" >> "$GITHUB_ENV"
       - name: Recover only source results identified by the selected coverage report
         if: github.event_name == 'workflow_dispatch' && inputs.coverage_run_id != ''
         env:
@@ -107,14 +119,27 @@ jobs:
           set -euo pipefail
           [[ "$TE_COVERAGE_RUN_ID" =~ ^[0-9]+$ ]]
           workflow_name="$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$TE_COVERAGE_RUN_ID" --jq .name)"
-          test "$workflow_name" = "Court Watch Tennis Europe completeness audit"
+          if [ "$TE_COVERAGE_RUN_ID" = 42100028210 ]; then
+            test "$workflow_name" = "Court Watch Tennis Europe source resume"
+          else
+            test "$workflow_name" = "Court Watch Tennis Europe completeness audit"
+          fi
           gh run download "$TE_COVERAGE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name tennis-europe-completeness-report --dir coverage-repair
           node --test src/v3/tennis-europe-draw-results.test.mjs
           node src/v3/repair-tennis-europe-draw-results.mjs
+          if [ "$TE_COVERAGE_RUN_ID" = 42100028210 ]; then
+            jq -e '.drawResultRecovery | .added == 21 and .undated == 21 and .manualCovered == 0' dist/v3/tennis_europe_oop_historical.json >/dev/null
+          fi
       - name: Audit consolidated historical retirement evidence
         run: node src/v3/audit-tennis-europe-retirements.mjs dist/v3/tennis_europe_oop_historical.json
       - name: Publish verified historical generation to R2
-        run: bash src/v3/tennis-europe-oop-history-r2.sh publish
+        run: |
+          set -euo pipefail
+          if [ -n "${TE_REPAIR_EXPECTED_GENERATION:-}" ]; then
+            aws --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" s3 cp "s3://$R2_BUCKET/tennis-europe/oop-history/pointers/current.json" repair-current.json --only-show-errors
+            test "$(jq -r .generation repair-current.json)" = "$TE_REPAIR_EXPECTED_GENERATION"
+          fi
+          bash src/v3/tennis-europe-oop-history-r2.sh publish
       - uses: actions/upload-artifact@v4
         if: always()
         with:

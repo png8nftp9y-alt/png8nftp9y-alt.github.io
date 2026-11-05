@@ -10620,3 +10620,9 @@ Verifica locale con il checkpoint reale dello shard 7 e il suo catalogo. Verific
 ## 2026-11-05 — Verifica mirata R2 dal checkpoint
 
 Il workflow manuale riusa il run 42024562917 per leggere gli oggetti nuovi o scoperti e riesaminare i candidati ancora presenti. Il rapporto aggrega i match nei campi tessera e ID separatamente e distingue due campi tecnici dei tabelloni. I candidati storici non più disponibili e le lacune di parsing precedenti restano espliciti. Il checkpoint precedente non identifica singolarmente i binari saltati. L'audit legge R2 senza pubblicare dati grezzi. Validazione locale: 18 test dello scanner e prova sintetica su tessera, telefono, email e campi di certificazione. Verifica remota da eseguire.
+
+## 2026-11-05 — Recupero mirato dei 21 risultati Tennis Europe
+
+Il report del run 42100028210 indica 20 risultati dei gironi di qualificazione di Sanxenxo e uno di TE 12 Ireland 1 assenti dall’archivio. Il confronto con le cinque liste ufficiali conferma partecipanti, turni, punteggi e vincitori. La data di gioco è assente in tutti i casi.
+
+Nel merge manuale, coverage_run_id=42100028210 seleziona l’archivio pubblicato dal merge 41950921170, verificato con SHA-256, e il report della ripresa. L’integrazione conserva i 58 risultati precedenti. La pubblicazione richiede 21 aggiunte senza data e verifica la generazione corrente R2 prima del publish. Se R2 è avanzato, il workflow si ferma per proteggere i dati più recenti. I consueti controlli di audit e parità D1 restano da verificare sui run a valle.
