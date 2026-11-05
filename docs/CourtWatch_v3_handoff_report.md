@@ -10640,3 +10640,6 @@ Il workflow manuale rilegge le 487 versioni segnalate dal run 42100805636, con p
 - Run 42107149966: due finali future di doppio a Kalymnos avevano entrambi i lati esplicitamente vuoti. Registrate come slot in attesa, senza creare partite o risultati. Gli slot del giorno corrente e i dati incompleti restano soggetti ai controlli.
 - Run 42103508158: timeout prima dell'import durante il download delle dipendenze Chromium. Aumentato il margine per l'installazione, mantenendo obbligatori i controlli Shield.
 - Safety ITF 120d: challenge Incapsula dopo i tentativi previsti. Complete D1 verification: sovraccarico 7429 durante il conteggio. Entrambi ancora aperti.
+
+## 2026-11-05 — Contesto residuo dei recapiti R2
+Controllo manuale delle impronte con mobile_in_other del run 42109856767 e dei due oggetti email del run precedente. Distingue tessere, campi con suffisso ID, URL e corrispondenze irrisolte. I campi irrisolti sono raggruppati per impronta del nome del campo e forma del valore. Il rapporto espone conteggi e impronte, senza valori originali. Test sintetico locale sulle categorie e sulla riservatezza delle chiavi. Le versioni mancanti e i binari storici restano lacune.
