@@ -39,6 +39,11 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
     if(acquired){covered++;pendingOpponents++;continue;}
    }
 
+   // Future doubles finals can be published as two explicitly empty teams.
+   const emptyTeams=/<div class="match__row-wrapper">\s*(?:<div class="match__row\s*">\s*<div class="match__row-title">\s*<\/div>\s*<\/div>\s*){2}<\/div>/i;
+   if(size===4&&card.round==='Final'&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>iso(asOf)&&emptyTeams.test(card.evidenceHtml||'')){
+    resolutions.push({kind:'future_final_awaiting_both_teams',date:card.date,event:card.event,round:card.round,sourceUrl:card.sourceUrl,sourceHash:card.sourceHash});continue;
+   }
    let reason='';
    if(!size||!card.round)reason='unsupported_oop_card';
    else if(card.players.length!==size)reason='incomplete_native_participants';

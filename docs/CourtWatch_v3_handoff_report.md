@@ -10635,3 +10635,8 @@ ITF discovery 2026-11-05T20:24:20.544Z: 0 newly discovered future tournaments; M
 
 ## 2026-11-05 — Contesto dei recapiti R2
 Il workflow manuale rilegge le 487 versioni segnalate dal run 42100805636, con priorità ai campi email e ai conteggi più alti. Registra solo conteggi e categorie di campo predefinite. Versioni indisponibili ed errori sono espliciti. I 9 errori e i 17 binari del controllo precedente restano fuori da questa selezione. Prova sintetica locale su tessera, telefono, email e testo non strutturato. Esito sui dati reali da verificare.
+
+## 2026-11-05 — Europe OOP live e installazione browser Shield
+- Run 42107149966: due finali future di doppio a Kalymnos avevano entrambi i lati esplicitamente vuoti. Registrate come slot in attesa, senza creare partite o risultati. Gli slot del giorno corrente e i dati incompleti restano soggetti ai controlli.
+- Run 42103508158: timeout prima dell'import durante il download delle dipendenze Chromium. Aumentato il margine per l'installazione, mantenendo obbligatori i controlli Shield.
+- Safety ITF 120d: challenge Incapsula dopo i tentativi previsti. Complete D1 verification: sovraccarico 7429 durante il conteggio. Entrambi ancora aperti.
