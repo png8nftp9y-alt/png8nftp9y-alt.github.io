@@ -10547,3 +10547,48 @@ tempi: occorre una nuova misura di primo accesso dopo deploy verde.
 - Workflow dedicato parte dal push dei suoi soli file oppure manualmente. Acquisizione con motore esistente; nessuna risposta vuota o tecnica diventa recupero. Artifact preservato anche su errore. Solo se entrambi i documenti sono completi: persistenza R2 e riconciliazione copertura, poi workflow D1 riusabile esistente con artifact obbligatorio e verifica integrale del contenuto importato, nella coda courtwatch-d1-writes.
 - Nessun rilancio Scope, nessun polling dello stato workflow, nessun cambiamento al motore ordinario, alla UI o ai criteri Scope. Le richieste sorgente restano quelle del normale acquisitore per i due eventi richiesti. Recupero remoto non ancora eseguito in questa sessione: esito e successiva verifica Scope ancora aperti.
 - Validazione:20 test passati su selezione parametri, URL errati/ID scambiati respinti, documenti vuoti/tecnici mai completi, guardie della persistenza D1 e collegamento del workflow al writer verificato. Sintassi e diff controllati.
+## 2026-11-05 — Storico condiviso fra giocatori al primo accesso
+
+La misura reale utente esponeva 39 giocatori, 126 richieste D1 e circa 7 secondi
+di storico, con circa 291 ms di esecuzione SQL cumulativa. Il precedente
+raggruppamento di SELECT lasciava numerose dipendenze e ondate di richieste.
+
+La snapshot completa TCL/Altri usa ora shared-player-history.mjs: descrittori
+limitati a 32 identità circuito per gruppo, due gruppi concorrenti, massimo quattro
+richieste sorgente in volo. Le partite sono lette tramite seek sugli indici del
+giocatore, con cursore indipendente per ogni identità e massimo 250 righe di
+risposta complessive. Le identità concluse escono dalle pagine successive, mentre
+uno storico lungo può usare l'intera pagina: nessuna scansione ripetuta delle
+partite future degli altri giocatori e nessun tetto allo storico completo.
+
+Gli alias locali conservano esattamente la prova nativa/canonica precedente.
+Le identità richieste dai candidati sono risolte una volta per snapshot, con la
+stessa deduplicazione e le pagine da 100 del lookup esistente. Si rileggono solo
+le partite degli alias autorizzati assenti dalle letture native. Estrazione e
+presentazione riusano le stesse funzioni del percorso singolo, incluse ambiguità,
+singolo/doppio, compagni, avversari, punteggi ed esiti non confermati. Le richieste
+scoped di un solo giocatore conservano il percorso già verificato.
+
+Server-Timing conserva conteggi effettivi, durata D1 e righe lette della risposta.
+Per le letture condivise espone hist_scope e hist_shared_io, senza riportare
+falsi lavori individuali. Nessun dato privato nei riepiloghi. Restano indipendenti
+iscrizioni, metadati e altre letture; tornei, agenda e storico vengono consegnati
+prima delle classifiche nella medesima risposta progressiva esistente.
+
+Verifiche su SQLite reale: 39 giocatori / 340 partite, output identico, 161 richieste
+separate contro 10 condivise; fixture densa di 6502 partite, 161 contro 36. Nessuna
+scrittura. Verificati seek sugli indici, paginazione oltre 250 righe, omonimi,
+assenza delle tabelle identità opzionali, stop dopo errori senza retry e limiti
+workerd di cinque termini composti, 32 argomenti funzione e 100 parametri SQL.
+Il test preesistente del vero Worker conserva tutte le 270 partite Europe con
+ID locali, FITP e ITF, esclude l'omonimo e confronta snapshot completa/scoped.
+Controllati inoltre sovrapposizione letture, appartenenza ai gruppi e risposta
+progressiva. Nuovi test inclusi nel normale check API; invarianti costi 18 verdi.
+
+Limite: meno richieste HTTP non equivale automaticamente a meno righe fatturate
+D1. I test sui piani escludono scansioni globali; il lavoro VM della fixture densa
+cresce da 1134600 a 1328600 istruzioni per le selezioni comuni e i filtri circuito.
+Il profiler esistente consente di controllare le righe effettive dopo deploy.
+I conteggi locali non sono una promessa sul tempo remoto: serve una nuova misura
+di primo accesso TCL e Altri dopo Shield, replay e deploy verdi. Nessuna modifica
+a motori, schedulazioni, cache client, polling, retry o protezione di pubblicazione.

@@ -23,7 +23,7 @@ test('scoped snapshot returns the exact full-snapshot player, entries and match 
    const fullCounter=counted(d.db),fullResponse=await request(fullCounter.db,group);assert.equal(fullResponse.status,200);const full=await fullResponse.json();
    const scopedCounter=counted(d.db),scopedResponse=await request(scopedCounter.db,group,'cw-target-1');assert.equal(scopedResponse.status,200);const scoped=await scopedResponse.json();
    assert.match(scopedResponse.headers.get('Server-Timing'),/total;dur=\d/);assert.match(scopedResponse.headers.get('Server-Timing'),/match_history;dur=\d/);assert.match(fullResponse.headers.get('Server-Timing'),/total;dur=\d/);assert.match(fullResponse.headers.get('Server-Timing'),/match_history;dur=\d/);
-   const profileHeader=fullResponse.headers.get('Server-Timing');assert.match(profileHeader,/hist_matches;dur=/);assert.match(profileHeader,/hist_last_start;dur=/);assert.match(profileHeader,/requests=\d+/);assert.ok(!profileHeader.includes('cw-target'));assert.ok(!profileHeader.includes('Case Player'));
+   const profileHeader=fullResponse.headers.get('Server-Timing');assert.match(profileHeader,/hist_matches;dur=/);assert.match(profileHeader,/hist_scope;dur=/);assert.match(profileHeader,/requests=\d+/);assert.ok(!profileHeader.includes('cw-target'));assert.ok(!profileHeader.includes('Case Player'));
    assert.equal(scoped.playerId,'cw-target-1');assert.equal(scoped.group,group);
    for(const [key,field] of [['players','id'],['tournaments','playerId'],['matches','playerId']])assert.deepEqual(scoped[key],full[key].filter(r=>r[field]==='cw-target-1'),key);
    assert.equal(scoped.matches.length,1);assert.equal(scoped.tournaments.length,1);
@@ -120,7 +120,7 @@ test('final profile resolution overlaps a pending catalogue and preserves exact 
  }finally{clearTimeout(timer);d.close()}
 });
 
-test('full group overlaps independent entries/history and bounds histories to three players, with unchanged membership and zero writes', {timeout:60000}, async()=>{
+test('full group overlaps independent entries/history and shares history reads with bounded group requests, with unchanged membership and zero writes', {timeout:60000}, async()=>{
  const d=database({identityMapping:true}),original=globalThis.fetch;globalThis.fetch=async()=>({ok:true,json:async()=>({tournaments:[]})});
  try{seed(d,5);let active=0,peak=0,releaseEntries,overlap=false;
   function wrap(statement,sql){return new Proxy(statement,{get(target,key){const value=target[key];if(key==='bind')return(...args)=>wrap(value.apply(target,args),sql);
@@ -134,7 +134,7 @@ test('full group overlaps independent entries/history and bounds histories to th
     return value.apply(target,args);
    };return typeof value==='function'?value.bind(target):value;}});}
   const before=d.writes(),response=await request({prepare:sql=>wrap(d.db.prepare(sql),sql),batch:s=>d.db.batch(s)},'others');
-  assert.equal(response.status,200);const body=await response.json();assert.equal(body.players.length,5);assert.equal(body.matches.length,5);assert.equal(overlap,true);assert(peak>1&&peak<=3,String(peak));assert.equal(d.writes(),before);
+  assert.equal(response.status,200);const body=await response.json();assert.equal(body.players.length,5);assert.equal(body.matches.length,5);assert.equal(overlap,true);assert(peak>=1&&peak<=2,String(peak));assert.equal(d.writes(),before);
  }finally{globalThis.fetch=original;d.close();}
 });
 

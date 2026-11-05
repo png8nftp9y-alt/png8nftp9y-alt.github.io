@@ -32,6 +32,11 @@ export async function verifiedParticipantAliases(db,player,circuit,native,varian
  if(!candidates.length)return aliases;
  const keyed=await Promise.all(candidates.map(async p=>({p,key:await participantSourceKey(circuit,p)})));
  const people=await storedIdentities(db,[player.sourceKey,player.canonicalId,player.id,...keyed.map(x=>x.key)]);
+ return participantAliases(player,circuit,native,keyed,people);
+}
+
+export function participantAliases(player,circuit,native,keyed,people){
+ const aliases=new Set();
  const targetIds=new Set([player.canonicalId,...[player.sourceKey,player.id].map(k=>people.get(k)?.canonicalId)].filter(Boolean));
  for(const {p,key} of keyed){
   const person=people.get(key),link=person&&playerCircuitIdentities(person).find(x=>x.circuit===circuit);
@@ -76,6 +81,10 @@ async function personalHistory(db,player,circuit){
  const known=new Set(nativeSources.map(row=>row.match_id));
  const aliasMatches=[...new Set([...aliases].map(key=>JSON.parse(key)[0]))].filter(id=>!known.has(id));
  const sources=[...nativeSources,...(aliasMatches.length?await readSources(aliasMatches,false):[])].sort((a,b)=>a.match_id<b.match_id?-1:a.match_id>b.match_id?1:0);
+ return historyFromSources(player,circuit,native,aliases,sources);
+}
+
+export function historyFromSources(player,circuit,native,aliases,sources){
  // Participants are read by the same indexed match lookup as the source row.
  // No per-player/per-40-match HTTP round trips and no incomplete history cap.
  const participants=sources.flatMap(source=>JSON.parse(source.history_participants||'[]'));

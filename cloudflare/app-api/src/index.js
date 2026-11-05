@@ -1,6 +1,7 @@
 import {progressiveSnapshot} from '../lib/progressive-snapshot.mjs';
 import {historyReadProfile} from '../lib/history-read-profile.mjs';
 import {historyReadDb} from '../lib/history-read-batch.mjs';
+import {sharedPlayerHistories} from '../lib/shared-player-history.mjs';
 import {boundedPlayerMap} from '../lib/bounded-player-map.mjs';
 import {snapshotHistoryPlayers,snapshotEntryPlayer} from '../lib/snapshot-history-players.mjs';
 import {agendaAdvancementRows} from '../lib/tennis-europe-agenda-advances.mjs';
@@ -263,9 +264,17 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
         return [rows,rows.some(t=>t.circuit==='itf')?await itfTournamentMetadata(env):new Map()];
       })),
       timing.measure('match_history',async()=>{
-        try{return await boundedPlayerMap(historyPlayers,async player=>{
-          const history=await historyProfile.player(()=>readHistory(player));prepare(history.tournaments);return history;
-        })}finally{historyProfile.report(timing)}
+        try{
+          if(!playerId){
+            const histories=await sharedPlayerHistories(historyProfile.db,historyPlayers,{configuredIds:enrichment.configuredIds});
+            for(const history of histories)prepare(history.tournaments);
+            timing.record('hist_scope',0,`players=${historyPlayers.length} shared=1`);
+            return histories;
+          }
+          return await boundedPlayerMap(historyPlayers,async player=>{
+            const history=await historyProfile.player(()=>readHistory(player));prepare(history.tournaments);return history;
+          });
+        }finally{historyProfile.report(timing)}
       }),
       timing.measure('rankings_read',()=>preparedTennisEuropeRankingData(env,[...new Set(players.map(p=>p.id))])).then(data=>({data}),error=>({error})),
       timing.measure('fitp_metadata_read',()=>fitpMetadataRows(env.DB,players)),
