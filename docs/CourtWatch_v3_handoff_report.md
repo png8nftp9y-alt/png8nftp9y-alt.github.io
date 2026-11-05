@@ -10630,3 +10630,5 @@ Nel merge manuale, coverage_run_id=42100028210 seleziona l’archivio pubblicato
 ## 5 novembre 2026 — Bandierine in Cerca
 
 La ricerca conserva anche nationalityCode e countryCode dalle fonti ITF e Tennis Europe, così può mostrare la bandierina quando la nazionalità è presente in uno di questi campi. Verifica in produzione dopo il deploy.
+
+ITF discovery 2026-11-05T20:24:20.544Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
