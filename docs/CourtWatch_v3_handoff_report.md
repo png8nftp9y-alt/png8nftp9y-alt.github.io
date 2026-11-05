@@ -10632,3 +10632,6 @@ Nel merge manuale, coverage_run_id=42100028210 seleziona l’archivio pubblicato
 La ricerca conserva anche nationalityCode e countryCode dalle fonti ITF e Tennis Europe, così può mostrare la bandierina quando la nazionalità è presente in uno di questi campi. Verifica in produzione dopo il deploy.
 
 ITF discovery 2026-11-05T20:24:20.544Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-11-05 — Contesto dei recapiti R2
+Il workflow manuale rilegge le 487 versioni segnalate dal run 42100805636, con priorità ai campi email e ai conteggi più alti. Registra solo conteggi e categorie di campo predefinite. Versioni indisponibili ed errori sono espliciti. I 9 errori e i 17 binari del controllo precedente restano fuori da questa selezione. Prova sintetica locale su tessera, telefono, email e testo non strutturato. Esito sui dati reali da verificare.
