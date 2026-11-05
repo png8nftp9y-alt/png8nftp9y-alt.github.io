@@ -1,3 +1,10 @@
+## 2026-11-05 — Verifica rapida dei tre oggetti R2 con campi medici candidati
+
+Nuovo workflow separato courtwatch-r2-field-review.yml. Legge il rapporto già disponibile del run 41913673787, identifica i tre fingerprint con field_medical_present, elenca metadati R2 finché li ritrova e scarica esclusivamente quei tre oggetti con verifica ETag. Non riesegue il controllo completo, non interroga FITP né D1, non scrive nel bucket. Usa lo scanner esistente per archivi/dump e aggiunge nomi dei campi classificati come medici, conteggi non vuoti, tipi e conteggio stringhe simili a date; non pubblica valori, nomi persone, chiavi R2 o contenuti grezzi. I nomi di campo non conformi a identificatori tecnici vengono oscurati con hash. Eventuali oggetti modificati/mancanti, limiti o errori vengono segnalati esplicitamente.
+
+Validazione: tre test mirati su valori non esposti, classificazione nomi/tipi, lettura limitata a tre oggetti e inventario inatteso; test scanner esistente, YAML e diff verificati. Il verde del nuovo workflow significa che i campi candidati sono stati identificati, non che i dati medici siano assenti. R2 completo resta incompleto e D1 non viene certificato da questo controllo.
+
+
 ## 2026-11-04 — Correzione audit D1: dump oltre 512 MB
 
 Il run 41913673787, job D1 126867730082, si è fermato con download_size_limit prima dell'analisi (coverage vuota). Non indica presenza di dati personali riservati. Il download del solo dump D1 ora viene scritto a blocchi su disco privato del runner, senza limite aggregato di 512 MB in RAM. Il dump viene importato in SQLite locale una istruzione per volta, preservando transazioni, stringhe con punto e virgola e commenti; ATTACH/DETACH ed estensioni restano vietati. Guardie HTTPS/host, budget, spazio disco e limite per singola istruzione rimangono espliciti. I dati grezzi non vengono pubblicati. Aggiunti contatori byte scaricati, istruzioni importate e righe analizzate.
