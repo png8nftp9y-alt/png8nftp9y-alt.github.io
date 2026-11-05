@@ -14,7 +14,7 @@ async function select(db,where,binds,limit=''){
  }));
  return groups.flat().sort(compare);
 }
-function result(r,linked){const p=payload(r);return{courtwatchId:r.circuit==='courtwatch'?r.official_id:linked.get(r.source_key)||'',sourceKey:r.circuit==='courtwatch'?'':r.source_key,identity:r.official_id||r.source_key,name:r.display_name,circuit:r.circuit,nationality:p.nationality||p.country||'',club:p.club||'',birthYear:p.birthYear||null,sources:[r.circuit]}}
+function result(r,linked){const p=payload(r);return{courtwatchId:r.circuit==='courtwatch'?r.official_id:linked.get(r.source_key)||'',sourceKey:r.circuit==='courtwatch'?'':r.source_key,identity:r.official_id||r.source_key,name:r.display_name,circuit:r.circuit,nationality:p.nationality||p.nationalityCode||p.countryCode||p.country||'',club:p.club||'',birthYear:p.birthYear||null,sources:[r.circuit]}}
 const candidate=r=>({...payload(r),name:r.display_name,officialId:r.official_id||payload(r).officialId||''});
 function unify(members,linked){
  const rows=members.map(r=>result(r,linked));
