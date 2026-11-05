@@ -10539,3 +10539,49 @@ tempi: occorre una nuova misura di primo accesso dopo deploy verde.
 - Replay locale con archivio reale41742734076/source41735878362, report41908082590 e risposte ufficiali appena lette:58 aggiunte senza data,1 override manuale gia presente,26 letture di pagina per23 draw. Nessun vecchio match modificato. Ripetizione del riparatore non legge fonti per casi gia soddisfatti e non aggiunge duplicati. Fixture conserva tutte59 carte originali con URL/SHA e pagine reali Romania/gruppo.
 - Validazione:95 test mirati verdi prima del confezionamento, incluse parita SQL SQLite, ripristino storico, immutabilita OOP, ritiri, paginazione, schema fonte, controllo baselines e fallimenti. Sintassi, YAML e diff controllati; installatore ripete questi controlli in worktree isolato e aggiorna questo report nello stesso commit.
 - Esecuzione utente dopo pubblicazione: avviare manualmente Court Watch Tennis Europe OOP historical merge, source_run_id=41735878362, coverage_run_id=41908082590. Nessun nuovo backfill dei16 shard richiesto per questi59 casi. Dopo merge riuscito la catena configurata avvia audit e import D1: gli esiti remoti vanno verificati. Restano da certificare gli altri layout/risultati irrisolti e la parita D1; nessuna affermazione che tutti i tornei siano gia completi. Assistente non ha fatto push, dispatch, rilanci, cancellazioni o scritture D1.
+
+## 2026-11-05 — Storico condiviso fra giocatori al primo accesso
+
+La misura reale utente esponeva 39 giocatori, 126 richieste D1 e circa 7 secondi
+di storico, con circa 291 ms di esecuzione SQL cumulativa. Il precedente
+raggruppamento di SELECT lasciava numerose dipendenze e ondate di richieste.
+
+La snapshot completa TCL/Altri usa ora shared-player-history.mjs: descrittori
+limitati a 32 identità circuito per gruppo, due gruppi concorrenti, massimo quattro
+richieste sorgente in volo. Le partite sono lette tramite seek sugli indici del
+giocatore, con cursore indipendente per ogni identità e massimo 250 righe di
+risposta complessive. Le identità concluse escono dalle pagine successive, mentre
+uno storico lungo può usare l'intera pagina: nessuna scansione ripetuta delle
+partite future degli altri giocatori e nessun tetto allo storico completo.
+
+Gli alias locali conservano esattamente la prova nativa/canonica precedente.
+Le identità richieste dai candidati sono risolte una volta per snapshot, con la
+stessa deduplicazione e le pagine da 100 del lookup esistente. Si rileggono solo
+le partite degli alias autorizzati assenti dalle letture native. Estrazione e
+presentazione riusano le stesse funzioni del percorso singolo, incluse ambiguità,
+singolo/doppio, compagni, avversari, punteggi ed esiti non confermati. Le richieste
+scoped di un solo giocatore conservano il percorso già verificato.
+
+Server-Timing conserva conteggi effettivi, durata D1 e righe lette della risposta.
+Per le letture condivise espone hist_scope e hist_shared_io, senza riportare
+falsi lavori individuali. Nessun dato privato nei riepiloghi. Restano indipendenti
+iscrizioni, metadati e altre letture; tornei, agenda e storico vengono consegnati
+prima delle classifiche nella medesima risposta progressiva esistente.
+
+Verifiche su SQLite reale: 39 giocatori / 340 partite, output identico, 161 richieste
+separate contro 10 condivise; fixture densa di 6502 partite, 161 contro 36. Nessuna
+scrittura. Verificati seek sugli indici, paginazione oltre 250 righe, omonimi,
+assenza delle tabelle identità opzionali, stop dopo errori senza retry e limiti
+workerd di cinque termini composti, 32 argomenti funzione e 100 parametri SQL.
+Il test preesistente del vero Worker conserva tutte le 270 partite Europe con
+ID locali, FITP e ITF, esclude l'omonimo e confronta snapshot completa/scoped.
+Controllati inoltre sovrapposizione letture, appartenenza ai gruppi e risposta
+progressiva. Nuovi test inclusi nel normale check API; invarianti costi 18 verdi.
+
+Limite: meno richieste HTTP non equivale automaticamente a meno righe fatturate
+D1. I test sui piani escludono scansioni globali; il lavoro VM della fixture densa
+cresce da 1134600 a 1328600 istruzioni per le selezioni comuni e i filtri circuito.
+Il profiler esistente consente di controllare le righe effettive dopo deploy.
+I conteggi locali non sono una promessa sul tempo remoto: serve una nuova misura
+di primo accesso TCL e Altri dopo Shield, replay e deploy verdi. Nessuna modifica
+a motori, schedulazioni, cache client, polling, retry o protezione di pubblicazione.

@@ -1,5 +1,5 @@
 // Numeric aggregates only, scoped to one snapshot. No logs, storage or queries.
-const phase=sql=>sql.includes('WITH candidate_matches AS MATERIALIZED')?'matches':/\bFROM match_participants p CROSS JOIN matches\b/.test(sql)?'aliases':/\bplayer_identity_people\b/.test(sql)?'identities':'other';
+const phase=sql=>sql.includes('WITH candidate_matches AS MATERIALIZED')?'matches':/\b(?:FROM|JOIN) match_participants p CROSS JOIN matches\b/.test(sql)?'aliases':/\bplayer_identity_people\b/.test(sql)?'identities':'other';
 export function historyReadProfile(binding,now=()=>performance.now()){
  const phases=new Map();const started=now();let active=0,peak=0,requests=0,players=0,playerActive=0,playerPeak=0,lastStart=0,jobMax=0,jobErrors=0;
  async function read(sql,operation){
@@ -18,8 +18,8 @@ export function historyReadProfile(binding,now=()=>performance.now()){
   db:{prepare:sql=>wrap(binding.prepare(sql),sql)},
   async player(operation){players++;playerPeak=Math.max(playerPeak,++playerActive);lastStart=Math.max(lastStart,Math.max(0,now()-started));const began=now();try{return await operation()}catch(error){jobErrors++;throw error}finally{jobMax=Math.max(jobMax,Math.max(0,now()-began));playerActive--}},
   report(timing){
-   timing.record('hist_last_start',lastStart,`players=${players} peak=${playerPeak} errors=${jobErrors}`);
-   timing.record('hist_job_max',jobMax,`requests=${requests} ioPeak=${peak} unfinished=${active}`);
+   if(players)timing.record('hist_last_start',lastStart,`players=${players} peak=${playerPeak} errors=${jobErrors}`);
+   timing.record(players?'hist_job_max':'hist_shared_io',players?jobMax:Math.max(0,now()-started),`requests=${requests} ioPeak=${peak} unfinished=${active}`);
    for(const name of ['matches','aliases','identities','other']){
     const s=phases.get(name);if(!s)continue;
     timing.record('hist_'+name,s.sum,`requests=${s.calls} reads=${s.reads} maxMs=${s.max.toFixed(1)} dbMs=${s.db.toFixed(1)} dbSamples=${s.dbSamples} rowsRead=${s.rows} rowSamples=${s.rowSamples} errors=${s.errors}`);
