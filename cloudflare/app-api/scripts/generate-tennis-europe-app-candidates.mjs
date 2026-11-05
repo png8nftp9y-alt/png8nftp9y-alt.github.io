@@ -1,3 +1,4 @@
+import {isVerifiedDrawResult} from '../../../src/v3/tennis-europe-draw-results.mjs';
 import {retirementFields} from '../../../src/v3/tennis-europe-retirement.mjs';
 import fs from 'node:fs/promises';
 import {drawMatchKey} from '../../../src/v3/tennis-europe-draw-walkovers.mjs';
@@ -21,7 +22,7 @@ function hydrateRelativeSchedules(matches){const groups=new Map();for(const matc
 hydrateRelativeSchedules(matchMap.values());
 const sourceIdentities=new Map();for(const match of matchMap.values())for(const player of match.players||[]){const key=normalize(player.name),identity=(player.nationality||'')+'|'+key;if(!sourceIdentities.has(key))sourceIdentities.set(key,new Set());sourceIdentities.get(key).add(identity)}
 const ambiguous=[],candidates=new Map();for(const [key,owners] of ownersByName)if(owners.length>1)ambiguous.push({type:'courtwatch_name_collision',key});
-for(const match of matchMap.values())for(const player of match.players||[]){const key=normalize(player.name),owners=ownersByName.get(key)||[];if(!owners.length)continue;if((sourceIdentities.get(key)?.size||0)>1){ambiguous.push({type:'source_identity_collision',key});continue}for(const owner of owners){
+for(const match of matchMap.values())for(const player of match.players||[]){if(match.sourceKind==='official_draw_result'&&!match.date){if(!isVerifiedDrawResult(match))throw Error('Unverified undated draw result');continue;}const key=normalize(player.name),owners=ownersByName.get(key)||[];if(!owners.length)continue;if((sourceIdentities.get(key)?.size||0)>1){ambiguous.push({type:'source_identity_collision',key});continue}for(const owner of owners){
  if(manualKeys.has(owner.id+'|'+drawMatchKey(match))){manualSuperseded.push({playerId:owner.id,matchId:match.id});continue;}
  const tournament=tournamentMap.get(match.competitionId)||{},playerId=String(player.id||'');
  const teamIndex=(match.teams||[]).findIndex(team=>(team||[]).map(String).includes(playerId));

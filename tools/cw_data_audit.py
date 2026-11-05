@@ -2,7 +2,7 @@
 Reports are candidate indicators, never legal findings or incident attribution.
 """
 import argparse, collections, contextlib, datetime as dt, gzip, hashlib, io
-import json, os, pathlib, re, sqlite3, tempfile, time, zipfile
+import json, os, pathlib, re, sqlite3, tempfile, time, zipfile, shutil
 import urllib.parse
 import requests
 
@@ -160,6 +160,40 @@ class Audit:
    for row in cursor:
     self.budget();self.json_value(dict(zip(names,row)),counts)
     self.report['coverage']['rows']=self.report['coverage'].get('rows',0)+1
+    if self.scope=='d1' and self.report['coverage']['rows']%25000==0:
+     self.save();print('D1 rows scanned:',self.report['coverage']['rows'],flush=True)
+ def sql_file(self, path, source):
+  """Import the local export statement by statement; never load the whole dump."""
+  counts=collections.Counter();statements=0
+  with tempfile.TemporaryDirectory() as temp:
+   with contextlib.closing(sqlite3.connect(str(pathlib.Path(temp)/'snapshot.sqlite'))) as db:
+    def auth(action,arg1,arg2,*_):
+     if action in (sqlite3.SQLITE_ATTACH,sqlite3.SQLITE_DETACH):return sqlite3.SQLITE_DENY
+     if action==sqlite3.SQLITE_FUNCTION and str(arg2).lower() in ('load_extension','readfile','writefile'):return sqlite3.SQLITE_DENY
+     return sqlite3.SQLITE_OK
+    db.set_authorizer(auth);db.isolation_level=None;statement=''
+    try:
+     with pathlib.Path(path).open(encoding='utf-8-sig') as stream:
+      for line in stream:
+       for segment in re.split(r'(?<=;)',line):
+        self.budget();statement+=segment
+        if len(statement)>64*1024*1024:raise Incomplete('sql_statement_size_limit')
+        if sqlite3.complete_statement(statement):
+         db.execute(statement);statement='';statements+=1
+         if statements%10000==0:
+          self.report['coverage']['importedStatements']=statements;self.save()
+          print('D1 local statements imported:',statements,flush=True)
+          if shutil.disk_usage(temp).free<1024*1024*1024:raise Incomplete('local_disk_space')
+     if statement.strip():
+      # A trailing comment is harmless; incomplete SQL must not silently pass.
+      clean=re.sub(r'/\*.*?\*/|--[^\n]*','',statement,flags=re.S).strip()
+      if clean:raise Incomplete('sql_incomplete_tail')
+     self.database(db,counts)
+    except Incomplete:raise
+    except Exception:raise Incomplete('sql_stream_import_failed') from None
+  self.record(source,{k:v for k,v in counts.items() if v})
+  self.report['coverage']['importedStatements']=statements
+  self.report['coverage']['itemsScanned']=self.report['coverage'].get('itemsScanned',0)+1
  def scan(self,data,name,source):
   counts=collections.Counter();self.bytes(data,name,counts)
   self.record(source,{k:v for k,v in counts.items() if v})
@@ -196,6 +230,33 @@ class HTTP:
     self.audit.budget();data.extend(chunk)
     if len(data)>MAX_BYTES:raise Incomplete('download_size_limit')
    return bytes(data) if download else json.loads(data)
+ def download_to(self,url,destination,redirects=0):
+  self.audit.budget();parsed=urllib.parse.urlsplit(url);host=parsed.hostname or ''
+  allowed=('github.com','githubusercontent.com','blob.core.windows.net','amazonaws.com','cloudflarestorage.com','r2.dev','storage.googleapis.com','cloudflare.com')
+  if redirects>5:raise Incomplete('redirect_limit')
+  if parsed.scheme!='https' or parsed.username or parsed.password:raise Incomplete('network_scheme_guard')
+  if not any(host==x or host.endswith('.'+x) for x in allowed):raise Incomplete('network_host_guard')
+  path=pathlib.Path(destination);total=0;last_report=0
+  print('D1 snapshot download started (stream to private local disk)',flush=True)
+  with requests.get(url,headers={'User-Agent':'CourtWatch-readonly-data-presence-audit'},timeout=(15,90),allow_redirects=False,stream=True) as response:
+   if response.status_code in (301,302,303,307,308):
+    target=urllib.parse.urljoin(url,response.headers.get('Location',''))
+    return self.download_to(target,path,redirects+1)
+   if not response.ok:raise Incomplete('http_'+str(response.status_code))
+   length=response.headers.get('Content-Length')
+   if length and length.isdigit() and int(length)+1024*1024*1024>shutil.disk_usage(path.parent).free:raise Incomplete('local_disk_space')
+   with path.open('wb') as stream:
+    for chunk in response.iter_content(1024*1024):
+     self.audit.budget()
+     if shutil.disk_usage(path.parent).free<len(chunk)+1024*1024*1024:raise Incomplete('local_disk_space')
+     stream.write(chunk);total+=len(chunk)
+     if total-last_report>=64*1024*1024:
+      last_report=total;self.audit.report['coverage']['downloadBytes']=total;self.audit.save()
+      print('D1 bytes downloaded:',total,flush=True)
+   if length and length.isdigit() and not response.headers.get('Content-Encoding') and total!=int(length):raise Incomplete('download_length_mismatch')
+  self.audit.report['coverage']['downloadBytes']=total
+  print('D1 snapshot downloaded; importing local copy. Bytes:',total,flush=True)
+  return total
  def gh(self,path,download=False):return self.request('https://api.github.com/repos/'+REPO+path,os.environ['GH_TOKEN'],download=download)
 
 def restore(a,h,run):
@@ -230,8 +291,10 @@ def audit_d1(a,h):
  else:raise Incomplete('d1_export_timeout')
  signed=result['result']['signed_url']
  if urllib.parse.urlsplit(signed).scheme!='https':raise Incomplete('export_download_scheme')
- data=h.request(signed,download=True)
- a.scan(data,'d1-snapshot.sql','d1-snapshot')
+ with tempfile.TemporaryDirectory() as temp:
+  path=pathlib.Path(temp)/'d1-snapshot.sql'
+  h.download_to(signed,path)
+  a.sql_file(path,'d1-snapshot')
  a.report['coverage']['snapshotExported']=True
  a.report['coverage']['timeTravelRestored']=False
 

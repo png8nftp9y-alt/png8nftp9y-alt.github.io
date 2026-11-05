@@ -13,7 +13,13 @@ export function bracketMatches(html,event,competitionId,drawId){
    const block=src.slice(starts[n],starts[n+1]||src.length),rowTags=[...block.matchAll(/<div\b[^>]*>/gi)].filter(x=>/class=["'][^"']*(?:^|\s)match__row(?:\s|["'])/.test(x[0])||/class=["']match__row(?:\s|["'])/.test(x[0]));
    if(/\bBye\b/i.test(text(block)))continue;
    const rows=rowTags.map((r,k)=>({won:cls(r[0],'has-won'),players:[...block.slice(r.index,rowTags[k+1]?.index||block.length).matchAll(/<a\b[^>]*data-player-id=["'][^"']+["'][^>]*>[\s\S]*?<\/a>/gi)].map(x=>tennisEuropeParticipant(x[0]))}));
-   const players=rows.flatMap(r=>r.players);if(!players.length){issues.push('unverified_empty_match_card:'+drawId+':'+rounds[i]);continue;}
+   const players=rows.flatMap(r=>r.players);
+   if(!players.length){
+    // Only a fully empty two-row slot without result/winner is structural.
+    // Missing rows or any result marker remain unverified.
+    const empty=rowTags.length===2&&rowTags.every((r,k)=>!text(block.slice(r.index,rowTags[k+1]?.index||block.length).split(/<div\b[^>]*class=["']match__(?:result|footer|btn)/i)[0]))&&!/has-won|Walkover|\bW\/O\b|class=["'][^"']*\bpoints\b/i.test(block);
+    if(!empty)issues.push('unverified_empty_match_card:'+drawId+':'+rounds[i]);continue;
+   }
    const size=/^[BG]D/i.test(event)?2:1,winners=rows.map((r,k)=>r.won?k:-1).filter(k=>k>=0);
    if(rows.length!==2||rows.some(r=>r.players.length!==size)||new Set(players.map(p=>p.id)).size!==size*2||winners.length!==1){issues.push('unverified_participants_or_result:'+drawId+':'+rounds[i]);continue;}
    const sets=[...block.matchAll(/<ul\b[^>]*class=["'][^"']*\bpoints\b[^"']*["'][^>]*>([\s\S]*?)<\/ul>/gi)].map(s=>[...s[1].matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/gi)].map(x=>text(x[1])).join('-'));
@@ -26,7 +32,13 @@ export function bracketMatches(html,event,competitionId,drawId){
  return{matches,issues};
 }
 const name=s=>String(s||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(' ').sort().join(' ');
-function winners(m){const byId=new Map((m.players||[]).map(p=>[String(p.id),name(p.name)]));return (m.teams?.[m.winnerTeamIndex]||m.winnerPlayerIds||[]).map(id=>byId.get(String(id))||'').sort().join('|');}
+function winners(m){
+ if(!m.players?.length&&m.manual===true&&[0,1].includes(m.teamIndex)&&[0,1].includes(m.winnerTeamIndex)){
+  const own=[m.playerName,...String(m.partner||'').split('/')].filter(Boolean),other=m.opponentOptions||String(m.opponent||'').split('/');
+  return (m.winnerTeamIndex===m.teamIndex?own:other).filter(Boolean).map(name).sort().join('|');
+ }
+ const byId=new Map((m.players||[]).map(p=>[String(p.id),name(p.name)]));return (m.teams?.[m.winnerTeamIndex]||m.winnerPlayerIds||[]).map(id=>byId.get(String(id))||'').sort().join('|');
+}
 const score=s=>String(s||'').replace(/\s+/g,' ').trim();
 function sameScore(a,b){const x=score(a),y=score(b);return x===y||x.replace(/(\d+)-(\d+)/g,'$2-$1')===y;}
 export function compareMatches(official,stored){

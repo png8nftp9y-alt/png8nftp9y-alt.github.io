@@ -1,3 +1,10 @@
+## 2026-11-04 — Correzione audit D1: dump oltre 512 MB
+
+Il run 41913673787, job D1 126867730082, si è fermato con download_size_limit prima dell'analisi (coverage vuota). Non indica presenza di dati personali riservati. Il download del solo dump D1 ora viene scritto a blocchi su disco privato del runner, senza limite aggregato di 512 MB in RAM. Il dump viene importato in SQLite locale una istruzione per volta, preservando transazioni, stringhe con punto e virgola e commenti; ATTACH/DETACH ed estensioni restano vietati. Guardie HTTPS/host, budget, spazio disco e limite per singola istruzione rimangono espliciti. I dati grezzi non vengono pubblicati. Aggiunti contatori byte scaricati, istruzioni importate e righe analizzate.
+
+I push dell'audit avviano ora solo D1; R2 resta disponibile da avvio manuale e il run R2 già attivo non viene cancellato o duplicato. Concorrenza separata per scope, nessun monitoraggio/rilancio automatico dei workflow. Nessuna richiesta FITP o modifica ai dati di produzione. Validazione: 18 test sintetici superati, inclusi trasferimento oltre cap RAM simulato, transazioni/multilinea, SQL incompleto e blocco ATTACH; YAML e diff verificati. Audit D1 reale ancora da completare dopo pubblicazione.
+
+
 ## 2026-11-04 — Audit mirato presenza dati D1/R2 (sola lettura)
 
 Nuovo workflow indipendente `courtwatch-data-presence-audit.yml`: esportazione D1 verso copia temporanea del runner e analisi di tutti gli oggetti R2 ancora conservati, inclusi backup e generazioni. Nessuna richiesta FITP, nessuna modifica ai dati di produzione, nessun ripristino Time Travel e nessun rilancio automatico. Nessuna variazione ai motori o alla UI. Dipendenze Python dirette fissate. Rapporti e checkpoint contengono conteggi, identificatori opachi e lacune di copertura; non nomi, recapiti, chiavi oggetto o contenuti grezzi. Copie grezze non vengono caricate come artefatti.
@@ -10493,3 +10500,42 @@ Fonte limite: https://github.com/cloudflare/workerd/blob/main/src/workerd/util/s
 - Un vecchio checkpoint instabile resta nel rapporto. E superato soltanto se OGNI suo membro ha un successivo checkpoint di recupero stabile. Prove osservati/alternates instabili, errori, corruzione, differenze e fonti mancanti restano bloccanti. ID pendenti e fallimenti ancora aperti impediscono il verde. Fallimenti di trasporto risolti conservati separatamente, record avversario sostituiti senza duplicare conteggi.
 - Validazione: 92 test mirati passati (91 nel controllo completo piu un ulteriore caso dei 19 pendenti); inclusi reset cache verificato con sorgente cambiata, nessun ciclo infinito, blocco non risolto se manca un solo membro, checkpoint osservati mai nascosto e massimo 32 profili. Sintassi e diff controllati; nessuna verifica remota anticipatamente dichiarata riuscita.
 - Restano separati il main maschile J30 Agno (J-J30-SUI-2026-006) e le qualificazioni maschili J100 Cochabamba (J-J100-BOL-2026-002) e J100 Mendoza (J-J100-ARG-2026-001). Questa modifica non acquisisce documenti e non li considera recuperati. Nessuna modifica all'app o scrittura D1.
+## 2026-11-04 — Misurazione dettagliata delle letture storico
+
+Ultima misura utente: storico 8180 ms, prima visualizzazione 11425 ms. Il problema
+velocità resta aperto. Aggiunte esclusivamente misure alle operazioni già presenti,
+senza nuove query, timer, cache, retry o variazioni al limite di parallelismo.
+
+Il wrapper osserva le richieste effettive dopo il raggruppamento SQL esistente:
+partite, verifiche alias locali, identità e altre letture. Espone nel Server-Timing
+somma delle durate client, conteggio richieste/sottoquery, massimo, durata D1 e
+righe lette quando presenti nei metadati della stessa risposta. dbSamples e
+rowSamples distinguono informazioni mancanti da valori misurati pari a zero.
+Le somme possono sovrapporsi: non vanno sommate al totale dello storico.
+
+hist_last_start misura il ritardo di avvio dell'ultimo lavoro giocatore rispetto
+alla creazione del profiler; hist_job_max il lavoro giocatore più lungo. Sono
+riportati anche picchi di concorrenza, errori e richieste ancora aperte. Solo
+riepiloghi numerici della singola richiesta: nessun SQL, parametro, nome, ID,
+payload, messaggio errore o scrittura nei log/archivi. Il pannello loadTiming già
+esistente visualizza questi campi senza modifiche al client.
+
+Verifiche: identità di query/parametri/risultati e raggruppamenti con e senza
+profilazione; richieste concorrenti non bloccate; errori propagati senza retry;
+metadati assenti non certificati come zero; snapshot TCL/Altri e classifiche
+progressive invariati. Test del vero Worker controllano la presenza dei nuovi
+campi e l'assenza di identificatori. Test inclusi nel normale check API.
+Questa modifica misura il collo di bottiglia, non dichiara un miglioramento dei
+tempi: occorre una nuova misura di primo accesso dopo deploy verde.
+
+## 2026-11-04 — Europe: risultati ufficiali senza giornata e recupero mirato dei 59 casi
+- Letto audit 41908082590 e artefatto13363325539: 567 tornei,264 complete,213 unverified,14 incomplete,70 team deferred,5 cancellati,1 rinviato; OOP dei491 individuali completi sulle giornate scoperte;59 missing e0 conflitti. Questo esito non certifica tutti i tabelloni ne D1.
+- Verificati tutti i59 casi sulle24 liste ufficiali GetMatchesContent dei relativi draw, paginazione inclusa. Tutti59 sono risultati pubblicati senza data: il solo OOP non li contiene. I37 casi Romania appartengono a questa categoria. Kufstein Grimoldi-Becerra W/O e gia un override manuale con data confermata: conservarlo, non duplicarlo. Fonte ordinaria prima recuperava i W/O dai draw, non i normali risultati privi di giornata.
+- Parser separato per liste incontri: ID nativi e link giocatori vincolati al torneo, due lati completi, vincitore esplicito, punteggio, SHA della carta e URL. Data solo dal footer ufficiale e nei limiti torneo; risultato senza data ammesso soltanto per torneo terminato prima della data di controllo, con date vuota e dateSource official_draw_undated. Nessun giorno dedotto dal turno o dalla fine torneo. Pagina vuota/standings, partecipanti incompleti, fonte indisponibile, paginazione ripetuta/esterna/salto di pagina e conflitti restano bloccanti per i casi da recuperare. Next-page massimo100, nessun polling aggiunto.
+- Recupero ordinario storico e recovery: conserva i record OOP e W/O, legge liste complete solo quando il tabellone mostra risultati mancanti, riusa liste gruppi gia lette. Live conserva il flusso OOP delle giornate attuali; recupero supplementare dei risultati abilitato per tornei gia terminati nella sua finestra. Guardie sul numero campo estese solo al nuovo tipo verificato, non rimosse.
+- Audit: supporto liste Round Robin e relativa paginazione; non confonde standings e incontri. Celle strutturali completamente vuote di un bracket non sono partite mancanti; marcatori di risultato o righe mancanti restano problemi. Override manuale pubblicato conteggiato con il suo vincitore; annullati/team/altre fonti ambigue restano espliciti e non certificati come tornei individuali completi.
+- D1: risultati senza data vanno in matches/results/participants, senza schedules e senza candidati agenda. Manifest espone il numero effettivo di schedules; confronto D1 usa questo conteggio mantenendo la compatibilita con vecchi manifest. Non cambia date o appuntamenti gia acquisiti. Test SQL reale: replay zero scritture, contatori coerenti,149 righe agenda datate conservate e risultato senza data escluso dall agenda. Lo storico personale puo mantenere la giornata vuota: non e prova di una data di gioco.
+- Merge manuale: nuovo input facoltativo coverage_run_id. Dopo il normale merge dei16 shard validati, legge il report indicato e recupera soltanto i missing di quel report dalla fonte attuale. Baseline sourceRunId e date torneo devono coincidere; richiesti stessi ID nativi, risultato/vincitore coerenti e assenza di duplicati. Qualsiasi mancato recupero ferma il publish. Vecchi match preservati byte per byte, override manuali conservati, riepiloghi identita ricalcolati. Status diagnostico repaired_not_coverage_certified: non e un verde forzato dell audit. R2 e workflow a valle restano nella normale catena gia esistente.
+- Replay locale con archivio reale41742734076/source41735878362, report41908082590 e risposte ufficiali appena lette:58 aggiunte senza data,1 override manuale gia presente,26 letture di pagina per23 draw. Nessun vecchio match modificato. Ripetizione del riparatore non legge fonti per casi gia soddisfatti e non aggiunge duplicati. Fixture conserva tutte59 carte originali con URL/SHA e pagine reali Romania/gruppo.
+- Validazione:95 test mirati verdi prima del confezionamento, incluse parita SQL SQLite, ripristino storico, immutabilita OOP, ritiri, paginazione, schema fonte, controllo baselines e fallimenti. Sintassi, YAML e diff controllati; installatore ripete questi controlli in worktree isolato e aggiorna questo report nello stesso commit.
+- Esecuzione utente dopo pubblicazione: avviare manualmente Court Watch Tennis Europe OOP historical merge, source_run_id=41735878362, coverage_run_id=41908082590. Nessun nuovo backfill dei16 shard richiesto per questi59 casi. Dopo merge riuscito la catena configurata avvia audit e import D1: gli esiti remoti vanno verificati. Restano da certificare gli altri layout/risultati irrisolti e la parita D1; nessuna affermazione che tutti i tornei siano gia completi. Assistente non ha fatto push, dispatch, rilanci, cancellazioni o scritture D1.
