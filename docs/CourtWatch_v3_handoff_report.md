@@ -10606,3 +10606,5 @@ a motori, schedulazioni, cache client, polling, retry o protezione di pubblicazi
 - Validazione:21 test passati, incluso test dell'invocazione figlio che esegue lo stesso vincolo del motore e verifica il secondo tentativo dopo il fallimento del primo. Recupero remoto e importD1 non ancora riusciti/certificati; il push della correzione avvia il workflow tramite trigger esistente, senza rerun aggiuntivi.
 
 ITF discovery 2026-11-05T07:27:23.413Z: 6 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-05T07:28:37.523Z: attempted 6, acquired 6, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
