@@ -12,7 +12,7 @@ if(oop.status!=='green'||candidates.status!=='green'||candidates.publishedToAgen
 const expected={
   teOopTournaments:Number(oop.counts.tournaments),
   teMatches:Number(oop.counts.matches)+Number(candidates.counts.manualParentMatches||0),
-  teSchedules:Number(oop.counts.matches),
+  teSchedules:Number(oop.counts.schedules??oop.counts.matches),
   teResults:Number(oop.counts.completed),
   tePlayers:Number(oop.counts.players),
   teParticipants:Number(oop.counts.participants),

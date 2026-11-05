@@ -1,3 +1,4 @@
+import {loadDrawResultPages,parseDrawResults,distinctDrawResults} from './tennis-europe-draw-results.mjs';
 import {inventoryOopPage,auditOopCompleteness} from './tennis-europe-oop-completeness.mjs';
 import {resolveOopScope} from './tennis-europe-oop-scope.mjs';
 import {auditDate,discoverAuditDraws,compareOfficialOop} from './tennis-europe-coverage-audit.mjs';
@@ -8,10 +9,11 @@ import {consent,get,dates,parsePage} from './tennis-europe-coverage-network.mjs'
 import {bracketMatches,compareMatches,coverageStatus} from './tennis-europe-coverage.mjs';
 const BASE='https://te.tournamentsoftware.com',shard=Number(process.env.TE_AUDIT_SHARD||0),total=16;
 const baseline=JSON.parse(await fs.readFile(process.env.TE_AUDIT_ARCHIVE||'baseline/tennis_europe_oop_historical.json','utf8'));
+const manualMatches=JSON.parse(await fs.readFile('dist/v3/manual_matches.json','utf8')).matches||[];
 const catalog=JSON.parse(await fs.readFile('history/tennis_europe_tournament_catalog.json','utf8'));
 const cutoff='2025-12-18',today=auditDate(process.env.TE_AUDIT_TODAY,baseline.generatedAt),rows=Object.values(catalog.tournaments||{}).filter(t=>t.endDate>=cutoff&&t.endDate<today).sort((a,b)=>a.competitionId.localeCompare(b.competitionId));
 const queue=rows.filter((_,i)=>i%total===shard),results=[],byTournament=new Map();
-for(const m of baseline.matches||[]){const id=String(m.competitionId).toUpperCase(),list=byTournament.get(id)||[];list.push(m);byTournament.set(id,list);}
+for(const m of [...(baseline.matches||[]),...manualMatches]){const id=String(m.competitionId).toUpperCase(),list=byTournament.get(id)||[];list.push(m);byTournament.set(id,list);}
 const clean=s=>String(s||'').replace(/<[^>]+>/g,' ').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
 function pageOK(html){if(/404\s*-\s*Page not found|name=["']CookiePurposes|Verify you are human/i.test(html))throw Error('source_not_available');return html;}
 await consent();
@@ -34,7 +36,15 @@ for(const tournament of queue){
     const shell=pageOK(await get(target.url));let html=shell;
     const action=shell.match(/<form\b[^>]*action=["']([^"']*\/(?:GetDrawContent|GetMatchesContent)[^"']*)/i)?.[1];
     if(action){const u=new URL(action.replace(/&amp;/g,'&'),BASE),allowed='/tournament/'+id+'/draw/'+target.number+'/';if(u.origin!==BASE||!['getdrawcontent','getmatchescontent'].some(endpoint=>u.pathname.toLowerCase()===allowed.toLowerCase()+endpoint))throw Error('unexpected_draw_endpoint');html=pageOK(await get(u.href,{'x-requested-with':'XMLHttpRequest',referer:target.url}));}
-    const event=clean(shell.match(/<h4\b[^>]*>([\s\S]*?)<\/h4>/i)?.[1]||target.event),parsed=bracketMatches(html,event,id,target.number);
+    const event=clean(shell.match(/<h4\b[^>]*>([\s\S]*?)<\/h4>/i)?.[1]||target.event);
+    let parsed;
+    if(/GetMatchesContent/i.test(action||'')){
+     const pages=await loadDrawResultPages({competitionId:id,drawId:target.number,get,initialHtml:html,initialUrl:new URL(action.replace(/&amp;/g,'&'),BASE).href});
+     parsed={matches:[],issues:[]};
+     for(const page of pages){const p=parseDrawResults({html:page.html,competitionId:id,drawId:target.number,event,sourceUrl:page.url,startDate:tournament.startDate,endDate:tournament.endDate,requireDates:false});parsed.matches.push(...p.matches);parsed.issues.push(...p.issues.map(x=>x.reason));}
+     parsed.matches=distinctDrawResults(parsed.matches);
+     d.sourcePages=pages.map(p=>({url:p.url,sha256:p.sourceHash}));
+    }else parsed=bracketMatches(html,event,id,target.number);
     d.event=event;d.sha256=createHash('sha256').update(html).digest('hex');d.matches=parsed.matches.length;d.issues=parsed.issues;official.push(...parsed.matches);
    }catch(e){d.issues.push(String(e.message));}
    r.issues.push(...d.issues.map(message=>({draw:target.number,message})));

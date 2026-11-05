@@ -29,6 +29,7 @@ async function fixture(t,env,liveCount=1){
  await fs.mkdir(path.join(cwd,'scripts'),{recursive:true});
  await fs.mkdir(path.join(root,'src/v3'),{recursive:true});
  await fs.copyFile(new URL('../../../src/v3/tennis-europe-retirement.mjs',import.meta.url),path.join(root,'src/v3/tennis-europe-retirement.mjs'));
+ for(const name of ['tennis-europe-draw-results.mjs','tennis-europe-metadata.mjs'])await fs.copyFile(new URL('../../../src/v3/'+name,import.meta.url),path.join(root,'src/v3',name));
  await fs.copyFile(generator,path.join(cwd,'scripts/generate.mjs'));
  const run=spawnSync(process.execPath,['scripts/generate.mjs'],{cwd,env:{...process.env,TE_INCREMENTAL:'1',TE_SYNC_HISTORICAL:'0',...env},encoding:'utf8'});
  assert.equal(run.status,0,run.stderr);

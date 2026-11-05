@@ -1,3 +1,4 @@
+import {loadDrawResultPages,parseDrawResults,isVerifiedDrawResult} from './tennis-europe-draw-results.mjs';
 import {officialRetirement,resolveRetirementWinners} from './tennis-europe-retirement.mjs';
 import {absoluteDrawLinks} from './tennis-europe-source-discovery.mjs';
 import {emptyBranchAdvance} from './tennis-europe-empty-advance.mjs';
@@ -157,8 +158,8 @@ export function parseDrawWalkovers({html,shell='',event='',competitionId,drawId,
  if(markers!==walkovers)issues.push({competitionId,drawId,sourceUrl,reason:'unparsed_walkover_markers',markers,walkovers});
  return{matches,pending,issues,walkovers,advancements};
 }
-export async function recoverDrawWalkovers({tournament,matches,get,documents=[],manualMatches=[]}){
- const id=tournament.competitionId,issues=[],pending=[],cases=[],advancements=[],all=new Map(),existing=new Map(matches.map(m=>[drawMatchKey(m),m])),manual=new Map(manualMatches.filter(m=>String(m.competitionId).toUpperCase()===id.toUpperCase()).map(m=>[drawMatchKey(m),m]));
+export async function recoverDrawWalkovers({tournament,matches,get,documents=[],manualMatches=[],recoverAllResults=false,asOf=new Date().toISOString().slice(0,10)}){
+ const id=tournament.competitionId,resultFailures=[],issues=[],pending=[],cases=[],advancements=[],all=new Map(),existing=new Map(matches.map(m=>[drawMatchKey(m),m])),manual=new Map(manualMatches.filter(m=>String(m.competitionId).toUpperCase()===id.toUpperCase()).map(m=>[drawMatchKey(m),m]));
  function reconcile(old,m){
   const incoming=teamNames(m)[m.winnerTeamIndex],teams=teamNames(old),index=teams.indexOf(incoming);
   if(JSON.stringify([...teams].sort())!==JSON.stringify(teamNames(m).sort())||index<0){issues.push({competitionId:id,matchId:old.id,reason:'walkover_team_conflict',sourceUrl:m.sourceUrl});return'needs_attention'}
@@ -187,11 +188,34 @@ export async function recoverDrawWalkovers({tournament,matches,get,documents=[],
    let html=shell;
    if(action){const url=new URL(decode(action),BASE);const expected='/TOURNAMENT/'+id.toUpperCase()+'/DRAW/'+target.number+'/';if(url.origin!==BASE||!['GETDRAWCONTENT','GETMATCHESCONTENT'].some(endpoint=>url.pathname.toUpperCase()===expected+endpoint))throw Error('unexpected_draw_endpoint');html=await get(url.href,{'x-requested-with':'XMLHttpRequest',referer:target.url});}
    else if(!/\bMonrad\b/i.test(text(shell))&&!/\bjs-bracket\b/.test(shell)&&!(/\bRound\s+Robin\b/i.test(text(shell))&&/class=["'][^"']*\bmatch\b/.test(shell))){issues.push({competitionId:id,drawId:target.number,sourceUrl:target.url,reason:'draw_content_endpoint_missing'});continue}
+   if(recoverAllResults){
+    const {bracketMatches}=await import('./tennis-europe-coverage.mjs');
+    const event=drawEvent(shell,target.event),board=bracketMatches(html,event,id,target.number);
+    const absent=board.matches.filter(m=>!matches.some(old=>drawMatchKey(old)===drawMatchKey(m))&&!manualMatches.some(old=>drawMatchKey(old)===drawMatchKey(m)));
+    // Reuse an already fetched list. Otherwise request the list only for a
+    // source result absent from OOP; live scheduling remains unchanged.
+    if(absent.length||/GetMatchesContent/i.test(action||'')){
+     const listUrl=BASE+'/tournament/'+id+'/Draw/'+target.number+'/GetMatchesContent?tabindex=1';
+     const pages=await loadDrawResultPages({competitionId:id,drawId:target.number,get,...(/GetMatchesContent/i.test(action||'')?{initialHtml:html,initialUrl:new URL(decode(action),BASE).href}:{initialUrl:listUrl})});
+     for(const page of pages){
+      const result=parseDrawResults({html:page.html,competitionId:id,drawId:target.number,event,sourceUrl:page.url,startDate:tournament.startDate,endDate:tournament.endDate,allowUndated:true,asOf});
+      for(const m of result.matches){
+       if(!isVerifiedDrawResult(m))throw Error('invalid_official_draw_result');
+       if(manualMatches.some(old=>drawMatchKey(old)===drawMatchKey(m)))continue;
+       const old=matches.find(old=>drawMatchKey(old)===drawMatchKey(m));
+       if(!old){matches.push(m);existing.set(drawMatchKey(m),m);cases.push({matchId:m.id,competitionId:id,drawId:target.number,reason:'recovered_official_draw_result',date:m.date,sourceUrl:m.sourceUrl});}
+      }
+     }
+     const unresolved=absent.filter(m=>!matches.some(old=>drawMatchKey(old)===drawMatchKey(m))&&!manualMatches.some(old=>drawMatchKey(old)===drawMatchKey(m)));
+     if(unresolved.length)throw Error('official_draw_results_still_missing:'+unresolved.length);
+    }
+   }
    const parsed=parseDrawWalkovers({html,shell,event:target.event,competitionId:id,drawId:target.number,startDate:tournament.startDate,endDate:tournament.endDate,sourceUrl:target.url,knownMatches:[...matches,...manualMatches]});issues.push(...parsed.issues);advancements.push(...(parsed.advancements||[]));
    for(const m of parsed.pending){const key=drawMatchKey(m),old=existing.get(key),override=manual.get(key);if(old||override)cases.push({competitionId:id,tournamentName:tournament.tournamentName||'',matchId:old?.id||override.matchId,event:m.event,round:m.round,date:old?.date||override.date,dateSource:'existing_verified_record',players:m.players.map(p=>p.name),score:m.score,sourceUrl:m.sourceUrl,disposition:override?'already_in_manual_override':reconcile(old,m)});else pending.push(m)}
    for(const m of parsed.matches){const key=drawMatchKey(m),old=existing.get(key),override=manual.get(key);const disposition=override?'already_in_manual_override':old?reconcile(old,m):'recovered';cases.push({competitionId:id,tournamentName:tournament.tournamentName||'',matchId:override?.matchId||old?.id||m.id,event:m.event,round:m.round,date:override?.date||old?.date||m.date,dateSource:old||override?'existing_verified_record':m.dateSource,players:m.players.map(p=>p.name),winnerPlayerIds:m.winnerPlayerIds,score:m.score,sourceUrl:m.sourceUrl,disposition});if(!old&&!override){matches.push(m);existing.set(key,m)}}
-  }catch(e){issues.push({competitionId:id,drawId:target.number,sourceUrl:target.url,reason:'draw_acquisition_failed',error:String(e.message)})}
+  }catch(e){if(recoverAllResults)resultFailures.push({drawId:target.number,error:String(e.message)});issues.push({competitionId:id,drawId:target.number,sourceUrl:target.url,reason:'draw_acquisition_failed',error:String(e.message)})}
  }
+ if(resultFailures.length){const error=new Error('Draw result recovery incomplete: '+JSON.stringify(resultFailures));error.drawResultFailures=resultFailures;throw error;}
  resolveRetirementWinners(matches,issues);
  return {status:issues.length||pending.length?'needs_attention':'checked',draws:all.size,cases,pending,issues,...(advancements.length?{advancements}:{})};
 }
