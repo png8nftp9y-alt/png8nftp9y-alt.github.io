@@ -56,4 +56,7 @@ jobs:
         run: node scripts/all-player-id-audit.mjs
       - name: Check circuit identity coverage
         if: ${{ !cancelled() && steps.counts.outcome == 'success' }}
-        run: node scripts/per-circuit-player-id-audit.mjs
+        run: |
+          # Keep the two scans outside the same 10-second D1 load window.
+          sleep 11
+          node scripts/per-circuit-player-id-audit.mjs
