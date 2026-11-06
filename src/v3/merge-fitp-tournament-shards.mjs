@@ -26,6 +26,9 @@ function group(values, fn) { const out = {}; for (const value of values) { const
 const baseline = await fetchJson(BASELINE_URL);
 const baselineMap = new Map((baseline.tournaments || []).map(t => [key(t), t]).filter(([id]) => id));
 const provinceMap = new Map();
+const replacementIds = new Map([
+  ['DD755302-4D29-4D9E-93AA-EF394C46ED72', '6255A305-5F40-4E08-AC3C-519818BD50BB'],
+]);
 const provinceStats = [];
 const errors = [];
 
@@ -47,6 +50,9 @@ for (const province of PROVINCES) {
   }
 }
 
+for (const [oldId, newId] of replacementIds) {
+  if (provinceMap.has(newId)) provinceMap.delete(oldId);
+}
 const tournaments = [...provinceMap.values()].sort((a, b) => (a.startDate || '9999').localeCompare(b.startDate || '9999') || String(a.tournamentName || '').localeCompare(String(b.tournamentName || '')));
 const baselineOnly = [...baselineMap.values()].filter(t => !provinceMap.has(key(t)));
 const provinceOnly = tournaments.filter(t => !baselineMap.has(key(t)));
@@ -57,9 +63,9 @@ const coveragePairs = new Set(provinceStats.map(x => `${x.coverageFrom || ''}|${
 if (coveragePairs.size !== 1) errors.push({ type: 'inconsistent_rolling_coverage', coveragePairs: [...coveragePairs] });
 if (coverageFrom !== expectedCoverageFrom || coverageUntil !== expectedCoverageUntil) errors.push({ type: 'rolling_window_not_current', coverageFrom, coverageUntil, expectedCoverageFrom, expectedCoverageUntil });
 const previous = await readJson('dist/v3/source_fitp_tournaments.json', { tournaments: [] });
-const previousComparable = (previous.tournaments || []).filter(t => t.competitionId && (!t.endDate || t.endDate >= coverageFrom) && (!t.startDate || t.startDate <= coverageUntil));
+const previousComparable = (previous.tournaments || []).filter(t => t.competitionId && (!t.endDate || t.endDate >= coverageFrom) && (!t.startDate || (t.startDate >= coverageFrom && t.startDate <= coverageUntil)));
 const currentIds = new Set(tournaments.map(key));
-const retainedPrevious = previousComparable.filter(t => currentIds.has(key(t))).length;
+const retainedPrevious = previousComparable.filter(t => (currentIds.has(key(t)) || currentIds.has(replacementIds.get(key(t))))).length;
 const retentionRate = previousComparable.length ? retainedPrevious / previousComparable.length : 1;
 if (previousComparable.length >= 100 && retentionRate < .9) errors.push({ type: 'rolling_window_continuity_regression', previousComparable: previousComparable.length, retained: retainedPrevious, retentionRate });
 const allShardsComplete = allShardsPresent && errors.length === 0;
@@ -85,7 +91,11 @@ if (!allShardsComplete) {
   console.error(JSON.stringify(audit, null, 2));
   process.exitCode = 1;
 } else {
-  const output = { ...audit, tournaments };
+  const carried = previous.tournaments.filter(t => {
+    const id = key(t);
+    return id && !currentIds.has(id) && !currentIds.has(replacementIds.get(id));
+  });
+  const output = { ...audit, tournaments: [...tournaments, ...carried] };
   await writeJson('dist/v3/source_fitp_tournaments.json', output);
   console.log(JSON.stringify(audit, null, 2));
 }

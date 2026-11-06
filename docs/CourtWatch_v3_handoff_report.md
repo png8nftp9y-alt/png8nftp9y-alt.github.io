@@ -10684,3 +10684,7 @@ unità non ancora verificate. Il confronto completo resta disponibile tramite
 full_archive esplicito; non scatta a ogni push. Nessun rilancio automatico.
 Verificati sostituzione e rimozioni, generazione SQL, recupero, replay senza
 scritture, gating del workflow e policy D1. Esito remoto da verificare.
+
+### Continuità del catalogo FITP a finestra ridotta
+
+Il controllo confronta i tornei per data di inizio. Il catalogo conserva gli ID già acquisiti fuori dalla ricerca e riconosce la sostituzione del Veneto 519. Il motore iscrizioni usa il nuovo ID FITP mantenendo la chiave storica CourtWatch. Restano attivi i controlli su province e copertura. Replay del merge sui 107 artefatti del run 42154019562. La scoperta di tornei mai acquisiti resta vincolata alle risposte FITP.
