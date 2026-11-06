@@ -2,9 +2,16 @@ import {AUDIT_CRITERION} from './itf-audit-acquisition-policy.mjs';
 
 // Use the same validated official coverage projection as the acquisition queues.
 // The legacy draw-target database is not the current coverage authority.
-export function applySystemCoverage(diagnostic,queue,today){
+const romeDay=instant=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(instant);
+
+export function applySystemCoverage(diagnostic,queue,today,{acceptanceMidnightGrace=false,now=Date.now()}={}){
+ const generated=Date.parse(queue?.generatedAt);
+ const previousDay=()=>new Date(Date.parse(today+'T00:00:00Z')-86400000).toISOString().slice(0,10);
+ // Only acceptance publication can reuse a recent report across local midnight.
+ const recentPrevious=acceptanceMidnightGrace&&Number.isFinite(generated)&&generated<=now
+   &&now-generated<=3600000&&queue.today===previousDay()&&romeDay(generated)===queue.today;
  const fail=()=>{throw Error('ITF_current_coverage_invalid_or_stale')};
- if(queue?.version!==5||queue.criterion!==AUDIT_CRITERION||queue.today!==today||!Number.isFinite(Date.parse(queue.generatedAt)))fail();
+ if(queue?.version!==5||queue.criterion!==AUDIT_CRITERION||(queue.today!==today&&!recentPrevious)||!Number.isFinite(Date.parse(queue.generatedAt)))fail();
  const c=queue.coverage,a=queue.audit;
  const integer=n=>Number.isSafeInteger(n)&&n>=0;
  if(!c||!a||!['catalogChecked','complete','cancelledNoDraws','resolved','missingDrawsTournaments','unverifiable','declaredDraws','acquiredDraws','missingDraws','actionableUnverifiable','futureUnverifiable'].every(k=>integer(c[k]))||!integer(a.blocked))fail();

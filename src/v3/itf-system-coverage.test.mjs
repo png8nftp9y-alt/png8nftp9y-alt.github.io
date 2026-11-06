@@ -54,3 +54,13 @@ test('ordinary validator executes after official coverage reconciliation',()=>{
   assert.match(fs.readFileSync('.github/workflows/'+f,'utf8'),/git add .*itf_system_diagnostics.json/);
  }
 });
+
+test('acceptance can cross Rome midnight with a recent report, without relaxing other audits',()=>{
+ const q={...copy(),today:'2026-11-06',generatedAt:'2026-11-06T22:53:32Z'};
+ const now=Date.parse('2026-11-06T23:39:36Z');
+ const options={acceptanceMidnightGrace:true,now};
+ assert.equal(applySystemCoverage(old,q,'2026-11-07',options).coverageCheckedAt,q.generatedAt);
+ assert.throws(()=>applySystemCoverage(old,q,'2026-11-07',{now}));
+ assert.throws(()=>applySystemCoverage(old,q,'2026-11-07',{...options,now:now+3600000}));
+ assert.throws(()=>applySystemCoverage(old,{...q,version:4},'2026-11-07',options));
+});
