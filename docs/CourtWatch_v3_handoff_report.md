@@ -10651,3 +10651,5 @@ Il workflow iscrizioni usa il catalogo e il dettaglio competizione. Rimosso il p
 ITF discovery 2026-11-06T07:28:48.885Z: 10 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-11-06T07:38:38.599Z: attempted 8, acquired 8, ordinary 2, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta ordinary 2026-11-06T07:39:31.422Z: attempted 2, acquired 2, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
