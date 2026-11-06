@@ -35,7 +35,20 @@ jobs:
       - name: Configure existing database and apply additive migrations
         run: |
           node scripts/configure-d1.mjs
-          npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+          migration_log=$(mktemp)
+          trap 'rm -f "$migration_log"' EXIT
+          if npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc >"$migration_log" 2>&1; then
+            cat "$migration_log"
+          else
+            status=$?
+            cat "$migration_log"
+            if ! grep -Eq 'code:[[:space:]]*7429([^0-9]|$)' "$migration_log"; then
+              exit "$status"
+            fi
+            echo "D1 7429: attendo 11 secondi e riprovo le migrazioni una volta."
+            sleep 11
+            npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
+          fi
       - name: Reconcile complete counts once per UTC date
         id: counts
         run: node scripts/daily-d1-verification.mjs
