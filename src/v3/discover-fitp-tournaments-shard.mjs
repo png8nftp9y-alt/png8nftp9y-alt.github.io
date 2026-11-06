@@ -11,8 +11,8 @@ const ROOT_WINDOW_DAYS = 7;
 const ROOT_OVERLAP_DAYS = 31;
 const MIN_SPLIT_DAYS = 1;
 const MAX_SPLIT_DEPTH = 0;
-const HORIZON_DAYS = 730;
-const PAST_DAYS = Number(process.env.FITP_PAST_DAYS || 240);
+const HORIZON_DAYS = Number(process.env.FITP_HORIZON_DAYS || 100);
+const PAST_DAYS = Number(process.env.FITP_PAST_DAYS || 60);
 const PROVINCE_ID = String(process.env.FITP_PROVINCE_ID || '');
 if (!PROVINCE_ID) throw new Error('FITP_PROVINCE_ID is required for province-sharded discovery');
 

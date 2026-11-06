@@ -10643,3 +10643,7 @@ Il workflow manuale rilegge le 487 versioni segnalate dal run 42100805636, con p
 
 ## 2026-11-05 — Contesto residuo dei recapiti R2
 Controllo manuale delle impronte con mobile_in_other del run 42109856767 e dei due oggetti email del run precedente. Distingue tessere, campi con suffisso ID, URL e corrispondenze irrisolte. I campi irrisolti sono raggruppati per impronta del nome del campo e forma del valore. Il rapporto espone conteggi e impronte, senza valori originali. Test sintetico locale sulle categorie e sulla riservatezza delle chiavi. Le versioni mancanti e i binari storici restano lacune.
+
+### FITP iscrizioni: rimosso l'aggiornamento delle schede individuali
+
+Il workflow iscrizioni usa il catalogo e il dettaglio competizione. Rimosso il passaggio che consultava le schede individuali per aggiornare circolo e classifica in players.json, insieme alla pubblicazione dei relativi file. Il calendario continua a usare la classifica delle iscrizioni secondo la logica esistente. Il catalogo provinciale giornaliero cerca da 60 giorni indietro a 100 avanti, con gli stessi limiti nel merge. Archivio e cache iscrizioni restano separati dalla finestra del catalogo. Il watchdog FITP passa ai minuti :10 e :40. Gli avvii da catalogo, domenicali e manuali restano disponibili. Validazione locale: sintassi YAML e test scheduler. Verifica del run GitHub ancora da eseguire.

@@ -7,7 +7,7 @@ const LIVE_GROUPS = new Map([
   ["17 * * * *", new Set(["acquired-search"])],
   ["0,15,30,45 * * * *", new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one"])],
   ["5,20,35,50 * * * *", new Set(["tennis-europe-oop", "tennis-europe"])],
-  ["10,25,40,55 * * * *", new Set(["fitp"])],
+  ["10,40 * * * *", new Set(["fitp"])],
     ["12 * * * *", new Set(["cloudflare-cost-audit"])],
 ]);
 const LIVE_IDS = new Set([...LIVE_GROUPS.values()].flatMap((ids) => [...ids]));

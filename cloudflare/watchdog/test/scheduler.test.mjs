@@ -46,7 +46,7 @@ test("staggered live crons dispatch only their circuit group", async () => {
   for (const [cron, expected] of [
     ["0,15,30,45 * * * *", itfWorkflows],
     ["5,20,35,50 * * * *", europeWorkflows],
-    ["10,25,40,55 * * * *", fitpWorkflows],
+    ["10,40 * * * *", fitpWorkflows],
       ["12 * * * *", auditWorkflows],
   ]) {
     const requests = await tick(cron, previous);
@@ -90,7 +90,7 @@ test("hourly index dispatches once at minute 17 and never from maintenance or ci
  const requests=await tick("17 * * * *",[{id:90,status:"completed",conclusion:"success",created_at:new Date(hourly-3600000).toISOString()}],null,hourly);
  assert.equal(requests.filter(r=>r.method==="POST").length,1);
  assert.ok(requests.filter(r=>r.method==="POST").every(r=>r.url.includes(indexWorkflow)));
- for(const cron of ["3,13,23,33,43,53 * * * *","0,15,30,45 * * * *","5,20,35,50 * * * *","10,25,40,55 * * * *","12 * * * *"]){
+ for(const cron of ["3,13,23,33,43,53 * * * *","0,15,30,45 * * * *","5,20,35,50 * * * *","10,40 * * * *","12 * * * *"]){
   const requests=await tick(cron);assert.ok(!requests.some(r=>r.url.includes(indexWorkflow)));
  }
 });
