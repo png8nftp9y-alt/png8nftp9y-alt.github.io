@@ -29,17 +29,25 @@ export const perCircuitPlayerIdAuditCtes=`${playerNativeIdAuditCtes}, native_peo
  SELECT circuit,official_id FROM native
  UNION SELECT circuit,own_id FROM refs WHERE own_id<>''
 )`;
-export const perCircuitPlayerIdAuditColumns=`
- (SELECT COUNT(*) FROM coverage s WHERE s.circuit=c.circuit) AS source_records,
- (SELECT COUNT(*) FROM coverage s WHERE s.circuit=c.circuit AND s.has_id=1) AS records_with_circuit_id,
- (SELECT COUNT(*) FROM coverage s WHERE s.circuit=c.circuit AND s.has_id=0) AS records_missing_circuit_id,
- (SELECT COUNT(*) FROM coverage s WHERE s.circuit=c.circuit AND s.own_id<>'') AS records_with_direct_id,
- (SELECT COUNT(DISTINCT official_id) FROM all_native n WHERE n.circuit=c.circuit) AS distinct_official_ids,
- (SELECT COUNT(*) FROM player_identity_pending_sources) AS pending_mapping,
- (SELECT COUNT(*) FROM player_circuit_identities WHERE NOT (${includedPlayerIdSourceSql()})) AS excluded_records`;
-export const perCircuitPlayerIdAuditSql=`${perCircuitPlayerIdAuditCtes}, circuits(circuit) AS (VALUES ('fitp'),('tennis-europe'),('itf'))
-SELECT c.circuit,${perCircuitPlayerIdAuditColumns}
-FROM circuits c`;
+export const perCircuitPlayerIdAuditSql=`${perCircuitPlayerIdAuditCtes}, circuits(circuit) AS (VALUES ('fitp'),('tennis-europe'),('itf')),
+ coverage_totals AS (
+ SELECT circuit,COUNT(*) AS source_records,
+ COUNT(CASE WHEN has_id=1 THEN 1 END) AS records_with_circuit_id,
+ COUNT(CASE WHEN has_id=0 THEN 1 END) AS records_missing_circuit_id,
+ COUNT(CASE WHEN own_id<>'' THEN 1 END) AS records_with_direct_id FROM coverage GROUP BY circuit
+), id_totals AS (
+ SELECT circuit,COUNT(DISTINCT official_id) AS distinct_official_ids FROM all_native GROUP BY circuit
+), global_totals AS (
+ SELECT (SELECT COUNT(*) FROM player_identity_pending_sources) AS pending_mapping,
+ (SELECT COUNT(*) FROM player_circuit_identities WHERE NOT (${includedPlayerIdSourceSql()})) AS excluded_records
+)
+SELECT c.circuit,COALESCE(t.source_records,0) AS source_records,
+ COALESCE(t.records_with_circuit_id,0) AS records_with_circuit_id,
+ COALESCE(t.records_missing_circuit_id,0) AS records_missing_circuit_id,
+ COALESCE(t.records_with_direct_id,0) AS records_with_direct_id,
+ COALESCE(n.distinct_official_ids,0) AS distinct_official_ids,g.*
+FROM circuits c LEFT JOIN coverage_totals t ON t.circuit=c.circuit
+LEFT JOIN id_totals n ON n.circuit=c.circuit CROSS JOIN global_totals g`;
 export function perCircuitPlayerIdAuditResult(rows){
  const expected=['fitp','tennis-europe','itf'];
  if(!Array.isArray(rows)||rows.length!==3||expected.some(c=>rows.filter(r=>r.circuit===c).length!==1))return{status:'unavailable',passed:false};

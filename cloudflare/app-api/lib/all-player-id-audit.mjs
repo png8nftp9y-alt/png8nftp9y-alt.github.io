@@ -85,7 +85,7 @@ export const allPlayerIdAuditSql=`${playerNativeIdAuditCtes}, excluded_personal_
  AND NOT EXISTS(SELECT 1 FROM audit_eligible_links l WHERE l.source_key=s.source_key OR l.source_key='courtwatch|'||s.lookup_key))
 ), resolved_links AS (
  SELECT s.source,s.source_key,s.lookup_key,COALESCE(a.canonical_id,l.canonical_id) AS canonical_id FROM sources s JOIN player_circuit_identities l ON l.source_key=s.source_key LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE ${includedPlayerIdSourceSql('l')}
- UNION SELECT s.source,s.source_key,s.lookup_key,COALESCE(a.canonical_id,l.canonical_id) FROM sources s JOIN player_circuit_identities l ON l.source_key=s.lookup_key LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE ${includedPlayerIdSourceSql('l')}
+ UNION SELECT s.source,s.source_key,s.lookup_key,COALESCE(a.canonical_id,l.canonical_id) FROM sources s JOIN player_circuit_identities l ON l.source_key=s.lookup_key LEFT JOIN player_identity_aliases a ON a.alias_id=l.canonical_id WHERE s.lookup_key<>s.source_key AND ${includedPlayerIdSourceSql('l')}
 ), resolved AS (
  SELECT source,source_key,lookup_key,canonical_id FROM resolved_links
  UNION SELECT s.source,s.source_key,s.lookup_key,a.canonical_id FROM sources s JOIN player_identity_aliases a ON a.alias_id=s.lookup_key
@@ -94,20 +94,23 @@ export const allPlayerIdAuditSql=`${playerNativeIdAuditCtes}, excluded_personal_
  SELECT s.source,s.source_key,s.lookup_key,COUNT(DISTINCT p.canonical_id) AS mapped FROM sources s
  LEFT JOIN resolved r ON r.source=s.source AND r.source_key=s.source_key AND r.lookup_key=s.lookup_key
  LEFT JOIN people p ON p.canonical_id=r.canonical_id GROUP BY s.source,s.source_key,s.lookup_key
+), people_totals AS (
+ SELECT COUNT(*) AS players,COUNT(CASE WHEN circuits>0 THEN 1 END) AS players_with_id,
+ COUNT(CASE WHEN circuits=0 THEN 1 END) AS players_without_id,
+ COUNT(CASE WHEN circuits>1 THEN 1 END) AS players_with_multiple_circuits FROM people
+), native_totals AS (
+ SELECT COUNT(DISTINCT CASE WHEN circuit='fitp' THEN official_id END) AS fitp_ids,
+ COUNT(DISTINCT CASE WHEN circuit='tennis-europe' THEN official_id END) AS tennis_europe_ids,
+ COUNT(DISTINCT CASE WHEN circuit='itf' THEN official_id END) AS itf_ids FROM native
 )
-SELECT (SELECT COUNT(*) FROM people) AS players,
- (SELECT COUNT(*) FROM people WHERE circuits>0) AS players_with_id,
- (SELECT COUNT(*) FROM people WHERE circuits=0) AS players_without_id,
- (SELECT COUNT(*) FROM people WHERE circuits>1) AS players_with_multiple_circuits,
+SELECT people_totals.*,
  (SELECT COUNT(*) FROM source_coverage WHERE mapped<>1) AS unmapped_or_ambiguous_sources,
  (SELECT COUNT(*) FROM sources) AS source_records,
  (SELECT COUNT(*) FROM audit_eligible_links l WHERE NOT EXISTS(SELECT 1 FROM player_identity_people p WHERE p.canonical_id=l.canonical_id)) AS orphan_links,
  (SELECT COUNT(*) FROM player_identity_pending_sources) AS pending_mapping,
  COALESCE((SELECT status FROM player_identity_sync WHERE id='current'),'absent') AS mapping_status,
  (SELECT COUNT(*) FROM player_circuit_identities WHERE NOT (${includedPlayerIdSourceSql()})) AS excluded_records,
- (SELECT COUNT(DISTINCT official_id) FROM native WHERE circuit='fitp') AS fitp_ids,
- (SELECT COUNT(DISTINCT official_id) FROM native WHERE circuit='tennis-europe') AS tennis_europe_ids,
- (SELECT COUNT(DISTINCT official_id) FROM native WHERE circuit='itf') AS itf_ids,
+ native_totals.*,
  (SELECT json_group_array(json_object('circuit',circuit,'players',n)) FROM
   (SELECT l.circuit,COUNT(DISTINCT l.canonical_id) AS n FROM audit_eligible_links l JOIN people p ON p.canonical_id=l.canonical_id WHERE p.circuits=0 GROUP BY l.circuit)) AS missing_by_link_circuit,
  (SELECT json_group_array(json_object('source',source,'records',n)) FROM
@@ -140,7 +143,8 @@ SELECT (SELECT COUNT(*) FROM people) AS players,
  (SELECT COUNT(*) FROM people p JOIN player_identity_people stored ON stored.canonical_id=p.canonical_id WHERE p.circuits=0
   AND length(COALESCE(json_extract(stored.payload,'$.worldTennisId'),''))=9
   AND CAST(json_extract(stored.payload,'$.worldTennisId') AS TEXT) GLOB '800*'
-  AND CAST(json_extract(stored.payload,'$.worldTennisId') AS TEXT) NOT GLOB '*[^0-9]*') AS missing_with_native_itf_field`;
+  AND CAST(json_extract(stored.payload,'$.worldTennisId') AS TEXT) NOT GLOB '*[^0-9]*') AS missing_with_native_itf_field
+ FROM people_totals CROSS JOIN native_totals`;
 
 
 export function allPlayerIdAuditResult(row) {
