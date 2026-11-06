@@ -10659,3 +10659,28 @@ ITF discovery 2026-11-06T19:52:41.486Z: 0 newly discovered future tournaments; M
 ## 6 novembre 2026 — Persistenza bandierine Tennis Europe
 
 La ricostruzione dell'indice conserva la nazionalità già registrata per lo stesso ID ufficiale Tennis Europe quando la fonte non indica il paese e i valori precedenti concordano. Il dato presente nella fonte ha priorità. Coperti i quattro profili corretti in D1 e verificati in produzione: Roman Shendrik, Aye Diallo, Elizaveta Orlova ed Eryk Lishko. Moez Ben-Amor è escluso dall'intervento. Aggiunto un test di ricostruzione dell'indice.
+
+## 2026-11-06 — OOP Europe: sostituzione provvisoria e import Agenda differenziale
+
+Il run live 42298844220 sul commit 21aea6bcea ha acquisito uno snapshot verde
+ma l'audit transizioni è rimasto rosso. L'artifact mostra uno slot ufficiale
+singolare, qualificazione BS14, 2026-11-07, campo 12, ordine 3: lo stesso ID
+è ancora schedulato con avversario in attesa, ma il solo partecipante noto
+è cambiato. Il comparatore usava una regola separata da quella modificata
+nel commit precedente. Ora il riconoscimento è condiviso e richiede stesso
+ID canonico dello slot, torneo, data, campo, ordine ufficiale, evento, turno
+e URL ufficiale. Entrambe le righe devono essere provvisorie e senza esito.
+Ambiguità e scomparse reali restano bloccanti. Il log indica ID e motivo
+delle rimozioni non spiegate, senza elencare i partecipanti. Il report è
+incluso nello stesso commit per il controllo Shield.
+
+Agenda Europe: push ordinari e aggiornamenti live selezionano il live.
+Il merge storico confronta il proprio archivio sorgente ma spedisce a D1
+solo unità nuove, cambiate o incomplete. Le ricevute delle unità cambiate
+sono invalidate prima della scrittura e confermate dopo parità e controllo
+degli hash. Le unità già verificate e identiche non producono lotti da
+importare. Per inizializzare le ricevute si controllano in sola lettura le
+unità non ancora verificate. Il confronto completo resta disponibile tramite
+full_archive esplicito; non scatta a ogni push. Nessun rilancio automatico.
+Verificati sostituzione e rimozioni, generazione SQL, recupero, replay senza
+scritture, gating del workflow e policy D1. Esito remoto da verificare.

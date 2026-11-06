@@ -19,9 +19,11 @@ const forbidText=(document,text,label)=>{if(document.includes(text))failures.pus
 requireText(general,'D1_IMPORT_SKIPPED unchanged=$LOCAL_IMPORT_HASH rows_written=0','import generale senza barriera no-op');
 requireText(general,"if: steps.import.outputs.changed == 'true'",'verifica generale non subordinata a un import cambiato');
 requireText(general,"if: github.event_name != 'workflow_run'",'migrazioni generali rieseguibili sui cicli periodici');
-requireText(europe,'TE_D1_IMPORT_SKIPPED unchanged=$LOCAL_IMPORT_HASH rows_written=0','import Tennis Europe senza barriera no-op');
-requireText(europe,"if: steps.import.outputs.changed == 'true'",'verifica Tennis Europe non subordinata a un import cambiato');
-requireText(europe,"json_extract(counts_json, '$.teImportHash')",'impronta Tennis Europe non confrontata con D1');
+requireText(europe,"if: steps.delta.outputs.changed == 'true'",'import Tennis Europe senza barriera no-op');
+requireText(europe,"if: steps.delta.outputs.verification_needed == 'true'",'verifica Tennis Europe non subordinata a dati o ricevute da confermare');
+requireText(europe,'guard-d1-import.mjs seed-tennis-europe-oop/delta/*.sql','import Tennis Europe non limitato al piano delta');
+requireText(read('scripts/prepare-tennis-europe-delta.mjs'),'planDelta(sourceUnits(original.files),old,query','piano Tennis Europe senza confronto con ricevute D1');
+requireText(read('scripts/prepare-tennis-europe-delta.mjs'),'TE_DELTA_PARITY_REQUIRED','ricevute Europe senza prova di parità');
 requireText(europe,"if: github.event_name != 'workflow_run'",'migrazioni Tennis Europe rieseguibili sui cicli periodici');
 forbidText(crud,"workflow_run:",'test CRUD nuovamente collegato a ogni deploy');
 requireText(universal,'counts.importHash=crypto.createHash','impronta universale assente');
@@ -42,4 +44,4 @@ if(failures.length){
   console.error(JSON.stringify({policy:'d1-cost-invariants',status:'red',failures},null,2));
   process.exit(1);
 }
-console.log(JSON.stringify({policy:'d1-cost-invariants',status:'green',checks:18}));
+console.log(JSON.stringify({policy:'d1-cost-invariants',status:'green',checks:20}));

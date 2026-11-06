@@ -23,3 +23,13 @@ test('actual compare command publishes the explanation and still fails on a real
  assert.equal(replay(current).status,0);let report=JSON.parse(readFileSync(output));assert.equal(report.status,'green');assert.equal(report.resolvedPendingReplacements.length,1);
  assert.notEqual(replay({...current,matches:[]}).status,0);report=JSON.parse(readFileSync(output));assert.equal(report.status,'red');assert.equal(report.unexplainedRemovals.length,1);
 });
+
+test('official same-slot provisional substitution is explained; uncertain or completed matches still block',()=>{
+ const competitionId='903480F6-55DB-4501-B014-F13DD75DCC96',date='20261107';
+ const old={competitionId,date,id:`te-slot|${competitionId}|${date}|Court 12|3`,event:'BS14 - Boys Singles 14 Qualifying',round:'Qualification round of 32',court:'Court 12',courtMatchNumber:3,courtMatchNumberSource:'official_schedule_subheader',sourceUrl:`https://te.tournamentsoftware.com/tournament/${competitionId}/matches/${date}`,opponentPending:true,status:'scheduled',players:[{id:'141'}]};
+ const next={...old,players:[{id:'88'}]},before={matches:[old]},after={tournaments:[{competitionId}],matches:[next]};
+ assert.deepEqual(unexplainedOopRemovals(before,after),[]);
+ assert.equal(resolvedPendingReplacements(before,after)[0].reason,'official_provisional_slot_player_replaced');
+ for(const matches of [[],[next,next],...[{id:'different'},{event:'BS16'},{round:'Final'},{status:'completed'},{score:'6-0'},{courtMatchNumberSource:''},{sourceUrl:'https://example.test'},{courtMatchNumber:4}].map(x=>[{...next,...x}])])
+  assert.equal(unexplainedOopRemovals(before,{...after,matches}).length,1);
+});

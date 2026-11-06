@@ -91,12 +91,4 @@ export function recoverOopResults({tournament,pages,matches}){
  }
  return added;
 }
-export function unexplainedOopRemovals(previous,current){
- const pendingSlot=m=>m.opponentPending===true&&m.status==='scheduled'&&
-  typeof m.id==='string'&&m.id.startsWith('te-slot|')&&m.players?.length===1&&
-  !m.score&&!m.winnerPlayerIds?.length;
- const slots=new Set((current.matches||[]).filter(pendingSlot)
-  .map(m=>JSON.stringify([m.id,m.event,m.round])));
- const active=new Set((current.tournaments||[]).map(t=>String(t.competitionId).toUpperCase())),known=new Set((current.matches||[]).map(key));
- return (previous?.matches||[]).filter(m=>active.has(String(m.competitionId).toUpperCase())&&!known.has(key(m))&&!(pendingSlot(m)&&slots.has(JSON.stringify([m.id,m.event,m.round])))&&!(m.opponentPending&&(current.matches||[]).some(n=>n.competitionId===m.competitionId&&iso(n.date)===iso(m.date)&&n.court===m.court&&n.courtMatchNumber===m.courtMatchNumber&&(m.players||[]).every(p=>(n.players||[]).some(q=>String(q.id)===String(p.id)))))).map(m=>({reason:'previous_acquired_match_absent_without_verified_exclusion',matchId:m.id,competitionId:m.competitionId,event:m.event,round:m.round,date:m.date,players:m.players}));
-}
+export {unexplainedOopRemovals} from './tennis-europe-oop-removals.mjs';

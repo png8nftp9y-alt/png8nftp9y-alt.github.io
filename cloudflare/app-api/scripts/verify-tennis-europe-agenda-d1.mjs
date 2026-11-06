@@ -31,3 +31,9 @@ const incremental=oop.incremental===true||candidates.incremental===true;
 for(const [key,value] of Object.entries(expected)){const actual=Number(row[key]);if(key==='appInvalid'||key==='appMissingCourtMatchNumbers'){if(actual!==value)errors.push(`${key}: D1=${actual} expected=${value}`)}else if(incremental?actual<value:actual!==value)errors.push(`${key}: D1=${actual} expected${incremental?'>=':'='}${value}`)}
 if(errors.length)throw new Error('Tennis Europe D1 parity failed: '+errors.join('; '));
 console.log(JSON.stringify({status:'green',circuit:'tennis-europe',incremental,counts:expected}));
+
+// Bind the receipt confirmation to this successful parity check and this plan.
+try{
+ const plan=await read('seed-tennis-europe-oop/delta-plan.json');
+ await fs.writeFile('seed-tennis-europe-oop/verified-parity.json',JSON.stringify({status:'green',id:plan.id,sourceHash:plan.sourceHash})+'\n');
+}catch(error){if(error.code!=='ENOENT')throw error}
