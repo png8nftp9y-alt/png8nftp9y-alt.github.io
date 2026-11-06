@@ -22,12 +22,18 @@ export function inventoryOopPage(html,competitionId,date){
  }
  return {competitionId,date,sourceHash:createHash('sha256').update(source).digest('hex'),explicitEmpty:/\bNo matches found\b/i.test(clean(source)),cards};
 }
+// An unassigned doubles final has two empty team rows and no result.
+function emptyDoubleFinal(html){
+ const body=String(html||'').match(/<div class="match__row-wrapper">([\s\S]*?)<div class="match__footer">/i)?.[1];
+ const row='<div class="match__row\\s*">\\s*<div class="match__row-title">\\s*</div>\\s*</div>\\s*';
+ return !!body&&new RegExp('^\\s*(?:'+row+'){2}</div>\\s*<div class="match__result">\\s*</div>\\s*</div>\\s*$','i').test(body);
+}
 export function auditOopCompleteness({tournament,pages,matches,listingHtml='',asOf=''}){
  const index=new Map();for(const match of matches){const k=key(match),list=index.get(k)||[];list.push(match);index.set(k,list);}
  const issues=[],days=[],resolutions=[];
  if(!pages.length&&asOf&&String(tournament.startDate).slice(0,10)>asOf&&/\bNo matches found\b/i.test(clean(listingHtml)))return {version:1,status:'not_published',competitionId:tournament.competitionId,days:[],issues:[],reason:'future_tournament_official_empty_listing'};
  if(!pages.length)issues.push({reason:'no_verified_oop_days',competitionId:tournament.competitionId});
- for(const page of pages){let byes=0,covered=0,pendingOpponents=0;
+ for(const page of pages){let byes=0,covered=0,pendingOpponents=0,pendingFinals=0;
   if(!page.cards.length&&!page.explicitEmpty)issues.push({reason:'unrecognized_or_unavailable_oop_page',date:page.date,sourceHash:page.sourceHash});
   for(const card of page.cards){if(card.bye){byes++;continue;}
    const resolution=oopUserResolution(card);if(resolution?.kind==='walkover'){resolutions.push({kind:'walkover_without_identified_opponent',date:card.date,event:card.event,round:card.round,player:card.players[0],score:'W/O',sourceUrl:card.sourceUrl,sourceHash:card.sourceHash,confirmedBy:resolution.confirmedBy,confirmedOn:resolution.confirmedOn});continue;}
@@ -46,6 +52,7 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
    }
    let reason='';
    if(!size||!card.round)reason='unsupported_oop_card';
+   else if(size===4&&/^final$/i.test(card.round)&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&emptyDoubleFinal(card.evidenceHtml)){pendingFinals++;continue;}
    else if(card.players.length!==size)reason='incomplete_native_participants';
    else {
     const candidates=index.get(key(card))||[];
@@ -56,7 +63,7 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
    }
    if(reason)issues.push({reason,...card});
   }
-  days.push({date:page.date,sourceHash:page.sourceHash,cards:page.cards.length,byes,covered,pendingOpponents,explicitEmpty:page.explicitEmpty});
+  days.push({date:page.date,sourceHash:page.sourceHash,cards:page.cards.length,byes,covered,pendingOpponents,pendingFinals,explicitEmpty:page.explicitEmpty});
  }
  return {version:1,status:issues.length?'incomplete':'complete',resolutions,scope:'Every discovered official OOP card, including Not scheduled; not a universal draw/catalogue certification',competitionId:tournament.competitionId,days,issues};
 }
