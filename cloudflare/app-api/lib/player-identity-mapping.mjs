@@ -16,7 +16,27 @@ export const personalNativeEvidence=p=>[
 const officialKey=r=>{const id=String(r.official_id||'').toLowerCase();return (r.circuit==='fitp'?/^\d{6,12}$/.test(id):r.circuit==='itf'?/^800\d{6}$/.test(id):r.circuit==='tennis-europe'?/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id):false)?r.circuit+'|'+id:''};
 export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],currentAliases=[],sourceComplete=true,confirmedLinks=[]}={}){
  if(!sourceComplete)throw Error('identity_source_incomplete');
- const all=[...new Map(rows.map(r=>[r.source_key,r])).values()];for(const r of all){if(!r.source_key)throw Error('identity_source_incomplete');parsed(r.payload);}
+ const retainedNationalities = new Map();
+ for (const link of currentLinks) {
+  if (link.circuit !== 'tennis-europe') continue;
+  const key = officialKey(link);
+  const nationality = String(link.nationality || '').trim().toUpperCase();
+  if (!key || !/^[A-Z]{3}$/.test(nationality)) continue;
+  const countries = retainedNationalities.get(key) || new Set();
+  countries.add(nationality);
+  retainedNationalities.set(key, countries);
+ }
+ const all = [...new Map(rows.map(row => [row.source_key, row])).values()].map(row => {
+  if (!row.source_key) throw Error('identity_source_incomplete');
+  const payload = parsed(row.payload);
+  if (row.circuit !== 'tennis-europe' ||
+      [payload.nationality, payload.country, payload.nationalityCode, payload.countryCode]
+       .some(value => String(value ?? '').trim())) return row;
+  const countries = retainedNationalities.get(officialKey(row));
+  if (countries?.size !== 1) return row;
+  const [nationality] = countries;
+  return {...row, payload: JSON.stringify({...payload, nationality})};
+ });
  const names=new Map();for(const r of all){const key=playerNameKey(r.display_name)||'source:'+r.source_key;const list=names.get(key)||[];list.push(r);names.set(key,list);}
  const sets=[];
  for(const members of names.values()){

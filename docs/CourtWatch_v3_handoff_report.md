@@ -10655,3 +10655,7 @@ ITF Meta ordinary 2026-11-06T07:38:38.599Z: attempted 8, acquired 8, ordinary 2,
 ITF Meta ordinary 2026-11-06T07:39:31.422Z: attempted 2, acquired 2, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF discovery 2026-11-06T19:52:41.486Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 6 novembre 2026 — Persistenza bandierine Tennis Europe
+
+La ricostruzione dell'indice conserva la nazionalità già registrata per lo stesso ID ufficiale Tennis Europe quando la fonte non indica il paese e i valori precedenti concordano. Il dato presente nella fonte ha priorità. Coperti i quattro profili corretti in D1 e verificati in produzione: Roman Shendrik, Aye Diallo, Elizaveta Orlova ed Eryk Lishko. Moez Ben-Amor è escluso dall'intervento. Aggiunto un test di ricostruzione dell'indice.

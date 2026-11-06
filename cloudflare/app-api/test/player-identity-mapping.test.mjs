@@ -40,3 +40,30 @@ test('explicit retained source key joins approved native pair, while unrelated n
  assert.throws(()=>buildIdentityMapping([...rows.slice(0,2),row('legacy','tennis-europe','87654321-1234-1234-1234-123456789abc','Iris Grosso',{nationality:'GBR'})],{confirmedLinks:[rule]}),/confirmed_source_link_evidence_conflict/);
  assert.throws(()=>buildIdentityMapping(rows,{confirmedLinks:[{...rule,sourceKeys:'legacy'}]}),/confirmed_source_link_invalid/);
 });
+
+test('Tennis Europe reindex retains nationality only for the same official ID', () => {
+ const row = {
+  source_key: 'acquired|tennis-europe|test',
+  circuit: 'tennis-europe',
+  official_id: guid,
+  display_name: 'Test Player',
+  payload: '{}'
+ };
+ const previous = buildIdentityMapping([
+  {...row, payload: JSON.stringify({nationality: 'FRA'})}
+ ]);
+ const currentLinks = previous.links;
+ const read = (source, links = currentLinks) => {
+  const plan = buildIdentityMapping([source], {currentLinks: links});
+  return [
+   plan.links[0].nationality,
+   JSON.parse(plan.people[0].payload).nationality || ''
+  ];
+ };
+ assert.deepEqual(read(row), ['FRA', 'FRA']);
+ assert.deepEqual(read({...row, payload: '{"nationality":"BEL"}'}), ['BEL', 'BEL']);
+ assert.deepEqual(read({...row, official_id: ''}), ['', '']);
+ assert.deepEqual(read(row, [
+  ...currentLinks, {...currentLinks[0], source_key: 'other', nationality: 'BEL'}
+ ]), ['', '']);
+});
