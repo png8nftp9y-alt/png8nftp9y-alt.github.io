@@ -10688,3 +10688,7 @@ scritture, gating del workflow e policy D1. Esito remoto da verificare.
 ### Continuità del catalogo FITP a finestra ridotta
 
 Il controllo confronta i tornei per data di inizio. Il catalogo conserva gli ID già acquisiti fuori dalla ricerca e riconosce la sostituzione del Veneto 519. Il motore iscrizioni usa il nuovo ID FITP mantenendo la chiave storica CourtWatch. Restano attivi i controlli su province e copertura. Replay del merge sui 107 artefatti del run 42154019562. La scoperta di tornei mai acquisiti resta vincolata alle risposte FITP.
+
+### Diagnostica FITP con finestra ridotta
+
+La riga FITP tornei valuta i cataloghi provinciali v2 tramite esito, completamento delle province, finestra validata, errori e freschezza. La soglia precedente resta per i cataloghi legacy. Verifica locale su catalogo ridotto, provincia mancante e catalogo datato.

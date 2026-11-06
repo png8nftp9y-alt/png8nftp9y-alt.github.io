@@ -154,7 +154,21 @@ function fitpTournamentLight(fitpTournaments) {
   const found = fitpTournaments.tournamentsFound || 0;
   const errors = fitpTournaments.errors || [];
   const failed = fitpTournaments.quality?.failedQueries ?? errors.length;
-  if (found < 5300) return "red";
+  if (fitpTournaments.version === "cw-v3-fitp-province-sharded-v2") {
+    const quality = fitpTournaments.quality;
+    const provinces = fitpTournaments.provinceWindow;
+    const expected = provinces?.expectedProvinceShards;
+    if (
+      fitpTournaments.status !== "fitp_province_sharded_complete" ||
+      quality?.allShardsPresent !== true ||
+      quality?.allShardsComplete !== true ||
+      !Number.isInteger(expected) || expected < 1 ||
+      provinces.completedProvinceShards !== expected ||
+      provinces.completeProvinceShards !== expected ||
+      fitpTournaments.continuity?.rollingWindowAdvanced !== true ||
+      found < 1 || errors.length
+    ) return "red";
+  } else if (found < 5300) return "red";
   const age = ageHours(fitpTournaments.generatedAt);
   if (age == null || age > 26) return "yellow";
   if (failed > 25) return "yellow";
