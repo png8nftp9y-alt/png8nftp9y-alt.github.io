@@ -10649,3 +10649,5 @@ Controllo manuale delle impronte con mobile_in_other del run 42109856767 e dei d
 Il workflow iscrizioni usa il catalogo e il dettaglio competizione. Rimosso il passaggio che consultava le schede individuali per aggiornare circolo e classifica in players.json, insieme alla pubblicazione dei relativi file. Il calendario continua a usare la classifica delle iscrizioni secondo la logica esistente. Il catalogo provinciale giornaliero cerca da 60 giorni indietro a 100 avanti, con gli stessi limiti nel merge. Archivio e cache iscrizioni restano separati dalla finestra del catalogo. Il watchdog FITP passa ai minuti :10 e :40. Gli avvii da catalogo, domenicali e manuali restano disponibili. Validazione locale: sintassi YAML e test scheduler. Verifica del run GitHub ancora da eseguire.
 
 ITF discovery 2026-11-06T07:28:48.885Z: 10 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-06T07:38:38.599Z: attempted 8, acquired 8, ordinary 2, extraordinary 1. Partial metadata preserved; official D1 sync follows.
