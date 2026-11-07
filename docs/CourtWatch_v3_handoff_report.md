@@ -10704,3 +10704,8 @@ ITF Meta ordinary 2026-11-07T06:46:13.768Z: attempted 2, acquired 2, ordinary 0,
 ITF Meta 2026-11-07T11:46:30.525Z: queue initialized/reconciled, started tournaments excluded, no historical recovery.
 
 ITF discovery 2026-11-07T13:40:24.385Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+## 2026-11-07 — Refresh Admin ID
+- Il commit 7d3ebe6a02 esegue in sequenza le tre letture D1 del refresh manuale e indica la fase fallita. In caso di errore conserva l'ultimo report completo.
+- Aggiunta verifica che un errore sugli anni di nascita venga identificato senza sostituire la copia salvata.

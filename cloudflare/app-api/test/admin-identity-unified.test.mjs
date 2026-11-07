@@ -54,5 +54,5 @@ test('failure in any reader preserves the previous complete saved identity page'
  const render=async()=>'<html><nav></nav><div class="admin-page page-id">'+await unifiedIdentityReport(env,url,loaders)+'</div></html>';
  await savedAdminPage(request,env,'id',render);const saved=[...values.entries()];
  loaders.birth=async()=>({available:false});const failed=await savedAdminPage(request,env,'id',render);
- assert.match(failed,/Aggiornamento non riuscito/);assert.match(failed,/Tutti i 64/);assert.equal(writes,1);assert.deepEqual([...values.entries()],saved);
+ assert.match(failed,/Aggiornamento non riuscito/);assert.match(failed,/Tutti i 64/);assert.match(failed,/data-identity-refresh-error="birth"/);assert.equal(writes,1);assert.deepEqual([...values.entries()],saved);
 });
