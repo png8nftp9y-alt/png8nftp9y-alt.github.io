@@ -6,9 +6,18 @@ test('full test suites run before acquiring the shared writer lease; publication
 test('historical/manual rebuilds are not replaced by routine incremental agenda runs',()=>{assert.match(read(files[0]),/inputs.full_refresh/);assert.match(read(files[0]),/Sync official Court Watch players/);assert.match(read(files[0]),/Repair D1 observed index/);assert.match(read(files[2]),/OOP historical merge' && 'historical' \|\| 'live'/);});
 test('read-only reconciliation never occupies the writer lease and marks concurrent generation changes',()=>{const audit=read('courtwatch-github-d1-completeness.yml');assert.match(audit,/group: courtwatch-d1-readonly-reconciliation/);assert.doesNotMatch(audit,/group: courtwatch-d1-writes/);const script=readFileSync(new URL('cloudflare/app-api/scripts/audit-github-d1-completeness.mjs',root),'utf8');assert.match(script,/concurrentGenerationChanged=beforeGeneration!==await generationMarker\(\)/);assert.match(script,/report.status=report.concurrentGenerationChanged\|\|/);});
 
-test('unsuccessful producers cannot replace a valid pending import, and audit-only edits do not trigger the general rebuild',()=>{for(const file of [files[0],files[2],files[4]])assert.match(read(file),/github.event.workflow_run.conclusion \|\| 'success'/);assert.match(read(files[0]),/!cloudflare\/app-api\/scripts\/audit-github-d1-completeness.mjs/);});
+test('unsuccessful producers cannot replace a valid pending import, and audit-only edits do not trigger the general rebuild',()=>{for(const file of [files[2],files[4]])assert.match(read(file),/github.event.workflow_run.conclusion \|\| 'success'/);assert.match(read(files[0]),/!cloudflare\/app-api\/scripts\/audit-github-d1-completeness.mjs/);});
 test('agenda checks out latest main after acquiring the writer lease, before import and runtime preflight',()=>{const s=read('courtwatch-tennis-europe-agenda.yml');assert.match(s,/actions\/checkout@v4\n        with: \{ref: main, fetch-depth: 1\}/);assert.ok(s.indexOf('ref: main')<s.indexOf('Import Tennis Europe rows only'));});
 
 test('runtime document publication has event triggers and no periodic polling schedule',()=>{const s=read('courtwatch-runtime-documents-d1.yml');assert.doesNotMatch(s,/^  schedule:|cron:/m);assert.match(s,/^  workflow_run:/m);assert.match(s,/^  workflow_dispatch:/m);assert.match(s,/^  push:/m);});
 import {RUNTIME_DOCUMENT_FILES} from '../../cloudflare/app-api/lib/runtime-document-plan.mjs';
 test('every runtime input retains one event-driven publishing owner',()=>{const sources=['courtwatch-cloudflare-app-api.yml','courtwatch-runtime-documents-d1.yml','courtwatch-tennis-europe-agenda.yml'].map(read);for(const path of RUNTIME_DOCUMENT_FILES)assert.equal(sources.filter(s=>s.includes("      - '"+path+"'")).length,1,path);});
+
+test('general D1 runs every 15 minutes independently of Agenda Europe',()=>{
+ const flow=read(files[0]);
+ assert.match(flow,/^  schedule:\n    - cron: '12,27,42,57 \* \* \* \*'/m);
+ assert.doesNotMatch(flow,/^  workflow_run:|github\.event\.workflow_run/m);
+ assert.match(flow,/^  workflow_dispatch:/m);
+ assert.match(flow,/^  push:/m);
+ assert.match(flow,/name: Apply D1 migrations\n        if: github\.event_name != 'schedule'/);
+});

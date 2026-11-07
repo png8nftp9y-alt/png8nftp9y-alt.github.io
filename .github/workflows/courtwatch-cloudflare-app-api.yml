@@ -8,13 +8,8 @@ on:
         description: Rebuild the complete observed-player index
         type: boolean
         default: false
-  workflow_run:
-    # Preserve the original publication chain: Europe OOP -> Agenda D1 -> general D1.
-    # Consolidate all producers from current main after the verified Agenda gate.
-    workflows:
-      - Court Watch Tennis Europe agenda D1
-    types: [completed]
-    branches: [main]
+  schedule:
+    - cron: '12,27,42,57 * * * *'
   push:
     branches: [main]
     paths:
@@ -54,13 +49,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: courtwatch-app-refresh${{ ((github.event_name == 'workflow_dispatch' && inputs.full_refresh) || (github.event_name == 'push' && (github.event.head_commit.message == 'Sync official Court Watch players' || startsWith(github.event.head_commit.message, 'Repair D1 observed index')))) && '-full' || '' }}-${{ github.event.workflow_run.conclusion || 'success' }}
+  group: courtwatch-app-refresh${{ ((github.event_name == 'workflow_dispatch' && inputs.full_refresh) || (github.event_name == 'push' && (github.event.head_commit.message == 'Sync official Court Watch players' || startsWith(github.event.head_commit.message, 'Repair D1 observed index')))) && '-full' || '' }}
   cancel-in-progress: false
   queue: single
 
 jobs:
   check-source:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -89,7 +83,6 @@ jobs:
       group: courtwatch-d1-writes
       cancel-in-progress: false
       queue: max
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     defaults:
@@ -140,7 +133,7 @@ jobs:
       - name: Deploy read-compatible Worker before database maintenance
         run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
       - name: Apply D1 migrations
-        if: github.event_name != 'workflow_run'
+        if: github.event_name != 'schedule'
         run: npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
       - name: Verify personal-history indexed read plans
         run: node scripts/verify-personal-history-read-plans.mjs
