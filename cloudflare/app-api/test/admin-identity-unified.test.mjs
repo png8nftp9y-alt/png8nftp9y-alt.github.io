@@ -5,15 +5,15 @@ import {loadObservedBirthAdmin} from '../lib/admin-observed-birth.mjs';
 import {savedAdminPage} from '../lib/admin-saved-page.mjs';
 const source=readFileSync(new URL('../src/index.js',import.meta.url),'utf8');
 const ids=()=>Object.assign(['fitp','tennis-europe','itf'].map(circuit=>({circuit,ids:1,players:1,missing:0})),{checkedAt:'2026-10-30'});
-test('one identity refresh overlaps the three independent readers and renders their complete reading',async()=>{
- let release;const wait=new Promise(r=>release=r),started=[];const load=(name,value)=>async()=>{started.push(name);if(started.length===3)release();await wait;return value;};
+test('one identity refresh serializes the three readers and renders their complete reading',async()=>{
+ const started=[];let busy=false;const load=(name,value)=>async()=>{assert.equal(busy,false);busy=true;started.push(name);await Promise.resolve();busy=false;return value;};
  const html=await unifiedIdentityReport({DB:{}},new URL('https://app/admin/id'),{ids:load('ids',ids()),review:load('review',{available:true,cases:[]}),birth:load('birth',{available:true,selected:64,missing:[]})});
  assert.deepEqual(started,['ids','review','birth']);assert.match(html,/data-identity-snapshot/);assert.match(html,/ID giocatori per circuito/);assert.match(html,/Identità sospette/);assert.match(html,/Tutti i 64/);
 });
 test('partial failure cannot be published as a complete updated reading',async()=>{
  for(const field of ['ids','review','birth']){
  const values={ids:ids(),review:{available:true,cases:[]},birth:{available:true,selected:64,missing:[]}};values[field]=field==='ids'?null:{available:false};
- await assert.rejects(unifiedIdentityReport({DB:{}},new URL('https://app/admin/id'),Object.fromEntries(Object.entries(values).map(([k,v])=>[k,async()=>v]))),/incomplete/);
+ await assert.rejects(unifiedIdentityReport({DB:{}},new URL('https://app/admin/id'),Object.fromEntries(Object.entries(values).map(([k,v])=>[k,async()=>v]))),new RegExp("incomplete:"+field));
  }
 });
 test('Diagnostics and ID have exactly one accessible identity refresh icon; old separate controls are removed',()=>{

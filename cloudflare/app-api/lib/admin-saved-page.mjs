@@ -27,7 +27,9 @@ export async function savedAdminPage(request,env,view,render){
   catch(error){
    console.error('admin_snapshot_refresh_failed',view,error);
    const saved=await read(env,view);
-   const warning='<div class="card" role="alert"><p><b>Aggiornamento non riuscito.</b> '+(saved?'È mostrata l’ultima lettura salvata; dati e stati non sono stati aggiornati.':'Nessuna lettura salvata disponibile; dati e stati non sono verificati.')+' Usa il pulsante di aggiornamento per riprovare.</p></div>';
+   const stage=view==='id'?/^identity_refresh_incomplete:(ids|review|birth)$/.exec(error?.message)?.[1]:null;
+   const marker=stage?' data-identity-refresh-error="'+stage+'"':'';
+   const warning='<div'+marker+' class="card" role="alert"><p><b>Aggiornamento non riuscito.</b> '+(saved?'È mostrata l’ultima lettura salvata; dati e stati non sono stati aggiornati.':'Nessuna lettura salvata disponibile; dati e stati non sono verificati.')+' Usa il pulsante di aggiornamento per riprovare.</p></div>';
    return (saved?.html||emptySavedPage(view,cfg)).replace('</nav>','</nav>'+warning);
   }
   const checkedAt=new Date().toISOString();
