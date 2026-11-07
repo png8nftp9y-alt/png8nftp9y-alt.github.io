@@ -1,14 +1,14 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
 const root=new URL('../../../',import.meta.url),read=file=>readFileSync(new URL(file,root),'utf8');
 const routes=JSON.parse(readFileSync(new URL('./engine-d1-routes.json',import.meta.url),'utf8'));
-test('every acquisition motor retains D1 publication, with general imports consolidated after verified Europe Agenda',()=>{
+test('every acquisition motor retains D1 publication through its configured route',()=>{
  for(const route of routes){
   const producer=read('.github/workflows/'+route.producer),bridge=read('.github/workflows/'+route.bridge),name=producer.match(/^name: (.+)$/m)?.[1];
   assert.ok(name,route.id+': missing producer name');
   const completion=bridge.match(/^  workflow_run:\n([\s\S]*?)(?=^  [a-z_]+:|^permissions:|^jobs:)/m)?.[1]||'';
   if(route.bridge==='courtwatch-cloudflare-app-api.yml'){
-   const triggers=(completion.match(/^      - .+$/gm)||[]).map(line=>line.slice(8));
-   assert.deepEqual(triggers,['Court Watch Tennis Europe agenda D1'],route.id+': general imports must follow only Agenda');
+   assert.match(bridge,/^  schedule:\n    - cron: '12,27,42,57 \* \* \* \*'$/m);
+   assert.doesNotMatch(bridge,/^  workflow_run:/m);
    const writer=bridge.slice(bridge.indexOf('  migrate-import-verify-deploy:'));
    const checkout=writer.match(/with: \{ref: main, fetch-depth: (\d+)\}/);
    assert.ok(checkout,route.id+': consolidation must read current data after the writer lease');
@@ -45,12 +45,12 @@ test('D1 runtime publication remains completion-driven without a periodic schedu
  }
 });
 
-test('general D1 follows successful Europe Agenda and has no autonomous periodic timer',()=>{
+test('general D1 is scheduled independently and Agenda still follows successful Europe OOP',()=>{
  const general=read('.github/workflows/courtwatch-cloudflare-app-api.yml');
  const header=general.split('permissions:')[0];
- assert.doesNotMatch(header,/^  schedule:|cron:/m);
+ assert.match(header,/^  schedule:\n    - cron: '12,27,42,57 \* \* \* \*'$/m);
  assert.match(header,/^  workflow_dispatch:/m);assert.match(header,/^  push:/m);
- assert.match(general,/github.event.workflow_run.conclusion == 'success'/);
+ assert.doesNotMatch(general,/^  workflow_run:|github\.event\.workflow_run/m);
  const agenda=read('.github/workflows/courtwatch-tennis-europe-agenda.yml');
  assert.match(agenda,/Court Watch Tennis Europe OOP and results live/);
  assert.match(agenda,/github.event.workflow_run.conclusion == 'success'/);
