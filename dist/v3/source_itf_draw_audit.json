@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-11-07T01:35:29.464Z",
+  "generatedAt": "2026-11-07T01:39:34.037Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -9,27 +9,27 @@
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
     "declaredSections": 6,
-    "requestedSections": 6,
+    "requestedSections": 4,
     "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
     "resolvedSections": 2,
     "missingSections": 4,
-    "newSectionsCached": 2,
+    "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
     "retrySections": 4,
-    "technicalErrorSections": 1,
+    "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 3,
+    "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 553,
     "globalCancelledNoDraws": 13,
     "globalPendingTotal": 61,
-    "globalPendingTechnical": 34,
-    "globalPendingPublication": 27,
+    "globalPendingTechnical": 33,
+    "globalPendingPublication": 28,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -63,8 +63,7 @@
       "J-J100-SVK-2026-001",
       "J-J100-TUR-2026-006",
       "J-J100-USA-2026-002",
-      "J-J100-USA-2026-004",
-      "J-J30-PER-2026-004"
+      "J-J100-USA-2026-004"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-DOM-2026-001",
@@ -93,7 +92,8 @@
       "J-J30-LBN-2026-002",
       "J-J30-MAR-2026-010",
       "J-J30-NGR-2026-006",
-      "J-J30-PAK-2026-005"
+      "J-J30-PAK-2026-005",
+      "J-J30-PER-2026-004"
     ]
   },
   "audit": [
@@ -225,14 +225,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge"
+      "eventFailure": null
     }
   ]
 }
