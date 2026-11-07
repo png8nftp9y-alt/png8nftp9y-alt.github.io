@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-11-07T14:35:05.791Z",
+  "generatedAt": "2026-11-07T14:40:25.054Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
@@ -913569,17 +913569,674 @@
       "startDate": "2026-11-09",
       "endDate": "2026-11-14",
       "decision": "pending",
-      "checkedAt": "2026-11-07T14:07:13.230Z",
+      "checkedAt": "2026-11-07T14:40:21.963Z",
       "playersFound": 0,
-      "declaredSections": 0,
-      "acquiredSections": 0,
+      "declaredSections": 6,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 0,
-      "eventInventory": [],
-      "families": [],
+      "resolvedSections": 2,
+      "missingSections": 4,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "competitionId": "J-J30-IND-2026-007",
+            "event": "B-S-M-KO",
+            "tournamentId": 1100205240,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-jaipur/ind/2026/j-j30-ind-2026-007/",
+            "family": "B-S-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "competitionId": "J-J30-IND-2026-007",
+            "event": "B-S-Q-KO",
+            "tournamentId": 1100205240,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-jaipur/ind/2026/j-j30-ind-2026-007/",
+            "family": "B-S-Q",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "competitionId": "J-J30-IND-2026-007",
+            "event": "B-D-M-KO",
+            "tournamentId": 1100205240,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-jaipur/ind/2026/j-j30-ind-2026-007/",
+            "family": "B-D-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "competitionId": "J-J30-IND-2026-007",
+            "event": "G-S-M-KO",
+            "tournamentId": 1100205240,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-jaipur/ind/2026/j-j30-ind-2026-007/",
+            "family": "G-S-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "competitionId": "J-J30-IND-2026-007",
+            "event": "G-S-Q-KO",
+            "tournamentId": 1100205240,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-jaipur/ind/2026/j-j30-ind-2026-007/",
+            "family": "G-S-Q",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "competitionId": "J-J30-IND-2026-007",
+            "event": "G-D-M-KO",
+            "tournamentId": 1100205240,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-jaipur/ind/2026/j-j30-ind-2026-007/",
+            "family": "G-D-M",
+            "structure": "KO"
+          }
+        }
+      ],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 24,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 20,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        }
+      ],
       "eventFailure": null,
-      "eventCache": {}
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800706772",
+              "name": "Sarthak Ashok Gaikwad",
+              "givenName": "Sarthak",
+              "familyName": "Ashok Gaikwad",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/sarthak-ashok-gaikwad/800706772/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800822033",
+              "name": "Suvigya Chaudhary",
+              "givenName": "Suvigya",
+              "familyName": "Chaudhary",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/suvigya-chaudhary/800822033/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800713929",
+              "name": "Bhavesh Shah Hem Chandra Shah",
+              "givenName": "Bhavesh Shah",
+              "familyName": "Hem Chandra Shah",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/bhavesh-shah-hem-chandra-shah/800713929/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800843621",
+              "name": "Mahijeet Pradhan",
+              "givenName": "Mahijeet",
+              "familyName": "Pradhan",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/mahijeet-pradhan/800843621/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800680170",
+              "name": "Preet Chaudhary",
+              "givenName": "Preet",
+              "familyName": "Chaudhary",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/preet-chaudhary/800680170/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800733662",
+              "name": "Arjun Sastry",
+              "givenName": "Arjun",
+              "familyName": "Sastry",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/arjun-sastry/800733662/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800710052",
+              "name": "Daksh Deepak Patil",
+              "givenName": "Daksh Deepak",
+              "familyName": "Patil",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/daksh-deepak-patil/800710052/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800775980",
+              "name": "Dhruv Promod",
+              "givenName": "Dhruv",
+              "familyName": "Promod",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/dhruv-promod/800775980/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800813781",
+              "name": "Aman Mimani",
+              "givenName": "Aman",
+              "familyName": "Mimani",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/aman-mimani/800813781/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800768528",
+              "name": "Kabir Parmar",
+              "givenName": "Kabir",
+              "familyName": "Parmar",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/kabir-parmar/800768528/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800733502",
+              "name": "Navya Yadav",
+              "givenName": "Navya",
+              "familyName": "Yadav",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/navya-yadav/800733502/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800834652",
+              "name": "Adwaita Nagar",
+              "givenName": "Adwaita",
+              "familyName": "Nagar",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/adwaita-nagar/800834652/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800741463",
+              "name": "Neel Bhardwaj Neel",
+              "givenName": "Neel Bhardwaj",
+              "familyName": "Neel",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/neel-bhardwaj-neel/800741463/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800773465",
+              "name": "Bhavik Mittal",
+              "givenName": "Bhavik",
+              "familyName": "Mittal",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/bhavik-mittal/800773465/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800829080",
+              "name": "Sidhant Choudhary",
+              "givenName": "Sidhant",
+              "familyName": "Choudhary",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/sidhant-choudhary/800829080/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800661707",
+              "name": "Darsh Khedekar",
+              "givenName": "Darsh",
+              "familyName": "Khedekar",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/darsh-khedekar/800661707/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777318",
+              "name": "Ritvik Dutt",
+              "givenName": "Ritvik",
+              "familyName": "Dutt",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/ritvik-dutt/800777318/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800768167",
+              "name": "Pavak Chitania",
+              "givenName": "Pavak",
+              "familyName": "Chitania",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/pavak-chitania/800768167/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800779213",
+              "name": "Aarav Bharat",
+              "givenName": "Aarav",
+              "familyName": "Bharat",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/aarav-bharat/800779213/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800849219",
+              "name": "Nimay Swapnil Gandhi",
+              "givenName": "Nimay Swapnil",
+              "familyName": "Gandhi",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/nimay-swapnil-gandhi/800849219/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800661495",
+              "name": "Mohammed Aariz Khan",
+              "givenName": "Mohammed Aariz",
+              "familyName": "Khan",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/mohammed-aariz-khan/800661495/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800707690",
+              "name": "SANKALP KUMAR SAHANI KUMAR",
+              "givenName": "SANKALP KUMAR SAHANI",
+              "familyName": "KUMAR",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/sankalp-kumar-sahani-kumar/800707690/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800657271",
+              "name": "Yaj Malik",
+              "givenName": "Yaj",
+              "familyName": "Malik",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/yaj-malik/800657271/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800847978",
+              "name": "Jason Jaat",
+              "givenName": "Jason",
+              "familyName": "Jaat",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/jason-jaat/800847978/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-07T14:40:21.963Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-IND-2026-007__B-S-Q-KO",
+            "storedAt": "2026-11-07T14:40:21.963Z"
+          }
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800795892",
+              "name": "Tanya Karthik",
+              "givenName": "Tanya",
+              "familyName": "Karthik",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/tanya-karthik/800795892/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800773283",
+              "name": "Simar Gill",
+              "givenName": "Simar",
+              "familyName": "Gill",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/simar-gill/800773283/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800709440",
+              "name": "YASHITHA ERETI",
+              "givenName": "YASHITHA",
+              "familyName": "ERETI",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/yashitha-ereti/800709440/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800779357",
+              "name": "Saanvi Ravikant Raju",
+              "givenName": "Saanvi Ravikant",
+              "familyName": "Raju",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/saanvi-ravikant-raju/800779357/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800737151",
+              "name": "Aaradhana Tehlan",
+              "givenName": "Aaradhana",
+              "familyName": "Tehlan",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/aaradhana-tehlan/800737151/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800713468",
+              "name": "Modi Hemakshi Mayur",
+              "givenName": "Modi",
+              "familyName": "Hemakshi Mayur",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/modi-hemakshi-mayur/800713468/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800854620",
+              "name": "Ritu Mandar Gyan",
+              "givenName": "Ritu Mandar",
+              "familyName": "Gyan",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/ritu-mandar-gyan/800854620/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800810144",
+              "name": "Naisha Chhillar",
+              "givenName": "Naisha",
+              "familyName": "Chhillar",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/naisha-chhillar/800810144/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800738959",
+              "name": "Aarnavi Tomar Aura",
+              "givenName": "Aarnavi Tomar",
+              "familyName": "Aura",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/aarnavi-tomar-aura/800738959/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800850823",
+              "name": "Aarzoo Malik",
+              "givenName": "Aarzoo",
+              "familyName": "Malik",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/aarzoo-malik/800850823/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800679825",
+              "name": "VAISHNAVI Singh",
+              "givenName": "VAISHNAVI",
+              "familyName": "Singh",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/vaishnavi-singh/800679825/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800878374",
+              "name": "Darshamini Singh Praveen Singh Rathore",
+              "givenName": "Darshamini Singh",
+              "familyName": "Praveen Singh Rathore",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/darshamini-singh-praveen-singh-rathore/800878374/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800870100",
+              "name": "Ashritha Nanda Kumar",
+              "givenName": "Ashritha",
+              "familyName": "Nanda Kumar",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/ashritha-nanda-kumar/800870100/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766343",
+              "name": "Khanak Raiyani",
+              "givenName": "Khanak",
+              "familyName": "Raiyani",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/khanak-raiyani/800766343/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800714477",
+              "name": "Sara Shaikh",
+              "givenName": "Sara",
+              "familyName": "Shaikh",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/sara-shaikh/800714477/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743366",
+              "name": "Khyati Bhatt Chetan Bhatt",
+              "givenName": "Khyati Bhatt",
+              "familyName": "Chetan Bhatt",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/khyati-bhatt-chetan-bhatt/800743366/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800855241",
+              "name": "Jaya Prava Boro",
+              "givenName": "Jaya Prava",
+              "familyName": "Boro",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/jaya-prava-boro/800855241/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800816392",
+              "name": "Mehul Malik",
+              "givenName": "Mehul",
+              "familyName": "Malik",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/mehul-malik/800816392/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800625529",
+              "name": "Pia Pallav Mistri",
+              "givenName": "Pia",
+              "familyName": "Pallav Mistri",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/pia-pallav-mistri/800625529/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800713501",
+              "name": "Sanidhya Karantoth",
+              "givenName": "Sanidhya",
+              "familyName": "Karantoth",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/sanidhya-karantoth/800713501/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-07T14:40:21.963Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-IND-2026-007__G-S-Q-KO",
+            "storedAt": "2026-11-07T14:40:21.963Z"
+          }
+        }
+      }
     },
     "J-J30-JAM-2026-009": {
       "competitionId": "J-J30-JAM-2026-009",
@@ -913587,7 +914244,7 @@
       "startDate": "2026-11-09",
       "endDate": "2026-11-15",
       "decision": "pending",
-      "checkedAt": "2026-11-07T14:07:13.716Z",
+      "checkedAt": "2026-11-07T14:40:22.728Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -913605,7 +914262,7 @@
       "startDate": "2026-11-09",
       "endDate": "2026-11-14",
       "decision": "pending",
-      "checkedAt": "2026-11-07T14:07:14.133Z",
+      "checkedAt": "2026-11-07T14:40:23.098Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -914270,7 +914927,7 @@
       "startDate": "2026-11-09",
       "endDate": "2026-11-14",
       "decision": "pending",
-      "checkedAt": "2026-11-07T14:07:14.573Z",
+      "checkedAt": "2026-11-07T14:40:23.490Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -914288,7 +914945,7 @@
       "startDate": "2026-11-09",
       "endDate": "2026-11-14",
       "decision": "pending",
-      "checkedAt": "2026-11-07T14:07:14.995Z",
+      "checkedAt": "2026-11-07T14:40:23.883Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -914306,7 +914963,7 @@
       "startDate": "2026-11-09",
       "endDate": "2026-11-14",
       "decision": "pending",
-      "checkedAt": "2026-11-07T14:07:15.417Z",
+      "checkedAt": "2026-11-07T14:40:24.276Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -914324,7 +914981,7 @@
       "startDate": "2026-11-09",
       "endDate": "2026-11-14",
       "decision": "pending",
-      "checkedAt": "2026-11-07T14:07:15.844Z",
+      "checkedAt": "2026-11-07T14:40:24.664Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 1,
@@ -914674,7 +915331,7 @@
       "startDate": "2026-11-09",
       "endDate": "2026-11-14",
       "decision": "pending",
-      "checkedAt": "2026-11-07T14:07:16.283Z",
+      "checkedAt": "2026-11-07T14:40:25.054Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
