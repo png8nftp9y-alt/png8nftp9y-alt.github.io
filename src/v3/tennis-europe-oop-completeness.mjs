@@ -22,8 +22,8 @@ export function inventoryOopPage(html,competitionId,date){
  }
  return {competitionId,date,sourceHash:createHash('sha256').update(source).digest('hex'),explicitEmpty:/\bNo matches found\b/i.test(clean(source)),cards};
 }
-// An unassigned doubles final has two empty team rows and no result.
-function emptyDoubleFinal(html){
+// An unassigned slot has two empty participant rows and no result.
+function emptyParticipantRows(html){
  const body=String(html||'').match(/<div class="match__row-wrapper">([\s\S]*?)<div class="match__footer">/i)?.[1];
  const row='<div class="match__row\\s*">\\s*<div class="match__row-title">\\s*</div>\\s*</div>\\s*';
  return !!body&&new RegExp('^\\s*(?:'+row+'){2}</div>\\s*<div class="match__result">\\s*</div>\\s*</div>\\s*$','i').test(body);
@@ -45,6 +45,11 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
     if(acquired){covered++;pendingOpponents++;continue;}
    }
 
+   // A future singles slot may be published before either player is assigned.
+   if(size===2&&card.round&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>iso(asOf)&&emptyParticipantRows(card.evidenceHtml)){
+    resolutions.push({kind:'future_singles_awaiting_both_players',date:card.date,event:card.event,round:card.round,sourceUrl:card.sourceUrl,sourceHash:card.sourceHash});continue;
+   }
+
    // Future doubles finals can be published as two explicitly empty teams.
    const emptyTeams=/<div class="match__row-wrapper">\s*(?:<div class="match__row\s*">\s*<div class="match__row-title">\s*<\/div>\s*<\/div>\s*){2}<\/div>/i;
    if(size===4&&card.round==='Final'&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>iso(asOf)&&emptyTeams.test(card.evidenceHtml||'')){
@@ -52,7 +57,7 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
    }
    let reason='';
    if(!size||!card.round)reason='unsupported_oop_card';
-   else if(size===4&&/^final$/i.test(card.round)&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&emptyDoubleFinal(card.evidenceHtml)){pendingFinals++;continue;}
+   else if(size===4&&/^final$/i.test(card.round)&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&emptyParticipantRows(card.evidenceHtml)){pendingFinals++;continue;}
    else if(card.players.length!==size)reason='incomplete_native_participants';
    else {
     const candidates=index.get(key(card))||[];
