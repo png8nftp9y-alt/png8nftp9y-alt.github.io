@@ -10692,3 +10692,5 @@ Il controllo confronta i tornei per data di inizio. Il catalogo conserva gli ID 
 ### Diagnostica FITP con finestra ridotta
 
 La riga FITP tornei valuta i cataloghi provinciali v2 tramite esito, completamento delle province, finestra validata, errori e freschezza. La soglia precedente resta per i cataloghi legacy. Verifica locale su catalogo ridotto, provincia mancante e catalogo datato.
+
+ITF discovery 2026-11-07T06:42:43.588Z: 10 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
