@@ -10713,3 +10713,7 @@ ITF discovery 2026-11-07T13:40:24.385Z: 0 newly discovered future tournaments; M
 ## 7 novembre 2026 — T‑1 ITF: osservati già iscritti al torneo
 
 Il calendario mostrava ancora A‑19 per Aila Zennaro ad Agno. La lista ufficiale aveva già associato la giocatrice all’ID ITF 800754994, mentre il controllo del tabellone ammetteva solo gli osservati con ITF nella scheda. Il T‑1 ora considera anche gli osservati con un’iscrizione attiva allo stesso torneo e conferma la loro presenza tramite ID ITF. La correzione del record di Agno va verificata dopo la rielaborazione mirata.
+
+## 2026-11-07 — Tre aggiornamenti indipendenti in Admin ID
+
+Conteggi ID, identità sospette e anni di nascita hanno ciascuno un pulsante, una lettura salvata e la data dell’ultimo aggiornamento riuscito. Un errore non blocca le altre sezioni.

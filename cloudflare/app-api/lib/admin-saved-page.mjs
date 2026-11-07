@@ -4,7 +4,7 @@ const flights=new Map(),versions=new Map(),preparedIds=new WeakMap();
 const spec={id:{flag:'refreshIds',label:'Aggiorna conteggi'},diagnostica:{flag:'refreshDiagnostics',label:'Aggiorna diagnostica'}};
 const key=view=>'monitoring/admin-pages/'+view+'/current.json';
 
-async function read(env,view){
+export async function readSavedAdminPage(env,view){
  if(!env.ARCHIVE)return null;
  try{
   const object=await env.ARCHIVE.get(key(view));if(!object)return null;
@@ -17,7 +17,7 @@ async function read(env,view){
 export async function savedAdminPage(request,env,view,render){
  const cfg=spec[view];if(!cfg)return render();
  const force=new URL(request.url).searchParams.get(cfg.flag)==='1';
- if(!force){const saved=await read(env,view);if(saved)return saved.html;if(env.ARCHIVE)return emptySavedPage(view,cfg);}
+ if(!force){const saved=await readSavedAdminPage(env,view);if(saved)return saved.html;if(env.ARCHIVE)return emptySavedPage(view,cfg);}
  const flightKey=new URL(request.url).origin+'|'+view;
  if(flights.has(flightKey))return flights.get(flightKey);
  const version=(versions.get(flightKey)||0)+1;versions.set(flightKey,version);
@@ -26,7 +26,7 @@ export async function savedAdminPage(request,env,view,render){
   try{raw=await render();}
   catch(error){
    console.error('admin_snapshot_refresh_failed',view,error);
-   const saved=await read(env,view);
+   const saved=await readSavedAdminPage(env,view);
    const stage=view==='id'?/^identity_refresh_incomplete:(ids|review|birth)$/.exec(error?.message)?.[1]:null;
    const marker=stage?' data-identity-refresh-error="'+stage+'"':'';
    const warning='<div'+marker+' class="card" role="alert"><p><b>Aggiornamento non riuscito.</b> '+(saved?'È mostrata l’ultima lettura salvata; dati e stati non sono stati aggiornati.':'Nessuna lettura salvata disponibile; dati e stati non sono verificati.')+' Usa il pulsante di aggiornamento per riprovare.</p></div>';
