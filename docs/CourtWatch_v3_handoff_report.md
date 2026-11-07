@@ -10694,3 +10694,5 @@ Il controllo confronta i tornei per data di inizio. Il catalogo conserva gli ID 
 La riga FITP tornei valuta i cataloghi provinciali v2 tramite esito, completamento delle province, finestra validata, errori e freschezza. La soglia precedente resta per i cataloghi legacy. Verifica locale su catalogo ridotto, provincia mancante e catalogo datato.
 
 ITF discovery 2026-11-07T06:42:43.588Z: 10 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-07T06:44:31.862Z: attempted 8, acquired 7, ordinary 2, extraordinary 2. Partial metadata preserved; official D1 sync follows.
