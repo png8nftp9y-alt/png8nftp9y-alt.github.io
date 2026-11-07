@@ -16,7 +16,8 @@ await walk(taskRoot);
 
 const sourceFile='dist/v3/source_itf_entries.json',targetFile='history/itf_draw_target_db.json';
 const source=await readJson(sourceFile,{entries:[]}),targetDoc=await readJson(targetFile,{targets:{},tournaments:{}}),former=new Set(((await readJson('former-players.json',{players:[]})).players||[]).map(p=>p.id));
-const watched=((await readJson('players.json',{players:[]})).players||[]).filter(p=>!former.has(p.id)&&(p.circuits||[]).some(c=>norm(c)==='ITF'));
+const observed=((await readJson('players.json',{players:[]})).players||[]).filter(p=>!former.has(p.id));
+const watched=observed.filter(p=>(p.circuits||[]).some(c=>norm(c)==='ITF'));
 const targets={...(targetDoc.targets||{})},tournaments={...(targetDoc.tournaments||{})},entries=new Map((source.entries||[]).map(e=>[e.playerId+'|'+e.competitionId,e]));
 const previous=tournaments[id]||{},eventCache={...(previous.eventCache||{})};for(const [event,value] of Object.entries(eventCache))if(value?.resolution==='unused_alternative_structure')delete eventCache[event];const tournamentDocs=docs.filter(d=>d.competitionId===id),byEvent=new Map(tournamentDocs.map(d=>[d.event,d]));
 let newSectionsCached=0;
@@ -60,7 +61,35 @@ const unusedAlternativeSections=eventInventory.filter(section=>isAlternative(sec
 const resolvedSections=acquiredSections+unusedAlternativeSections+declaredButUnusedSections;
 const missingSections=Math.max(0,eventInventory.length-resolvedSections),complete=eventInventory.length>0&&missingSections===0,cancelledName=/\bcancel(?:led|ed)\b/i.test(String(tournament.tournamentName||inventory.tournamentName||'')),cancelledNoDraws=!coverage&&!inventory.inventoryError&&eventInventory.length===0&&cancelledName,decision=complete?'complete':cancelledNoDraws?'cancelled_no_draws':'pending';
 const found=new Map();
-for(const section of eventInventory)for(const raw of eventCache[section.event]?.players||[])for(const player of watched)if(aliases(player).some(alias=>norm(raw.name)===alias))found.set(player.id,{player,raw});
+const nativeId = value => {
+ const candidate = String(value || '').trim();
+ return /^800\d{6}$/.test(candidate) ? candidate : '';
+};
+const watchedIds = new Set(watched.map(player => player.id));
+const candidates = observed.flatMap(player => {
+ const key = player.id + '|' + id;
+ const entry = entries.get(key);
+ const target = targets[key];
+ const acceptance = target?.acceptanceEntry || entry;
+ const officialId = nativeId(acceptance?.worldTennisId);
+ const hasActiveAcceptance = officialId && !target?.withdrawnAt &&
+  target?.drawDecision !== 'removed' &&
+  (Boolean(target?.acceptanceEntry) || entry?.acceptanceListPublished === true);
+ return watchedIds.has(player.id) || hasActiveAcceptance
+  ? [{player, officialId, allowNameMatch: watchedIds.has(player.id)}]
+  : [];
+});
+for (const section of eventInventory) {
+ for (const raw of eventCache[section.event]?.players || []) {
+  const drawId = nativeId(raw.id || raw.playerId);
+  for (const {player, officialId, allowNameMatch} of candidates) {
+   const matches = drawId && officialId
+    ? drawId === officialId
+    : allowNameMatch && aliases(player).some(alias => norm(raw.name) === alias);
+   if (matches) found.set(player.id, {player, raw});
+  }
+ }
+}
 for(const {player,raw} of found.values()){
  const key=player.id+'|'+id,old=entries.get(key)||targets[key]?.acceptanceEntry||{},drawEntry={...old,playerId:player.id,playerName:player.name,worldTennisId:String(raw.id||old.worldTennisId||''),circuit:'itf',competitionId:id,tournamentName:tournament.tournamentName||inventory.tournamentName,location:tournament.location||old.location||'',startDate:tournament.startDate,endDate:tournament.endDate,category:tournament.category||old.category||'',sourceUrl:tournament.sourceUrl||old.sourceUrl||'',preDrawCalendarListLabel:old.preDrawCalendarListLabel||old.calendarListLabel||'',acceptanceCode:'',acceptancePosition:null,calendarListLabel:'',entryStatus:'draw_confirmed',calendarState:'draw_confirmed',drawConfirmedAt:NOW,lastSeen:NOW};entries.set(key,drawEntry);targets[key]={...(targets[key]||{}),acceptanceEntry:targets[key]?.acceptanceEntry||null,drawDecision:'confirmed',drawEntry,lastDrawCheckedAt:NOW};
 }
