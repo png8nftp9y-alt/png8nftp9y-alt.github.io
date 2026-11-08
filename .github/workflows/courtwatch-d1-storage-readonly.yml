@@ -1,0 +1,75 @@
+name: CourtWatch D1 storage read-only check
+on:
+  push:
+    branches: [audit/d1-runtime-storage-readonly]
+    paths: [.github/workflows/courtwatch-d1-storage-readonly.yml]
+permissions: {}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: courtwatch-d1-writes
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - name: Verify protected runtime document versions
+        env:
+          CF_ACCOUNT: ${{ secrets.R2_ACCOUNT_ID }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64, gzip, hashlib, json, os, urllib.request
+
+          base = 'https://api.cloudflare.com/client/v4/accounts/' + os.environ['CF_ACCOUNT'] + '/d1/database'
+          def request(path, body=None):
+              data = None if body is None else json.dumps(body).encode()
+              req = urllib.request.Request(base + path, data=data, headers={
+                  'Authorization': 'Bearer ' + os.environ['CF_TOKEN'],
+                  'Content-Type': 'application/json',
+              })
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  result = json.load(response)
+              if not result['success']:
+                  raise SystemExit('Cloudflare request failed')
+              return result['result']
+
+          databases = [row for row in request('?name=courtwatch-app&per_page=100') if row['name'] == 'courtwatch-app']
+          if len(databases) != 1:
+              raise SystemExit('Expected exactly one courtwatch-app database')
+          endpoint = '/' + databases[0]['uuid'] + '/query'
+
+          def select(sql, *params):
+              assert sql.lstrip().startswith('SELECT ')
+              results = request(endpoint, {'sql': sql, 'params': params})
+              if not all(item['success'] for item in results):
+                  raise SystemExit('D1 read failed')
+              return [row for item in results for row in item['results']]
+
+          def manifest():
+              return select("SELECT value FROM app_state WHERE key='runtimeDocumentRelease'")[0]['value']
+
+          backup = {
+              'dist/v3/tournaments.json': ('c5d18785421067567e133ad8bb68559e45f38f72c74bbbbf39732d64357f3090', 'abb5a97d81baf8d3d0cfcd7a1d462b84e08ad237695f10c3af6089b3c57bbbcc'),
+              'dist/v3/tournament_entries.json': ('a477795549c47203c18366d47aae2626f9a8927b80d3e489dadc0db3d2e28db2', '077266272b7a4e9da2319dc51cc80126df462a5bdf4148676062976c901dec2d'),
+              'dist/v3/source_fitp_entries.json': ('8d4f7b4561d3d20e99220d0d4526c74cdb077c71f4bef17809c0f55fe2de7c90', '35f68c0c93b80453d8f88d3da4eda8a458a84f5f2a6e12657c677672a3c4d0fa'),
+          }
+          before = manifest()
+          release = json.loads(before)
+          active = {row['path']: row for row in release['documents']}
+          for path, hashes in backup.items():
+              checks = {'active': (active[path]['hash'], active[path]['chunks']),
+                        'recovery': (hashes[0], 2), 'verified_previous': (hashes[1], 2)}
+              for label, (digest, count) in checks.items():
+                  rows = select('SELECT seq, data FROM runtime_document_chunks WHERE path=? AND content_hash=? ORDER BY seq', path, digest)
+                  if len(rows) != count or [row['seq'] for row in rows] != list(range(count)):
+                      raise SystemExit(f'Missing or non-contiguous chunks: {path} {label}')
+                  raw = gzip.decompress(base64.b64decode(''.join(row['data'] for row in rows), validate=True))
+                  if hashlib.sha256(raw).hexdigest() != digest:
+                      raise SystemExit(f'Hash mismatch: {path} {label}')
+                  print(f'Verified {path} {label}: {count} chunks', flush=True)
+          if manifest() != before:
+              raise SystemExit('Release changed during audit')
+          print('READ_ONLY_OK ' + release['fingerprint'])
+          PY
