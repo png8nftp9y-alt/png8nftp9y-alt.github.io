@@ -14,6 +14,7 @@ const presentFields=t=>({
  address:first(t.address,t.clubAddress,t.venueAddress),
  location:first(t.location,t.city),
  surface:first(t.surface,t.courtSurface,t.playingSurface),
+ tournamentCategory:first(t.tournamentCategory),
  environment:first(t.environment,t.indoorOutdoor,t.courtEnvironment),
  qualificationStartDate:first(t.qualificationStartDate),
  officialStartDate:first(t.officialStartDate)
@@ -33,7 +34,9 @@ export async function fetchTournamentPresentation(c,fetcher){
   const response=await fetcher(ROOT+'/'+file,{cf:{cacheEverything:true,cacheTtl:file==='history/itf_official_metadata.json'?60:3600},signal:AbortSignal.timeout(3000)});
   if(!response.ok)return [];
   const data=await response.json(),rows=data.tournaments;
-  return Array.isArray(rows)?rows:rows&&typeof rows==='object'?Object.entries(rows).map(([id,t])=>({...t,competitionId:id})):[];
+  const tournaments=Array.isArray(rows)?rows:rows&&typeof rows==='object'?Object.entries(rows).map(([id,t])=>({...t,competitionId:id})):[];
+  if(c!=='tennis-europe')return tournaments;
+  return [...tournaments,...Object.entries(data.categoriesByCompetitionId||{}).map(([competitionId,tournamentCategory])=>({competitionId,tournamentCategory}))];
  }));
  const map=new Map();
  for(const result of results)if(result.status==='fulfilled')for(const row of result.value){

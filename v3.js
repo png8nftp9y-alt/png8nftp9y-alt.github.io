@@ -2225,8 +2225,9 @@ function agendaCircuitBadges(value, tournament = value) {
   const source = circuit(value),
     circuitBadge = `<span class="type ${source}">${esc(agendaCircuitLabel(value))}</span>`;
   if (source !== "tennis-europe") return circuitBadge;
-  const conditions = tournamentSurfaceLabel(tournament, true);
-  return `${circuitBadge}<span class="type tournamentConditions">${esc(conditions || "SUPERFICIE/AMBIENTE NON PUBBLICATI")}</span>`;
+  const conditions = tournamentSurfaceLabel(tournament, true),
+    category = readableText(tournament?.tournamentCategory || value?.tournamentCategory || "");
+  return `${circuitBadge}${category ? `<span class="type tennisEuropeCategory">${esc(category)}</span>` : ""}<span class="type tournamentConditions">${esc(conditions || "SUPERFICIE/AMBIENTE NON PUBBLICATI")}</span>`;
 }
 function agendaTournamentLocation(t, m) {
   const source = circuit(t || m),
@@ -4160,9 +4161,10 @@ function renderTournament(key) {
       ? `<a class="btn tournamentAcceptanceLink" href="${esc(acceptanceUrl)}" target="_blank" rel="noopener" aria-label="Apri Acceptance List"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Acceptance List</span></a>`
       : "",
     drawLinks = tournamentDrawLinks(t, matches),
-    surfaceLabel = tournamentSurfaceLabel(t);
+    surfaceLabel = tournamentSurfaceLabel(t),
+    category = source === "tennis-europe" ? readableText(t.tournamentCategory || "") : "";
   $("profileContent").innerHTML =
-    `<div class="card tournamentHero"><div><h2>${title}</h2>${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(displayDate(t.startDate) || "data da pubblicare")} – ${esc(displayDate(t.endDate) || "data da pubblicare")}</p></div><div class="tournamentHeroActions">${acceptanceLink}<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div></div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
+    `<div class="card tournamentHero"><div><h2>${title}</h2>${category ? `<p>${esc(category)}</p>` : ""}${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(displayDate(t.startDate) || "data da pubblicare")} – ${esc(displayDate(t.endDate) || "data da pubblicare")}</p></div><div class="tournamentHeroActions">${acceptanceLink}<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div></div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
   if (futureEurope) loadFutureTournamentEuropeRankings(key, [...byPlayer.keys()].map(id => (state.data.players || []).find(player => player.id === id)).filter(Boolean));
   if (source === "fitp") loadInlineFitpDrawLinks(t);
   bindParticipantNavigation($("profileContent"));

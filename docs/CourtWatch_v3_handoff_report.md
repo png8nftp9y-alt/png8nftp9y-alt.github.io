@@ -10756,3 +10756,8 @@ Correzione Agenda: ripristinata una revisione cache JS crescente a 19 cifre per 
 Il run 42311115779 si è fermato prima degli avversari. L’audit ora suddivide i lotti in base al peso del JSON UTF-8, conservando ordine e controlli sugli errori. Certificazione in attesa di un audit completo.
 
 ITF discovery 2026-11-08T22:37:43.613Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+### 2026-11-08 — Categoria ufficiale Tennis Europe
+
+Acquisita dal tag categoria della ricerca ufficiale per ID torneo. Primo passaggio esteso alle date dello storico, con recupero manuale ripetibile. Il catalogo conserva le categorie già verificate fuori finestra. Agenda con etichetta viola e testo bianco, pagina torneo con testo fra titolo e superficie. I valori mancanti restano vuoti. Verifica locale con test del parser e della proiezione. Copertura effettiva da misurare dopo acquisizione e pubblicazione.

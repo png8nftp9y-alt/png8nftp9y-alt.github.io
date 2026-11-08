@@ -1,6 +1,11 @@
 name: Court Watch v3 Tennis Europe tournament map
 on:
   workflow_dispatch:
+    inputs:
+      category_backfill:
+        description: Rescan the full archived date range for official categories
+        type: boolean
+        default: false
   schedule:
     - cron: '17 */6 * * *'
   push:
@@ -39,7 +44,9 @@ jobs:
           ref: "${{ needs.engine-source.outputs.sha }}"
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
-      - run: TE_SHARD=${{ matrix.shard }} node src/v3/discover-tennis-europe-tournaments-shard.mjs
+      - env:
+          TE_CATEGORY_BACKFILL: ${{ inputs.category_backfill }}
+        run: TE_SHARD=${{ matrix.shard }} node src/v3/discover-tennis-europe-tournaments-shard.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: te-tournaments-${{ matrix.shard }}

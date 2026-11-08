@@ -126,3 +126,21 @@ export function tennisEuropeCourtConditions(html){
   if(!environment){const match=whole.match(/(?:environment|indoor\s*\/\s*outdoor|court type)\s*[:\-]?\s*(indoor|outdoor)\b/i);environment=normalizeEnvironment(match?.[1]||'')}
   return{surface,environment,indoorOutdoor:environment};
 }
+
+// The official search places grading tags in a separate list within each tournament card.
+export function tennisEuropeSearchCategories(html) {
+  const categories = new Map();
+  const cardStart = /<li\b[^>]*>\s*<div\b[^>]*class=["']media["'][^>]*>/gi;
+  const cards = [...String(html || '').matchAll(cardStart)];
+  for (const [index, start] of cards.entries()) {
+    const card = html.slice(start.index, cards[index + 1]?.index);
+    const id = card.match(/href=["'][^"']*\/sport\/(?:tournament|events)(?:\.aspx)?\?id=([a-f0-9-]{36})(?:&|["'])/i)?.[1]?.toUpperCase();
+    if (!id) continue;
+    const values = [...card.matchAll(/<span\b[^>]*class=["'][^"']*\btag--soft\b[^"']*["'][^>]*>\s*([^<>]+?)\s*<\/span>/gi)]
+      .map(match => match[1].trim())
+      .filter(value => /^(?:Super Category|Category [1-3]|Masters|European Championship|Tennis Europe Festival|Invitational|Small States)$/i.test(value));
+    const unique = [...new Set(values)];
+    if (unique.length === 1) categories.set(id, unique[0]);
+  }
+  return categories;
+}

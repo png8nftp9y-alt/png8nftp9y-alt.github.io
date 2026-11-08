@@ -64,6 +64,7 @@ function entry(row) {
     address: row.address || "",
     addressSource: row.addressSource || "",
     addressSearchUrl: row.addressSearchUrl || "",
+    ...(c === "tennis-europe" && row.tournamentCategory ? { tournamentCategory: row.tournamentCategory } : {}),
     surface: row.surface || row.surfaceDesc || row.courtSurface || row.playingSurface || "",
     environment: row.environment || row.indoorOutdoor || row.indoorOrOutDoor || row.courtEnvironment || (row.indoor === true ? "Indoor" : row.outdoor === true ? "Outdoor" : ""),
     startDate: row.qualificationStartDate || row.startDate || "",
@@ -116,6 +117,7 @@ function toTournament(e) {
     address: e.address || "",
     addressSource: e.addressSource || "",
     addressSearchUrl: e.addressSearchUrl || "",
+    ...(e.tournamentCategory ? { tournamentCategory: e.tournamentCategory } : {}),
     surface: e.surface || "",
     environment: e.environment || "",
     startDate: mapStartDate || e.startDate,
@@ -279,6 +281,7 @@ const teEntries = [...(te.entries || []), ...(teHistory.entries || [])]
     return entry({
       ...r,
       circuit: "tennis-europe",
+      tournamentCategory: teTournaments.categoriesByCompetitionId?.[String(r.competitionId || "").toUpperCase()] || official.tournamentCategory,
       venueName: r.venueName || official.venueName || "",
       address: r.address || official.address || "",
       surface: r.surface || official.surface || official.surfaceDesc || official.courtSurface || official.playingSurface || "",
