@@ -14,6 +14,21 @@ export const personalNativeEvidence=p=>[
  ...(p.circuitProfiles||[]).flatMap(profile=>playerCircuitIdentities({circuitProfiles:[profile]}))
 ];
 const officialKey=r=>{const id=String(r.official_id||'').toLowerCase();return (r.circuit==='fitp'?/^\d{6,12}$/.test(id):r.circuit==='itf'?/^800\d{6}$/.test(id):r.circuit==='tennis-europe'?/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(id):false)?r.circuit+'|'+id:''};
+// Exact partitions confirmed in Admin ID. The canonical IDs retain the ITF
+// identities while the official Europe profiles follow the approved partitions.
+const reviewedCanonicalIds=new Map([
+ ['itf|800794057','cw-3b74f341d08a7696d7ae0e96b7211113'],
+ ['tennis-europe|081310fb-8497-45ad-aaac-67f1cecd5b8e','cw-3b74f341d08a7696d7ae0e96b7211113'],
+ ['itf|800807639','cw-c9bcea025983f65f35d904c4da17ee8b'],
+ ['tennis-europe|ecfa5792-feca-4610-b16e-0798f597c180','cw-c9bcea025983f65f35d904c4da17ee8b'],
+ ['itf|800866511','cw-e82216294e6b2e63ad2f18fd9a7fb66c'],
+ ['itf|800824432','cw-2ed484d1152e0f1541b4a9c62a0a7536'],
+ ['itf|800882252','cw-01d2e4b376f783b30c0ee54e9b6a5f58'],
+ ['tennis-europe|bc0fc70f-dc12-4dbe-bccf-72cd90419f70','cw-6f10458515009fdaacbaf91960723168'],
+]);
+const reviewedCanonical=row=>reviewedCanonicalIds.get(officialKey(row));
+const reviewedAnchors=new Set(reviewedCanonicalIds.values());
+const reviewedGroups=rows=>new Set(rows.map(reviewedCanonical).filter(Boolean));
 export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],currentAliases=[],sourceComplete=true,confirmedLinks=[]}={}){
  if(!sourceComplete)throw Error('identity_source_incomplete');
  const retainedNationalities = new Map();
@@ -37,7 +52,7 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
   const [nationality] = countries;
   return {...row, payload: JSON.stringify({...payload, nationality})};
  });
- const names=new Map();for(const r of all){const key=playerNameKey(r.display_name)||'source:'+r.source_key;const list=names.get(key)||[];list.push(r);names.set(key,list);}
+ const names=new Map();for(const r of all){const key=reviewedCanonical(r)||playerNameKey(r.display_name)||'source:'+r.source_key;const list=names.get(key)||[];list.push(r);names.set(key,list);}
  const sets=[];
  for(const members of names.values()){
   const merged=mergeSearchIdentities([...members],new Map());
@@ -59,7 +74,7 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
   const roots=new Set([find(i),...wanted.map(key=>find(official.get(key)))]),members=rootMembers(roots),ids=new Map(),years=new Set();
   if(members.some(m=>playerNameKey(m.display_name)!==playerNameKey(r.display_name)))continue;
   for(const m of members){const p=parsed(m.payload),year=Number(p.birthYear||String(p.birthDate||p.dateOfBirth||'').slice(0,4));if(year)years.add(year);const key=officialKey(m);if(key){const known=ids.get(m.circuit)||new Set();known.add(key);ids.set(m.circuit,known);}}
-  if(years.size>1||[...ids.values()].some(values=>values.size>1))continue;
+  if(reviewedGroups(members).size>1||years.size>1||[...ids.values()].some(values=>values.size>1))continue;
   const root=find(i);for(const current of roots)parent[find(current)]=root;
  }
  // User-confirmed cross-circuit links are exact native IDs, never name matches.
@@ -99,7 +114,7 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
 
   const roots=new Set(found.map(g=>find(g.i))),members=sets.flatMap((g,i)=>roots.has(find(i))?g:[]),ids=new Map();
   for(const r of members){const key=officialKey(r);if(!key)continue;const known=ids.get(r.circuit)||new Set();known.add(key);ids.set(r.circuit,known);}
-  if([...ids.values()].some(s=>s.size>1))throw Error('confirmed_identity_link_conflicts_with_existing_profile');
+  if(reviewedGroups(members).size>1||[...ids.values()].some(s=>s.size>1))throw Error('confirmed_identity_link_conflicts_with_existing_profile');
   if(rule.nameKey){
    // Exact native IDs explicitly confirmed for this person remain authoritative
    // when retained sources spell the same profile's name differently.
@@ -111,13 +126,15 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
   const root=find(found[0].i);for(const g of found)parent[find(g.i)]=root;
  }
  const priorBySource=new Map(currentLinks.map(r=>[r.source_key,r.canonical_id])),priorGroups=new Map();
- sets.forEach((members,i)=>{for(const id of new Set(members.map(r=>priorBySource.get(r.source_key)).filter(Boolean))){const previous=priorGroups.get(id)||[];for(const j of previous){const combined=rootMembers(new Set([find(i),find(j)])).map(r=>({...r,display_name:'Persisted identity'}));if(mergeSearchIdentities(combined,new Map()).length===1)parent[find(i)]=find(j);}previous.push(i);priorGroups.set(id,previous);}});
+ sets.forEach((members,i)=>{for(const id of new Set(members.map(r=>priorBySource.get(r.source_key)).filter(Boolean))){const previous=priorGroups.get(id)||[];for(const j of previous){const members=rootMembers(new Set([find(i),find(j)]));const combined=members.map(r=>({...r,display_name:'Persisted identity'}));if(reviewedGroups(members).size<2&&mergeSearchIdentities(combined,new Map()).length===1)parent[find(i)]=find(j);}previous.push(i);priorGroups.set(id,previous);}});
  const groups=new Map();sets.forEach((members,i)=>{const root=find(i);groups.set(root,[...(groups.get(root)||[]),...members]);});
  const existing=new Map(currentLinks.map(r=>[r.source_key,r.canonical_id])),people=[],links=[],aliases=[],assigned=new Set();
  for(const members of groups.values()){
   const configured=members.filter(r=>r.circuit==='courtwatch').map(r=>r.official_id).filter(Boolean).sort(),previous=[...new Set(members.map(r=>existing.get(r.source_key)).filter(Boolean))].sort();
   const primary=mergeSearchIdentities([...members],new Map())[0],actual=members.filter(r=>r.circuit!=='courtwatch').sort((a,b)=>Number(Boolean(officialPlayerUrl(b.circuit,{...parsed(b.payload),name:b.display_name,officialId:b.official_id})))-Number(Boolean(officialPlayerUrl(a.circuit,{...parsed(a.payload),name:a.display_name,officialId:a.official_id})))||a.source_key.localeCompare(b.source_key))[0];
-  const canonicalId=configured.find(id=>!assigned.has(id))||previous.find(id=>!assigned.has(id))||'cw-'+createHash('sha256').update(actual?.source_key||members[0].source_key).digest('hex').slice(0,32);
+  const [approvedId]=reviewedGroups(members);
+  if(approvedId&&configured.some(id=>id!==approvedId))throw Error('reviewed_partition_has_configured_identity');
+  const canonicalId=approvedId||configured.find(id=>!assigned.has(id))||previous.find(id=>!assigned.has(id)&&!reviewedAnchors.has(id))||'cw-'+createHash('sha256').update(actual?.source_key||members[0].source_key).digest('hex').slice(0,32);
   assigned.add(canonicalId);
   const enriched=new Map();for(const r of members){const raw={...parsed(r.payload),name:r.display_name,officialId:r.official_id};if(!raw.nationality&&!raw.country)raw.nationality=primary.nationality||'';const candidates=members.filter(x=>x.circuit===r.circuit).map(x=>({...parsed(x.payload),name:x.display_name,officialId:x.official_id}));enriched.set(r.source_key,{...raw,...recoverProfileEvidence(r.circuit,raw,candidates)});}
   const profiles=new Map();for(const r of members){const p={...enriched.get(r.source_key),sourceCircuit:r.circuit};if(r.circuit==='courtwatch'){for(const profile of circuitProfiles(p))if(profile.url)profiles.set(profile.circuit,profile);}else{const url=officialPlayerUrl(r.circuit,p);if(url)profiles.set(r.circuit,{circuit:r.circuit,url});}}
@@ -131,7 +148,7 @@ export function buildIdentityMapping(rows,{currentLinks=[],currentPeople=[],curr
   if(nationalities.size>1)throw Error('confirmed_nationality_conflict');if(nationalities.size)payload.nationality=[...nationalities][0];
   people.push({canonical_id:canonicalId,name_key:playerNameKey(payload.name),payload:JSON.stringify(payload)});
   for(const r of members){const p=enriched.get(r.source_key),year=Number(p.birthYear||String(p.birthDate||p.dateOfBirth||'').slice(0,4))||null;links.push({source_key:r.source_key,canonical_id:canonicalId,name_key:playerNameKey(r.display_name),circuit:r.circuit,official_id:String(p.officialId||r.official_id||''),profile_url:officialPlayerUrl(r.circuit,{...p,name:r.display_name,officialId:p.officialId||r.official_id}),normalized_name:normalizePlayerName(r.display_name),display_name:r.display_name||'',birth_year:year,nationality:p.nationality||p.country||''});}
-  for(const alias of [...new Set([canonicalId,...configured,...previous.filter(id=>!assigned.has(id)||id===canonicalId)])])aliases.push({alias_id:alias,canonical_id:canonicalId});
+  for(const alias of [...new Set([canonicalId,...configured,...previous.filter(id=>id===canonicalId||!assigned.has(id)&&!reviewedAnchors.has(id))])])aliases.push({alias_id:alias,canonical_id:canonicalId});
  }
  const plans={};for(const [type,incoming,current,key]of [['people',people,currentPeople,'canonical_id'],['links',links,currentLinks,'source_key'],['aliases',aliases,currentAliases,'alias_id']]){const unique=[...new Map(incoming.map(r=>[r[key],r])).values()],keys=new Set(unique.map(r=>r[key]));plans[type]=buildIncrementalSyncPlan({current:current.filter(r=>keys.has(r[key])),incoming:unique,keyOf:r=>r[key],sourceComplete});}
  return{plans,people,links,aliases};

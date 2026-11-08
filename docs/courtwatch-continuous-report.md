@@ -1491,3 +1491,8 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 
 - Applica gli abbinamenti nativi espliciti per Giannotta (SUI), Akan (TUR), Carnel (BEL) e Champion (FRA), preservando le fonti originali. Verifica ID, nazionalità canoniche e chiusura delle segnalazioni in D1.
 - Liu e Calugar richiedono una verifica separata dei collegamenti canonici esistenti prima di intervenire sullo storico.
+
+
+## 2026-11-08 — Separazione dei profili Liu e Calugar
+
+- Applica le partizioni approvate per gli otto ID ufficiali, preservando i record originali. Sostituisce la precedente associazione Liu e riallinea l’alias Europe identificato. L’alias Calugar privo di ID ufficiale non viene riassegnato.
