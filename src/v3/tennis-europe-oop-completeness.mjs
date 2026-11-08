@@ -45,8 +45,8 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
     if(acquired){covered++;pendingOpponents++;continue;}
    }
 
-   // A future singles slot may be published before either player is assigned.
-   if(size===2&&card.round&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>iso(asOf)&&emptyParticipantRows(card.evidenceHtml)){
+   // A current or future singles slot may be published before either player is assigned.
+   if(size===2&&card.round&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>=iso(asOf)&&emptyParticipantRows(card.evidenceHtml)){
     resolutions.push({kind:'future_singles_awaiting_both_players',date:card.date,event:card.event,round:card.round,sourceUrl:card.sourceUrl,sourceHash:card.sourceHash});continue;
    }
 

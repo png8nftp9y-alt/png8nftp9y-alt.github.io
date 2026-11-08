@@ -37,3 +37,12 @@ test('future explicit empty publication is not confused with failed acquisition 
  const args={tournament:{competitionId:'T',startDate:'2026-08-27'},pages:[],matches:[],listingHtml:'Match schedule No matches found',asOf:'2026-08-26'};
  assert.equal(requireOopCompleteness(args).status,'not_published');assert.throws(()=>requireOopCompleteness({...args,listingHtml:'unavailable'}),/unresolved/);assert.throws(()=>requireOopCompleteness({...args,asOf:'2026-08-27'}),/unresolved/);
 });
+
+test('official empty singles slot is provisional today and unresolved after its date',()=>{
+ const emptyRow='<div class="match__row"><div class="match__row-title"></div></div>';
+ const placeholder=card({people:[],sets:''}).replace(/<\/div>$/, `<div class="match__row-wrapper">${emptyRow.repeat(2)}</div><div class="match__result"></div></div><div class="match__footer"></div></div>`);
+ const pages=[page(placeholder)];
+ for(const [asOf,status] of [['2026-08-25','complete'],['2026-08-26','complete'],['2026-08-27','incomplete']]){
+  assert.equal(auditOopCompleteness({tournament:{competitionId:'T'},pages,matches:[],asOf}).status,status);
+ }
+});

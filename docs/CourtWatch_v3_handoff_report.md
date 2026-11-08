@@ -10721,3 +10721,8 @@ Conteggi ID, identità sospette e anni di nascita hanno ciascuno un pulsante, un
 ITF discovery 2026-11-07T22:24:10.804Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-11-08T06:49:32.953Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+## 2026-11-08 — Affidabilità OOP Tennis Europe
+
+Lo slot ufficiale di singolare con due posti vuoti e senza esito resta provvisorio anche nel giorno programmato. Dopo quella data il controllo resta bloccante. Regressione verificata sul caso Mecholupy del run 42482126535 e inclusa nei test del workflow live.
