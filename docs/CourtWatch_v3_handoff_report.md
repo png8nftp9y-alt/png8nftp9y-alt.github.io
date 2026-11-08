@@ -10739,3 +10739,5 @@ Le richieste POST mantengono l’origine della pagina e il Worker verifica
 che corrisponda alla propria origine. Modifiche pubblicate nei commit
 75251a81b0 e 735a3d0caa. Il run Shield 42486626207 della PR #165
 si è fermato prima del browser perché il report mancava nella PR.
+
+ITF discovery 2026-11-08T18:10:09.195Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
