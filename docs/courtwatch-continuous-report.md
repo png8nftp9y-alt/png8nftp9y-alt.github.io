@@ -1496,3 +1496,8 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 ## 2026-11-08 — Separazione dei profili Liu e Calugar
 
 - Applica le partizioni approvate per gli otto ID ufficiali, preservando i record originali. Sostituisce la precedente associazione Liu e riallinea l’alias Europe identificato. L’alias Calugar privo di ID ufficiale non viene riassegnato.
+
+
+## 2026-11-08 — Test incrementale Liu e Calugar
+
+- Aggiunto il test SQLite dedicato alla correzione, alla conservazione delle fonti e alla riesecuzione senza scritture.
