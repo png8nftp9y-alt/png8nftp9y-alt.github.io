@@ -68,6 +68,7 @@ for (const group of ['main', 'others']) {
     c.ctx.renderIfDataChanged = () => {
       renders.push({score: c.ctx.state.data.agenda[0]?.score, filesReady, cacheReady});
       c.ctx.scrollY = 0; // Simulate layout clamping during a DOM replacement.
+      return true; // The real renderer reports that it replaced the view.
     };
     c.ctx.state.selected = new Set([player.id]);
     c.ctx.state.sexFilter = 'F';

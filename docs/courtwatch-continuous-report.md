@@ -1501,3 +1501,8 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 ## 2026-11-08 — Test incrementale Liu e Calugar
 
 - Aggiunto il test SQLite dedicato alla correzione, alla conservazione delle fonti e alla riesecuzione senza scritture.
+
+
+## Verifica dello scorrimento durante il caricamento
+
+- Allineata la simulazione del renderer al valore restituito dal codice reale. Le modifiche al test avviano anche la verifica in Chromium.
