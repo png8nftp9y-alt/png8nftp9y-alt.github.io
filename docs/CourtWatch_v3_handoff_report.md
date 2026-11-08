@@ -10746,3 +10746,6 @@ ITF discovery 2026-11-08T18:10:09.195Z: 0 newly discovered future tournaments; M
 ### 2026-11-08 — Risultati Agenda tra osservati
 
 L’Agenda mostra in blu il risultato tra due osservati con il nome del vincitore. Usa `won` quando `advances` è assente. I risultati TCL contro esterni conservano i colori esistenti. Aggiornati gli asset e verificati i test su punteggi e ritiri. Verifica in produzione dopo il deploy.
+
+
+Correzione Agenda: ripristinata una revisione cache JS crescente a 19 cifre per il controllo di rilascio.
