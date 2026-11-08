@@ -997,8 +997,8 @@ function applyPendingProgressiveRankings() {
       playerRankingCache.set(String(player.id),{playerId:player.id,latestRankingDates:player.tennisEuropeLatestRankingDates||{},rankings});
     }
     const hash=location.hash,y=typeof scrollY==='number'?scrollY:null;
-    renderIfDataChanged();
-    if(y!==null&&location.hash===hash&&typeof scrollTo==='function')scrollTo({top:y,behavior:'auto'});
+    if (renderIfDataChanged(true) && y !== null && scrollY !== y && location.hash === hash && typeof scrollTo === 'function')
+      scrollTo({top:y, behavior:'instant'});
     Promise.resolve(saveCachedData(state.data)).catch(error=>console.warn('Archivio locale non disponibile',error));
   }
 }
@@ -3190,7 +3190,23 @@ function renderDataSignature(data) {
         : value,
   );
 }
-function renderIfDataChanged() {
+let lastPageScrollAt = -Infinity;
+let deferredProjectionRender;
+
+function renderIfDataChanged(background = false) {
+  if (background) {
+    const remaining = 180 - (Date.now() - lastPageScrollAt);
+    if (remaining > 0) {
+      clearTimeout(deferredProjectionRender);
+      deferredProjectionRender = setTimeout(() => {
+        const y = scrollY;
+        if (renderIfDataChanged(true) && scrollY !== y)
+          scrollTo({top:y, behavior:"instant"});
+      }, remaining);
+      return false;
+    }
+    clearTimeout(deferredProjectionRender);
+  }
   state.data = normalizeMatchProjection(state.data);
   const signature = renderDataSignature(state.data);
   if (signature === renderedDataSignature) {
@@ -4863,6 +4879,7 @@ function wire() {
       dismissPlayerSearch();
     }
   });
+  addEventListener("scroll", () => { lastPageScrollAt = Date.now(); }, { passive: true });
   for (const event of ["wheel", "touchmove", "pointerdown", "keydown"])
     addEventListener(event, () => { uiScrollRestoreCancelled = true; }, { passive: true });
   addEventListener("hashchange", () => {
@@ -4951,8 +4968,8 @@ function refreshKnownMatchResults() {
       knownResultUpdates.set(group, updates);
       const hash = location.hash, y = typeof scrollY === 'number' ? scrollY : null;
       state.data = applyKnownResultUpdates(state.data, group);
-      renderIfDataChanged();
-      if (y !== null && location.hash === hash) scrollTo({top:y, behavior:'auto'});
+      if (renderIfDataChanged(true) && y !== null && scrollY !== y && location.hash === hash && typeof scrollTo === 'function')
+        scrollTo({top:y, behavior:'instant'});
       Promise.resolve(saveCachedData(state.data)).catch(error => console.warn('Archivio locale non disponibile', error));
     } catch (error) { console.warn('Aggiornamento risultati Europe non disponibile', error); }
     finally { clearTimeout(timer); knownResultRequests.delete(group); }
@@ -5171,10 +5188,10 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
           ),
         );
       syncLabel(state.data, optionalFailures > 0);
-      renderIfDataChanged();
+      const rendered = renderIfDataChanged(viewY !== null);
       if (typeof recordStartupTiming === "function") recordStartupTiming("projection_render", publicationStarted, {complete:Boolean(projection)});
-      if (viewY !== null && viewHash !== null && location.hash === viewHash && typeof scrollTo === "function")
-        scrollTo({top: viewY, behavior: "auto"});
+      if (rendered && viewY !== null && scrollY !== viewY && location.hash === viewHash && typeof scrollTo === "function")
+        scrollTo({top: viewY, behavior: "instant"});
       if (typeof applyPendingProgressiveRankings === "function") applyPendingProgressiveRankings();
       const persistenceStarted = Date.now();
       Promise.resolve(saveCachedData(state.data)).catch(error => console.warn("Archivio locale non disponibile", error));
