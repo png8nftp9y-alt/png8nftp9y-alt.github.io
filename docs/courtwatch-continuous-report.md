@@ -1477,3 +1477,8 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 - Il guard è obbligatorio per rebuild universale, agenda Tennis Europe e classifiche Tennis Europe ed è incluso nella suite sintattica del Worker.
 - Reso idempotente anche il refresh settimanale ranking: una pubblicazione già importata non viene più riscritta integralmente; gli UPSERT aggiornano storico e alias soltanto quando i valori effettivi cambiano. Restano invariati acquisizione completa B14/G14/B16/G16, frequenze e API.
 - Evidenza precedente alla nuova protezione: run ranking 16 verde con 10.316 posizioni, circa 116.393 righe lette e 61.958 scritte, contro circa 190,5 milioni di letture della regressione eliminata. Il nuovo run deve certificare il guard verde e la seconda esecuzione identica con scritture drasticamente inferiori.
+
+## 2026-11-08 — Orari di aggiornamento in Admin → ID
+
+- L’orario dell’ultima lettura riuscita è mostrato sotto il pulsante della propria sezione e usa il fuso orario Europe/Rome. Il markup espone anche il timestamp ISO.
+- Il run Hotfix 42488448591 si è fermato prima del deploy perché il commit 350ea8913 non includeva il report. Questa revisione include codice e report nello stesso commit.

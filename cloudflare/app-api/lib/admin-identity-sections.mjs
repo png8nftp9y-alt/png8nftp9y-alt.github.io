@@ -43,8 +43,9 @@ export async function renderIdentitySections(env,url,page){
    else content='<p class="pill warn">Pagina delle segnalazioni non disponibile. È mostrata la lettura salvata.</p>'+content;
   }
   const date=saved?new Date(saved.checkedAt).toLocaleString('it-IT',{timeZone:'Europe/Rome'}):'mai aggiornato';
+  const timestamp=saved?'<time datetime="'+new Date(saved.checkedAt).toISOString()+'">'+date+'</time>':date;
   const control='<div><form method="post" action="/admin/id?refreshSection='+id+'"><button type="submit"><span aria-hidden="true">↻</span> Aggiorna '+label+'</button></form>'+
-   '<p class="muted">Ultimo aggiornamento: '+date+'</p></div>';
+   '<p class="muted">Ultimo aggiornamento: '+timestamp+'</p></div>';
   const card='<section class="card"><h2>'+label+'</h2>'+
    (failed===id?'<p role="alert">Aggiornamento non riuscito. Resta disponibile l’ultima lettura di questa sezione, se presente.</p>':'')+content+'</section>';
   return {control,card};
