@@ -1,9 +1,6 @@
 name: Court Watch Tennis Europe completeness audit
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ['Court Watch Tennis Europe OOP historical merge']
-    types: [completed]
 permissions:
   contents: read
   actions: read

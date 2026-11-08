@@ -1482,3 +1482,7 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 
 - L’orario dell’ultima lettura riuscita è mostrato sotto il pulsante della propria sezione e usa il fuso orario Europe/Rome. Il markup espone anche il timestamp ISO.
 - Il run Hotfix 42488448591 si è fermato prima del deploy perché il commit 350ea8913 non includeva il report. Questa revisione include codice e report nello stesso commit.
+
+## 2026-11-08 — Audit di completezza Tennis Europe su richiesta
+
+- Rimosso l’avvio automatico dopo il merge OOP storico. Il lancio manuale usa l’ultimo merge riuscito.
