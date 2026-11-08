@@ -8,9 +8,10 @@ const completions=s=>(s.match(/^  workflow_run:\n([\s\S]*?)(?=^  \w+:|^permissio
 const paths=s=>(s.match(/^  push:\n([\s\S]*?)(?=^\w|^  \w+:)/m)?.[1].match(/^      - '[^']+'$/gm)||[]).map(x=>x.slice(9,-1));
 function matches(pattern,file){return new RegExp('^'+pattern.split('*').map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('.*')+'$').test(file);}
 function owns(source,file){let matched=false;for(const pattern of paths(source)){if(matches(pattern.replace(/^!/,''),file))matched=!pattern.startsWith('!');}return matched;}
-test('general D1 follows only verified Agenda, preserving dedicated native metadata publishers',()=>{
- const a=completions(common),b=completions(runtime);assert.deepEqual(a,['Court Watch Tennis Europe agenda D1']);assert.ok(b.length>=6);
- assert.deepEqual(a.filter(name=>b.includes(name)),[]);
+test('general D1 runs independently, preserving dedicated native metadata publishers',()=>{
+ assert.match(common,/^  schedule:\n    - cron: '12,27,42,57 \* \* \* \*'$/m);
+ assert.doesNotMatch(common,/^  workflow_run:/m);
+ const b=completions(runtime);assert.ok(b.length>=6);
  for(const name of ['Court Watch ITF Meta engine','Court Watch future ITF tournament metadata acquisition','Court Watch v3 ITF T-1 complete draws','Court Watch ITF incremental catalog and diagnostics'])assert.ok(b.includes(name),name);
  assert.match(common,/run: node scripts\/sync-runtime-documents-d1.mjs/);
 });
