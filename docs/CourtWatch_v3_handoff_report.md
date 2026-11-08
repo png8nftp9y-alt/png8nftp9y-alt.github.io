@@ -10731,3 +10731,11 @@ Lo slot ufficiale di singolare con due posti vuoti e senza esito resta provvisor
 ## 2026-11-08 — Cadenza D1 generale
 
 Cloudflare avvia il D1 generale ai minuti 12, 27, 42 e 57. Lo stesso slot o un run attivo impediscono il doppio avvio. Il dispatch periodico salta le migrazioni. Rimossi cron GitHub e recupero D1 dal giro di manutenzione del watchdog.
+
+## 2026-11-08 — Admin ID e verifica Shield
+
+I tre comandi di aggiornamento sono raccolti in alto nella pagina Admin ID.
+Le richieste POST mantengono l’origine della pagina e il Worker verifica
+che corrisponda alla propria origine. Modifiche pubblicate nei commit
+75251a81b0 e 735a3d0caa. Il run Shield 42486626207 della PR #165
+si è fermato prima del browser perché il report mancava nella PR.
