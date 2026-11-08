@@ -1,4 +1,4 @@
-name: CourtWatch D1 storage read-only check
+name: CourtWatch D1 historical storage cleanup
 on:
   push:
     branches: [audit/d1-runtime-storage-readonly]
@@ -7,20 +7,25 @@ permissions: {}
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 45
     concurrency:
       group: courtwatch-d1-writes
       cancel-in-progress: false
       queue: max
     steps:
-      - name: Verify protected runtime document versions
+      - name: Back up and remove the verified historical versions
         env:
           CF_ACCOUNT: ${{ secrets.R2_ACCOUNT_ID }}
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
         shell: bash
         run: |
           python3 - <<'PY'
-          import base64, gzip, hashlib, json, os, urllib.request
+          import base64, gzip, hashlib, json, os, subprocess, tempfile, urllib.request
+          from pathlib import Path
 
           base = 'https://api.cloudflare.com/client/v4/accounts/' + os.environ['CF_ACCOUNT'] + '/d1/database'
           def request(path, body=None):
@@ -928,6 +933,7 @@ jobs:
                   ),
               ),
           }
+          candidates_by_path = {}
           total_versions = total_bytes = 0
           candidate_digest = hashlib.sha256()
           for path, (expected_count, expected_digest, old, encoded) in baseline.items():
@@ -958,6 +964,7 @@ jobs:
                   if hashlib.sha256(raw).hexdigest() != digest:
                       raise SystemExit(f'Protected content hash mismatch: {path}')
               candidates = [row for row in matched if row['hash'] not in protected]
+              candidates_by_path[path] = candidates
               size = sum(row['bytes'] for row in candidates)
               for row in candidates:
                   candidate_digest.update(f"{path}\t{row['hash']}\t{row['chunks']}\t{row['bytes']}\n".encode())
@@ -970,4 +977,81 @@ jobs:
               'release': release['fingerprint'], 'versions': total_versions,
               'bytes': total_bytes, 'sha256': candidate_digest.hexdigest(),
           }), flush=True)
+          approved = '8dd6f03bb12a960e4cb27ee6365b0dddf3a4ba0a5df708f98b90d1bae7885835'
+          if (candidate_digest.hexdigest(), total_versions, total_bytes) != (approved, 8461, 516257896):
+              raise SystemExit('Candidate set changed; cleanup aborted before any deletion')
+          
+          def batches(rows, size):
+              for start in range(0, len(rows), size):
+                  yield rows[start:start+size]
+          
+          def download_chunks(path, batch):
+              marks = ','.join('?' for _ in batch)
+              return select(
+                  'SELECT content_hash AS hash,seq,data FROM runtime_document_chunks '
+                  f'WHERE path=? AND content_hash IN ({marks}) ORDER BY content_hash,seq',
+                  path, *(row['hash'] for row in batch))
+          
+          def file_digest(path):
+              with path.open('rb') as handle:
+                  return hashlib.file_digest(handle, 'sha256').hexdigest()
+          
+          key = f"maintenance/d1-runtime-chunks/{approved}/{os.environ['GITHUB_RUN_ID']}-{os.environ['GITHUB_RUN_ATTEMPT']}.jsonl.gz"
+          url = 's3://' + os.environ['R2_BUCKET'] + '/' + key
+          aws = ['aws', '--endpoint-url', 'https://' + os.environ['CF_ACCOUNT'] + '.r2.cloudflarestorage.com', 's3', 'cp']
+          with tempfile.TemporaryDirectory() as directory:
+              archive = Path(directory) / 'chunks.jsonl.gz'
+              copy = Path(directory) / 'readback.jsonl.gz'
+              with gzip.open(archive, 'wt', encoding='utf-8') as handle:
+                  handle.write(json.dumps({'manifest': release, 'candidateDigest': approved}) + '\n')
+                  for path, candidates in candidates_by_path.items():
+                      for batch in batches(candidates, 16):
+                          chunks = {}
+                          for row in download_chunks(path, batch):
+                              chunks.setdefault(row['hash'], []).append(row)
+                          for candidate in batch:
+                              digest = candidate['hash']
+                              rows = chunks.get(digest, [])
+                              if [row['seq'] for row in rows] != list(range(candidate['chunks'])):
+                                  raise SystemExit(f'Incomplete historical backup: {path}')
+                              data = ''.join(row['data'] for row in rows)
+                              raw = gzip.decompress(base64.b64decode(data, validate=True))
+                              if len(data) != candidate['bytes'] or hashlib.sha256(raw).hexdigest() != digest:
+                                  raise SystemExit(f'Historical backup hash mismatch: {path}')
+                              for row in rows:
+                                  handle.write(json.dumps({'path': path, **row}, separators=(',', ':')) + '\n')
+                      print(f'Archived {path}: {len(candidates)} versions', flush=True)
+              checksum = file_digest(archive)
+              subprocess.run([*aws, str(archive), url, '--only-show-errors'], check=True)
+              subprocess.run([*aws, url, str(copy), '--only-show-errors'], check=True)
+              if file_digest(copy) != checksum:
+                  raise SystemExit('R2 backup readback checksum mismatch')
+              print(f'BACKUP_VERIFIED {key} sha256={checksum}', flush=True)
+          
+          if manifest() != before:
+              raise SystemExit('Release changed before cleanup; no deletion attempted')
+          
+          removed = 0
+          for path, candidates in candidates_by_path.items():
+              for batch in batches(candidates, 80):
+                  marks = ','.join('?' for _ in batch)
+                  sql = (f'DELETE FROM runtime_document_chunks WHERE path=? AND content_hash IN ({marks}) '
+                         "AND (SELECT value FROM app_state WHERE key='runtimeDocumentRelease')=?")
+                  result = request(endpoint, {'sql': sql, 'params': [path, *(row['hash'] for row in batch), before]})
+                  expected = sum(row['chunks'] for row in batch)
+                  if len(result) != 1 or not result[0]['success'] or result[0]['meta']['changes'] != expected:
+                      raise SystemExit(f'Cleanup stopped after {removed} confirmed blocks; backup: {key}')
+                  removed += expected
+              print(f'Removed {path}: {len(candidates)} versions', flush=True)
+          if manifest() != before:
+              raise SystemExit('Release changed before post-cleanup verification')
+          for path in candidates_by_path:
+              document = active[path]
+              rows = select('SELECT seq,data FROM runtime_document_chunks WHERE path=? AND content_hash=? ORDER BY seq', path, document['hash'])
+              if [row['seq'] for row in rows] != list(range(document['chunks'])):
+                  raise SystemExit(f'Active chunks missing after cleanup: {path}')
+              raw = gzip.decompress(base64.b64decode(''.join(row['data'] for row in rows), validate=True))
+              if hashlib.sha256(raw).hexdigest() != document['hash']:
+                  raise SystemExit(f'Active hash mismatch after cleanup: {path}')
+          print(f'CLEANUP_VERIFIED versions={total_versions} blocks={removed} payload_bytes={total_bytes}', flush=True)
           PY
