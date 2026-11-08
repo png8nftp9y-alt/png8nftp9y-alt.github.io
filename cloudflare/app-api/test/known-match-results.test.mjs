@@ -39,10 +39,23 @@ for (const group of ['main','others']) test(group+': result renders without wait
  assert.equal(c.ctx.refreshKnownMatchResults(),pending);assert.equal(c.calls.length,1);
  c.respond();await pending;
  assert.equal(c.renders[0].advances,true);assert.equal(c.renders[0].score,'6-0 6-3');
- assert.equal(c.ctx.state.data.tournaments[0].id,'historic');assert.equal(c.calls[1].scroll,480);
+ assert.equal(c.ctx.state.data.tournaments[0].id,'historic');
+ assert.equal(c.calls.some(call=>Object.hasOwn(call,'scroll')),false);
  const stale={...c.ctx.state.data,matches:[{...match,status:'scheduled'}]};
  assert.equal(c.ctx.applyKnownResultUpdates(stale).matches[0].status,'completed');
  assert.equal(c.saved[0].matches[0].advances,true);
+});
+test('restores scroll only if the result render moves the page',async()=>{
+ const c=setup();
+ const render=c.ctx.renderIfDataChanged;
+ c.ctx.renderIfDataChanged=()=>{
+  render();
+  c.ctx.scrollY=0;
+  return true;
+ };
+ const pending=c.ctx.refreshKnownMatchResults();
+ c.respond();await pending;
+ assert.deepEqual(c.calls.filter(call=>Object.hasOwn(call,'scroll')),[{scroll:480}]);
 });
 test('double on second team, loss, winner-first score and pending outcome remain correct',async()=>{
  const c=setup();c.ctx.state.data.matches[0]={...match,teamIndex:1,partner:'Partner'};
