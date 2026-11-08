@@ -10766,3 +10766,8 @@ Acquisita dal tag categoria della ricerca ufficiale per ID torneo. Primo passagg
 ## Inventario per la verifica estesa delle pagine avversario ITF
 
 Modalità manuale in sola lettura. Incrocia gli ID ITF ricercabili con partite e iscrizioni D1 e con una generazione dei tabelloni R2. Il report identifica il perimetro per la successiva verifica delle pagine.
+
+
+## Correzione checkpoint audit avversari ITF
+
+Il run 42534989681 si è fermato con rawById non definito. La cache ora è dichiarata nello stesso blocco del checkpoint.

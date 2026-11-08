@@ -35,6 +35,7 @@ try{
  const session=auditReadSession((sql,params)=>{budget.check();return selectors.query(sql,params);},{minimumIntervalMs:100,onFailure:failure=>{report.d1Failure=failure;if(failure.error==='diagnostic_d1_request_failed:http_500:codes_7500')transportFailures++;}}),{query,db}=session;report.readSessionMetrics=session.metrics;
  report.readCheckpoints=[];report.pendingOpponentIds=[];report.failedOpponents=[];const opponentAttempts=auditOpponentFailures();let checkpointStartedAt=new Date().toISOString();
  report.timeBudgetSeconds=budget.seconds;
+ const rawById=new Map();
  async function checkpoint(scope,members=[]){
   budget.check();
   const startedAt=checkpointStartedAt;
@@ -103,7 +104,7 @@ try{
   const response=await worker.fetch(new Request('https://audit.invalid/app/api/'+endpoint,{headers:{'Cf-Access-Authenticated-User-Email':email,'X-CourtWatch-Group':group}}),{DB:db},{});
   if(response.status!==200)throw Error('audit_api_status_'+response.status+':'+endpoint.split('?')[0]);return response.json();
  }
- const snapshots=new Map(),scoped=new Map(),people=new Map(),opponentIds=new Map(),rawById=new Map();
+ const snapshots=new Map(),scoped=new Map(),people=new Map(),opponentIds=new Map();
  async function rawHistory(id){
   if(rawById.has(id))return rawById.get(id);const out=[];let after='';
   for(;;){const rows=await query("SELECT DISTINCT m.id,m.tournament_id,m.played_date,m.payload,t.source_tournament_id,t.payload AS tournament_payload FROM match_participants p CROSS JOIN matches m ON m.id=p.match_id LEFT JOIN tournaments t ON t.id=m.tournament_id WHERE p.source_player_id=? AND m.circuit='itf' AND m.id>? ORDER BY m.id LIMIT 200",[id,after]);out.push(...rows);if(rows.length<200)break;after=rows.at(-1).id;}
