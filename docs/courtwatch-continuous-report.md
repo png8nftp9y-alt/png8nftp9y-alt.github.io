@@ -1486,3 +1486,8 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 ## 2026-11-08 — Audit di completezza Tennis Europe su richiesta
 
 - Rimosso l’avvio automatico dopo il merge OOP storico. Il lancio manuale usa l’ultimo merge riuscito.
+
+## 2026-11-08 — Quattro associazioni approvate in Admin ID
+
+- Applica gli abbinamenti nativi espliciti per Giannotta (SUI), Akan (TUR), Carnel (BEL) e Champion (FRA), preservando le fonti originali. Verifica ID, nazionalità canoniche e chiusura delle segnalazioni in D1.
+- Liu e Calugar richiedono una verifica separata dei collegamenti canonici esistenti prima di intervenire sullo storico.
