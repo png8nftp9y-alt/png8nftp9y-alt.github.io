@@ -32,6 +32,8 @@ registry = """const verifiedCategoriesByAge = {
   '5FF8792E-6CA1-4624-968B-24DAE81D884C': [[14, 3], [16, 2]],
   // Gran Canaria Yellow Bowl — tenniseurope.org/calendarevent/91351/, tenniseurope.org/calendarevent/91352/
   'C26D5B98-C00A-4F39-A207-237B6810D614': [[12, 1], [14, 2]],
+  // Robey FOCUS tennis academy open 2027 — tenniseurope.org/calendarevent/92749/ and /92750/
+  '7A2FC9C8-FD64-4C81-A396-8501BA60940D': [[12, 2], [14, 3]],
 };
 for (const [id, pairs] of Object.entries(verifiedCategoriesByAge)) {
   categoriesByCompetitionId[id] = pairs.map(([age, grade]) => 'U'+age+' · Category '+grade).join(' / ');
@@ -72,6 +74,6 @@ with Path('docs/CourtWatch_v3_handoff_report.md').open('a') as report:
                  'Verificate per ID le coppie età/categoria di nove tornei storici '
                  'con categorie multiple. Le due tappe Development 2026 sono U14 Categoria 2. '
                  'I 69 eventi Winter e Summer Cups sono separati dalle categorie individuali. '
-                 'Robey 2027 resta da verificare separatamente. Agenda cronologica usa la fascia '
+                 'Robey 2027 verificato come U12 Categoria 2 e U14 Categoria 3. Agenda cronologica usa la fascia '
                  'del match quando disponibile. Verifica locale di sintassi e presentazione. '
                  'Acquisizione e pubblicazione da verificare sul run del catalogo.\n')
