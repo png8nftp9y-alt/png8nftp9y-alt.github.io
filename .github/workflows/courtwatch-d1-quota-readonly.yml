@@ -1,0 +1,63 @@
+name: CourtWatch D1 quota and reusable pages
+on:
+  push:
+    branches: [audit/d1-runtime-storage-readonly]
+    paths: [.github/workflows/courtwatch-d1-quota-readonly.yml]
+permissions: {}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Read database sizes and page metrics
+        env:
+          CF_ACCOUNT: ${{ secrets.R2_ACCOUNT_ID }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request, urllib.error
+          base = 'https://api.cloudflare.com/client/v4/accounts/' + os.environ['CF_ACCOUNT'] + '/d1/database'
+          def api(path, sql=None):
+              payload = None if sql is None else json.dumps({'sql': sql}).encode()
+              req = urllib.request.Request(base + path, data=payload, headers={
+                  'Authorization': 'Bearer ' + os.environ['CF_TOKEN'],
+                  'Content-Type': 'application/json',
+              })
+              try:
+                  with urllib.request.urlopen(req, timeout=20) as response:
+                      data = json.load(response)
+              except urllib.error.HTTPError as error:
+                  data = json.load(error)
+              if not data['success']:
+                  raise ValueError([item.get('message') for item in data.get('errors', [])])
+              return data
+
+          databases = []
+          page = 1
+          while True:
+              data = api(f'?page={page}&per_page=100')
+              databases.extend(data['result'])
+              if len(data['result']) < 100:
+                  break
+              page += 1
+          if not databases:
+              raise SystemExit('No D1 databases returned')
+          for db in sorted(databases, key=lambda db: db.get('file_size') or 0, reverse=True):
+              print('D1_DATABASE ' + json.dumps({'name': db['name'], 'bytes': db.get('file_size')}))
+          if all(db.get('file_size') is not None for db in databases):
+              print('D1_ACCOUNT_BYTES ' + str(sum(db['file_size'] for db in databases)))
+          target = [db for db in databases if db['name'] == 'courtwatch-app']
+          if len(target) != 1:
+              raise SystemExit('Expected one courtwatch-app database')
+          endpoint = '/' + target[0]['uuid'] + '/query'
+          measurements = {}
+          for pragma in ('page_count', 'page_size', 'freelist_count'):
+              try:
+                  result = api(endpoint, 'PRAGMA ' + pragma)['result'][0]
+                  measurements[pragma] = result['results'][0][pragma]
+              except (ValueError, KeyError, IndexError) as error:
+                  print(f'D1_METRIC_UNAVAILABLE {pragma}: {error}')
+          if {'page_size', 'freelist_count'} <= measurements.keys():
+              measurements['reusable_bytes'] = measurements['page_size'] * measurements['freelist_count']
+          print('D1_PAGE_METRICS ' + json.dumps(measurements))
+          PY
