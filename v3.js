@@ -2221,13 +2221,21 @@ function agendaCircuitLabel(value) {
     ? "ITF"
     : "FITP";
 }
-function agendaCircuitBadges(value, tournament = value) {
+function agendaCircuitBadges(value, tournament = value, matchOnly = false) {
   const source = circuit(value),
     circuitBadge = `<span class="type ${source}">${esc(agendaCircuitLabel(value))}</span>`;
   if (source !== "tennis-europe") return circuitBadge;
   const conditions = tournamentSurfaceLabel(tournament, true),
-    category = readableText(tournament?.tournamentCategory || value?.tournamentCategory || "");
-  return `${circuitBadge}${category ? `<span class="type tennisEuropeCategory">${esc(category)}</span>` : ""}<span class="type tournamentConditions">${esc(conditions || "SUPERFICIE/AMBIENTE NON PUBBLICATI")}</span>`;
+    category = readableText(tournament?.tournamentCategory || value?.tournamentCategory || ""),
+    age = matchOnly
+      ? readableText([value?.event, value?.draw, value?.ageGroup, value?.ageCategory].filter(Boolean).join(" "))
+          .match(/\b(?:(?:U|[BG][SD])\s*(12|14|16|18)|(12|14|16|18)\s*(?:&\s*U|&\s*Under))\b/i)
+      : null,
+    pairs = category.split(" / "),
+    matchCategory = age && pairs.every(pair => /^U\d+ · /.test(pair))
+      ? pairs.find(pair => pair.startsWith("U" + (age[1] || age[2]) + " · ")) || ""
+      : category;
+  return `${circuitBadge}${matchCategory ? `<span class="type tennisEuropeCategory">${esc(matchCategory)}</span>` : ""}<span class="type tournamentConditions">${esc(conditions || "SUPERFICIE/AMBIENTE NON PUBBLICATI")}</span>`;
 }
 function agendaTournamentLocation(t, m) {
   const source = circuit(t || m),
@@ -2561,7 +2569,7 @@ function renderAgenda() {
                       itemPlace = agendaTournamentLocation(itemTournament, m),
                       itemSource = circuit(m),
                       chronologicalMeta = mixedChronological
-                        ? `<div class="agendaChronologicalTournament"><div>${itemTKey ? `<button data-open-tournament="${esc(itemTKey)}">${esc(itemName)}</button>` : `<span>${esc(itemName)}</span>`}<small>${esc(itemPlace)}</small></div><div class="agendaTournamentBadges">${agendaCircuitBadges(m, itemTournament || m)}</div></div>`
+                        ? `<div class="agendaChronologicalTournament"><div>${itemTKey ? `<button data-open-tournament="${esc(itemTKey)}">${esc(itemName)}</button>` : `<span>${esc(itemName)}</span>`}<small>${esc(itemPlace)}</small></div><div class="agendaTournamentBadges">${agendaCircuitBadges(m, itemTournament || m, true)}</div></div>`
                         : "";
                     return `<article class="agendaItem${loss}${win}${agendaLongCourt(m) ? " agendaLongCourt" : ""}"><div class="agendaWhen"><div class="agendaRoundLabels">${round ? (oopUrl ? `<a class="type roundCode agendaRoundOopLink" ${whenAttrs.trim()}>${esc(round)}</a>` : `<span class="type roundCode">${esc(round)}</span>`) : ""}${agendaDrawCodeHtml(m, itemTournament)}</div><${whenTag} class="agendaWhenDetails${oopUrl ? " agendaWhenLink" : ""}"${whenAttrs}><small class="agendaCourtField${m.court ? "" : " agendaFieldEmpty"}">${m.court ? esc(agendaCourtName(m)) : "—"}</small>${schedule.restText ? `<small class="agendaRestLabel"><span>${esc(schedule.restText)}</span>${schedule.restDetail ? `<em>${esc(schedule.restDetail)}</em>` : ""}</small>` : ""}<small class="agendaCourtMatch${numberText ? "" : " agendaFieldEmpty"}">${numberText ? `<span>${esc(numberText)}</span>${schedule.numberDetail ? `<em>${esc(schedule.numberDetail)}</em>` : ""}` : "—"}</small><time class="${schedule.timeText ? "" : "agendaFieldEmpty"}">${schedule.timeText ? esc(schedule.timeText) : "—"}</time></${whenTag}></div><div class="agendaMatchBody">${chronologicalMeta}<div class="agendaTitle">${agendaPlayerTeamLinksHtml(m)}</div><p class="versus">${opponentHtml(m, x)}</p>${agendaResultHtml(m, x)}${x.condition ? `<p class="condition">${esc(readableText(x.condition))}</p>` : ""}</div></article>`;
                   })
