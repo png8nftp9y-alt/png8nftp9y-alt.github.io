@@ -1,27 +1,27 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-08T19:39:22.566Z",
+  "generatedAt": "2026-11-08T19:51:20.233Z",
   "today": "2026-11-08",
   "windowEnd": "2026-11-11",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
-  "readyForT1": false,
+  "readyForT1": true,
   "activation": "prepared_only",
   "coverage": {
     "catalogChecked": 1168,
     "complete": 951,
     "cancelledNoDraws": 13,
     "resolved": 964,
-    "missingDrawsTournaments": 24,
-    "unverifiable": 180,
-    "declaredDraws": 5603,
-    "acquiredDraws": 5522,
-    "missingDraws": 81,
-    "actionableUnverifiable": 1,
+    "missingDrawsTournaments": 25,
+    "unverifiable": 179,
+    "declaredDraws": 5609,
+    "acquiredDraws": 5524,
+    "missingDraws": 85,
+    "actionableUnverifiable": 0,
     "futureUnverifiable": 179,
     "ordinary": {
       "total": 25,
-      "missingDraws": 81,
-      "inventoryRequired": 1
+      "missingDraws": 85,
+      "inventoryRequired": 0
     },
     "extraordinaryA": {
       "total": 0,
@@ -1482,27 +1482,75 @@
         "tournamentName": "J60 Pszczyna",
         "startDate": "2026-11-10",
         "endDate": "2026-11-15",
-        "status": "inventory_empty",
-        "inventoryError": "empty_inventory",
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "status": "missing",
+        "inventoryError": null,
+        "knownDraws": 6,
+        "acquiredDraws": 2,
+        "missingDraws": 4,
+        "missingEvents": [
+          {
+            "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-08T19:40:38.683Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-08T19:40:38.683Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-08T19:40:38.683Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-08T19:40:38.683Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-11-08T18:55:01.604Z",
+        "needsInventory": false,
+        "checkedAt": "2026-11-08T19:40:38.683Z",
         "eligibleFrom": "2026-11-09"
       }
     ],
     "total": 25,
-    "missingDraws": 81,
-    "acquiredDraws": 54,
+    "missingDraws": 85,
+    "acquiredDraws": 56,
     "missingByReason": {
-      "draw_without_players": 81
+      "draw_without_players": 85
     },
     "byStatus": {
-      "missing": 24,
-      "inventory_empty": 1
+      "missing": 25
     }
   },
   "extraordinary": {
@@ -4389,9 +4437,9 @@
     }
   },
   "audit": {
-    "urgentUnverifiable": 1,
+    "urgentUnverifiable": 0,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 1,
+    "actionableUnverifiable": 0,
     "futureUnverifiable": 179,
     "blocked": 0
   }
