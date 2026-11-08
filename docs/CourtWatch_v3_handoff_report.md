@@ -10749,3 +10749,8 @@ L’Agenda mostra in blu il risultato tra due osservati con il nome del vincitor
 
 
 Correzione Agenda: ripristinata una revisione cache JS crescente a 19 cifre per il controllo di rilascio.
+
+
+## 2026-11-08 — Limite dei lotti nell’audit avversari ITF
+
+Il run 42311115779 si è fermato prima degli avversari. L’audit ora suddivide i lotti in base al peso del JSON UTF-8, conservando ordine e controlli sugli errori. Certificazione in attesa di un audit completo.

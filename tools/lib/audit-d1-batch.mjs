@@ -7,8 +7,23 @@ export function auditD1Batch({account=process.env.CLOUDFLARE_ACCOUNT_ID,token=pr
   if(!Array.isArray(queries)||queries.length<1||queries.length>4)throw Error('audit_invalid_batch_size');
   for(const q of queries){assertReadOnlyQuery(q.sql);if(!Array.isArray(q.params||[]))throw Error('audit_invalid_batch_params');}
   if(!account||!token||!databaseId||!/^[0-9a-f-]{36}$/i.test(databaseId))throw Error('diagnostic_credentials_missing');
-  const body={batch:queries.map(q=>({sql:q.sql,params:q.params||[]}))};
-  if(Buffer.byteLength(JSON.stringify(body))>65536)throw Error('audit_batch_too_large');
+  const groups=[];
+  let group=[];
+  for(const q of queries.map(({sql,params=[]})=>({sql,params}))){
+   if(Buffer.byteLength(JSON.stringify({batch:[q]}))>65536)throw Error('audit_batch_too_large');
+   if(group.length&&Buffer.byteLength(JSON.stringify({batch:[...group,q]}))>65536){
+    groups.push(group);
+    group=[];
+   }
+   group.push(q);
+  }
+  groups.push(group);
+  const results=[];
+  for(const part of groups)results.push(...await request(part));
+  return results;
+ }
+ async function request(queries){
+  const body={batch:queries};
   metrics.requests++;metrics.queries+=queries.length;
   const response=await fetcher(`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/${databaseId}/query`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(30000)});
   let data;try{data=await response.json();}catch{throw Error('diagnostic_invalid_batch_response');}
