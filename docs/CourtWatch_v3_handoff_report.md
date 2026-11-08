@@ -10719,3 +10719,5 @@ Il calendario mostrava ancora A‑19 per Aila Zennaro ad Agno. La lista ufficial
 Conteggi ID, identità sospette e anni di nascita hanno ciascuno un pulsante, una lettura salvata e la data dell’ultimo aggiornamento riuscito. Un errore non blocca le altre sezioni.
 
 ITF discovery 2026-11-07T22:24:10.804Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-11-08T06:49:32.953Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
