@@ -8,8 +8,10 @@ on:
         description: Rebuild the complete observed-player index
         type: boolean
         default: false
-  schedule:
-    - cron: '12,27,42,57 * * * *'
+      periodic:
+        description: Periodic run dispatched by Cloudflare
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -133,7 +135,7 @@ jobs:
       - name: Deploy read-compatible Worker before database maintenance
         run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
       - name: Apply D1 migrations
-        if: github.event_name != 'schedule'
+        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.periodic)
         run: npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
       - name: Verify personal-history indexed read plans
         run: node scripts/verify-personal-history-read-plans.mjs

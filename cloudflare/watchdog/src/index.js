@@ -4,6 +4,7 @@ const API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
 
 const MAINTENANCE_CRON = "3,13,23,33,43,53 * * * *";
 const LIVE_GROUPS = new Map([
+  ["12,27,42,57 * * * *", new Set(["d1"])],
   ["17 * * * *", new Set(["acquired-search"])],
   ["0,15,30,45 * * * *", new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one"])],
   ["5,20,35,50 * * * *", new Set(["tennis-europe-oop", "tennis-europe"])],
@@ -15,7 +16,7 @@ const LIVE_IDS = new Set([...LIVE_GROUPS.values()].flatMap((ids) => [...ids]));
 const TARGETS = [
   { id: "acquired-search", workflow: "courtwatch-acquired-player-search.yml", intervalMinutes: 60 },
   { id: "tennis-europe-oop", workflow: "courtwatch-tennis-europe-oop-live.yml" },
-  { id: "d1", workflow: "courtwatch-cloudflare-app-api.yml", successfulRunMaxAgeMinutes: 40, cooldownMinutes: 25 },
+  { id: "d1", workflow: "courtwatch-cloudflare-app-api.yml" },
   {
     id: "fitp",
     workflow: "courtwatch-v3-fitp-entries.yml",
@@ -103,7 +104,7 @@ async function dispatch(target, env) {
   const response = await fetch(`${API_BASE}/actions/workflows/${target.workflow}/dispatches`, {
     method: "POST",
     headers: { ...githubHeaders(env), "Content-Type": "application/json" },
-    body: JSON.stringify({ ref: "main" }),
+    body: JSON.stringify(target.id === "d1" ? { ref: "main", inputs: { periodic: true } } : { ref: "main" }),
   });
   if (response.status !== 204) throw new Error(`dispatch ${target.id}: HTTP ${response.status}`);
 }
@@ -130,11 +131,11 @@ async function checkLiveSchedule(target, env, scheduledTime) {
     ? allRuns.filter((run) => !/^ITF T-1 extraordinary-[ab]$/.test(String(run.display_title || "")))
     : allRuns;
   const intervalMs = (target.intervalMinutes || 15) * 60000;
-  const slotStart = Math.floor(scheduledTime / intervalMs) * intervalMs;
+  const slotStart = target.id === "d1" ? scheduledTime : Math.floor(scheduledTime / intervalMs) * intervalMs;
   const active = runs.find(
     (run) =>
       run.status !== "completed" &&
-      (target.id === "acquired-search" || ageMinutes(run.created_at, scheduledTime) <= 120),
+      (target.id === "acquired-search" || target.id === "d1" || ageMinutes(run.created_at, scheduledTime) <= 120),
   );
   if (active) return { id: target.id, action: "active", runId: active.id };
   const inSlot = runs.find((run) => Date.parse(run.created_at) >= slotStart);

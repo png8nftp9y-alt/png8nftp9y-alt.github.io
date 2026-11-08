@@ -9,7 +9,7 @@ const paths=s=>(s.match(/^  push:\n([\s\S]*?)(?=^\w|^  \w+:)/m)?.[1].match(/^   
 function matches(pattern,file){return new RegExp('^'+pattern.split('*').map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('.*')+'$').test(file);}
 function owns(source,file){let matched=false;for(const pattern of paths(source)){if(matches(pattern.replace(/^!/,''),file))matched=!pattern.startsWith('!');}return matched;}
 test('general D1 runs independently, preserving dedicated native metadata publishers',()=>{
- assert.match(common,/^  schedule:\n    - cron: '12,27,42,57 \* \* \* \*'$/m);
+ assert.doesNotMatch(common,/^  schedule:/m);
  assert.doesNotMatch(common,/^  workflow_run:/m);
  const b=completions(runtime);assert.ok(b.length>=6);
  for(const name of ['Court Watch ITF Meta engine','Court Watch future ITF tournament metadata acquisition','Court Watch v3 ITF T-1 complete draws','Court Watch ITF incremental catalog and diagnostics'])assert.ok(b.includes(name),name);

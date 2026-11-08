@@ -10726,3 +10726,8 @@ ITF discovery 2026-11-08T06:49:32.953Z: 0 newly discovered future tournaments; M
 ## 2026-11-08 — Affidabilità OOP Tennis Europe
 
 Lo slot ufficiale di singolare con due posti vuoti e senza esito resta provvisorio anche nel giorno programmato. Dopo quella data il controllo resta bloccante. Regressione verificata sul caso Mecholupy del run 42482126535 e inclusa nei test del workflow live.
+
+
+## 2026-11-08 — Cadenza D1 generale
+
+Cloudflare avvia il D1 generale ai minuti 12, 27, 42 e 57. Lo stesso slot o un run attivo impediscono il doppio avvio. Il dispatch periodico salta le migrazioni. Rimossi cron GitHub e recupero D1 dal giro di manutenzione del watchdog.

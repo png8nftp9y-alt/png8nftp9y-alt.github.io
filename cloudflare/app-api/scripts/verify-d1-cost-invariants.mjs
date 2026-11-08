@@ -18,7 +18,7 @@ const forbidText=(document,text,label)=>{if(document.includes(text))failures.pus
 
 requireText(general,'D1_IMPORT_SKIPPED unchanged=$LOCAL_IMPORT_HASH rows_written=0','import generale senza barriera no-op');
 requireText(general,"if: steps.import.outputs.changed == 'true'",'verifica generale non subordinata a un import cambiato');
-requireText(general,"if: github.event_name != 'workflow_run'",'migrazioni generali rieseguibili sui cicli periodici');
+requireText(general,"- name: Apply D1 migrations\n        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.periodic)",'migrazioni generali rieseguibili sui cicli periodici');
 requireText(europe,"if: steps.delta.outputs.changed == 'true'",'import Tennis Europe senza barriera no-op');
 requireText(europe,"if: steps.delta.outputs.verification_needed == 'true'",'verifica Tennis Europe non subordinata a dati o ricevute da confermare');
 requireText(europe,'guard-d1-import.mjs seed-tennis-europe-oop/delta/*.sql','import Tennis Europe non limitato al piano delta');

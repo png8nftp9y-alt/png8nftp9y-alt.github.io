@@ -22,7 +22,8 @@ async function tick(cron, runs = [], failWorkflow = null, scheduledTime = slot) 
     requests.push({ url, method: init.method || "GET" });
     if (failWorkflow && url.includes(failWorkflow)) return new Response("", {status: 503});
     if (init.method === "POST") {
-      assert.deepEqual(JSON.parse(init.body), {ref: "main"});
+      assert.deepEqual(JSON.parse(init.body), url.includes("courtwatch-cloudflare-app-api.yml")
+        ? {ref: "main", inputs: {periodic: true}} : {ref: "main"});
       return new Response(null, {status: 204});
     }
     return Response.json(url.includes("/runs?")
@@ -69,13 +70,13 @@ test("queued, waiting and running workflows are not cancelled or duplicated", as
     assert.equal(requests.filter(r => r.method === "POST").length, 0);
   }
 });
-test("10-minute watchdog retains D1 recovery and daily ITF safety", async () => {
+test("10-minute watchdog keeps daily ITF safety separate from D1", async () => {
   const requests = await tick("3,13,23,33,43,53 * * * *", [{
     id: 4, status: "completed", conclusion: "success",
     created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
   }]);
   for (const workflow of workflows) assert(!requests.some(r => r.url.includes(workflow)));
-  assert(requests.some(r => r.url.includes("courtwatch-cloudflare-app-api.yml")));
+  assert(!requests.some(r => r.url.includes("courtwatch-cloudflare-app-api.yml")));
   assert(requests.some(r => r.url.includes("courtwatch-v3-itf-safety-120d.yml")));
   assert.equal(requests.filter(r => r.method === "POST").length, 0);
 });
@@ -115,4 +116,16 @@ test("hourly index timer exists in Cloudflare only, preserving the shared D1 que
  const workflow=readFileSync(new URL('../../../.github/workflows/courtwatch-acquired-player-search.yml',import.meta.url),'utf8');
  assert.doesNotMatch(workflow.split('permissions:')[0],/^  (schedule|workflow_run|push):/m);
  assert.match(workflow,/workflow_dispatch:/);assert.match(workflow,/group: courtwatch-d1-writes/);
+});
+
+test("D1 starts once per Cloudflare quarter and skips active runs", async () => {
+  const cron = "12,27,42,57 * * * *";
+  for (const minute of [12, 27, 42, 57]) {
+    const at = Date.UTC(2026, 10, 8, 13, minute);
+    const prior = {id: 1, status: "completed", conclusion: "success", created_at: new Date(at - 900000).toISOString()};
+    const count = async runs => (await tick(cron, runs, null, at)).filter(r => r.method === "POST").length;
+    assert.equal(await count([prior]), 1);
+    assert.equal(await count([{...prior, created_at: new Date(at).toISOString()}]), 0);
+    assert.equal(await count([{...prior, status: "in_progress"}]), 0);
+  }
 });

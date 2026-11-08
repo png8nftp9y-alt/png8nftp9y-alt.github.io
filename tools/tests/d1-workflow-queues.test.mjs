@@ -15,9 +15,9 @@ test('every runtime input retains one event-driven publishing owner',()=>{const 
 
 test('general D1 runs every 15 minutes independently of Agenda Europe',()=>{
  const flow=read(files[0]);
- assert.match(flow,/^  schedule:\n    - cron: '12,27,42,57 \* \* \* \*'/m);
+ assert.doesNotMatch(flow,/^  schedule:/m);
  assert.doesNotMatch(flow,/^  workflow_run:|github\.event\.workflow_run/m);
  assert.match(flow,/^  workflow_dispatch:/m);
  assert.match(flow,/^  push:/m);
- assert.match(flow,/name: Apply D1 migrations\n        if: github\.event_name != 'schedule'/);
+ assert.ok(flow.includes("name: Apply D1 migrations\n        if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.periodic)"));
 });
