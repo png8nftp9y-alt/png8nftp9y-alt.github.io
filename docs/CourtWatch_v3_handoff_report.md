@@ -10741,3 +10741,8 @@ che corrisponda alla propria origine. Modifiche pubblicate nei commit
 si è fermato prima del browser perché il report mancava nella PR.
 
 ITF discovery 2026-11-08T18:10:09.195Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+### 2026-11-08 — Risultati Agenda tra osservati
+
+L’Agenda mostra in blu il risultato tra due osservati con il nome del vincitore. Usa `won` quando `advances` è assente. I risultati TCL contro esterni conservano i colori esistenti. Aggiornati gli asset e verificati i test su punteggi e ritiri. Verifica in produzione dopo il deploy.

@@ -1567,10 +1567,11 @@ function agendaResultHtml(m, x) {
       : String(x.op || "").split(/\s*\/\s*|\s+oppure\s+/i),
     courtWatchOpponent =
       names.length === 1 ? courtWatchPlayerByName(names[0]) : null,
+    observedWon = typeof m.advances === "boolean" ? m.advances : m.won,
     winner =
-      courtWatchOpponent && m.advances === true
+      courtWatchOpponent && observedWon === true
         ? readablePerson(m.playerName)
-        : courtWatchOpponent && m.advances === false
+        : courtWatchOpponent && observedWon === false
           ? readablePerson(courtWatchOpponent.name)
           : "";
   return winner
