@@ -32,11 +32,7 @@ function legacySections(saved){
 export async function renderIdentitySections(env,url,page){
  const legacy=legacySections(await readSavedAdminPage(env,'id'));
  const failed=url.searchParams.get('refreshFailed');
- const controls='<div class="card summary" role="group" aria-label="Aggiornamenti Admin ID">'+
-  Object.entries(sections).map(([id,{label}])=>
-   '<form method="post" action="/admin/id?refreshSection='+id+'"><button type="submit"><span aria-hidden="true">↻</span> Aggiorna '+label+'</button></form>'
-  ).join('')+'</div>';
- const html=(await Promise.all(Object.keys(sections).map(async id=>{
+ const rendered=await Promise.all(Object.entries(sections).map(async([id,{label}])=>{
   let saved;
   try{const object=await env.ARCHIVE?.get(key(id));if(object){const value=await object.json();if(valid(value))saved=value;}}catch{}
   saved??=legacy[id];
@@ -47,9 +43,14 @@ export async function renderIdentitySections(env,url,page){
    else content='<p class="pill warn">Pagina delle segnalazioni non disponibile. È mostrata la lettura salvata.</p>'+content;
   }
   const date=saved?new Date(saved.checkedAt).toLocaleString('it-IT',{timeZone:'Europe/Rome'}):'mai aggiornato';
-  return '<section class="card"><h2>'+sections[id].label+'</h2><p>Ultimo aggiornamento: '+date+'</p>'+
+  const control='<div><form method="post" action="/admin/id?refreshSection='+id+'"><button type="submit"><span aria-hidden="true">↻</span> Aggiorna '+label+'</button></form>'+
+   '<p class="muted">Ultimo aggiornamento: '+date+'</p></div>';
+  const card='<section class="card"><h2>'+label+'</h2>'+
    (failed===id?'<p role="alert">Aggiornamento non riuscito. Resta disponibile l’ultima lettura di questa sezione, se presente.</p>':'')+content+'</section>';
- }))).join('');
+  return {control,card};
+ }));
+ const controls='<div class="card summary" role="group" aria-label="Aggiornamenti Admin ID">'+rendered.map(({control})=>control).join('')+'</div>';
+ const html=rendered.map(({card})=>card).join('');
  return page.replace(/(<div class="admin-page page-id">)[\s\S]*?(?=<div class="admin-page page-itf">|<\/main>|<\/body>|<\/html>)/,(_match,open)=>open+controls+html+'</div>')
   .replace(/<div class="card"><form\b[^>]*action="\/admin\/id"[^>]*>[\s\S]*?<\/form><p[^>]*>[\s\S]*?<\/p><\/div>/g,'');
 }
