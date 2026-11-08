@@ -2,6 +2,10 @@ name: Court Watch ITF opponent scope verification
 on:
   workflow_dispatch:
     inputs:
+      inventory_only:
+        description: 'Build the read-only D1 and R2 profile inventory'
+        type: boolean
+        default: false
       opponent_ids:
         description: 'Optional comma-separated native IDs: fresh targeted check, not a full-scope certificate'
         type: string
@@ -56,6 +60,7 @@ jobs:
       - name: Verify scoped opponents, source inputs and browser rendering
         timeout-minutes: 22
         env:
+          ITF_AUDIT_INVENTORY_ONLY: ${{ inputs.inventory_only && 'true' || 'false' }}
           ITF_AUDIT_OPPONENT_IDS: ${{ inputs.opponent_ids || '' }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

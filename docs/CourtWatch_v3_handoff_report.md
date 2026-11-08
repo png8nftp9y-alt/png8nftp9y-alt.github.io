@@ -10761,3 +10761,8 @@ ITF discovery 2026-11-08T22:37:43.613Z: 0 newly discovered future tournaments; M
 ### 2026-11-08 — Categoria ufficiale Tennis Europe
 
 Acquisita dal tag categoria della ricerca ufficiale per ID torneo. Primo passaggio esteso alle date dello storico, con recupero manuale ripetibile. Il catalogo conserva le categorie già verificate fuori finestra. Agenda con etichetta viola e testo bianco, pagina torneo con testo fra titolo e superficie. I valori mancanti restano vuoti. Verifica locale con test del parser e della proiezione. Copertura effettiva da misurare dopo acquisizione e pubblicazione.
+
+
+## Inventario per la verifica estesa delle pagine avversario ITF
+
+Modalità manuale in sola lettura. Incrocia gli ID ITF ricercabili con partite e iscrizioni D1 e con una generazione dei tabelloni R2. Il report identifica il perimetro per la successiva verifica delle pagine.

@@ -51,6 +51,48 @@ try{
  if(!generation||!/^[A-Za-z0-9_.-]+$/.test(generation))throw Error('invalid_current_itf_generation');
  report.itfGeneration=generation;
  const draws=parse(r2(`itf/database/generations/${generation}/itf_draw_target_db.json`).toString());
+ if(process.env.ITF_AUDIT_INVENTORY_ONLY==='true'){
+  if(process.env.ITF_AUDIT_OPPONENT_IDS)throw Error('inventory_and_targeted_audit_are_mutually_exclusive');
+  if(!draws.tournaments||!Object.keys(draws.tournaments).length)throw Error('current_itf_draw_source_incomplete');
+  const presence=presenceIndex(draws);
+  if(!presence.players.size)throw Error('empty_itf_draw_presence');
+  const rows=await live.query(`WITH searchable AS MATERIALIZED (
+   SELECT official_id AS id FROM observed_players WHERE circuit='itf' AND official_id<>'' AND official_id NOT GLOB '*[^0-9]*'
+   UNION
+   SELECT official_id AS id FROM search_acquired_players WHERE circuit='itf' AND official_id<>'' AND official_id NOT GLOB '*[^0-9]*'
+  ), evidence AS (
+   SELECT id, EXISTS(
+    SELECT 1 FROM match_participants p CROSS JOIN matches m ON m.id=p.match_id
+    WHERE p.source_player_id=s.id AND m.circuit='itf'
+   ) AS played, EXISTS(
+    SELECT 1 FROM opponent_entry_profiles e WHERE e.circuit='itf'
+     AND e.source_player_id=s.id AND json_array_length(e.payload,'$.tournaments')>0
+   ) AS entered
+   FROM searchable s ORDER BY id
+  )
+  SELECT json_group_array(json_array(id,played,entered)) AS profiles FROM evidence`,[]);
+  if(rows.length!==1)throw Error('invalid_itf_search_inventory');
+  const profiles=JSON.parse(rows[0].profiles);
+  if(!Array.isArray(profiles)||!profiles.length)throw Error('empty_itf_search_inventory');
+  const inventory=profiles.map(([id,played,entered])=>({
+   id,played:Boolean(played),entered:Boolean(entered),drawTournaments:presence.players.get(id)?.size||0
+  }));
+  const inD1=p=>p.played||p.entered;
+  const inR2=p=>p.drawTournaments>0;
+  const summary={
+   searchable:inventory.length,
+   withD1:inventory.filter(inD1).length,
+   withR2:inventory.filter(inR2).length,
+   onlyR2:inventory.filter(p=>inR2(p)&&!inD1(p)).length,
+   withEvidence:inventory.filter(p=>inD1(p)||inR2(p)).length,
+   withoutEvidence:inventory.filter(p=>!inD1(p)&&!inR2(p)).length,
+   unidentifiedDrawParticipants:presence.unidentified.length
+  };
+  report.limitations=['Inventory only. Searchable numeric ITF IDs matched exactly against D1 and the pinned R2 draw generation. Page rendering is not verified.'];
+  report.inventory={summary,profiles:inventory};
+  report.status='inventory_completed';
+  console.log('ITF_INVENTORY='+JSON.stringify({generation,...summary}));
+ }else{
  const acceptance=parse(gunzipSync(r2(`itf/database/generations/${generation}/itf_participant_cache.json.gz`)).toString());
  if(!draws.tournaments||!Array.isArray(acceptance.participants)||!acceptance.participants.length)throw Error('current_itf_source_incomplete');
  report.sourceDates={draws:draws.generatedAt||null,acceptance:acceptance.generatedAt||null};
@@ -175,5 +217,6 @@ try{
  report.sourceChanges={d1:!report.readEvidence.stable,pinnedItfGeneration:generation};report.concurrentSourceChanged=report.sourceChanges.d1||report.alternateCoverageEvidence.changedDuringAudit;report.problemGroups={identity:report.unverifiable.filter(x=>x.reason==='opponent_identity_not_confirmed'),alternates:report.alternates.filter(x=>x.expected.state==='unverifiable'),zeroPresence:report.players.filter(x=>!x.expected.length),excludedPlayers:report.playerCoverage.filter(x=>x.status!=='audited')};
  report.status=report.failedOpponents.length?'incomplete_transport_failures':report.pendingOpponentIds.length?'incomplete_opponent_checkpoints':report.concurrentSourceChanged?'inconclusive_concurrent_source_change':report.issues.length?'differences_found':report.unverifiable.length||presence.unidentified.length||report.drawCoverage.missingInventoryCount?'checked_scope_matches_with_unverifiable_cases':'checked_captured_scope_matches';
  if(report.status==='checked_captured_scope_matches'&&report.opponentSelection.kind!=='full')report.status='checked_targeted_scope_matches';
+ }
 }catch(error){report.status=budget.expired()||error.message==='audit_time_budget_exceeded'?'incomplete_time_budget':'audit_failed';report.error=String(error.message).replace(/[\w.+-]+@[\w.-]+/g,'[email]').slice(0,1200);process.exitCode=1;}
-finally{await browser?.close();server?.close();frozenClient?.close();if(!['checked_captured_scope_matches','checked_targeted_scope_matches'].includes(report.status))process.exitCode=1;report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');console.log('ITF_PAGE_AUDIT='+JSON.stringify({status:report.status,players:report.players.length,opponents:report.opponents.length,alternates:report.alternates.length,issues:report.issues.length,unverifiable:report.unverifiable.length,metrics:report.metrics,readSession:report.readSessionMetrics,localReadMetrics:report.localReadMetrics,snapshot:report.snapshot,d1Failure:report.d1Failure,error:report.error}));console.log('ITF_FAILED_OPPONENTS='+JSON.stringify(report.failedOpponents));console.log('ITF_DOCUMENT_SELECTORS='+JSON.stringify(report.documentSelectors));console.log('ITF_PENDING_OPPONENT_IDS='+JSON.stringify(report.pendingOpponentIds));console.log('ITF_BATCH_VERIFICATION='+JSON.stringify(report.batchVerification));for(const row of report.players)console.log('ITF_PLAYER_AUDIT='+JSON.stringify({group:row.group,name:row.name,nativeId:row.nativeId,expected:row.scoped.expected,missingSnapshot:row.scoped.missing,missingBrowser:row.browser?.missing}));for(const row of report.unverifiable)console.log('ITF_UNVERIFIABLE='+JSON.stringify(row));for(const row of report.issues)console.log('ITF_PAGE_DIFFERENCE='+JSON.stringify(row));}
+finally{await browser?.close();server?.close();frozenClient?.close();if(!['checked_captured_scope_matches','checked_targeted_scope_matches','inventory_completed'].includes(report.status))process.exitCode=1;report.finishedAt=new Date().toISOString();await fs.mkdir('artifacts',{recursive:true});await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');console.log('ITF_PAGE_AUDIT='+JSON.stringify({status:report.status,players:report.players.length,opponents:report.opponents.length,alternates:report.alternates.length,issues:report.issues.length,unverifiable:report.unverifiable.length,metrics:report.metrics,readSession:report.readSessionMetrics,localReadMetrics:report.localReadMetrics,snapshot:report.snapshot,d1Failure:report.d1Failure,error:report.error}));console.log('ITF_FAILED_OPPONENTS='+JSON.stringify(report.failedOpponents));console.log('ITF_DOCUMENT_SELECTORS='+JSON.stringify(report.documentSelectors));console.log('ITF_PENDING_OPPONENT_IDS='+JSON.stringify(report.pendingOpponentIds));console.log('ITF_BATCH_VERIFICATION='+JSON.stringify(report.batchVerification));for(const row of report.players)console.log('ITF_PLAYER_AUDIT='+JSON.stringify({group:row.group,name:row.name,nativeId:row.nativeId,expected:row.scoped.expected,missingSnapshot:row.scoped.missing,missingBrowser:row.browser?.missing}));for(const row of report.unverifiable)console.log('ITF_UNVERIFIABLE='+JSON.stringify(row));for(const row of report.issues)console.log('ITF_PAGE_DIFFERENCE='+JSON.stringify(row));}
