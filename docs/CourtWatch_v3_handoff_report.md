@@ -10803,3 +10803,5 @@ Rimosso il trigger push dopo l'avvio automatico del run 42614338423. Inventario,
 ### 2026-11-09 — Sostituzioni lucky loser nell’OOP Tennis Europe
 
 L’audit riconosce una sostituzione di un singolo partecipante con designazione ufficiale LL nella stessa partita programmata, quando torneo, data, tabellone, turno, campo e numero della partita coincidono e lo slot ufficiale è univoco. Il controllo continua a bloccare le sparizioni senza riscontro. Riprodotto l’artefatto del run 42614157617: tre sostituzioni riconosciute e zero sparizioni inspiegate. Verificati quattro casi negativi. Esito live da verificare.
+
+ITF discovery 2026-11-09T22:53:33.412Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
