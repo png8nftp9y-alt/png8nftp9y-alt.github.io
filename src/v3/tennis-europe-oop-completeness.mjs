@@ -28,6 +28,17 @@ function emptyParticipantRows(html){
  const row='<div class="match__row\\s*">\\s*<div class="match__row-title">\\s*</div>\\s*</div>\\s*';
  return !!body&&new RegExp('^\\s*(?:'+row+'){2}</div>\\s*<div class="match__result">\\s*</div>\\s*</div>\\s*$','i').test(body);
 }
+// A published doubles slot can have one complete team and an explicitly empty opponent row.
+function doublesAwaitingOpponent(html, players) {
+ const body=String(html||'').match(/<div class="match__row-wrapper">([\s\S]*?)<div class="match__result">/i)?.[1]||'';
+ const starts=[...body.matchAll(/<div class="match__row\s*">/gi)];
+ if(starts.length!==2)return false;
+ const rows=starts.map((row,i)=>body.slice(row.index,starts[i+1]?.index));
+ const empty=rows.findIndex(row=>/^<div class="match__row\s*">\s*<div class="match__row-title">\s*<\/div>\s*<\/div>(?:\s*<\/div>)?\s*$/i.test(row));
+ if(empty<0)return false;
+ const native=[...rows[1-empty].matchAll(/<a\b[^>]*data-player-id=["']([^"']+)["']/gi)].map(row=>row[1]).sort();
+ return new Set(native).size===2&&native.join('|')===ids({players});
+}
 export function auditOopCompleteness({tournament,pages,matches,listingHtml='',asOf=''}){
  const index=new Map();for(const match of matches){const k=key(match),list=index.get(k)||[];list.push(match);index.set(k,list);}
  const issues=[],days=[],resolutions=[];
@@ -50,6 +61,10 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
     resolutions.push({kind:'future_singles_awaiting_both_players',date:card.date,event:card.event,round:card.round,sourceUrl:card.sourceUrl,sourceHash:card.sourceHash});continue;
    }
 
+   if(size===4&&card.round&&card.drawUrl&&card.players.length===2&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>=iso(asOf)&&doublesAwaitingOpponent(card.evidenceHtml,card.players)){
+    pendingOpponents++;
+    resolutions.push({kind:'doubles_awaiting_opponent_team',date:card.date,event:card.event,round:card.round,sourceUrl:card.sourceUrl,sourceHash:card.sourceHash});continue;
+   }
    // Future doubles finals can be published as two explicitly empty teams.
    const emptyTeams=/<div class="match__row-wrapper">\s*(?:<div class="match__row\s*">\s*<div class="match__row-title">\s*<\/div>\s*<\/div>\s*){2}<\/div>/i;
    if(size===4&&card.round==='Final'&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>iso(asOf)&&emptyTeams.test(card.evidenceHtml||'')){
