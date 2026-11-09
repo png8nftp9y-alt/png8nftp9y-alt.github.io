@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-11-09T15:17:15.609Z",
+  "generatedAt": "2026-11-09T15:24:51.343Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,21 +8,21 @@
     "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
-    "declaredSections": 4,
-    "requestedSections": 2,
-    "acquiredSections": 2,
+    "declaredSections": 6,
+    "requestedSections": 5,
+    "acquiredSections": 1,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 2,
-    "missingSections": 2,
+    "resolvedSections": 1,
+    "missingSections": 5,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 2,
+    "retrySections": 5,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 2,
+    "notPublishedOrIncompleteSections": 5,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 558,
@@ -102,20 +102,27 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-JAM-2026-009",
-      "tournamentName": "J30 Kingston",
+      "competitionId": "J-J30-URU-2026-008",
+      "tournamentName": "J30 Punta del Este",
       "decision": "pending",
       "playersFound": [],
-      "declaredSections": 4,
-      "acquiredSections": 2,
+      "declaredSections": 6,
+      "acquiredSections": 1,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 2,
+      "resolvedSections": 1,
+      "missingSections": 5,
       "sections": [
         {
           "event": "B-S-M-KO",
           "family": "B-S-M",
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -130,9 +137,16 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": true,
-          "resolved": true,
-          "status": "acquired"
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
         },
         {
           "event": "G-D-M-KO",
@@ -145,10 +159,23 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "B-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
               "players": 30,
               "error": null,
               "failureType": null,
@@ -171,14 +198,27 @@
         },
         {
           "family": "G-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 17,
-              "error": null,
-              "failureType": null,
-              "resolved": true
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
             }
           ]
         },
