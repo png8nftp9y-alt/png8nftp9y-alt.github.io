@@ -1506,3 +1506,8 @@ Questa sezione è il registro unico delle attività ancora necessarie. Un elemen
 ## Verifica dello scorrimento durante il caricamento
 
 - Allineata la simulazione del renderer al valore restituito dal codice reale. Le modifiche al test avviano anche la verifica in Chromium.
+
+
+## 2026-11-09 — Esecuzione dei test del check Worker
+
+- Accorpate le invocazioni consecutive dei test Node con concorrenza 2. Conservati tutti i file, le ripetizioni e l’ordine dei controlli separati.
