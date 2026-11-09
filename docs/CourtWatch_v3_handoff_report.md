@@ -10786,3 +10786,5 @@ Modalità manuale in sola lettura su 50 profili fuori dal gruppo ordinario. Il c
 ### 2026-11-09 — Posizione categorie Tennis Europe in Agenda
 
 Per torneo e giorno, l’Agenda usa le fasce dei match mostrati. Con una fascia confermata, la categoria compare nell’intestazione. Con più fasce, compare sotto turno e fascia nella singola partita. Una fascia ambigua non riceve una categoria. La pagina torneo mostra tutte le coppie. Verificate localmente otto combinazioni di fasce e categorie. Verifica grafica in produzione dopo il deploy.
+
+ITF discovery 2026-11-09T07:19:14.644Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
