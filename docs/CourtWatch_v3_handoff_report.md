@@ -10793,3 +10793,8 @@ ITF discovery 2026-11-09T07:19:14.644Z: 0 newly discovered future tournaments; M
 ## Ripresa mirata del pilota ITF dopo il limite D1
 
 Il job 128907450375 ha restituito D1 7429 sul selettore delle versioni ITF. Il selettore di audit usa esplicitamente gli indici per torneo e per ultima versione. Il pilota accetta un sottoinsieme del campione per riprendere gli ID pendenti. L'esito remoto e la stabilità delle letture restano da verificare.
+
+
+## Verifica avversari ITF solo su richiesta
+
+Rimosso il trigger push dopo l'avvio automatico del run 42614338423. Inventario, pilota e audit ordinario sono disponibili tramite avvio manuale.

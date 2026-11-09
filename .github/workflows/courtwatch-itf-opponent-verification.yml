@@ -14,35 +14,6 @@ on:
         description: 'Optional comma-separated native IDs: fresh targeted check, not a full-scope certificate'
         type: string
         default: ''
-  push:
-    branches: [main]
-    paths:
-      - 'tools/verify-itf-opponent-scope.mjs'
-      - 'tools/lib/audit-read-evidence.mjs'
-      - 'tools/lib/audit-d1-batch.mjs'
-      - 'tools/lib/audit-time-budget.mjs'
-      - 'tools/lib/audit-opponent-checkpoints.mjs'
-      - 'tools/lib/audit-pending-opponents.mjs'
-      - 'tools/tests/audit-pending-opponents.test.mjs'
-      - 'tools/tests/audit-opponent-checkpoints.test.mjs'
-      - 'tools/lib/itf-page-audit.mjs'
-      - 'tools/tests/audit-time-budget.test.mjs'
-      - 'tools/tests/itf-page-audit.test.mjs'
-      - 'tools/lib/audit-itf-entry-profiles.mjs'
-      - 'tools/tests/audit-itf-entry-profiles.test.mjs'
-      - 'tools/lib/audit-latest-itf-documents.mjs'
-      - 'tools/lib/audit-opponent-failure.mjs'
-      - 'tools/tests/audit-latest-itf-documents.test.mjs'
-      - 'tools/tests/audit-opponent-failure.test.mjs'
-      - 'tools/lib/audit-opponent-selection.mjs'
-      - 'tools/tests/audit-opponent-selection.test.mjs'
-      - 'tools/tests/audit-d1-batch.test.mjs'
-      - 'tools/lib/itf-audit-read-session.mjs'
-      - 'tools/tests/itf-audit-read-session.test.mjs'
-      - 'tools/lib/opponent-native-history-check.mjs'
-      - 'tools/tests/opponent-native-history-check.test.mjs'
-      - 'tools/tests/audit-read-evidence.test.mjs'
-      - '.github/workflows/courtwatch-itf-opponent-verification.yml'
 permissions:
   contents: read
 concurrency:
