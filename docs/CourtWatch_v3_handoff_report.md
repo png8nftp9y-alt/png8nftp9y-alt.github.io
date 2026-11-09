@@ -10781,3 +10781,8 @@ Verificate per ID le coppie età/categoria di nove tornei storici con categorie 
 ## Pilota ITF per l’audit esteso degli avversari
 
 Modalità manuale in sola lettura su 50 profili fuori dal gruppo ordinario. Il campione è distribuito per fonti D1 e R2. Controllo delle partite D1 e dello slot corrente o futuro con le iscrizioni indicizzate. Browser su dieci profili e sui casi discordanti. La parità storica indipendente rispetto ai soli tabelloni R2 resta da verificare.
+
+
+### 2026-11-09 — Posizione categorie Tennis Europe in Agenda
+
+Per torneo e giorno, l’Agenda usa le fasce dei match mostrati. Con una fascia confermata, la categoria compare nell’intestazione. Con più fasce, compare sotto turno e fascia nella singola partita. Una fascia ambigua non riceve una categoria. La pagina torneo mostra tutte le coppie. Verificate localmente otto combinazioni di fasce e categorie. Verifica grafica in produzione dopo il deploy.
