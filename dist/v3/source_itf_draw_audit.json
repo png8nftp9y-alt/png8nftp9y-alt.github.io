@@ -1,35 +1,35 @@
 {
   "version": 16,
-  "generatedAt": "2026-11-09T18:24:55.611Z",
+  "generatedAt": "2026-11-09T18:42:42.826Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
     "tournamentsChecked": 1,
-    "completeTournaments": 0,
+    "completeTournaments": 1,
     "cancelledNoDrawsTournaments": 0,
-    "pendingTournaments": 1,
-    "declaredSections": 6,
-    "requestedSections": 4,
-    "acquiredSections": 2,
+    "pendingTournaments": 0,
+    "declaredSections": 4,
+    "requestedSections": 2,
+    "acquiredSections": 4,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 2,
-    "missingSections": 4,
-    "newSectionsCached": 0,
+    "resolvedSections": 4,
+    "missingSections": 0,
+    "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 4,
+    "retrySections": 0,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 4,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 559,
+    "globalCompleteTournaments": 561,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 64,
+    "globalPendingTotal": 62,
     "globalPendingTechnical": 33,
-    "globalPendingPublication": 31,
+    "globalPendingPublication": 29,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -83,9 +83,7 @@
       "J-J200-MEX-2026-004",
       "J-J30-GUA-2026-001",
       "J-J30-IND-2026-007",
-      "J-J30-JAM-2026-009",
       "J-J30-JPN-2026-008",
-      "J-J30-LBN-2026-002",
       "J-J30-MAR-2026-010",
       "J-J30-NGR-2026-006",
       "J-J30-PAK-2026-005",
@@ -101,27 +99,20 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-POL-2026-005",
-      "tournamentName": "J60 Pszczyna",
-      "decision": "pending",
+      "competitionId": "J-J30-LBN-2026-002",
+      "tournamentName": "J30 Jounieh (CLOSED)",
+      "decision": "complete",
       "playersFound": [],
-      "declaredSections": 6,
-      "acquiredSections": 2,
+      "declaredSections": 4,
+      "acquiredSections": 4,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 4,
+      "resolvedSections": 4,
+      "missingSections": 0,
       "sections": [
         {
-          "event": "B-S-M-KO",
+          "event": "B-S-M-RR",
           "family": "B-S-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
-        },
-        {
-          "event": "B-S-Q-KO",
-          "family": "B-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -129,20 +120,13 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
-        },
-        {
-          "event": "G-S-Q-KO",
-          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -150,32 +134,19 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
-            }
-          ]
-        },
-        {
-          "family": "B-S-Q",
           "populated": true,
           "events": [
             {
-              "event": "B-S-Q-KO",
-              "players": 16,
+              "event": "B-S-M-RR",
+              "players": 25,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -184,37 +155,24 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 20,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
         {
           "family": "G-S-M",
-          "populated": false,
-          "events": [
-            {
-              "event": "G-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
-            }
-          ]
-        },
-        {
-          "family": "G-S-Q",
           "populated": true,
           "events": [
             {
-              "event": "G-S-Q-KO",
-              "players": 16,
+              "event": "G-S-M-KO",
+              "players": 14,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -223,14 +181,14 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 14,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
