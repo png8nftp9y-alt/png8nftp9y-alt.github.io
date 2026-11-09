@@ -2,6 +2,10 @@ name: Court Watch ITF opponent scope verification
 on:
   workflow_dispatch:
     inputs:
+      pilot_50:
+        description: 'Check 50 ITF profiles outside the ordinary audit scope'
+        type: boolean
+        default: false
       inventory_only:
         description: 'Build the read-only D1 and R2 profile inventory'
         type: boolean
@@ -60,6 +64,7 @@ jobs:
       - name: Verify scoped opponents, source inputs and browser rendering
         timeout-minutes: 22
         env:
+          ITF_AUDIT_PILOT: ${{ inputs.pilot_50 && 'true' || 'false' }}
           ITF_AUDIT_INVENTORY_ONLY: ${{ inputs.inventory_only && 'true' || 'false' }}
           ITF_AUDIT_OPPONENT_IDS: ${{ inputs.opponent_ids || '' }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}

@@ -10776,3 +10776,8 @@ Il run 42534989681 si è fermato con rawById non definito. La cache ora è dichi
 ### 2026-11-09 — Categorie Tennis Europe per fascia d’età
 
 Verificate per ID le coppie età/categoria di nove tornei storici con categorie multiple. Le due tappe Development 2026 sono U14 Categoria 2. I 69 eventi Winter e Summer Cups sono separati dalle categorie individuali. Robey 2027 verificato come U12 Categoria 2 e U14 Categoria 3. Agenda cronologica usa la fascia del match quando disponibile. Verifica locale di sintassi e presentazione. Acquisizione e pubblicazione da verificare sul run del catalogo.
+
+
+## Pilota ITF per l’audit esteso degli avversari
+
+Modalità manuale in sola lettura su 50 profili fuori dal gruppo ordinario. Il campione è distribuito per fonti D1 e R2. Controllo delle partite D1 e dello slot corrente o futuro con le iscrizioni indicizzate. Browser su dieci profili e sui casi discordanti. La parità storica indipendente rispetto ai soli tabelloni R2 resta da verificare.

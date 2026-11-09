@@ -17,6 +17,8 @@ import worker from '../cloudflare/app-api/src/index.js';
 import {playerCircuitIdentities} from '../cloudflare/app-api/lib/player-circuit-profiles.mjs';
 import {runtimeDocumentReader} from '../cloudflare/app-api/lib/runtime-document-reader.mjs';
 import {presenceIndex,comparePresence,alternateExpectation,forbiddenPast,competitionKey} from './lib/itf-page-audit.mjs';
+import {opponentTournamentWindow} from '../cloudflare/app-api/lib/opponent-tournament-window.mjs';
+const pilot=process.env.ITF_AUDIT_PILOT==='true';
 const budget=auditTimeBudget({seconds:1200});
 const root=process.cwd(),output='artifacts/itf-opponent-verification.json',today=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome'}).format(new Date());
 const report={startedAt:new Date().toISOString(),sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),status:'running',metrics:{queries:0,rowsRead:0,rowsWritten:0},playerCoverage:[],players:[],opponents:[],alternates:[],issues:[],unverifiable:[],limitations:['Worker/browser replay captured read-only D1 results and a pinned acquired ITF generation; every distinct D1 query is rechecked uncached within its observed-player checkpoint or bounded group of at most eight sequential opponent profiles. Hash-verified immutable draw chunks are reused after their first successful read checkpoint; mutable selectors and profiles are refreshed for every checkpoint. The audit selector returns latest versions per draw key instead of every historical version; page selection semantics are tested for parity. Checkpoints are independent and do not certify one common instant for all players. This is not an atomic cross-service snapshot or certification of all circuits.','Scope: both lists of the configured account and native-ID opponents/partners in their acquired ITF matches. Other users and unrelated opponents are outside scope.','Fresh browser context; existing private caches on user devices are not read.','No external ITF acquisition. Missing source draws cannot be certified as absent participation.','R2 acquired generation is pinned; later acquisitions are outside scope. Changes in any rechecked D1 input or coverage evidence keep the result inconclusive.']};
@@ -52,12 +54,8 @@ try{
  if(!generation||!/^[A-Za-z0-9_.-]+$/.test(generation))throw Error('invalid_current_itf_generation');
  report.itfGeneration=generation;
  const draws=parse(r2(`itf/database/generations/${generation}/itf_draw_target_db.json`).toString());
- if(process.env.ITF_AUDIT_INVENTORY_ONLY==='true'){
-  if(process.env.ITF_AUDIT_OPPONENT_IDS)throw Error('inventory_and_targeted_audit_are_mutually_exclusive');
-  if(!draws.tournaments||!Object.keys(draws.tournaments).length)throw Error('current_itf_draw_source_incomplete');
-  const presence=presenceIndex(draws);
-  if(!presence.players.size)throw Error('empty_itf_draw_presence');
-  const rows=await live.query(`WITH searchable AS MATERIALIZED (
+ async function readInventory(presence,read){
+  const rows=await read(`WITH searchable AS MATERIALIZED (
    SELECT official_id AS id FROM observed_players WHERE circuit='itf' AND official_id<>'' AND official_id NOT GLOB '*[^0-9]*'
    UNION
    SELECT official_id AS id FROM search_acquired_players WHERE circuit='itf' AND official_id<>'' AND official_id NOT GLOB '*[^0-9]*'
@@ -78,6 +76,17 @@ try{
   const inventory=profiles.map(([id,played,entered])=>({
    id,played:Boolean(played),entered:Boolean(entered),drawTournaments:presence.players.get(id)?.size||0
   }));
+  return inventory;
+ }
+ if(pilot&&(process.env.ITF_AUDIT_INVENTORY_ONLY==='true'||process.env.ITF_AUDIT_OPPONENT_IDS)){
+  throw Error('pilot_cannot_be_combined_with_other_audit_modes');
+ }
+ if(process.env.ITF_AUDIT_INVENTORY_ONLY==='true'){
+  if(process.env.ITF_AUDIT_OPPONENT_IDS)throw Error('inventory_and_targeted_audit_are_mutually_exclusive');
+  if(!draws.tournaments||!Object.keys(draws.tournaments).length)throw Error('current_itf_draw_source_incomplete');
+  const presence=presenceIndex(draws);
+  if(!presence.players.size)throw Error('empty_itf_draw_presence');
+  const inventory=await readInventory(presence,live.query);
   const inD1=p=>p.played||p.entered;
   const inR2=p=>p.drawTournaments>0;
   const summary={
@@ -173,13 +182,44 @@ try{
  await opponentPage.waitForFunction(()=>typeof state!=='undefined'&&Array.isArray(state.data?.players));
  await opponentPage.evaluate(()=>{const box=document.createElement('div');box.id='opponentTournamentHistory';document.body.append(box);});
  for(const [id,p]of people)if(!opponentIds.has(id))opponentIds.set(id,p.name);
- const selectedScope=auditOpponentSelection(opponentIds,process.env.ITF_AUDIT_OPPONENT_IDS||'');report.opponentSelection={kind:selectedScope.kind,requested:selectedScope.requested,total:selectedScope.opponents.size};
+ let selectedScope=auditOpponentSelection(opponentIds,process.env.ITF_AUDIT_OPPONENT_IDS||'');
+ if(pilot){
+  const candidates=(await readInventory(presence,query))
+   .filter(p=>!opponentIds.has(p.id)&&(p.played||p.entered||p.drawTournaments));
+  const buckets=new Map();
+  for(const row of candidates){
+   const key=[row.played,row.entered,row.drawTournaments>0].join('/');
+   if(!buckets.has(key))buckets.set(key,[]);
+   buckets.get(key).push(row);
+  }
+  const chosen=[];
+  while(chosen.length<50&&buckets.size){
+   for(const [key,rows] of buckets){
+    const row=rows.shift();
+    chosen.push({...row,bucket:key});
+    if(!rows.length)buckets.delete(key);
+    if(chosen.length===50)break;
+   }
+  }
+  if(chosen.length!==50)throw Error('insufficient_pilot_profiles');
+  const profiles=new Map();
+  for(const {id} of chosen){
+   const names=await query("SELECT display_name FROM observed_players WHERE circuit='itf' AND official_id=? AND display_name<>'' UNION SELECT display_name FROM search_acquired_players WHERE circuit='itf' AND official_id=? AND display_name<>'' ORDER BY display_name LIMIT 1",[id,id]);
+   if(!names[0]?.display_name)throw Error('pilot_profile_name_missing:'+id);
+   profiles.set(id,names[0].display_name);
+  }
+  selectedScope={kind:'pilot_50',requested:chosen.map(p=>p.id),opponents:profiles};
+  report.pilot={sample:chosen,browserSample:chosen.filter((_,i)=>i%5===0).map(p=>p.id)};
+  report.limitations.push('Pilot profiles extend the ordinary observed scope. R2 draw presence stratifies the sample; historical parity for R2-only tournament evidence is not checked independently.');
+  await checkpoint('pilot_inventory');
+ }
+report.opponentSelection={kind:selectedScope.kind,requested:selectedScope.requested,total:selectedScope.opponents.size};
  report.pendingOpponentIds=[...selectedScope.opponents.keys()].filter(id=>/^\d+$/.test(id));
  const groups=auditOpponentCheckpoints({verify:checkpoint,onVerified:ids=>{const done=new Set(ids);report.pendingOpponentIds=report.pendingOpponentIds.filter(id=>!done.has(id));}});
  report.opponentCheckpointPolicy={maxProfiles:8,maxAgeMs:30000,sequential:true};
  async function auditOpponent(id,name,recovery=false){
   if(!/^\d+$/.test(id)){report.unverifiable.push({nativeId:id,name,reason:'draw_local_id_requires_verified_mapping'});return;}
-  report.activeOpponent={nativeId:id,name};console.log('ITF_OPPONENT_PROGRESS='+JSON.stringify({checked:report.opponents.length,total:opponentIds.size}));
+  report.activeOpponent={nativeId:id,name};console.log('ITF_OPPONENT_PROGRESS='+JSON.stringify({checked:report.opponents.length,total:selectedScope.opponents.size}));
   await opponentAttempts.run({transportFailures:()=>transportFailures,onTransportFailure:async error=>{
    report.failedOpponents.push({nativeId:id,name,error:String(error.message),reason:'D1_7500'});
    report.readCheckpoints.push({scope:'opponent:'+id,members:[id],recovery,stable:false,status:'transport_failed',checked:0,changedReads:[],changedQueries:[]});
@@ -194,8 +234,23 @@ try{
   if(!playerCircuitIdentities({circuitProfiles:result.circuitProfiles||[]}).some(p=>p.circuit==='itf'&&String(p.profileId)===id))report.unverifiable.push({nativeId:id,name,reason:'opponent_identity_not_confirmed'});
   const nativeCheck=checkOpponentNativeHistory(await rawHistory(id),result.tournaments,today);if(nativeCheck.missingTournaments.length||nativeCheck.missingMatches.length)issue('opponent_native_history_missing',{nativeId:id,...nativeCheck});report.unverifiable.push(...nativeCheck.unverifiable.map(x=>({nativeId:id,...x})));
   const selected=result.tournaments.filter(itf),bad=selected.filter(forbiddenPast),record={nativeId:id,name,selected:selected.map(t=>({competitionId:t.competitionId,historyKind:t.historyKind,matches:t.matches?.length||0,historyMatchCount:t.historyMatchCount||0})),invalidPast:bad.map(competitionKey)};
+  if(pilot){
+   const profile=(await auditItfEntryProfiles(query,[id])).get(id);
+   const actual=result.tournaments.find(t=>t.historyKind==='current'||t.historyKind==='upcoming');
+   const key=t=>(t.circuit||'itf')+'|'+competitionKey(t);
+   const indexed=(profile?.tournaments||[])
+    .map(t=>({...t,circuit:'itf'}))
+    .filter(t=>!actual||key(t)!==key(actual));
+   const expected=opponentTournamentWindow([...(actual?[actual]:[]),...indexed],today)
+    .find(t=>t.historyKind==='current'||t.historyKind==='upcoming');
+   if(expected&&(!actual||key(expected)!==key(actual))){
+    issue('pilot_itf_entry_missing',{nativeId:id,expected:key(expected),actual:actual?key(actual):null});
+   }
+  }
+  if(!pilot||report.pilot.browserSample.includes(id)||report.issues.some(row=>row.nativeId===id)||bad.length){
   record.browser=await opponentPage.evaluate(data=>{const projected=opponentHistoryProjection(data),again=opponentHistoryProjection(projected);renderOpponentHistory(data);return {selected:projected.tournaments.filter(t=>circuit(t)==='itf').map(t=>({competitionId:t.competitionId,historyKind:t.historyKind,historyMatchCount:t.historyMatchCount||0,matches:t.matches?.length||0})),sections:document.querySelectorAll('#opponentTournamentHistory .opponentHistoryTournament').length,expectedSections:projected.tournaments.length,stable:JSON.stringify(projected.tournaments.map(t=>[t.circuit,t.competitionId,t.historyKind]))===JSON.stringify(again.tournaments.map(t=>[t.circuit,t.competitionId,t.historyKind]))};},result);
   if(!record.browser.stable||record.browser.sections!==record.browser.expectedSections||record.browser.selected.some(forbiddenPast))issue('opponent_browser_projection_mismatch',record);
+  }
   const existing=report.opponents.findIndex(row=>row.nativeId===id);if(existing<0)report.opponents.push(record);else report.opponents[existing]=record;if(bad.length)issue('opponent_acceptance_in_past',record);
   if(recovery){const verified=await checkpoint('opponent:'+id,[id]);report.readCheckpoints.at(-1).recovery=true;if(verified.stable)report.pendingOpponentIds=report.pendingOpponentIds.filter(x=>x!==id);}else{groups.add(id);if(groups.due())await groups.flush();}delete report.activeOpponent;
   await fs.writeFile(output,JSON.stringify(report,null,2)+'\n');
