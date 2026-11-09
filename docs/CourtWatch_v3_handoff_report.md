@@ -10788,3 +10788,8 @@ Modalità manuale in sola lettura su 50 profili fuori dal gruppo ordinario. Il c
 Per torneo e giorno, l’Agenda usa le fasce dei match mostrati. Con una fascia confermata, la categoria compare nell’intestazione. Con più fasce, compare sotto turno e fascia nella singola partita. Una fascia ambigua non riceve una categoria. La pagina torneo mostra tutte le coppie. Verificate localmente otto combinazioni di fasce e categorie. Verifica grafica in produzione dopo il deploy.
 
 ITF discovery 2026-11-09T07:19:14.644Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+## Ripresa mirata del pilota ITF dopo il limite D1
+
+Il job 128907450375 ha restituito D1 7429 sul selettore delle versioni ITF. Il selettore di audit usa esplicitamente gli indici per torneo e per ultima versione. Il pilota accetta un sottoinsieme del campione per riprendere gli ID pendenti. L'esito remoto e la stabilità delle letture restano da verificare.

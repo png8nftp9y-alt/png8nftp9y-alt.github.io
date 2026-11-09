@@ -78,7 +78,7 @@ try{
   }));
   return inventory;
  }
- if(pilot&&(process.env.ITF_AUDIT_INVENTORY_ONLY==='true'||process.env.ITF_AUDIT_OPPONENT_IDS)){
+ if(pilot&&process.env.ITF_AUDIT_INVENTORY_ONLY==='true'){
   throw Error('pilot_cannot_be_combined_with_other_audit_modes');
  }
  if(process.env.ITF_AUDIT_INVENTORY_ONLY==='true'){
@@ -182,7 +182,8 @@ try{
  await opponentPage.waitForFunction(()=>typeof state!=='undefined'&&Array.isArray(state.data?.players));
  await opponentPage.evaluate(()=>{const box=document.createElement('div');box.id='opponentTournamentHistory';document.body.append(box);});
  for(const [id,p]of people)if(!opponentIds.has(id))opponentIds.set(id,p.name);
- let selectedScope=auditOpponentSelection(opponentIds,process.env.ITF_AUDIT_OPPONENT_IDS||'');
+ const requestedIds=process.env.ITF_AUDIT_OPPONENT_IDS||'';
+ let selectedScope=auditOpponentSelection(opponentIds,pilot?'':requestedIds);
  if(pilot){
   const candidates=(await readInventory(presence,query))
    .filter(p=>!opponentIds.has(p.id)&&(p.played||p.entered||p.drawTournaments));
@@ -202,13 +203,14 @@ try{
    }
   }
   if(chosen.length!==50)throw Error('insufficient_pilot_profiles');
+  const selection=auditOpponentSelection(new Map(chosen.map(row=>[row.id,row])),requestedIds);
   const profiles=new Map();
-  for(const {id} of chosen){
+  for(const {id} of selection.opponents.values()){
    const names=await query("SELECT display_name FROM observed_players WHERE circuit='itf' AND official_id=? AND display_name<>'' UNION SELECT display_name FROM search_acquired_players WHERE circuit='itf' AND official_id=? AND display_name<>'' ORDER BY display_name LIMIT 1",[id,id]);
    if(!names[0]?.display_name)throw Error('pilot_profile_name_missing:'+id);
    profiles.set(id,names[0].display_name);
   }
-  selectedScope={kind:'pilot_50',requested:chosen.map(p=>p.id),opponents:profiles};
+  selectedScope={kind:requestedIds?'pilot_resume':'pilot_50',requested:[...profiles.keys()],opponents:profiles};
   report.pilot={sample:chosen,browserSample:chosen.filter((_,i)=>i%5===0).map(p=>p.id)};
   report.limitations.push('Pilot profiles extend the ordinary observed scope. R2 draw presence stratifies the sample; historical parity for R2-only tournament evidence is not checked independently.');
   await checkpoint('pilot_inventory');
