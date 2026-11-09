@@ -10810,3 +10810,8 @@ ITF discovery 2026-11-09T22:53:33.412Z: 0 newly discovered future tournaments; M
 ### 2026-11-10 — Doppi OOP con coppia avversaria in attesa
 
 L’audit registra come in attesa uno slot di doppio odierno o futuro con due ID nella stessa coppia, riga avversaria esplicitamente vuota e nessun esito. La partita non viene inventata. Riprodotti i due casi Lleida del run 42721739091 e tre controlli negativi. Esito live e sincronizzazione Agenda da verificare dopo il push.
+
+
+## 2026-11-09 — Verifica fonte ranking ITF Junior
+- L’acquisitore abilita l’endpoint Combined Rankings JT per Boys e Girls. La verifica controlla data, totale e ID distinti su tutte le pagine.
+- Test locali con risposte simulate completati. Acquisizione live sul VPS ancora da verificare. Questa prova non scrive in D1.
