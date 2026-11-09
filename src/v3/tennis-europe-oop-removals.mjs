@@ -35,8 +35,28 @@ function verifiedRokahReplacement(old,matches){
   m.sourceUrl==='https://te.tournamentsoftware.com/tournament/'+tournament+'/matches/20261108');
  return candidates.length===1?candidates[0]:null;
 }
+function verifiedLuckyLoserReplacement(old,matches){
+ const players=m=>m.players||[];
+ const scheduled=m=>m.status==='scheduled'&&!m.score&&!m.retired&&!m.winnerPlayerId&&!m.winnerPlayerIds?.length&&
+  m.opponentPending!==true&&players(m).length===2&&players(m).every(p=>p.id)&&
+  new Set(players(m).map(p=>String(p.id))).size===2&&
+  m.court&&Number.isInteger(m.courtMatchNumber)&&m.courtMatchNumber>0&&
+  m.courtMatchNumberSource==='official_schedule_subheader';
+ if(!scheduled(old)||!/^([BG])S\d{2}\b/i.test(old.event)||!old.round||!old.drawUrl)return null;
+ const date=iso(old.date).replaceAll('-','');
+ const source='https://te.tournamentsoftware.com/tournament/'+old.competitionId+'/matches/'+date;
+ if(old.sourceUrl!==source)return null;
+ const candidates=matches.filter(m=>m.competitionId===old.competitionId&&iso(m.date)===iso(old.date)&&
+  m.event===old.event&&m.round===old.round&&m.drawUrl===old.drawUrl&&m.sourceUrl===source&&
+  m.court===old.court&&m.courtMatchNumber===old.courtMatchNumber);
+ if(candidates.length!==1||!scheduled(candidates[0]))return null;
+ const next=candidates[0],oldIds=new Set(players(old).map(p=>String(p.id)));
+ const newcomers=players(next).filter(p=>!oldIds.has(String(p.id)));
+ return newcomers.length===1&&[newcomers[0].entryType,newcomers[0].designation].includes('LL')?next:null;
+}
 function replacement(old,matches){
  const confirmed=verifiedRokahReplacement(old,matches);if(confirmed)return confirmed;
+ const luckyLoser=verifiedLuckyLoserReplacement(old,matches);if(luckyLoser)return luckyLoser;
  if(!old.opponentPending||old.status!=='scheduled'||old.score||old.winnerPlayerIds?.length||!/^([BG])S\d{2}\b/i.test(old.event)||old.players?.length!==1||!old.players[0].id)return null;
  const pending=provisionalReplacement(old,matches);if(pending)return pending;
  const candidates=matches.filter(m=>m.opponentPending!==true&&m.players?.length===2&&new Set(m.players.map(p=>String(p.id))).size===2&&iso(m.date)===iso(old.date)&&drawMatchKey({...m,players:[]})===drawMatchKey({...old,players:[]})&&m.players.some(p=>String(p.id)===String(old.players[0].id))&&m.sourceUrl===old.sourceUrl&&m.court&&Number.isInteger(m.courtMatchNumber)&&m.courtMatchNumber>0&&m.courtMatchNumberSource==='official_schedule_subheader');
@@ -44,7 +64,7 @@ function replacement(old,matches){
 }
 export function resolvedPendingReplacements(previous,current){
  const matches=current.matches||[],known=new Set(matches.map(key));
- return (previous?.matches||[]).filter(m=>!known.has(key(m))).flatMap(m=>{const next=replacement(m,matches);return next?[{reason:verifiedRokahReplacement(m,[next])?'official_draw_schedule_replacement':next.opponentPending?'official_provisional_slot_player_replaced':'pending_opponent_resolved_and_schedule_updated',previousMatchId:m.id,currentMatchId:next.id,competitionId:m.competitionId,date:next.date,event:next.event,round:next.round,knownPlayerIds:m.players.map(p=>String(p.id)),previousCourt:m.court,currentCourt:next.court,previousCourtMatchNumber:m.courtMatchNumber,currentCourtMatchNumber:next.courtMatchNumber}]:[]});
+ return (previous?.matches||[]).filter(m=>!known.has(key(m))).flatMap(m=>{const next=replacement(m,matches);return next?[{reason:verifiedRokahReplacement(m,[next])?'official_draw_schedule_replacement':verifiedLuckyLoserReplacement(m,[next])?'official_lucky_loser_same_slot':next.opponentPending?'official_provisional_slot_player_replaced':'pending_opponent_resolved_and_schedule_updated',previousMatchId:m.id,currentMatchId:next.id,competitionId:m.competitionId,date:next.date,event:next.event,round:next.round,knownPlayerIds:m.players.map(p=>String(p.id)),previousCourt:m.court,currentCourt:next.court,previousCourtMatchNumber:m.courtMatchNumber,currentCourtMatchNumber:next.courtMatchNumber}]:[]});
 }
 export function unexplainedOopRemovals(previous,current){
  const matches=current.matches||[],active=new Set((current.tournaments||[]).map(t=>String(t.competitionId).toUpperCase())),known=new Set(matches.map(key));

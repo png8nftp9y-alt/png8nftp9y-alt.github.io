@@ -10798,3 +10798,8 @@ Il job 128907450375 ha restituito D1 7429 sul selettore delle versioni ITF. Il s
 ## Verifica avversari ITF solo su richiesta
 
 Rimosso il trigger push dopo l'avvio automatico del run 42614338423. Inventario, pilota e audit ordinario sono disponibili tramite avvio manuale.
+
+
+### 2026-11-09 — Sostituzioni lucky loser nell’OOP Tennis Europe
+
+L’audit riconosce una sostituzione di un singolo partecipante con designazione ufficiale LL nella stessa partita programmata, quando torneo, data, tabellone, turno, campo e numero della partita coincidono e lo slot ufficiale è univoco. Il controllo continua a bloccare le sparizioni senza riscontro. Riprodotto l’artefatto del run 42614157617: tre sostituzioni riconosciute e zero sparizioni inspiegate. Verificati quattro casi negativi. Esito live da verificare.
