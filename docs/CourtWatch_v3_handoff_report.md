@@ -10857,3 +10857,5 @@ L’Agenda riusa le bandierine già caricate quando aggiorna le partite. La vist
 ITF discovery 2026-11-10T07:57:02.569Z: 7 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-11-10T07:59:10.433Z: attempted 7, acquired 7, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF discovery 2026-11-10T20:11:52.697Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
