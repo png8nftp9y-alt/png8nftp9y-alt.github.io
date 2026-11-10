@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-10T22:13:52.034Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-10T22:16:19.378Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -933083,7 +933083,7 @@
       "startDate": "2026-11-10",
       "endDate": "2026-11-15",
       "decision": "pending",
-      "checkedAt": "2026-11-10T21:38:13.229Z",
+      "checkedAt": "2026-11-10T22:16:17.630Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -935819,7 +935819,7 @@
       "startDate": "2026-11-10",
       "endDate": "2026-11-15",
       "decision": "pending",
-      "checkedAt": "2026-11-10T21:38:13.654Z",
+      "checkedAt": "2026-11-10T22:16:18.093Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -937069,7 +937069,7 @@
       "startDate": "2026-11-09",
       "endDate": "2026-11-14",
       "decision": "pending",
-      "checkedAt": "2026-11-10T21:38:14.062Z",
+      "checkedAt": "2026-11-10T22:16:18.544Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 3,
@@ -938178,7 +938178,7 @@
       "startDate": "2026-11-09",
       "endDate": "2026-11-14",
       "decision": "pending",
-      "checkedAt": "2026-11-10T21:38:14.455Z",
+      "checkedAt": "2026-11-10T22:16:18.962Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -942083,7 +942083,7 @@
       "startDate": "2026-11-10",
       "endDate": "2026-11-15",
       "decision": "pending",
-      "checkedAt": "2026-11-10T21:38:14.836Z",
+      "checkedAt": "2026-11-10T22:16:19.378Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -942208,8 +942208,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -942234,8 +942234,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -942247,8 +942247,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -942273,14 +942273,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "draw_artifact_missing",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "B-S-M-KO:draw_artifact_missing | B-D-M-KO:draw_artifact_missing | G-S-M-KO:draw_artifact_missing | G-D-M-KO:draw_artifact_missing",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
