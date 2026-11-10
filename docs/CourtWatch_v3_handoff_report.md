@@ -10823,3 +10823,7 @@ L’audit registra come in attesa uno slot di doppio odierno o futuro con due ID
 
 ## 2026-11-10 — Verifica diretta ranking ITF Junior
 - Il run precedente si è fermato per segreti non configurati. La sonda manuale verifica ora la prima pagina Boys e Girls direttamente dall’ITF. Sintassi verificata, esito live da verificare. Nessuna scrittura D1.
+
+
+## 2026-11-10 — Verifica completa ranking ITF Junior
+- Il run 42730200532 ha verificato le prime 100 posizioni Boys e Girls. La sonda manuale verifica ora tutte le pagine. Test simulati completati per 5.223 Boys, 5.176 Girls e blocco a metà lettura. Prova completa live ancora da eseguire. Nessuna scrittura D1.
