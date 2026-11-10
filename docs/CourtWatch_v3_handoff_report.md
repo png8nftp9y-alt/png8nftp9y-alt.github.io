@@ -10831,3 +10831,12 @@ L’audit registra come in attesa uno slot di doppio odierno o futuro con due ID
 
 ## 2026-11-10 — Diagnosi pagine ranking ITF Junior
 - Il run 42730948969 si è fermato a skip=1800 Boys per timeout e a skip=4300 Girls per risposta anomala. La sonda riprova una volta la singola pagina in timeout e precisa il controllo fallito. Test simulati completati. Prova live da verificare. Nessuna scrittura D1.
+
+### 10 novembre 2026 — Salvataggio del certificato D1
+
+Dopo il confronto dei conteggi, se Cloudflare D1 risponde con errore 7429
+durante il salvataggio del certificato giornaliero, il verificatore attende
+11 secondi e riprova una volta la sola scrittura. La scansione dei conteggi
+viene eseguita una volta. Il run Agenda D1 42730358905 ha confermato la
+verifica di parità, il deploy del Worker e il controllo finale dell’API
+e dell’Agenda Tennis Europe.
