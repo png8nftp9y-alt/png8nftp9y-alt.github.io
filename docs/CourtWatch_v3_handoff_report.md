@@ -10849,3 +10849,7 @@ e dell’Agenda Tennis Europe.
 ## 2026-11-10 — Bandierine e layout dell’Agenda
 
 L’Agenda riusa le bandierine già caricate quando aggiorna le partite. La vista cronologica dispone le schede su una sola colonna fino a 900 px. Incrementate le versioni numeriche di JavaScript e CSS per la pubblicazione.
+
+
+## 2026-11-10 — Verifica ranking ITF Junior in una risposta
+- Il run 42735319733 ha rilevato sette ID Boys ripetuti al rank 4296 tra pagine e una voce Girls con gender M. La modalità diagnostica prova take=6000, verifica totali e ID distinti e confronta la voce Girls con la lista Boys della stessa data. Test simulato completato. Limite live da verificare. Nessuna scrittura D1.
