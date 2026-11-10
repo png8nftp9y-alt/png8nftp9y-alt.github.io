@@ -10827,3 +10827,7 @@ L’audit registra come in attesa uno slot di doppio odierno o futuro con due ID
 
 ## 2026-11-10 — Verifica completa ranking ITF Junior
 - Il run 42730200532 ha verificato le prime 100 posizioni Boys e Girls. La sonda manuale verifica ora tutte le pagine. Test simulati completati per 5.223 Boys, 5.176 Girls e blocco a metà lettura. Prova completa live ancora da eseguire. Nessuna scrittura D1.
+
+
+## 2026-11-10 — Diagnosi pagine ranking ITF Junior
+- Il run 42730948969 si è fermato a skip=1800 Boys per timeout e a skip=4300 Girls per risposta anomala. La sonda riprova una volta la singola pagina in timeout e precisa il controllo fallito. Test simulati completati. Prova live da verificare. Nessuna scrittura D1.

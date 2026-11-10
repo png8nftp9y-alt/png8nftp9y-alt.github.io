@@ -31,21 +31,38 @@ jobs:
                 const skip = Number(url.searchParams.get('skip'));
                 try {
                   if (pages || category === 'G') await delay(1200);
-                  const response = await fetch(url, {
-                    headers: { accept: 'application/json' },
-                    signal: AbortSignal.timeout(20000),
-                  });
-                  const body = await response.text();
+                  async function readPage() {
+                    const response = await fetch(url, {
+                      headers: { accept: 'application/json' },
+                      signal: AbortSignal.timeout(20000),
+                    });
+                    return { response, body: await response.text() };
+                  }
+                  let page;
+                  try {
+                    page = await readPage();
+                  } catch (error) {
+                    if (error.name !== 'TimeoutError') throw error;
+                    console.log(JSON.stringify({ category, skip, retry: 'timeout' }));
+                    await delay(3000);
+                    page = await readPage();
+                  }
+                  const { response, body } = page;
                   if (/Incapsula|Additional security check|hCaptcha/i.test(body))
                     throw Error('incapsula_challenge');
                   if (!response.ok) throw Error('HTTP ' + response.status);
                   let json;
                   try { json = JSON.parse(body); }
                   catch { throw Error('non_json'); }
-                  if (!Array.isArray(json?.items) ||
-                      (skip === 0 && json.items[0]?.rank !== 1) ||
-                      json.items.some(row => row?.gender !== gender))
-                    throw Error('invalid_ranking_page');
+                  if (!Array.isArray(json?.items)) throw Error('items_missing_or_not_array');
+                  if (!json.items.length) throw Error('items_empty');
+                  if (skip === 0 && json.items[0]?.rank !== 1) throw Error('first_rank_not_1');
+                  const wrongCategory = json.items.findIndex(row => row?.gender !== gender);
+                  if (wrongCategory !== -1) {
+                    const value = json.items[wrongCategory]?.gender;
+                    const reason = value == null ? 'missing' : value === '' ? 'empty' : 'unexpected';
+                    throw Error('gender_' + reason + ' at row ' + (skip + wrongCategory + 1));
+                  }
                   pages++;
                   if (pages % 10 === 0) console.log(JSON.stringify({ category, pages, skip }));
                   return { ok: true, json };
