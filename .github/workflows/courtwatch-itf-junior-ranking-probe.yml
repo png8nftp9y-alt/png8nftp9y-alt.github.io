@@ -12,14 +12,43 @@ concurrency:
 jobs:
   check-ranking:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Check official Boys and Girls rankings through the ITF acquirer
-        env:
-          ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL }}
-          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
-        run: node infra/itf-acquirer/check-junior-rankings.mjs
+      - name: Read first page of official Boys and Girls rankings
+        run: |
+          node --input-type=module <<'JS'
+          import { rankingUrl } from './infra/itf-acquirer/junior-ranking.mjs';
+          for (const [category, gender] of [['B', 'M'], ['G', 'F']]) {
+            try {
+              const response = await fetch(rankingUrl(category, 100, 0), {
+                headers: { accept: 'application/json' },
+                signal: AbortSignal.timeout(20000),
+              });
+              const body = await response.text();
+              if (/Incapsula|Additional security check|hCaptcha/i.test(body))
+                throw Error('incapsula_challenge');
+              if (!response.ok) throw Error('HTTP ' + response.status);
+              let data;
+              try { data = JSON.parse(body); }
+              catch { throw Error('non_json'); }
+              if (!data?.rankDate || !Number.isInteger(data.totalItems) ||
+                  !Array.isArray(data.items) || !data.items.length ||
+                  data.items.length > Math.min(100, data.totalItems) ||
+                  data.items[0]?.rank !== 1 ||
+                  data.items.some(row => row?.gender !== gender || !Number.isSafeInteger(row.playerId)))
+                throw Error('invalid_ranking_page');
+              console.log(JSON.stringify({
+                category, rankDate: data.rankDate, totalItems: data.totalItems,
+                rows: data.items.length, firstRank: data.items[0].rank,
+                lastRank: data.items.at(-1).rank,
+              }));
+            } catch (error) {
+              console.error(JSON.stringify({ category, error: error.message }));
+              process.exitCode = 1;
+            }
+          }
+          JS

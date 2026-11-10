@@ -10819,3 +10819,7 @@ L’audit registra come in attesa uno slot di doppio odierno o futuro con due ID
 
 ## 2026-11-10 — Sonda ITF Junior da GitHub Actions
 - Workflow manuale in sola lettura tramite l’acquisitore ITF configurato. Test locali completati per liste complete, dati incompleti, URL rifiutato e Incapsula. Prova live ancora da eseguire.
+
+
+## 2026-11-10 — Verifica diretta ranking ITF Junior
+- Il run precedente si è fermato per segreti non configurati. La sonda manuale verifica ora la prima pagina Boys e Girls direttamente dall’ITF. Sintassi verificata, esito live da verificare. Nessuna scrittura D1.
