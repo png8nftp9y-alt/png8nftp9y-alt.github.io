@@ -10855,3 +10855,5 @@ L’Agenda riusa le bandierine già caricate quando aggiorna le partite. La vist
 - Il run 42735319733 ha rilevato sette ID Boys ripetuti al rank 4296 tra pagine e una voce Girls con gender M. La modalità diagnostica prova take=6000, verifica totali e ID distinti e confronta la voce Girls con la lista Boys della stessa data. Test simulato completato. Limite live da verificare. Nessuna scrittura D1.
 
 ITF discovery 2026-11-10T07:57:02.569Z: 7 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-10T07:59:10.433Z: attempted 7, acquired 7, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
