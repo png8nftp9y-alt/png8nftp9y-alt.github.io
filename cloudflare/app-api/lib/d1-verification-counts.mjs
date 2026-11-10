@@ -16,7 +16,14 @@ export async function readVerificationCounts(query,{now=new Date(),version='v1'}
   const errors=verificationMetricNames.filter(k=>Number(actual?.[k])!==value[k]);
   if(errors.length)throw Error('D1 full verification counters mismatch: '+errors.join(','));
   const quote=v=>"'"+String(v).replaceAll("'","''")+"'";
-  await query(`INSERT INTO d1_daily_verification(id,verified_date,version) VALUES('counts',${quote(date)},${quote(version)}) ON CONFLICT(id) DO UPDATE SET verified_date=excluded.verified_date,version=excluded.version WHERE verified_date IS NOT excluded.verified_date OR version IS NOT excluded.version`);
+  const certificateSql=`INSERT INTO d1_daily_verification(id,verified_date,version) VALUES('counts',${quote(date)},${quote(version)}) ON CONFLICT(id) DO UPDATE SET verified_date=excluded.verified_date,version=excluded.version WHERE verified_date IS NOT excluded.verified_date OR version IS NOT excluded.version`;
+  try{
+   await query(certificateSql);
+  }catch(error){
+   if(!/\b7429\b|D1 DB is overloaded/i.test(String(error?.message||error)))throw error;
+   await new Promise(resolve=>setTimeout(resolve,11000));
+   await query(certificateSql);
+  }
   mode='full_daily';
  }
  return {value,mode};
