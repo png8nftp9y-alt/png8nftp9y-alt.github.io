@@ -617,3 +617,10 @@ button,a,[role="link"],summary{touch-action:manipulation}
 }
 
 .type.tennisEuropeCategory{background:#7040a0;color:#fff}
+
+/* Agenda cronologica: una scheda per riga fino a 900px. */
+@media (max-width: 900px) {
+  .chronologicalAgendaBlock .agendaMatchRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

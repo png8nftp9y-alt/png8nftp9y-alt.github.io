@@ -10844,3 +10844,8 @@ e dell’Agenda Tennis Europe.
 
 ## 2026-11-10 — Diagnosi mirata ranking ITF Junior
 - Il run 42733011187 ha recuperato due timeout Boys e rilevato anomalie a skip=4500 Boys e alla riga 4354 Girls. Il workflow aggiunge una modalità diagnostica a tre pagine, senza nomi o ID nei log e senza scritture D1. Test simulati completati. Esito live da verificare.
+
+
+## 2026-11-10 — Bandierine e layout dell’Agenda
+
+L’Agenda riusa le bandierine già caricate quando aggiorna le partite. La vista cronologica dispone le schede su una sola colonna fino a 900 px. Incrementate le versioni numeriche di JavaScript e CSS per la pubblicazione.
