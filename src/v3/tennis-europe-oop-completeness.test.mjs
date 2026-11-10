@@ -46,3 +46,13 @@ test('official empty singles slot is provisional today and unresolved after its 
   assert.equal(auditOopCompleteness({tournament:{competitionId:'T'},pages,matches:[],asOf}).status,status);
  }
 });
+
+
+test('inventory catches an official match card with reordered classes that the parser can miss',()=>{
+ const changed=card().replace('match match--list','match--list extra match');
+ const inventory=page(changed);
+ assert.equal(inventory.cards.length,1);
+ const report=audit([inventory],[]);
+ assert.equal(report.status,'incomplete');
+ assert.equal(report.issues[0].reason,'official_card_not_acquired');
+});

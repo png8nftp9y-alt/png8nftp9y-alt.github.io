@@ -10,7 +10,10 @@ const score=s=>String(s||'').replace(/\s+/g,' ').trim();
 const sameScore=(a,b)=>score(a)===score(b)||score(a).replace(/(\d+)-(\d+)/g,'$2-$1')===score(b);
 // Independent card inventory: never uses parsePage's output to discover source cards.
 export function inventoryOopPage(html,competitionId,date){
- const source=String(html||''),starts=[...source.matchAll(/<div\b[^>]*class=["'][^"']*\bmatch\s+match--list\b[^"']*["'][^>]*>/gi)].map(x=>x.index),cards=[];
+ const source=String(html||''),cards=[];
+ const starts=[...source.matchAll(/<div\b[^>]*\sclass\s*=\s*(["'])([^"']*)\1[^>]*>/gi)]
+  .filter(([, ,classes])=>classes.split(/\s+/).includes('match--list'))
+  .map(tag=>tag.index);
  for(let i=0;i<starts.length;i++){
   const block=source.slice(starts[i],starts[i+1]||source.length),players=[...new Map([...block.matchAll(/<a\b[^>]*data-player-id=["'][^"']+["'][^>]*>[\s\S]*?<\/a>/gi)].map(x=>tennisEuropeParticipant(x[0])).filter(p=>p.id&&p.name).map(p=>[p.id,p])).values()];
   const event=clean(block.match(/<a\b[^>]*href=["'][^"']*draw[^"']*["'][^>]*>[\s\S]*?<span\b[^>]*class=["'][^"']*nav-link__value[^"']*["'][^>]*>([\s\S]*?)<\/span>/i)?.[1]),round=clean(block.match(/<span\b[^>]*title=["']([^"']+)["'][^>]*class=["'][^"']*nav-link/i)?.[1]);

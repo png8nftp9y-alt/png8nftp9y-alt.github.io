@@ -66,7 +66,26 @@ export function resolvedPendingReplacements(previous,current){
  const matches=current.matches||[],known=new Set(matches.map(key));
  return (previous?.matches||[]).filter(m=>!known.has(key(m))).flatMap(m=>{const next=replacement(m,matches);return next?[{reason:verifiedRokahReplacement(m,[next])?'official_draw_schedule_replacement':verifiedLuckyLoserReplacement(m,[next])?'official_lucky_loser_same_slot':next.opponentPending?'official_provisional_slot_player_replaced':'pending_opponent_resolved_and_schedule_updated',previousMatchId:m.id,currentMatchId:next.id,competitionId:m.competitionId,date:next.date,event:next.event,round:next.round,knownPlayerIds:m.players.map(p=>String(p.id)),previousCourt:m.court,currentCourt:next.court,previousCourtMatchNumber:m.courtMatchNumber,currentCourtMatchNumber:next.courtMatchNumber}]:[]});
 }
+export function auditOopRemovals(previous,current){
+ const matches=current.matches||[],known=new Set(matches.map(key));
+ const active=new Map((current.tournaments||[]).map(t=>[String(t.competitionId).toUpperCase(),t.oopCompleteness]));
+ const officialRemovals=[],unexplainedRemovals=[];
+ for(const match of previous?.matches||[]){
+  const id=String(match.competitionId).toUpperCase(),audit=active.get(id);
+  if(!active.has(id)||known.has(key(match))||replacement(match,matches))continue;
+  const date=iso(match.date);
+  const day=audit?.status==='complete'&&!audit.issues?.length&&audit.days?.find(entry=>
+   date&&iso(entry.date)===date&&/^[a-f0-9]{64}$/.test(entry.sourceHash||'')&&
+   (entry.cards>0||entry.explicitEmpty===true));
+  const evidence={matchId:match.id,competitionId:match.competitionId,event:match.event,round:match.round,date:match.date,players:match.players};
+  if(day&&match.status==='scheduled'&&!match.score&&!match.retired&&!match.winnerPlayerId&&!match.winnerPlayerIds?.length){
+   officialRemovals.push({...evidence,reason:'absent_from_verified_official_oop',sourceHash:day.sourceHash});
+  }else{
+   unexplainedRemovals.push({...evidence,reason:'previous_acquired_match_absent_without_verified_exclusion'});
+  }
+ }
+ return {officialRemovals,unexplainedRemovals};
+}
 export function unexplainedOopRemovals(previous,current){
- const matches=current.matches||[],active=new Set((current.tournaments||[]).map(t=>String(t.competitionId).toUpperCase())),known=new Set(matches.map(key));
- return (previous?.matches||[]).filter(m=>active.has(String(m.competitionId).toUpperCase())&&!known.has(key(m))&&!replacement(m,matches)).map(m=>({reason:'previous_acquired_match_absent_without_verified_exclusion',matchId:m.id,competitionId:m.competitionId,event:m.event,round:m.round,date:m.date,players:m.players}));
+ return auditOopRemovals(previous,current).unexplainedRemovals;
 }
