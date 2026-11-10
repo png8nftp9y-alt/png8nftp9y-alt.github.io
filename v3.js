@@ -2442,6 +2442,27 @@ function renderWeeklyAgenda() {
         }),
     );
 }
+function updateDailyAgenda(dailyAgenda, markup) {
+  const template = document.createElement("template");
+  template.innerHTML = markup;
+  if (dailyAgenda.childNodes.length === 1 &&
+      dailyAgenda.firstChild.isEqualNode(template.content.firstChild)) return false;
+
+  const loadedFlags = new Map();
+  for (const flag of dailyAgenda.querySelectorAll("img.countryFlag")) {
+    if (!flag.complete || !flag.naturalWidth) continue;
+    const key = flag.outerHTML;
+    if (!loadedFlags.has(key)) loadedFlags.set(key, []);
+    loadedFlags.get(key).push(flag);
+  }
+  const content = document.importNode(template.content, true);
+  for (const flag of content.querySelectorAll("img.countryFlag")) {
+    const loaded = loadedFlags.get(flag.outerHTML)?.pop();
+    if (loaded) flag.replaceWith(loaded);
+  }
+  dailyAgenda.replaceChildren(content);
+  return true;
+}
 function renderAgenda() {
   const resolveTournament = createMatchTournamentResolver(),
     key = iso(state.agenda),
@@ -2522,7 +2543,7 @@ function renderAgenda() {
   const isChronological = state.agendaMode === "chronological",
     blocks = isChronological ? chronologicalBlocks : tournamentBlocks;
   let chronologicalHeaderIdentity = "";
-  $("dailyAgenda").innerHTML = blocks.length
+  const markup = blocks.length
     ? `<div class="agendaList">${blocks
         .map(({ tournament, matches }) => {
           const sample = matches[0],
@@ -2600,7 +2621,9 @@ function renderAgenda() {
         })
         .join("")}</div>`
     : '<div class="empty">Nessuna partita confermata per questa giornata.</div>';
-  document.querySelectorAll("#dailyAgenda [data-open-tournament]").forEach(
+  const dailyAgenda = $("dailyAgenda");
+  if (!updateDailyAgenda(dailyAgenda, markup)) return;
+  dailyAgenda.querySelectorAll("[data-open-tournament]").forEach(
     (x) =>
       (x.onclick = (event) => {
         if (hasLocalMouseSelection(event, x)) return;
@@ -2608,7 +2631,7 @@ function renderAgenda() {
           "tournament/" + encodeURIComponent(x.dataset.openTournament);
       }),
   );
-  bindParticipantNavigation($("dailyAgenda"));
+  bindParticipantNavigation(dailyAgenda);
 }
 function tournamentKey(t) {
   const identity =
