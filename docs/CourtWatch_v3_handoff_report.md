@@ -10815,3 +10815,7 @@ L’audit registra come in attesa uno slot di doppio odierno o futuro con due ID
 ## 2026-11-09 — Verifica fonte ranking ITF Junior
 - L’acquisitore abilita l’endpoint Combined Rankings JT per Boys e Girls. La verifica controlla data, totale e ID distinti su tutte le pagine.
 - Test locali con risposte simulate completati. Acquisizione live sul VPS ancora da verificare. Questa prova non scrive in D1.
+
+
+## 2026-11-10 — Sonda ITF Junior da GitHub Actions
+- Workflow manuale in sola lettura tramite l’acquisitore ITF configurato. Test locali completati per liste complete, dati incompleti, URL rifiutato e Incapsula. Prova live ancora da eseguire.

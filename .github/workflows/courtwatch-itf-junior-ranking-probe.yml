@@ -1,0 +1,25 @@
+name: CourtWatch ITF Junior ranking probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: courtwatch-itf-junior-ranking-probe
+
+jobs:
+  check-ranking:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check official Boys and Girls rankings through the ITF acquirer
+        env:
+          ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
+        run: node infra/itf-acquirer/check-junior-rankings.mjs
