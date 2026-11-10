@@ -10853,3 +10853,5 @@ L’Agenda riusa le bandierine già caricate quando aggiorna le partite. La vist
 
 ## 2026-11-10 — Verifica ranking ITF Junior in una risposta
 - Il run 42735319733 ha rilevato sette ID Boys ripetuti al rank 4296 tra pagine e una voce Girls con gender M. La modalità diagnostica prova take=6000, verifica totali e ID distinti e confronta la voce Girls con la lista Boys della stessa data. Test simulato completato. Limite live da verificare. Nessuna scrittura D1.
+
+ITF discovery 2026-11-10T07:57:02.569Z: 7 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
