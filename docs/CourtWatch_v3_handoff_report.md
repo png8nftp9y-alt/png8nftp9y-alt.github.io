@@ -10869,3 +10869,5 @@ ITF Meta ordinary 2026-11-11T07:20:29.942Z: attempted 1, acquired 1, ordinary 0,
 
 ## 2026-11-11 — Recupero paginazione ranking ITF Junior
 - La verifica completa rilegge con confini spostati le pagine con ID ripetuti e richiede il totale esatto di ID distinti. Le anomalie gender sono conteggiate conservando la categoria della lista ufficiale. Test simulati completati; prova live da verificare. Nessuna scrittura D1.
+
+ITF discovery 2026-11-11T20:05:19.374Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
