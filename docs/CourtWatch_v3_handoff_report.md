@@ -10861,3 +10861,5 @@ ITF Meta ordinary 2026-11-10T07:59:10.433Z: attempted 7, acquired 7, ordinary 0,
 ITF discovery 2026-11-10T20:11:52.697Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-11-11T07:17:10.729Z: 9 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-11T07:19:33.866Z: attempted 8, acquired 8, ordinary 1, extraordinary 1. Partial metadata preserved; official D1 sync follows.
