@@ -6,7 +6,7 @@ on:
       mode:
         description: Ranking check
         type: choice
-        default: diagnostic
+        default: full
         options: [diagnostic, full]
 
 permissions:
@@ -33,6 +33,7 @@ jobs:
 
           for (const [category, gender] of [['B', 'M'], ['G', 'F']]) {
             let pages = 0;
+            const genderMismatches = new Set();
             try {
               const result = await checkRanking(category, async url => {
                 const skip = Number(url.searchParams.get('skip'));
@@ -64,11 +65,8 @@ jobs:
                   if (!Array.isArray(json?.items)) throw Error('items_missing_or_not_array');
                   if (!json.items.length) throw Error('items_empty');
                   if (skip === 0 && json.items[0]?.rank !== 1) throw Error('first_rank_not_1');
-                  const wrongCategory = json.items.findIndex(row => row?.gender !== gender);
-                  if (wrongCategory !== -1) {
-                    const value = json.items[wrongCategory]?.gender;
-                    const reason = value == null ? 'missing' : value === '' ? 'empty' : 'unexpected';
-                    throw Error('gender_' + reason + ' at row ' + (skip + wrongCategory + 1));
+                  for (const row of json.items) {
+                    if (row?.gender !== gender) genderMismatches.add(row?.playerId);
                   }
                   pages++;
                   if (pages % 10 === 0) console.log(JSON.stringify({ category, pages, skip }));
@@ -76,8 +74,8 @@ jobs:
                 } catch (error) {
                   throw Error('skip=' + skip + ': ' + error.message);
                 }
-              });
-              console.log(JSON.stringify(result));
+              }, 100, { recoverTies: true });
+              console.log(JSON.stringify({ ...result, genderMismatches: genderMismatches.size }));
             } catch (error) {
               console.error(JSON.stringify({ category, error: error.message }));
               process.exitCode = 1;

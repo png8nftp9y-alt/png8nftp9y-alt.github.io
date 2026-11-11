@@ -10865,3 +10865,7 @@ ITF discovery 2026-11-11T07:17:10.729Z: 9 newly discovered future tournaments; M
 ITF Meta ordinary 2026-11-11T07:19:33.866Z: attempted 8, acquired 8, ordinary 1, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta ordinary 2026-11-11T07:20:29.942Z: attempted 1, acquired 1, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+## 2026-11-11 — Recupero paginazione ranking ITF Junior
+- La verifica completa rilegge con confini spostati le pagine con ID ripetuti e richiede il totale esatto di ID distinti. Le anomalie gender sono conteggiate conservando la categoria della lista ufficiale. Test simulati completati; prova live da verificare. Nessuna scrittura D1.
