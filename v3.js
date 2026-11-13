@@ -1095,7 +1095,7 @@ async function refreshPlayerMembership(group,epoch,isSnapshotComplete) {
     const ids=new Set(players.map(p=>p.id));
     state.data={matches:[],agenda:[],results:[],opponents:[],tournamentEntries:[],tournaments:[],...previous,group,players};
     for(const key of ['matches','agenda','results','tournamentEntries','tournaments'])state.data[key]=(state.data[key]||[]).filter(r=>ids.has(r.playerId));
-    state.selected=new Set([...state.selected].filter(id=>ids.has(id)));
+    // Preserve selection when an intermediate membership list omits a player.
     for(const p of players)if(!old.has(p.id))state.selected.add(p.id);
     const hash=location.hash,y=typeof scrollY==='number'?scrollY:null;
     renderIfDataChanged();
@@ -1155,9 +1155,6 @@ function applyCachedProjection(saved) {
   if (!uiSelectionRestored) {
     saved.players.forEach(player => state.selected.add(player.id));
     uiSelectionRestored = true;
-  } else {
-    const ids = new Set(saved.players.map(player => player.id));
-    state.selected = new Set([...state.selected].filter(id => ids.has(id)));
   }
   return true;
 }
@@ -5045,12 +5042,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
     if (!uiSelectionRestored) {
       state.data.players.forEach((p) => state.selected.add(p.id));
       uiSelectionRestored = true;
-    } else
-      state.selected = new Set(
-        [...state.selected].filter((id) =>
-          state.data.players.some((p) => p.id === id),
-        ),
-      );
+    }
     syncLabel(state.data, true);
     renderIfDataChanged();
     restoreUiScroll();
@@ -5235,12 +5227,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       if (!uiSelectionRestored) {
         state.data.players.forEach((p) => state.selected.add(p.id));
         uiSelectionRestored = true;
-      } else
-        state.selected = new Set(
-          [...state.selected].filter((id) =>
-            state.data.players.some((p) => p.id === id),
-          ),
-        );
+      }
       syncLabel(state.data, optionalFailures > 0);
       const rendered = renderIfDataChanged(viewY !== null);
       if (typeof recordStartupTiming === "function") recordStartupTiming("projection_render", publicationStarted, {complete:Boolean(projection)});
@@ -5281,12 +5268,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       if (!uiSelectionRestored) {
         state.data.players.forEach((p) => state.selected.add(p.id));
         uiSelectionRestored = true;
-      } else
-        state.selected = new Set(
-          [...state.selected].filter((id) =>
-            state.data.players.some((p) => p.id === id),
-          ),
-        );
+      }
       syncLabel(state.data, true);
       renderIfDataChanged();
       restoreUiScroll();

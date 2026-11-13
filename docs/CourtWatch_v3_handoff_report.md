@@ -10893,3 +10893,8 @@ Estesa a tutte le larghezze la disposizione con una partita per riga. Conservate
 ## Agenda WebKit e compatibilità runner CI
 
 Una partita per riga anche nella vista per torneo, conservando le colonne interne. Runner della sicurezza e di Others fissati a Ubuntu 24.04 per compatibilità con Playwright 1.54.2. Aggiornate le versioni degli asset. Verifica browser demandata alla CI.
+
+
+## Selezione giocatori durante il refresh
+
+Le proiezioni intermedie e la sincronizzazione elenco conservano gli ID selezionati anche quando temporaneamente assenti. La rimozione esplicita del giocatore mantiene il proprio percorso. Verificati ripristino cache parziale/completa, deselezione manuale e selezione vuota; sintassi JavaScript valida.
