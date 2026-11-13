@@ -17,7 +17,7 @@ permissions:
   contents: read
 jobs:
   fingerprint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       code_fingerprint: ${{ steps.code.outputs.code_fingerprint }}
@@ -36,7 +36,7 @@ jobs:
       group: courtwatch-code-safety-${{ needs.fingerprint.outputs.code_fingerprint }}
       cancel-in-progress: false
       queue: max
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4

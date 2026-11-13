@@ -10888,3 +10888,8 @@ ITF discovery 2026-11-13T20:11:17.179Z: 0 newly discovered future tournaments; M
 ## Agenda cronologica — correzione WebKit desktop
 
 Estesa a tutte le larghezze la disposizione con una partita per riga. Conservate le colonne interne di orario e giocatori. Aggiornate le versioni degli asset. Verifica browser demandata alla CI.
+
+
+## Agenda WebKit e compatibilità runner CI
+
+Una partita per riga anche nella vista per torneo, conservando le colonne interne. Runner della sicurezza e di Others fissati a Ubuntu 24.04 per compatibilità con Playwright 1.54.2. Aggiornate le versioni degli asset. Verifica browser demandata alla CI.
