@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-13T17:35:58.916Z",
+  "generatedAt": "2026-11-13T18:05:25.809Z",
   "today": "2026-11-13",
   "windowEnd": "2026-11-16",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -11,17 +11,17 @@
     "complete": 976,
     "cancelledNoDraws": 13,
     "resolved": 989,
-    "missingDrawsTournaments": 0,
-    "unverifiable": 201,
-    "declaredDraws": 5607,
-    "acquiredDraws": 5607,
-    "missingDraws": 0,
-    "actionableUnverifiable": 21,
+    "missingDrawsTournaments": 1,
+    "unverifiable": 200,
+    "declaredDraws": 5613,
+    "acquiredDraws": 5609,
+    "missingDraws": 4,
+    "actionableUnverifiable": 20,
     "futureUnverifiable": 180,
     "ordinary": {
       "total": 21,
-      "missingDraws": 0,
-      "inventoryRequired": 21
+      "missingDraws": 4,
+      "inventoryRequired": 20
     },
     "extraordinaryA": {
       "total": 0,
@@ -59,7 +59,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-13T17:16:13.082Z",
+        "checkedAt": "2026-11-13T17:46:19.271Z",
         "eligibleFrom": "2026-11-15"
       },
       {
@@ -67,6 +67,71 @@
         "tournamentName": "J100 Stabekk",
         "startDate": "2026-11-16",
         "endDate": "2026-11-20",
+        "status": "missing",
+        "inventoryError": null,
+        "knownDraws": 6,
+        "acquiredDraws": 2,
+        "missingDraws": 4,
+        "missingEvents": [
+          {
+            "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-13T17:47:13.754Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-13T17:47:13.754Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-13T17:47:13.754Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-13T17:47:13.754Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
+        "resolvedEvents": [],
+        "needsInventory": false,
+        "checkedAt": "2026-11-13T17:47:13.754Z",
+        "eligibleFrom": "2026-11-15"
+      },
+      {
+        "competitionId": "J-J200-USA-2026-006",
+        "tournamentName": "J200  Delray Beach",
+        "startDate": "2026-11-16",
+        "endDate": "2026-11-22",
         "status": "inventory_empty",
         "inventoryError": "empty_inventory",
         "knownDraws": null,
@@ -75,23 +140,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-13T17:16:14.801Z",
-        "eligibleFrom": "2026-11-15"
-      },
-      {
-        "competitionId": "J-J200-USA-2026-006",
-        "tournamentName": "J200  Delray Beach",
-        "startDate": "2026-11-16",
-        "endDate": "2026-11-22",
-        "status": "inventory_required",
-        "inventoryError": "GetEventFilters_incapsula_challenge",
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
-        "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-11-13T17:16:28.250Z",
+        "checkedAt": "2026-11-13T17:46:18.399Z",
         "eligibleFrom": "2026-11-15"
       },
       {
@@ -107,7 +156,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-13T17:16:13.156Z",
+        "checkedAt": "2026-11-13T17:46:18.161Z",
         "eligibleFrom": "2026-11-15"
       },
       {
@@ -123,7 +172,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-13T17:16:23.080Z",
+        "checkedAt": "2026-11-13T17:46:21.088Z",
         "eligibleFrom": "2026-11-15"
       },
       {
@@ -139,7 +188,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-13T17:16:12.312Z",
+        "checkedAt": "2026-11-13T17:46:19.448Z",
         "eligibleFrom": "2026-11-15"
       },
       {
@@ -155,7 +204,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-13T17:16:13.967Z",
+        "checkedAt": "2026-11-13T17:46:16.669Z",
         "eligibleFrom": "2026-11-15"
       },
       {
@@ -171,7 +220,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-13T17:16:13.148Z",
+        "checkedAt": "2026-11-13T17:46:19.228Z",
         "eligibleFrom": "2026-11-15"
       },
       {
@@ -384,12 +433,16 @@
       }
     ],
     "total": 21,
-    "missingDraws": 0,
-    "acquiredDraws": 0,
-    "missingByReason": {},
+    "missingDraws": 4,
+    "acquiredDraws": 2,
+    "missingByReason": {
+      "draw_without_players": 3,
+      "incapsula_blocked": 1
+    },
     "byStatus": {
       "inventory_empty": 7,
-      "inventory_required": 14
+      "missing": 1,
+      "inventory_required": 13
     }
   },
   "extraordinary": {
@@ -3292,9 +3345,9 @@
     }
   },
   "audit": {
-    "urgentUnverifiable": 21,
+    "urgentUnverifiable": 20,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 21,
+    "actionableUnverifiable": 20,
     "futureUnverifiable": 180,
     "blocked": 0
   }
