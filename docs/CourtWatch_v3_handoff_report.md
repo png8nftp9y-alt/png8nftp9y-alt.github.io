@@ -10881,3 +10881,5 @@ ITF discovery 2026-11-12T20:36:13.803Z: 0 newly discovered future tournaments; M
 ITF discovery 2026-11-13T07:21:16.215Z: 1 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta 2026-11-13T13:11:58.145Z: queue initialized/reconciled, started tournaments excluded, no historical recovery.
+
+ITF discovery 2026-11-13T20:11:17.179Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
