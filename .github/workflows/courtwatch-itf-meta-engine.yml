@@ -26,7 +26,8 @@ concurrency:
   queue: single
 jobs:
   batch:
-    runs-on: ubuntu-latest
+    # Playwright 1.54.2 requires a supported runner image.
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     outputs:
       count: ${{ steps.select.outputs.count }}

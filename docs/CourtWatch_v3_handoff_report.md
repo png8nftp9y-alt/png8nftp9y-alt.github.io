@@ -10929,3 +10929,7 @@ Validazione: il test sul sorgente OOP reale fallisce con il vecchio verificatore
 ## Riduzione richieste dello storico condiviso
 
 Aumentata da 250 a 1000 righe la pagina delle letture condivise. Conservati paginazione completa, limiti di concorrenza, verifiche di identità e interruzione in caso di errore. Nessuna cache persistente o scrittura aggiunta. Nei test: 6502 partite identiche, 36 richieste prima e 14 dopo; operazioni SQLite da 1328600 a 1282500. Superati i quattro test shared-player-history. Il guadagno sulla latenza online resta da misurare.
+
+### 14 novembre 2026 — Compatibilità browser ITF Meta
+
+Fissato il job batch a Ubuntu 24.04: Playwright 1.54.2 non supporta Ubuntu 26.04 assegnato da ubuntu-latest. Il run 43593917504 falliva prima dell'acquisizione. Validazione: YAML verificato e 13 test della coda superati. Installazione browser e acquisizione da confermare nel nuovo run.
