@@ -10900,3 +10900,5 @@ Una partita per riga anche nella vista per torneo, conservando le colonne intern
 Le proiezioni intermedie e la sincronizzazione elenco conservano gli ID selezionati anche quando temporaneamente assenti. La rimozione esplicita del giocatore mantiene il proprio percorso. Verificati ripristino cache parziale/completa, deselezione manuale e selezione vuota; sintassi JavaScript valida.
 
 ITF discovery 2026-11-14T07:08:01.206Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-11-14T18:39:34.009Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
