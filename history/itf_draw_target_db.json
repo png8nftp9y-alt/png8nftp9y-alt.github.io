@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-14T03:17:43.362Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-14T03:20:19.139Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -950308,7 +950308,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-14T02:19:23.856Z",
+      "checkedAt": "2026-11-14T03:20:16.084Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -951163,7 +951163,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-20",
       "decision": "pending",
-      "checkedAt": "2026-11-14T02:19:24.391Z",
+      "checkedAt": "2026-11-14T03:20:16.737Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -951288,8 +951288,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -951314,8 +951314,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -951327,8 +951327,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -951353,14 +951353,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -951988,17 +951988,1124 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-14T02:19:24.889Z",
+      "checkedAt": "2026-11-14T03:20:17.155Z",
       "playersFound": 0,
-      "declaredSections": 0,
-      "acquiredSections": 0,
+      "declaredSections": 6,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 0,
-      "eventInventory": [],
-      "families": [],
-      "eventFailure": null,
-      "eventCache": {}
+      "resolvedSections": 2,
+      "missingSections": 4,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "competitionId": "J-J200-USA-2026-006",
+            "event": "B-S-M-KO",
+            "tournamentId": 1100205283,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j200-delray-beach/usa/2026/j-j200-usa-2026-006/",
+            "family": "B-S-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "competitionId": "J-J200-USA-2026-006",
+            "event": "B-S-Q-KO",
+            "tournamentId": 1100205283,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j200-delray-beach/usa/2026/j-j200-usa-2026-006/",
+            "family": "B-S-Q",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "competitionId": "J-J200-USA-2026-006",
+            "event": "B-D-M-KO",
+            "tournamentId": 1100205283,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j200-delray-beach/usa/2026/j-j200-usa-2026-006/",
+            "family": "B-D-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "competitionId": "J-J200-USA-2026-006",
+            "event": "G-S-M-KO",
+            "tournamentId": 1100205283,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j200-delray-beach/usa/2026/j-j200-usa-2026-006/",
+            "family": "G-S-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "competitionId": "J-J200-USA-2026-006",
+            "event": "G-S-Q-KO",
+            "tournamentId": 1100205283,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j200-delray-beach/usa/2026/j-j200-usa-2026-006/",
+            "family": "G-S-Q",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "competitionId": "J-J200-USA-2026-006",
+            "event": "G-D-M-KO",
+            "tournamentId": 1100205283,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j200-delray-beach/usa/2026/j-j200-usa-2026-006/",
+            "family": "G-D-M",
+            "structure": "KO"
+          }
+        }
+      ],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 51,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 38,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
+              "resolved": false
+            }
+          ]
+        }
+      ],
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800690483",
+              "name": "Benjamin Sienghen",
+              "givenName": "Benjamin",
+              "familyName": "Sienghen",
+              "nationalityCode": "THA",
+              "profileLink": "/en/players/benjamin-sienghen/800690483/tha/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800860061",
+              "name": "Michael Livson",
+              "givenName": "Michael",
+              "familyName": "Livson",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/michael-livson/800860061/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800711310",
+              "name": "Marko Pavlovic",
+              "givenName": "Marko",
+              "familyName": "Pavlovic",
+              "nationalityCode": "SRB",
+              "profileLink": "/en/players/marko-pavlovic/800711310/srb/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800843557",
+              "name": "Joseph Kim",
+              "givenName": "Joseph",
+              "familyName": "Kim",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/joseph-kim/800843557/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800769193",
+              "name": "Satvik Santosh",
+              "givenName": "Satvik",
+              "familyName": "Santosh",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/satvik-santosh/800769193/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800824506",
+              "name": "Karl Ekstrand",
+              "givenName": "Karl",
+              "familyName": "Ekstrand",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/karl-ekstrand/800824506/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800687212",
+              "name": "Haruka Okubo",
+              "givenName": "Haruka",
+              "familyName": "Okubo",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/haruka-okubo/800687212/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800824607",
+              "name": "Max Martin",
+              "givenName": "Max",
+              "familyName": "Martin",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/max-martin/800824607/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800760803",
+              "name": "Malek Mbaye",
+              "givenName": "Malek",
+              "familyName": "Mbaye",
+              "nationalityCode": "CAN",
+              "profileLink": "/en/players/malek-mbaye/800760803/can/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791147",
+              "name": "Geet Pondala",
+              "givenName": "Geet",
+              "familyName": "Pondala",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/geet-pondala/800791147/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766273",
+              "name": "Oliver Russell",
+              "givenName": "Oliver",
+              "familyName": "Russell",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/oliver-russell/800766273/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800775114",
+              "name": "Santiago Salazar",
+              "givenName": "Santiago",
+              "familyName": "Salazar",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/santiago-salazar/800775114/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800649807",
+              "name": "Tymofii Trushenov",
+              "givenName": "Tymofii",
+              "familyName": "Trushenov",
+              "nationalityCode": "UKR",
+              "profileLink": "/en/players/tymofii-trushenov/800649807/ukr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800783429",
+              "name": "Alexander Walker",
+              "givenName": "Alexander",
+              "familyName": "Walker",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/alexander-walker/800783429/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751175",
+              "name": "Vinicius Barbosa",
+              "givenName": "Vinicius",
+              "familyName": "Barbosa",
+              "nationalityCode": "BRA",
+              "profileLink": "/en/players/vinicius-barbosa/800751175/bra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777594",
+              "name": "Mark Karpovich",
+              "givenName": "Mark",
+              "familyName": "Karpovich",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/mark-karpovich/800777594/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800764504",
+              "name": "Angad Singh",
+              "givenName": "Angad",
+              "familyName": "Singh",
+              "nationalityCode": "CAN",
+              "profileLink": "/en/players/angad-singh/800764504/can/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800790296",
+              "name": "Alexander Klimovich",
+              "givenName": "Alexander",
+              "familyName": "Klimovich",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/alexander-klimovich/800790296/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800784214",
+              "name": "Mathias Mendez",
+              "givenName": "Mathias",
+              "familyName": "Mendez",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/mathias-mendez/800784214/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751173",
+              "name": "Mateus Barbosa",
+              "givenName": "Mateus",
+              "familyName": "Barbosa",
+              "nationalityCode": "BRA",
+              "profileLink": "/en/players/mateus-barbosa/800751173/bra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800844787",
+              "name": "Kurt Sayan",
+              "givenName": "Kurt",
+              "familyName": "Sayan",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/kurt-sayan/800844787/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800746408",
+              "name": "Dylan clarke",
+              "givenName": "Dylan",
+              "familyName": "clarke",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/dylan-clarke/800746408/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800718796",
+              "name": "Alvaro Escribano",
+              "givenName": "Alvaro",
+              "familyName": "Escribano",
+              "nationalityCode": "ESP",
+              "profileLink": "/en/players/alvaro-escribano/800718796/esp/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800710684",
+              "name": "Xavier Sanders",
+              "givenName": "Xavier",
+              "familyName": "Sanders",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/xavier-sanders/800710684/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800775903",
+              "name": "Alexander Pierce",
+              "givenName": "Alexander",
+              "familyName": "Pierce",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/alexander-pierce/800775903/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781756",
+              "name": "Ivan Urbanovich",
+              "givenName": "Ivan",
+              "familyName": "Urbanovich",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/ivan-urbanovich/800781756/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800701878",
+              "name": "Vincenzo Loffredo",
+              "givenName": "Vincenzo",
+              "familyName": "Loffredo",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/vincenzo-loffredo/800701878/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800753972",
+              "name": "Sohith Tella",
+              "givenName": "Sohith",
+              "familyName": "Tella",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/sohith-tella/800753972/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800675080",
+              "name": "Horace-John Stewart",
+              "givenName": "Horace-John",
+              "familyName": "Stewart",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/horace-john-stewart/800675080/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800724602",
+              "name": "William Delach",
+              "givenName": "William",
+              "familyName": "Delach",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/william-delach/800724602/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800593832",
+              "name": "Gleb Pirogov",
+              "givenName": "Gleb",
+              "familyName": "Pirogov",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/gleb-pirogov/800593832/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800762626",
+              "name": "Carson Kuchar",
+              "givenName": "Carson",
+              "familyName": "Kuchar",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/carson-kuchar/800762626/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800795116",
+              "name": "Marvin Remy",
+              "givenName": "Marvin",
+              "familyName": "Remy",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/marvin-remy/800795116/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800757409",
+              "name": "demetre dadianidze",
+              "givenName": "demetre",
+              "familyName": "dadianidze",
+              "nationalityCode": "GEO",
+              "profileLink": "/en/players/demetre-dadianidze/800757409/geo/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800826099",
+              "name": "Vincenzo Palmiotto",
+              "givenName": "Vincenzo",
+              "familyName": "Palmiotto",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/vincenzo-palmiotto/800826099/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800774188",
+              "name": "EITA MISHIMA",
+              "givenName": "EITA",
+              "familyName": "MISHIMA",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/eita-mishima/800774188/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800876020",
+              "name": "Lucas Celechovsky",
+              "givenName": "Lucas",
+              "familyName": "Celechovsky",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/lucas-celechovsky/800876020/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800813160",
+              "name": "Christopher Bright",
+              "givenName": "Christopher",
+              "familyName": "Bright",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/christopher-bright/800813160/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800647720",
+              "name": "oscar puyplat",
+              "givenName": "oscar",
+              "familyName": "puyplat",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/oscar-puyplat/800647720/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800826909",
+              "name": "Alejandro Palacios",
+              "givenName": "Alejandro",
+              "familyName": "Palacios",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/alejandro-palacios/800826909/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777387",
+              "name": "Motian Qian",
+              "givenName": "Motian",
+              "familyName": "Qian",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/motian-qian/800777387/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800762516",
+              "name": "Yakov Sabah",
+              "givenName": "Yakov",
+              "familyName": "Sabah",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/yakov-sabah/800762516/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800732425",
+              "name": "Damian Tabuteau",
+              "givenName": "Damian",
+              "familyName": "Tabuteau",
+              "nationalityCode": "HAI",
+              "profileLink": "/en/players/damian-tabuteau/800732425/hai/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800718102",
+              "name": "Albert Crismar",
+              "givenName": "Albert",
+              "familyName": "Crismar",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/albert-crismar/800718102/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800723513",
+              "name": "Anthony Dry",
+              "givenName": "Anthony",
+              "familyName": "Dry",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/anthony-dry/800723513/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800698328",
+              "name": "Maddox Bose",
+              "givenName": "Maddox",
+              "familyName": "Bose",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/maddox-bose/800698328/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800843937",
+              "name": "Miroslav Jarolim",
+              "givenName": "Miroslav",
+              "familyName": "Jarolim",
+              "nationalityCode": "CRC",
+              "profileLink": "/en/players/miroslav-jarolim/800843937/crc/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800827077",
+              "name": "Samuel Rosales Stephen",
+              "givenName": "Samuel",
+              "familyName": "Rosales Stephen",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/samuel-rosales-stephen/800827077/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800726529",
+              "name": "Daniel Ruban",
+              "givenName": "Daniel",
+              "familyName": "Ruban",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/daniel-ruban/800726529/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800654308",
+              "name": "Tomas Orrego",
+              "givenName": "Tomas",
+              "familyName": "Orrego",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/tomas-orrego/800654308/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800698789",
+              "name": "Nikola Bogojevic",
+              "givenName": "Nikola",
+              "familyName": "Bogojevic",
+              "nationalityCode": "CAN",
+              "profileLink": "/en/players/nikola-bogojevic/800698789/can/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-14T03:20:17.155Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J200-USA-2026-006__B-S-Q-KO",
+            "storedAt": "2026-11-14T03:20:17.155Z"
+          }
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800725515",
+              "name": "Taylor Burke",
+              "givenName": "Taylor",
+              "familyName": "Burke",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/taylor-burke/800725515/aus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800812438",
+              "name": "Natalie Thelemaque",
+              "givenName": "Natalie",
+              "familyName": "Thelemaque",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/natalie-thelemaque/800812438/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800821015",
+              "name": "Malaika Chinyerere",
+              "givenName": "Malaika",
+              "familyName": "Chinyerere",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/malaika-chinyerere/800821015/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800822001",
+              "name": "Jacqueline Nick",
+              "givenName": "Jacqueline",
+              "familyName": "Nick",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/jacqueline-nick/800822001/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781385",
+              "name": "Saranya Agarwal",
+              "givenName": "Saranya",
+              "familyName": "Agarwal",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/saranya-agarwal/800781385/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800725473",
+              "name": "Kairrie Fu",
+              "givenName": "Kairrie",
+              "familyName": "Fu",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/kairrie-fu/800725473/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800737356",
+              "name": "Melissa Paniagua Gasser",
+              "givenName": "Melissa",
+              "familyName": "Paniagua Gasser",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/melissa-paniagua-gasser/800737356/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800762446",
+              "name": "Valentina Serrano Garibay",
+              "givenName": "Valentina",
+              "familyName": "Serrano Garibay",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/valentina-serrano-garibay/800762446/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800738396",
+              "name": "Sophia Osipova",
+              "givenName": "Sophia",
+              "familyName": "Osipova",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/sophia-osipova/800738396/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800822084",
+              "name": "Julia Przybylski",
+              "givenName": "Julia",
+              "familyName": "Przybylski",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/julia-przybylski/800822084/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800755130",
+              "name": "CHLOE RUIZ",
+              "givenName": "CHLOE",
+              "familyName": "RUIZ",
+              "nationalityCode": "FRA",
+              "profileLink": "/en/players/chloe-ruiz/800755130/fra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800706973",
+              "name": "Khadija Adeniran",
+              "givenName": "Khadija",
+              "familyName": "Adeniran",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/khadija-adeniran/800706973/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777512",
+              "name": "Tamara Herman",
+              "givenName": "Tamara",
+              "familyName": "Herman",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/tamara-herman/800777512/mex/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800697702",
+              "name": "Lily Revak",
+              "givenName": "Lily",
+              "familyName": "Revak",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/lily-revak/800697702/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800818202",
+              "name": "Katie Charlotte Mann",
+              "givenName": "Katie Charlotte",
+              "familyName": "Mann",
+              "nationalityCode": "CAN",
+              "profileLink": "/en/players/katie-charlotte-mann/800818202/can/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800752642",
+              "name": "Andrea Jakovljevic",
+              "givenName": "Andrea",
+              "familyName": "Jakovljevic",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/andrea-jakovljevic/800752642/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800802491",
+              "name": "Emillina Alexandre",
+              "givenName": "Emillina",
+              "familyName": "Alexandre",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/emillina-alexandre/800802491/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800649732",
+              "name": "Zara KIRKAN",
+              "givenName": "Zara",
+              "familyName": "KIRKAN",
+              "nationalityCode": "TUR",
+              "profileLink": "/en/players/zara-kirkan/800649732/tur/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781384",
+              "name": "Sitara Agarwal",
+              "givenName": "Sitara",
+              "familyName": "Agarwal",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/sitara-agarwal/800781384/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800780929",
+              "name": "Diana Ensignia",
+              "givenName": "Diana",
+              "familyName": "Ensignia",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/diana-ensignia/800780929/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800756494",
+              "name": "Noa Shiloh Branker",
+              "givenName": "Noa",
+              "familyName": "Shiloh Branker",
+              "nationalityCode": "NED",
+              "profileLink": "/en/players/noa-shiloh-branker/800756494/ned/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800780968",
+              "name": "Patricia Gonzalez",
+              "givenName": "Patricia",
+              "familyName": "Gonzalez",
+              "nationalityCode": "CUB",
+              "profileLink": "/en/players/patricia-gonzalez/800780968/cub/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800707175",
+              "name": "Riko Pang",
+              "givenName": "Riko",
+              "familyName": "Pang",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/riko-pang/800707175/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800829395",
+              "name": "Eva Haberjan",
+              "givenName": "Eva",
+              "familyName": "Haberjan",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/eva-haberjan/800829395/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800857418",
+              "name": "Zoriana Voloshyna",
+              "givenName": "Zoriana",
+              "familyName": "Voloshyna",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/zoriana-voloshyna/800857418/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800761607",
+              "name": "Caroline Gama de Castro",
+              "givenName": "Caroline",
+              "familyName": "Gama de Castro",
+              "nationalityCode": "BRA",
+              "profileLink": "/en/players/caroline-gama-de-castro/800761607/bra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800765504",
+              "name": "Liya Mbaye",
+              "givenName": "Liya",
+              "familyName": "Mbaye",
+              "nationalityCode": "CAN",
+              "profileLink": "/en/players/liya-mbaye/800765504/can/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766233",
+              "name": "Charlotte Ballarin",
+              "givenName": "Charlotte",
+              "familyName": "Ballarin",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/charlotte-ballarin/800766233/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800703427",
+              "name": "Aishi Bisht",
+              "givenName": "Aishi",
+              "familyName": "Bisht",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/aishi-bisht/800703427/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800746856",
+              "name": "Morenike Adeniran",
+              "givenName": "Morenike",
+              "familyName": "Adeniran",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/morenike-adeniran/800746856/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800824602",
+              "name": "Evangelina Romaniuk",
+              "givenName": "Evangelina",
+              "familyName": "Romaniuk",
+              "nationalityCode": "CAN",
+              "profileLink": "/en/players/evangelina-romaniuk/800824602/can/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800810014",
+              "name": "Arianne James",
+              "givenName": "Arianne",
+              "familyName": "James",
+              "nationalityCode": "JAM",
+              "profileLink": "/en/players/arianne-james/800810014/jam/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800839439",
+              "name": "Victoria Park",
+              "givenName": "Victoria",
+              "familyName": "Park",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/victoria-park/800839439/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800815404",
+              "name": "Karolina Kriek",
+              "givenName": "Karolina",
+              "familyName": "Kriek",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/karolina-kriek/800815404/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800769308",
+              "name": "Janica Bo",
+              "givenName": "Janica",
+              "familyName": "Bo",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/janica-bo/800769308/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800762016",
+              "name": "Ilaria Bitunova",
+              "givenName": "Ilaria",
+              "familyName": "Bitunova",
+              "nationalityCode": "BLR",
+              "profileLink": "/en/players/ilaria-bitunova/800762016/blr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800788405",
+              "name": "Alisa Shifrin",
+              "givenName": "Alisa",
+              "familyName": "Shifrin",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/alisa-shifrin/800788405/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800713383",
+              "name": "Taisiya Sorokina",
+              "givenName": "Taisiya",
+              "familyName": "Sorokina",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/taisiya-sorokina/800713383/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-14T03:20:17.155Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J200-USA-2026-006__G-S-Q-KO",
+            "storedAt": "2026-11-14T03:20:17.155Z"
+          }
+        }
+      }
     },
     "J-J30-AIA-2026-003": {
       "competitionId": "J-J30-AIA-2026-003",
@@ -952006,7 +953113,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-14T02:19:25.379Z",
+      "checkedAt": "2026-11-14T03:20:17.568Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -952024,7 +953131,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-14T02:19:25.876Z",
+      "checkedAt": "2026-11-14T03:20:17.957Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -952042,7 +953149,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-14T02:19:26.376Z",
+      "checkedAt": "2026-11-14T03:20:18.346Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -952060,7 +953167,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-14T02:19:26.871Z",
+      "checkedAt": "2026-11-14T03:20:18.748Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -952078,7 +953185,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-14T02:19:27.363Z",
+      "checkedAt": "2026-11-14T03:20:19.139Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
