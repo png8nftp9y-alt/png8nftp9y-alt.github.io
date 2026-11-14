@@ -27,7 +27,7 @@ test('without the removed button diagnostics makes one request on opening, succe
 test('the three non-routine flows are excluded from diagnostics even when their saved runs failed',()=>{
  const excluded=['courtwatch-all-itf-metadata.yml','courtwatch-v3-oop.yml','courtwatch-v3-results.yml'];
  const doc={items:[],workflowStates:excluded.map((workflow,i)=>({...status(workflow,900+i),latestRun:{...status(workflow,900+i).latestRun,conclusion:'failure'}}))};
- const rows=operationalWorkflowRows(doc);assert.equal(rows.length,25);assert.ok(excluded.every(file=>!rows.some(row=>row.workflow===file)));
+ const rows=operationalWorkflowRows(doc);assert.equal(rows.length,ADMIN_OPERATIONAL_WORKFLOWS.length);assert.ok(excluded.every(file=>!rows.some(row=>row.workflow===file)));
  assert.doesNotMatch(renderCurrentWorkflows(doc),/run 900|run 901|run 902/);
  for(const file of ['courtwatch-itf-meta-engine.yml','courtwatch-tennis-europe-oop-live.yml','courtwatch-tennis-europe-agenda.yml','courtwatch-cloudflare-app-api.yml'])assert.ok(rows.some(row=>row.workflow===file));
 });

@@ -1,6 +1,7 @@
 // Presentation only: current production acquisition/publication and operational checks.
 // This list never enables, disables or reschedules a workflow.
 export const ADMIN_OPERATIONAL_WORKFLOWS=[
+ ['courtwatch-itf-junior-rankings.yml','ITF Junior · classifiche e recuperi'],
  ['courtwatch-v3-fitp-tournaments-sharded.yml','FITP · catalogo provinciale'],
  ['courtwatch-v3-fitp-entries.yml','FITP · iscrizioni e cancellazioni'],
  ['courtwatch-fitp-player-metadata.yml','FITP · circoli e classifiche'],

@@ -1,4 +1,5 @@
 export const operationalTargets=[
+ ['ITF Junior classifiche e recuperi','courtwatch-itf-junior-rankings.yml',180],
  ['Deploy watchdog Cloudflare','courtwatch-cloudflare-watchdog-deploy.yml',1e9],['ITF sicurezza 120 giorni','courtwatch-v3-itf-safety-120d.yml',1800],['FITP pubblicazione catalogo','courtwatch-v3-fitp-tournaments-sharded.yml',1560],['FITP motore live','courtwatch-v3-fitp-entries.yml',45],['Europe motore live','courtwatch-v3-tennis-europe-live.yml',45],['ITF discovery e R2','courtwatch-v3-itf-live.yml',45],['ITF labels e R2','courtwatch-v3-itf-known-fast.yml',45],['ITF T−1 e R2','courtwatch-v3-itf-t-minus-one.yml',45],['Agenda/OOP Europe','courtwatch-tennis-europe-oop-live.yml',45],['D1 generale','courtwatch-cloudflare-app-api.yml',45],['D1 agenda Europe','courtwatch-tennis-europe-agenda.yml',45]
 ];
 const compact=run=>run?Object.fromEntries(['id','name','path','status','conclusion','created_at','updated_at','html_url','display_title'].map(k=>[k,run[k]??null])):null;
