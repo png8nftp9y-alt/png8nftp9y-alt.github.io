@@ -45,7 +45,7 @@ concurrency:
 jobs:
   check-source:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     outputs:
       source_sha: ${{ steps.source.outputs.sha }}
@@ -73,7 +73,7 @@ jobs:
       group: courtwatch-d1-writes
       cancel-in-progress: false
       queue: max
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     defaults:
       run:
