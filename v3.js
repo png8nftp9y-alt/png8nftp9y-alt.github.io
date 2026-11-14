@@ -5316,6 +5316,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       Promise.resolve(saveCachedData(state.data)).catch(error => console.warn("Archivio locale non disponibile", error));
       if (typeof recordStartupTiming === "function") recordStartupTiming("cache_sync", persistenceStarted);
     }
+    let readyPublication = null, immediatePublication = null;
     const projectionPromise = (preparedProjection ? Promise.resolve(preparedProjection) : apiProjection()).catch((error) => {
       console.warn("Fallback JSON Court Watch attivo", error);
       return null;
@@ -5323,7 +5324,14 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       if (projection) {
         state.completeProjectionVersion=(state.completeProjectionVersion||0)+1;
         // Fresh API data must not wait for secondary JSON or local persistence.
-        try { publishProjection(projection, typeof lastLoadedDocuments === "object" && lastLoadedDocuments || {}, []); }
+        const available = readyPublication || {
+          docs: typeof lastLoadedDocuments === "object" && lastLoadedDocuments || {},
+          settled: [],
+        };
+        try {
+          publishProjection(projection, available.docs, available.settled);
+          immediatePublication = {projection, docs: available.docs};
+        }
         catch (error) { console.warn("Aggiornamento immediato non disponibile", error); }
       }
       return projection;
@@ -5336,8 +5344,11 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       ]),
     );
     lastLoadedDocuments = docs;
+    readyPublication = {docs, settled};
     const projection = await projectionPromise;
-    publishProjection(projection, docs, settled);
+    // Skip only an already successful publication of these exact inputs.
+    if (immediatePublication?.projection !== projection || immediatePublication?.docs !== docs)
+      publishProjection(projection, docs, settled);
   } catch (e) {
     if (selectionEpoch !== (state.playerSelectionEpoch || 0)) return;
     const fallback = state.data || cachedData();

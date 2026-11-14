@@ -10940,3 +10940,8 @@ ITF Meta extraordinary 2026-11-14T21:18:52.586Z: attempted 1, acquired 0, ordina
 ## Compatibilità runner del deploy Worker
 
 Fissati a Ubuntu 24.04 i job check-source e deploy-worker. Il ricontrollo della revisione può installare Chromium e richiede un sistema supportato da Playwright 1.54.2. Conservati tutti i controlli di sicurezza prima della pubblicazione.
+
+
+## Evita la doppia pubblicazione degli stessi dati
+
+La pubblicazione immediata API usa i documenti nuovi se già pronti. Il passaggio finale viene saltato soltanto dopo pubblicazione riuscita della stessa proiezione e dello stesso oggetto documenti. Conservati aggiornamenti successivi, fallback ed evidenza degli errori. Cinque test verificano entrambi gli ordini di arrivo e i fallimenti. Guadagno reale da misurare dopo il deploy.
