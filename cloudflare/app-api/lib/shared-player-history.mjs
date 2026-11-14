@@ -3,7 +3,9 @@ import {storedIdentities} from './player-identity-lookup.mjs';
 import {participantSourceKey,participantAliases,historyFromSources} from './personal-tennis-europe-history.mjs';
 
 const normalize=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,' ').trim().toLowerCase();
-const PAGE=250, GROUP=32;
+// Larger bounded pages reduce sequential D1 round trips.
+// Pagination continues until every requested history is complete.
+const PAGE=1000, GROUP=32;
 const requested=`SELECT json_extract(j.value,'$.slot') AS slot,json_extract(j.value,'$.circuit') AS circuit,json_extract(j.value,'$.native') AS native,json_extract(j.value,'$.names') AS names,json_extract(j.value,'$.aliases') AS aliases,json_extract(j.value,'$.after') AS after FROM json_each(?) j`;
 async function read(db,sql,values,state){
  if(state.error)throw state.error;

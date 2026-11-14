@@ -10924,3 +10924,8 @@ Le partite con ID vengono confrontate con lo stesso ID e con le righe prive di I
 Il run global D1 policy 43639459931 (#726) classificava la regex /query|filter|search/i del lettore OOP come endpoint D1. Limitato il riconoscimento di /query alla fine di un URL o all'inizio dei parametri/fragment: nessuna esenzione per il lettore OOP, SQL e comandi Wrangler restano verificati. Aggiunte regressioni in repository Git temporanei sia su diff locale sia su commit; il workflow esegue ora anche questi test.
 
 Validazione: il test sul sorgente OOP reale fallisce con il vecchio verificatore e passa con il nuovo; 13 test complessivi passati (9 nuove regressioni + 4 invarianti incrementali D1). Verificati endpoint D1 letterali e interpolati, query string, SQL multilinea, UPDATE/DELETE/REPLACE e Wrangler. Nessuna scrittura D1 eseguita. Run GitHub della correzione da verificare dopo il push.
+
+
+## Riduzione richieste dello storico condiviso
+
+Aumentata da 250 a 1000 righe la pagina delle letture condivise. Conservati paginazione completa, limiti di concorrenza, verifiche di identità e interruzione in caso di errore. Nessuna cache persistente o scrittura aggiunta. Nei test: 6502 partite identiche, 36 richieste prima e 14 dopo; operazioni SQLite da 1328600 a 1282500. Superati i quattro test shared-player-history. Il guadagno sulla latenza online resta da misurare.
