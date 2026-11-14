@@ -10918,3 +10918,9 @@ Validazione: 117 test OOP passati, inclusa fixture HTML ufficiale Azores e casi 
 ## Prestazioni: indice per il controllo duplicati
 
 Le partite con ID vengono confrontate con lo stesso ID e con le righe prive di ID, conservando il confronto precedente per i casi provvisori. Indicizzazione separata per circuito e data. Superati 16 test esistenti e confronti tra versione originale e ottimizzata. Benchmark sintetico isolato: circa 7,7 s contro 33 ms su 5.000 righe con ID distinti. Non costituisce misura dei tempi reali dell'app o del server.
+
+### 14 novembre 2026 — Falso positivo del controllo incrementale D1 su regex OOP
+
+Il run global D1 policy 43639459931 (#726) classificava la regex /query|filter|search/i del lettore OOP come endpoint D1. Limitato il riconoscimento di /query alla fine di un URL o all'inizio dei parametri/fragment: nessuna esenzione per il lettore OOP, SQL e comandi Wrangler restano verificati. Aggiunte regressioni in repository Git temporanei sia su diff locale sia su commit; il workflow esegue ora anche questi test.
+
+Validazione: il test sul sorgente OOP reale fallisce con il vecchio verificatore e passa con il nuovo; 13 test complessivi passati (9 nuove regressioni + 4 invarianti incrementali D1). Verificati endpoint D1 letterali e interpolati, query string, SQL multilinea, UPDATE/DELETE/REPLACE e Wrangler. Nessuna scrittura D1 eseguita. Run GitHub della correzione da verificare dopo il push.

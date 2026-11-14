@@ -29,8 +29,10 @@ const sourceExtensions = new Set([
   ".js", ".mjs", ".cjs", ".ts", ".mts", ".cts", ".sh", ".py", ".sql", ".yml", ".yaml"
 ]);
 
+// Match a query endpoint ending a URL (or introducing its query/fragment),
+// not a regex alternative such as /query|filter|search/i in an HTML reader.
 const mutationPattern =
-  /\b(INSERT\s+INTO|UPDATE\s+[A-Za-z0-9_."'\`]+\s+SET|DELETE\s+FROM|REPLACE\s+INTO|UPSERT)\b|wrangler\s+d1\s+(execute|migrations)|\/query\b/i;
+  /\b(INSERT\s+INTO|UPDATE\s+[A-Za-z0-9_."'\`]+\s+SET|DELETE\s+FROM|REPLACE\s+INTO|UPSERT)\b|wrangler\s+d1\s+(execute|migrations)|\/query(?=['"`?#])/i;
 
 function git(args) {
   try {

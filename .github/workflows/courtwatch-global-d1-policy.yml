@@ -51,4 +51,5 @@ jobs:
       - name: Verify global incremental D1 policy
         run: |
           node --test cloudflare/app-api/test/d1-incremental-sync.test.mjs
+          node --test cloudflare/app-api/test/d1-new-feature-policy.test.mjs
           node cloudflare/app-api/scripts/verify-d1-new-feature-policy.mjs
