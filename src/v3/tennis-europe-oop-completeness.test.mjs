@@ -1,5 +1,32 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {inventoryOopPage,auditOopCompleteness,requireOopCompleteness} from './tennis-europe-oop-completeness.mjs';
+import {readFileSync} from 'node:fs';
+test('Azores real empty main-draw listing remains unpublished during earlier catalogue days',()=>{
+ const listingHtml=readFileSync(new URL('./fixtures/te-azores-empty-future-schedule.html',import.meta.url),'utf8');
+ const tournament={competitionId:'D8965BC9-5780-4B4A-80F0-D450C4C3290B',startDate:'2026-11-14',endDate:'2026-11-22'};
+ const args={tournament,pages:[],matches:[],listingHtml,asOf:'2026-11-14'};
+ for(const asOf of ['2026-11-14','2026-11-15']){
+  const report=requireOopCompleteness({...args,asOf});
+  assert.equal(report.status,'not_published');
+  assert.equal(report.evidence.date,'2026-11-16');
+  assert.match(report.evidence.sourceHash,/^[a-f0-9]{64}$/);
+ }
+ for(const asOf of ['2026-11-16','2026-11-17'])assert.throws(()=>requireOopCompleteness({...args,asOf}),/unresolved/);
+ for(const changed of [
+  listingHtml.replace('No matches found','Unavailable'),
+  listingHtml.replace('"date":"20261116"','"date":"20260230"'),
+  listingHtml.replace('"date":"20261116"','"date":"20261123"'),
+  listingHtml.replace('"location":""','"location":"1"'),
+  listingHtml.replace('"location":""','"location":"","query":"someone"'),
+  listingHtml.replace('"code":"d8965bc9-5780-4b4a-80f0-d450c4c3290b"','"code":"OTHER"'),
+  listingHtml.replace('/Matches/DoSearch','/Matches/Other'),
+  listingHtml+'<div class="match match--list"></div>',
+  listingHtml.replace('visualreality.app.tournament.matches.init(','other.init('),
+ ])assert.throws(()=>requireOopCompleteness({...args,listingHtml:changed}),/unresolved/);
+ assert.throws(()=>requireOopCompleteness({...args,matches:[{competitionId:tournament.competitionId,players:[]}]}),/unresolved/);
+ assert.throws(()=>requireOopCompleteness({...args,pages:[{date:'20261114',cards:[],explicitEmpty:false}]}),/unresolved/);
+ assert.equal(unexplainedOopRemovals({matches:[{competitionId:tournament.competitionId,date:'20261114',players:[{id:'1'},{id:'2'}]}]},{tournaments:[{competitionId:tournament.competitionId}],matches:[]}).length,1);
+});
 // Structural reductions of the observed layout, not raw official HTML.
 const card=({people=[['36','Jan GALAD'],['10','Sebastian PTASINSKI']],bye=false,event='BS12 - Boys Singles 12 Main Draw',round='Round of 16',sets='6-0 6-0',winner=0}={})=>`<div class="match match--list"><a href="/tournament/T/draw/1"><span class="nav-link__value">${event}</span></a><span title="${round}" class="nav-link"></span>${people.map(([id,name],i)=>`<div class="match__row ${i===winner?'has-won':''}"><a data-player-id="${id}">${name}</a></div>`).join('')}${bye?'Bye':''}${sets.split(' ').filter(Boolean).map(s=>`<ul class="points">${s.split('-').map(v=>`<li>${v}</li>`).join('')}</ul>`).join('')}</div>`;
 const page=html=>inventoryOopPage(html,'T','20260826');

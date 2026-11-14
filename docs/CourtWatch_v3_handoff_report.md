@@ -10907,3 +10907,9 @@ ITF discovery 2026-11-14T18:39:34.009Z: 0 newly discovered future tournaments; M
 ## Pulsante Indietro adattivo
 
 Il pulsante indica la destinazione precedente nell'app, con nome del giocatore o torneo quando disponibile. I link diretti senza percorso interno tornano alla Home. La navigazione usa la cronologia nativa e conserva i metadati nell'entrata corrente. Verificata in simulazione la sequenza Agenda, giocatore, torneo, avversario e i ritorni; verifica browser demandata alla CI.
+
+### 14 novembre 2026 — OOP Azores: programma ufficiale futuro senza incontri
+
+Il run 43637002375 si fermava con no_verified_oop_days per D8965BC9-5780-4B4A-80F0-D450C4C3290B. Il catalogo parte il 14/11, mentre la pagina ufficiale mostra 16–22/11 e una pagina Matches vuota selezionata sul 16/11. Il verificatore riconosce ora questa evidenza come not_published, senza inventare giornate o partite e senza modificare le date del catalogo. Richiede configurazione nativa dello stesso torneo, giorno futuro valido entro i limiti, nessun filtro località/ricerca, nessuna card e nessuna partita acquisita; registra URL e SHA256. Dal giorno selezionato l'assenza torna bloccante. Il confronto con lo snapshot precedente continua a bloccare sparizioni inspiegate.
+
+Validazione: 117 test OOP passati, inclusa fixture HTML ufficiale Azores e casi negativi (data scaduta/invalida/fuori torneo, identità errata, filtri, card presenti e partite scomparse). Pubblicazione R2 e import Agenda D1 da verificare dopo applicazione; nessun rilancio automatico.

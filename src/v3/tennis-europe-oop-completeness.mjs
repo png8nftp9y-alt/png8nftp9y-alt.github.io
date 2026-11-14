@@ -42,10 +42,24 @@ function doublesAwaitingOpponent(html, players) {
  const native=[...rows[1-empty].matchAll(/<a\b[^>]*data-player-id=["']([^"']+)["']/gi)].map(row=>row[1]).sort();
  return new Set(native).size===2&&native.join('|')===ids({players});
 }
+// The catalogue can include qualifying days before the main-draw schedule.
+// Accept only the unfiltered native matches page for this tournament and a
+// strictly future selected day within its bounds. This never certifies an OOP.
+function futureEmptySchedule(tournament,html,asOf){
+ if(!iso(asOf)||!/\bNo matches found\b/i.test(clean(html))||inventoryOopPage(html,tournament.competitionId,'').cards.length)return null;
+ const configs=[...String(html).matchAll(/visualreality\.app\.tournament\.matches\.init\((\{[^\r\n]*\})\);/g)];
+ if(configs.length!==1)return null;
+ let config;try{config=JSON.parse(configs[0][1]);}catch{return null;}
+ const params=config.postParamObject||{},id=String(tournament.competitionId||''),day=iso(params.date),start=iso(tournament.startDate),end=iso(tournament.endDate);
+ if(!id||String(params.code).toUpperCase()!==id.toUpperCase()||String(config.requestUrl).toUpperCase()!==`/tournament/${id}/Matches/DoSearch`.toUpperCase()||params.location!==''||!day||!start||!end||day<=asOf||day<start||day>end||matchesQuery(params))return null;
+ return {date:day,sourceUrl:`https://te.tournamentsoftware.com/tournament/${id}/matches`,sourceHash:createHash('sha256').update(String(html)).digest('hex')};
+}
+function matchesQuery(params){return Object.entries(params).some(([name,value])=>/query|filter|search/i.test(name)&&String(value||'').trim());}
 export function auditOopCompleteness({tournament,pages,matches,listingHtml='',asOf=''}){
  const index=new Map();for(const match of matches){const k=key(match),list=index.get(k)||[];list.push(match);index.set(k,list);}
  const issues=[],days=[],resolutions=[];
  if(!pages.length&&asOf&&String(tournament.startDate).slice(0,10)>asOf&&/\bNo matches found\b/i.test(clean(listingHtml)))return {version:1,status:'not_published',competitionId:tournament.competitionId,days:[],issues:[],reason:'future_tournament_official_empty_listing'};
+ if(!pages.length&&!matches.length){const evidence=futureEmptySchedule(tournament,listingHtml,asOf);if(evidence)return {version:1,status:'not_published',competitionId:tournament.competitionId,days:[],issues:[],reason:'official_future_schedule_empty_listing',evidence};}
  if(!pages.length)issues.push({reason:'no_verified_oop_days',competitionId:tournament.competitionId});
  for(const page of pages){let byes=0,covered=0,pendingOpponents=0,pendingFinals=0;
   if(!page.cards.length&&!page.explicitEmpty)issues.push({reason:'unrecognized_or_unavailable_oop_page',date:page.date,sourceHash:page.sourceHash});
