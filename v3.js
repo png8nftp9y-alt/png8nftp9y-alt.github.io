@@ -2350,7 +2350,7 @@ function dedupeAgendaMatches(items) {
     return tournament && date && court && number ? [tournament,date,court,number].join('|') : '';
   };
   const complete = items.filter(match => circuit(match) === 'tennis-europe' && doubles(match) && match.partner && opponents(match).length === 2);
-  const unique = [];
+  const unique = [], buckets = new Map();
   for (const match of items) {
     const key = slot(match), op = opponents(match);
     const wrong = !match.manual && !match.partner && !match.score && !match.result &&
@@ -2367,7 +2367,23 @@ function dedupeAgendaMatches(items) {
       name(match.court).replace(/^(court|campo)\s*/, '') === '2' && agendaCourtMatchNumber(match) === 5 &&
       op.length === 1 && /^(?:ivona dirnbek)(?: dirnbek)?$/.test(op[0]);
     if (wrong || obsoleteCereghiniRow) continue;
-    if (!unique.some(existing => sameAgendaMatch(existing, match))) unique.push(match);
+    const bucketKey = JSON.stringify([circuit(match), match.date]);
+    let bucket = buckets.get(bucketKey);
+    if (!bucket) {
+      bucket = {rows: [], byId: new Map(), withoutId: []};
+      buckets.set(bucketKey, bucket);
+    }
+    const id = String(match.matchId || "");
+    const exact = id ? bucket.byId.get(id) : null;
+    const candidates = id
+      ? (exact ? [exact, ...bucket.withoutId] : bucket.withoutId)
+      : bucket.rows;
+    if (!candidates.some(existing => sameAgendaMatch(existing, match))) {
+      unique.push(match);
+      bucket.rows.push(match);
+      if (id) bucket.byId.set(id, match);
+      else bucket.withoutId.push(match);
+    }
   }
   return unique;
 }

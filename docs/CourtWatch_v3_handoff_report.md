@@ -10913,3 +10913,8 @@ Il pulsante indica la destinazione precedente nell'app, con nome del giocatore o
 Il run 43637002375 si fermava con no_verified_oop_days per D8965BC9-5780-4B4A-80F0-D450C4C3290B. Il catalogo parte il 14/11, mentre la pagina ufficiale mostra 16–22/11 e una pagina Matches vuota selezionata sul 16/11. Il verificatore riconosce ora questa evidenza come not_published, senza inventare giornate o partite e senza modificare le date del catalogo. Richiede configurazione nativa dello stesso torneo, giorno futuro valido entro i limiti, nessun filtro località/ricerca, nessuna card e nessuna partita acquisita; registra URL e SHA256. Dal giorno selezionato l'assenza torna bloccante. Il confronto con lo snapshot precedente continua a bloccare sparizioni inspiegate.
 
 Validazione: 117 test OOP passati, inclusa fixture HTML ufficiale Azores e casi negativi (data scaduta/invalida/fuori torneo, identità errata, filtri, card presenti e partite scomparse). Pubblicazione R2 e import Agenda D1 da verificare dopo applicazione; nessun rilancio automatico.
+
+
+## Prestazioni: indice per il controllo duplicati
+
+Le partite con ID vengono confrontate con lo stesso ID e con le righe prive di ID, conservando il confronto precedente per i casi provvisori. Indicizzazione separata per circuito e data. Superati 16 test esistenti e confronti tra versione originale e ottimizzata. Benchmark sintetico isolato: circa 7,7 s contro 33 ms su 5.000 righe con ID distinti. Non costituisce misura dei tempi reali dell'app o del server.
