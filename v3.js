@@ -4459,9 +4459,76 @@ renderProfile = function (id) {
   );
   applyFilter();
 };
+// Adaptive back navigation: track only entries created inside this app.
+let adaptiveNavigation = null;
+let adaptiveReplaceState = null;
+function adaptiveNavigationUrl() {
+  return location.pathname + location.search + location.hash;
+}
+function adaptiveBackText() {
+  const hash = location.hash;
+  const names = {"":"alla Home","#home":"alla Home","#agenda":"all’Agenda","#calendar":"al Calendario","#players":"ai Giocatori"};
+  if (Object.prototype.hasOwnProperty.call(names, hash)) return "← Torna " + names[hash];
+  const heading = document.querySelector("#profileView.active .tournamentHero h2, #profileView.active .profileHero h2, #profileView.active .opponentProfileHero h2")?.textContent?.trim();
+  if (/^#tournament\//.test(hash)) return heading ? "← Torna al torneo " + heading : "← Torna al torneo";
+  if (/^#player-search\//.test(hash)) return "← Torna alla ricerca giocatori";
+  return heading ? "← Torna a " + heading : "← Torna al profilo";
+}
+function writeAdaptiveNavigation() {
+  try {
+    adaptiveReplaceState.call(history, {...(history.state || {}), courtwatchNavigation: adaptiveNavigation}, "", location.href);
+  } catch {}
+}
+function syncAdaptiveNavigation() {
+  if (!adaptiveReplaceState) {
+    adaptiveReplaceState = history.replaceState;
+    history.replaceState = function(value, title, url) {
+      const result = adaptiveReplaceState.call(this, value, title, url);
+      if (adaptiveNavigation) {
+        adaptiveNavigation = {...adaptiveNavigation, url: adaptiveNavigationUrl()};
+        writeAdaptiveNavigation();
+      }
+      return result;
+    };
+  }
+  const url = adaptiveNavigationUrl();
+  const saved = history.state?.courtwatchNavigation;
+  if (saved?.url === url && Array.isArray(saved.trail)) {
+    adaptiveNavigation = {...saved, trail: saved.trail.slice(-40)};
+  } else if (!adaptiveNavigation || adaptiveNavigation.url !== url) {
+    const trail = adaptiveNavigation ? [...adaptiveNavigation.trail, {
+      url: adaptiveNavigation.url,
+      label: adaptiveNavigation.label || "← Torna alla Home"
+    }].slice(-40) : [];
+    adaptiveNavigation = {url, trail, label: "← Torna alla Home"};
+  }
+  writeAdaptiveNavigation();
+  updateAdaptiveBackButton();
+}
+function updateAdaptiveBackButton() {
+  const button = $("backHome");
+  if (!button || !adaptiveNavigation) return;
+  const previous = adaptiveNavigation.trail.at(-1);
+  button.textContent = previous?.label || "← Torna alla Home";
+  button.setAttribute("aria-label", button.textContent);
+  button.title = button.textContent;
+}
+function finishAdaptiveNavigation() {
+  if (!adaptiveNavigation || adaptiveNavigation.url !== adaptiveNavigationUrl()) return;
+  adaptiveNavigation.label = adaptiveBackText();
+  writeAdaptiveNavigation();
+  updateAdaptiveBackButton();
+}
+function adaptiveGoBack() {
+  syncAdaptiveNavigation();
+  if (adaptiveNavigation.trail.length) history.back();
+  else location.hash = "";
+}
+
 function route() {
   const requestedGroup = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
   if (groupSwitchRunning && requestedGroup !== PLAYER_GROUP) return;
+  syncAdaptiveNavigation();
   state.data = normalizeMatchProjection(withoutPucItfReferences(state.data));
   const player = location.hash.match(/^#player\/(.+)$/),
     currentOpponent = location.hash.match(
@@ -4561,6 +4628,7 @@ function route() {
     scrollTo(0, preview.y);
   delete document.documentElement.dataset.cwRefreshPreview;
   delete window.courtWatchRefreshPreview;
+  finishAdaptiveNavigation();
 }
 function syncMonthFromAgenda() {
   state.month = new Date(
@@ -4901,13 +4969,7 @@ function wire() {
         location.hash = button.dataset.homeRoute;
       }),
   );
-  $("backHome").onclick = () => {
-    if (history.length > 1) {
-      history.back();
-      return;
-    }
-    location.hash = "";
-  };
+  $("backHome").onclick = adaptiveGoBack;
   $("brandHome").onclick = () => {
     location.hash = "";
     scrollTo({ top: 0, behavior: "smooth" });

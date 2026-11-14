@@ -10902,3 +10902,8 @@ Le proiezioni intermedie e la sincronizzazione elenco conservano gli ID selezion
 ITF discovery 2026-11-14T07:08:01.206Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-11-14T18:39:34.009Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+## Pulsante Indietro adattivo
+
+Il pulsante indica la destinazione precedente nell'app, con nome del giocatore o torneo quando disponibile. I link diretti senza percorso interno tornano alla Home. La navigazione usa la cronologia nativa e conserva i metadati nell'entrata corrente. Verificata in simulazione la sequenza Agenda, giocatore, torneo, avversario e i ritorni; verifica browser demandata alla CI.
