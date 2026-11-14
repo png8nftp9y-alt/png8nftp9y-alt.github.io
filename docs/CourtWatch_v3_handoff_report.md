@@ -10933,3 +10933,5 @@ Aumentata da 250 a 1000 righe la pagina delle letture condivise. Conservati pagi
 ### 14 novembre 2026 — Compatibilità browser ITF Meta
 
 Fissato il job batch a Ubuntu 24.04: Playwright 1.54.2 non supporta Ubuntu 26.04 assegnato da ubuntu-latest. Il run 43593917504 falliva prima dell'acquisizione. Validazione: YAML verificato e 13 test della coda superati. Installazione browser e acquisizione da confermare nel nuovo run.
+
+ITF Meta extraordinary 2026-11-14T21:18:52.586Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
