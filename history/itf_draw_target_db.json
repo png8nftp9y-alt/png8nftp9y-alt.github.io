@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-14T22:52:26.049Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-14T23:05:44.841Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -950308,7 +950308,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-14T22:07:26.293Z",
+      "checkedAt": "2026-11-14T23:05:41.336Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -951163,7 +951163,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-20",
       "decision": "pending",
-      "checkedAt": "2026-11-14T22:07:26.912Z",
+      "checkedAt": "2026-11-14T23:05:41.863Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -951288,8 +951288,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -951314,8 +951314,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -951327,8 +951327,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -951353,14 +951353,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -951988,7 +951988,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-14T22:07:27.453Z",
+      "checkedAt": "2026-11-14T23:05:42.361Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -953113,7 +953113,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-14T22:07:27.937Z",
+      "checkedAt": "2026-11-14T23:05:42.858Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -953131,13 +953131,13 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-14T22:07:28.452Z",
+      "checkedAt": "2026-11-14T23:05:43.350Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 0,
+      "acquiredSections": 1,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 6,
+      "resolvedSections": 1,
+      "missingSections": 5,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -953256,22 +953256,22 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         },
         {
           "family": "B-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 16,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -953282,8 +953282,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -953295,8 +953295,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -953308,8 +953308,8 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -953328,8 +953328,183 @@
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
-      "eventCache": {}
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800754063",
+              "name": "Agustin Chalabe",
+              "givenName": "Agustin",
+              "familyName": "Chalabe",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/agustin-chalabe/800754063/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800874925",
+              "name": "Martiniano Perales",
+              "givenName": "Martiniano",
+              "familyName": "Perales",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/martiniano-perales/800874925/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800778427",
+              "name": "Lisandro Gama Castro",
+              "givenName": "Lisandro",
+              "familyName": "Gama Castro",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/lisandro-gama-castro/800778427/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800839283",
+              "name": "Joaquin Tecco",
+              "givenName": "Joaquin",
+              "familyName": "Tecco",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/joaquin-tecco/800839283/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791720",
+              "name": "Santiago Martinez Espeche",
+              "givenName": "Santiago",
+              "familyName": "Martinez Espeche",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/santiago-martinez-espeche/800791720/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800798181",
+              "name": "Bautista Rodriguez",
+              "givenName": "Bautista",
+              "familyName": "Rodriguez",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/bautista-rodriguez/800798181/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800758835",
+              "name": "Cristobal Marconi",
+              "givenName": "Cristobal",
+              "familyName": "Marconi",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/cristobal-marconi/800758835/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800875778",
+              "name": "Augusto Lemos Quirino",
+              "givenName": "Augusto",
+              "familyName": "Lemos Quirino",
+              "nationalityCode": "BRA",
+              "profileLink": "/en/players/augusto-lemos-quirino/800875778/bra/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800811766",
+              "name": "Juan Ignacio",
+              "givenName": "Juan Ignacio",
+              "familyName": "",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/juan-ignacio-/800811766/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800874620",
+              "name": "Ian Romay",
+              "givenName": "Ian",
+              "familyName": "Romay",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/ian-romay/800874620/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800820079",
+              "name": "Branko Fleitas",
+              "givenName": "Branko",
+              "familyName": "Fleitas",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/branko-fleitas/800820079/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800797854",
+              "name": "Facundo Gallastegui",
+              "givenName": "Facundo",
+              "familyName": "Gallastegui",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/facundo-gallastegui/800797854/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800820284",
+              "name": "Benicio Suarez",
+              "givenName": "Benicio",
+              "familyName": "Suarez",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/benicio-suarez/800820284/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800819795",
+              "name": "Juan Eztala",
+              "givenName": "Juan",
+              "familyName": "Eztala",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/juan-eztala/800819795/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800730264",
+              "name": "Toribio Ghidini",
+              "givenName": "Toribio",
+              "familyName": "Ghidini",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/toribio-ghidini/800730264/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800794827",
+              "name": "Santiago Malatini",
+              "givenName": "Santiago",
+              "familyName": "Malatini",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/santiago-malatini/800794827/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-14T23:05:43.350Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-ARG-2026-004__B-S-Q-KO",
+            "storedAt": "2026-11-14T23:05:43.350Z"
+          }
+        }
+      }
     },
     "J-J30-CAM-2026-002": {
       "competitionId": "J-J30-CAM-2026-002",
@@ -953337,7 +953512,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-14T22:07:28.922Z",
+      "checkedAt": "2026-11-14T23:05:43.843Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -953832,7 +954007,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-14T22:07:29.452Z",
+      "checkedAt": "2026-11-14T23:05:44.337Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -953850,7 +954025,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-14T22:07:29.994Z",
+      "checkedAt": "2026-11-14T23:05:44.841Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
