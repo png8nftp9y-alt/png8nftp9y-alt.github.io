@@ -36,7 +36,7 @@ if(process.argv.includes('--plan')){
   try{
     const result=await recoverTournament({tournament,events:sections.filter(s=>s.competitionId===id).map(s=>s.event),saved,
       inventory:tournamentEvents,draw:drawsheet,
-      browser:async(t,options)=>(await import('../src/v3/read-itf-draws-browser.mjs')).readTournamentDrawsInBrowser(t,options),
+      browser:async(t,options)=>(await import('../src/v3/read-itf-draws-browser.mjs')).readTournamentDrawsInBrowser(t,{...options,networkFallback:true}),
       onDocument:async row=>{await fs.writeFile(`${dir}/${id}_${row.event}.json`,JSON.stringify(row));report.sections.push({event:row.event,status:'saved'});await checkpoint()}});
     report.failures=result.failures;
     report.sections=result.sections.map(s=>({event:s.event,status:saved.has(sectionKey(id,s.event))?'reused':'saved'}));

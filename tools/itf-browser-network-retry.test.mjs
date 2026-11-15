@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 function reader(){
  const source=readFileSync(new URL('../src/v3/read-itf-draws-browser.mjs',import.meta.url),'utf8');
- const start=source.indexOf('async function api(page,url){'),end=source.indexOf('export async function',start);
+ const start=source.indexOf('async function api(page,url'),end=source.indexOf('export async function',start);
  const context={challengePattern:/Incapsula|hCaptcha/i,pause:async()=>{},Error,JSON};
  vm.createContext(context);vm.runInContext(source.slice(start,end)+';globalThis.read=api;',context);return context.read;
 }

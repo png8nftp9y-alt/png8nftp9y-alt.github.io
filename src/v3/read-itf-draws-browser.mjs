@@ -5,15 +5,26 @@ const challengePattern=/Incapsula|_Incapsula_Resource|Additional security check 
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const eventKey=combo=>[combo.playerTypeCode,combo.matchTypeCode,combo.eventClassificationCode,combo.drawsheetStructureCode].join('-');
 
-async function api(page,url){
+async function api(page,url,{networkFallback=false}={}){
   let last='browser_non_json';
   for(let attempt=0;attempt<3;attempt++){
     try{
-      const response=await page.evaluate(async endpoint=>{
+      let response;
+      try{response=await page.evaluate(async endpoint=>{
         const result=await fetch(endpoint,{credentials:'include',signal:AbortSignal.timeout(30000),headers:{accept:'application/json, text/plain, */*','x-requested-with':'XMLHttpRequest'}});
         return{status:result.status,text:await result.text()};
-      },url);
+      },url)}catch(error){
+        if(!networkFallback||!/Failed to fetch|NetworkError|ERR_|Timeout/i.test(error.message))throw error;
+        const endpoint=new URL(url);
+        if(endpoint.origin!=='https://www.itftennis.com'||!/^\/tennis\/api\/TournamentApi\/(GetDrawsheet|GetEventFilters)$/.test(endpoint.pathname))throw Error('session_api_url_not_allowed');
+        let result;
+        try{
+          result=await page.request.get(url,{timeout:30000,failOnStatusCode:false,headers:{accept:'application/json, text/plain, */*','x-requested-with':'XMLHttpRequest'}});
+          response={status:result.status(),text:await result.text()};
+        }finally{await result?.dispose()}
+      }
       if(challengePattern.test(response.text))last='browser_incapsula_challenge';
+      else if(response.status<200||response.status>=300)last=`browser_http_${response.status}`;
       else{
         try{return JSON.parse(response.text)}catch{last=`browser_non_json_${response.status}`}
       }
@@ -27,7 +38,7 @@ async function api(page,url){
   throw new Error(last);
 }
 
-export async function readTournamentDrawsInBrowser(tournament,{tasks=null,events=null}={}){
+export async function readTournamentDrawsInBrowser(tournament,{tasks=null,events=null,networkFallback=false}={}){
   const browser=await chromium.launch({channel:'chrome',headless:true});
   try{
     const context=await browser.newContext({locale:'en-GB',timezoneId:'Europe/Rome'});
@@ -37,7 +48,7 @@ export async function readTournamentDrawsInBrowser(tournament,{tasks=null,events
     let combos;
     if(tasks?.length)combos=tasks.map(combo=>({...combo,sourceUrl:tournament.sourceUrl||combo.sourceUrl||''}));
     else{
-    const filters=await api(page,`${API}/GetEventFilters?tournamentKey=${encodeURIComponent(tournament.competitionId.toLowerCase())}`);
+    const filters=await api(page,`${API}/GetEventFilters?tournamentKey=${encodeURIComponent(tournament.competitionId.toLowerCase())}`,{networkFallback});
     combos=eventCombinations(filters).map(combo=>({...combo,sourceUrl:tournament.sourceUrl||''}));
     }
     if(events!==null){const wanted=new Set(events);combos=combos.filter(combo=>wanted.has(eventKey(combo)))}
@@ -45,7 +56,7 @@ export async function readTournamentDrawsInBrowser(tournament,{tasks=null,events
     const outcomes=[];
     for(const combo of combos){
       const query=new URLSearchParams({tournamentId:String(combo.tournamentId),tourType:String(combo.tourType||'N'),weekNumber:String(combo.weekNumber||0),playerTypeCode:String(combo.playerTypeCode),matchTypeCode:String(combo.matchTypeCode),eventClassificationCode:String(combo.eventClassificationCode),drawsheetStructureCode:String(combo.drawsheetStructureCode)});
-      try{outcomes.push({combo,json:await api(page,`${API}/GetDrawsheet?${query}`)})}
+      try{outcomes.push({combo,json:await api(page,`${API}/GetDrawsheet?${query}`,{networkFallback})})}
       catch(error){outcomes.push({combo,error:error.message})}
       await pause(900);
     }
