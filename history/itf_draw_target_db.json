@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-15T13:48:57.361Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-15T13:51:11.296Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -959512,7 +959512,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-15T12:50:16.367Z",
+      "checkedAt": "2026-11-15T13:51:07.504Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -960307,7 +960307,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-15T12:50:16.884Z",
+      "checkedAt": "2026-11-15T13:51:08.102Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -960432,8 +960432,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -960458,8 +960458,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -960471,8 +960471,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -960497,14 +960497,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -961172,13 +961172,13 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-15T12:50:17.498Z",
+      "checkedAt": "2026-11-15T13:51:08.663Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 0,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 6,
+      "resolvedSections": 2,
+      "missingSections": 4,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -961297,22 +961297,22 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         },
         {
           "family": "B-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -961323,8 +961323,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -961336,22 +961336,22 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 19,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -961369,8 +961369,547 @@
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
-      "eventCache": {}
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800719513",
+              "name": "dan gun Kim",
+              "givenName": "dan gun",
+              "familyName": "Kim",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/dan-gun-kim/800719513/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800721207",
+              "name": "Seunghun Shin",
+              "givenName": "Seunghun",
+              "familyName": "Shin",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/seunghun-shin/800721207/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800725410",
+              "name": "JUNHWI",
+              "givenName": "JUNHWI",
+              "familyName": "",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/junhwi-/800725410/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800799820",
+              "name": "Changmyeong Han",
+              "givenName": "Changmyeong",
+              "familyName": "Han",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/changmyeong-han/800799820/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751245",
+              "name": "Him Wong",
+              "givenName": "Him",
+              "familyName": "Wong",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/him-wong/800751245/hkg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800860997",
+              "name": "Siwon Park",
+              "givenName": "Siwon",
+              "familyName": "Park",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/siwon-park/800860997/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800778355",
+              "name": "ILHUN JUNG",
+              "givenName": "ILHUN",
+              "familyName": "JUNG",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/ilhun-jung/800778355/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800723097",
+              "name": "TAE  YOUNG KIM",
+              "givenName": "TAE  YOUNG",
+              "familyName": "KIM",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/tae-young-kim/800723097/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800762561",
+              "name": "YUBEEN KIM",
+              "givenName": "YUBEEN",
+              "familyName": "KIM",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/yubeen-kim/800762561/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800746711",
+              "name": "Seungyu Hong",
+              "givenName": "Seungyu",
+              "familyName": "Hong",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/seungyu-hong/800746711/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800801118",
+              "name": "Do Hyeon Kim",
+              "givenName": "Do Hyeon",
+              "familyName": "Kim",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/do-hyeon-kim/800801118/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800703554",
+              "name": "seungsu kim",
+              "givenName": "seungsu",
+              "familyName": "kim",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/seungsu-kim/800703554/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800858765",
+              "name": "Ain Lee",
+              "givenName": "Ain",
+              "familyName": "Lee",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/ain-lee/800858765/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800812808",
+              "name": "Ziyuan Niu",
+              "givenName": "Ziyuan",
+              "familyName": "Niu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/ziyuan-niu/800812808/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800747805",
+              "name": "YERU YANG",
+              "givenName": "YERU",
+              "familyName": "YANG",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/yeru-yang/800747805/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800802102",
+              "name": "Doyeon Kim",
+              "givenName": "Doyeon",
+              "familyName": "Kim",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/doyeon-kim/800802102/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800818674",
+              "name": "Jiho Park",
+              "givenName": "Jiho",
+              "familyName": "Park",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/jiho-park/800818674/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800725024",
+              "name": "JEONG MIN KIM",
+              "givenName": "JEONG MIN",
+              "familyName": "KIM",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/jeong-min-kim/800725024/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800725640",
+              "name": "Kim SEUNGHO",
+              "givenName": "Kim",
+              "familyName": "SEUNGHO",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/kim-seungho/800725640/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800642817",
+              "name": "Milan Gorodetskyy",
+              "givenName": "Milan",
+              "familyName": "Gorodetskyy",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/milan-gorodetskyy/800642817/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800855515",
+              "name": "Sicheng Yang",
+              "givenName": "Sicheng",
+              "familyName": "Yang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/sicheng-yang/800855515/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800738465",
+              "name": "Lee Hyun June",
+              "givenName": "Lee",
+              "familyName": "Hyun June",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/lee-hyun-june/800738465/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800720487",
+              "name": "Se Hoon Kim",
+              "givenName": "Se Hoon",
+              "familyName": "Kim",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/se-hoon-kim/800720487/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766692",
+              "name": "HA MIN PARK",
+              "givenName": "HA MIN",
+              "familyName": "PARK",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/ha-min-park/800766692/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800716389",
+              "name": "DOWAN PARK",
+              "givenName": "DOWAN",
+              "familyName": "PARK",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/dowan-park/800716389/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800688123",
+              "name": "Jongwon Lee",
+              "givenName": "Jongwon",
+              "familyName": "Lee",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/jongwon-lee/800688123/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800815890",
+              "name": "Minwoo Song",
+              "givenName": "Minwoo",
+              "familyName": "Song",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/minwoo-song/800815890/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800780407",
+              "name": "Xiqiao He",
+              "givenName": "Xiqiao",
+              "familyName": "He",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/xiqiao-he/800780407/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800714177",
+              "name": "Seonghyeon Moon",
+              "givenName": "Seonghyeon",
+              "familyName": "Moon",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/seonghyeon-moon/800714177/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800822019",
+              "name": "Minseo Kim",
+              "givenName": "Minseo",
+              "familyName": "Kim",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/minseo-kim/800822019/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800742585",
+              "name": "JIHAN KIM",
+              "givenName": "JIHAN",
+              "familyName": "KIM",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/jihan-kim/800742585/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800831113",
+              "name": "Rongbin Dai",
+              "givenName": "Rongbin",
+              "familyName": "Dai",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/rongbin-dai/800831113/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-15T13:51:08.663Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-KOR-2026-012__B-S-Q-KO",
+            "storedAt": "2026-11-15T13:51:08.663Z"
+          }
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800740600",
+              "name": "Taejin Jung",
+              "givenName": "Taejin",
+              "familyName": "Jung",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/taejin-jung/800740600/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800761390",
+              "name": "Jiyu Park",
+              "givenName": "Jiyu",
+              "familyName": "Park",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/jiyu-park/800761390/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800715121",
+              "name": "Anna Lee Young",
+              "givenName": "Anna Lee",
+              "familyName": "Young",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/anna-lee-young/800715121/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800686539",
+              "name": "Ye Ryeong Jo",
+              "givenName": "Ye Ryeong",
+              "familyName": "Jo",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/ye-ryeong-jo/800686539/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800679269",
+              "name": "SEOJEONG YANG",
+              "givenName": "SEOJEONG",
+              "familyName": "YANG",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/seojeong-yang/800679269/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777609",
+              "name": "gaon shin",
+              "givenName": "gaon",
+              "familyName": "shin",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/gaon-shin/800777609/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800762648",
+              "name": "HANNA LEE",
+              "givenName": "HANNA",
+              "familyName": "LEE",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/hanna-lee/800762648/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800799307",
+              "name": "Jiyoo Kim",
+              "givenName": "Jiyoo",
+              "familyName": "Kim",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/jiyoo-kim/800799307/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800665981",
+              "name": "namin Jung",
+              "givenName": "namin",
+              "familyName": "Jung",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/namin-jung/800665981/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800819638",
+              "name": "Jihyo",
+              "givenName": "Jihyo",
+              "familyName": "",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/jihyo-/800819638/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800722482",
+              "name": "ji yeong Jung",
+              "givenName": "ji yeong",
+              "familyName": "Jung",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/ji-yeong-jung/800722482/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800770140",
+              "name": "Byeol KIM",
+              "givenName": "Byeol",
+              "familyName": "KIM",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/byeol-kim/800770140/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800847135",
+              "name": "Seoa Jeung",
+              "givenName": "Seoa",
+              "familyName": "Jeung",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/seoa-jeung/800847135/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800789833",
+              "name": "Hyeon Seo Cho",
+              "givenName": "Hyeon Seo",
+              "familyName": "Cho",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/hyeon-seo-cho/800789833/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800787349",
+              "name": "Yeojin Jung",
+              "givenName": "Yeojin",
+              "familyName": "Jung",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/yeojin-jung/800787349/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800883633",
+              "name": "Wenhan Zuo",
+              "givenName": "Wenhan",
+              "familyName": "Zuo",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/wenhan-zuo/800883633/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800749985",
+              "name": "YEAHONE JEONG",
+              "givenName": "YEAHONE",
+              "familyName": "JEONG",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/yeahone-jeong/800749985/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800762926",
+              "name": "SEOYUN KIM",
+              "givenName": "SEOYUN",
+              "familyName": "KIM",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/seoyun-kim/800762926/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800797808",
+              "name": "Ah In Choi",
+              "givenName": "Ah In",
+              "familyName": "Choi",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/ah-in-choi/800797808/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-15T13:51:08.663Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-KOR-2026-012__G-S-Q-KO",
+            "storedAt": "2026-11-15T13:51:08.663Z"
+          }
+        }
+      }
     },
     "J-J60-EST-2026-004": {
       "competitionId": "J-J60-EST-2026-004",
@@ -961378,7 +961917,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T12:50:18.018Z",
+      "checkedAt": "2026-11-15T13:51:09.194Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -962193,7 +962732,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T12:50:18.558Z",
+      "checkedAt": "2026-11-15T13:51:09.729Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -962738,7 +963277,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T12:50:19.034Z",
+      "checkedAt": "2026-11-15T13:51:10.250Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -963393,7 +963932,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T12:50:19.588Z",
+      "checkedAt": "2026-11-15T13:51:10.775Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -964128,7 +964667,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-15T12:50:20.122Z",
+      "checkedAt": "2026-11-15T13:51:11.296Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -964253,8 +964792,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -964279,8 +964818,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -964292,8 +964831,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -964318,14 +964857,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
