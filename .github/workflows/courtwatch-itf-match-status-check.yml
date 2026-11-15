@@ -1,0 +1,46 @@
+name: CourtWatch ITF match status check
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read Kim Yang official match status
+        env:
+          ITF_ACQUISITION_URL: ${{ vars.ITF_ACQUISITION_URL || secrets.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
+        run: |
+          node --input-type=module <<'JS'
+          import {drawsheet,drawMatchNodes} from './src/v3/itf-common.mjs';
+          const data=await drawsheet({
+            tournamentId:1100204552,tourType:'N',weekNumber:0,
+            playerTypeCode:'B',matchTypeCode:'S',
+            eventClassificationCode:'Q',drawsheetStructureCode:'KO',
+            sourceUrl:'https://www.itftennis.com/en/tournament/j30-phan-thiet/vie/2026/j-j30-vie-2026-007/'
+          });
+          const matches=drawMatchNodes(data).map(r=>r.match).filter(m=>{
+            const ids=(m.teams||[]).flatMap(t=>(t.players||[])
+              .map(p=>String(p.id||p.playerId||'')));
+            return ['800687542','800785157'].every(id=>ids.includes(id));
+          });
+          if(matches.length!==1)throw Error('Expected one Kim Yang match');
+          const m=matches[0];
+          console.log(JSON.stringify({
+            matchId:m.matchId,
+            fields:Object.fromEntries(Object.entries(m).filter(([k,v])=>
+              /status|result|walk|score/i.test(k)&&(v===null||typeof v!=='object'))),
+            corrected:{
+              playStatus:m.playStatusDesc||m.playStatus||'',
+              playStatusCode:m.playStatusCode??null,
+              resultStatus:m.resultStatusDesc||m.resultStatus||'',
+              resultStatusCode:m.resultStatusCode??null
+            }
+          },null,2));
+          JS
