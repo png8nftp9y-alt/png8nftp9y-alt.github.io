@@ -8,16 +8,21 @@ const eventKey=combo=>[combo.playerTypeCode,combo.matchTypeCode,combo.eventClass
 async function api(page,url){
   let last='browser_non_json';
   for(let attempt=0;attempt<3;attempt++){
-    const response=await page.evaluate(async endpoint=>{
-      const result=await fetch(endpoint,{credentials:'include',headers:{accept:'application/json, text/plain, */*','x-requested-with':'XMLHttpRequest'}});
-      return{status:result.status,text:await result.text()};
-    },url);
-    if(challengePattern.test(response.text))last='browser_incapsula_challenge';
-    else{
-      try{return JSON.parse(response.text)}catch{last=`browser_non_json_${response.status}`}
+    try{
+      const response=await page.evaluate(async endpoint=>{
+        const result=await fetch(endpoint,{credentials:'include',signal:AbortSignal.timeout(30000),headers:{accept:'application/json, text/plain, */*','x-requested-with':'XMLHttpRequest'}});
+        return{status:result.status,text:await result.text()};
+      },url);
+      if(challengePattern.test(response.text))last='browser_incapsula_challenge';
+      else{
+        try{return JSON.parse(response.text)}catch{last=`browser_non_json_${response.status}`}
+      }
+    }catch(error){last=`browser_network_error:${error.message}`}
+    if(attempt<2){
+      try{await page.reload({waitUntil:'domcontentloaded',timeout:60000})}
+      catch(error){last+=`;reload:${error.message}`}
+      await pause(2500*(attempt+1));
     }
-    await page.reload({waitUntil:'domcontentloaded',timeout:60000});
-    await pause(2500*(attempt+1));
   }
   throw new Error(last);
 }
