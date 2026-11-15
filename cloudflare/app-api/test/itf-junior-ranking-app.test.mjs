@@ -5,7 +5,7 @@ import {publication} from '../lib/itf-junior-ranking-batch.mjs';
 import {publishPartialRanking} from '../lib/itf-junior-ranking-partial.mjs';
 import {readItfRankingTargets} from '../lib/itf-junior-ranking-reader.mjs';
 import {enrichItfJuniorRankings} from '../lib/itf-junior-ranking-enrichment.mjs';
-import {renderItfRankingDiagnostics} from '../lib/admin-itf-junior-rankings.mjs';
+import {renderItfRankingDiagnostics,renderItfRankingCoverage} from '../lib/admin-itf-junior-rankings.mjs';
 import worker from '../src/index.js';
 const stamp='2026-11-15T14:00:00Z',row=(id,rank=1)=>({playerId:id,rank,points:100/rank,playerGivenName:'Example',playerFamilyName:'Player',playerNationalityCode:'ITA',gender:'M'});
 const partial=(items,date='2026-11-09',category='B')=>({category,rankingDate:date,total:1000,capturedAt:stamp,items,status:'partial',error:'incapsula_challenge'});
@@ -108,4 +108,20 @@ test('ITF player labels omit dates and acquisition status; opponent labels retai
  }
  const player=ctx.currentPlayerRankingLabels({itfJuniorRanking:{ranking:null,status:'unranked',rankingDate:'2026-11-09'}},[]).join(' ');assert.doesNotMatch(player,/2026-11-09/);
  assert.doesNotMatch(ctx.opponentEuropeRankingText({itfJuniorRanking:{status:'pending'}}),/parziale/);
+});
+
+test('ITF coverage shows only the newest publication date, deduplicates ready partials and waits for the other category',async()=>{
+ const d=database();try{
+  await d.execute(publication('B','2026-11-09',[row(800000001)],1,stamp).statements);
+  await publishPartialRanking({...partial([row(800000002)],'2026-11-09','G'),total:3},d);
+  await publishPartialRanking({...partial([row(800000002),row(800000003,2)],'2026-11-09','G'),total:3},d);
+  let html=await renderItfRankingCoverage(adapter(d));assert.match(html,/09\/11\/2026/);assert.match(html,/2 \/ 3 acquisite/);assert.match(html,/<td>1<\/td>/);assert.match(html,/1 \/ 1 acquisite/);
+  await publishPartialRanking({...partial([row(800000004)],'2026-11-16','B'),total:5891},d);
+  html=await renderItfRankingCoverage(adapter(d));assert.match(html,/16\/11\/2026/);assert.match(html,/1 \/ 5891 acquisite/);assert.match(html,/<td>5890<\/td>/);assert.match(html,/0 \/ — acquisite/);assert.match(html,/In attesa di acquisizione/);assert.doesNotMatch(html,/09\/11\/2026|2 \/ 3 acquisite/);
+  await d.execute(publication('G','2026-11-16',[row(800000005)],1,stamp).statements);html=await renderItfRankingCoverage(adapter(d));assert.match(html,/1 \/ 1 acquisite/);
+ }finally{d.close();}
+});
+test('coverage stays between ITF metadata and draws, with reads restricted to the ITF view',()=>{
+ const source=readFileSync(new URL('../src/index.js',import.meta.url),'utf8');assert.ok(source.includes("view==='itf'?await renderItfRankingCoverage(env.DB):''"));
+ const placement="${renderMetadataQueue(docs['itf_metadata_queue_status.json'],esc,age)}${itfRankingCoveragePanel}${itfQueueSection}";assert.ok(source.includes(placement));
 });

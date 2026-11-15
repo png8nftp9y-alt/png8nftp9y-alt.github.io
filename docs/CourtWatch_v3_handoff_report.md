@@ -11056,3 +11056,11 @@ Validazione: 11 test passati nella suite future-tournament-ranking (inclusi i te
 - Misure per identità, metadati, storico, documenti ITF, presentazione e ranking incontri. Pannello opt-in loadTiming=1; nessun nuovo polling o archivio telemetria.
 - Test di regressione su navigazione immediata, risposta progressiva, errori, cache e cambi giocatore, inclusi nei controlli ordinari. Cache JavaScript incrementata.
 - Verifica browser e tempi reali della versione nuova richiedono il deploy; nessuna riduzione in secondi dichiarata prima della misura live.
+
+## 2026-11-16 — Copertura dell’ultima classifica nel pannello ITF
+
+- Su richiesta, aggiunto in Admin → ITF tra metadati e tabelloni un riquadro Boys/Girls con data ranking, acquisite/totale atteso, mancanti e stato. La vista mostra soltanto la data di pubblicazione più recente rilevata dalla fonte, non uno storico di settimane.
+- Appena una nuova data è presente negli import o nei metadati di recovery, sostituisce la precedente nella vista. La categoria non ancora acquisita per quella data risulta in attesa; non si riciclano i conteggi della settimana precedente. Il cambio avviene alla rilevazione della nuova data, non al solo cambio del calendario.
+- Le pubblicazioni complete usano il totale già verificato. I parziali contano gli ID distinti dell’unione dei soli manifest ready=1 della data corrente; duplicati tra tentativi non aumentano la copertura. Totali sconosciuti o conflittuali non producono zero mancanti o falsa completezza. Totali variabili come 5891 sono letti dalla fonte.
+- Dati delle precedenti settimane conservati in archivio. Nessuna modifica dei ranking in app, dei recuperi o della schedulazione; nessuna scrittura D1. Le nuove letture avvengono solo nella pagina ITF e non aggiungono richieste HTTP o R2.
+- Test SQLite di cambio settimana, copertura parziale deduplicata, totale variabile, categoria in attesa e pubblicazione completa; verifica posizione del riquadro e isolamento delle letture admin. Test locali superati; deploy e numeri reali del riquadro remoto ancora da verificare. Nessun polling o rilancio manuale nella preparazione.

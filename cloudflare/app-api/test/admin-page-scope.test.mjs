@@ -26,9 +26,9 @@ test('Cloudflare reads only its R2 usage snapshot, including during a remote out
   assert.match(r.html,/<h2>Consumi Cloudflare<\/h2>/);
   assert.doesNotMatch(r.html,/<div class="admin-page page-(?:diagnostica|id|itf|utenti)">/);
 });
-test('ITF reads exactly two verified D1 reports, without HTTP or R2',async()=>{
+test('ITF reads its verified reports and ranking schema availability, without HTTP or R2',async()=>{
   const r=await open('itf');
-  assert.equal(r.sql.length,1);assert.deepEqual(r.objects,[]);assert.deepEqual(r.urls,[]);
+  assert.equal(r.sql.length,2);assert.deepEqual(r.objects,[]);assert.deepEqual(r.urls,[]);assert.equal(r.sql.filter(q=>q.includes('sqlite_master')&&q.includes('itf_junior_ranking_publications')).length,1);
   assert.equal(r.sql.filter(q=>q.includes('runtime_document_chunks')).length,1);
   assert.match(r.html,/Completezza tabelloni ITF/);assert.match(r.html,/metadati/i);
 });
