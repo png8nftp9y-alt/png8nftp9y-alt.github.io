@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-15T16:39:36.037Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-15T16:41:43.805Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -955377,7 +955377,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-15T15:27:32.719Z",
+      "checkedAt": "2026-11-15T16:41:40.112Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -955395,7 +955395,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T15:27:33.630Z",
+      "checkedAt": "2026-11-15T16:41:40.784Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -955520,8 +955520,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -955546,8 +955546,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -955559,8 +955559,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -955585,14 +955585,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -956170,13 +956170,13 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T15:27:34.175Z",
+      "checkedAt": "2026-11-15T16:41:41.299Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 1,
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 1,
-      "missingSections": 5,
+      "acquiredSections": 2,
+      "unusedAlternativeSections": 1,
+      "resolvedSections": 3,
+      "missingSections": 3,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -956295,8 +956295,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -956321,22 +956321,22 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 19,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -956347,9 +956347,9 @@
             {
               "event": "G-S-Q-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "error": "empty_singles_qualification",
+              "failureType": "empty_singles_qualification",
+              "resolved": true
             }
           ]
         },
@@ -956360,14 +956360,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -956482,6 +956482,224 @@
             "taskId": "J-J30-PAK-2026-006__B-S-Q-KO",
             "storedAt": "2026-11-14T15:24:01.870Z"
           }
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800675268",
+              "name": "Varvara Rubtsova",
+              "givenName": "Varvara",
+              "familyName": "Rubtsova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/varvara-rubtsova/800675268/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800860945",
+              "name": "Khadija Khalil",
+              "givenName": "Khadija",
+              "familyName": "Khalil",
+              "nationalityCode": "PAK",
+              "profileLink": "/en/players/khadija-khalil/800860945/pak/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800759479",
+              "name": "XuanYi Wei",
+              "givenName": "XuanYi",
+              "familyName": "Wei",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/xuanyi-wei/800759479/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800729717",
+              "name": "Yeanna Chowdhury",
+              "givenName": "Yeanna",
+              "familyName": "Chowdhury",
+              "nationalityCode": "BAN",
+              "profileLink": "/en/players/yeanna-chowdhury/800729717/ban/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800711756",
+              "name": "Polina Sushkova",
+              "givenName": "Polina",
+              "familyName": "Sushkova",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/polina-sushkova/800711756/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800750817",
+              "name": "Yijia Wang",
+              "givenName": "Yijia",
+              "familyName": "Wang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yijia-wang/800750817/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800770875",
+              "name": "Ailin Bakiyeva",
+              "givenName": "Ailin",
+              "familyName": "Bakiyeva",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/ailin-bakiyeva/800770875/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800661272",
+              "name": "Xeniya Semenova",
+              "givenName": "Xeniya",
+              "familyName": "Semenova",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/xeniya-semenova/800661272/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800697675",
+              "name": "Anyawee Paisarnpanuwong",
+              "givenName": "Anyawee",
+              "familyName": "Paisarnpanuwong",
+              "nationalityCode": "THA",
+              "profileLink": "/en/players/anyawee-paisarnpanuwong/800697675/tha/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800785876",
+              "name": "Yuqi Li",
+              "givenName": "Yuqi",
+              "familyName": "Li",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yuqi-li/800785876/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800819497",
+              "name": "Githmi Riyana Fernando",
+              "givenName": "Githmi Riyana",
+              "familyName": "Fernando",
+              "nationalityCode": "SRI",
+              "profileLink": "/en/players/githmi-riyana-fernando/800819497/sri/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800885372",
+              "name": "Aleezay",
+              "givenName": "Aleezay",
+              "familyName": "",
+              "nationalityCode": "PAK",
+              "profileLink": "/en/players/aleezay-/800885372/pak/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800690795",
+              "name": "Mariia Markevich",
+              "givenName": "Mariia",
+              "familyName": "Markevich",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/mariia-markevich/800690795/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800705336",
+              "name": "Adema Alseipulova",
+              "givenName": "Adema",
+              "familyName": "Alseipulova",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/adema-alseipulova/800705336/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800746090",
+              "name": "Ploypetch Daungkhiaw",
+              "givenName": "Ploypetch",
+              "familyName": "Daungkhiaw",
+              "nationalityCode": "THA",
+              "profileLink": "/en/players/ploypetch-daungkhiaw/800746090/tha/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800774268",
+              "name": "Danelya Beissebayeva",
+              "givenName": "Danelya",
+              "familyName": "Beissebayeva",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/danelya-beissebayeva/800774268/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800780738",
+              "name": "Milana Vorobyeva",
+              "givenName": "Milana",
+              "familyName": "Vorobyeva",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/milana-vorobyeva/800780738/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800753549",
+              "name": "Arianna Grigorian",
+              "givenName": "Arianna",
+              "familyName": "Grigorian",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/arianna-grigorian/800753549/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800793625",
+              "name": "Meimei Hu",
+              "givenName": "Meimei",
+              "familyName": "Hu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/meimei-hu/800793625/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-15T16:41:41.299Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-PAK-2026-006__G-S-M-KO",
+            "storedAt": "2026-11-15T16:41:41.299Z"
+          }
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": false,
+          "players": [],
+          "resolution": "empty_singles_qualification",
+          "resolutionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "mainEvents": [
+              "G-S-M-KO"
+            ],
+            "storedAt": "2026-11-15T16:41:41.299Z"
+          }
         }
       }
     },
@@ -956491,7 +956709,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T15:27:34.672Z",
+      "checkedAt": "2026-11-15T16:41:41.796Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 1,
@@ -956852,7 +957070,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T15:27:35.171Z",
+      "checkedAt": "2026-11-15T16:41:42.292Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -957527,7 +957745,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T15:27:35.669Z",
+      "checkedAt": "2026-11-15T16:41:42.811Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -958282,7 +958500,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T15:27:36.168Z",
+      "checkedAt": "2026-11-15T16:41:43.307Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -958637,7 +958855,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T15:27:36.666Z",
+      "checkedAt": "2026-11-15T16:41:43.805Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
