@@ -58,3 +58,47 @@ test('actual acquisition command preserves validated pages when a later request 
   const saved=JSON.parse(readFileSync(join(dir,'itf-junior-work/B.json'),'utf8'));assert.equal(saved.status,'partial');assert.equal(saved.total,300);assert.equal(saved.items.length,200);assert.equal(saved.rankingDate,'2026-11-09');assert.match(saved.error,/incapsula/);
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
+test('D1_TEST_INITIAL_IMPORT: complementary validated partials certify the full union and stop category retries',async()=>{
+ const d=database();try{
+  const tasks=recoveryPlan([],stamp);
+  await publishPartialRanking(partial([row(800000001)],'2026-11-09',2),d);
+  const result=await publishRecovery({tasks,startedAt:stamp},{...d,readResult:async category=>category==='B'?partial([row(800000002,2)],'2026-11-09',2):({...partial([row(800000003)],'2026-11-09',2),category:'G',status:'acquired',total:1})});
+  assert.equal(result.success,true);assert.ok(result.states.every(s=>s.phase==='complete'&&s.next_retry_at===null&&s.last_error===''));
+  const value=(await readItfRankingTargets(adapter(d),[{playerId:'800000001',category:'B'}]))[0];assert.equal(value.partial,false);assert.equal(value.ranking,1);
+  assert.equal(recoveryPlan(result.states,stamp).length,0);
+ }finally{d.close();}
+});
+test('D1_TEST_IDENTICAL_ZERO_WRITES: replaying a certified union changes no publication or position',async()=>{
+ const d=database();try{
+  const value=partial([row(800000001)],'2026-11-09',1);await publishPartialRanking(value,d);let changes=0;
+  await publishPartialRanking(value,{query:d.query,execute:async sql=>{const r=await d.execute(sql);changes+=r.changes;}});assert.equal(changes,0);
+ }finally{d.close();}
+});
+test('D1_TEST_INCOMPLETE_SOURCE_GUARD: changed totals and conflicting identities cannot certify a union',async()=>{
+ for(const conflict of ['total','rank']){const d=database();try{
+  await publishPartialRanking(partial([row(800000001)],'2026-11-09',3),d);
+  await assert.rejects(publishPartialRanking(partial(conflict==='rank'?[row(800000001,2),row(800000002,3)]:[row(800000002,2)],'2026-11-09',conflict==='total'?2:3),d),/Conflicting/);
+  assert.equal((await d.query('SELECT COUNT(*) n FROM itf_junior_ranking_publications WHERE complete=1'))[0].n,0);
+ }finally{d.close();}}
+});
+test('D1_TEST_REAL_DELTAS_ONLY: different dates, categories and unready imports cannot fill a missing identity',async()=>{
+ const d=database();try{
+  await publishPartialRanking({...partial([row(800000002,2)],'2026-11-02',2),category:'G'},d);
+  await publishPartialRanking(partial([row(800000002,2)],'2026-11-09',2),d);await d.execute(['UPDATE itf_junior_ranking_partial_publications SET ready=0;']);
+  const value=await publishPartialRanking(partial([row(800000001)],'2026-11-09',2),d);
+  assert.equal(value.complete,false);assert.equal(value.acquired,1);
+  const result=await publishRecovery({tasks:recoveryPlan([],stamp),startedAt:stamp},{...d,readResult:async category=>category==='B'?partial([row(800000002,2)],'2026-11-09',2):({category,status:'failure',error:'independent source failure'})});
+  assert.equal(result.success,false);assert.equal(result.states.find(s=>s.category==='B').phase,'complete');assert.equal(result.states.find(s=>s.category==='G').phase,'failed');
+ }finally{d.close();}
+});
+test('D1_TEST_REAL_DELTAS_ONLY: interrupted union promotion resumes without falsely certifying completion',async()=>{
+ const d=database();try{
+  await publishPartialRanking(partial([row(800000001)],'2026-11-09',2),d);
+  const value=partial([row(800000002,2)],'2026-11-09',2);let interrupted=false;
+  await assert.rejects(publishPartialRanking(value,{query:d.query,execute:async statements=>{
+   if(statements.some(s=>s.includes('SET complete=1'))){await d.execute(statements.slice(0,2));interrupted=true;throw Error('Promotion interrupted');}return d.execute(statements);
+  }}),/Promotion interrupted/);
+  assert.equal(interrupted,true);assert.equal((await d.query('SELECT COUNT(*) n FROM itf_junior_ranking_publications WHERE complete=1'))[0].n,0);
+  const completed=await publishPartialRanking(value,d);assert.equal(completed.complete,true);assert.equal(completed.acquired,2);
+ }finally{d.close();}
+});

@@ -18,12 +18,12 @@ for(const task of taskPlan.inserts){
   }else result=failedCategory(task,plan.startedAt,'Acquisition interrupted or result artifact unavailable');
  }
  if(result.status!=='acquired'){
-  failed=true;let detail=result.error||'Acquisition failed';
+  let detail=result.error||'Acquisition failed';
   if(result.status==='partial'){
-   try{const saved=await publishPartialRanking(result,{execute,query});detail+=` · partial ranking visible: ${saved.acquired}/${saved.expected}, ${saved.rankingDate}`;}
+   try{const saved=await publishPartialRanking(result,{execute,query});if(saved.complete){await execute([state(retry,'complete',saved)]);continue;}detail+=` · partial ranking visible: ${saved.acquired}/${saved.expected}, ${saved.rankingDate}`;}
    catch(error){detail+=' · partial import failed: '+error.message;}
   }
-  await execute([state(retry,'failed',{rankingDate:result.rankingDate,total:result.total,error:detail})]);continue;
+  failed=true;await execute([state(retry,'failed',{rankingDate:result.rankingDate,total:result.total,error:detail})]);continue;
  }
  let checked,checkpointSaved=task.action==='import';
  try{

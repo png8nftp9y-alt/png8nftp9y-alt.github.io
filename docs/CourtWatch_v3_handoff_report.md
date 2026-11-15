@@ -11030,3 +11030,12 @@ ITF discovery 2026-11-15T22:28:50.620Z: 0 newly discovered future tournaments; M
 - Rimosso il trigger push dal workflow storico T-1.
 - Conservato workflow_dispatch per recuperi straordinari espliciti.
 - Le modifiche ai lettori non rilanciano più la scansione storica completa.
+
+## 2026-11-16 — Certificazione ranking dall’unione dei parziali verificati
+
+- Corretto il limite segnalato dall’utente: i ranking acquisiti in tentativi diversi possono essere tutti disponibili senza che un singolo tentativo abbia completato l’intera lista. Dopo ogni import parziale verificato il publisher confronta l’unione degli ID della stessa categoria e data con il totale dichiarato.
+- Solo manifest parziali ready=1 partecipano. Date/categorie diverse, import non verificati, totali differenti, identità con posizioni/punti o metadati conflittuali non possono certificare una classifica completa. Nessuna riduzione del totale per fare diventare verde un run.
+- Se l’unione validata raggiunge esattamente il totale, viene costruita e verificata una normale pubblicazione completa tramite lo stesso builder incrementale. Solo dopo il controllo D1 la categoria diventa complete, next_retry_at viene azzerato e il suo errore di acquisizione superato viene cancellato. Diagnostica e reader usano la pubblicazione completa.
+- Un errore indipendente nell’altra categoria mantiene rosso l’esito complessivo senza riaprire la categoria ormai completa. Ripetizioni identiche della pubblicazione non riscrivono ranking; import canonici interrotti non diventano completi prima della verifica e possono riprendere tramite il builder esistente.
+- Test SQLite: unione complementare e recuperi fermati; replay identico zero scritture; blocco conflitti/totali; isolamento data/categoria e manifest non ready; errore indipendente dell’altra categoria. Regressioni pubblicazione, lettura app e recovery verificate localmente. Policy D1 verificata. Nessuna scrittura D1 remota o rilancio manuale nella preparazione.
+- Pubblicazione remota e certificazione effettiva delle 5176 Girls ancora da verificare. Questa correzione non inventa gli ID mancanti e non garantisce che la loro acquisizione sia già avvenuta.
