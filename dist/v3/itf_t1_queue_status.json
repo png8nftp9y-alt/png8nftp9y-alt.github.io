@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-15T16:54:13.422Z",
+  "generatedAt": "2026-11-15T17:10:20.627Z",
   "today": "2026-11-15",
   "windowEnd": "2026-11-18",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -11,17 +11,17 @@
     "complete": 976,
     "cancelledNoDraws": 13,
     "resolved": 989,
-    "missingDrawsTournaments": 22,
-    "unverifiable": 179,
-    "declaredDraws": 5738,
-    "acquiredDraws": 5652,
-    "missingDraws": 86,
-    "actionableUnverifiable": 4,
+    "missingDrawsTournaments": 23,
+    "unverifiable": 178,
+    "declaredDraws": 5743,
+    "acquiredDraws": 5653,
+    "missingDraws": 90,
+    "actionableUnverifiable": 3,
     "futureUnverifiable": 175,
     "ordinary": {
       "total": 26,
-      "missingDraws": 86,
-      "inventoryRequired": 4
+      "missingDraws": 90,
+      "inventoryRequired": 3
     },
     "extraordinaryA": {
       "total": 0,
@@ -1506,7 +1506,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-15T15:52:29.353Z",
+        "checkedAt": "2026-11-15T16:55:05.234Z",
         "eligibleFrom": "2026-11-16"
       },
       {
@@ -1514,28 +1514,77 @@
         "tournamentName": "J30 Stellenbosch",
         "startDate": "2026-11-17",
         "endDate": "2026-11-22",
-        "status": "inventory_empty",
-        "inventoryError": "empty_inventory",
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "status": "missing",
+        "inventoryError": null,
+        "knownDraws": 5,
+        "acquiredDraws": 1,
+        "missingDraws": 4,
+        "missingEvents": [
+          {
+            "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-15T16:55:40.173Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-15T16:55:40.173Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-15T16:55:40.173Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-15T16:55:40.173Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-11-15T15:52:26.345Z",
+        "needsInventory": false,
+        "checkedAt": "2026-11-15T16:55:40.173Z",
         "eligibleFrom": "2026-11-16"
       }
     ],
     "total": 26,
-    "missingDraws": 86,
-    "acquiredDraws": 45,
+    "missingDraws": 90,
+    "acquiredDraws": 46,
     "missingByReason": {
-      "draw_without_players": 82,
+      "draw_without_players": 86,
       "incapsula_blocked": 4
     },
     "byStatus": {
-      "missing": 22,
-      "inventory_empty": 4
+      "missing": 23,
+      "inventory_empty": 3
     }
   },
   "extraordinary": {
@@ -4358,9 +4407,9 @@
     }
   },
   "audit": {
-    "urgentUnverifiable": 4,
+    "urgentUnverifiable": 3,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 4,
+    "actionableUnverifiable": 3,
     "futureUnverifiable": 175,
     "blocked": 0
   }
