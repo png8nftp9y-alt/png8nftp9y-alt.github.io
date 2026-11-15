@@ -21,11 +21,10 @@ export async function readItfRankingTargets(db,targets){
  if(!targets.length)return [];
  for(const t of targets)if(!/^800\d{6}$/.test(String(t.playerId))||!['B','G'].includes(t.category)||t.matchDate&&(!/^\d{4}-\d{2}-\d{2}$/.test(t.matchDate)||!Number.isFinite(Date.parse(t.matchDate))))throw Error('Invalid native ITF ranking target');
  const all=async(sql,params=[])=>((await db.prepare(sql).bind(...params).all()).results||[]);
- let sources;
- try{sources=await all('SELECT category,ranking_date,content_hash,captured_at,expected_count,0 AS partial FROM itf_junior_ranking_publications WHERE complete=1');}
- catch(error){if(/no such table: itf_junior_ranking_publications/.test(String(error)))return targets.map(t=>({category:t.category,ranking:null,status:'unavailable'}));throw error;}
- try{sources.push(...await all('SELECT category,ranking_date,content_hash,captured_at,expected_count,acquired_count,1 AS partial FROM itf_junior_ranking_partial_publications WHERE ready=1'));}
- catch(error){if(!/no such table: itf_junior_ranking_partial_publications/.test(String(error)))throw error;}
+ const tables=new Set((await all("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('itf_junior_ranking_publications','itf_junior_ranking_partial_publications','itf_junior_ranking_history')")).map(r=>r.name));
+ if(!tables.has('itf_junior_ranking_publications')||!tables.has('itf_junior_ranking_history'))return targets.map(t=>({category:t.category,ranking:null,status:'unavailable'}));
+ const sources=await all('SELECT category,ranking_date,content_hash,captured_at,expected_count,0 AS partial FROM itf_junior_ranking_publications WHERE complete=1');
+ if(tables.has('itf_junior_ranking_partial_publications'))sources.push(...await all('SELECT category,ranking_date,content_hash,captured_at,expected_count,acquired_count,1 AS partial FROM itf_junior_ranking_partial_publications WHERE ready=1'));
  if(!sources.length)return targets.map(t=>({category:t.category,ranking:null,status:'unavailable'}));
  const ids=[...new Set(targets.map(t=>String(t.playerId)))],index=new Map();
  const eligible=new Set(sources.map(p=>key(p.category,p.ranking_date,p.content_hash,'')));

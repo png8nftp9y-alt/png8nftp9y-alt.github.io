@@ -11007,3 +11007,11 @@ Fissato migrate-import-verify-deploy a Ubuntu 24.04. Il run 43720405227 falliva 
 - L'API restituisce anche il ranking archiviato senza timestamp del profilo, conservando provenienza e data originale dell'osservazione.
 - Test di regressione API e rendering; incremento cache JavaScript.
 - Nessuna nuova richiesta FITP o modifica ai dati D1.
+
+## 2026-11-15 — Sblocco cache ITF Junior e letture durante la migrazione
+
+- Run hotfix 43767005523 e ranking 43767005605 bloccati dal controllo cache: la precedente patch aveva sostituito una revisione numerica maggiore con 20261115-itf-junior-partial. Il codice aveva superato i test sorgenti ma Worker e import D1 sono stati saltati. Nessun deploy/import riuscito viene dichiarato.
+- L’installatore incrementa con interi Python la massima revisione numerica JS presente nelle ultime 40 revisioni HTML accessibili, conservando il resto della pagina. Nessun controllo cache viene rimosso.
+- Reader e diagnostica verificano in sqlite_master le tabelle disponibili prima dei SELECT. I replay read-only non generano errori SQL per una tabella parziale non ancora inizializzata; continuano a leggere le pubblicazioni complete già presenti. Errori reali del database restano errori. Nessuna tabella o posizione viene creata da una lettura.
+- Test aggiunto con SQLite reale, tabella parziale rimossa e wrapper che registra e sanitizza ogni errore come i diagnostici remoti: ranking completo mantenuto e zero query fallite; errore reale non nascosto. 35 test mirati superati prima del confezionamento; regressioni cache e controlli sorgenti eseguiti dall’installatore.
+- Il run Girls ha salvato 2000 record in artifact prima della challenge; quel run non li ha importati. Import, creazione schema e deploy successivi restano da verificare. Nessun rilancio manuale o polling eseguito nella preparazione.

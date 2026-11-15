@@ -3,8 +3,10 @@ export async function renderItfRankingDiagnostics(db){
  const title='<h2>Classifiche ITF Junior</h2>';
  try{
   const read=async(sql)=>((await db.prepare(sql).bind().all()).results||[]);
+  const tables=new Set((await read("SELECT name FROM sqlite_master WHERE type='table' AND name IN ('itf_junior_ranking_publications','itf_junior_ranking_partial_publications','itf_junior_ranking_recovery','itf_junior_ranking_attempts')")).map(r=>r.name));
+  if(!tables.has('itf_junior_ranking_publications')||!tables.has('itf_junior_ranking_recovery')||!tables.has('itf_junior_ranking_attempts'))return title+'<p class="pill warn">Archivio ranking non inizializzato.</p>';
   const versions=await read('SELECT category,ranking_date,content_hash,captured_at,expected_count,expected_count AS acquired_count,0 AS partial FROM itf_junior_ranking_publications WHERE complete=1');
-  try{versions.push(...await read('SELECT category,ranking_date,content_hash,captured_at,expected_count,acquired_count,1 AS partial FROM itf_junior_ranking_partial_publications WHERE ready=1'));}catch(e){if(!/no such table: itf_junior_ranking_partial_publications/.test(String(e)))throw e;}
+  if(tables.has('itf_junior_ranking_partial_publications'))versions.push(...await read('SELECT category,ranking_date,content_hash,captured_at,expected_count,acquired_count,1 AS partial FROM itf_junior_ranking_partial_publications WHERE ready=1'));
   const states=await read('SELECT category,phase,next_retry_at,last_error FROM itf_junior_ranking_recovery');
   const attempt=(await read('SELECT run_url,checked_at,status FROM itf_junior_ranking_attempts ORDER BY checked_at DESC LIMIT 1'))[0];
   const rows=['B','G'].map(category=>{

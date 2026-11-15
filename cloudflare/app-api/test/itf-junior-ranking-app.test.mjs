@@ -86,3 +86,13 @@ test('FITP numeric profile IDs and conflicting ITF identities never borrow a ran
   assert.equal(people[0].itfJuniorRanking,null);assert.equal(people[1].itfJuniorRanking,null);
  }finally{d.close();}
 });
+test('before partial schema migration, read-only audits encounter zero failed SQL statements and retain complete rankings',async()=>{
+ const d=database();try{
+  await d.execute(publication('B','2026-11-09',[row(800000001,321)],1,stamp).statements);
+  await d.execute(['DROP TABLE itf_junior_ranking_partial_publications;']);let failed=0;
+  const db={prepare(sql){return {bind(...params){return {all:async()=>{try{return {results:await d.query(sql,params)}}catch{failed++;throw Error('diagnostic_d1_request_failed:http_400:codes_7500')}}}}}}};
+  const [value]=await readItfRankingTargets(db,[target(800000001)]);assert.equal(value.ranking,321);
+  const html=await renderItfRankingDiagnostics(db);assert.match(html,/Completa/);assert.equal(failed,0);
+  await assert.rejects(readItfRankingTargets({prepare(){throw Error('Real database failure')}},[target(800000001)]),/Real database failure/);
+ }finally{d.close();}
+});
