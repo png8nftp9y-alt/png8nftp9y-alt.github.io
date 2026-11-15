@@ -2,9 +2,6 @@ name: Court Watch v3 ITF historical T-1 engine
 # Tournament-isolated production engine
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['src/v3/scan-itf-history-tournament.mjs','src/v3/run-itf-history-worker.mjs','src/v3/merge-itf-history-tournaments.mjs','.github/workflows/courtwatch-v3-itf-history-engine.yml']
 permissions: {contents: read}
 concurrency: {group: courtwatch-v3-itf-history-engine,cancel-in-progress: true}
 jobs:

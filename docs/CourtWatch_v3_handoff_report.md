@@ -11024,3 +11024,9 @@ ITF discovery 2026-11-15T22:28:50.620Z: 0 newly discovered future tournaments; M
 - Nella pagina giocatore/giocatrice la posizione ITF Junior compare senza data. Nell’intestazione della pagina avversario resta la data effettiva, nella forma (ranking del ...), come Europe. Le informazioni di data e completezza restano nei dati API e D1 e non cambia la selezione temporale della classifica.
 - Aggiornate le prove API/rendering e aggiunta regressione per ranking completi, parziali, precedenti durante recupero, assenza confermata e acquisizione pendente. Incremento cache numerico verificato prima del push. Nessuna scrittura D1 o modifica della schedulazione.
 - Deploy remoto della presentazione ancora da verificare dopo il push; nessun rilancio manuale o polling nella preparazione.
+
+
+### Motore storico ITF solo manuale — 2026-11-16
+- Rimosso il trigger push dal workflow storico T-1.
+- Conservato workflow_dispatch per recuperi straordinari espliciti.
+- Le modifiche ai lettori non rilanciano più la scansione storica completa.
