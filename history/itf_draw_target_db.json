@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-15T19:49:42.504Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-15T19:53:42.556Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -961938,7 +961938,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-15T18:26:40.336Z",
+      "checkedAt": "2026-11-15T19:53:38.776Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -962733,7 +962733,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-15T18:26:41.094Z",
+      "checkedAt": "2026-11-15T19:53:39.624Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -963598,7 +963598,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-15T18:26:41.470Z",
+      "checkedAt": "2026-11-15T19:53:40.081Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -964343,7 +964343,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T18:26:41.842Z",
+      "checkedAt": "2026-11-15T19:53:40.578Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -965158,7 +965158,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T18:26:42.201Z",
+      "checkedAt": "2026-11-15T19:53:41.075Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -966371,7 +966371,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T18:26:42.587Z",
+      "checkedAt": "2026-11-15T19:53:41.568Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -966496,8 +966496,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -966522,8 +966522,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -966535,8 +966535,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -966561,14 +966561,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -967026,7 +967026,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-15T18:26:42.963Z",
+      "checkedAt": "2026-11-15T19:53:42.063Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -967761,13 +967761,13 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-15T18:26:43.345Z",
+      "checkedAt": "2026-11-15T19:53:42.556Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 3,
+      "acquiredSections": 4,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 3,
-      "missingSections": 3,
+      "resolvedSections": 4,
+      "missingSections": 2,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -967920,14 +967920,14 @@
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -968960,6 +968960,340 @@
             "complete": true,
             "taskId": "J-J60-SLO-2026-006__B-S-M-KO",
             "storedAt": "2026-11-15T16:53:32.375Z"
+          }
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800663534",
+              "name": "Nicole Yekaterina Villa",
+              "givenName": "Nicole Yekaterina",
+              "familyName": "Villa",
+              "nationalityCode": "SUI",
+              "profileLink": "/en/players/nicole-yekaterina-villa/800663534/sui/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800705009",
+              "name": "EVA SIFKOVIC",
+              "givenName": "EVA",
+              "familyName": "SIFKOVIC",
+              "nationalityCode": "SLO",
+              "profileLink": "/en/players/eva-sifkovic/800705009/slo/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800695574",
+              "name": "Cristiana Cosmeanu",
+              "givenName": "Cristiana",
+              "familyName": "Cosmeanu",
+              "nationalityCode": "ROU",
+              "profileLink": "/en/players/cristiana-cosmeanu/800695574/rou/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800764071",
+              "name": "Morena Druzijanic",
+              "givenName": "Morena",
+              "familyName": "Druzijanic",
+              "nationalityCode": "CRO",
+              "profileLink": "/en/players/morena-druzijanic/800764071/cro/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800772025",
+              "name": "Anna Gottvaldova",
+              "givenName": "Anna",
+              "familyName": "Gottvaldova",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/anna-gottvaldova/800772025/cze/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800666064",
+              "name": "Bianca Del Sal",
+              "givenName": "Bianca",
+              "familyName": "Del Sal",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/bianca-del-sal/800666064/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800664715",
+              "name": "Ema Halajko",
+              "givenName": "Ema",
+              "familyName": "Halajko",
+              "nationalityCode": "CRO",
+              "profileLink": "/en/players/ema-halajko/800664715/cro/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800592500",
+              "name": "Beti Butina Jazbec",
+              "givenName": "Beti",
+              "familyName": "Butina Jazbec",
+              "nationalityCode": "SLO",
+              "profileLink": "/en/players/beti-butina-jazbec/800592500/slo/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800668548",
+              "name": "Nela Padrnosova",
+              "givenName": "Nela",
+              "familyName": "Padrnosova",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/nela-padrnosova/800668548/cze/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800693780",
+              "name": "Alessia Maria Minzat",
+              "givenName": "Alessia Maria",
+              "familyName": "Minzat",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/alessia-maria-minzat/800693780/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800676959",
+              "name": "Maja Grosicka",
+              "givenName": "Maja",
+              "familyName": "Grosicka",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/maja-grosicka/800676959/pol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800665539",
+              "name": "Paulina Maier",
+              "givenName": "Paulina",
+              "familyName": "Maier",
+              "nationalityCode": "AUT",
+              "profileLink": "/en/players/paulina-maier/800665539/aut/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800709491",
+              "name": "Claire Hirschi",
+              "givenName": "Claire",
+              "familyName": "Hirschi",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/claire-hirschi/800709491/aus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800701500",
+              "name": "Ema Mastnak",
+              "givenName": "Ema",
+              "familyName": "Mastnak",
+              "nationalityCode": "SLO",
+              "profileLink": "/en/players/ema-mastnak/800701500/slo/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800690434",
+              "name": "GIULIA MARIA SOFIA BONACCORSO",
+              "givenName": "GIULIA MARIA SOFIA",
+              "familyName": "BONACCORSO",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/giulia-maria-sofia-bonaccorso/800690434/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800665647",
+              "name": "Milana Rasan-Buha",
+              "givenName": "Milana",
+              "familyName": "Rasan-Buha",
+              "nationalityCode": "CRO",
+              "profileLink": "/en/players/milana-rasan-buha/800665647/cro/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800709933",
+              "name": "Giulia Luchetti",
+              "givenName": "Giulia",
+              "familyName": "Luchetti",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/giulia-luchetti/800709933/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766434",
+              "name": "Olivia Frauchiger",
+              "givenName": "Olivia",
+              "familyName": "Frauchiger",
+              "nationalityCode": "SUI",
+              "profileLink": "/en/players/olivia-frauchiger/800766434/sui/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800701019",
+              "name": "Maya Micheva",
+              "givenName": "Maya",
+              "familyName": "Micheva",
+              "nationalityCode": "BUL",
+              "profileLink": "/en/players/maya-micheva/800701019/bul/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800746250",
+              "name": "Zara Bergelj",
+              "givenName": "Zara",
+              "familyName": "Bergelj",
+              "nationalityCode": "SLO",
+              "profileLink": "/en/players/zara-bergelj/800746250/slo/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800703909",
+              "name": "Elena Miljkovic",
+              "givenName": "Elena",
+              "familyName": "Miljkovic",
+              "nationalityCode": "AUT",
+              "profileLink": "/en/players/elena-miljkovic/800703909/aut/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800741075",
+              "name": "Ana Marija Rebic",
+              "givenName": "Ana Marija",
+              "familyName": "Rebic",
+              "nationalityCode": "CRO",
+              "profileLink": "/en/players/ana-marija-rebic/800741075/cro/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800729104",
+              "name": "Tinkara Sep",
+              "givenName": "Tinkara",
+              "familyName": "Sep",
+              "nationalityCode": "SLO",
+              "profileLink": "/en/players/tinkara-sep/800729104/slo/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743146",
+              "name": "Natalie Irahola",
+              "givenName": "Natalie",
+              "familyName": "Irahola",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/natalie-irahola/800743146/cze/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800713249",
+              "name": "Leonie Vivienne Epper",
+              "givenName": "Leonie Vivienne",
+              "familyName": "Epper",
+              "nationalityCode": "SUI",
+              "profileLink": "/en/players/leonie-vivienne-epper/800713249/sui/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745596",
+              "name": "Virginia Zema",
+              "givenName": "Virginia",
+              "familyName": "Zema",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/virginia-zema/800745596/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800782288",
+              "name": "Liza Butina Jazbec",
+              "givenName": "Liza",
+              "familyName": "Butina Jazbec",
+              "nationalityCode": "SLO",
+              "profileLink": "/en/players/liza-butina-jazbec/800782288/slo/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800728310",
+              "name": "Nera Skender",
+              "givenName": "Nera",
+              "familyName": "Skender",
+              "nationalityCode": "CRO",
+              "profileLink": "/en/players/nera-skender/800728310/cro/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800667362",
+              "name": "Daria Malchenko",
+              "givenName": "Daria",
+              "familyName": "Malchenko",
+              "nationalityCode": "UKR",
+              "profileLink": "/en/players/daria-malchenko/800667362/ukr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800661420",
+              "name": "Agnese Stagni",
+              "givenName": "Agnese",
+              "familyName": "Stagni",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/agnese-stagni/800661420/ita/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800778536",
+              "name": "LILI STUSAJ",
+              "givenName": "LILI",
+              "familyName": "STUSAJ",
+              "nationalityCode": "SLO",
+              "profileLink": "/en/players/lili-stusaj/800778536/slo/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800673016",
+              "name": "AYANNA MARIA MITU",
+              "givenName": "AYANNA MARIA",
+              "familyName": "MITU",
+              "nationalityCode": "ROU",
+              "profileLink": "/en/players/ayanna-maria-mitu/800673016/rou/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-15T19:53:42.556Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-SLO-2026-006__G-S-M-KO",
+            "storedAt": "2026-11-15T19:53:42.556Z"
           }
         }
       }
