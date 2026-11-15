@@ -1,0 +1,32 @@
+name: CourtWatch ITF targeted status recovery
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: [0,1,2,3,4,5,6,7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Recover only requested draw statuses
+        env:
+          STATUS_SHARD: ${{ matrix.shard }}
+          ITF_REQUEST_TIMEOUT_MS: '15000'
+          ITF_ACQUISITION_URL: ${{ vars.ITF_ACQUISITION_URL || secrets.ITF_ACQUISITION_URL }}
+          ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
+        run: node tools/recover-itf-target-status.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: itf-target-status-${{ matrix.shard }}
+          path: artifacts/itf-status-${{ matrix.shard }}/
+          retention-days: 14
