@@ -10978,3 +10978,10 @@ ITF discovery 2026-11-15T07:19:26.945Z: 0 newly discovered future tournaments; M
 - Aggiunto test di regressione; invariati i controlli sulle altre categorie.
 - Verifica ufficiale: 27 classifiche disponibili prima scartate dal parser; 10 profili assenti. Equiparati e segnaposto Q esclusi dall'indagine.
 - Recupero D1 separato e limitato alle 27 classifiche verificate ancora vuote; nessuna nuova richiesta FITP.
+
+
+### FITP: ripiego sulla classifica archiviata — 2026-11-15
+- Se mancano classifiche disponibili, utilizza observed_players.payload.ranking tramite tessera FITP esatta.
+- Conserva provenienza observed e data originale in fitpRankingObservedAt; non presenta il recupero come nuovo aggiornamento del profilo.
+- Nessuna scrittura D1 e nessuna richiesta FITP aggiuntiva.
+- Test su priorità delle fonti, valori NC, dati non validi e query indicizzata.
