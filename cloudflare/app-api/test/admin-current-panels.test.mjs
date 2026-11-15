@@ -9,7 +9,7 @@ test('current D1 workflow fragment replaces retained red diagnostics, includes m
  let reads=0;const db={prepare(sql){reads++;assert.doesNotMatch(sql,/COUNT\(|player_circuit_identities|observed_players/);return d.db.prepare(sql)}};
  const auth={Authorization:'Basic '+btoa('admin:secret')},env={ADMIN_TOKEN:'secret',DB:db},writes=d.writes();
  assert.equal((await worker.fetch(new Request('https://app/admin/diagnostica?currentPanels=1'),env)).status,401);assert.equal(reads,0);
- const response=await worker.fetch(new Request('https://app/admin/diagnostica?currentPanels=1',{headers:auth}),env),panels=await response.json();assert.equal(response.status,200);assert.match(panels.workflows,/Acceptance/);assert.match(panels.workflows,/run 9/);assert.doesNotMatch(panels.application,/old failure/);assert.match(panels.application,/green/);assert.equal(reads,1);assert.equal(d.writes(),writes);
+ const response=await worker.fetch(new Request('https://app/admin/diagnostica?currentPanels=1',{headers:auth}),env),panels=await response.json();assert.equal(response.status,200);assert.match(panels.workflows,/Acceptance/);assert.match(panels.workflows,/run 9/);assert.doesNotMatch(panels.application,/old failure/);assert.match(panels.application,/green/);assert.equal(reads,2);assert.match(panels.application,/Classifiche ITF Junior/);assert.equal(d.writes(),writes);
  }finally{d.close()}
 });
 test('Diagnostics preserves the complete saved reading until its explicit refresh',()=>{

@@ -24,3 +24,11 @@ CREATE TABLE IF NOT EXISTS itf_junior_ranking_recovery_chunks (
  category TEXT NOT NULL,cycle_key TEXT NOT NULL,snapshot_hash TEXT NOT NULL,seq INTEGER NOT NULL,data TEXT NOT NULL,
  PRIMARY KEY(category,cycle_key,snapshot_hash,seq)
 );
+
+CREATE TABLE IF NOT EXISTS itf_junior_ranking_partial_publications (
+ category TEXT NOT NULL,ranking_date TEXT NOT NULL,content_hash TEXT NOT NULL,
+ expected_count INTEGER NOT NULL CHECK(expected_count>0),acquired_count INTEGER NOT NULL CHECK(acquired_count>0 AND acquired_count<=expected_count),
+ captured_at TEXT NOT NULL,ready INTEGER NOT NULL DEFAULT 0 CHECK(ready IN (0,1)),
+ PRIMARY KEY(category,ranking_date,content_hash),
+ FOREIGN KEY(category,ranking_date,content_hash) REFERENCES itf_junior_ranking_publications(category,ranking_date,content_hash)
+);

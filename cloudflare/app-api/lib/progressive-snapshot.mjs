@@ -1,6 +1,6 @@
 // One authenticated response: complete match/tournament data first, rankings later.
-const playerKeys=['tennisEuropeRankings','tennisEuropeRankingDates','tennisEuropeRanking','tennisEuropeLatestRankingDates'];
-const matchKey=key=>/^(?:player|partner|opponent)Te/.test(key);
+const playerKeys=['itfJuniorRanking','tennisEuropeRankings','tennisEuropeRankingDates','tennisEuropeRanking','tennisEuropeLatestRankingDates'];
+const matchKey=key=>/^(?:player|partner|opponent)(?:Te|Itf)/.test(key);
 export function snapshotRankingPatch(snapshot){
  return {group:snapshot.group,
   players:snapshot.players.map(p=>({id:p.id,...Object.fromEntries(playerKeys.filter(k=>Object.hasOwn(p,k)).map(k=>[k,p[k]]))})),

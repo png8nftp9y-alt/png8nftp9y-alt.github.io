@@ -10989,3 +10989,13 @@ ITF discovery 2026-11-15T07:19:26.945Z: 0 newly discovered future tournaments; M
 ### 15 novembre 2026 — Runner del job finale D1/API
 
 Fissato migrate-import-verify-deploy a Ubuntu 24.04. Il run 43720405227 falliva installando Chromium su Ubuntu 26.04 durante la ripetizione dei controlli sul codice avanzato in coda. Controlli di sicurezza, importazione e deploy invariati. Verificata modifica limitata al runner; esecuzione CI da confermare.
+
+## 2026-11-15 — Ranking ITF Junior in app e pubblicazioni parziali verificate
+
+- Collegati i ranking ITF Junior Boys/Girls alle pagine giocatore e avversario, agli snapshot ordinari/progressivi e ai ranking delle partite ITF. Identità native verificate, nessun abbinamento per solo nome; le identità FITP numeriche e quelle ITF conflittuali non ricevono ranking impropri.
+- Pagina giocatore: pubblicazione più recente disponibile; partite: pubblicazione più vicina alla data della partita, con preferenza per quella precedente a pari distanza. Data effettiva sempre esposta. La regola è pronta anche per le future importazioni ITF.
+- Se una richiesta successiva fallisce (anche Incapsula), il comando di acquisizione conserva le pagine già validate della stessa pubblicazione. I loro ranking diventano leggibili soltanto dopo verifica del relativo import D1; la categoria resta incompleta e il recupero orario resta attivo. Nessuna certificazione completa di dati parziali.
+- Le identità mancanti da un parziale non sono dichiarate non classificate: possono usare una precedente posizione nota, con data e aggiornamento incompleto espliciti. Una successiva classifica completa è autorevole anche per le assenze. I parziali verificati di più tentativi restano consultabili, senza resuscitare dati superati da una versione completa.
+- Diagnostica: Boys/Girls, data, completezza, consistenza dell’ultima versione parziale, errore e prossimo recupero. La pagina di diagnostica resta in sola lettura.
+- Import incrementale e ripetizione identica senza scritture; un import interrotto resta nascosto fino alla verifica e riprende i soli ID mancanti. Test SQLite, API Worker autenticata, rendering e snapshot progressivi verificati; comando reale di acquisizione provato con due pagine valide e successiva challenge simulata. Verificatore UI e policy globale D1 superati; controlli di regressione eseguiti per fasi, corrette soltanto le aspettative coinvolte dai nuovi campi/query.
+- Limite storico esplicito: il probe della settimana precedente aveva contato i record senza conservarli; questa modifica non può ricostruire record allora scartati. Visibilità e nuove acquisizioni remote da verificare dopo pubblicazione e deploy. Nessuna scrittura D1 remota o rilancio manuale nella preparazione.

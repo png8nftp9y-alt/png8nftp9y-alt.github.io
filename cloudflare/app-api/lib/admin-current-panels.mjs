@@ -1,3 +1,4 @@
+import {renderItfRankingDiagnostics} from './admin-itf-junior-rankings.mjs';
 import {attachIdentityRefresh,IDENTITY_REFRESH_CLIENT} from './admin-identity-unified.mjs';
 import {loadObservedBirthAdmin,renderObservedBirthAdmin} from './admin-observed-birth.mjs';
 import {operationalWorkflowRows} from './admin-operational-workflows.mjs';
@@ -37,7 +38,7 @@ export async function adminPanelResponse(view,env,url,headers){
  try{
   let panels;
   if(view==='id'){const [review,birth]=await Promise.all([loadIdentityReviewCases(env.DB,url),loadObservedBirthAdmin(env.DB)]);panels={review:renderIdentityReviewCases(review),birth:renderObservedBirthAdmin(birth)};}
-  else{const reader=adminRuntimeDocuments(env.DB);await reader.preload(['dist/v3/operational_status.json','dist/v3/diagnostics.json']);const [doc,diagnostics]=await Promise.all([reader.get('dist/v3/operational_status.json'),reader.get('dist/v3/diagnostics.json')]);panels={workflows:renderCurrentWorkflows(doc),application:renderCurrentApplication(doc,diagnostics)};}
+  else{const reader=adminRuntimeDocuments(env.DB);await reader.preload(['dist/v3/operational_status.json','dist/v3/diagnostics.json']);const [doc,diagnostics]=await Promise.all([reader.get('dist/v3/operational_status.json'),reader.get('dist/v3/diagnostics.json')]);panels={workflows:renderCurrentWorkflows(doc),application:renderCurrentApplication(doc,diagnostics)+await renderItfRankingDiagnostics(env.DB)};}
   return new Response(JSON.stringify(panels),{headers:{...headers,'Content-Type':'application/json; charset=utf-8'}});
  }catch{return new Response(JSON.stringify({error:'Lettura corrente non disponibile. Riapri la pagina o usa il pulsante di aggiornamento della sezione.'}),{status:503,headers:{...headers,'Content-Type':'application/json; charset=utf-8'}})}
 }

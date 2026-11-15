@@ -30,7 +30,7 @@ for (const marker of [
 }
 assert.ok(hasSource('playerRankingSummary(p)'), 'player profile must render both FITP and Tennis Europe rankings');
 assert.doesNotMatch(source, /profileTitle\.append\(profileRankings\)/, 'player rankings must remain in the muted detail row');
-assert.ok(hasSource("source==='tennis-europe'?tournamentTeRanking:source==='fitp'?playerRecord?.ranking:''"), 'tournament page must use the ranking appropriate to that tournament');
+assert.ok(hasSource("source==='tennis-europe'?tournamentTeRanking:source==='fitp'?playerRecord?.ranking:source==='itf'?rows.find(row=>row.playerItfRanking)?.playerItfRanking||playerRecord?.itfJuniorRanking:''"), 'tournament page must use the ranking appropriate to that tournament');
 // Check rendered output rather than the old template spelling: future Europe
 // rankings now use an asynchronously filled span between nationality and rank.
 const headingLines=source.split('\n').filter(line=>line.includes('const playerHeading = '));
@@ -71,7 +71,7 @@ assert.ok(hasApiSource("apiPath==='/player-search'") && hasApiSource('searchPlay
 assert.ok(hasApiSource('paginatedPlayerSearch(env.DB') && hasApiSource('resolveCircuitProfiles') && hasSource('page.nextCursor') && hasSource('Mostra altri'), 'search must include acquired players and expose pagination without joining homonyms by name alone');
 assert.ok(hasSource('result.sources || []') && hasSource('Court Watch" : "", ...sourceLabels'), 'player search must render all merged profile sources');
 assert.ok(hasApiSource('player.tennisEuropeRankingDates') && hasApiSource("if(player.tennisEuropeRankingDates[key]&&player.tennisEuropeRankingDates[key]>date)return"), 'API must retain the newest Tennis Europe ranking by date');
-assert.ok(hasApiSource('applyPreparedTennisEuropeRankings') && hasApiSource('tennis_europe_current_player_rankings') && hasApiSource("prepared_tennis_europe_projection_failed"), 'private snapshot must read prepared Tennis Europe projections and remain available if optional ranking enrichment fails');
+assert.ok(hasApiSource('applyPreparedTennisEuropeRankings') && hasApiSource('tennis_europe_current_player_rankings') && hasApiSource("app_ranking_projection_failed"), 'private snapshot must read prepared Tennis Europe projections and remain available if optional ranking enrichment fails');
 assert.ok(hasApiSource('tennisEuropeNameKey') && hasApiSource('h.normalized_name LIKE ?') && hasApiSource('playersByName.get(tennisEuropeNameKey(row.normalized_name))'), 'current player rankings must resolve reversed Tennis Europe names');
 assert.ok(hasSource('function renderOpponentProfile(') && hasSource('profile.ranking_date'), 'opponent page must expose the current ranking date');
 assert.ok(hasSource('profile.category') && hasSource('follow.onclick = () => addCourtWatchPlayerFromUi({identity,name}, follow)'), 'opponent header must expose current age category and follow action');

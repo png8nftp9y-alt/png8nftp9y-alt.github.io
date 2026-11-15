@@ -58,7 +58,7 @@ test('cold Diagnostics executes consolidated counts on SQLite; optional missing 
   const req=()=>new Request('https://cold.test/admin/diagnostica',{headers:{Authorization:'Basic '+btoa('admin:test-only')}});
   const before=d.writes();const response=await worker.fetch(req(),{ADMIN_TOKEN:'test-only',DB:db});
   assert.equal(response.status,200);const html=await response.text();assert.match(html,/Conteggi D1/);
-  assert.equal(queries.length,4);assert.equal(d.writes(),before);
+  assert.equal(queries.length,5);assert.equal(queries.filter(sql=>sql.includes('itf_junior_ranking_publications')).length,1);assert.equal(d.writes(),before);
   const countSql=queries.find(sql=>sql.startsWith('SELECT (SELECT COUNT(*)'));
   const counts=d.execute(countSql)[0];
   for(const [table,count] of Object.entries(counts))assert.equal(count,d.execute('SELECT COUNT(*) AS n FROM '+table)[0].n);

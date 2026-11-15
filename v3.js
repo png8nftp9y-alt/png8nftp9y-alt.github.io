@@ -532,7 +532,16 @@ function knownNationality(name, value) {
   }
   return VERIFIED_NATIONALITY[wanted] || "";
 }
+const itfRankingText = value => {
+  if (!value) return "";
+  if (Number.isInteger(value.ranking) && value.ranking > 0)
+    return `n°${value.ranking} ITF Junior · ${displayDate(value.rankingDate)}${value.partial ? " · classifica parziale" : value.latestIncomplete ? " · aggiornamento incompleto" : ""}`;
+  if (value.status === "pending") return "ITF Junior · acquisizione parziale: ranking non ancora disponibile";
+  if (value.status === "unranked") return `ITF Junior · non classificato (${displayDate(value.rankingDate)})`;
+  return "Ranking ITF Junior non disponibile";
+};
 const teRankHtml = (value) => {
+  if (value && typeof value === "object" && value.status) return ` <span class="teRanking">${esc(itfRankingText(value))}</span>`;
   const rank = Number(value);
   return Number.isInteger(rank) && rank > 0
     ? ` <span class="teRanking">n°${rank} TE</span>`
@@ -557,6 +566,7 @@ function latestCurrentRankingRow(row,player) {
 }
 function currentPlayerRankingLabels(player, rows = null) {
   const labels = [];
+  if(player?.itfJuniorRanking)labels.push(itfRankingText(player.itfJuniorRanking));
   const fitpRanking = player?.fitpEntryRanking?.ranking || player?.ranking;
   if (fitpRanking) labels.push(`${readableText(fitpRanking)} FITP`);
   const liveRows = Array.isArray(rows)
@@ -589,6 +599,7 @@ async function loadCurrentPlayerRanking(player) {
     );
   try {
     const data = await playerRankingRequests.get(key);
+    player.itfJuniorRanking=data.itfJuniorRanking||null;
     player.tennisEuropeLatestRankingDates=data.latestRankingDates||{};
     const target = $("playerLiveRankings"),
       labels = currentPlayerRankingLabels(player, data.rankings || []);
@@ -964,8 +975,8 @@ function recordPlayerLoadTiming(stage,started,response=null){
   } catch {} // Diagnostics must never interrupt a player operation.
 }
 function mergeProgressiveRankingFields(target, patch) {
-  const playerKeys=['tennisEuropeRankings','tennisEuropeRankingDates','tennisEuropeRanking','tennisEuropeLatestRankingDates'];
-  const matchField=key=>/^(?:player|partner|opponent)Te/.test(key);
+  const playerKeys=['itfJuniorRanking','tennisEuropeRankings','tennisEuropeRankingDates','tennisEuropeRanking','tennisEuropeLatestRankingDates'];
+  const matchField=key=>/^(?:player|partner|opponent)(?:Te|Itf)/.test(key);
   let changed=false;
   function replace(row,next,keys){
     const before=JSON.stringify(keys.map(key=>row[key]));
@@ -994,7 +1005,7 @@ function applyPendingProgressiveRankings() {
     if(!changed&&!job.coreChanged)continue;
     if(typeof playerRankingCache!=='undefined')for(const player of job.patch.players||[]){
       const rankings=Object.entries(player.tennisEuropeRankings||{}).map(([category,ranking])=>({category:category==='u14'?'U14':category==='u16'?'U16':category,ranking,ranking_date:player.tennisEuropeRankingDates?.[category]}));
-      playerRankingCache.set(String(player.id),{playerId:player.id,latestRankingDates:player.tennisEuropeLatestRankingDates||{},rankings});
+      playerRankingCache.set(String(player.id),{playerId:player.id,itfJuniorRanking:player.itfJuniorRanking||null,latestRankingDates:player.tennisEuropeLatestRankingDates||{},rankings});
     }
     const hash=location.hash,y=typeof scrollY==='number'?scrollY:null;
     if (renderIfDataChanged(true) && y !== null && scrollY !== y && location.hash === hash && typeof scrollTo === 'function')
@@ -1506,7 +1517,7 @@ function partnerHtml(m) {
       .map(readablePerson)
       .filter(Boolean),
     nationalities = m.partnerNationalities || [],
-    rankings = m.partnerTeRankings || [],
+    rankings = circuit(m) === "itf" ? m.partnerItfRankings || [] : m.partnerTeRankings || [],
     designations = m.partnerDesignations || m.partnerEntryTypes || m.partnerSeeds || [];
   return names
     .map((name, index) =>
@@ -1533,7 +1544,7 @@ function opponentHtml(m, x) {
       : m.opponentNationality
         ? [m.opponentNationality]
         : [],
-    rankings = m.opponentTeRankings || [],
+    rankings = circuit(m) === "itf" ? m.opponentItfRankings || [] : m.opponentTeRankings || [],
     designations = m.opponentDesignations || m.opponentEntryTypes || m.opponentSeeds || [],
     people = names
       .map((name, index) => {
@@ -1611,11 +1622,11 @@ function playerTeamHtml(m) {
     m.sourceNationality ||
       m.playerNationality ||
       monitoredNationality(m.playerId),
-    m.playerTeRanking,
+    circuit(m) === "itf" ? m.playerItfRanking : m.playerTeRanking,
     participantDesignation(m, "player"),
   );
   return m.partner
-    ? `${player}/${peopleHtml(m.partner, m.partnerNationalities || [], m.partnerTeRankings || [], m.partnerDesignations || m.partnerEntryTypes || m.partnerSeeds || [])}`
+    ? `${player}/${peopleHtml(m.partner, m.partnerNationalities || [], (circuit(m) === "itf" ? m.partnerItfRankings : m.partnerTeRankings) || [], m.partnerDesignations || m.partnerEntryTypes || m.partnerSeeds || [])}`
     : player;
 }
 function analysisKey(m) {
@@ -2285,7 +2296,7 @@ function agendaPlayerTeamLinksHtml(m) {
             m.sourceNationality ||
               m.playerNationality ||
               monitoredNationality(m.playerId),
-            m.playerTeRanking,
+            circuit(m) === "itf" ? m.playerItfRanking : m.playerTeRanking,
           ),
     player = `<button class="inlinePlayerLink" data-open-player="${esc(m.playerId)}">${playerContent}</button>`,
     partnerName = readablePerson(m.partner || "");
@@ -2302,7 +2313,7 @@ function agendaPlayerTeamLinksHtml(m) {
         : peopleHtml(
             partnerName,
             m.partnerNationalities || [],
-            m.partnerTeRankings || [],
+            (circuit(m) === "itf" ? m.partnerItfRankings : m.partnerTeRankings) || [],
           );
   return partnerRecord
     ? `${player}<span class="teamSeparator">/</span><button class="inlinePlayerLink" data-open-player="${esc(partnerRecord.id)}">${partnerContent}</button>`
@@ -3394,6 +3405,7 @@ function matchResultText(match) {
   return value + (retired && !/\brit\.?\b/i.test(value) ? " Rit." : "");
 }
 function opponentHistoryRanking(person) {
+  if(person?.itfJuniorRanking)return itfRankingText(person.itfJuniorRanking);
   if (!person?.ranking) return "";
   const category = /14$/.test(person.rankingCategory || "")
     ? " U14"
@@ -3580,10 +3592,12 @@ function opponentTournamentStatusHtml(tournament) {
 }
 function opponentEuropeRankingText(profile) {
   if (!profile) return '';
+  const itf=profile.itfJuniorRanking?itfRankingText(profile.itfJuniorRanking):'';
   if (profile.ranking) {
     const category = /14$/.test(profile.category || '') ? ' U14' : /16$/.test(profile.category || '') ? ' U16' : '';
-    return `n°${profile.ranking} TE${category}${profile.ranking_date ? ` · (ranking del ${displayDate(profile.ranking_date)})` : ''}`;
+    return [itf, `n°${profile.ranking} TE${category}${profile.ranking_date ? ` · (ranking del ${displayDate(profile.ranking_date)})` : ''}`].filter(Boolean).join(' · ');
   }
+  if(itf)return itf;
   return profile.europeRankingStatus === 'unranked-u12' ? 'No ranking Europe U12'
     : profile.europeRankingStatus === 'unranked' ? 'No ranking Europe' : '';
 }
@@ -3664,6 +3678,7 @@ function mergeOpponentHistory(previous, next) {
   // An explicit missing current rank is authoritative, unlike an omitted field.
   if (next.profile && Object.hasOwn(next.profile, "ranking"))
     profileUpdate.ranking = next.profile.ranking;
+  if(next.profile && Object.hasOwn(next.profile,"itfJuniorRanking"))profileUpdate.itfJuniorRanking=next.profile.itfJuniorRanking;
   const profile = next.profile === null ? null : {...previous.profile, ...profileUpdate};
   return {...previous, ...next, profile, tournaments: [...tournaments.values()]};
 }
@@ -4208,10 +4223,10 @@ function renderTournament(key) {
             ? tournamentTeRanking
             : source === "fitp"
               ? playerRecord?.ranking
-              : "";
+              : source === "itf" ? rows.find(row=>row.playerItfRanking)?.playerItfRanking||playerRecord?.itfJuniorRanking : "";
       const europeCategories = futureTournamentEuropeCategories(group.entry, rows, t);
       const matchRows = matchHistorySectionsHtml(rows);
-      const playerHeading = `<button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${futureEurope ? `<span class="teRanking" data-future-europe-ranking="${esc(group.playerId)}" data-future-europe-categories="${esc(europeCategories.join(","))}">${playerRankingCache.has(String(group.playerId)) ? esc(" · " + futureTournamentEuropeRanking(playerRecord, playerRankingCache.get(String(group.playerId)), europeCategories)) : ""}</span>` : ""}${!futureEurope && playerRanking ? (source === "tennis-europe" ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button>`;
+      const playerHeading = `<button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${futureEurope ? `<span class="teRanking" data-future-europe-ranking="${esc(group.playerId)}" data-future-europe-categories="${esc(europeCategories.join(","))}">${playerRankingCache.has(String(group.playerId)) ? esc(" · " + futureTournamentEuropeRanking(playerRecord, playerRankingCache.get(String(group.playerId)), europeCategories)) : ""}</span>` : ""}${!futureEurope && playerRanking ? (["tennis-europe", "itf"].includes(source) ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button>`;
       return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}">${playerHeading}<span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}${source === "fitp" ? ` · ${fitpTournamentSubscriptionHtml({...group.entry, circuit:source})}` : ""}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
     })
     .join("");
@@ -5196,8 +5211,10 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
         .filter((p) => (!FORMER_PLAYERS.has(p.id) || p.userAdded) && !removedCourtWatchPlayers.has(p.id) &&
           (projection ? (projectedPlayers.has(p.id) || (previousPlayers.has(p.id) && (!verifiedMembership || verifiedMembership.has(p.id))) || confirmedCourtWatchPlayers.has(p.id)) : Array.isArray(previous.players) ? previousPlayers.has(p.id) : true))
         .map((player) => {
-          const projected = projectedPlayers.get(player.id),
-            retained =
+          const projected = projectedPlayers.get(player.id);
+          const itf=projected&&Object.hasOwn(projected,"itfJuniorRanking")?projected.itfJuniorRanking:previousPlayers.get(player.id)?.itfJuniorRanking;
+          if(itf!==undefined)player={...player,itfJuniorRanking:itf};
+          const retained =
               projected?.tennisEuropeRankings || projected?.tennisEuropeRanking
                 ? projected
                 : previousPlayers.get(player.id);

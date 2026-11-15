@@ -1,3 +1,5 @@
+import {readFileSync} from 'node:fs';
+import {publishPartialRanking} from '../lib/itf-junior-ranking-partial.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {progressiveSnapshot} from '../lib/progressive-snapshot.mjs';
@@ -19,6 +21,8 @@ test('a ranking failure retains the complete first response and emits no private
 test('real full snapshot returns before ranking SELECT resolves; final fields match ordinary JSON with zero writes',async()=>{
  const d=database({identityMapping:true});let release,block=false,rankingStarted=false;
  try{
+  await d.query(readFileSync(new URL('../lib/itf-junior-ranking-schema.sql',import.meta.url),'utf8'));
+  await publishPartialRanking({category:'G',status:'partial',rankingDate:'2026-11-09',capturedAt:'2026-11-15T13:00:00Z',total:1000,items:[{playerId:800000001,rank:321,points:100,playerGivenName:'Case',playerFamilyName:'Player',playerNationalityCode:'ITA',gender:'F'}]},{query:sql=>d.query(sql),execute:sql=>d.query(sql.join('\n'))});
   const owner='user-federico-181099',p={id:'cw-progressive',name:'Case Player',sex:'F',birthYear:2012,userAdded:true,sourceKey:'itf|id:800000001',sourceCircuit:'itf',sourcePlayerId:'800000001',worldTennisId:'800000001'};
   d.execute('INSERT INTO user_app_player_additions VALUES(?,?,?,?,?)',[owner,p.id,p.sourceKey,JSON.stringify(p),'2026-11-03']);
   for(const table of ['user_app_players','user_app_other_players'])d.execute(`INSERT INTO ${table} VALUES(?,?,?)`,[owner,p.id,'2026-11-03']);
@@ -31,7 +35,7 @@ test('real full snapshot returns before ranking SELECT resolves; final fields ma
    block=false;const expected=await(await request(group,false)).json();
    block=true;rankingStarted=false;const response=await request(group,true);assert.equal(response.status,200);const reader=response.body.getReader(),first=await read(reader);
    assert.equal(first.type,'snapshot');assert.deepEqual(first.data.tournaments,expected.tournaments);assert.deepEqual(first.data.matches,expected.matches);assert.equal(first.data.group,group);
-   assert.equal(rankingStarted,true);release();const frame=await read(reader);assert.equal(frame.type,'rankings');assert.equal(frame.data.players[0].tennisEuropeRanking,expected.players[0].tennisEuropeRanking);assert.deepEqual(frame.data.players[0].tennisEuropeRankings,expected.players[0].tennisEuropeRankings);assert.deepEqual(frame.data.players[0].tennisEuropeLatestRankingDates,expected.players[0].tennisEuropeLatestRankingDates);await reader.cancel();
+   assert.equal(rankingStarted,true);release();const frame=await read(reader);assert.equal(frame.type,'rankings');assert.equal(frame.data.players[0].itfJuniorRanking.ranking,321);assert.equal(frame.data.players[0].itfJuniorRanking.partial,true);assert.deepEqual(frame.data.players[0].itfJuniorRanking,expected.players[0].itfJuniorRanking);assert.equal(frame.data.players[0].tennisEuropeRanking,expected.players[0].tennisEuropeRanking);assert.deepEqual(frame.data.players[0].tennisEuropeRankings,expected.players[0].tennisEuropeRankings);assert.deepEqual(frame.data.players[0].tennisEuropeLatestRankingDates,expected.players[0].tennisEuropeLatestRankingDates);await reader.cancel();
   }
   assert.equal(d.writes(),before);
  }finally{release?.();d.close()}

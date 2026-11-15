@@ -1,3 +1,4 @@
+import {publishPartialRanking} from './itf-junior-ranking-partial.mjs';
 // D1_WRITE_POLICY: incremental
 import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
 import {publication,quote as q,digest,snapshotChunks} from './itf-junior-ranking-batch.mjs';
@@ -17,7 +18,12 @@ for(const task of taskPlan.inserts){
   }else result=failedCategory(task,plan.startedAt,'Acquisition interrupted or result artifact unavailable');
  }
  if(result.status!=='acquired'){
-  failed=true;await execute([state(retry,'failed',{error:result.error||'Acquisition failed'})]);continue;
+  failed=true;let detail=result.error||'Acquisition failed';
+  if(result.status==='partial'){
+   try{const saved=await publishPartialRanking(result,{execute,query});detail+=` · partial ranking visible: ${saved.acquired}/${saved.expected}, ${saved.rankingDate}`;}
+   catch(error){detail+=' · partial import failed: '+error.message;}
+  }
+  await execute([state(retry,'failed',{rankingDate:result.rankingDate,total:result.total,error:detail})]);continue;
  }
  let checked,checkpointSaved=task.action==='import';
  try{

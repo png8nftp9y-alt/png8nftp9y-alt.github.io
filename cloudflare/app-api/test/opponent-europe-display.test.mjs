@@ -1,3 +1,4 @@
+import {enrichItfJuniorRankings} from '../lib/itf-junior-ranking-enrichment.mjs';
 import {opponentItfDocumentHistory} from '../lib/opponent-itf-document-history.mjs';
 import {localEuropeOpponentIdentity} from '../lib/opponent-local-identity.mjs';
 import {opponentEuropeProfile} from '../lib/opponent-europe-profile.mjs';
@@ -24,7 +25,7 @@ function view(){
  courtWatchPlayerByName:()=>null,participantDesignationHtml:()=>'',nationalityHtml:()=>'',
  fullMatchRoundLabel:m=>m.round,displayDate:x=>x,opponentTournamentEventLinks:()=>'',
  tournamentOfficialUrl:()=>'',tournamentSurfaceLabel:()=>'',tournamentPlace:()=> 'Luogo da pubblicare',opponentTournamentDateLabel:()=>'',bindParticipantNavigation:()=>{}};
- ctx.opponentEuropeProfile=opponentEuropeProfile;ctx.enrichIdentityNationalities=async()=>{};
+ ctx.enrichItfJuniorRankings=enrichItfJuniorRankings;ctx.opponentEuropeProfile=opponentEuropeProfile;ctx.enrichIdentityNationalities=async()=>{};
  vm.createContext(ctx);
  vm.runInContext(slice(source,'const circuit =','const circuitRank =')+
  slice(source,'function agendaKey(','function mergeKnownMatches(')+
@@ -108,12 +109,12 @@ test('SQLite Europe history through the real API assembler renders current and p
    }}
   };
   const future={id:'future',competitionId:'future',circuit:'tennis-europe',startDate:'2026-10-21',endDate:'2026-10-25',matches:[]};
-  const ctx={opponentItfDocumentHistory,localEuropeOpponentIdentity,enrichFitpMetadata,Map,Set,Date,Intl,console,opponentTournamentWindow,opponentEuropeSources,opponentSelfParticipant,tennisEuropeNativeId,linkedOpponentIdentity:async()=>null,
+  const ctx={enrichItfJuniorRankings,opponentItfDocumentHistory,localEuropeOpponentIdentity,enrichFitpMetadata,Map,Set,Date,Intl,console,opponentTournamentWindow,opponentEuropeSources,opponentSelfParticipant,tennisEuropeNativeId,linkedOpponentIdentity:async()=>null,
    tennisEuropeTournamentMetadata:async()=>new Map(),searchIdentityProfile:async()=>({name:'Test Person',sourcePlayerId:'profile-test',sourceCircuit:'tennis-europe'}),playerCircuitIdentities:()=>[],
    playerEntryTournaments:async()=>[future,...[7,8,9].map(i=>({id:'entry'+i,circuit:'tennis-europe',startDate:'2026-10-0'+i,endDate:'2026-10-0'+i,matches:[]}))],otherCircuitOpponentHistory:async()=>[],resolveCircuitProfiles:async()=>new Map(),circuitProfiles:()=>[],enrichPersonalTournamentPresentation:async x=>x,
    currentTennisEuropePlayerRanking:async()=>({rankings:[]}),currentRankingCategoryAllowed:()=>true};
   ctx.opponentItfDocumentHistory=(await import('../lib/opponent-itf-document-history.mjs')).opponentItfDocumentHistory;
-  ctx.opponentEuropeProfile=opponentEuropeProfile;ctx.enrichIdentityNationalities=async()=>{};
+  ctx.enrichItfJuniorRankings=enrichItfJuniorRankings;ctx.opponentEuropeProfile=opponentEuropeProfile;ctx.enrichIdentityNationalities=async()=>{};
  vm.createContext(ctx);
   vm.runInContext(slice(worker,'function missingOptionalTable(','async function enrichTennisEuropeRankings(')+
    slice(worker,'const incompleteCompletedScore=','async function itfTournamentMetadata(')+
