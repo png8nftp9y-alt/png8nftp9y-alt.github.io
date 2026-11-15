@@ -1,32 +1,68 @@
 name: CourtWatch ITF targeted status recovery
 on:
   workflow_dispatch:
+    inputs:
+      previous_run:
+        description: Run with saved documents to reuse
+        required: true
+        default: '43767061098'
 permissions:
   contents: read
+  actions: read
 jobs:
-  recover:
+  plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        shard: [0,1,2,3,4,5,6,7]
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      remaining: ${{ steps.plan.outputs.remaining }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - uses: actions/download-artifact@v4
         with:
-          node-version: '22'
-      - name: Recover only requested draw statuses
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.previous_run }}
+          pattern: 'itf-target-status-*'
+          path: artifacts/previous-itf-status
+      - id: plan
+        run: node tools/recover-itf-target-status.mjs --plan
+      - uses: actions/upload-artifact@v4
+        with:
+          name: itf-target-status-checkpoint
+          path: artifacts/previous-itf-status/
+          retention-days: 14
+  recover:
+    needs: plan
+    if: needs.plan.outputs.remaining != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          name: itf-target-status-checkpoint
+          path: artifacts/previous-itf-status
+      - name: Recover only missing sections of one tournament
         env:
-          STATUS_SHARD: ${{ matrix.shard }}
+          STATUS_COMPETITION_ID: ${{ matrix.competitionId }}
           ITF_REQUEST_TIMEOUT_MS: '15000'
-          ITF_ACQUISITION_URL: ${{ vars.ITF_ACQUISITION_URL || secrets.ITF_ACQUISITION_URL }}
+          ITF_REQUEST_DELAY_MS: '1800'
+          ITF_ACQUISITION_URL: ${{ secrets.ITF_ACQUISITION_URL || vars.ITF_ACQUISITION_URL }}
           ITF_ACQUIRER_TOKEN: ${{ secrets.ITF_ACQUIRER_TOKEN }}
         run: node tools/recover-itf-target-status.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: itf-target-status-${{ matrix.shard }}
-          path: artifacts/itf-status-${{ matrix.shard }}/
+          name: itf-target-status-${{ matrix.competitionId }}
+          path: artifacts/recovered-itf-status/
+          if-no-files-found: error
           retention-days: 14

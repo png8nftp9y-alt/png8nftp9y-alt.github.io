@@ -22,7 +22,7 @@ async function api(page,url){
   throw new Error(last);
 }
 
-export async function readTournamentDrawsInBrowser(tournament,{tasks=null}={}){
+export async function readTournamentDrawsInBrowser(tournament,{tasks=null,events=null}={}){
   const browser=await chromium.launch({channel:'chrome',headless:true});
   try{
     const context=await browser.newContext({locale:'en-GB',timezoneId:'Europe/Rome'});
@@ -35,6 +35,7 @@ export async function readTournamentDrawsInBrowser(tournament,{tasks=null}={}){
     const filters=await api(page,`${API}/GetEventFilters?tournamentKey=${encodeURIComponent(tournament.competitionId.toLowerCase())}`);
     combos=eventCombinations(filters).map(combo=>({...combo,sourceUrl:tournament.sourceUrl||''}));
     }
+    if(events!==null){const wanted=new Set(events);combos=combos.filter(combo=>wanted.has(eventKey(combo)))}
     if(!combos.length)throw new Error('browser_event_filters_empty');
     const outcomes=[];
     for(const combo of combos){
