@@ -61,8 +61,8 @@ test('real Worker player-ranking endpoint exposes persisted partial rank and act
   await publishPartialRanking(partial([row(800000001,321)]),{query:sql=>d.query(sql),execute:sql=>d.query(sql.join('\n'))});
   const before=d.writes(),response=await worker.fetch(new Request('https://app.test/app/api/player-ranking?playerId=person:ranking-test&name=Example%20Player',{headers:{'Cf-Access-Authenticated-User-Email':'federico181099@gmail.com'}}),{DB:d.db});
   assert.equal(response.status,200);const data=await response.json();assert.equal(data.itfJuniorRanking.ranking,321);assert.equal(data.itfJuniorRanking.partial,true);assert.equal(d.writes(),before);
-  const ctx=view(),labels=ctx.currentPlayerRankingLabels({itfJuniorRanking:data.itfJuniorRanking},[]).join(' ');assert.match(labels,/n°321 ITF Junior/);assert.match(labels,/2026-11-09/);assert.match(labels,/classifica parziale/);
-  assert.match(ctx.opponentEuropeRankingText({itfJuniorRanking:data.itfJuniorRanking}),/n°321 ITF Junior/);
+  const ctx=view(),labels=ctx.currentPlayerRankingLabels({itfJuniorRanking:data.itfJuniorRanking},[]).join(' ');assert.match(labels,/n°321 ITF Junior/);assert.doesNotMatch(labels,/2026-11-09|parziale|incompleto/);
+  const opponentLabel=ctx.opponentEuropeRankingText({itfJuniorRanking:data.itfJuniorRanking});assert.match(opponentLabel,/n°321 ITF Junior/);assert.match(opponentLabel,/ranking del 2026-11-09/);assert.doesNotMatch(opponentLabel,/parziale|incompleto/);
  }finally{d.close();}
 });
 test('UI distinguishes pending partial data from confirmed unranked status and clears stale opponent cache',()=>{
@@ -95,4 +95,17 @@ test('before partial schema migration, read-only audits encounter zero failed SQ
   const html=await renderItfRankingDiagnostics(db);assert.match(html,/Completa/);assert.equal(failed,0);
   await assert.rejects(readItfRankingTargets({prepare(){throw Error('Real database failure')}},[target(800000001)]),/Real database failure/);
  }finally{d.close();}
+});
+
+test('ITF player labels omit dates and acquisition status; opponent labels retain the actual ranking date',()=>{
+ const ctx=view();
+ for(const flags of [{partial:true},{latestIncomplete:true},{}]){
+  const value={ranking:321,status:'ranked',rankingDate:'2026-11-09',...flags};
+  const player=ctx.currentPlayerRankingLabels({itfJuniorRanking:value},[]).join(' ');
+  assert.equal(player,'n°321 ITF Junior');
+  const opponent=ctx.opponentEuropeRankingText({itfJuniorRanking:value});
+  assert.equal(opponent,'n°321 ITF Junior · (ranking del 2026-11-09)');
+ }
+ const player=ctx.currentPlayerRankingLabels({itfJuniorRanking:{ranking:null,status:'unranked',rankingDate:'2026-11-09'}},[]).join(' ');assert.doesNotMatch(player,/2026-11-09/);
+ assert.doesNotMatch(ctx.opponentEuropeRankingText({itfJuniorRanking:{status:'pending'}}),/parziale/);
 });

@@ -532,12 +532,12 @@ function knownNationality(name, value) {
   }
   return VERIFIED_NATIONALITY[wanted] || "";
 }
-const itfRankingText = value => {
+const itfRankingText = (value, showDate = false) => {
   if (!value) return "";
+  const date = showDate && value.rankingDate ? ` · (ranking del ${displayDate(value.rankingDate)})` : "";
   if (Number.isInteger(value.ranking) && value.ranking > 0)
-    return `n°${value.ranking} ITF Junior · ${displayDate(value.rankingDate)}${value.partial ? " · classifica parziale" : value.latestIncomplete ? " · aggiornamento incompleto" : ""}`;
-  if (value.status === "pending") return "ITF Junior · acquisizione parziale: ranking non ancora disponibile";
-  if (value.status === "unranked") return `ITF Junior · non classificato (${displayDate(value.rankingDate)})`;
+    return `n°${value.ranking} ITF Junior${date}`;
+  if (value.status === "unranked") return `ITF Junior · non classificato${date}`;
   return "Ranking ITF Junior non disponibile";
 };
 const teRankHtml = (value) => {
@@ -3598,7 +3598,7 @@ function opponentFitpRankingText(metadata) {
 }
 function opponentEuropeRankingText(profile) {
   if (!profile) return '';
-  const itf=profile.itfJuniorRanking?itfRankingText(profile.itfJuniorRanking):'';
+  const itf=profile.itfJuniorRanking?itfRankingText(profile.itfJuniorRanking, true):'';
   if (profile.ranking) {
     const category = /14$/.test(profile.category || '') ? ' U14' : /16$/.test(profile.category || '') ? ' U16' : '';
     return [itf, `n°${profile.ranking} TE${category}${profile.ranking_date ? ` · (ranking del ${displayDate(profile.ranking_date)})` : ''}`].filter(Boolean).join(' · ');

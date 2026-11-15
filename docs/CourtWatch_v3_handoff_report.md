@@ -11017,3 +11017,10 @@ Fissato migrate-import-verify-deploy a Ubuntu 24.04. Il run 43720405227 falliva 
 - Il run Girls ha salvato 2000 record in artifact prima della challenge; quel run non li ha importati. Import, creazione schema e deploy successivi restano da verificare. Nessun rilancio manuale o polling eseguito nella preparazione.
 
 ITF discovery 2026-11-15T22:28:50.620Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-11-15 — Presentazione ranking ITF allineata a Europe
+
+- Su richiesta, rimossi dai ranking visibili nelle pagine dell’app i messaggi classifica parziale e aggiornamento incompleto. Il ranking validato rimane visibile; lo stato di acquisizione continua a essere esposto in diagnostica.
+- Nella pagina giocatore/giocatrice la posizione ITF Junior compare senza data. Nell’intestazione della pagina avversario resta la data effettiva, nella forma (ranking del ...), come Europe. Le informazioni di data e completezza restano nei dati API e D1 e non cambia la selezione temporale della classifica.
+- Aggiornate le prove API/rendering e aggiunta regressione per ranking completi, parziali, precedenti durante recupero, assenza confermata e acquisizione pendente. Incremento cache numerico verificato prima del push. Nessuna scrittura D1 o modifica della schedulazione.
+- Deploy remoto della presentazione ancora da verificare dopo il push; nessun rilancio manuale o polling nella preparazione.
