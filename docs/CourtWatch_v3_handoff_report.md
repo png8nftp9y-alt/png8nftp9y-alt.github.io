@@ -10985,3 +10985,7 @@ ITF discovery 2026-11-15T07:19:26.945Z: 0 newly discovered future tournaments; M
 - Conserva provenienza observed e data originale in fitpRankingObservedAt; non presenta il recupero come nuovo aggiornamento del profilo.
 - Nessuna scrittura D1 e nessuna richiesta FITP aggiuntiva.
 - Test su priorità delle fonti, valori NC, dati non validi e query indicizzata.
+
+### 15 novembre 2026 — Runner del job finale D1/API
+
+Fissato migrate-import-verify-deploy a Ubuntu 24.04. Il run 43720405227 falliva installando Chromium su Ubuntu 26.04 durante la ripetizione dei controlli sul codice avanzato in coda. Controlli di sicurezza, importazione e deploy invariati. Verificata modifica limitata al runner; esecuzione CI da confermare.
