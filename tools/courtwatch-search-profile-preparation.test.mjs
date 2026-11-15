@@ -27,11 +27,18 @@ test('first two visible results prepare complete history before any click; reque
  buttons[2].onfocus();assert.equal(loads.length,2);loads[0].finish();await tick();assert.equal(loads.length,3);
  loads[1].finish();loads[2].finish();await tick();
 });
-test('click reuses in-flight preparation and opens only with tournaments and matches ready',async()=>{
- const {context,loads,cached}=harness();const opening=context.openCurrentOpponent('fitp|id:1','Player 1');
- assert.equal(loads.length,2);assert.equal(context.location.hash,'#player-search/test');
- loads[0].finish();await opening;
- assert.match(context.location.hash,/^opponent-profile/);assert.equal(cached.get('fitp|id:1').tournaments[0].matches.length,1);
+test('click opens immediately and reuses in-flight preparation without a duplicate request',async()=>{
+ const {context,loads,cached}=harness();
+ const prepared=context.opponentHistoryRequests.get('fitp|id:1');
+ const opening=context.openCurrentOpponent('fitp|id:1','Player 1');
+ assert.match(context.location.hash,/^opponent-profile/);
+ assert.equal(loads.length,2);
+ assert.equal(context.opponentHistoryRequests.get('fitp|id:1'),prepared);
+ await opening;
+ assert.equal(cached.has('fitp|id:1'),false);
+ loads[0].finish();await prepared;
+ assert.equal(cached.get('fitp|id:1').tournaments[0].matches.length,1);
+ assert.equal(loads.length,2);
  loads[1].finish();await tick();
 });
 test('changing route during preparation never sends the user back to the selected result',async()=>{

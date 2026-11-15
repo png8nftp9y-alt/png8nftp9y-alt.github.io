@@ -11064,3 +11064,9 @@ Validazione: 11 test passati nella suite future-tournament-ranking (inclusi i te
 - Le pubblicazioni complete usano il totale già verificato. I parziali contano gli ID distinti dell’unione dei soli manifest ready=1 della data corrente; duplicati tra tentativi non aumentano la copertura. Totali sconosciuti o conflittuali non producono zero mancanti o falsa completezza. Totali variabili come 5891 sono letti dalla fonte.
 - Dati delle precedenti settimane conservati in archivio. Nessuna modifica dei ranking in app, dei recuperi o della schedulazione; nessuna scrittura D1. Le nuove letture avvengono solo nella pagina ITF e non aggiungono richieste HTTP o R2.
 - Test SQLite di cambio settimana, copertura parziale deduplicata, totale variabile, categoria in attesa e pubblicazione completa; verifica posizione del riquadro e isolamento delle letture admin. Test locali superati; deploy e numeri reali del riquadro remoto ancora da verificare. Nessun polling o rilancio manuale nella preparazione.
+
+
+### Test mobile: apertura immediata ricerca — 2026-11-16
+- Allineato il test di preparazione al comportamento richiesto: scheda aperta subito mentre storico e tornei arrivano dalla richiesta già in corso.
+- Conservati controlli su richieste duplicate e navigazione successiva; aggiunti i test progressivi al workflow mobile e ai suoi trigger.
+- Verificata localmente la suite Node del job mobile. Chromium/WebKit remoti restano da confermare dopo pubblicazione.
