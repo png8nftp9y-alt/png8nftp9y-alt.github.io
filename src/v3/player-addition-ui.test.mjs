@@ -118,7 +118,7 @@ test('home player without matches opens immediately even after the transient con
  c.context.removedCourtWatchPlayers.add('new');await c.context.openProfile('new');assert.equal(c.context.location.hash,'#players');
 });
 test('profile route renders an available player without waiting for matches',()=>{
- const start=source.indexOf('  if (player && (!state.data'),end=source.indexOf('  if (currentOpponent)',start);
+ const start=source.indexOf('  if (player && (!state.data'),end=source.indexOf('  if (opponent || legacyOpponent)',start);
  const ctx={state:{data:{players:[{id:'new'}],matches:[]},initialMatchProjectionPending:true},removedCourtWatchPlayers:new Set(),player:['#player/new','new'],location:{hash:'#player/new'},requestedHash:'#player/new',initialProjectionRequest:new Promise(()=>{}),load(){throw Error('must not load')},route(){},Promise,decodeURIComponent};
  vm.createContext(ctx);const helper=source.slice(source.indexOf('function shouldKeepPlayerRefreshPreview('),source.indexOf('async function openProfile('));
  vm.runInContext(helper+'function checkRoute(){'+source.slice(start,end)+'return "render";} ',ctx);

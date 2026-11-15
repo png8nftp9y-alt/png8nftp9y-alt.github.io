@@ -24,7 +24,7 @@ test('ITF calendar starts on the official first qualifying day',()=>{
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 test('recursive opponent renderer exposes official links without tournament locations',()=>{
- const ui=readFileSync(new URL('../../../v3.js',import.meta.url),'utf8'),body={innerHTML:''};
+ const ui=readFileSync(new URL('../../../v3.js',import.meta.url),'utf8'),body={innerHTML:'',setAttribute(){}};
  const ctx={iso:()=> '2026-10-14',withoutPucItfReferences:x=>x,$:id=>id==='opponentTournamentHistory'?body:null,circuit:t=>t.circuit,readableText:x=>x||'',esc:x=>String(x||''),state:{data:{tournaments:[]}},tournamentSurfaceLabel:()=>'',opponentTournamentEventLinks:()=>'',opponentTournamentDateLabel:()=>'',opponentHistoryMatchSectionsHtml:()=>'',bindParticipantNavigation:()=>{},tennisEuropeVenueLocation:t=>[t.venueName,t.address,t.location].filter(Boolean).join(', '),fitpSummerCenterPlace:()=>'',fitpClubCase:x=>x||'',fitpAddressCase:x=>x||'',fitpCityProvince:x=>x||''};
  vm.createContext(ctx);
  for(const [a,b] of [['function tournamentOfficialUrl(','function tournamentDrawUrl('],['function tournamentPlace(','function agendaOrderOfPlayUrl('],['function tournamentMapsUrl(','function tournamentSurfaceLabel('],['function opponentTournamentWindow(','function opponentHistoryKey(']])vm.runInContext(ui.slice(ui.indexOf(a),ui.indexOf(b)),ctx);

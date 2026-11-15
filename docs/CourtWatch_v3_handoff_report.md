@@ -11046,3 +11046,13 @@ ITF discovery 2026-11-15T22:28:50.620Z: 0 newly discovered future tournaments; M
 Causa riprodotta per Virginia Cereghini a Bad Waltersdorf (23AE0F0E-0063-44C6-BB79-0A2DAB4197C3): iscrizione GS16 nel campo acceptanceEvent; la proiezione universale usa eventSourceId. futureTournamentEuropeCategories non leggeva nessuno dei due campi, restituiva categorie vuote e il filtro delle classifiche produceva NR anche in presenza di una classifica U16 valida. Aggiunti entrambi i campi al riconoscimento esistente. La pagina continua a usare soltanto la pubblicazione corrente della categoria iscritta; nessuna classifica fissata nel codice o derivata dall'acceptance list. Incrementata la versione cache di v3.js.
 
 Validazione: 11 test passati nella suite future-tournament-ranking (inclusi i test importati), nuova regressione GS16 da entrambi i formati, selezione U16 rispetto a U14 e supporto GD14. Sintassi JavaScript e diff verificati. Non è stato possibile leggere l'API privata live perché protetta da Cloudflare Access; classifica effettiva e deploy da verificare dopo pubblicazione. Nessuna modifica ai ranking ITF, a D1 o alle frequenze di acquisizione.
+
+
+### Ricerca: apertura immediata e profilo progressivo — 2026-11-16
+- Apertura immediata dopo il click, senza scritta Caricamento; sezioni in attesa vuote con aria-busy e Riprova in caso di errore.
+- Risposta autenticata progressiva: prima classifica e dati principali, poi tornei e storico. JSON precedente ancora disponibile.
+- Metadati e storico letti in parallelo dopo una sola risoluzione identità. Il ranking ITF corrente non viene riletto nella fase storica.
+- Precaricamento, click e scheda condividono la richiesta; cache già validata riutilizzata, risposte tardive isolate dal giocatore corrente.
+- Misure per identità, metadati, storico, documenti ITF, presentazione e ranking incontri. Pannello opt-in loadTiming=1; nessun nuovo polling o archivio telemetria.
+- Test di regressione su navigazione immediata, risposta progressiva, errori, cache e cambi giocatore, inclusi nei controlli ordinari. Cache JavaScript incrementata.
+- Verifica browser e tempi reali della versione nuova richiedono il deploy; nessuna riduzione in secondi dichiarata prima della misura live.

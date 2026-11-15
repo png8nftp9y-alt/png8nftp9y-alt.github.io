@@ -3321,11 +3321,7 @@ async function openCurrentOpponent(profileId, name, event = "") {
   const identity = profileId || readablePerson(name);
   const monitored = monitoredOpponentPlayer(identity);
   if (monitored) return openProfile(monitored.id);
-  const epoch = ++profileNavigationEpoch, previousHash = location.hash;
-  if (!preparedOpponentHistory(name, event, identity)) {
-    try {await fetchOpponentHistory(name, event, identity);} catch {return;}
-  }
-  if (epoch !== profileNavigationEpoch || location.hash !== previousHash) return;
+  ++profileNavigationEpoch;
   location.hash =
     "opponent-profile/" +
     encodeURIComponent(identity) +
@@ -3624,6 +3620,8 @@ function renderOpponentHistory(data) {
     nationality.hidden = false;
   }
   if (!body) return;
+  body.setAttribute("aria-busy", data.historyPending ? "true" : "false");
+  if (data.historyPending && !tournaments.length) return;
   body.innerHTML = tournaments.length
     ? tournaments
         .map(
@@ -3699,6 +3697,7 @@ async function fetchOpponentHistory(name, event = "", profileId = "", refresh = 
   if (!refresh && opponentHistoryIsFresh(requestKey))
     return opponentHistoryCache.get(requestKey);
   if (!opponentHistoryRequests.has(requestKey)) {
+    const started = Date.now();
     const controller = new AbortController(),
       timer = setTimeout(() => controller.abort(), 15000);
     opponentHistoryRequests.set(requestKey, fetch(
@@ -3710,12 +3709,37 @@ async function fetchOpponentHistory(name, event = "", profileId = "", refresh = 
         "&asOf=" +
         encodeURIComponent(asOf) +
         "&event=" +
-        encodeURIComponent(event || ""),
+        encodeURIComponent(event || "") + (typeof TextDecoder === "function" ? "&streamProfile=1" : ""),
       privateApiOptions({ cache: "no-store", signal: controller.signal }),
     ).then(async (response) => {
     if (!response.ok) throw Error("opponent history");
-    const incoming = await response.json();
-    if (!Array.isArray(incoming.tournaments)) throw Error("opponent history incomplete");
+    let incoming;
+    if (response.headers?.get('content-type')?.includes('application/x-ndjson') && response.body?.getReader) {
+      const reader=response.body.getReader(),decoder=new TextDecoder();let buffer='',complete=false;
+      const receive=line=>{
+        if(!line.trim())return;
+        const packet=JSON.parse(line);
+        if(packet.type==='error')throw Error('opponent history unavailable');
+        if(packet.type==='profile'){
+          const partial=mergeOpponentHistory(preparedOpponentHistory(name,event,profileId),packet.data);
+          opponentHistoryCache.set(requestKey,partial);
+          if(typeof recordStartupTiming==='function')recordStartupTiming('opponent_profile',started,{serverMs:packet.durationMs});
+          const routeKey=[profileId||readablePerson(name),readablePerson(name),event].join('|');
+          if(typeof activeOpponentRouteKey!=='undefined'&&activeOpponentRouteKey===routeKey)renderOpponentHistory(partial);
+        } else if(packet.type==='history'){
+          incoming=packet.data;complete=true;
+          if(typeof recordStartupTiming==='function')recordStartupTiming('opponent_history',started,{serverMs:packet.durationMs,serverTiming:packet.serverTiming||''});
+        }
+      };
+      try{
+        while(true){const {value,done}=await reader.read();buffer+=decoder.decode(value||new Uint8Array(),{stream:!done});let split;while((split=buffer.indexOf('\n'))>=0){receive(buffer.slice(0,split));buffer=buffer.slice(split+1);}if(done)break;}
+        if(buffer.trim())receive(buffer);
+        if(!complete)throw Error('opponent history incomplete');
+      }catch(error){await reader.cancel().catch(()=>{});throw error;}
+      finally{reader.releaseLock();}
+    } else incoming=await response.json();
+    if (!incoming || !Array.isArray(incoming.tournaments)) throw Error("opponent history incomplete");
+    incoming.historyPending = false;
     const data = mergeOpponentHistory(preparedOpponentHistory(name, event, profileId), incoming);
     opponentHistoryCache.set(requestKey, data);
     opponentHistoryValidated.set(requestKey, epoch);
@@ -3768,24 +3792,27 @@ function queueOpponentPreload(name, event = "", profileId = "", isCurrent = null
   opponentPrefetchQueue.push({ name, event, profileId, isCurrent });
   runOpponentPrefetchQueue();
 }
-async function loadOpponentHistory(name, event = "", profileId = "") {
+async function loadOpponentHistory(name, event = "", profileId = "", refresh = false) {
   const body = $("opponentTournamentHistory"),
     routeKey = activeOpponentRouteKey,
     { requestKey } = opponentHistoryKey(name, event, profileId),
     cached = preparedOpponentHistory(name, event, profileId);
   if (cached) renderOpponentHistory(cached);
   try {
-    const data = await fetchOpponentHistory(name, event, profileId, true);
+    const data = await fetchOpponentHistory(name, event, profileId, refresh);
     if (activeOpponentRouteKey === routeKey) {
       saveActiveOpponent(requestKey, data);
       renderOpponentHistory(data);
     }
   } catch {
-    if (body && !cached)
+    if (body) {
+      body.setAttribute("aria-busy", "false");
+    }
+    if (body && (!cached || cached.historyPending))
       body.innerHTML =
         `<div class="empty">Storico temporaneamente non disponibile. <button type="button" class="btn" data-retry-opponent>Riprova</button></div>`;
     body?.querySelector("[data-retry-opponent]")?.addEventListener("click", () =>
-      loadOpponentHistory(name, event, profileId),
+      loadOpponentHistory(name, event, profileId, true),
     );
   }
 }
@@ -3837,7 +3864,7 @@ function renderOpponentProfile(identity, name, event = "", initialNationality = 
   follow.title = "Aggiungi giocatore";
   follow.setAttribute("aria-label", "Aggiungi giocatore");
   $("profileContent").innerHTML =
-    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentCircuitProfiles" class="playerCircuitProfiles"></span><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Tornei</h3></div><div id="opponentTournamentHistory"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Aggiungi giocatore</button></p></div>`;
+    `<div class="card opponentProfileHero"><div class="opponentProfileIdentity"><h2>${esc(readablePerson(name))}</h2><span id="opponentCircuitProfiles" class="playerCircuitProfiles"></span><span id="opponentProfileCurrentNationality" class="opponentProfileNationality"${flag ? "" : " hidden"}>${flag}</span><span id="opponentProfileRanking" class="opponentProfileRanking" hidden></span></div></div><div class="card opponentHistoryPlaceholder"><div class="cardHead"><h3>Tornei</h3></div><div id="opponentTournamentHistory" aria-busy="true"></div><p class="opponentFollowHint"><button type="button" data-follow-opponent>Aggiungi giocatore</button></p></div>`;
   $("homeView").classList.remove("active");
   $("profileView").classList.add("active");
   $("profileContent").querySelector("[data-follow-opponent]")?.addEventListener("click", (event) => {
@@ -4588,22 +4615,11 @@ function route() {
     });
     return;
   }
-  if (currentOpponent) {
-    const identity = decodeURIComponent(currentOpponent[1]), name = decodeURIComponent(currentOpponent[2]), event = decodeURIComponent(currentOpponent[3]) === "-" ? "" : decodeURIComponent(currentOpponent[3]);
-    if (!monitoredOpponentPlayer(identity) && !preparedOpponentHistory(name, event, identity)) {
-      fetchOpponentHistory(name, event, identity).then(() => {if (location.hash === requestedHash) route();}).catch(() => {});
-      return;
-    }
-  }
   if (opponent || legacyOpponent) {
     const match = opponent || legacyOpponent;
     const details = opponentFromMatchDetails(decodeURIComponent(match[opponent ? 2 : 1]), decodeURIComponent(match[opponent ? 3 : 2]), Number(match[opponent ? 4 : 3]), opponent ? match[1] : "opponent");
     if (!details && state.initialMatchProjectionPending) {
       Promise.resolve(initialProjectionRequest || load()).then(() => {if (location.hash === requestedHash && !state.initialMatchProjectionPending) route();});
-      return;
-    }
-    if (details && !monitoredOpponentPlayer(details.identity) && !preparedOpponentHistory(details.name, details.event, details.identity)) {
-      fetchOpponentHistory(details.name, details.event, details.identity).then(() => {if (location.hash === requestedHash) route();}).catch(() => {});
       return;
     }
   }

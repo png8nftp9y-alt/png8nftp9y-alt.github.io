@@ -18,7 +18,7 @@ function choose(rows,person){
  if(ranked.length>1)return ranked.find(r=>r.category===sex)||null;
  return rows.find(r=>r.category===sex)||rows.find(r=>r.status==='pending')||rows.find(r=>r.status==='unranked')||rows[0]||null;
 }
-export async function enrichItfJuniorRankings(db,players=[],matches=[],tournaments=[]){
+export async function enrichItfJuniorRankings(db,players=[],matches=[],tournaments=[],options={}){
  const targets=[],assignments=[],playerMap=new Map(players.map(p=>[p.id,p]));
  function add(person,date,assign,category=null,participant=false){
   const id=identity(person,participant);if(!id)return;
@@ -26,7 +26,7 @@ export async function enrichItfJuniorRankings(db,players=[],matches=[],tournamen
   for(const category of categories)targets.push({playerId:id,category,...(date?{matchDate:date}:{})});
   assignments.push(rows=>assign(choose(rows.slice(start,start+categories.length),person)));
  }
- for(const p of players){p.itfJuniorRanking=null;add(p,null,v=>{p.itfJuniorRanking=v;});}
+ if(!options.skipPlayers)for(const p of players){p.itfJuniorRanking=null;add(p,null,v=>{p.itfJuniorRanking=v;});}
  const history=new Set(),all=[...matches];
  for(const t of tournaments)if(t.circuit==='itf')for(const m of t.matches||[]){history.add(m);all.push(m);}
  const source=m=>m.circuit||(history.has(m)?'itf':''),ids=[...new Set(all.filter(m=>source(m)==='itf').map(m=>m.matchId||m.id).filter(Boolean))],peopleByMatch=new Map();

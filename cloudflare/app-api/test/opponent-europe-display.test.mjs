@@ -19,7 +19,7 @@ const source=readFileSync(new URL('../../../v3.js',import.meta.url),'utf8');
 const today='2026-10-14';
 const slice=(text,start,end)=>text.slice(text.indexOf(start),text.indexOf(end,text.indexOf(start)));
 function view(){
- const nodes={opponentTournamentHistory:{innerHTML:''},opponentProfileRanking:{},opponentProfileCurrentNationality:{}};
+ const nodes={opponentTournamentHistory:{innerHTML:'',setAttribute(){}},opponentProfileRanking:{},opponentProfileCurrentNationality:{}};
  const ctx={state:{data:{tournaments:[]}},$:id=>nodes[id],iso:()=>today,Date,Map,Set,
  readableText:x=>String(x||''),readablePerson:x=>String(x||''),esc:x=>String(x||''),
  courtWatchPlayerByName:()=>null,participantDesignationHtml:()=>'',nationalityHtml:()=>'',
