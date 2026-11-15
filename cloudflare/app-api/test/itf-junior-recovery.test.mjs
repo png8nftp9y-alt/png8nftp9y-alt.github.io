@@ -1,3 +1,4 @@
+import {database} from './itf-junior-recovery-fixture.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,mkdtempSync,rmSync} from 'node:fs';
@@ -11,17 +12,7 @@ const start='2026-11-10T18:17:00.000Z',cycle=rankingCycle(start);
 const base=(category,phase='complete')=>({category,cycle_key:cycle,phase});
 const row=(id,rank=1)=>({playerId:id,rank,points:50/rank,playerGivenName:"D'Angelo",playerFamilyName:'Example',playerNationalityCode:'ITA',gender:'M'});
 const acquired=(task,items)=>({...task,status:'acquired',rankingDate:'2026-11-09',items,total:items.length,capturedAt:start});
-function database(){
- const dir=mkdtempSync(join(tmpdir(),'cw-itf-retry-')),file=join(dir,'test.db');
- function sql(body){const result=spawnSync('python3',['-c',`import json,sqlite3,sys
-p=json.load(sys.stdin);c=sqlite3.connect(p['file']);c.row_factory=sqlite3.Row
-with c:
- if 'script' in p:c.executescript(p['script'])
- rows=[dict(r) for r in c.execute(p['query'],p.get('params',[]))] if 'query' in p else []
-print(json.dumps({'rows':rows,'changes':c.total_changes}))`],{encoding:'utf8',input:JSON.stringify({file,...body})});assert.equal(result.status,0,result.stderr);return JSON.parse(result.stdout);}
- sql({script:readFileSync(new URL('../lib/itf-junior-ranking-schema.sql',import.meta.url),'utf8')});
- return {query:async(query,params=[])=>sql({query,params}).rows,execute:async statements=>sql({script:statements.join('\n')}),close:()=>rmSync(dir,{recursive:true,force:true})};
-}
+
 test('normal cycles match Europe Monday/Tuesday 18:17 UTC, including week/year boundary',()=>{
  assert.equal(rankingCycle('2026-11-09T18:16:59Z'),'2026-11-03T18:17:00.000Z');
  assert.equal(rankingCycle('2026-11-09T18:17:00Z'),'2026-11-09T18:17:00.000Z');

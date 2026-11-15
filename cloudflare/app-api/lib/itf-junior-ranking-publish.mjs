@@ -1,9 +1,12 @@
+// D1_WRITE_POLICY: incremental
+import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
 import {publication,quote as q,digest,snapshotChunks} from './itf-junior-ranking-batch.mjs';
 import {failedCategory,rankingCycle} from './itf-junior-recovery.mjs';
 export async function publishRecovery(plan,{execute,query,readResult,runId='local',runUrl='',now=()=>new Date().toISOString()}){
 let failed=false;
 const state=(task,phase,extra={})=>`INSERT INTO itf_junior_ranking_recovery(category,cycle_key,phase,next_retry_at,content_hash,ranking_date,expected_count,snapshot_hash,chunk_count,last_error,updated_at) VALUES (${[task.category,task.cycle,phase,phase==='complete'?null:task.nextRetryAt,extra.contentHash,extra.rankingDate,extra.total,extra.snapshotHash,extra.chunkCount,extra.error||'',now()].map(q).join(',')}) ON CONFLICT(category) DO UPDATE SET cycle_key=excluded.cycle_key,phase=excluded.phase,next_retry_at=excluded.next_retry_at,content_hash=excluded.content_hash,ranking_date=excluded.ranking_date,expected_count=excluded.expected_count,snapshot_hash=excluded.snapshot_hash,chunk_count=excluded.chunk_count,last_error=excluded.last_error,updated_at=excluded.updated_at;`;
-for(const task of plan.tasks){
+const taskPlan=buildIncrementalSyncPlan({current:[],incoming:plan.tasks,keyOf:task=>task.category,sourceComplete:Array.isArray(plan.tasks)&&plan.tasks.every(task=>['B','G'].includes(task.category)&&['acquire','import'].includes(task.action)&&Number.isFinite(Date.parse(task.cycle)))});
+for(const task of taskPlan.inserts){
  const retry=failedCategory(task,plan.retryBaseAt||plan.startedAt,'');
  let result;
  try{result=await readResult(task.category);}
@@ -27,6 +30,8 @@ for(const task of plan.tasks){
    await execute(statements);checkpointSaved=true;
    await execute([`DELETE FROM itf_junior_ranking_recovery_chunks WHERE category=${q(task.category)} AND NOT(cycle_key=${q(task.cycle)} AND snapshot_hash=${q(hash)});`]);
   }
+  const current=await query(`SELECT player_id,ranking,points,display_name,nationality,source_gender FROM itf_junior_ranking_history WHERE ${checked.key}`);
+  checked=publication(task.category,result.rankingDate,result.items,result.total,result.capturedAt,{current});
   await execute(checked.statements);
   const rows=await query(`SELECT complete,expected_count,(SELECT COUNT(*) FROM itf_junior_ranking_history WHERE ${checked.key}) AS acquired FROM itf_junior_ranking_publications WHERE ${checked.key}`);
   if(rows.length!==1||Number(rows[0].complete)!==1||Number(rows[0].expected_count)!==checked.total||Number(rows[0].acquired)!==checked.total)throw Error('D1 ranking verification failed');

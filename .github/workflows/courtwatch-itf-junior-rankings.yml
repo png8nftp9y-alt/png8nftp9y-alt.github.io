@@ -59,12 +59,15 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with: {fetch-depth: 2}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - working-directory: cloudflare/app-api
         run: |
           node --test test/itf-junior-recovery.test.mjs
           npm run check
+      - name: Verify new D1 feature policy before acquiring writer lease
+        run: node cloudflare/app-api/scripts/verify-d1-new-feature-policy.mjs
   release-safety:
     needs: [plan, check-source]
     uses: ./.github/workflows/courtwatch-release-safety.yml
@@ -134,7 +137,9 @@ jobs:
           merge-multiple: true
           path: cloudflare/app-api/itf-junior-work
       - name: Initialize versioned archive and recovery checkpoints
-        run: npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file lib/itf-junior-ranking-schema.sql
+        run: |
+          node scripts/guard-d1-import.mjs lib/itf-junior-ranking-schema.sql
+          npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file lib/itf-junior-ranking-schema.sql
       - name: Publish valid categories and retain failed recovery work
         run: node scripts/publish-itf-junior-recovery.mjs
   pending-status:
