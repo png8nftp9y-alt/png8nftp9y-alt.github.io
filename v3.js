@@ -3590,6 +3590,12 @@ function opponentTournamentStatusHtml(tournament) {
     return '';
   return '<span class="completedTournamentLabel">CONCLUSO</span>';
 }
+function opponentFitpRankingText(metadata) {
+  if (!metadata?.ranking) return '';
+  const archived = metadata.source === 'observed' && metadata.observedAt
+    ? ` · (dato osservato il ${displayDate(metadata.observedAt)})` : '';
+  return `${metadata.ranking} FITP${archived}`;
+}
 function opponentEuropeRankingText(profile) {
   if (!profile) return '';
   const itf=profile.itfJuniorRanking?itfRankingText(profile.itfJuniorRanking):'';
@@ -3609,7 +3615,7 @@ function renderOpponentHistory(data) {
   const profileRanking = $("opponentProfileRanking"),
     profile = data.profile || null;
   if (profileRanking) {
-    profileRanking.textContent = opponentEuropeRankingText(profile);
+    profileRanking.textContent = [opponentFitpRankingText(data.fitpMetadata), opponentEuropeRankingText(profile)].filter(Boolean).join(' · ');
     profileRanking.hidden = !profileRanking.textContent;
   }
   const nationality = $("opponentProfileCurrentNationality");

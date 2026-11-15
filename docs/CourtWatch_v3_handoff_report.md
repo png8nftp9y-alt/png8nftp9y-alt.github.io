@@ -10999,3 +10999,11 @@ Fissato migrate-import-verify-deploy a Ubuntu 24.04. Il run 43720405227 falliva 
 - Diagnostica: Boys/Girls, data, completezza, consistenza dell’ultima versione parziale, errore e prossimo recupero. La pagina di diagnostica resta in sola lettura.
 - Import incrementale e ripetizione identica senza scritture; un import interrotto resta nascosto fino alla verifica e riprende i soli ID mancanti. Test SQLite, API Worker autenticata, rendering e snapshot progressivi verificati; comando reale di acquisizione provato con due pagine valide e successiva challenge simulata. Verificatore UI e policy globale D1 superati; controlli di regressione eseguiti per fasi, corrette soltanto le aspettative coinvolte dai nuovi campi/query.
 - Limite storico esplicito: il probe della settimana precedente aveva contato i record senza conservarli; questa modifica non può ricostruire record allora scartati. Visibilità e nuove acquisizioni remote da verificare dopo pubblicazione e deploy. Nessuna scrittura D1 remota o rilancio manuale nella preparazione.
+
+
+### FITP: classifica nelle schede avversario — 2026-11-15
+- Verifica browser: classifica assente nelle schede di Pellegrino e Cocchi.
+- Il rendering ora mostra FITP insieme agli eventuali ranking TE/ITF.
+- L'API restituisce anche il ranking archiviato senza timestamp del profilo, conservando provenienza e data originale dell'osservazione.
+- Test di regressione API e rendering; incremento cache JavaScript.
+- Nessuna nuova richiesta FITP o modifica ai dati D1.
