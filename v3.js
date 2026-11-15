@@ -4135,7 +4135,7 @@ async function loadFutureTournamentEuropeRankings(key, players) {
   }
 }
 function futureTournamentEuropeCategories(entry, rows = [], tournament = {}) {
-  const read = item => [...new Set(['category','ageCategory','ageGroup','categoryCode','event','draw','eventType'].flatMap(field => {
+  const read = item => [...new Set(['acceptanceEvent','eventSourceId','category','ageCategory','ageGroup','categoryCode','event','draw','eventType'].flatMap(field => {
     const text = String(item?.[field] || '').toUpperCase();
     return [...text.matchAll(/(?:\b(?:U|UNDER)\s*[- ]?|\b[BG](?:S|D)?\s*[- ]?)(10|12|14|16)\b|\b(10|12|14|16)\s*(?:&\s*UNDER|AND\s*UNDER|ANS)\b|^(10|12|14|16)$/g)].map(match => match[1] || match[2] || match[3]);
   }))];

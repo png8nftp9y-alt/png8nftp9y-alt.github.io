@@ -11039,3 +11039,10 @@ ITF discovery 2026-11-15T22:28:50.620Z: 0 newly discovered future tournaments; M
 - Un errore indipendente nell’altra categoria mantiene rosso l’esito complessivo senza riaprire la categoria ormai completa. Ripetizioni identiche della pubblicazione non riscrivono ranking; import canonici interrotti non diventano completi prima della verifica e possono riprendere tramite il builder esistente.
 - Test SQLite: unione complementare e recuperi fermati; replay identico zero scritture; blocco conflitti/totali; isolamento data/categoria e manifest non ready; errore indipendente dell’altra categoria. Regressioni pubblicazione, lettura app e recovery verificate localmente. Policy D1 verificata. Nessuna scrittura D1 remota o rilancio manuale nella preparazione.
 - Pubblicazione remota e certificazione effettiva delle 5176 Girls ancora da verificare. Questa correzione non inventa gli ID mancanti e non garantisce che la loro acquisizione sia già avvenuta.
+
+
+### 16 novembre 2026 — Categoria iscrizione Tennis Europe nelle pagine torneo future
+
+Causa riprodotta per Virginia Cereghini a Bad Waltersdorf (23AE0F0E-0063-44C6-BB79-0A2DAB4197C3): iscrizione GS16 nel campo acceptanceEvent; la proiezione universale usa eventSourceId. futureTournamentEuropeCategories non leggeva nessuno dei due campi, restituiva categorie vuote e il filtro delle classifiche produceva NR anche in presenza di una classifica U16 valida. Aggiunti entrambi i campi al riconoscimento esistente. La pagina continua a usare soltanto la pubblicazione corrente della categoria iscritta; nessuna classifica fissata nel codice o derivata dall'acceptance list. Incrementata la versione cache di v3.js.
+
+Validazione: 11 test passati nella suite future-tournament-ranking (inclusi i test importati), nuova regressione GS16 da entrambi i formati, selezione U16 rispetto a U14 e supporto GD14. Sintassi JavaScript e diff verificati. Non è stato possibile leggere l'API privata live perché protetta da Cloudflare Access; classifica effettiva e deploy da verificare dopo pubblicazione. Nessuna modifica ai ranking ITF, a D1 o alle frequenze di acquisizione.

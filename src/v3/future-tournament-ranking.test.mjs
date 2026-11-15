@@ -35,3 +35,13 @@ test('async header uses its own registration category on the shared ranking resp
 });
 
 import './junior-masters-playoff.test.mjs';
+
+test('Bad Waltersdorf acceptance and projected GS16 registration select the current U16 rank',()=>{
+ const {c}=fixture(),player={id:'virginia-cereghini',birthYear:2013,sex:'F'};
+ const data={latestRankingDates:{G14:'2026-11-10',G16:'2026-11-10'},rankings:[{category:'G14',ranking:258,ranking_date:'2026-11-10'},{category:'G16',ranking:562,ranking_date:'2026-11-10'}]};
+ for(const entry of [{acceptanceEvent:'GS16'},{eventSourceId:'GS16'}]){
+  const categories=Array.from(c.futureTournamentEuropeCategories(entry,[],{name:'Bad Waltersdorf Open 2026 - indoors'}));
+  assert.deepEqual(categories,['16']);assert.equal(c.futureTournamentEuropeRanking(player,data,categories),'n°562 TE U16');
+ }
+ assert.deepEqual(Array.from(c.futureTournamentEuropeCategories({eventSourceId:'GD14'})),['14']);
+});
