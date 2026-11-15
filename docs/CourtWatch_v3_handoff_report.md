@@ -10971,3 +10971,10 @@ ITF discovery 2026-11-15T07:19:26.945Z: 0 newly discovered future tournaments; M
 - Validazione locale: test mirati passati e D1 GLOBAL NEW FEATURE POLICY: OK, anche simulando il commit completo della nuova funzione rispetto al repository privo di essa. Sintassi e YAML controllati; nessuna scrittura D1 remota nella preparazione.
 - Lo script applica soltanto questa correzione in un worktree separato, esegue test mirati e policy e ritenta fetch/rebase/push senza force e senza ripetere la suite completa per gli aggiornamenti di dati/report dei bot. La suite completa resta nei gate CI.
 - Run remoti successivi alla correzione ancora da verificare; nessun rilancio manuale o polling eseguito dall’assistente.
+
+
+### FITP: classifiche di prima categoria — 2026-11-15
+- Il parser accetta anche 1.10, 1.11 e gli altri valori di prima categoria a più cifre.
+- Aggiunto test di regressione; invariati i controlli sulle altre categorie.
+- Verifica ufficiale: 27 classifiche disponibili prima scartate dal parser; 10 profili assenti. Equiparati e segnaposto Q esclusi dall'indagine.
+- Recupero D1 separato e limitato alle 27 classifiche verificate ancora vuote; nessuna nuova richiesta FITP.

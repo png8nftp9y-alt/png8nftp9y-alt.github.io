@@ -18,7 +18,7 @@ export function parseFitpSheet(data,card){
  const club=typeof rawClub==='string'?displayPlayerClub(rawClub):'';
  const raw=p.Ranking||p.ranking||p.classification||p.classifica;
  const ranking=typeof raw==='string'?raw.replace(/\s+/g,'').replace(/^([1-4])NC$/i,'$1.NC').toUpperCase():'';
- return{membership_card:String(card),club,ranking:/^(?:[1-4]\.(?:[1-9]|NC)|NC)$/.test(ranking)?ranking:''};
+ return{membership_card:String(card),club,ranking:/^(?:1\.(?:[1-9][0-9]*|NC)|[2-4]\.(?:[1-9]|NC)|NC)$/.test(ranking)?ranking:''};
 }
 export async function fetchFitpSheet(card,fetcher=fetch){
  const response=await fetcher('https://dp-fit-prod-function.azurewebsites.net/api/v6/player/sheet/simple',{
