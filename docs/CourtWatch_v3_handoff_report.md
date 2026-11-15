@@ -10947,3 +10947,5 @@ Fissati a Ubuntu 24.04 i job check-source e deploy-worker. Il ricontrollo della 
 La pubblicazione immediata API usa i documenti nuovi se già pronti. Il passaggio finale viene saltato soltanto dopo pubblicazione riuscita della stessa proiezione e dello stesso oggetto documenti. Conservati aggiornamenti successivi, fallback ed evidenza degli errori. Cinque test verificano entrambi gli ordini di arrivo e i fallimenti. Guadagno reale da misurare dopo il deploy.
 
 ITF discovery 2026-11-14T22:52:27.107Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-11-15T07:19:26.945Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
