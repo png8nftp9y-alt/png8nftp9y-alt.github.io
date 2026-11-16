@@ -11078,3 +11078,5 @@ ITF discovery 2026-11-16T07:23:12.912Z: 0 newly discovered future tournaments; M
 - Il test verifica apertura immediata, riuso del prefetch e conservazione dei dati acquisiti.
 - Storico in attesa distinto da storico completato; refresh esplicito verificato con una sola richiesta aggiuntiva.
 - Nessun controllo browser rimosso. Sintassi verificata dall’installatore; esecuzione Chromium remota da confermare.
+
+ITF discovery 2026-11-16T22:41:38.370Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
