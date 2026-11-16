@@ -1,0 +1,31 @@
+name: Court Watch ranking orchestration checks
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/courtwatch-tennis-europe-rankings.yml'
+      - '.github/workflows/courtwatch-itf-junior-rankings.yml'
+      - '.github/workflows/courtwatch-ranking-orchestration-check.yml'
+      - 'cloudflare/app-api/lib/itf-junior-*.mjs'
+      - 'cloudflare/app-api/scripts/plan-itf-junior-recovery.mjs'
+      - 'cloudflare/app-api/test/itf-junior-*.mjs'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/courtwatch-tennis-europe-rankings.yml'
+      - '.github/workflows/courtwatch-itf-junior-rankings.yml'
+      - '.github/workflows/courtwatch-ranking-orchestration-check.yml'
+      - 'cloudflare/app-api/lib/itf-junior-recovery.mjs'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Verify shared ordinary start and independent recovery without remote access
+        run: |
+          node --check cloudflare/app-api/lib/itf-junior-recovery.mjs
+          node --test --test-concurrency=2 cloudflare/app-api/test/itf-junior-recovery.test.mjs cloudflare/app-api/test/itf-junior-ranking-partial.test.mjs

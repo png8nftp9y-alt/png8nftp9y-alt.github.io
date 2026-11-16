@@ -11080,3 +11080,12 @@ ITF discovery 2026-11-16T07:23:12.912Z: 0 newly discovered future tournaments; M
 - Nessun controllo browser rimosso. Sintassi verificata dall’installatore; esecuzione Chromium remota da confermare.
 
 ITF discovery 2026-11-16T22:41:38.370Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-11-17 — Ranking ITF ed Europe indipendenti agli stessi orari
+- I workflow restano completamente separati: nessun workflow_call, workflow_run o dipendenza reciproca. Entrambi hanno il cron ordinario 17 18 * * 1,2 (lunedì e martedì 18:17 UTC, 19:17 italiane in inverno).
+- ITF distingue il cron ordinario dai recuperi: il primo verifica entrambe le categorie Boys/Girls anche se complete nel ciclo precedente; gli altri due cron coprono le restanti ore senza duplicare il ciclo ordinario. I recuperi orari, checkpoint e import D1 restano autonomi.
+- Gli import già acquisiti mantengono priorità; la modalità ordinaria può riprenderli subito. La coda D1 condivisa continua a serializzare le scritture.
+- Stesso orario programmato non garantisce avvio nello stesso secondo: GitHub può ritardare o saltare i cron. Nessun avvio Europe è richiesto per far funzionare ITF, e viceversa.
+- Test aggiunti per categorie, cron indipendenti e assenza di collegamenti tra workflow. Nuova CI da confermare sul commit; nessuna acquisizione o scrittura D1 remota eseguita durante la preparazione.
+- Shield resta obbligatorio su Ubuntu 24.04 compatibile con Playwright del repository, senza rimuovere controlli browser.
+- CI ha rilevato un’asserzione preesistente legata alla singola stringa cron oraria: aggiornata al nuovo cron ordinario, mantenendo i controlli separati sulla copertura dei recuperi orari e sui lock D1.

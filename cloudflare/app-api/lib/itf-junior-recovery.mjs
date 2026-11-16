@@ -13,7 +13,7 @@ export function recoveryPlan(states,now,{force=false}={}){
   const previous=byCategory.get(category);
   // Never discard a fully acquired publication merely because a new week began.
   if(previous?.phase==='acquired'){
-   if(Date.parse(previous.next_retry_at)>Date.parse(now))return [];
+   if(!force&&Date.parse(previous.next_retry_at)>Date.parse(now))return [];
    return [{category,cycle:previous.cycle_key,action:'import',contentHash:previous.content_hash,rankingDate:previous.ranking_date,expectedCount:previous.expected_count}];
   }
   if(force||previous?.cycle_key!==cycle)return [{category,cycle,action:'acquire'}];
