@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-11-16T14:41:24.300Z",
+  "generatedAt": "2026-11-16T14:53:47.436Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,12 +8,12 @@
     "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
-    "declaredSections": 5,
+    "declaredSections": 6,
     "requestedSections": 4,
-    "acquiredSections": 1,
+    "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 1,
+    "resolvedSections": 2,
     "missingSections": 4,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
@@ -25,11 +25,11 @@
     "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 581,
+    "globalCompleteTournaments": 582,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 68,
-    "globalPendingTechnical": 34,
-    "globalPendingPublication": 34,
+    "globalPendingTotal": 67,
+    "globalPendingTechnical": 36,
+    "globalPendingPublication": 31,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -64,6 +64,8 @@
       "J-J100-TUR-2026-006",
       "J-J100-USA-2026-002",
       "J-J100-USA-2026-004",
+      "J-J30-ARG-2026-004",
+      "J-J30-CAM-2026-002",
       "J-J60-SLO-2026-006"
     ],
     "publicationPendingCompetitionIds": [
@@ -81,11 +83,8 @@
       "J-J100-SWE-2026-002",
       "J-J200-USA-2026-006",
       "J-J30-AIA-2026-003",
-      "J-J30-ARG-2026-004",
-      "J-J30-CAM-2026-002",
       "J-J30-GUA-2026-002",
       "J-J30-ISR-2026-001",
-      "J-J30-LBN-2026-003",
       "J-J30-MAR-2026-011",
       "J-J30-PAK-2026-006",
       "J-J30-PUR-2026-003",
@@ -105,15 +104,15 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-RSA-2026-001",
-      "tournamentName": "J30 Stellenbosch",
+      "competitionId": "J-J30-MAR-2026-011",
+      "tournamentName": "J30 Fes",
       "decision": "pending",
       "playersFound": [],
-      "declaredSections": 5,
-      "acquiredSections": 1,
+      "declaredSections": 6,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 1,
+      "resolvedSections": 2,
       "missingSections": 4,
       "sections": [
         {
@@ -145,6 +144,13 @@
           "status": "pending"
         },
         {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
+        },
+        {
           "event": "G-D-M-KO",
           "family": "G-D-M",
           "acquired": false,
@@ -172,7 +178,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 24,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -202,6 +208,19 @@
               "error": "draw_not_published_or_incomplete",
               "failureType": "not_published_or_incomplete",
               "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 22,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
