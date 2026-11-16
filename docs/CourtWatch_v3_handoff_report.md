@@ -11080,3 +11080,11 @@ ITF discovery 2026-11-16T07:23:12.912Z: 0 newly discovered future tournaments; M
 - Nessun controllo browser rimosso. Sintassi verificata dall’installatore; esecuzione Chromium remota da confermare.
 
 ITF discovery 2026-11-16T22:41:38.370Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-11-16 — Avvio ordinario ranking ITF collegato a Europe
+- Europe richiama il workflow ITF Junior come workflow riutilizzabile in un job parallelo senza dipendenze dai controlli o dall’import Europe. Ogni avvio Europe richiede la modalità ordinaria ITF, per entrambe le categorie anche se prima complete; permessi actions:read esplicitati per il workflow chiamato.
+- Europe conserva il proprio job di pubblicazione senza dipendenza dall’esito ITF. Il run complessivo segnala comunque un eventuale ramo ITF fallito. Tutte le scritture restano nella coda D1 e dietro i controlli esistenti.
+- Il cron orario ITF e la pianificazione dei recuperi restano disponibili anche come catch-up del ciclo. Gli avvii passano dalla stessa concurrency ITF; il completamento ferma i recuperi della categoria nel ciclo corrente. La richiesta ordinaria è esplicita e può rileggere entrambe le categorie; non si dichiara eliminata ogni rilettura tra eventi differenti.
+- Una fonte già interamente acquisita in attesa d’import conserva la precedenza e i checkpoint: la modalità ordinaria può riprendere subito l’import. Se appartiene al vecchio ciclo, i successivi controlli recuperano il nuovo ciclo dopo l’import, come da policy esistente.
+- Aggiunti test per avvio comune prima/dopo la soglia, categorie complete/incomplete, checkpoint conservati e indipendenza del job Europe. Nuovo controllo GitHub Node/SQLite senza segreti e senza accesso remoto; esiti CI da confermare.
+- Ambiente locale indisponibile. Sei scenari della logica pura eseguiti nel runtime disponibile; suite Node/SQLite completa demandata alla CI. Correzione su ramo separato, nessun merge main, rilancio di motori o scrittura D1 da parte dell’assistente. Primo avvio comune in produzione da verificare.

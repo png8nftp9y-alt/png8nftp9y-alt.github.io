@@ -108,3 +108,26 @@ test('new week cannot discard an already acquired publication awaiting import',(
  const imported=[base('B'),{...base('G'),cycle_key:'2026-11-16T18:17:00.000Z'}];
  assert.deepEqual(recoveryPlan(imported,'2026-11-16T19:17:00Z').map(t=>t.category),['B']);
 });
+
+test('ordinary Europe start checks both ITF categories before or after the old fixed cycle boundary',()=>{
+ const states=[base('B'),{...base('G','failed'),next_retry_at:'2026-11-16T23:00:00Z'}];
+ for(const now of ['2026-11-16T17:20:00Z','2026-11-16T18:20:00Z']){
+  assert.deepEqual(recoveryPlan(states,now,{force:true}).map(t=>[t.category,t.action]),[['B','acquire'],['G','acquire']]);
+ }
+ const cached=[{...base('B','acquired'),content_hash:'saved',next_retry_at:'2026-11-16T23:00:00Z'},base('G')];
+ assert.deepEqual(recoveryPlan(cached,'2026-11-16T17:20:00Z',{force:true}).map(t=>[t.category,t.action]),[['B','import'],['G','acquire']]);
+});
+test('Europe ordinary and ITF share one event while Europe publishing and hourly recovery stay independent',()=>{
+ const read=name=>readFileSync(new URL('../../../.github/workflows/'+name,import.meta.url),'utf8');
+ const europe=read('courtwatch-tennis-europe-rankings.yml'),itf=read('courtwatch-itf-junior-rankings.yml');
+ assert.match(europe,/cron: '17 18 \* \* 1,2'/);
+ const call=europe.slice(europe.indexOf('  itf-junior:'),europe.indexOf('  check-source:'));
+ assert.match(call,/uses: \.\/\.github\/workflows\/courtwatch-itf-junior-rankings\.yml/);
+ assert.match(call,/ordinary: true/);assert.match(call,/secrets: inherit/);assert.doesNotMatch(call,/needs:/);
+ assert.match(europe,/permissions:\n  contents: read\n  actions: read/);
+ assert.match(europe,/  sync:\n    needs: \[check-source, release-safety\]/);
+ assert.match(itf,/workflow_call:\n    inputs:\n      ordinary:/);
+ assert.ok(itf.includes("ITF_FORCE: ${{ inputs.force || inputs.ordinary || false }}"));
+ 
+ assert.match(itf,/cron: '17 \* \* \* \*'/);assert.match(itf,/group: courtwatch-d1-writes/);
+});
