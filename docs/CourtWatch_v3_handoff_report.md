@@ -11070,3 +11070,5 @@ Validazione: 11 test passati nella suite future-tournament-ranking (inclusi i te
 - Allineato il test di preparazione al comportamento richiesto: scheda aperta subito mentre storico e tornei arrivano dalla richiesta già in corso.
 - Conservati controlli su richieste duplicate e navigazione successiva; aggiunti i test progressivi al workflow mobile e ai suoi trigger.
 - Verificata localmente la suite Node del job mobile. Chromium/WebKit remoti restano da confermare dopo pubblicazione.
+
+ITF discovery 2026-11-16T07:23:12.912Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
