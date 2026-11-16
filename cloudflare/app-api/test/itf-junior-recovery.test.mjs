@@ -93,7 +93,7 @@ test('both source failures and an interrupted source job never produce a success
 });
 test('workflow acquires categories independently outside D1 lease and imports under the shared lease only when work is due',()=>{
  const flow=readFileSync(new URL('../../../.github/workflows/courtwatch-itf-junior-rankings.yml',import.meta.url),'utf8');
- assert.match(flow,/cron: '17 \* \* \* \*'/);assert.match(flow,/fail-fast: false/);
+ assert.match(flow,/cron: '17 18 \* \* 1,2'/);assert.match(flow,/fail-fast: false/);
  const acquire=flow.slice(flow.indexOf('  acquire:'),flow.indexOf('  publish:'));
  assert.doesNotMatch(acquire,/courtwatch-d1-writes/);assert.match(acquire,/ITF_CATEGORY: \$\{\{ matrix.category \}\}/);
  assert.match(flow,/group: courtwatch-d1-writes\n      cancel-in-progress: false/);

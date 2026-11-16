@@ -11088,3 +11088,4 @@ ITF discovery 2026-11-16T22:41:38.370Z: 0 newly discovered future tournaments; M
 - Stesso orario programmato non garantisce avvio nello stesso secondo: GitHub può ritardare o saltare i cron. Nessun avvio Europe è richiesto per far funzionare ITF, e viceversa.
 - Test aggiunti per categorie, cron indipendenti e assenza di collegamenti tra workflow. Nuova CI da confermare sul commit; nessuna acquisizione o scrittura D1 remota eseguita durante la preparazione.
 - Shield resta obbligatorio su Ubuntu 24.04 compatibile con Playwright del repository, senza rimuovere controlli browser.
+- CI ha rilevato un’asserzione preesistente legata alla singola stringa cron oraria: aggiornata al nuovo cron ordinario, mantenendo i controlli separati sulla copertura dei recuperi orari e sui lock D1.
