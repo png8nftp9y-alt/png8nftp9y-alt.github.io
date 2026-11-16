@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-11-16T17:31:20.172Z",
+  "generatedAt": "2026-11-16T17:45:27.180Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,28 +8,28 @@
     "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
-    "declaredSections": 5,
-    "requestedSections": 3,
+    "declaredSections": 6,
+    "requestedSections": 4,
     "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
     "resolvedSections": 2,
-    "missingSections": 3,
+    "missingSections": 4,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 3,
+    "retrySections": 4,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 3,
+    "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 583,
     "globalCancelledNoDraws": 13,
     "globalPendingTotal": 66,
-    "globalPendingTechnical": 34,
-    "globalPendingPublication": 32,
+    "globalPendingTechnical": 35,
+    "globalPendingPublication": 31,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -64,6 +64,7 @@
       "J-J100-TUR-2026-006",
       "J-J100-USA-2026-002",
       "J-J100-USA-2026-004",
+      "J-J60-JPN-2026-004",
       "J-J30-POL-2026-006"
     ],
     "publicationPendingCompetitionIds": [
@@ -96,23 +97,22 @@
       "J-J30-HUN-2026-005",
       "J-J30-KOR-2026-012",
       "J-J60-EST-2026-004",
-      "J-J60-JPN-2026-004",
       "J-J60-PER-2026-003",
       "J-J30-RSA-2026-001"
     ]
   },
   "audit": [
     {
-      "competitionId": "J-J30-PAK-2026-006",
-      "tournamentName": "J30 Islamabad",
+      "competitionId": "J-J60-PER-2026-003",
+      "tournamentName": "J60 Lima",
       "decision": "pending",
       "playersFound": [],
-      "declaredSections": 5,
+      "declaredSections": 6,
       "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
       "resolvedSections": 2,
-      "missingSections": 3,
+      "missingSections": 4,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -138,6 +138,13 @@
         {
           "event": "G-S-M-KO",
           "family": "G-S-M",
+          "acquired": false,
+          "resolved": false,
+          "status": "pending"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
           "acquired": true,
           "resolved": true,
           "status": "acquired"
@@ -170,7 +177,7 @@
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 10,
+              "players": 32,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -192,11 +199,24 @@
         },
         {
           "family": "G-S-M",
-          "populated": true,
+          "populated": false,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 19,
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 18,
               "error": null,
               "failureType": null,
               "resolved": true
