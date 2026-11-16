@@ -117,17 +117,14 @@ test('ordinary Europe start checks both ITF categories before or after the old f
  const cached=[{...base('B','acquired'),content_hash:'saved',next_retry_at:'2026-11-16T23:00:00Z'},base('G')];
  assert.deepEqual(recoveryPlan(cached,'2026-11-16T17:20:00Z',{force:true}).map(t=>[t.category,t.action]),[['B','import'],['G','acquire']]);
 });
-test('Europe ordinary and ITF share one event while Europe publishing and hourly recovery stay independent',()=>{
+test('Europe and ITF have independent schedules at the same ordinary time and hourly ITF recovery',()=>{
  const read=name=>readFileSync(new URL('../../../.github/workflows/'+name,import.meta.url),'utf8');
  const europe=read('courtwatch-tennis-europe-rankings.yml'),itf=read('courtwatch-itf-junior-rankings.yml');
- assert.match(europe,/cron: '17 18 \* \* 1,2'/);
- const call=europe.slice(europe.indexOf('  itf-junior:'),europe.indexOf('  check-source:'));
- assert.match(call,/uses: \.\/\.github\/workflows\/courtwatch-itf-junior-rankings\.yml/);
- assert.match(call,/ordinary: true/);assert.match(call,/secrets: inherit/);assert.doesNotMatch(call,/needs:/);
- assert.match(europe,/permissions:\n  contents: read\n  actions: read/);
- assert.match(europe,/  sync:\n    needs: \[check-source, release-safety\]/);
- assert.match(itf,/workflow_call:\n    inputs:\n      ordinary:/);
- assert.ok(itf.includes("ITF_FORCE: ${{ inputs.force || inputs.ordinary || false }}"));
- 
- assert.match(itf,/cron: '17 \* \* \* \*'/);assert.match(itf,/group: courtwatch-d1-writes/);
+ for(const flow of [europe,itf])assert.match(flow,/cron: '17 18 \* \* 1,2'/);
+ assert.doesNotMatch(europe,/itf-junior:/);
+ assert.doesNotMatch(itf,/workflow_call:|workflow_run:/);
+ assert.ok(itf.includes("ITF_FORCE: ${{ inputs.force || (github.event_name == 'schedule' && github.event.schedule == '17 18 * * 1,2') }}"));
+ assert.match(itf,/cron: '17 0-17,19-23 \* \* \*'/);
+ assert.match(itf,/cron: '17 18 \* \* 0,3-6'/);
+ assert.match(itf,/group: courtwatch-d1-writes/);
 });

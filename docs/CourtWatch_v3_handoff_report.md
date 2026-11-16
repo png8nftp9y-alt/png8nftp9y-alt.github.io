@@ -11081,11 +11081,10 @@ ITF discovery 2026-11-16T07:23:12.912Z: 0 newly discovered future tournaments; M
 
 ITF discovery 2026-11-16T22:41:38.370Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
-## 2026-11-16 — Avvio ordinario ranking ITF collegato a Europe
-- Europe richiama il workflow ITF Junior come workflow riutilizzabile in un job parallelo senza dipendenze dai controlli o dall’import Europe. Ogni avvio Europe richiede la modalità ordinaria ITF, per entrambe le categorie anche se prima complete; permessi actions:read esplicitati per il workflow chiamato.
-- Europe conserva il proprio job di pubblicazione senza dipendenza dall’esito ITF. Il run complessivo segnala comunque un eventuale ramo ITF fallito. Tutte le scritture restano nella coda D1 e dietro i controlli esistenti.
-- Il cron orario ITF e la pianificazione dei recuperi restano disponibili anche come catch-up del ciclo. Gli avvii passano dalla stessa concurrency ITF; il completamento ferma i recuperi della categoria nel ciclo corrente. La richiesta ordinaria è esplicita e può rileggere entrambe le categorie; non si dichiara eliminata ogni rilettura tra eventi differenti.
-- Una fonte già interamente acquisita in attesa d’import conserva la precedenza e i checkpoint: la modalità ordinaria può riprendere subito l’import. Se appartiene al vecchio ciclo, i successivi controlli recuperano il nuovo ciclo dopo l’import, come da policy esistente.
-- Aggiunti test per avvio comune prima/dopo la soglia, categorie complete/incomplete, checkpoint conservati e indipendenza del job Europe. Nuovo controllo GitHub Node/SQLite senza segreti e senza accesso remoto; esiti CI da confermare.
-- Ambiente locale indisponibile. Sei scenari della logica pura eseguiti nel runtime disponibile; suite Node/SQLite completa demandata alla CI. Correzione su ramo separato, nessun merge main, rilancio di motori o scrittura D1 da parte dell’assistente. Primo avvio comune in produzione da verificare.
-- Il gate Shield ha superato il release guard ma fallito nell’installazione Chromium: la versione Playwright del repository non supporta ubuntu26.04-x64. Fissato soltanto il runner Shield a ubuntu-24.04; installazione browser e test funzionale completo restano obbligatori. Esito del nuovo gate da confermare.
+## 2026-11-17 — Ranking ITF ed Europe indipendenti agli stessi orari
+- I workflow restano completamente separati: nessun workflow_call, workflow_run o dipendenza reciproca. Entrambi hanno il cron ordinario 17 18 * * 1,2 (lunedì e martedì 18:17 UTC, 19:17 italiane in inverno).
+- ITF distingue il cron ordinario dai recuperi: il primo verifica entrambe le categorie Boys/Girls anche se complete nel ciclo precedente; gli altri due cron coprono le restanti ore senza duplicare il ciclo ordinario. I recuperi orari, checkpoint e import D1 restano autonomi.
+- Gli import già acquisiti mantengono priorità; la modalità ordinaria può riprenderli subito. La coda D1 condivisa continua a serializzare le scritture.
+- Stesso orario programmato non garantisce avvio nello stesso secondo: GitHub può ritardare o saltare i cron. Nessun avvio Europe è richiesto per far funzionare ITF, e viceversa.
+- Test aggiunti per categorie, cron indipendenti e assenza di collegamenti tra workflow. Nuova CI da confermare sul commit; nessuna acquisizione o scrittura D1 remota eseguita durante la preparazione.
+- Shield resta obbligatorio su Ubuntu 24.04 compatibile con Playwright del repository, senza rimuovere controlli browser.

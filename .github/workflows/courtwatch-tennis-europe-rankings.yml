@@ -14,17 +14,11 @@ on:
       - 'cloudflare/app-api/lib/all-app-ranking-input.mjs'
 permissions:
   contents: read
-  actions: read
 concurrency:
   group: courtwatch-te-rankings
   cancel-in-progress: false
   queue: single
 jobs:
-  itf-junior:
-    uses: ./.github/workflows/courtwatch-itf-junior-rankings.yml
-    with:
-      ordinary: true
-    secrets: inherit
   check-source:
     runs-on: ubuntu-latest
     timeout-minutes: 15
