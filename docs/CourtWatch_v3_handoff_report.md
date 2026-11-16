@@ -11072,3 +11072,9 @@ Validazione: 11 test passati nella suite future-tournament-ranking (inclusi i te
 - Verificata localmente la suite Node del job mobile. Chromium/WebKit remoti restano da confermare dopo pubblicazione.
 
 ITF discovery 2026-11-16T07:23:12.912Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+## 2026-11-16 — Allineamento test browser Others alla navigazione immediata
+- Run 43775933327 e 43776439266: medesima aspettativa obsoleta sul vecchio hash dopo il clic avversario.
+- Il test verifica apertura immediata, riuso del prefetch e conservazione dei dati acquisiti.
+- Storico in attesa distinto da storico completato; refresh esplicito verificato con una sola richiesta aggiuntiva.
+- Nessun controllo browser rimosso. Sintassi verificata dall’installatore; esecuzione Chromium remota da confermare.

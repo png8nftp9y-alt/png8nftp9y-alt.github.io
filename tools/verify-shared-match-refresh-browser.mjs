@@ -37,7 +37,7 @@ try {
       new MutationObserver(() => {
         const stat = document.querySelector('#profileContent [data-stat="all"]');
         if (stat) window.observedProfileCounts.push(Number(stat.textContent));
-        if (document.querySelector('.opponentProfileHero') && !document.querySelector('#opponentTournamentHistory .unifiedMatchRow')) window.observedEmptyOpponent = true;
+        if (document.querySelector('.opponentProfileHero') && document.querySelector('#opponentTournamentHistory[aria-busy="false"]') && !document.querySelector('#opponentTournamentHistory .unifiedMatchRow')) window.observedEmptyOpponent = true;
       }).observe(document, {childList: true, subtree: true, characterData: true});
     });
     await page.route('**/*', async route => {
@@ -110,7 +110,7 @@ try {
     assert.equal(await page.locator('#profileContent .unifiedMatchRow').count(), 3, `${group}: first profile must recover history despite a newer partial cache`);
     assert.equal(await page.evaluate(() => observedProfileCounts.includes(0)), false);
 
-    // Visible links prefetch. A click during that request keeps the complete current page.
+    // Visible links prefetch. Navigation opens immediately and shares the pending request.
     holdOpponent = true;
     await page.evaluate(() => {
       const root = document.querySelector('#profileContent');
@@ -119,23 +119,34 @@ try {
     });
     await page.waitForFunction(() => opponentHistoryRequests.has(opponentHistoryKey('Opponent A', 'GS14', 'fixture-opponent-a').requestKey));
     await page.locator('[data-test-opponent]').click();
-    assert.equal(await page.evaluate(() => location.hash), '#player/' + player.id);
-    assert.equal(await page.locator('#profileContent .unifiedMatchRow').count(), 3);
+    await page.waitForFunction(() => location.hash === '#opponent-profile/fixture-opponent-a/Opponent%20A/GS14');
+    await page.waitForFunction(() => document.querySelector('.opponentProfileHero h2')?.textContent === 'Opponent A');
+    assert.equal(await page.locator('#opponentTournamentHistory').getAttribute('aria-busy'), 'true');
+    assert.deepEqual(await page.evaluate(() => state.data.matches.map(m => m.id).sort()), [...before].sort());
+
     assert.equal(opponentRequests.get('fixture-opponent-a'), 1, `${group}: click must share the pending prefetch`);
     assert.equal(typeof releaseOpponent, 'function');
     holdOpponent = false; releaseOpponent();
     await page.waitForFunction(() => document.querySelector('.opponentProfileHero h2')?.textContent === 'Opponent A');
+    await page.waitForFunction(() => document.querySelector('#opponentTournamentHistory')?.getAttribute('aria-busy') === 'false');
     assert.equal(await page.locator('#opponentTournamentHistory .unifiedMatchRow').count(), 1);
+    await page.waitForFunction(() => document.querySelector('#opponentProfileRanking')?.textContent.includes('12 TE'));
+    assert.equal(opponentRequests.get('fixture-opponent-a'), 1, `${group}: opening must reuse prefetch`);
+    await page.evaluate(() => loadOpponentHistory('Opponent A', 'GS14', 'fixture-opponent-a', true));
     await page.waitForFunction(() => document.querySelector('#opponentProfileRanking')?.textContent.includes('7 TE'));
-    assert.equal(opponentRequests.get('fixture-opponent-a'), 2, `${group}: opening checks the latest ranking once after prefetch`);
+    assert.equal(opponentRequests.get('fixture-opponent-a'), 2, `${group}: explicit refresh checks the latest ranking with one new request`);
 
     // The opponent's own visible opponent is prepared by the same path.
     await page.waitForFunction(() => opponentHistoryCache.has(opponentHistoryKey('Opponent B', 'GS14', 'fixture-opponent-b').requestKey));
     await page.locator('[data-open-current-opponent="fixture-opponent-b"]').click();
     await page.waitForFunction(() => document.querySelector('.opponentProfileHero h2')?.textContent === 'Opponent B');
+    await page.waitForFunction(() => document.querySelector('#opponentTournamentHistory')?.getAttribute('aria-busy') === 'false');
     assert.equal(await page.locator('#opponentTournamentHistory .unifiedMatchRow').count(), 1);
+    await page.waitForFunction(() => document.querySelector('#opponentProfileRanking')?.textContent.includes('12 TE'));
+    assert.equal(opponentRequests.get('fixture-opponent-b'), 1, `${group}: opening must reuse prefetch`);
+    await page.evaluate(() => loadOpponentHistory('Opponent B', 'GS14', 'fixture-opponent-b', true));
     await page.waitForFunction(() => document.querySelector('#opponentProfileRanking')?.textContent.includes('7 TE'));
-    assert.equal(opponentRequests.get('fixture-opponent-b'), 2, `${group}: recursive opening also refreshes the current ranking once`);
+    assert.equal(opponentRequests.get('fixture-opponent-b'), 2, `${group}: recursive explicit refresh adds exactly one request`);
     assert.equal(await page.evaluate(() => observedEmptyOpponent), false, `${group}: neither opponent page may be rendered empty`);
 
     opponentPartial = true;
