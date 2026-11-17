@@ -3,8 +3,6 @@ name: Court Watch Tennis Europe rankings
 # Certification trigger: 2026-09-11
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '17 18 * * 1,2'
   push:
     branches: [main]
     paths:

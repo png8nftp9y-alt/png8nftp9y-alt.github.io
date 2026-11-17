@@ -5,7 +5,7 @@ const API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
 const MAINTENANCE_CRON = "3,13,23,33,43,53 * * * *";
 const LIVE_GROUPS = new Map([
   ["12,27,42,57 * * * *", new Set(["d1"])],
-  ["17 * * * *", new Set(["acquired-search"])],
+  ["17 * * * *", new Set(["acquired-search", "itf-junior-rankings", "europe-rankings"])],
   ["0,15,30,45 * * * *", new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one"])],
   ["5,20,35,50 * * * *", new Set(["tennis-europe-oop", "tennis-europe"])],
   ["10,40 * * * *", new Set(["fitp"])],
@@ -14,6 +14,8 @@ const LIVE_GROUPS = new Map([
 const LIVE_IDS = new Set([...LIVE_GROUPS.values()].flatMap((ids) => [...ids]));
 
 const TARGETS = [
+  { id: "itf-junior-rankings", workflow: "courtwatch-itf-junior-rankings.yml", intervalMinutes: 60, ranking: true },
+  { id: "europe-rankings", workflow: "courtwatch-tennis-europe-rankings.yml", intervalMinutes: 60, ranking: true, ordinaryOnly: true },
   { id: "acquired-search", workflow: "courtwatch-acquired-player-search.yml", intervalMinutes: 60 },
   { id: "tennis-europe-oop", workflow: "courtwatch-tennis-europe-oop-live.yml" },
   { id: "d1", workflow: "courtwatch-cloudflare-app-api.yml" },
@@ -100,11 +102,11 @@ function runState(target, runs, now) {
   return { active, recent, success };
 }
 
-async function dispatch(target, env) {
+async function dispatch(target, env, inputs) {
   const response = await fetch(`${API_BASE}/actions/workflows/${target.workflow}/dispatches`, {
     method: "POST",
     headers: { ...githubHeaders(env), "Content-Type": "application/json" },
-    body: JSON.stringify(target.id === "d1" ? { ref: "main", inputs: { periodic: true } } : { ref: "main" }),
+    body: JSON.stringify(inputs ? {ref: "main", inputs} : target.id === "d1" ? { ref: "main", inputs: { periodic: true } } : { ref: "main" }),
   });
   if (response.status !== 204) throw new Error(`dispatch ${target.id}: HTTP ${response.status}`);
 }
@@ -125,22 +127,25 @@ async function checkTarget(target, env, now) {
 }
 
 async function checkLiveSchedule(target, env, scheduledTime) {
+  const at = new Date(scheduledTime);
+  const ordinaryRanking = [1, 2].includes(at.getUTCDay()) && at.getUTCHours() === 18;
+  if (target.ordinaryOnly && !ordinaryRanking) return {id: target.id, action: "outside_schedule"};
   const allRuns = await latestRuns(target, env);
   // Extraordinary runs share this workflow but must not block ordinary dispatch.
   const runs = target.id === "itf-t-minus-one"
     ? allRuns.filter((run) => !/^ITF T-1 extraordinary-[ab]$/.test(String(run.display_title || "")))
     : allRuns;
   const intervalMs = (target.intervalMinutes || 15) * 60000;
-  const slotStart = target.id === "d1" ? scheduledTime : Math.floor(scheduledTime / intervalMs) * intervalMs;
+  const slotStart = target.ranking || target.id === "d1" ? scheduledTime : Math.floor(scheduledTime / intervalMs) * intervalMs;
   const active = runs.find(
     (run) =>
       run.status !== "completed" &&
-      (target.id === "acquired-search" || target.id === "d1" || ageMinutes(run.created_at, scheduledTime) <= 120),
+      (target.ranking || target.id === "acquired-search" || target.id === "d1" || ageMinutes(run.created_at, scheduledTime) <= 120),
   );
   if (active) return { id: target.id, action: "active", runId: active.id };
   const inSlot = runs.find((run) => Date.parse(run.created_at) >= slotStart);
   if (inSlot) return { id: target.id, action: "already_started", runId: inSlot.id };
-  await dispatch(target, env);
+  await dispatch(target, env, target.id === "itf-junior-rankings" ? {force: ordinaryRanking, periodic: true} : undefined);
   return { id: target.id, action: "dispatched", slotStart: new Date(slotStart).toISOString() };
 }
 

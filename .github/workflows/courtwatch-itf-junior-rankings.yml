@@ -7,10 +7,10 @@ on:
         description: Reacquire both categories even if already complete
         type: boolean
         default: false
-  schedule:
-    - cron: '17 18 * * 1,2'
-    - cron: '17 0-17,19-23 * * *'
-    - cron: '17 18 * * 0,3-6'
+      periodic:
+        description: Cloudflare hourly timer
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -38,7 +38,8 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-      ITF_FORCE: ${{ inputs.force || (github.event_name == 'schedule' && github.event.schedule == '17 18 * * 1,2') }}
+      ITF_PERIODIC: ${{ inputs.periodic || false }}
+      ITF_FORCE: ${{ inputs.force || false }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

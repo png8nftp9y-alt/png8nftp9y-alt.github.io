@@ -11095,3 +11095,12 @@ ITF discovery 2026-11-17T08:36:31.700Z: 15 newly discovered future tournaments; 
 ITF Meta ordinary 2026-11-17T08:38:13.363Z: attempted 8, acquired 8, ordinary 7, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta ordinary 2026-11-17T08:39:29.222Z: attempted 7, acquired 7, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+## 2026-11-17 — Timer ranking Cloudflare, workflow indipendenti
+- Verificato il run programmato ITF 44043549672: Boys 5239/5239 completo del 16 novembre; Girls ancora 5185/5198 e conflitto ID 800755640. Il conflitto non è risolto dalla modifica di schedulazione.
+- I cron nativi GitHub non hanno prodotto la frequenza oraria attesa; causa interna GitHub non dimostrata. Gli altri motori usano già il timer Cloudflare del watchdog: esteso il suo tick esistente del minuto 17 ai ranking.
+- ITF ed Europe restano workflow e run distinti. Lunedì e martedì 18:17 UTC vengono richiesti entrambi separatamente; ITF riceve force=true per verificare Boys e Girls. Nelle altre ore viene richiesto solo ITF in modalità recupero (force=false). Conclusioni di uno non condizionano l’altro.
+- Rimossi i cron nativi dai due workflow per avere un solo proprietario della schedulazione. Conservati avvio manuale, trigger push, code D1 e controlli di rilascio. Nessun run attivo viene cancellato o duplicato; un errore API di una categoria di workflow non blocca l’altra.
+- Dispatch ITF periodici esplicitamente riconosciuti dal planner per conservare cooldown ancorato allo slot del minuto 17. Acquisizioni complete non vengono rifatte dai recuperi.
+- Test Node locali watchdog: 12/12 pass, inclusi errori indipendenti, duplicati, run attivi e orari. Deploy Cloudflare e primo dispatch remoto restano da verificare dopo pubblicazione. Nessun rilancio manuale di acquisizioni durante la preparazione.
