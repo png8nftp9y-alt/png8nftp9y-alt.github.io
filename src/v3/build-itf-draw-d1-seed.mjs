@@ -1,4 +1,5 @@
 import {itfDrawPresence,itfPresenceSQL} from './itf-draw-presence.mjs';
+import {storedDocumentMatches} from './itf-existing-document-manifest.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -9,6 +10,10 @@ import {documentRecord,documentSQL} from './itf-draw-document-d1.mjs';
 // buildIncrementalSyncPlan contract: stable IDs, conditional UPSERTs, no archive DELETE.
 
 const roots=process.argv.slice(2);
+const presenceOnly=process.env.ITF_D1_PRESENCE_ONLY==='1';
+const storedManifest=process.env.ITF_D1_EXISTING_DOCUMENTS?JSON.parse(await fs.readFile(process.env.ITF_D1_EXISTING_DOCUMENTS,'utf8')):{documents:[]};
+if(!Array.isArray(storedManifest.documents))throw Error('Invalid existing-document manifest');
+const storedVersions=new Map(storedManifest.documents.map(row=>[row.draw_key+'|'+row.content_sha256,row]));
 if(!roots.length)throw new Error('Pass at least one directory containing ITF draw documents');
 const readJson=async(file,fallback)=>{try{return JSON.parse(await fs.readFile(file,'utf8'))}catch{return fallback}};
 const catalog={tournaments:[...(await readJson('src/v3/itf-audit-baseline-20261001.json',{tournaments:[]})).tournaments,...(await readJson('dist/v3/source_itf_history_tournaments.json',{tournaments:[]})).tournaments,...(await readJson('dist/v3/source_itf_tournaments.json',{tournaments:[]})).tournaments]};
@@ -33,7 +38,7 @@ for(const doc of complete){
  if(!competitionId){unmapped.push({competitionId,event});continue}
  const tournamentId='tournament_itf_'+crypto.createHash('sha256').update('itf|'+competitionId).digest('hex').slice(0,24);
  tournamentMap.set(tournamentId,{id:tournamentId,circuit:'itf',sourceTournamentId:competitionId,name:source.tournamentName||source.name||competitionId,location:source.location||'',surface:source.surface||'',environment:source.environment||source.indoorOutdoor||'',startDate:source.startDate||'',endDate:source.endDate||'',officialStartDate:source.officialStartDate||source.startDate||'',status:'archived',source:{circuit:'itf',sourceId:competitionId,sourceUrl:source.sourceUrl||doc.sourceUrl||''}});
- for(const raw of doc.matches||[]){
+ for(const raw of presenceOnly?[]:doc.matches||[]){
   const sourceMatchId=String(raw.matchId||crypto.createHash('sha256').update(stable(raw)).digest('hex').slice(0,20));
   const id=`match_itf_${competitionId.toLowerCase()}_${event.toLowerCase()}_${sourceMatchId}`;
   const row={id,tournamentId,circuit:'itf',playedDate:String(raw.playedDate||raw.date||''),sourceMatchId,competitionId,event,round:raw.round||'',roundNumber:raw.roundNumber??null,teams:raw.teams||[],winnerTeam:raw.winnerTeam??null,sourceUrl:raw.sourceUrl||doc.sourceUrl||source.sourceUrl||'',payloadVersion:1};
@@ -45,7 +50,11 @@ for(const doc of complete){
 }
 if(unreadable.length||unmapped.length)throw new Error(`ITF archive invalid: unreadable=${unreadable.length} unmapped=${unmapped.length}`);
 const statements=['PRAGMA foreign_keys=ON;'];
-for(const {row} of [...tasks.values()].sort((a,b)=>a.row.drawKey.localeCompare(b.row.drawKey)))statements.push(...documentSQL(row));
+let reusedDocuments=0;
+for(const {row} of [...tasks.values()].sort((a,b)=>a.row.drawKey.localeCompare(b.row.drawKey))){
+ if(storedDocumentMatches(row,storedVersions.get(row.drawKey+'|'+row.sha256)))reusedDocuments++;
+ else statements.push(...documentSQL(row));
+}
 for(const row of [...tournamentMap.values()].sort((a,b)=>a.id.localeCompare(b.id)))statements.push(`INSERT INTO tournaments(id,circuit,source_tournament_id,start_date,end_date,payload) VALUES(${esc(row.id)},'itf',${esc(row.sourceTournamentId)},${esc(row.startDate)},${esc(row.endDate)},${payload(row)}) ON CONFLICT(id) DO UPDATE SET circuit=excluded.circuit,source_tournament_id=excluded.source_tournament_id,start_date=excluded.start_date,end_date=excluded.end_date,payload=json_patch(tournaments.payload,excluded.payload) WHERE ${different(['circuit','source_tournament_id','start_date','end_date'])} OR json_patch(tournaments.payload,excluded.payload) IS NOT tournaments.payload;`);
 const fresh=table=>`coalesce(json_extract(excluded.payload,'$._itfDrawObservedAt'),'') >= coalesce(json_extract(${table}.payload,'$._itfDrawObservedAt'),json_extract(${table}.payload,'$.sourceObservedAt'),'')`;
 for(const doc of complete){
@@ -67,5 +76,7 @@ const resolvedEmptyQualifications=documents.filter(row=>row.acquisitionState==='
 const caseChecks=complete.filter(doc=>doc.competitionId==='J-J30-FRA-2026-003').map(doc=>({competitionId:doc.competitionId,event:doc.event,contentSha256:tasks.get(doc.competitionId+'|'+doc.event).row.sha256,players:itfDrawPresence(doc).players.filter(p=>/bourdenet|danesi|ghiselli/i.test(p.name))}));
 const audit={version:5,generatedAt:new Date().toISOString(),scope:'saved acquired documents and checksum-verified archive; ordinary pending excluded',status:documents.length?'awaiting_remote_content_verification':'no_complete_documents',sourceFiles:files.length,uniqueTasks:seen.size,storedDocuments:documents.length,completeDocuments:complete.length,archivedUnverified,resolvedEmptyQualifications,retryDocuments:retry.length,pendingTasks:retry,requiredArchiveTasks:archiveTasks.size,archiveMissing,tournaments:tournamentMap.size,matches:matchMap.size,results:resultMap.size,sqlFiles,unreadable:unreadable.length,unmapped:unmapped.length,documents,presence:{caseChecks,confirmedRelations:complete.reduce((n,doc)=>n+itfDrawPresence(doc).players.length,0),unidentified:complete.flatMap(doc=>itfDrawPresence(doc).unidentified.map(p=>({competitionId:doc.competitionId,event:doc.event,...p})))}};
 await fs.mkdir('dist/v3/audits',{recursive:true});await fs.writeFile('dist/v3/audits/itf-draw-d1-sync.json',JSON.stringify(audit,null,2)+'\n');
+audit.presenceOnly=presenceOnly;audit.reusedDocuments=reusedDocuments;
+await fs.writeFile('dist/v3/audits/itf-draw-d1-sync.json',JSON.stringify(audit,null,2)+'\n');
 console.log('ITF_DRAW_D1_SEED='+JSON.stringify(audit));
 if(archiveMissing.length)throw new Error('Archive contains documents that cannot be preserved: '+archiveMissing.join(','));

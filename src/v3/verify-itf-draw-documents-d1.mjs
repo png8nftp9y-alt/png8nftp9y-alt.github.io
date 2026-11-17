@@ -16,6 +16,7 @@ async function query(sql){
 }
 const report={version:3,verifiedAt:new Date().toISOString(),scope:expected.scope,expectedDocuments:expected.documents.length,verifiedDocuments:0,missingOrCorrupt:[],archivedUnverified:expected.archivedUnverified||[],resolvedEmptyQualifications:expected.resolvedEmptyQualifications||[],fullPeriodCertified:false,verifiedPresenceRelations:0,missingPresence:[],unidentifiedParticipants:expected.presence?.unidentified?.length??null,caseChecks:expected.presence?.caseChecks||[]};
 try{
+ if(report.unidentifiedParticipants!==0)throw Error('Acquired draw participants without valid native IDs; presence completeness cannot be certified');
  if(expected.documents.length){
   const config=JSON.parse(await fs.readFile(path.join(root,'cloudflare/app-api/wrangler.generated.jsonc'),'utf8'));
   account=process.env.CLOUDFLARE_ACCOUNT_ID;token=process.env.CLOUDFLARE_API_TOKEN;id=config.d1_databases?.find(x=>x.binding==='DB')?.database_id;
