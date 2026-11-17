@@ -19,10 +19,10 @@ async function tick(cron, runs = [], failWorkflow = null, scheduledTime = slot) 
   const requests = [], pending = [];
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (url, init = {}) => {
-    requests.push({ url, method: init.method || "GET" });
+    requests.push({ url, method: init.method || "GET", body: init.body });
     if (failWorkflow && url.includes(failWorkflow)) return new Response("", {status: 503});
     if (init.method === "POST") {
-      assert.deepEqual(JSON.parse(init.body), url.includes("courtwatch-cloudflare-app-api.yml")
+      assert.deepEqual(JSON.parse(init.body), (url.includes("courtwatch-cloudflare-app-api.yml") || url.includes("courtwatch-itf-junior-rankings.yml"))
         ? {ref: "main", inputs: {periodic: true}} : {ref: "main"});
       return new Response(null, {status: 204});
     }
@@ -89,8 +89,8 @@ const indexWorkflow = "courtwatch-acquired-player-search.yml";
 const hourly = Date.UTC(2026,9,21,10,17);
 test("hourly index dispatches once at minute 17 and never from maintenance or circuit crons", async()=>{
  const requests=await tick("17 * * * *",[{id:90,status:"completed",conclusion:"success",created_at:new Date(hourly-3600000).toISOString()}],null,hourly);
- assert.equal(requests.filter(r=>r.method==="POST").length,1);
- assert.ok(requests.filter(r=>r.method==="POST").every(r=>r.url.includes(indexWorkflow)));
+ assert.equal(requests.filter(r=>r.method==="POST"&&r.url.includes(indexWorkflow)).length,1);
+ assert.ok(requests.some(r=>r.method==="POST"&&r.url.includes(indexWorkflow)));
  for(const cron of ["3,13,23,33,43,53 * * * *","0,15,30,45 * * * *","5,20,35,50 * * * *","10,40 * * * *","12 * * * *"]){
   const requests=await tick(cron);assert.ok(!requests.some(r=>r.url.includes(indexWorkflow)));
  }
@@ -98,7 +98,7 @@ test("hourly index dispatches once at minute 17 and never from maintenance or ci
 test("same-hour manual or scheduled index suppresses a duplicate even outside the current quarter hour",async()=>{
  for(const delta of [0,12*60000]){
   const requests=await tick("17 * * * *",[{id:91,status:"completed",conclusion:"success",created_at:new Date(hourly-delta).toISOString()}],null,hourly);
-  assert.equal(requests.filter(r=>r.method==="POST").length,0);
+  assert.equal(requests.filter(r=>r.method==="POST"&&r.url.includes(indexWorkflow)).length,0);
  }
 });
 test("any active index prevents another dispatch and an API failure does not retry",async()=>{
@@ -107,7 +107,7 @@ test("any active index prevents another dispatch and an API failure does not ret
   assert.equal(requests.filter(r=>r.method==="POST").length,0);
  }
  const failed=await tick("17 * * * *",[],indexWorkflow,hourly);
- assert.equal(failed.length,1);assert.equal(failed.filter(r=>r.method==="POST").length,0);
+ assert.equal(failed.filter(r=>r.url.includes(indexWorkflow)).length,1);assert.equal(failed.filter(r=>r.method==="POST"&&r.url.includes(indexWorkflow)).length,0);
 });
 test("hourly index timer exists in Cloudflare only, preserving the shared D1 queue",async()=>{
  const {readFileSync}=await import('node:fs');
@@ -128,4 +128,27 @@ test("D1 starts once per Cloudflare quarter and skips active runs", async () => 
     assert.equal(await count([{...prior, created_at: new Date(at).toISOString()}]), 0);
     assert.equal(await count([{...prior, status: "in_progress"}]), 0);
   }
+});
+
+test("ITF hourly recovery is independent, never forced, and excludes ordinary ranking slots",async()=>{
+ const name="courtwatch-itf-junior-rankings.yml",cron="17 * * * *";
+ const at=Date.UTC(2026,10,18,9,17);
+ const requests=await tick(cron,[],null,at);
+ const posts=requests.filter(r=>r.method==="POST"&&r.url.includes(name));
+ assert.equal(posts.length,1);assert.deepEqual(JSON.parse(posts[0].body),{ref:"main",inputs:{periodic:true}});
+ assert.ok(!requests.some(r=>r.url.includes("courtwatch-tennis-europe-rankings.yml")));
+ for(const day of [16,17]){
+  const requests=await tick(cron,[],null,Date.UTC(2026,10,day,18,17));
+  assert.ok(!requests.some(r=>r.url.includes(name)));
+ }
+ for(const status of ["queued","pending","waiting","in_progress"]){
+  const requests=await tick(cron,[{status,created_at:new Date(at-10800000).toISOString()}],null,at);
+  assert.equal(requests.filter(r=>r.method==="POST"&&r.url.includes(name)).length,0);
+ }
+ const same=await tick(cron,[{status:"completed",created_at:new Date(at).toISOString()}],null,at);
+ assert.equal(same.filter(r=>r.method==="POST"&&r.url.includes(name)).length,0);
+ const prior=await tick(cron,[{status:"completed",conclusion:"failure",created_at:new Date(at-3600000).toISOString()}],null,at);
+ assert.equal(prior.filter(r=>r.method==="POST"&&r.url.includes(name)).length,1);
+ const failed=await tick(cron,[],name,at);
+ assert.ok(failed.some(r=>r.method==="POST"&&r.url.includes(indexWorkflow)));
 });

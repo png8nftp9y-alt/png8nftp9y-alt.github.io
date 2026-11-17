@@ -5,7 +5,7 @@ const API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
 const MAINTENANCE_CRON = "3,13,23,33,43,53 * * * *";
 const LIVE_GROUPS = new Map([
   ["12,27,42,57 * * * *", new Set(["d1"])],
-  ["17 * * * *", new Set(["acquired-search"])],
+  ["17 * * * *", new Set(["acquired-search", "itf-junior-recovery"])],
   ["0,15,30,45 * * * *", new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one"])],
   ["5,20,35,50 * * * *", new Set(["tennis-europe-oop", "tennis-europe"])],
   ["10,40 * * * *", new Set(["fitp"])],
@@ -14,6 +14,7 @@ const LIVE_GROUPS = new Map([
 const LIVE_IDS = new Set([...LIVE_GROUPS.values()].flatMap((ids) => [...ids]));
 
 const TARGETS = [
+  { id: "itf-junior-recovery", workflow: "courtwatch-itf-junior-rankings.yml", intervalMinutes: 60 },
   { id: "acquired-search", workflow: "courtwatch-acquired-player-search.yml", intervalMinutes: 60 },
   { id: "tennis-europe-oop", workflow: "courtwatch-tennis-europe-oop-live.yml" },
   { id: "d1", workflow: "courtwatch-cloudflare-app-api.yml" },
@@ -104,7 +105,7 @@ async function dispatch(target, env) {
   const response = await fetch(`${API_BASE}/actions/workflows/${target.workflow}/dispatches`, {
     method: "POST",
     headers: { ...githubHeaders(env), "Content-Type": "application/json" },
-    body: JSON.stringify(target.id === "d1" ? { ref: "main", inputs: { periodic: true } } : { ref: "main" }),
+    body: JSON.stringify(target.id === "itf-junior-recovery" ? {ref: "main", inputs: {periodic: true}} : target.id === "d1" ? { ref: "main", inputs: { periodic: true } } : { ref: "main" }),
   });
   if (response.status !== 204) throw new Error(`dispatch ${target.id}: HTTP ${response.status}`);
 }
@@ -125,17 +126,20 @@ async function checkTarget(target, env, now) {
 }
 
 async function checkLiveSchedule(target, env, scheduledTime) {
+  // Ordinary Monday/Tuesday starts remain owned by the existing GitHub cron.
+  const at = new Date(scheduledTime);
+  if (target.id === "itf-junior-recovery" && [1,2].includes(at.getUTCDay()) && at.getUTCHours() === 18) return {id: target.id, action: "ordinary_slot"};
   const allRuns = await latestRuns(target, env);
   // Extraordinary runs share this workflow but must not block ordinary dispatch.
   const runs = target.id === "itf-t-minus-one"
     ? allRuns.filter((run) => !/^ITF T-1 extraordinary-[ab]$/.test(String(run.display_title || "")))
     : allRuns;
   const intervalMs = (target.intervalMinutes || 15) * 60000;
-  const slotStart = target.id === "d1" ? scheduledTime : Math.floor(scheduledTime / intervalMs) * intervalMs;
+  const slotStart = ["d1", "itf-junior-recovery"].includes(target.id) ? scheduledTime : Math.floor(scheduledTime / intervalMs) * intervalMs;
   const active = runs.find(
     (run) =>
       run.status !== "completed" &&
-      (target.id === "acquired-search" || target.id === "d1" || ageMinutes(run.created_at, scheduledTime) <= 120),
+      (target.id === "itf-junior-recovery" || target.id === "acquired-search" || target.id === "d1" || ageMinutes(run.created_at, scheduledTime) <= 120),
   );
   if (active) return { id: target.id, action: "active", runId: active.id };
   const inSlot = runs.find((run) => Date.parse(run.created_at) >= slotStart);

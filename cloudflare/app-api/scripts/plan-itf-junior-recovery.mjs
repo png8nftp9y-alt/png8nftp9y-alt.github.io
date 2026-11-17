@@ -16,7 +16,7 @@ for(const task of tasks.filter(t=>t.action==='import')){
 // Scheduled runs use hourly slots; GitHub can enqueue a slot a few minutes late.
 // Manual attempts retain a full sixty-minute cooldown from their actual start.
 let retryBaseAt=startedAt;
-if(process.env.GITHUB_EVENT_NAME==='schedule'){
+if(process.env.GITHUB_EVENT_NAME==='schedule'||process.env.ITF_PERIODIC==='true'){
  const slot=new Date(startedAt);slot.setUTCMinutes(17,0,0);if(slot>new Date(startedAt))slot.setUTCHours(slot.getUTCHours()-1);retryBaseAt=slot.toISOString();
 }
 await fs.writeFile('itf-junior-work/plan.json',JSON.stringify({tasks,startedAt,retryBaseAt,snapshots}));

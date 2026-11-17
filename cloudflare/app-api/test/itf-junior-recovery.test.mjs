@@ -124,7 +124,7 @@ test('Europe and ITF have independent schedules at the same ordinary time and ho
  assert.doesNotMatch(europe,/itf-junior:/);
  assert.doesNotMatch(itf,/workflow_call:|workflow_run:/);
  assert.ok(itf.includes("ITF_FORCE: ${{ inputs.force || (github.event_name == 'schedule' && github.event.schedule == '17 18 * * 1,2') }}"));
- assert.match(itf,/cron: '17 0-17,19-23 \* \* \*'/);
- assert.match(itf,/cron: '17 18 \* \* 0,3-6'/);
+ assert.equal((itf.match(/cron:/g)||[]).length,1);
+ assert.match(itf,/ITF_PERIODIC:/);
  assert.match(itf,/group: courtwatch-d1-writes/);
 });

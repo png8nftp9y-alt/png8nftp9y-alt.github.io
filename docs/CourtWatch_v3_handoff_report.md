@@ -11095,3 +11095,11 @@ ITF discovery 2026-11-17T08:36:31.700Z: 15 newly discovered future tournaments; 
 ITF Meta ordinary 2026-11-17T08:38:13.363Z: attempted 8, acquired 8, ordinary 7, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta ordinary 2026-11-17T08:39:29.222Z: attempted 7, acquired 7, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+## 2026-11-17 — Solo recuperi orari ranking ITF su Cloudflare
+- Scope concordato: Europe invariato; cron ordinario ITF identico a Europe, lunedì/martedì 18:17 UTC, invariato. La precedente proposta a4f1180 di migrare entrambi i timer è superata e non va applicata.
+- Rimossi esclusivamente i due cron di recupero GitHub ITF. Il tick Cloudflare esistente del minuto 17 richiede ITF in modalità periodic=true, senza force, nelle altre ore. Alle 18:17 UTC lunedì/martedì non effettua dispatch per lasciare l’avvio ordinario al suo cron esistente.
+- Il planner riconosce i dispatch periodici per ancorare il cooldown allo slot orario. Recupera categorie incomplete o import già acquisiti; quelle complete non vengono forzate. Controlli di rilascio, lock D1, cron e workflow Europe invariati.
+- Duplicati nello stesso slot e run attivi impediscono nuovi dispatch. Gli errori API restano espliciti senza bloccare gli altri target. La causa interna dei mancati eventi GitHub non è dimostrata; la modifica elimina questa dipendenza per i soli recuperi.
+- Test locali Node watchdog: 11/11 pass. Deploy watchdog e primo recupero remoto ancora da verificare dopo pubblicazione. Nessun workflow rilanciato manualmente e nessuna scrittura D1 effettuata nella preparazione. Conflitto ranking Girls ID 800755640 non risolto da questa modifica.
