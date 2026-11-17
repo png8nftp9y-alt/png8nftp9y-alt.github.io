@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-11-17T20:48:12.295Z",
+  "generatedAt": "2026-11-17T21:15:24.632Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -8,12 +8,12 @@
     "completeTournaments": 0,
     "cancelledNoDrawsTournaments": 0,
     "pendingTournaments": 1,
-    "declaredSections": 5,
+    "declaredSections": 6,
     "requestedSections": 4,
-    "acquiredSections": 1,
+    "acquiredSections": 2,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 1,
+    "resolvedSections": 2,
     "missingSections": 4,
     "newSectionsCached": 0,
     "newTerminalAlternatives": 0,
@@ -25,11 +25,11 @@
     "notPublishedOrIncompleteSections": 4,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 587,
+    "globalCompleteTournaments": 588,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 62,
-    "globalPendingTechnical": 33,
-    "globalPendingPublication": 29,
+    "globalPendingTotal": 61,
+    "globalPendingTechnical": 35,
+    "globalPendingPublication": 26,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -63,7 +63,9 @@
       "J-J100-SVK-2026-001",
       "J-J100-TUR-2026-006",
       "J-J100-USA-2026-002",
-      "J-J100-USA-2026-004"
+      "J-J100-USA-2026-004",
+      "J-J30-ARG-2026-004",
+      "J-J30-PAK-2026-006"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-DOM-2026-001",
@@ -78,12 +80,9 @@
       "J-J100-MEX-2026-001",
       "J-J100-RSA-2026-001",
       "J-J100-SWE-2026-002",
-      "J-J30-AIA-2026-003",
-      "J-J30-ARG-2026-004",
       "J-J30-CAM-2026-002",
       "J-J30-GUA-2026-002",
       "J-J30-MAR-2026-011",
-      "J-J30-PAK-2026-006",
       "J-J30-PUR-2026-003",
       "J-J30-UZB-2026-005",
       "J-J60-BOT-2026-003",
@@ -99,15 +98,15 @@
   },
   "audit": [
     {
-      "competitionId": "J-J30-RSA-2026-001",
-      "tournamentName": "J30 Stellenbosch",
+      "competitionId": "J-J30-UZB-2026-005",
+      "tournamentName": "J30 Andijan",
       "decision": "pending",
       "playersFound": [],
-      "declaredSections": 5,
-      "acquiredSections": 1,
+      "declaredSections": 6,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 1,
+      "resolvedSections": 2,
       "missingSections": 4,
       "sections": [
         {
@@ -137,6 +136,13 @@
           "acquired": false,
           "resolved": false,
           "status": "pending"
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-D-M-KO",
@@ -196,6 +202,19 @@
               "error": "draw_not_published_or_incomplete",
               "failureType": "not_published_or_incomplete",
               "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 20,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
