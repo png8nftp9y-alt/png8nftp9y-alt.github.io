@@ -11095,3 +11095,9 @@ ITF discovery 2026-11-17T08:36:31.700Z: 15 newly discovered future tournaments; 
 ITF Meta ordinary 2026-11-17T08:38:13.363Z: attempted 8, acquired 8, ordinary 7, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta ordinary 2026-11-17T08:39:29.222Z: attempted 7, acquired 7, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+## 2026-11-17 — Konzett: official duplicated surname in Europe global header
+Official browser verification: tournament E73A01FD-BE25-412C-95E9-36F166BC6029 player 37 shows Yannik KONZETT, AUT, and links to profile 478bc9a8-fb51-47ec-9c56-9f9821f4a808 whose header reads Yannik Konzett Konzett, Austria. Exact global name comparison caused europe_profile_identity_unverified.
+Allow only this verified header spelling for the exact acquired source hash cb6dcb2d3cd88254136e447f, unchanged source name/AUT, exact original tournament/local player and linked global GUID. Still fetch both official pages, verify global URL/header/nationality, require all retained references to agree, preserve source name/nation/history and record alias provenance. No generic repeated-surname normalization and no user-confirmed binding invented.
+Validation: 14 recovery tests and 3 retained-profile tests pass locally, including production SQLite recovery, zero-missing mapping, unchanged participants, replay without requests/writes, wrong title/country/URL and unrelated sources rejected. Production D1 recovery and workflow success remain pending ordinary acquired-index execution after publication. No new schedules or manual workflow relaunch.

@@ -12,6 +12,18 @@ import {europeMissingIdDetailsSql} from './europe-missing-id-origins.mjs';
 const host='https://te.tournamentsoftware.com';
 const parse=value=>typeof value==='string'?JSON.parse(value||'{}'):value||{};
 
+// Official pages inspected 2026-11-17: tournament player 37 is Yannik KONZETT
+// (AUT), and links to a global header containing the duplicated surname below.
+// This is a source-bound spelling exception, never a generic name relaxation.
+export function verifiedEuropeHeaderName(row,anchor,tournament,player){
+ const nation=row.nationality||parse(row.payload).nationality||'';
+ return row.source_key==='acquired|tennis-europe|name:cb6dcb2d3cd88254136e447f'&&
+  row.display_name==='Yannik KONZETT'&&nation==='AUT'&&
+  anchor.officialId==='478bc9a8-fb51-47ec-9c56-9f9821f4a808'&&
+  String(tournament).toUpperCase()==='E73A01FD-BE25-412C-95E9-36F166BC6029'&&String(player)==='37'
+  ?'Yannik Konzett Konzett':row.display_name;
+}
+
 export function europePublicPages({fetchPage=fetch}={}){
  const cookies=new Map(),pages=new Map();let consent;
  async function request(url,options={}){
@@ -85,12 +97,15 @@ export async function europeMatchProfileEvidence(rows,query,publicPage){
    if(!anchor){const alias=tournamentFederationAlias(local.text,local.url,tournament,player);if(alias)anchor=redirectedGlobalProfile(await page(alias))}
    if(!anchor)throw Error('europe_profile_global_link_missing');
    reference.profileUrl=anchor.profileUrl;
-   const global=await page(anchor.profileUrl),verified=teProfileEvidence(global.text,{...anchor,name:row.display_name},global.url);
+   const global=await page(anchor.profileUrl),headerName=verifiedEuropeHeaderName(row,anchor,tournament,player);
+   const verified=teProfileEvidence(global.text,{...anchor,name:row.display_name},global.url)||
+    (headerName!==row.display_name?teProfileEvidence(global.text,{...anchor,name:headerName},global.url):null);
    const own=parse(row.payload),nation=matchingNation('tennis-europe',row.nationality||own.nationality);
    if(!verified||nation&&matchingNation('tennis-europe',verified.nationality)!==nation)throw Error('europe_profile_identity_unverified');
    reference.status='verified';reference.officialId=verified.officialId;
    evidence.set(verified.officialId,{officialId:verified.officialId,profileUrl:verified.profileUrl,
-    profileEvidenceProvenance:{type:'exact_acquired_match_tournament_global_profile',originalCompetitions:new Set([...refs.values()].map(p=>p.source_tournament_id)).size}});
+    profileEvidenceProvenance:{type:'exact_acquired_match_tournament_global_profile',originalCompetitions:new Set([...refs.values()].map(p=>p.source_tournament_id)).size,
+     ...(headerName!==row.display_name?{verifiedHeaderAlias:headerName,aliasVerifiedOn:'2026-11-17'}:{})}});
   }catch(error){complete=false;reference.status='unresolved';reference.reason=/^europe_profile_[a-z0-9_]+$/.test(error.message)?error.message:'public_profile_request_failed'}}
   if(complete&&evidence.size===1){resolved.set(row.source_table+'|'+row.source_key,[...evidence.values()][0]);report.verified++;detail.reason='verified'}else{report.unresolved++;detail.reason=evidence.size>1?'conflicting_official_ids':'official_profile_evidence_incomplete'}
  }

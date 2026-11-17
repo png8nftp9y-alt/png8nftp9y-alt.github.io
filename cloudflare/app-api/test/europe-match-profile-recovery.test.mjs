@@ -6,6 +6,42 @@ import {syncAcquiredSearch} from '../scripts/sync-acquired-player-search.mjs';
 import {syncPlayerIdentities} from '../scripts/sync-player-identities.mjs';
 import {europeMatchProfileEvidence,recoverEuropeMatchProfiles,europePublicPages} from '../lib/europe-match-profile-recovery.mjs';
 import {europeMissingIdOriginsSql,europeMissingIdOriginsResult} from '../lib/europe-missing-id-origins.mjs';
+import {verifiedEuropeHeaderName} from '../lib/europe-match-profile-recovery.mjs';
+
+test('Konzett official duplicated surname is accepted only for the verified exact source and tournament; replay preserves history',async()=>{
+ const realTournament='E73A01FD-BE25-412C-95E9-36F166BC6029',id='478bc9a8-fb51-47ec-9c56-9f9821f4a808';
+ for(const variant of ['valid','wrong-name','wrong-country','wrong-profile']){
+  const d=database({identityMapping:true});try{
+   const raw=fixture(d,37,{name:'Yannik KONZETT',nation:'AUT'});
+   raw.href='/sport/player.aspx?id='+realTournament+'&player=37';
+   d.execute('UPDATE tournaments SET source_tournament_id=?',[realTournament]);
+   d.execute('UPDATE match_participants SET payload=?',[JSON.stringify(raw)]);
+   await syncAcquiredSearch(d.query);await syncPlayerIdentities(d.query);
+   const before=await d.query('SELECT * FROM match_participants'),writes=d.writes();
+   const publicPage=async url=>url.includes('/sport/player.aspx')?
+    {url:host+'/tournament/'+realTournament+'/player/37',text:'<h4 class="media__title--large"><a href="/player-profile/'+id+'">Yannik KONZETT</a></h4>'}:
+    {url:variant==='wrong-profile'?host+'/player-profile/'+guid(37):url,text:'<img class="profile-head__nat" src="//static.tournamentsoftware.com/content/images/flags/'+(variant==='wrong-country'?'GER':'AUT')+'.svg"><h2 class="media__title--large">'+(variant==='wrong-name'?'Another Konzett':'Yannik Konzett Konzett')+'</h2>'};
+   const result=await recoverEuropeMatchProfiles(d.query,{publicPage});
+   assert.equal(result.repaired,variant==='valid'?1:0);
+   assert.deepEqual(await d.query('SELECT * FROM match_participants'),before);
+   if(variant==='valid'){
+    await syncPlayerIdentities(d.query);
+    assert.equal(europeMissingIdOriginsResult((await d.query(europeMissingIdOriginsSql))[0]).missingPeople,0);
+    const saved=(await d.query('SELECT official_id,display_name FROM search_acquired_players'))[0];
+    assert.equal(saved.official_id,id);assert.equal(saved.display_name,'Yannik KONZETT');
+    const after=d.writes();assert.equal((await recoverEuropeMatchProfiles(d.query,{publicPage:()=>{throw Error('unexpected replay request')}})).examined,0);assert.equal(d.writes(),after);
+   }else assert.equal(d.writes(),writes);
+  }finally{d.close()}
+ }
+});
+test('verified header alias never applies to another source, name, nation, GUID, tournament or local player',()=>{
+ const row={source_key:'acquired|tennis-europe|name:cb6dcb2d3cd88254136e447f',display_name:'Yannik KONZETT',nationality:'AUT'},anchor={officialId:'478bc9a8-fb51-47ec-9c56-9f9821f4a808'},t='E73A01FD-BE25-412C-95E9-36F166BC6029';
+ assert.equal(verifiedEuropeHeaderName(row,anchor,t,'37'),'Yannik Konzett Konzett');
+ for(const change of [{source_key:'other'},{display_name:'Another Konzett'},{nationality:'GER'}]){const r={...row,...change};assert.equal(verifiedEuropeHeaderName(r,anchor,t,'37'),r.display_name)}
+ assert.equal(verifiedEuropeHeaderName(row,{officialId:guid(1)},t,'37'),row.display_name);
+ assert.equal(verifiedEuropeHeaderName(row,anchor,tournament,'37'),row.display_name);
+ assert.equal(verifiedEuropeHeaderName(row,anchor,t,'38'),row.display_name);
+});
 // D1_TEST_INITIAL_IMPORT / D1_TEST_IDENTICAL_ZERO_WRITES
 // D1_TEST_REAL_DELTAS_ONLY / D1_TEST_INCOMPLETE_SOURCE_GUARD
 const tournament='12345678-1234-1234-1234-123456789abc',guid=n=>String(n).padStart(8,'0')+'-1234-1234-1234-123456789abc',host='https://te.tournamentsoftware.com';
