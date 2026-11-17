@@ -11091,3 +11091,5 @@ ITF discovery 2026-11-16T22:41:38.370Z: 0 newly discovered future tournaments; M
 - CI ha rilevato un’asserzione preesistente legata alla singola stringa cron oraria: aggiornata al nuovo cron ordinario, mantenendo i controlli separati sulla copertura dei recuperi orari e sui lock D1.
 
 ITF discovery 2026-11-17T08:36:31.700Z: 15 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-17T08:38:13.363Z: attempted 8, acquired 8, ordinary 7, extraordinary 1. Partial metadata preserved; official D1 sync follows.
