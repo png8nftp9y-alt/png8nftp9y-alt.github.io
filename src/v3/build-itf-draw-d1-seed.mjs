@@ -1,5 +1,5 @@
 import {itfDrawPresence,itfPresenceSQL} from './itf-draw-presence.mjs';
-import {storedDocumentMatches} from './itf-existing-document-manifest.mjs';
+import {storedDocumentMatches} from '../../cloudflare/app-api/lib/itf-existing-document-manifest.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
