@@ -37,7 +37,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Check native draw participation and absence guards
-        run: node --test cloudflare/app-api/test/itf-draw-presence.test.mjs src/v3/itf-existing-document-manifest.test.mjs src/v3/itf-draw-document-d1.test.mjs
+        run: node --test cloudflare/app-api/test/itf-draw-presence.test.mjs cloudflare/app-api/test/itf-existing-document-manifest.test.mjs cloudflare/app-api/test/export-itf-document-manifest.test.mjs src/v3/itf-draw-document-d1.test.mjs
       - name: Download and checksum-verify the current archive and live draws
         run: |
           set -euo pipefail
@@ -58,7 +58,7 @@ jobs:
           node scripts/configure-d1.mjs
           npx wrangler d1 migrations apply courtwatch-app --remote --config wrangler.generated.jsonc
       - name: Read existing immutable document versions
-        run: node src/v3/itf-existing-document-manifest.mjs
+        run: node cloudflare/app-api/scripts/export-itf-document-manifest.mjs
       - name: Build native participation links without reimporting matches or identical documents
         env:
           ITF_D1_REQUIRED_ARCHIVE_ROOT: /tmp/itf-draw-archive
