@@ -129,3 +129,37 @@ test("D1 starts once per Cloudflare quarter and skips active runs", async () => 
     assert.equal(await count([{...prior, status: "in_progress"}]), 0);
   }
 });
+
+const dailyWorkflow = "courtwatch-d1-daily-verification.yml";
+const dailyAt = Date.UTC(2026, 10, 18, 4, 17);
+test("daily D1 timer dispatches only its audit and suppresses every same-day outcome", async () => {
+  const previous = {id: 120, status: "completed", conclusion: "success", created_at: new Date(dailyAt - 86400000).toISOString()};
+  const requests = await tick("17 4 * * *", [previous], null, dailyAt);
+  const posts = requests.filter(r => r.method === "POST");
+  assert.equal(posts.length, 1);
+  assert.ok(posts[0].url.includes(dailyWorkflow));
+  for (const conclusion of ["success", "failure", "cancelled"]) {
+    const current = {...previous, conclusion, created_at: new Date(Date.UTC(2026, 10, 18, 1)).toISOString()};
+    assert.equal((await tick("17 4 * * *", [current], null, dailyAt)).filter(r => r.method === "POST").length, 0);
+  }
+});
+test("daily audit never duplicates active older runs or retries an API failure", async () => {
+  for (const status of ["queued", "pending", "waiting", "in_progress"]) {
+    const requests = await tick("17 4 * * *", [{id: 121, status, created_at: new Date(dailyAt - 86400000).toISOString()}], null, dailyAt);
+    assert.equal(requests.filter(r => r.method === "POST").length, 0);
+  }
+  const failed = await tick("17 4 * * *", [], dailyWorkflow, dailyAt);
+  assert.equal(failed.length, 1);
+  assert.equal(failed.filter(r => r.method === "POST").length, 0);
+});
+test("daily audit has one external timer, no GitHub cron or push trigger, and keeps the D1 lock", async () => {
+  const {readFileSync} = await import("node:fs");
+  const config = JSON.parse(readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8"));
+  assert.equal(config.triggers.crons.filter(c => c === "17 4 * * *").length, 1);
+  const workflow = readFileSync(new URL("../../../.github/workflows/" + dailyWorkflow, import.meta.url), "utf8");
+  assert.match(workflow, /workflow_dispatch:/);
+  assert.doesNotMatch(workflow.split("permissions:")[0], /^  (schedule|push|workflow_run):/m);
+  assert.match(workflow, /group: courtwatch-d1-writes/);
+  assert.match(workflow, /cancel-in-progress: false/);
+});
+
