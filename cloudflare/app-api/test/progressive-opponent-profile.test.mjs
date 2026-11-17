@@ -12,7 +12,7 @@ function assembler({history,metadata={},onProfile}={}){
  const context={
   linkedOpponentIdentity:async()=>{calls.identity++;return person;},playerCircuitIdentities:()=>[],
   tennisEuropeOpponentHistory:()=>{calls.history++;return history||Promise.resolve({profile:null,tournaments:[]});},
-  playerEntryTournaments:async()=>[],otherCircuitOpponentHistory:async()=>[],opponentItfDocumentHistory:async()=>[],
+  playerEntryTournaments:async()=>[],otherCircuitOpponentHistory:async()=>[],opponentItfDocumentHistory:async()=>[],itfDrawParticipationTournaments:async()=>[],
   enrichIdentityNationalities:async()=>{},resolveCircuitProfiles:async()=>new Map(),
   enrichPersonalTournamentPresentation:async rows=>rows,currentTennisEuropePlayerRanking:async()=>({rankings:[]}),
   enrichFitpMetadata:async(db,people)=>{calls.metadata++;Object.assign(people[0],metadata);},

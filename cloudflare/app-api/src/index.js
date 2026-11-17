@@ -1,3 +1,4 @@
+import {itfDrawParticipationTournaments} from '../lib/itf-draw-participations.mjs';
 import {progressiveOpponentProfile} from '../lib/progressive-opponent-profile.mjs';
 import {renderItfRankingDiagnostics,renderItfRankingCoverage} from '../lib/admin-itf-junior-rankings.mjs';
 import {enrichItfJuniorRankings} from '../lib/itf-junior-ranking-enrichment.mjs';
@@ -189,6 +190,8 @@ async function universalOpponentHistory(env,options){
   playerEntryTournaments(env,identity||{name:request.name,sourceCircuit:request.sourceCircuit||(tennisEuropeNativeId(request.profileId)?'tennis-europe':''),sourcePlayerId:request.profileId},request),
   otherCircuitOpponentHistory(env.DB,{...request,identity:identity||(tennisEuropeNativeId(request.profileId)?{sourceCircuit:'tennis-europe',sourcePlayerId:request.profileId}:null)})
  ]));
+ const confirmedPresence=await itfDrawParticipationTournaments(env.DB,[identity||{name:request.name,sourceCircuit:request.sourceCircuit,sourcePlayerId:request.profileId}]);
+ entries.push(...confirmedPresence);
  const itfHistoryIssues=[];
  const acquiredItf=await measure('opponent_itf_history',()=>opponentItfDocumentHistory(env.DB,{identity:identity||{sourceCircuit:request.sourceCircuit,sourcePlayerId:request.profileId},entries,existing:[...history.tournaments,...other],asOf,excludeMatchId:request.excludeMatchId,onIncomplete:issue=>itfHistoryIssues.push(issue)}));
  const [info,presented]=await Promise.all([summary,measure('opponent_presentation',()=>enrichPersonalTournamentPresentation([...entries,...history.tournaments,...other,...acquiredItf],env.RUNTIME_DOCUMENTS))]);
@@ -291,7 +294,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
         const entries=await playerEntryTournaments(env,player,{entryRows:profiles.get(player.id)});
         return [player.id,prepare(entries)];
       }))),
-      timing.measure('native_tournaments',()=>personalUnreleasedTournamentHistory(env.DB,added).then(async rows=>{
+      timing.measure('native_tournaments',()=>personalUnreleasedTournamentHistory(env.DB,added,nativePlayers).then(async rows=>{
         prepare(rows);
         return [rows,rows.some(t=>t.circuit==='itf')?await itfTournamentMetadata(env):new Map()];
       })),
@@ -322,7 +325,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
       const live=mergePersonalLiveTournaments(tournaments,entries.map(t=>({...t,playerName:player.name})),player.id);
       tournaments.splice(0,tournaments.length,...live);
     }
-    const unreleasedHistory=scopedData?scopedData[1][0]:await personalUnreleasedTournamentHistory(env.DB,added);
+    const unreleasedHistory=scopedData?scopedData[1][0]:await personalUnreleasedTournamentHistory(env.DB,added,nativePlayers);
     const officialItf=scopedData?scopedData[1][1]:unreleasedHistory.some(t=>t.circuit==='itf')?await itfTournamentMetadata(env):new Map();
     const allHistory=new Map(tournaments.map(t=>[`${t.playerId}|${t.circuit}|${t.competitionId}`,t]));
     for(const t of unreleasedHistory){const official=officialItf.get(String(t.competitionId||'').toUpperCase())||{};const key=`${t.playerId}|${t.circuit}|${t.competitionId}`;allHistory.set(key,mergePersonalHistoryTournament({...t,location:t.location||official.location||'',startDate:t.startDate||official.startDate||'',endDate:t.endDate||official.endDate||''},allHistory.get(key)));}

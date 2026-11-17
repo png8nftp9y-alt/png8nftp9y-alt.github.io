@@ -1,0 +1,23 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';import fs from 'node:fs';
+import {itfDrawPresence,itfPresenceSQL} from '../../../src/v3/itf-draw-presence.mjs';
+import {documentRecord,documentSQL} from '../../../src/v3/itf-draw-document-d1.mjs';
+import {itfDrawParticipationTournaments} from '../lib/itf-draw-participations.mjs';
+import {opponentTournamentWindow} from '../lib/opponent-tournament-window.mjs';
+const readSchema=name=>fs.readFileSync(new URL('../migrations/'+name,import.meta.url),'utf8');
+const lola={id:'800123451',name:'Lola Fixture'},martina={id:'800123452',name:'Martina Fixture'};
+const draw=(players=[lola],competitionId='J-J30-FRA-2026-003',generatedAt='2026-11-01T00:00:00Z')=>({competitionId,event:'G-S-Q-KO',generatedAt,status:'complete',players,matches:[{matchId:'no-result',teams:[{players:[martina]},{players:[]}],winnerTeam:null}]});
+function fixture(){
+ const sql=new DatabaseSync(':memory:');
+ sql.exec(readSchema('0025_itf_draw_documents.sql')+readSchema('0049_itf_draw_participations.sql')+'CREATE TABLE tournaments(id TEXT PRIMARY KEY,circuit TEXT,source_tournament_id TEXT,payload TEXT);');
+ const db={prepare(q){return{bind(...args){return{all:async()=>({results:sql.prepare(q).all(...args)})}}}}};
+ function add(doc){const row=documentRecord(doc);assert.ok(row);const id='t-'+doc.competitionId;sql.prepare('INSERT INTO tournaments VALUES(?,?,?,?) ON CONFLICT DO NOTHING').run(id,'itf',doc.competitionId,JSON.stringify({name:'Compiegne',startDate:'2026-06-21',endDate:'2026-06-28'}));const statements=[...documentSQL(row),...itfPresenceSQL(doc,row,id)].join('\n');sql.exec(statements);return{row,statements};}
+ const read=id=>itfDrawParticipationTournaments(db,[{id:'observed-'+id,sourceCircuit:'itf',sourcePlayerId:id}]);
+ return {sql,db,add,read};
+}
+test('D1_TEST_INITIAL_IMPORT: every native participant is linked without results, including draw-list-only/BYE presence',async()=>{const f=fixture();try{f.add(draw());assert.equal((await f.read(lola.id)).length,1);assert.equal((await f.read(martina.id)).length,1);assert.equal((await f.read('800999999')).length,0);const rows=await f.read(lola.id);assert.equal(rows[0].drawConfirmed,true);assert.equal(rows[0].historyEvidence,'acquired_itf_draw_presence');}finally{f.sql.close()}});
+test('D1_TEST_IDENTICAL_ZERO_WRITES: immutable evidence replay writes nothing',()=>{const f=fixture();try{const {statements}=f.add(draw()),before=f.sql.prepare('SELECT total_changes() n').get().n;f.sql.exec(statements);assert.equal(f.sql.prepare('SELECT total_changes() n').get().n,before);}finally{f.sql.close()}});
+test('D1_TEST_REAL_DELTAS_ONLY: a newer draw removes stale presence from reads and preserves the original evidence',async()=>{const f=fixture();try{f.add(draw());f.add(draw([],'J-J30-FRA-2026-003','2026-11-02T00:00:00Z'));assert.deepEqual(await f.read(lola.id),[]);assert.equal((await f.read(martina.id)).length,1);assert.equal(f.sql.prepare('SELECT COUNT(*) n FROM itf_draw_participations WHERE source_player_id=?').get(lola.id).n,1);}finally{f.sql.close()}});
+test('D1_TEST_INCOMPLETE_SOURCE_GUARD: pending/failed archive cannot certify participation; absent alternates remain absent',()=>{const d=draw();for(const acquisitionState of ['archived_unverified','resolved_empty_qualification'])assert.deepEqual(itfPresenceSQL(d,{acquisitionState},'t'),[]);const extracted=itfDrawPresence({...d,players:[{name:'Same Name',id:'local-1'},{name:'Unidentified'},{id:lola.id,name:'A'},{id:lola.id,name:'A'}]});assert.equal(extracted.players.length,2);assert.equal(extracted.unidentified.length,2);});
+test('the same unobserved identity keeps every acquired tournament; observed-player status is irrelevant',async()=>{const f=fixture();try{for(let i=0;i<7;i++)f.add(draw([lola],'ITF-'+i));const rows=await f.read(lola.id);assert.equal(rows.length,7);assert.equal(new Set(rows.map(t=>t.competitionId)).size,7);assert.equal(opponentTournamentWindow(rows,'2026-11-03').length,3);assert.equal(opponentTournamentWindow([{circuit:'itf',competitionId:'A',startDate:'2026-01-01',endDate:'2026-01-07',acceptanceCode:'A',entryStatus:'alternate'}],'2026-11-03').length,0);}finally{f.sql.close()}});
+test('missing migration is compatible during rollout, but other database failures are not swallowed',async()=>{const person={sourceCircuit:'itf',sourcePlayerId:lola.id};for(const message of ['no such table: itf_draw_participations','transport failure']){const db={prepare(){throw Error(message)}};if(message.startsWith('no such'))assert.deepEqual(await itfDrawParticipationTournaments(db,[person]),[]);else await assert.rejects(itfDrawParticipationTournaments(db,[person]),/transport failure/);}});

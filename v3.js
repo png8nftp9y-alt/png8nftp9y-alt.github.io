@@ -3566,7 +3566,7 @@ function opponentTournamentWindow(tournaments,today){
  const all=[...unique.values()],valid=t=>/^\d{4}-\d{2}-\d{2}$/.test(String(t.startDate||'')),end=t=>String(t.endDate||t.startDate).slice(0,10);
  // Past acceptance lists are intentions, not evidence of a played tournament.
  // ITF and Europe history must select match-backed tournaments before taking its three slots.
- const past=all.filter(t=>valid(t)&&end(t)<today&&(!['tennis-europe','itf'].includes(t.circuit||'tennis-europe')||t.matches.length>0||t.historyMatchCount>0)).sort((a,b)=>end(b).localeCompare(end(a))||key(a).localeCompare(key(b))).slice(0,3).map(t=>({...t,historyKind:'past'}));
+ const past=all.filter(t=>valid(t)&&end(t)<today&&(!['tennis-europe','itf'].includes(t.circuit||'tennis-europe')||t.matches.length>0||t.historyMatchCount>0||(t.circuit==='itf'&&t.historyEvidence==='acquired_itf_draw_presence'&&t.drawConfirmed===true))).sort((a,b)=>end(b).localeCompare(end(a))||key(a).localeCompare(key(b))).slice(0,3).map(t=>({...t,historyKind:'past'}));
  const eligible=all.filter(t=>valid(t)&&!['W','WITHDRAWN','CANCELLED','CANCELED'].includes(String(t.acceptanceCode||'').toUpperCase())&&!/withdraw|ritirat|cancel|excluded/i.test(String(t.entryStatus||'')));
  const current=eligible.filter(t=>t.startDate<=today&&end(t)>=today).sort((a,b)=>String(b.startDate).localeCompare(String(a.startDate))||key(a).localeCompare(key(b)));
  const future=eligible.filter(t=>t.startDate>today).sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))||key(a).localeCompare(key(b)));
