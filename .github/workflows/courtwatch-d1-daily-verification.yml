@@ -2,12 +2,7 @@
 name: Court Watch daily complete D1 verification
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '17 4 * * *'
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/courtwatch-d1-daily-verification.yml'
+  # Dispatched daily at 04:17 UTC by the Cloudflare watchdog.
 permissions:
   contents: read
 jobs:
@@ -60,3 +55,4 @@ jobs:
           # Keep the two scans outside the same 10-second D1 load window.
           sleep 11
           node scripts/per-circuit-player-id-audit.mjs
+

@@ -11095,3 +11095,11 @@ ITF discovery 2026-11-17T08:36:31.700Z: 15 newly discovered future tournaments; 
 ITF Meta ordinary 2026-11-17T08:38:13.363Z: attempted 8, acquired 8, ordinary 7, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta ordinary 2026-11-17T08:39:29.222Z: attempted 7, acquired 7, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+## 2026-11-17 — Timer esterno per la verifica D1 giornaliera
+
+- Motivo: il cron GitHub previsto alle 04:17 UTC ha creato i run giornalieri con ritardi di molte ore. La modifica riguarda esclusivamente la schedulazione, non i controlli ID o i dati.
+- Il watchdog Cloudflare esistente invia workflow_dispatch a courtwatch-d1-daily-verification.yml ogni giorno alle 04:17 UTC (05:17 italiane in inverno, 06:17 in estate), usando il token già configurato. Rimosso il cron GitHub e il trigger push del solo audit giornaliero per evitare due sorgenti di avvio automatico.
+- Prima del dispatch verifica gli ultimi run su main: qualunque run creato nella stessa giornata UTC, anche fallito o annullato, impedisce un secondo avvio; qualunque run precedente ancora attivo o in coda impedisce sovrapposizioni. Nessun retry automatico. Resta il lock courtwatch-d1-writes.
+- Validazione locale: 13/13 test scheduler superati, inclusi isolamento del timer, esiti della giornata, run attivi di giorni precedenti e errore API senza retry. Nessuna richiesta GitHub o Cloudflare reale eseguita dai test.
+- Attivazione: il merge su main avvia il workflow di deploy watchdog esistente; attendere il suo esito verde prima di dichiarare attivo il nuovo timer. La disponibilità dei runner GitHub può ancora ritardare l'esecuzione dopo la creazione del run. La verifica ID preesistente può ancora fallire indipendentemente dal timer.

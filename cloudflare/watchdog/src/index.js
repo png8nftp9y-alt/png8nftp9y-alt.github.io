@@ -4,6 +4,7 @@ const API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
 
 const MAINTENANCE_CRON = "3,13,23,33,43,53 * * * *";
 const LIVE_GROUPS = new Map([
+  ["17 4 * * *", new Set(["d1-daily-verification"])],
   ["12,27,42,57 * * * *", new Set(["d1"])],
   ["17 * * * *", new Set(["acquired-search"])],
   ["0,15,30,45 * * * *", new Set(["itf-known-labels", "itf-acceptance-42d", "itf-t-minus-one"])],
@@ -14,6 +15,7 @@ const LIVE_GROUPS = new Map([
 const LIVE_IDS = new Set([...LIVE_GROUPS.values()].flatMap((ids) => [...ids]));
 
 const TARGETS = [
+  { id: "d1-daily-verification", workflow: "courtwatch-d1-daily-verification.yml", intervalMinutes: 24 * 60 },
   { id: "acquired-search", workflow: "courtwatch-acquired-player-search.yml", intervalMinutes: 60 },
   { id: "tennis-europe-oop", workflow: "courtwatch-tennis-europe-oop-live.yml" },
   { id: "d1", workflow: "courtwatch-cloudflare-app-api.yml" },
@@ -135,7 +137,7 @@ async function checkLiveSchedule(target, env, scheduledTime) {
   const active = runs.find(
     (run) =>
       run.status !== "completed" &&
-      (target.id === "acquired-search" || target.id === "d1" || ageMinutes(run.created_at, scheduledTime) <= 120),
+      (target.id === "acquired-search" || target.id === "d1" || target.id === "d1-daily-verification" || ageMinutes(run.created_at, scheduledTime) <= 120),
   );
   if (active) return { id: target.id, action: "active", runId: active.id };
   const inSlot = runs.find((run) => Date.parse(run.created_at) >= slotStart);
@@ -174,3 +176,4 @@ export default {
     return Response.json({ service: "courtwatch-cloudflare-watchdog", status: "ready", targets: TARGETS.map(({ id }) => id) });
   },
 };
+
