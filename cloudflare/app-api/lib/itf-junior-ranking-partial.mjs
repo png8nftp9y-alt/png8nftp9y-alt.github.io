@@ -18,12 +18,18 @@ export async function publishPartialRanking(result,{execute,query}){
 
 export async function completePartialUnion(result,{execute,query}){
  const scope=`category=${q(result.category)} AND ranking_date=${q(result.rankingDate)}`;
- const rows=await query(`SELECT h.player_id,h.ranking,h.points,h.display_name,h.nationality,h.source_gender,p.expected_count FROM itf_junior_ranking_history h JOIN itf_junior_ranking_partial_publications p USING(category,ranking_date,content_hash) WHERE p.${scope.replaceAll(' AND ',' AND p.')} AND p.ready=1`);
+ const rows=await query(`SELECT h.player_id,h.ranking,h.points,h.display_name,h.nationality,h.source_gender,p.expected_count FROM itf_junior_ranking_history h JOIN itf_junior_ranking_partial_publications p USING(category,ranking_date,content_hash) WHERE p.${scope.replaceAll(' AND ',' AND p.')} AND p.ready=1 ORDER BY p.captured_at DESC,p.content_hash ASC,h.display_name ASC`);
  const unique=new Map();
  for(const row of rows){
   if(Number(row.expected_count)!==result.total)throw Error('Conflicting expected totals in partial ranking union');
   const id=String(row.player_id),value={playerId:Number(id),rank:Number(row.ranking),points:Number(row.points),playerGivenName:'',playerFamilyName:row.display_name||'',playerNationalityCode:row.nationality||'',gender:row.source_gender||''};
-  const old=unique.get(id);if(old&&JSON.stringify(old)!==JSON.stringify(value))throw Error('Conflicting native identity in partial ranking union: '+id);
+  const old=unique.get(id);
+  if(old){
+   // Native ID identifies the player; spelling changes are source metadata.
+   // Newest verified capture wins the display name, without rewriting snapshots.
+   if(['rank','points','playerNationalityCode','gender'].some(field=>old[field]!==value[field]))throw Error('Conflicting native identity in partial ranking union: '+id);
+   continue;
+  }
   unique.set(id,value);
  }
  const items=[...unique.values()];
