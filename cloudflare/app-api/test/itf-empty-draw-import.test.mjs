@@ -29,4 +29,17 @@ test('saved documents still require D1 configuration and cannot silently take th
   const report=JSON.parse(readFileSync(path.join(dir,'dist/v3/audits/itf-draw-d1-content-verification.json')));assert.equal(report.status,'failed');assert.equal(report.expectedDocuments,1);
  });
 });
+for(const presence of [undefined,{unidentified:[{id:'local-only',name:'Unresolved'}]}])test('nonempty documents cannot pass without explicit complete participation metadata: '+JSON.stringify(presence),()=>{
+ fixture({documents:[{drawKey:'T|G-S-Q-KO',sha256:'hash',acquisitionState:'complete'}],presence},({dir,run})=>{
+  const checked=run(verify);assert.notEqual(checked.status,0);
+  const report=JSON.parse(readFileSync(path.join(dir,'dist/v3/audits/itf-draw-d1-content-verification.json')));
+  assert.equal(report.status,'failed');assert.match(report.error,/without valid native IDs/);assert.equal(report.fullPeriodCertified,false);
+ });
+});
+test('an empty manifest with reported unidentified players is inconsistent and remains failed',()=>{
+ fixture({documents:[],presence:{unidentified:[{id:'local-only'}]}},({dir,run})=>{
+  assert.notEqual(run(verify).status,0);
+  const report=JSON.parse(readFileSync(path.join(dir,'dist/v3/audits/itf-draw-d1-content-verification.json')));assert.equal(report.status,'failed');
+ });
+});
 for(const audit of [{documents:[],storedDocuments:0,sqlFiles:1},{documents:[{}],storedDocuments:1,sqlFiles:0},{documents:[],storedDocuments:0,sqlFiles:0,archiveMissing:['T|B-S-M-KO']}])test('an inconsistent work manifest cannot bypass persistence: '+JSON.stringify(audit),()=>fixture(audit,({run})=>assert.notEqual(run(plan).status,0)));
