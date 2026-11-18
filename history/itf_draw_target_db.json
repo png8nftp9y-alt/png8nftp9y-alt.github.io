@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-18T10:11:42.379Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-18T10:14:14.593Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -973872,7 +973872,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T09:30:05.433Z",
+      "checkedAt": "2026-11-18T10:14:13.049Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -975635,7 +975635,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-18T09:30:03.311Z",
+      "checkedAt": "2026-11-18T10:14:10.640Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -975760,8 +975760,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -975786,8 +975786,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -975799,8 +975799,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -975825,14 +975825,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -978581,7 +978581,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-18T09:30:03.857Z",
+      "checkedAt": "2026-11-18T10:14:11.499Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -979326,7 +979326,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T09:30:05.954Z",
+      "checkedAt": "2026-11-18T10:14:13.565Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -982001,14 +982001,14 @@
       "tournamentName": "J60 Hokuto",
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
-      "decision": "pending",
-      "checkedAt": "2026-11-18T09:30:06.471Z",
+      "decision": "complete",
+      "checkedAt": "2026-11-18T10:14:14.083Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 2,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 4,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -982122,14 +982122,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -982148,27 +982148,27 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 28,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -982187,19 +982187,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -982648,6 +982648,822 @@
             "taskId": "J-J60-JPN-2026-004__G-S-Q-KO",
             "storedAt": "2026-11-14T15:38:06.129Z"
           }
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800627137",
+              "name": "Yuta Amano",
+              "givenName": "Yuta",
+              "familyName": "Amano",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/yuta-amano/800627137/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800824908",
+              "name": "Hozumi Kaneda",
+              "givenName": "Hozumi",
+              "familyName": "Kaneda",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/hozumi-kaneda/800824908/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800808247",
+              "name": "Casra Afsharipour",
+              "givenName": "Casra",
+              "familyName": "Afsharipour",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/casra-afsharipour/800808247/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800708454",
+              "name": "Yutaro Otsuka",
+              "givenName": "Yutaro",
+              "familyName": "Otsuka",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/yutaro-otsuka/800708454/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800668525",
+              "name": "SungMin Lee",
+              "givenName": "SungMin",
+              "familyName": "Lee",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/sungmin-lee/800668525/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800747814",
+              "name": "RUI ISHIKAWA",
+              "givenName": "RUI",
+              "familyName": "ISHIKAWA",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/rui-ishikawa/800747814/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800806690",
+              "name": "Kaito Ohtani",
+              "givenName": "Kaito",
+              "familyName": "Ohtani",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/kaito-ohtani/800806690/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745317",
+              "name": "Shun Munetoh",
+              "givenName": "Shun",
+              "familyName": "Munetoh",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/shun-munetoh/800745317/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-18T10:14:14.083Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-JPN-2026-004__B-S-M-KO",
+            "storedAt": "2026-11-18T10:14:14.083Z"
+          }
+        },
+        "B-D-M-KO": {
+          "family": "B-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800745866",
+              "name": "Kodai ABE",
+              "givenName": "Kodai",
+              "familyName": "ABE",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/kodai-abe/800745866/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800667744",
+              "name": "RYOTA TERAUCHI",
+              "givenName": "RYOTA",
+              "familyName": "TERAUCHI",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/ryota-terauchi/800667744/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800848053",
+              "name": "Honosuke Ishibe",
+              "givenName": "Honosuke",
+              "familyName": "Ishibe",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/honosuke-ishibe/800848053/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766810",
+              "name": "Keiji Yamaguchi",
+              "givenName": "Keiji",
+              "familyName": "Yamaguchi",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/keiji-yamaguchi/800766810/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800797545",
+              "name": "Barron Hsu",
+              "givenName": "Barron",
+              "familyName": "Hsu",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/barron-hsu/800797545/usa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800787234",
+              "name": "Alejandro Puentes",
+              "givenName": "Alejandro",
+              "familyName": "Puentes",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/alejandro-puentes/800787234/usa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800824908",
+              "name": "Hozumi Kaneda",
+              "givenName": "Hozumi",
+              "familyName": "Kaneda",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/hozumi-kaneda/800824908/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800725255",
+              "name": "KAISEI UKAWA",
+              "givenName": "KAISEI",
+              "familyName": "UKAWA",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/kaisei-ukawa/800725255/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800821940",
+              "name": "Munehito Kawanabe",
+              "givenName": "Munehito",
+              "familyName": "Kawanabe",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/munehito-kawanabe/800821940/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800756542",
+              "name": "TAO TAKAHASHI",
+              "givenName": "TAO",
+              "familyName": "TAKAHASHI",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/tao-takahashi/800756542/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800862218",
+              "name": "Krelz Jan Gecosala",
+              "givenName": "Krelz Jan",
+              "familyName": "Gecosala",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/krelz-jan-gecosala/800862218/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766514",
+              "name": "shun YOSHINO",
+              "givenName": "shun",
+              "familyName": "YOSHINO",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/shun-yoshino/800766514/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800709915",
+              "name": "Takeru Mikami",
+              "givenName": "Takeru",
+              "familyName": "Mikami",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/takeru-mikami/800709915/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800815994",
+              "name": "KOGA TOMA",
+              "givenName": "KOGA",
+              "familyName": "TOMA",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/koga-toma/800815994/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800738228",
+              "name": "Lucas Sebastian Go",
+              "givenName": "Lucas Sebastian",
+              "familyName": "Go",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/lucas-sebastian-go/800738228/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800863742",
+              "name": "Soua Polanco",
+              "givenName": "Soua",
+              "familyName": "Polanco",
+              "nationalityCode": "MEX",
+              "profileLink": "/en/players/soua-polanco/800863742/mex/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800702659",
+              "name": "Gota Inoue",
+              "givenName": "Gota",
+              "familyName": "Inoue",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/gota-inoue/800702659/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800763140",
+              "name": "Rai TAKIMOTO",
+              "givenName": "Rai",
+              "familyName": "TAKIMOTO",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/rai-takimoto/800763140/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800827297",
+              "name": "Thalis Shun Shitara",
+              "givenName": "Thalis Shun",
+              "familyName": "Shitara",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/thalis-shun-shitara/800827297/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800816757",
+              "name": "Haruhi Yokoyama",
+              "givenName": "Haruhi",
+              "familyName": "Yokoyama",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/haruhi-yokoyama/800816757/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800761201",
+              "name": "siwon lee",
+              "givenName": "siwon",
+              "familyName": "lee",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/siwon-lee/800761201/kor/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800668525",
+              "name": "SungMin Lee",
+              "givenName": "SungMin",
+              "familyName": "Lee",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/sungmin-lee/800668525/kor/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800808247",
+              "name": "Casra Afsharipour",
+              "givenName": "Casra",
+              "familyName": "Afsharipour",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/casra-afsharipour/800808247/usa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800784852",
+              "name": "Dylan Charlier",
+              "givenName": "Dylan",
+              "familyName": "Charlier",
+              "nationalityCode": "SUI",
+              "profileLink": "/en/players/dylan-charlier/800784852/sui/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800806690",
+              "name": "Kaito Ohtani",
+              "givenName": "Kaito",
+              "familyName": "Ohtani",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/kaito-ohtani/800806690/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745332",
+              "name": "Kuranosuke Suzuki",
+              "givenName": "Kuranosuke",
+              "familyName": "Suzuki",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/kuranosuke-suzuki/800745332/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745317",
+              "name": "Shun Munetoh",
+              "givenName": "Shun",
+              "familyName": "Munetoh",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/shun-munetoh/800745317/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800708454",
+              "name": "Yutaro Otsuka",
+              "givenName": "Yutaro",
+              "familyName": "Otsuka",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/yutaro-otsuka/800708454/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-18T10:14:14.083Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-JPN-2026-004__B-D-M-KO",
+            "storedAt": "2026-11-18T10:14:14.083Z"
+          }
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800749912",
+              "name": "minori sato",
+              "givenName": "minori",
+              "familyName": "sato",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/minori-sato/800749912/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800725859",
+              "name": "Meyu Sakata",
+              "givenName": "Meyu",
+              "familyName": "Sakata",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/meyu-sakata/800725859/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800727264",
+              "name": "YUYUKA HAKURA",
+              "givenName": "YUYUKA",
+              "familyName": "HAKURA",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/yuyuka-hakura/800727264/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800710516",
+              "name": "Eme Shinchi",
+              "givenName": "Eme",
+              "familyName": "Shinchi",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/eme-shinchi/800710516/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800718957",
+              "name": "Juria Miyamoto",
+              "givenName": "Juria",
+              "familyName": "Miyamoto",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/juria-miyamoto/800718957/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800883296",
+              "name": "Emiri Hasegawa",
+              "givenName": "Emiri",
+              "familyName": "Hasegawa",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/emiri-hasegawa/800883296/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745791",
+              "name": "Mei Shimamura",
+              "givenName": "Mei",
+              "familyName": "Shimamura",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/mei-shimamura/800745791/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800808019",
+              "name": "Devanshi Shrestha",
+              "givenName": "Devanshi",
+              "familyName": "Shrestha",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/devanshi-shrestha/800808019/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-18T10:14:14.083Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-JPN-2026-004__G-S-M-KO",
+            "storedAt": "2026-11-18T10:14:14.083Z"
+          }
+        },
+        "G-D-M-KO": {
+          "family": "G-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800745791",
+              "name": "Mei Shimamura",
+              "givenName": "Mei",
+              "familyName": "Shimamura",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/mei-shimamura/800745791/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800684190",
+              "name": "Riko Shozui",
+              "givenName": "Riko",
+              "familyName": "Shozui",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/riko-shozui/800684190/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745342",
+              "name": "Anna Miyazaki",
+              "givenName": "Anna",
+              "familyName": "Miyazaki",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/anna-miyazaki/800745342/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800798183",
+              "name": "Shiori Toma",
+              "givenName": "Shiori",
+              "familyName": "Toma",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/shiori-toma/800798183/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800683497",
+              "name": "Yuna Ozaki",
+              "givenName": "Yuna",
+              "familyName": "Ozaki",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/yuna-ozaki/800683497/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800778972",
+              "name": "Aozora Tsuboi",
+              "givenName": "Aozora",
+              "familyName": "Tsuboi",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/aozora-tsuboi/800778972/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800717515",
+              "name": "ADANI RAIHAN MUHAMMAD AZHARI",
+              "givenName": "ADANI RAIHAN",
+              "familyName": "MUHAMMAD AZHARI",
+              "nationalityCode": "MAS",
+              "profileLink": "/en/players/adani-raihan-muhammad-azhari/800717515/mas/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800732668",
+              "name": "Batrisyia Elvina Saiful Amir",
+              "givenName": "Batrisyia Elvina",
+              "familyName": "Saiful Amir",
+              "nationalityCode": "MAS",
+              "profileLink": "/en/players/batrisyia-elvina-saiful-amir/800732668/mas/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800788468",
+              "name": "Shina Okuyama",
+              "givenName": "Shina",
+              "familyName": "Okuyama",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/shina-okuyama/800788468/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800808134",
+              "name": "Kaho Urata",
+              "givenName": "Kaho",
+              "familyName": "Urata",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/kaho-urata/800808134/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800841196",
+              "name": "Yuriko Michihiro",
+              "givenName": "Yuriko",
+              "familyName": "Michihiro",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/yuriko-michihiro/800841196/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800731153",
+              "name": "Jingke Yan",
+              "givenName": "Jingke",
+              "familyName": "Yan",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/jingke-yan/800731153/chn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800788350",
+              "name": "Yusa Sakaguchi",
+              "givenName": "Yusa",
+              "familyName": "Sakaguchi",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/yusa-sakaguchi/800788350/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800722535",
+              "name": "Dasha Yuffa",
+              "givenName": "Dasha",
+              "familyName": "Yuffa",
+              "nationalityCode": "ESP",
+              "profileLink": "/en/players/dasha-yuffa/800722535/esp/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800808835",
+              "name": "Rika Hagiwara",
+              "givenName": "Rika",
+              "familyName": "Hagiwara",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/rika-hagiwara/800808835/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800672079",
+              "name": "Mirai Kameoka",
+              "givenName": "Mirai",
+              "familyName": "Kameoka",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/mirai-kameoka/800672079/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800779075",
+              "name": "Sofia Bartolata",
+              "givenName": "Sofia",
+              "familyName": "Bartolata",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/sofia-bartolata/800779075/usa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800788491",
+              "name": "Ichina Miyashita",
+              "givenName": "Ichina",
+              "familyName": "Miyashita",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/ichina-miyashita/800788491/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800749912",
+              "name": "minori sato",
+              "givenName": "minori",
+              "familyName": "sato",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/minori-sato/800749912/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800710516",
+              "name": "Eme Shinchi",
+              "givenName": "Eme",
+              "familyName": "Shinchi",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/eme-shinchi/800710516/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800863754",
+              "name": "Sana Kato",
+              "givenName": "Sana",
+              "familyName": "Kato",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/sana-kato/800863754/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800729795",
+              "name": "Mako Kuwabara",
+              "givenName": "Mako",
+              "familyName": "Kuwabara",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/mako-kuwabara/800729795/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800718957",
+              "name": "Juria Miyamoto",
+              "givenName": "Juria",
+              "familyName": "Miyamoto",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/juria-miyamoto/800718957/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800685123",
+              "name": "Nonoka Shimizu",
+              "givenName": "Nonoka",
+              "familyName": "Shimizu",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/nonoka-shimizu/800685123/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743792",
+              "name": "Riko Amemiya",
+              "givenName": "Riko",
+              "familyName": "Amemiya",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/riko-amemiya/800743792/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800786258",
+              "name": "Minami Yako",
+              "givenName": "Minami",
+              "familyName": "Yako",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/minami-yako/800786258/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800808019",
+              "name": "Devanshi Shrestha",
+              "givenName": "Devanshi",
+              "familyName": "Shrestha",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/devanshi-shrestha/800808019/usa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800884225",
+              "name": "Clara Todd",
+              "givenName": "Clara",
+              "familyName": "Todd",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/clara-todd/800884225/usa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800858503",
+              "name": "Kathlyn Ann Bugna",
+              "givenName": "Kathlyn Ann",
+              "familyName": "Bugna",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/kathlyn-ann-bugna/800858503/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751800",
+              "name": "Ally Saito",
+              "givenName": "Ally",
+              "familyName": "Saito",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/ally-saito/800751800/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745972",
+              "name": "AKARI ODA",
+              "givenName": "AKARI",
+              "familyName": "ODA",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/akari-oda/800745972/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800725859",
+              "name": "Meyu Sakata",
+              "givenName": "Meyu",
+              "familyName": "Sakata",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/meyu-sakata/800725859/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-18T10:14:14.083Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-JPN-2026-004__G-D-M-KO",
+            "storedAt": "2026-11-18T10:14:14.083Z"
+          }
         }
       }
     },
@@ -982657,7 +983473,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T09:30:06.993Z",
+      "checkedAt": "2026-11-18T10:14:14.593Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -985543,7 +986359,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-18T09:30:04.393Z",
+      "checkedAt": "2026-11-18T10:14:12.022Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -986866,7 +987682,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-18T09:30:04.911Z",
+      "checkedAt": "2026-11-18T10:14:12.536Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 1,
