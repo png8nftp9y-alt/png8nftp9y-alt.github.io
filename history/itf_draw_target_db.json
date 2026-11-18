@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-18T11:55:05.798Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-18T11:57:16.422Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -959980,7 +959980,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T11:30:54.686Z",
+      "checkedAt": "2026-11-18T11:57:12.762Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 4,
@@ -961156,7 +961156,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T11:30:55.171Z",
+      "checkedAt": "2026-11-18T11:57:13.329Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -961281,8 +961281,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -961320,8 +961320,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -961353,7 +961353,7 @@
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -962319,7 +962319,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T11:30:55.630Z",
+      "checkedAt": "2026-11-18T11:57:13.844Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -966582,7 +966582,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T11:30:56.089Z",
+      "checkedAt": "2026-11-18T11:57:14.352Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -967357,7 +967357,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T11:30:56.548Z",
+      "checkedAt": "2026-11-18T11:57:14.866Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 4,
@@ -968333,7 +968333,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T11:30:57.000Z",
+      "checkedAt": "2026-11-18T11:57:15.386Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 4,
@@ -968440,8 +968440,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -968499,7 +968499,7 @@
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -969368,14 +969368,14 @@
       "tournamentName": "J30 Andijan",
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
-      "decision": "pending",
-      "checkedAt": "2026-11-18T11:30:57.457Z",
+      "decision": "complete",
+      "checkedAt": "2026-11-18T11:57:15.904Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 5,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 5,
-      "missingSections": 1,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -969489,14 +969489,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -970776,6 +970776,100 @@
             "complete": true,
             "taskId": "J-J30-UZB-2026-005__G-S-M-KO",
             "storedAt": "2026-11-18T10:01:14.256Z"
+          }
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800755971",
+              "name": "Zakhar Haburzaniya",
+              "givenName": "Zakhar",
+              "familyName": "Haburzaniya",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/zakhar-haburzaniya/800755971/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800674031",
+              "name": "Nurdaulet Balkan",
+              "givenName": "Nurdaulet",
+              "familyName": "Balkan",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/nurdaulet-balkan/800674031/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800623299",
+              "name": "Akhmadjon Toshmukhamedov",
+              "givenName": "Akhmadjon",
+              "familyName": "Toshmukhamedov",
+              "nationalityCode": "UZB",
+              "profileLink": "/en/players/akhmadjon-toshmukhamedov/800623299/uzb/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800632711",
+              "name": "Semen Kolykhmatov",
+              "givenName": "Semen",
+              "familyName": "Kolykhmatov",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/semen-kolykhmatov/800632711/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743240",
+              "name": "Rungu Tian",
+              "givenName": "Rungu",
+              "familyName": "Tian",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/rungu-tian/800743240/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800653458",
+              "name": "Mark Haidt",
+              "givenName": "Mark",
+              "familyName": "Haidt",
+              "nationalityCode": "BLR",
+              "profileLink": "/en/players/mark-haidt/800653458/blr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800652777",
+              "name": "Zhantore Sanzharuly",
+              "givenName": "Zhantore",
+              "familyName": "Sanzharuly",
+              "nationalityCode": "KAZ",
+              "profileLink": "/en/players/zhantore-sanzharuly/800652777/kaz/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800576306",
+              "name": "Somon Amonov",
+              "givenName": "Somon",
+              "familyName": "Amonov",
+              "nationalityCode": "TJK",
+              "profileLink": "/en/players/somon-amonov/800576306/tjk/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-18T11:57:15.904Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-UZB-2026-005__B-S-M-KO",
+            "storedAt": "2026-11-18T11:57:15.904Z"
           }
         }
       }
@@ -973517,7 +973611,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T11:30:57.906Z",
+      "checkedAt": "2026-11-18T11:57:16.422Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
