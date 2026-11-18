@@ -11140,3 +11140,9 @@ Run 44199193422 rejected the new raw D1 query client and a SQL-generating test l
 - Il planner riconosce i dispatch periodici per ancorare il cooldown allo slot orario. Recupera categorie incomplete o import già acquisiti; quelle complete non vengono forzate. Controlli di rilascio, lock D1, cron e workflow Europe invariati.
 - Duplicati nello stesso slot e run attivi impediscono nuovi dispatch. Gli errori API restano espliciti senza bloccare gli altri target. La causa interna dei mancati eventi GitHub non è dimostrata; la modifica elimina questa dipendenza per i soli recuperi.
 - Test locali Node watchdog: 11/11 pass. Deploy watchdog e primo recupero remoto ancora da verificare dopo pubblicazione. Nessun workflow rilanciato manualmente e nessuna scrittura D1 effettuata nella preparazione. Conflitto ranking Girls ID 800755640 non risolto da questa modifica.
+
+## 2026-11-18 — Varianti del nome nell’unione ranking ITF Junior
+- Confrontati gli artifact Girls dei run 43980335395 (14282824838) e 44043549672 (14310154306): ID 800755640, Alexandra/Aleksandra Ishemgulova; stessa data ranking 2026-11-16, posizione 1634, punti 40.75, RUS, F. Differisce soltanto il nome.
+- L’unione per ID nativo tollera differenze del solo nome quando posizione, punti, nazionalità e sesso coincidono. Il nome proviene dalla cattura verificata più recente, con ordinamento deterministico; nessun aggiornamento o cancellazione delle pubblicazioni originali.
+- Restano bloccanti dati ranking o identitari discordanti, totali diversi, ID duplicati e fonti incomplete non validate. Non modifica acquisizione, recuperi, Europe o regole di visualizzazione.
+- Test Node/SQLite locali: 13/13 pass, incluso caso reale in entrambi gli ordini, copie originali preservate, replay a zero scritture e conflitti su rank/points/nationality/gender. Acquisizione/import remoto da verificare dopo pubblicazione; rimuovere questo ostacolo non certifica il recupero delle 13 mancanti.

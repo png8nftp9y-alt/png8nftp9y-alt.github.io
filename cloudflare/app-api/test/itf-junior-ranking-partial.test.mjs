@@ -102,3 +102,28 @@ test('D1_TEST_REAL_DELTAS_ONLY: interrupted union promotion resumes without fals
   const completed=await publishPartialRanking(value,d);assert.equal(completed.complete,true);assert.equal(completed.acquired,2);
  }finally{d.close();}
 });
+
+test('native-ID union accepts Alexandra/Aleksandra spelling only and keeps the newest verified name in either insertion order',async()=>{
+ for(const reversed of [false,true]){const d=database();try{
+  const girl=(name)=>({playerId:800755640,rank:1634,points:40.75,playerGivenName:name,playerFamilyName:'Ishemgulova',playerNationalityCode:'RUS',gender:'F'});
+  const old={...partial([girl('Alexandra')],'2026-11-16',3),category:'G',capturedAt:'2026-11-16T23:33:50.879Z'};
+  const newer={...old,items:[girl('Aleksandra')],capturedAt:'2026-11-17T08:04:06.143Z'};
+  for(const capture of reversed?[newer,old]:[old,newer]){const result=await publishPartialRanking(capture,d);assert.equal(result.complete,false);assert.equal(result.acquired,1);}
+  const before=await d.query("SELECT content_hash,display_name FROM itf_junior_ranking_history WHERE player_id='800755640' ORDER BY content_hash");
+  assert.equal(before.length,2);assert.ok(before.some(r=>r.display_name==='Alexandra Ishemgulova'));assert.ok(before.some(r=>r.display_name==='Aleksandra Ishemgulova'));
+  const complement={...old,capturedAt:'2026-11-17T09:00:00Z',items:[{...girl('Other'),playerId:800755641,rank:1635},{...girl('Third'),playerId:800755642,rank:1636}]};
+  const result=await publishPartialRanking(complement,d);assert.equal(result.complete,true);assert.equal(result.acquired,3);
+  const rows=await d.query("SELECT h.display_name FROM itf_junior_ranking_history h JOIN itf_junior_ranking_publications p USING(category,ranking_date,content_hash) WHERE h.player_id='800755640' AND p.complete=1");
+  assert.deepEqual(rows,[{display_name:'Aleksandra Ishemgulova'}]);
+  const again=await d.query("SELECT content_hash,display_name FROM itf_junior_ranking_history WHERE player_id='800755640' ORDER BY content_hash");
+  assert.ok(before.every(r=>again.some(a=>a.content_hash===r.content_hash&&a.display_name===r.display_name)));
+  let changes=0;await publishPartialRanking(complement,{query:d.query,execute:async sql=>{const r=await d.execute(sql);changes+=r.changes;}});assert.equal(changes,0);
+ }finally{d.close();}}
+});
+test('name spelling tolerance never accepts conflicting rank, points, nationality or gender',async()=>{
+ for(const delta of [{rank:2},{points:99},{playerNationalityCode:'FRA'},{gender:'F'}]){const d=database();try{
+  await publishPartialRanking(partial([row(800000001)],'2026-11-09',3),d);
+  await assert.rejects(publishPartialRanking(partial([{...row(800000001),...delta},row(800000002,3)],'2026-11-09',3),d),/Conflicting native identity/);
+  assert.equal((await d.query('SELECT COUNT(*) n FROM itf_junior_ranking_publications WHERE complete=1'))[0].n,0);
+ }finally{d.close();}}
+});
