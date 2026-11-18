@@ -11161,3 +11161,5 @@ Validation: all 25 targeted empty-import/presence/document tests pass; full Work
 - Test locali Node/SQLite: 34/34 pass, inclusi localizzazione delle 13, duplicati, accumulo su più tentativi fino a complete, zero scritture ranking per cache completa, conservazione su Incapsula, rollover effettivo del comando e controlli identitari. I test entrano anche in npm check e nella CI ranking. Pubblicazione e import remoto da verificare; questa patch non garantisce che Incapsula permetta le richieste.
 
 ITF discovery 2026-11-18T08:06:08.728Z: 6 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-18T08:07:25.185Z: attempted 6, acquired 6, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
