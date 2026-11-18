@@ -15,7 +15,7 @@ function fixture(audit,check){
  }finally{rmSync(dir,{recursive:true,force:true});}
 }
 test('pending-only work needs neither a D1 configuration nor credentials and reports zero verified documents',()=>{
- fixture({scope:'pending',documents:[],storedDocuments:0,sqlFiles:0,archiveMissing:[]},({dir,run})=>{
+ fixture({scope:'pending',documents:[],storedDocuments:0,sqlFiles:0,archiveMissing:[],presence:{unidentified:[],caseChecks:[]}},({dir,run})=>{
   const planned=run(plan);assert.equal(planned.status,0,planned.stderr);assert.equal(readFileSync(path.join(dir,'outputs'),'utf8'),'has_documents=false\n');
   const checked=run(verify);assert.equal(checked.status,0,checked.stderr);
   const report=JSON.parse(readFileSync(path.join(dir,'dist/v3/audits/itf-draw-d1-content-verification.json')));
@@ -30,3 +30,16 @@ test('saved documents still require D1 configuration and cannot silently take th
  });
 });
 for(const audit of [{documents:[],storedDocuments:0,sqlFiles:1},{documents:[{}],storedDocuments:1,sqlFiles:0},{documents:[],storedDocuments:0,sqlFiles:0,archiveMissing:['T|B-S-M-KO']}])test('an inconsistent work manifest cannot bypass persistence: '+JSON.stringify(audit),()=>fixture(audit,({run})=>assert.notEqual(run(plan).status,0)));
+
+test('missing or unidentified presence evidence still fails verification even when there are no documents',()=>{
+ for(const presence of [undefined,{unidentified:[{id:null}],caseChecks:[]}]){
+  const audit={scope:'pending',documents:[],storedDocuments:0,sqlFiles:0,archiveMissing:[]};
+  if(presence!==undefined)audit.presence=presence;
+  fixture(audit,({dir,run})=>{
+   const checked=run(verify);assert.notEqual(checked.status,0);
+   const report=JSON.parse(readFileSync(path.join(dir,'dist/v3/audits/itf-draw-d1-content-verification.json')));
+   assert.equal(report.status,'failed');assert.match(report.error,/without valid native IDs/);
+   assert.equal(report.fullPeriodCertified,false);
+  });
+ }
+});

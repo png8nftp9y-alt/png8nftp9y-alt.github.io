@@ -11146,3 +11146,8 @@ Run 44199193422 rejected the new raw D1 query client and a SQL-generating test l
 - L’unione per ID nativo tollera differenze del solo nome quando posizione, punti, nazionalità e sesso coincidono. Il nome proviene dalla cattura verificata più recente, con ordinamento deterministico; nessun aggiornamento o cancellazione delle pubblicazioni originali.
 - Restano bloccanti dati ranking o identitari discordanti, totali diversi, ID duplicati e fonti incomplete non validate. Non modifica acquisizione, recuperi, Europe o regole di visualizzazione.
 - Test Node/SQLite locali: 13/13 pass, incluso caso reale in entrambi gli ordini, copie originali preservate, replay a zero scritture e conflitti su rank/points/nationality/gender. Acquisizione/import remoto da verificare dopo pubblicazione; rimuovere questo ostacolo non certifica il recupero delle 13 mancanti.
+
+## 2026-11-18 — Fixture tabelloni pending allineata al controllo presenze
+- Run ranking ITF 44204759044: test specifici recupero/ranking verdi, npm check bloccato dal caso pending-only di itf-empty-draw-import.test.mjs; import remoto saltato. Il manifesto simulato omette presence, ora obbligatorio nel verificatore per impedire certificazioni senza controllo ID.
+- Aggiornata solo la fixture pending con presence.unidentified=[] e caseChecks=[]; nessun controllo di produzione indebolito. Aggiunto test negativo che mantiene bloccati manifesti senza evidence presence o con partecipanti non identificati.
+- Node locale: 6/6 test pass. Questa patch non modifica acquisizione ranking, Incapsula, contenuti D1 o schedulazione. Nessuna pubblicazione main o rilancio remoto eseguito; l’utente applica patch e comandi.
