@@ -28,4 +28,4 @@ jobs:
       - name: Verify shared ordinary start and independent recovery without remote access
         run: |
           node --check cloudflare/app-api/lib/itf-junior-recovery.mjs
-          node --test --test-concurrency=2 cloudflare/app-api/test/itf-junior-recovery.test.mjs cloudflare/app-api/test/itf-junior-ranking-partial.test.mjs
+          node --test --test-concurrency=2 cloudflare/app-api/test/itf-junior-recovery.test.mjs cloudflare/app-api/test/itf-junior-ranking-partial.test.mjs cloudflare/app-api/test/itf-junior-targeted-recovery.test.mjs
