@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-18T21:58:00.910Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-18T22:00:29.245Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -959980,7 +959980,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T21:13:46.975Z",
+      "checkedAt": "2026-11-18T22:00:26.473Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 4,
@@ -962507,7 +962507,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T21:13:48.150Z",
+      "checkedAt": "2026-11-18T22:00:27.293Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -962632,8 +962632,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -962671,8 +962671,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -962704,7 +962704,7 @@
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -975893,14 +975893,14 @@
       "tournamentName": "J60 Pereira",
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
-      "decision": "pending",
-      "checkedAt": "2026-11-18T21:13:50.236Z",
+      "decision": "complete",
+      "checkedAt": "2026-11-18T22:00:28.855Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 5,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 5,
-      "missingSections": 1,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -976014,14 +976014,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -977742,6 +977742,100 @@
             "taskId": "J-J60-COL-2026-002__G-S-M-KO",
             "storedAt": "2026-11-18T19:31:16.655Z"
           }
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800724355",
+              "name": "Ignacio Mejias",
+              "givenName": "Ignacio",
+              "familyName": "Mejias",
+              "nationalityCode": "VEN",
+              "profileLink": "/en/players/ignacio-mejias/800724355/ven/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800656378",
+              "name": "Rafael Montalvo Galarza",
+              "givenName": "Rafael",
+              "familyName": "Montalvo Galarza",
+              "nationalityCode": "ECU",
+              "profileLink": "/en/players/rafael-montalvo-galarza/800656378/ecu/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800717006",
+              "name": "ALEJANDRO MARQUEZ",
+              "givenName": "ALEJANDRO",
+              "familyName": "MARQUEZ",
+              "nationalityCode": "COL",
+              "profileLink": "/en/players/alejandro-marquez/800717006/col/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800702369",
+              "name": "Tiziano Gomez",
+              "givenName": "Tiziano",
+              "familyName": "Gomez",
+              "nationalityCode": "ARG",
+              "profileLink": "/en/players/tiziano-gomez/800702369/arg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800779161",
+              "name": "Jairo Hernando Castaneda Moncada",
+              "givenName": "Jairo Hernando",
+              "familyName": "Castaneda Moncada",
+              "nationalityCode": "COL",
+              "profileLink": "/en/players/jairo-hernando-castaneda-moncada/800779161/col/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800720305",
+              "name": "Alex Perez",
+              "givenName": "Alex",
+              "familyName": "Perez",
+              "nationalityCode": "COL",
+              "profileLink": "/en/players/alex-perez/800720305/col/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800652577",
+              "name": "Jeronimo Duque Salazar",
+              "givenName": "Jeronimo",
+              "familyName": "Duque Salazar",
+              "nationalityCode": "COL",
+              "profileLink": "/en/players/jeronimo-duque-salazar/800652577/col/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800720216",
+              "name": "Benjamin Neftali Rojas Villanueva",
+              "givenName": "Benjamin Neftali",
+              "familyName": "Rojas Villanueva",
+              "nationalityCode": "VEN",
+              "profileLink": "/en/players/benjamin-neftali-rojas-villanueva/800720216/ven/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-18T22:00:28.855Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J60-COL-2026-002__B-S-M-KO",
+            "storedAt": "2026-11-18T22:00:28.855Z"
+          }
         }
       }
     },
@@ -977751,7 +977845,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-18T21:13:47.578Z",
+      "checkedAt": "2026-11-18T22:00:26.900Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -980697,7 +980791,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-18T21:13:48.666Z",
+      "checkedAt": "2026-11-18T22:00:27.695Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -986325,7 +986419,7 @@
       "startDate": "2026-11-16",
       "endDate": "2026-11-21",
       "decision": "pending",
-      "checkedAt": "2026-11-18T21:13:50.754Z",
+      "checkedAt": "2026-11-18T22:00:29.245Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -986450,8 +986544,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -986489,8 +986583,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -986522,7 +986616,7 @@
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -989859,7 +989953,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-18T21:13:49.209Z",
+      "checkedAt": "2026-11-18T22:00:28.080Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -991182,7 +991276,7 @@
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
       "decision": "pending",
-      "checkedAt": "2026-11-18T21:30:50.941Z",
+      "checkedAt": "2026-11-18T22:00:28.470Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 1,
@@ -991289,8 +991383,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -991315,8 +991409,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -991328,8 +991422,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -991341,14 +991435,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
