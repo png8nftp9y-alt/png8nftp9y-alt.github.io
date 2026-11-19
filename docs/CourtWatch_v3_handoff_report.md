@@ -11217,3 +11217,8 @@ No acquisition, identity mapping or D1 changes.
 Added user-confirmed year 2011 for exact identity cw-f71046ff22d79f0544a4830b5380e92f, FITP 7125349855. Uses existing reviewed birth-year import; remote readback pending.
 
 Updated reviewed birth-year fixture count from 23 to 24 to include Federico Vitali; retained all import, conflict and zero-write replay checks.
+
+
+## 2026-11-20 — Restore opponent renderer test dependencies
+
+Load the real tournamentConcluded and tournamentCancelled functions in the two isolated renderer test contexts. Preserve existing assertions and application behavior. Fixes five ReferenceError failures blocking the Worker deployment. Validation: both affected test files pass, 16 tests total. Production deployment remains subject to CI.

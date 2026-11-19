@@ -28,7 +28,8 @@ function view(){
  tournamentOfficialUrl:()=>'',tournamentSurfaceLabel:()=>'',tournamentPlace:()=> 'Luogo da pubblicare',opponentTournamentDateLabel:()=>'',bindParticipantNavigation:()=>{}};
  ctx.enrichItfJuniorRankings=enrichItfJuniorRankings;ctx.opponentEuropeProfile=opponentEuropeProfile;ctx.enrichIdentityNationalities=async()=>{};
  vm.createContext(ctx);
- vm.runInContext(slice(source,'const circuit =','const circuitRank =')+
+ vm.runInContext(slice(source,'function tournamentConcluded(','function playerTournamentEligible(')+
+ slice(source,'const circuit =','const circuitRank =')+
  slice(source,'function agendaKey(','function mergeKnownMatches(')+
  slice(source,'function incompleteCompletedScore(','function opponentHistoryRoundLabel(')+
  slice(source,'function opponentHistoryPersonHtml(','function opponentHistoryKey('),ctx);
