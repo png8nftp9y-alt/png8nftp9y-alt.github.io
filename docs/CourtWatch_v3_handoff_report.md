@@ -11163,3 +11163,9 @@ Validation: all 25 targeted empty-import/presence/document tests pass; full Work
 ITF discovery 2026-11-18T08:06:08.728Z: 6 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-11-18T08:07:25.185Z: attempted 6, acquired 6, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+## 2026-11-19 — Chiang and Migliorini explicit identity decisions
+User confirms Ethan Chiang ITF 800715811 and Europe ddd86ae5-fd92-44ff-9441-112b6b647364 are one person, and the two FITP Tommaso Migliorini are separate. Added exact reviewed rules and guarded incremental application following the existing five-review procedure. Keeps FITP 4828797672 linked to Europe 08268525-9480-4614-8c6d-6f6ee6a51ab3; FITP 2960558409 stays separate. Raw sources remain unchanged; decisions close only these exact native IDs. No broad nationality merge rule. Workflow performs targeted verification, application and readback, sharing the D1 write queue. Remote D1 verification remains pending user publication.
+
+Validation: 22 focused SQLite/mapping/review tests passed, zero failures.
