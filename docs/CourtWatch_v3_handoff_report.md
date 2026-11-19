@@ -11210,3 +11210,10 @@ Opponent pages show "No ranking ITF". Existing numeric rankings remain visible.
 Updated asset version and the existing UI regression.
 Validation: JavaScript syntax, whitespace checks and 29 targeted ranking tests.
 No acquisition, identity mapping or D1 changes.
+
+
+
+## 2026-11-20 — Federico Vitali birth year
+Added user-confirmed year 2011 for exact identity cw-f71046ff22d79f0544a4830b5380e92f, FITP 7125349855. Uses existing reviewed birth-year import; remote readback pending.
+
+Updated reviewed birth-year fixture count from 23 to 24 to include Federico Vitali; retained all import, conflict and zero-write replay checks.

@@ -62,7 +62,7 @@ test('existing different year or canonical identity change never gets overwritte
  }finally{d.close();}}
 });
 test('unresolved records are never imported and evidence persists year only',()=>{
- assert.equal(evidence.players.length,23);assert.equal(evidence.unresolved.length,0);
+ assert.equal(evidence.players.length,24);assert.equal(evidence.unresolved.length,0);
  assert.ok(!evidence.players.some(p=>evidence.unresolved.some(u=>u.id===p.id)));
  for(const p of evidence.players){assert.equal(typeof p.birthYear,'number');assert.equal(p.birthDate,undefined);assert.equal(p.dateOfBirth,undefined);}
 });
