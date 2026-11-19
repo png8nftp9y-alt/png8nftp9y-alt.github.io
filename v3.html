@@ -18,21 +18,23 @@
       html[data-cw-refresh-preview] main.view { pointer-events: none; }
     </style>
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=1794692701120761000" />
+    <link rel="stylesheet" href="v3.css?v=20261119225311-header" />
   </head>
   <body>
     <div class="shell">
       <header class="top">
-        <button type="button" id="brandHome" class="brand" aria-label="Torna alla home">
+        <div class="brandGroup">
+          <button type="button" id="brandHome" class="brand" aria-label="Torna alla home">
           <div class="logo">CW</div>
           <div><h1>Court Watch</h1><span id="activePlayerGroup" class="sectionGroupBadge" hidden>Altri</span></div>
         </button>
+          <button type="button" id="homeOthers" data-switch-player-group class="playersHeaderAction">Vai a Altri</button>
+        </div>
         <nav id="quickSectionNav" class="quickSectionNav" aria-label="Navigazione principale" hidden>
           <button type="button" data-home-route="players" aria-label="Giocatori" title="Giocatori">👤</button>
           <button type="button" data-home-route="calendar" aria-label="Calendario" title="Calendario">🗓️</button>
           <button type="button" data-home-route="agenda" aria-label="Agenda" title="Agenda">📌</button>
         </nav>
-        <button type="button" id="homeOthers" data-switch-player-group class="playersHeaderAction">Vai a Altri</button>
         <div class="status" id="syncStatus">Caricamento…</div>
         <div class="accountControl" id="accountControl">
           <button
@@ -73,7 +75,6 @@
           <button id="weeklyAgendaToggle" class="weeklyAgendaToggle" type="button" aria-expanded="false" aria-controls="weeklyAgendaPanel">
             <span aria-hidden="true">📋</span><strong>Tornei della settimana</strong>
           </button>
-          <button type="button" class="playersHeaderAction" data-switch-player-group>Vai a Altri</button>
         </div>
         <section id="weeklyAgendaPanel" class="card weeklyAgendaPanel" hidden>
           <div class="cardHead"><h3 id="weeklyAgendaTitle">Tornei della settimana</h3></div>
@@ -226,7 +227,6 @@
                     <option value="F">F</option>
                   </select></label
                 >
-                <button type="button" class="playersHeaderAction" data-switch-player-group>Vai a Altri</button>
               </div>
               <button id="toggleAll" class="btn">Deseleziona tutti</button>
             </div>
@@ -266,14 +266,7 @@
                     title="Rimuovi giocatore"
                   >
                     −</button
-                  ><button
-                    type="button"
-                    class="playersHeaderAction"
-                    aria-label="Vai a Altri"
-                    data-switch-player-group
                   >
-                    Vai a Altri
-                  </button>
                 </div>
                 <span id="playerTotal"></span>
                 <form id="playerSearchForm" class="playerSearchForm" role="search" autocomplete="off">
@@ -322,7 +315,7 @@
           view.innerHTML = saved.html;
           view.classList.add("active");
           document.getElementById("quickSectionNav").hidden = !location.hash;
-          document.getElementById("homeOthers").hidden = Boolean(location.hash);
+          document.getElementById("homeOthers").hidden = false;
           document.getElementById("syncStatus").hidden = true;
           document.documentElement.dataset.cwRefreshPreview = "";
           history.scrollRestoration = "manual";
@@ -389,6 +382,6 @@
         if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
       })();
     </script>
-    <script crossorigin="anonymous" src="v3.js?v=1795053273199771001-ranking-order"></script>
+    <script crossorigin="anonymous" src="v3.js?v=20261119225311-header"></script>
   </body>
 </html>

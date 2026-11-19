@@ -627,3 +627,14 @@ button,a,[role="link"],summary{touch-action:manipulation}
 .agendaTournamentBlock .agendaMatchRow {
   grid-template-columns: minmax(0, 1fr);
 }
+
+/* Shared header group switch */
+.brandGroup{display:flex;align-items:center;gap:12px;min-width:0;justify-self:start}
+.brandGroup .brand{margin-right:0}
+.top .brandGroup #homeOthers{flex:0 0 auto;white-space:nowrap;min-height:44px}
+@media(max-width:700px){
+  .brandGroup{gap:8px}
+  .brandGroup .brand{gap:6px}
+  .brandGroup .brand h1{font-size:15px}
+  .top .brandGroup #homeOthers{grid-column:auto;grid-row:auto;padding:6px 8px;font-size:12px}
+}

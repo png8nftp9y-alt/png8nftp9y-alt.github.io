@@ -4638,7 +4638,7 @@ function route() {
   }
   const isHomeRoute = !location.hash;
   $("quickSectionNav").hidden = isHomeRoute;
-  $("homeOthers").hidden = !isHomeRoute;
+  $("homeOthers").hidden = false;
   document.querySelectorAll("#quickSectionNav [data-home-route]").forEach(
     (button) =>
       button.classList.toggle(
