@@ -11173,3 +11173,7 @@ Validation: 22 focused SQLite/mapping/review tests passed, zero failures.
 
 ## 2026-11-19 — Ordine classifiche pagina giocatore
 Visualizzazione FITP, ITF, Tennis Europe nella funzione condivisa dal caricamento iniziale e aggiornato. Versione asset aggiornata. Verifica sintattica JavaScript eseguita prima del commit.
+
+
+## 2026-11-19 — Chiang/Migliorini D1 test association
+Added the existing incremental regression tests under the exact filename required by the global D1 policy. No identity or data changes. Validated targeted tests and global D1 policy.
