@@ -73,9 +73,10 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
     if(acquired){covered++;pendingOpponents++;continue;}
    }
 
-   // A current or future singles slot may be published before either player is assigned.
-   if(size===2&&card.round&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>=iso(asOf)&&emptyParticipantRows(card.evidenceHtml)){
-    resolutions.push({kind:'future_singles_awaiting_both_players',date:card.date,event:card.event,round:card.round,sourceUrl:card.sourceUrl,sourceHash:card.sourceHash});continue;
+   // Current or future singles/doubles slots may await both players/teams.
+   // Accept only two explicitly empty native rows, without result or winner.
+   if([2,4].includes(size)&&card.round&&card.drawUrl&&card.players.length===0&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>=iso(asOf)&&emptyParticipantRows(card.evidenceHtml)){
+    resolutions.push({kind:size===4?'doubles_awaiting_both_teams':'future_singles_awaiting_both_players',date:card.date,event:card.event,round:card.round,sourceUrl:card.sourceUrl,sourceHash:card.sourceHash});continue;
    }
 
    if(size===4&&card.round&&card.drawUrl&&card.players.length===2&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>=iso(asOf)&&doublesAwaitingOpponent(card.evidenceHtml,card.players)){
