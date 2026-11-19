@@ -26,6 +26,8 @@ on:
       - '.github/workflows/courtwatch-release-safety.yml'
       - 'tools/release-code-fingerprint.mjs'
       - 'tools/ensure-release-safety.mjs'
+      - 'tools/prepare-ci-browser-apt.py'
+      - 'tools/tests/prepare-ci-browser-apt.test.py'
       - 'tools/run-release-safety.mjs'
       - 'tools/tests/ensure-release-safety.test.mjs'
       - 'tools/verify-player-group-release-browser.mjs'
@@ -58,7 +60,7 @@ jobs:
         with: {node-version: '22'}
       - name: Check source outside the D1 writer queue
         working-directory: cloudflare/app-api
-        run: npm run check && node --test test/app-worker-r2-binding.test.mjs
+        run: npm run check && node --test test/app-worker-r2-binding.test.mjs && python3 ../../tools/tests/prepare-ci-browser-apt.test.py
   release-safety:
     needs: check-source
     uses: ./.github/workflows/courtwatch-release-safety.yml

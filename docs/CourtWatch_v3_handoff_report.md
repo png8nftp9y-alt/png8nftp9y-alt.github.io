@@ -11179,3 +11179,7 @@ Visualizzazione FITP, ITF, Tennis Europe nella funzione condivisa dal caricament
 Added the existing incremental regression tests under the exact filename required by the global D1 policy. No identity or data changes. Validated targeted tests and global D1 policy.
 
 ITF discovery 2026-11-19T02:04:16.457Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+## 2026-11-19 — Release browser installation handles current Ubuntu runner mirrors
+Worker hotfix 44440819628 passed source and initial release safety, then stopped during final revision recheck: Playwright dependency download from us-east-2.ec2.archive.ubuntu.com exceeded 300 seconds. The existing preparation only replaced legacy Azure URIs. Normalize runner mirror+file sources (archive and security separately) and direct EC2 Ubuntu mirrors to official HTTPS endpoints, retaining existing 20-second APT network limits and unrelated vendor sources. Increase final browser-install subprocess timeout to 600 seconds; retain all required source, browser, snapshot and exact-code checks. Hotfix watches helper changes and runs the mirror regression. Validation: isolated Python mirror/idempotence/vendor-preservation regression and four existing release-gate tests passed. Live installation/deploy remains pending publication; network availability cannot be guaranteed.
