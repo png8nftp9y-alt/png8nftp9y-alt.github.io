@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-19T17:15:10.003Z",
+  "generatedAt": "2026-11-19T17:44:01.545Z",
   "today": "2026-11-19",
   "windowEnd": "2026-11-22",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -62,17 +62,17 @@
             "family": "G-S-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "incapsula_blocked",
-            "detail": "richiesta bloccata da Incapsula",
-            "lastError": "GetDrawsheet_incapsula_challenge",
-            "lastAttemptAt": "2026-11-19T17:01:33.994Z",
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-19T17:31:21.777Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-19T17:01:33.994Z",
+        "checkedAt": "2026-11-19T17:31:21.777Z",
         "eligibleFrom": "2026-11-16"
       }
     ],
@@ -80,7 +80,7 @@
     "missingDraws": 1,
     "acquiredDraws": 5,
     "missingByReason": {
-      "incapsula_blocked": 1
+      "draw_without_players": 1
     },
     "byStatus": {
       "missing": 1
