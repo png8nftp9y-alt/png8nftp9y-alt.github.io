@@ -11177,3 +11177,5 @@ Visualizzazione FITP, ITF, Tennis Europe nella funzione condivisa dal caricament
 
 ## 2026-11-19 — Chiang/Migliorini D1 test association
 Added the existing incremental regression tests under the exact filename required by the global D1 policy. No identity or data changes. Validated targeted tests and global D1 policy.
+
+ITF discovery 2026-11-19T02:04:16.457Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
