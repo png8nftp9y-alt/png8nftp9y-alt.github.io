@@ -14,8 +14,12 @@ def prepare(apt):
         if not path.is_file():
             continue
         text = path.read_text()
-        updated = re.sub(r'https?://azure\.archive\.ubuntu\.com/ubuntu(?=[/\s]|$)',
+        updated = re.sub(r'mirror\+file:/etc/apt/apt-mirrors\.txt(?=[/\s]|$)',
                          'https://archive.ubuntu.com/ubuntu', text)
+        updated = re.sub(r'mirror\+file:/etc/apt/apt-mirrors-security\.txt(?=[/\s]|$)',
+                         'https://security.ubuntu.com/ubuntu', updated)
+        updated = re.sub(r'https?://(?:azure\.archive\.ubuntu\.com|[a-z0-9-]+\.ec2\.archive\.ubuntu\.com)/ubuntu(?=[/\s]|$)',
+                         'https://archive.ubuntu.com/ubuntu', updated)
         if updated != text:
             path.write_text(updated)
             changed += 1
