@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-19T21:11:01.944Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-19T21:13:25.723Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -992134,14 +992134,14 @@
       "tournamentName": "J30 Kozerki",
       "startDate": "2026-11-17",
       "endDate": "2026-11-22",
-      "decision": "pending",
-      "checkedAt": "2026-11-19T20:45:41.142Z",
+      "decision": "complete",
+      "checkedAt": "2026-11-19T21:13:25.723Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 5,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 5,
-      "missingSections": 1,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -992294,14 +992294,14 @@
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 8,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -993542,6 +993542,100 @@
             "complete": true,
             "taskId": "J-J30-POL-2026-006__B-S-M-KO",
             "storedAt": "2026-11-19T15:58:00.054Z"
+          }
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800693968",
+              "name": "Anna Idaszewska",
+              "givenName": "Anna",
+              "familyName": "Idaszewska",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/anna-idaszewska/800693968/pol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800755690",
+              "name": "Natalia Zablocka",
+              "givenName": "Natalia",
+              "familyName": "Zablocka",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/natalia-zablocka/800755690/pol/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800647076",
+              "name": "Ruzena Karsnakova",
+              "givenName": "Ruzena",
+              "familyName": "Karsnakova",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/ruzena-karsnakova/800647076/cze/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800774748",
+              "name": "Anna Kuznetsova",
+              "givenName": "Anna",
+              "familyName": "Kuznetsova",
+              "nationalityCode": "UKR",
+              "profileLink": "/en/players/anna-kuznetsova/800774748/ukr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800775834",
+              "name": "KRISTYNA NIKODYMOVA",
+              "givenName": "KRISTYNA",
+              "familyName": "NIKODYMOVA",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/kristyna-nikodymova/800775834/cze/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800715143",
+              "name": "Eliska Holubova",
+              "givenName": "Eliska",
+              "familyName": "Holubova",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/eliska-holubova/800715143/cze/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800744991",
+              "name": "Nikol Suchankova",
+              "givenName": "Nikol",
+              "familyName": "Suchankova",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/nikol-suchankova/800744991/cze/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800678001",
+              "name": "Adela Jelinkova",
+              "givenName": "Adela",
+              "familyName": "Jelinkova",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/adela-jelinkova/800678001/cze/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-19T21:13:25.723Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-POL-2026-006__G-S-M-KO",
+            "storedAt": "2026-11-19T21:13:25.723Z"
           }
         }
       }
