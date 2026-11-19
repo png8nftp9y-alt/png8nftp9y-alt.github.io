@@ -11163,3 +11163,7 @@ Validation: all 25 targeted empty-import/presence/document tests pass; full Work
 ITF discovery 2026-11-18T08:06:08.728Z: 6 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-11-18T08:07:25.185Z: attempted 6, acquired 6, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+## 2026-11-19 — Player profile ranking display order
+User requests FITP, ITF, then Tennis Europe in the player profile. Reorder labels in the shared currentPlayerRankingLabels renderer used by initial/cached and live ranking display; retain ranking values and category/date filtering. Bump v3.js asset version in v3.html. Validation: JavaScript syntax and direct renderer checks for all three circuits and missing rankings. Production application pending user cherry-pick/push.
