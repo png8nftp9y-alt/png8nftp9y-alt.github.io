@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-19T14:44:51.365Z",
+  "generatedAt": "2026-11-19T15:01:43.761Z",
   "today": "2026-11-19",
   "windowEnd": "2026-11-22",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -62,10 +62,10 @@
             "family": "B-S-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "incapsula_blocked",
-            "detail": "richiesta bloccata da Incapsula",
-            "lastError": "GetDrawsheet_incapsula_challenge",
-            "lastAttemptAt": "2026-11-19T14:16:29.441Z",
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-19T14:46:54.595Z",
             "rowParity": null,
             "sources": []
           },
@@ -74,17 +74,17 @@
             "family": "G-S-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "incapsula_blocked",
-            "detail": "richiesta bloccata da Incapsula",
-            "lastError": "GetDrawsheet_incapsula_challenge",
-            "lastAttemptAt": "2026-11-19T14:16:29.441Z",
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-19T14:46:54.595Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-19T14:16:29.441Z",
+        "checkedAt": "2026-11-19T14:46:54.595Z",
         "eligibleFrom": "2026-11-16"
       },
       {
@@ -106,7 +106,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-19T14:16:22.930Z",
+            "lastAttemptAt": "2026-11-19T14:46:40.388Z",
             "rowParity": null,
             "sources": []
           },
@@ -118,14 +118,14 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-19T14:16:22.930Z",
+            "lastAttemptAt": "2026-11-19T14:46:40.388Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-19T14:16:22.930Z",
+        "checkedAt": "2026-11-19T14:46:40.388Z",
         "eligibleFrom": "2026-11-16"
       }
     ],
@@ -133,8 +133,7 @@
     "missingDraws": 4,
     "acquiredDraws": 7,
     "missingByReason": {
-      "incapsula_blocked": 2,
-      "draw_without_players": 2
+      "draw_without_players": 4
     },
     "byStatus": {
       "missing": 2
