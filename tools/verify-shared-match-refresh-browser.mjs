@@ -258,7 +258,7 @@ try {
     assert.equal(await page.evaluate(() => documentIdentity), documentIdentity);
     failGroupSnapshot = false; holdGroupSnapshot = true;
     const destinationRequest = page.waitForRequest(request => request.url().includes('/app-snapshot') && request.headers()['x-courtwatch-group'] === targetGroup);
-    await page.locator('#playersView [data-switch-player-group]').click();
+    await page.locator('#homeOthers').click();
     await destinationRequest;
     assert.equal(await page.evaluate(() => PLAYER_GROUP), group);
     assert.equal(await page.locator('#playersList .playerRow').count(), 1);
@@ -268,7 +268,7 @@ try {
     assert.deepEqual(await page.evaluate(() => state.data.players.map(player => player.id)), [targetPlayer.id]);
     assert.deepEqual(await page.evaluate(() => [...state.selected]), [targetPlayer.id]);
     assert.equal(await page.evaluate(() => documentIdentity), documentIdentity);
-    await page.locator('#playersView [data-switch-player-group]').click();
+    await page.locator('#homeOthers').click();
     await page.waitForFunction(expected => PLAYER_GROUP === expected && !groupSwitchRunning, group);
     assert.deepEqual(await page.evaluate(() => state.data.players.map(player => player.id)), [player.id]);
     assert.equal(await page.evaluate(() => state.selected.size), 0, `${group}: deselect-all must remain scoped to the original list`);

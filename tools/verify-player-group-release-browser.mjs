@@ -30,8 +30,8 @@ const verify=async group=>{
 try{
  await page.goto('http://127.0.0.1:'+server.address().port+'/v3.html?protected=1#players',{waitUntil:'domcontentloaded'});
  await verify('main');
- await page.locator('#playersView [data-switch-player-group]').click();await verify('others');
- await page.locator('#playersView [data-switch-player-group]').click();await verify('main');
+ await page.locator('#homeOthers').click();await verify('others');
+ await page.locator('#homeOthers').click();await verify('main');
  assert.ok(requests.main>0&&requests.others>0);assert.equal(errors.length,0);
  console.log('REAL_TCL_OTHERS_SWITCH='+JSON.stringify({passed:true,mainPlayers:snapshots.main.players.length,othersPlayers:snapshots.others.players.length,requests}));
 }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

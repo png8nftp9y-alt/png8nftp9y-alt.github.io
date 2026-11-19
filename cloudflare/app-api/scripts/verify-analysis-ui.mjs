@@ -84,7 +84,7 @@ assert.ok(hasSource('gender: agendaGenderClass(match)') && hasSource('drawCode $
 assert.ok(hasSource('matchup = `vs ${opponents || "Avversario da definire"}`') && hasSource('Doppio${partner === "__double__" ? "" : ` con ${partner}`}') && !hasSource('matchup = `${partners ? `con ${partners} ` : ""}vs ${opponents'), 'opponent doubles must show the partner only in the section heading');
 assert.ok(hasApiSource("apiPath==='/opponent-profile'"), 'API must expose opponent history');
 assert.ok(hasApiSource('universalOpponentHistory') && hasApiSource('opponentEntryTournaments') && hasApiSource('opponent_entry_profiles'), 'opponent profiles must merge Tennis Europe history with FITP and ITF tournament entries');
-assert.ok(hasSource('opponentTournamentEntry') && hasSource('tournament.acceptanceCode') && hasSource('sourceDot ${esc(source)}'), 'opponent profiles must distinguish entry-only FITP and ITF tournaments without inventing matches');
+assert.ok(hasSource('function opponentTournamentAcceptanceLabel(') && hasSource('tournament.acceptanceCode') && hasSource('Acceptance list: ${esc(acceptanceLabel)}') && hasSource('sourceDot ${esc(source)}'), 'opponent profiles must distinguish entry-only FITP and ITF tournaments without inventing matches');
 assert.equal(tennisEuropeNativeId('78'), '', 'draw-local numeric IDs cannot identify a Europe person');
 assert.equal(tennisEuropeNativeId('12345678-1234-1234-1234-123456789ABC'), '12345678-1234-1234-1234-123456789abc', 'official GUIDs must be normalized');
 assert.ok(hasSource('&profileId=') && hasApiSource('opponentEuropeSources') && hasApiSource('opponentSelfParticipant'), 'opponent history must use the ID-aware source and participant resolver');
@@ -142,7 +142,7 @@ assert.ok(hasSource('function groupedMatchSections(') && hasSource('matchTypeHea
 assert.ok(hasSource('function fullMatchRoundLabel(') && hasSource('Qualification round ${Math.max') && hasSource('matchRoundFull'), 'all match pages must use full round labels and ordinal qualification rounds');
 assert.ok(hasSource('/bonus\\s*draw/i.test(source)') && hasSource('Bonus ${value}'), 'bonus draws must prefix the complete round label');
 assert.ok(!hasSource('<span class="matchType">${matchType}</span>'), 'grouped match rows must not repeat the match type');
-assert.ok((html.match(/<button\b[^>]*\bdata-switch-player-group(?:\s|>)/g) || []).length === 4 && hasSource('X-CourtWatch-Group') && hasSource('GROUP_CACHE_SUFFIX'), 'Altri must share routes with a scoped persistent player list and caches');
+assert.ok((html.match(/<button\b[^>]*\bdata-switch-player-group(?:\s|>)/g) || []).length === 1 && html.includes('class="brandGroup"') && hasSource('X-CourtWatch-Group') && hasSource('GROUP_CACHE_SUFFIX'), 'Altri must share routes with a scoped persistent player list and caches');
 assert.ok(hasSource('Acceptance list: '), 'scheduled Tennis Europe tournaments must label the acceptance list');
 assert.ok(hasSource('querySelectorAll(".unifiedMatchRow")') && hasSource('class="result ${outcome}"') && hasSource('$("brandHome").onclick'), 'tournament counters must read unified rows and the brand must return home');
 assert.ok(!hasSource('$("resetHome")') && hasSource('String(a.startDate || "").localeCompare'), 'home label must be absent and weekly tournaments must be ordered');

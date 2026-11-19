@@ -30,7 +30,7 @@ try {
    await page.goto('https://courtwatch.test/app#players');
    await page.waitForFunction(()=>state.data?.players?.[0]?.id==='main-player'&&loadRunning);
    const identity=await page.evaluate(()=>documentIdentity='preserved');
-   await page.locator('#playersView [data-switch-player-group]').tap();
+   await page.locator('#homeOthers').tap();
    await page.waitForFunction(()=>PLAYER_GROUP==='others'&&!groupSwitchRunning&&state.data?.membershipOnly===true);
    await page.locator('#playersList [data-profile="others-player"]').waitFor();
    assert.match(await page.locator('#playersList').innerText(),/Saved Club/);
@@ -87,7 +87,9 @@ try {
   for(const route of ['','players','calendar','agenda']){
    await page.evaluate(route=>location.hash=route,route);
    const view='#'+(route||'home')+'View.active';await page.locator(view).waitFor();
-   const switcher=page.locator(route?view+' [data-switch-player-group]':'#homeOthers');
+   assert.equal(await page.locator('[data-switch-player-group]').count(),1);
+   assert.equal(await page.locator('.brandGroup #homeOthers').isVisible(),true);
+   const switcher=page.locator('#homeOthers');
    if(scenario==='null-ui')await page.evaluate(()=>localStorage.setItem('courtwatch-v3-ui-state-v1','null'));
    await switcher.tap();
    await page.waitForFunction(()=>PLAYER_GROUP==='main'&&!groupSwitchRunning);

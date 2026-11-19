@@ -138,7 +138,7 @@ try{
   }
   await page.locator('#brandHome').click();await page.locator('#homeView.active').waitFor({state:'visible'});
   requireCheck(await page.locator('#homeView').isVisible(),'layout mobile home');
-  requireCheck(await page.locator('[data-switch-player-group]').count()===4,'quattro accessi alla sezione parallela');
+  requireCheck(await page.locator('[data-switch-player-group]').count()===1,'unico accesso alla sezione parallela nella testata');
   await page.locator('#homeOthers').click();await page.waitForURL(url=>url.searchParams.get('group')==='others',{waitUntil:'domcontentloaded'});
   await openSection('players');
   await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='0');
@@ -152,7 +152,7 @@ try{
   await page.reload({waitUntil:'domcontentloaded'});await page.locator('#profileView.active').waitFor({state:'visible'});
   await openSection('players');await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='1');
   requireCheck(await page.locator('#playersList [data-profile]').count()===1,'Altri conservato dopo ricarica');
-  await page.locator('#playersView [data-switch-player-group]').click();await page.waitForURL(url=>!url.searchParams.has('group'),{waitUntil:'domcontentloaded'});
+  await page.locator('#homeOthers').click();await page.waitForURL(url=>!url.searchParams.has('group'),{waitUntil:'domcontentloaded'});
   await page.waitForFunction(n=>document.querySelector('#playerTotal')?.textContent===String(n),playerCount);
   requireCheck(await page.locator('#playersList [data-profile="shield-other"]').count()===0,'aggiunta Altri non modifica TCL');
   requireCheck(await page.locator('#playersView.active').isVisible()&&new URL(page.url()).hash==='#players','Altri → TCL conserva pagina Giocatori');
@@ -162,20 +162,20 @@ try{
   await page.evaluate(()=>scrollTo(0,80));
   const mirrorScroll=await page.evaluate(()=>scrollY);
   requireCheck(mirrorScroll>0,'calendario sorgente con posizione di scroll verificabile');
-  await page.locator('#calendarView [data-switch-player-group]').evaluate(button=>button.click());
+  await page.locator('#homeOthers').evaluate(button=>button.click());
   await page.waitForURL(url=>url.searchParams.get('group')==='others'&&url.hash==='#calendar',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelectorAll('#playerFilters button').length===1);
   await page.waitForFunction(y=>Math.abs(scrollY-y)<=2,mirrorScroll);
   requireCheck(await page.locator('#calendarView.active').isVisible(),'TCL → Altri conserva Calendario');
   requireCheck(await page.locator('#calendarMonthLabel').textContent()===mirrorMonth&&await page.locator('#calendarSex').inputValue()==='F','Calendario speculare conserva mese e filtro');
-  requireCheck(await page.locator('#calendarView [data-switch-player-group]').textContent()==='Vai a TCL','etichetta TCL nel calendario Altri');
-  await page.locator('#calendarView [data-switch-player-group]').evaluate(button=>button.click());
+  requireCheck(await page.locator('#homeOthers').textContent()==='Vai a TCL','etichetta TCL nel calendario Altri');
+  await page.locator('#homeOthers').evaluate(button=>button.click());
   await page.waitForURL(url=>!url.searchParams.has('group')&&url.hash==='#calendar',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(n=>document.querySelectorAll('#playerFilters button').length===n,playerCount);
   await page.waitForFunction(y=>Math.abs(scrollY-y)<=2,mirrorScroll);
   requireCheck(await page.locator('#calendarMonthLabel').textContent()===mirrorMonth,'Altri → TCL conserva Calendario e posizione');
   await openSection('players');
-  await page.locator('#playersView [data-switch-player-group]').click();await page.waitForURL(url=>url.searchParams.get('group')==='others'&&url.hash==='#players',{waitUntil:'domcontentloaded'});
+  await page.locator('#homeOthers').click();await page.waitForURL(url=>url.searchParams.get('group')==='others'&&url.hash==='#players',{waitUntil:'domcontentloaded'});
   await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='1');
   await page.locator('#removePlayer').click();await page.locator('[data-remove-player="shield-other"]').click();
   await page.locator('[data-removal-yes]').click();await page.waitForFunction(()=>document.querySelector('#playerTotal')?.textContent==='0');

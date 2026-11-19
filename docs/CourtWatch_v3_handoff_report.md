@@ -11198,3 +11198,7 @@ Validation: 15 targeted tests passed, including execution of the real opponent r
 ## 2026-11-19 — Single group switch beside Court Watch brand
 
 The shared Vai a Altri / Vai a TCL switch now sits beside the brand and remains visible on every route, including initial HTML rendering. Removed duplicate switches from Players, Calendar and Agenda. Existing group-switch behavior is preserved. Updated JS/CSS asset versions. Validation: one HTML switch and header placement assertions, JavaScript syntax and whitespace checks. Production visual verification awaits publication.
+
+## 2026-11-19 — Align navigation checks with the single header switch
+
+Runs 44632743952 and 44632744155 timed out because browser checks still selected the removed Players switch. Updated all scoped switch selectors, including release and functional shield checks, to the shared header control; the mobile route loop now asserts exactly one control and visibility in the brand wrapper. Run 44632744075 stopped on the obsolete opponentTournamentEntry source assertion after the acceptance-label change; the source guard now requires the replacement acceptance-label function and rendering. All existing behavioral checks remain. Validation: source UI check and three acceptance-label tests passed; browser launch blocked locally by socket restrictions. Live browser confirmation awaits publication.
