@@ -65,10 +65,10 @@ test('real Worker player-ranking endpoint exposes persisted partial rank and act
   const opponentLabel=ctx.opponentEuropeRankingText({itfJuniorRanking:data.itfJuniorRanking});assert.match(opponentLabel,/n°321 ITF Junior/);assert.match(opponentLabel,/ranking del 2026-11-09/);assert.doesNotMatch(opponentLabel,/parziale|incompleto/);
  }finally{d.close();}
 });
-test('UI distinguishes pending partial data from confirmed unranked status and clears stale opponent cache',()=>{
+test('UI shows No ranking ITF for opponents and clears stale opponent cache',()=>{
  const ctx=view();
  assert.doesNotMatch(ctx.opponentEuropeRankingText({itfJuniorRanking:{ranking:null,status:'pending'}}),/non classificato/);
- assert.match(ctx.opponentEuropeRankingText({itfJuniorRanking:{ranking:null,status:'unranked',rankingDate:'2026-11-09'}}),/non classificato/);
+ for(const status of ['unranked','pending','unavailable'])assert.equal(ctx.opponentEuropeRankingText({itfJuniorRanking:{ranking:null,status,rankingDate:'2026-11-09'}}),'No ranking ITF');
  ctx.circuit=t=>t.circuit||'itf';vm.runInContext(slice('function mergeOpponentHistory(','async function fetchOpponentHistory('),ctx);
  const fresh=ctx.mergeOpponentHistory({profile:{itfJuniorRanking:{ranking:321}},tournaments:[]},{profile:{itfJuniorRanking:null},tournaments:[]});assert.equal(fresh.profile.itfJuniorRanking,null);
  vm.runInContext(slice('function mergeProgressiveRankingFields(','function applyPendingProgressiveRankings('),ctx);

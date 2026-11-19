@@ -537,11 +537,13 @@ const itfRankingText = (value, showDate = false) => {
   const date = showDate && value.rankingDate ? ` · (ranking del ${displayDate(value.rankingDate)})` : "";
   if (Number.isInteger(value.ranking) && value.ranking > 0)
     return `n°${value.ranking} ITF Junior${date}`;
-  if (value.status === "unranked") return `ITF Junior · non classificato${date}`;
-  return "Ranking ITF Junior non disponibile";
+  return "No ranking ITF";
 };
 const teRankHtml = (value) => {
-  if (value && typeof value === "object" && value.status) return ` <span class="teRanking">${esc(itfRankingText(value))}</span>`;
+  if (value && typeof value === "object" && value.status) {
+    const label = itfRankingText(value);
+    return label ? ` <span class="teRanking">${esc(label)}</span>` : "";
+  }
   const rank = Number(value);
   return Number.isInteger(rank) && rank > 0
     ? ` <span class="teRanking">n°${rank} TE</span>`
@@ -568,7 +570,8 @@ function currentPlayerRankingLabels(player, rows = null) {
   const labels = [];
   const fitpRanking = player?.fitpEntryRanking?.ranking || player?.ranking;
   if (fitpRanking) labels.push(`${readableText(fitpRanking)} FITP`);
-  if(player?.itfJuniorRanking)labels.push(itfRankingText(player.itfJuniorRanking));
+  const itfLabel = Number.isInteger(player?.itfJuniorRanking?.ranking) && player.itfJuniorRanking.ranking > 0 ? itfRankingText(player.itfJuniorRanking) : "";
+  if (itfLabel) labels.push(itfLabel);
   const liveRows = Array.isArray(rows)
     ? rows
     : Object.entries(player?.tennisEuropeRankings || {}).map(([category, ranking]) => ({

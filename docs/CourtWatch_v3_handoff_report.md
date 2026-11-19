@@ -11202,3 +11202,11 @@ The shared Vai a Altri / Vai a TCL switch now sits beside the brand and remains 
 ## 2026-11-19 — Align navigation checks with the single header switch
 
 Runs 44632743952 and 44632744155 timed out because browser checks still selected the removed Players switch. Updated all scoped switch selectors, including release and functional shield checks, to the shared header control; the mobile route loop now asserts exactly one control and visibility in the brand wrapper. Run 44632744075 stopped on the obsolete opponentTournamentEntry source assertion after the acceptance-label change; the source guard now requires the replacement acceptance-label function and rendering. All existing behavioral checks remain. Validation: source UI check and three acceptance-label tests passed; browser launch blocked locally by socket restrictions. Live browser confirmation awaits publication.
+
+## 2026-11-20 — ITF ranking absence by page
+
+Observed-player pages omit the ITF label without a positive numeric rank.
+Opponent pages show "No ranking ITF". Existing numeric rankings remain visible.
+Updated asset version and the existing UI regression.
+Validation: JavaScript syntax, whitespace checks and 29 targeted ranking tests.
+No acquisition, identity mapping or D1 changes.
