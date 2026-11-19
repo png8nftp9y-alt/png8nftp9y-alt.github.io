@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-11-19T16:45:35.683Z",
+  "generatedAt": "2026-11-19T17:13:32.787Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -20,16 +20,16 @@
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
     "retrySections": 1,
-    "technicalErrorSections": 0,
+    "technicalErrorSections": 1,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 1,
+    "notPublishedOrIncompleteSections": 0,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 603,
     "globalCancelledNoDraws": 13,
     "globalPendingTotal": 46,
-    "globalPendingTechnical": 33,
-    "globalPendingPublication": 13,
+    "globalPendingTechnical": 34,
+    "globalPendingPublication": 12,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -63,7 +63,8 @@
       "J-J100-SVK-2026-001",
       "J-J100-TUR-2026-006",
       "J-J100-USA-2026-002",
-      "J-J100-USA-2026-004"
+      "J-J100-USA-2026-004",
+      "J-J30-POL-2026-006"
     ],
     "publicationPendingCompetitionIds": [
       "J-J30-DOM-2026-001",
@@ -77,8 +78,7 @@
       "J-J100-GUA-2026-002",
       "J-J100-MEX-2026-001",
       "J-J100-RSA-2026-001",
-      "J-J100-SWE-2026-002",
-      "J-J30-POL-2026-006"
+      "J-J100-SWE-2026-002"
     ]
   },
   "audit": [
@@ -184,8 +184,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -217,7 +217,7 @@
           ]
         }
       ],
-      "eventFailure": null
+      "eventFailure": "GetDrawsheet_incapsula_challenge"
     }
   ]
 }
