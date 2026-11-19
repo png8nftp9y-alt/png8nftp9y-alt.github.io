@@ -11187,3 +11187,10 @@ Worker hotfix 44440819628 passed source and initial release safety, then stopped
 ITF discovery 2026-11-19T21:06:11.120Z: 1 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-11-19T21:07:47.463Z: attempted 1, acquired 1, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+## 2026-11-19 — Opponent tournament acceptance labels
+
+The opponent renderer displayed only the ITF acceptance code and discarded the numeric acceptance position supplied by the API. ITF and Tennis Europe now show Acceptance list: CODE-position beside the tournament name, using acceptancePosition, legacy entryPosition or the saved list-label suffix. FITP has no redundant Iscritto caption. Explicit draw confirmation or an acquired match suppresses the acceptance label; the start date alone does not fabricate a confirmation. Concluded, cancelled, withdrawn and excluded records have no acceptance label. No source acquisition, D1 write or scheduling change. Client asset version incremented.
+
+Validation: 15 targeted tests passed, including execution of the real opponent renderer, ITF/Europe numeric labels, FITP absence, current unconfirmed lists, draw/match confirmation and chronology/cache regressions. JavaScript syntax passed. Release guard required before publication. Lola/Saint Paul live page remains to be checked after deploy; this change does not certify freshness of the remote opponent index.

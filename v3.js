@@ -3603,6 +3603,21 @@ function opponentEuropeRankingText(profile) {
   return profile.europeRankingStatus === 'unranked-u12' ? 'No ranking Europe U12'
     : profile.europeRankingStatus === 'unranked' ? 'No ranking Europe' : '';
 }
+function opponentTournamentAcceptanceLabel(tournament) {
+  if (!['itf', 'tennis-europe'].includes(circuit(tournament)) || tournamentConcluded(tournament) ||
+      tournamentCancelled(tournament) || tournament.drawConfirmed === true ||
+      /draw_confirmed|official_draw/i.test(`${tournament.calendarState || ''} ${tournament.entryStatus || ''}`) ||
+      /withdrawn|removed|excluded|ritirat|cancelled|canceled|annullat/i.test(`${tournament.status || ''} ${tournament.entryStatus || ''}`) ||
+      (tournament.matches || []).length) return '';
+  const raw = String(tournament.acceptanceCode || tournament.calendarListLabel || '').trim().toUpperCase();
+  const parts = raw.split('-');
+  const code = ({MAIN:'MD', QUALIFYING:'Q', ALTERNATE:'A', ALTERNATES:'A'})[parts[0]] || parts[0];
+  if (!['MD', 'Q', 'A', 'WC', 'LL'].includes(code)) return '';
+  const position = tournament.acceptancePosition ?? tournament.entryPosition ??
+    parts[1] ?? String(tournament.calendarListLabel || '').split('-')[1];
+  const valid = String(position ?? '').trim() !== '' && Number.isInteger(Number(position)) && Number(position) > 0;
+  return code + (valid ? '-' + Number(position) : '');
+}
 function renderOpponentHistory(data) {
   data = opponentHistoryProjection(data);
   const badges=$("opponentCircuitProfiles");if(badges)badges.innerHTML=playerCircuitLinksHtml(data.circuitProfiles||[]);
@@ -3636,10 +3651,8 @@ function renderOpponentHistory(data) {
               courtConditions =
                 tournamentSurfaceLabel(projectedTournament || tournament) ||
                 tournamentSurfaceLabel(tournament);
-            const entryLabel = !(tournament.matches || []).length && tournament.entryStatus
-              ? `<p class="opponentTournamentEntry">${esc(source === "itf" && tournament.acceptanceCode ? `Iscritto · ${tournament.acceptanceCode}` : "Iscritto")}</p>`
-              : "";
-            return `<section class="opponentHistoryTournament${tournament.historyKind === "current" ? " ongoingTournament" : ""}"><header class="opponentHistoryTournamentHead"><div class="opponentTournamentTitle">${opponentTournamentStatusHtml(tournament)}<h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4></div><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header>${entryLabel}<div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [], tournament)}</div></section>`;
+            const acceptanceLabel = opponentTournamentAcceptanceLabel(tournament);
+            return `<section class="opponentHistoryTournament${tournament.historyKind === "current" ? " ongoingTournament" : ""}"><header class="opponentHistoryTournamentHead"><div class="opponentTournamentTitle">${opponentTournamentStatusHtml(tournament)}<h4><i class="sourceDot ${esc(source)}"></i>${home ? `<a href="${esc(home)}" target="_blank" rel="noopener">${esc(readableText(tournament.name))}</a>` : esc(readableText(tournament.name))}${acceptanceLabel ? ` <span class="acceptanceLiveLabel">Acceptance list: ${esc(acceptanceLabel)}</span>` : ""}${courtConditions ? ` <small class="tournamentSurface">${esc(courtConditions)}</small>` : ""}</h4></div><span class="opponentTournamentEvents">${opponentTournamentEventLinks(tournament)}</span>${opponentTournamentDateLabel(tournament) ? `<time class="opponentTournamentDates">${esc(opponentTournamentDateLabel(tournament))}</time>` : ""}</header><div class="opponentHistoryMatches">${opponentHistoryMatchSectionsHtml(tournament.matches || [], tournament)}</div></section>`;
           },
         )
         .join("")
