@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-11-19T11:54:11.227Z",
+  "generatedAt": "2026-11-19T12:25:29.306Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -10,19 +10,19 @@
     "pendingTournaments": 1,
     "declaredSections": 5,
     "requestedSections": 4,
-    "acquiredSections": 1,
+    "acquiredSections": 3,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 1,
-    "missingSections": 4,
-    "newSectionsCached": 0,
+    "resolvedSections": 3,
+    "missingSections": 2,
+    "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 4,
+    "retrySections": 2,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 4,
+    "notPublishedOrIncompleteSections": 2,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
     "globalCompleteTournaments": 602,
@@ -89,11 +89,11 @@
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 5,
-      "acquiredSections": 1,
+      "acquiredSections": 3,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 1,
-      "missingSections": 4,
+      "resolvedSections": 3,
+      "missingSections": 2,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -112,9 +112,9 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-M-KO",
@@ -126,9 +126,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -160,14 +160,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -186,14 +186,14 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 22,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
