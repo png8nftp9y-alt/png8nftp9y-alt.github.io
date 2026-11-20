@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-20T17:46:38.231Z",
+  "generatedAt": "2026-11-20T18:14:41.263Z",
   "today": "2026-11-20",
   "windowEnd": "2026-11-23",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -11,17 +11,17 @@
     "complete": 1002,
     "cancelledNoDraws": 13,
     "resolved": 1015,
-    "missingDrawsTournaments": 2,
-    "unverifiable": 195,
-    "declaredDraws": 5767,
-    "acquiredDraws": 5759,
-    "missingDraws": 8,
-    "actionableUnverifiable": 21,
+    "missingDrawsTournaments": 3,
+    "unverifiable": 194,
+    "declaredDraws": 5773,
+    "acquiredDraws": 5761,
+    "missingDraws": 12,
+    "actionableUnverifiable": 20,
     "futureUnverifiable": 174,
     "ordinary": {
       "total": 23,
-      "missingDraws": 8,
-      "inventoryRequired": 21
+      "missingDraws": 12,
+      "inventoryRequired": 20
     },
     "extraordinaryA": {
       "total": 0,
@@ -406,14 +406,14 @@
         "startDate": "2026-11-23",
         "endDate": "2026-11-28",
         "status": "inventory_required",
-        "inventoryError": null,
+        "inventoryError": "GetEventFilters_incapsula_challenge",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-11-20T17:47:35.586Z",
         "eligibleFrom": "2026-11-22"
       },
       {
@@ -421,15 +421,15 @@
         "tournamentName": "J30 Harare",
         "startDate": "2026-11-23",
         "endDate": "2026-11-28",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-11-20T17:47:21.438Z",
         "eligibleFrom": "2026-11-22"
       },
       {
@@ -437,15 +437,15 @@
         "tournamentName": "J500 Merida",
         "startDate": "2026-11-23",
         "endDate": "2026-11-28",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-11-20T17:47:21.486Z",
         "eligibleFrom": "2026-11-22"
       },
       {
@@ -453,15 +453,15 @@
         "tournamentName": "J60 Shenzhen",
         "startDate": "2026-11-23",
         "endDate": "2026-11-28",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-11-20T17:47:42.845Z",
         "eligibleFrom": "2026-11-22"
       },
       {
@@ -469,15 +469,15 @@
         "tournamentName": "J60 Armenia",
         "startDate": "2026-11-23",
         "endDate": "2026-11-28",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-11-20T17:47:25.869Z",
         "eligibleFrom": "2026-11-22"
       },
       {
@@ -485,15 +485,15 @@
         "tournamentName": "J60 Dunakeszi",
         "startDate": "2026-11-23",
         "endDate": "2026-11-29",
-        "status": "inventory_required",
-        "inventoryError": null,
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "checkedAt": "2026-11-20T17:47:24.035Z",
         "eligibleFrom": "2026-11-22"
       },
       {
@@ -501,29 +501,78 @@
         "tournamentName": "J60 Antalya",
         "startDate": "2026-11-23",
         "endDate": "2026-11-28",
-        "status": "inventory_required",
+        "status": "missing",
         "inventoryError": null,
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "knownDraws": 6,
+        "acquiredDraws": 2,
+        "missingDraws": 4,
+        "missingEvents": [
+          {
+            "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-20T17:48:26.439Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-20T17:48:26.439Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-20T17:48:26.439Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-20T17:48:26.439Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-10-01T21:21:46.918Z",
+        "needsInventory": false,
+        "checkedAt": "2026-11-20T17:48:26.439Z",
         "eligibleFrom": "2026-11-22"
       }
     ],
     "total": 23,
-    "missingDraws": 8,
-    "acquiredDraws": 4,
+    "missingDraws": 12,
+    "acquiredDraws": 6,
     "missingByReason": {
-      "draw_without_players": 7,
-      "incapsula_blocked": 1
+      "draw_without_players": 10,
+      "incapsula_blocked": 2
     },
     "byStatus": {
-      "inventory_empty": 13,
-      "missing": 2,
-      "inventory_required": 8
+      "inventory_empty": 18,
+      "missing": 3,
+      "inventory_required": 2
     }
   },
   "extraordinary": {
@@ -3330,9 +3379,9 @@
     }
   },
   "audit": {
-    "urgentUnverifiable": 21,
+    "urgentUnverifiable": 20,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 21,
+    "actionableUnverifiable": 20,
     "futureUnverifiable": 174,
     "blocked": 0
   }
