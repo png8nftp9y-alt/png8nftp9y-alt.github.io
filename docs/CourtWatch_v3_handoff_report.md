@@ -11222,3 +11222,5 @@ Updated reviewed birth-year fixture count from 23 to 24 to include Federico Vita
 ## 2026-11-20 — Restore opponent renderer test dependencies
 
 Load the real tournamentConcluded and tournamentCancelled functions in the two isolated renderer test contexts. Preserve existing assertions and application behavior. Fixes five ReferenceError failures blocking the Worker deployment. Validation: both affected test files pass, 16 tests total. Production deployment remains subject to CI.
+
+ITF discovery 2026-11-20T20:54:01.048Z: 5 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
