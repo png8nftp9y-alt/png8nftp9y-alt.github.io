@@ -1,3 +1,4 @@
+import {explicitAuditOpponents} from './lib/audit-explicit-opponents.mjs';
 import {recoverPendingOpponents,resolveOpponentCheckpoints} from './lib/audit-pending-opponents.mjs';
 import {auditOpponentCheckpoints} from './lib/audit-opponent-checkpoints.mjs';
 import {checkOpponentNativeHistory} from './lib/opponent-native-history-check.mjs';
@@ -183,7 +184,8 @@ try{
  await opponentPage.evaluate(()=>{const box=document.createElement('div');box.id='opponentTournamentHistory';document.body.append(box);});
  for(const [id,p]of people)if(!opponentIds.has(id))opponentIds.set(id,p.name);
  const requestedIds=process.env.ITF_AUDIT_OPPONENT_IDS||'';
- let selectedScope=auditOpponentSelection(opponentIds,pilot?'':requestedIds);
+ const selectable=pilot?opponentIds:await explicitAuditOpponents(query,opponentIds,requestedIds);
+ let selectedScope=auditOpponentSelection(selectable,pilot?'':requestedIds);
  if(pilot){
   const candidates=(await readInventory(presence,query))
    .filter(p=>!opponentIds.has(p.id)&&(p.played||p.entered||p.drawTournaments));
@@ -234,6 +236,13 @@ report.opponentSelection={kind:selectedScope.kind,requested:selectedScope.reques
   for(const detail of result.itfHistoryIssues||[])report.unverifiable.push({nativeId:id,name,...detail});
   if(result.itfDocumentHistoryComplete===false)console.log('ITF_OPPONENT_INCOMPLETE='+JSON.stringify({nativeId:id,name,documents:result.itfHistoryIssues||[]}));
   if(!playerCircuitIdentities({circuitProfiles:result.circuitProfiles||[]}).some(p=>p.circuit==='itf'&&String(p.profileId)===id))report.unverifiable.push({nativeId:id,name,reason:'opponent_identity_not_confirmed'});
+  if(requestedIds){
+   const acquired=[...(presence.players.get(id)||new Map()).values()];
+   const indexed=await query('SELECT p.draw_key,p.content_sha256,p.tournament_id,t.source_tournament_id,t.payload AS tournament_payload FROM itf_draw_participations p LEFT JOIN tournaments t ON t.id=p.tournament_id WHERE p.source_player_id=? ORDER BY p.draw_key,p.content_sha256',[id]);
+   const links=await query("SELECT source_key,canonical_id,circuit,official_id FROM player_circuit_identities WHERE circuit='itf' AND official_id=?",[id]);
+   const diagnostic={nativeId:id,name,acquired,indexed,links,returned:result.tournaments.map(t=>({circuit:t.circuit,competitionId:t.competitionId,name:t.name,startDate:t.startDate,endDate:t.endDate,historyEvidence:t.historyEvidence,drawConfirmed:t.drawConfirmed})),circuitProfiles:result.circuitProfiles};
+   (report.explicitDiagnostics||=[]).push(diagnostic);console.log('ITF_EXPLICIT_DIAGNOSTIC='+JSON.stringify(diagnostic));
+  }
   const nativeCheck=checkOpponentNativeHistory(await rawHistory(id),result.tournaments,today);if(nativeCheck.missingTournaments.length||nativeCheck.missingMatches.length)issue('opponent_native_history_missing',{nativeId:id,...nativeCheck});report.unverifiable.push(...nativeCheck.unverifiable.map(x=>({nativeId:id,...x})));
   const selected=result.tournaments.filter(itf),bad=selected.filter(forbiddenPast),record={nativeId:id,name,selected:selected.map(t=>({competitionId:t.competitionId,historyKind:t.historyKind,matches:t.matches?.length||0,historyMatchCount:t.historyMatchCount||0})),invalidPast:bad.map(competitionKey)};
   if(pilot){
