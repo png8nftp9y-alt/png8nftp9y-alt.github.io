@@ -132,6 +132,14 @@ jobs:
         run: npm run configure
       - name: Verify D1 runtime content before the early Worker deployment
         run: node scripts/sync-runtime-documents-d1.mjs
+      - name: Install private watchdog controls before app binding
+        working-directory: cloudflare/watchdog
+        run: |
+          if ! node scripts/controls-ready.mjs; then
+            node --test test/scheduler.test.mjs test/workflow-controls.test.mjs
+            ../app-api/node_modules/.bin/wrangler deploy --dry-run
+            ../app-api/node_modules/.bin/wrangler deploy --minify --keep-vars
+          fi
       - name: Deploy read-compatible Worker before database maintenance
         run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
       - name: Apply D1 migrations

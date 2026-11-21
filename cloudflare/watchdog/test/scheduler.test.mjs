@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker from "../src/index.js";
+import worker from "../src/scheduler.mjs";
 
 const itfWorkflows = [
   "courtwatch-v3-itf-known-fast.yml",
@@ -19,6 +19,7 @@ async function tick(cron, runs = [], failWorkflow = null, scheduledTime = slot) 
   const requests = [], pending = [];
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (url, init = {}) => {
+    if (!String(url).includes('/runs?') && (init.method || 'GET') === 'GET' && String(url).includes('/actions/workflows/')) return Response.json({state:'active'});
     requests.push({ url, method: init.method || "GET", body: init.body });
     if (failWorkflow && url.includes(failWorkflow)) return new Response("", {status: 503});
     if (init.method === "POST") {

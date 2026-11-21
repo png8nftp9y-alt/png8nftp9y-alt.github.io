@@ -111,6 +111,14 @@ jobs:
           node --input-type=module -e "import fs from 'node:fs'; const c=JSON.parse(fs.readFileSync('wrangler.generated.jsonc','utf8')); if(!c.r2_buckets?.some(b=>b.binding==='ARCHIVE' && b.bucket_name===process.env.R2_BUCKET)) throw Error('Missing ARCHIVE binding; deploy blocked');"
       - name: Verify fresh D1 runtime release before deployment
         run: node scripts/sync-runtime-documents-d1.mjs
+      - name: Install private watchdog controls before app binding
+        working-directory: cloudflare/watchdog
+        run: |
+          if ! node scripts/controls-ready.mjs; then
+            node --test test/scheduler.test.mjs test/workflow-controls.test.mjs
+            ../app-api/node_modules/.bin/wrangler deploy --dry-run
+            ../app-api/node_modules/.bin/wrangler deploy --minify --keep-vars
+          fi
       - name: Deploy Worker only
         run: npx wrangler deploy --minify --keep-vars --config wrangler.generated.jsonc
       - name: Verify deployed nationality flags

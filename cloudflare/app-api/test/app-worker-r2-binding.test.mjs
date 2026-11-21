@@ -13,6 +13,7 @@ test('real configure preserves ARCHIVE alongside DB when hotfix receives R2_BUCK
   const result=spawnSync(process.execPath,['--import',bootstrap,script],{cwd:dir,encoding:'utf8',env:{...process.env,CLOUDFLARE_ACCOUNT_ID:'fixture',CLOUDFLARE_API_TOKEN:'fixture',R2_BUCKET:'existing-courtwatch-archive',GITHUB_OUTPUT:path.join(dir,'output')}});
   assert.equal(result.status,0,result.stderr);
   const config=JSON.parse(readFileSync(path.join(dir,'wrangler.generated.jsonc'),'utf8'));
+  assert.deepEqual(config.services,[{binding:'AUTOMATION_CONTROL',service:'courtwatch-watchdog',entrypoint:'AutomationControl'}]);
   assert.equal(config.d1_databases[0].binding,'DB');assert.equal(config.r2_buckets[0].binding,'ARCHIVE');assert.equal(config.r2_buckets[0].bucket_name,'existing-courtwatch-archive');
  }finally{rmSync(dir,{recursive:true,force:true})}
 });
