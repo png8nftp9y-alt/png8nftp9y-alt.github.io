@@ -11226,3 +11226,8 @@ Load the real tournamentConcluded and tournamentCancelled functions in the two i
 ITF discovery 2026-11-20T20:54:01.048Z: 5 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-11-20T20:55:18.385Z: attempted 5, acquired 5, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+## 2026-11-20 — Opponent acceptance label typography
+
+Acceptance list follows surface and indoor/outdoor conditions, in black normal-weight text. Scoped to opponent headings; no data or confirmation-rule changes. Both asset versions incremented. Existing renderer tests, syntax and release guard required before push; live visual check after deploy.
