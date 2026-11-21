@@ -11325,3 +11325,10 @@ Shared-date layout: Europe and ITF form a two-row group with the date in the adj
 ## 2026-11-22 — Compact opponent ranking spacing
 
 Removed newline text nodes between block ranking rows, which produced excessive blank space under pre-line formatting. Shared and separate-date rankings now render explicit rows with no Europe/ITF gap; FITP alone has a 4px following margin. The 10-day date rule and explicit shared date remain unchanged. Numeric JS/CSS asset versions bumped. Installer checks ranking regressions and committed release guard before push.
+
+
+## 2026-11-22 — Workflow controls Cloudflare redirect compatibility
+
+Fixed Admin workflow-state reads failing before GitHub access: Workers fetch rejects redirect:error, despite Node mocks accepting it. All three controller requests now use redirect:manual; 3xx still fail existing status checks and are never followed. No workflow state is changed by installation. Added an actual workerd/Miniflare private-RPC regression checking page reads and verified pause/resume against a local fake GitHub service only; included in watchdog deployment checks. Validation: old code fails this regression, corrected code passes all 21 watchdog/runtime tests. Production verification pending deployment. No real workflow disabled, enabled, cancelled or manually dispatched.
+
+Admin pause/resume controls moved into the existing Workflow e watchdog table in a fifth ON/OFF column after Riferimento. Exact catalogue labels map each row to its native workflow id; saved run evidence is preserved. Opening the page and currentPanels response both attach fresh controls. The separate pause panel is removed. Unavailable reads retain the table with unavailable cells and no mutation buttons. Validation: 5 Admin controls tests, 14 existing panel/catalogue tests, and actual runtime RPC regression passed. No production workflow state changed.

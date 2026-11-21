@@ -3,7 +3,7 @@ function headers(env){if(!env.COURTWATCH_GITHUB_TOKEN)throw Error('workflow_cont
 export async function listWorkflowControls(env,fetcher=fetch){
  const workflows=[];
  for(let page=1;page<=10;page++){
-  const response=await fetcher(`${BASE}/actions/workflows?per_page=100&page=${page}`,{headers:headers(env),redirect:'error',signal:AbortSignal.timeout(15000)});
+  const response=await fetcher(`${BASE}/actions/workflows?per_page=100&page=${page}`,{headers:headers(env),redirect:'manual',signal:AbortSignal.timeout(15000)});
   if(!response.ok)throw Error('workflow_controls_read:'+response.status);
   const data=await response.json();
   if(!Array.isArray(data.workflows)||!Number.isInteger(data.total_count))throw Error('workflow_controls_invalid');
@@ -21,14 +21,14 @@ export async function listWorkflowControls(env,fetcher=fetch){
 }
 export async function setWorkflowEnabled(env,{id,enabled,expectedState},fetcher=fetch){
  if(!Number.isSafeInteger(id)||id<=0||typeof enabled!=='boolean'||!['active','disabled_manually','disabled_inactivity'].includes(expectedState))throw Error('workflow_control_invalid');
- const get=()=>fetcher(`${BASE}/actions/workflows/${id}`,{headers:headers(env),redirect:'error',signal:AbortSignal.timeout(15000)});
+ const get=()=>fetcher(`${BASE}/actions/workflows/${id}`,{headers:headers(env),redirect:'manual',signal:AbortSignal.timeout(15000)});
  const before=await get();if(!before.ok)throw Error('workflow_controls_read:'+before.status);
  const current=await before.json();
  if(current.id!==id||!String(current.path||'').startsWith('.github/workflows/'))throw Error('workflow_control_invalid');
  if(current.state!==expectedState)throw Error('workflow_control_conflict');
  const desired=enabled?'active':'disabled_manually';
  if(current.state===desired)return {id,state:desired,changed:false};
- const response=await fetcher(`${BASE}/actions/workflows/${id}/${enabled?'enable':'disable'}`,{method:'PUT',headers:headers(env),redirect:'error',signal:AbortSignal.timeout(15000)});
+ const response=await fetcher(`${BASE}/actions/workflows/${id}/${enabled?'enable':'disable'}`,{method:'PUT',headers:headers(env),redirect:'manual',signal:AbortSignal.timeout(15000)});
  if(response.status!==204)throw Error('workflow_control_write:'+response.status);
  const after=await get();if(!after.ok)throw Error('workflow_control_verify:'+after.status);
  const result=await after.json();if(result.id!==id||result.state!==desired)throw Error('workflow_control_unverified');

@@ -32,7 +32,7 @@ jobs:
       - run: npm install --package-lock-only
       - run: npm ci
       - name: Test scheduling and duplicate protection
-        run: node --test test/scheduler.test.mjs test/workflow-controls.test.mjs
+        run: node --test test/scheduler.test.mjs test/workflow-controls.test.mjs test/workflow-controls-runtime.test.mjs
       - name: Validate Worker
         run: npx wrangler deploy --dry-run
       - name: Deploy Worker and cron
