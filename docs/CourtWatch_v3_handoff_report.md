@@ -11270,3 +11270,16 @@ ITF discovery 2026-11-21T07:52:11.514Z: 5 newly discovered future tournaments; M
 ITF Meta ordinary 2026-11-21T07:53:41.731Z: attempted 5, acquired 5, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF Meta extraordinary 2026-11-21T07:54:49.160Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+## 2026-11-21 — Chiusura caso presenze ITF, finestra storico avversari ed etichette acceptance
+
+Stato finale concordato con l’utente: caso chiuso nel perimetro ITF già verificato. Questa nota aggiorna le indicazioni «verifica remota/deploy da completare» delle precedenti sezioni relative a questi interventi, che descrivevano lo stato al momento della preparazione; non modifica gli esiti di audit non correlati.
+
+- Copertura tabelloni: conferma dell’utente per il perimetro controllato. Non viene estesa retroattivamente a periodi o tornei futuri non ancora acquisiti.
+- Associazioni native ITF: il controllo remoto del backfill 44200281834 ha verificato 6.192 documenti e 172.800 relazioni giocatore–tabellone, senza relazioni mancanti né partecipanti non identificati. Il controllo riguarda i documenti acquisiti e le rispettive prove di partecipazione, non inventa risultati o certificazioni di eliminazione.
+- Storico avversari: correzione generale 6eec7d7f7b4684f8822716a2bab053fd2859c61b della finestra visibile applicata; l’utente ha confermato controlli verdi e corretta visualizzazione dei tre tornei nel caso verificato. Le referenze FITP a ITF/CHALLENGER escluse dalla vista non consumano uno dei tre posti. Non si dichiara un’ispezione manuale di ogni profilo.
+- Etichette pagina avversario: ITF e Tennis Europe mostrano «Acceptance list: CODE-posizione» quando disponibile, inclusi gli alternate A. Etichetta nera, peso normale, nel gruppo a destra immediatamente prima della data (60a47ba47258a422602015574dfd1d1f0bbdf072, controlli verdi confermati dall’utente). FITP senza dicitura ridondante «Iscritto». Conferma nel tabellone/incontro acquisito sopprime l’etichetta; la sola data iniziale non certifica presenza. I ritirati/esclusi sono esclusi dalla selezione corrente/futura secondo lo stato acquisito; una partecipazione storica documentata non viene cancellata dal solo ritiro successivo.
+- Aggiornamenti successivi: liste e stati riflettono l’ultima sincronizzazione acquisita dai siti ufficiali, assunti come riferimento autorevole. Nuovi tornei continuano attraverso le pipeline ordinarie. Il recupero straordinario courtwatch-itf-draw-d1-backfill.yml è stato disattivato separatamente in 7bd83e2d8adc2ac3c11658ea096b4ec2b694f080.
+
+Validazione di questa chiusura: rilettura del report corrente e riconciliazione con gli esiti remoti e le conferme dell’utente già raccolti nella chat. Solo documentazione: nessun nuovo audit, acquisizione, modifica applicativa, scrittura D1/R2 o rilancio manuale.
