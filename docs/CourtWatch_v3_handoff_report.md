@@ -11244,3 +11244,7 @@ Move acceptance out of the tournament-name heading into the right-aligned metada
 
 ## 2026-11-21 — Mascaretti visible history window
 Run 44846982099 confirms native Bari participation exists in D1, but hidden FITP ITF J60 BARI consumed the third slot before browser filtering. Filter hidden FITP ITF/CHALLENGER references before selecting backend and browser windows. Native Bari is retained; no data mutations. Forty focused window, document, entry, chronology and PUC regressions passed locally. Cache bumped. Remote deploy/readback pending.
+
+## 2026-11-21 — Tournament-specific adaptive back labels
+
+Preserved ITF back labels. Europe uses TE plus the metadata city, excluding venue and country, and falls back to TE without an invented city. Ordinary FITP tournaments use the generic tournament label; names containing Super Next Gen, Junior Next Gen, Master, Road to Bologna, Kinder or Campionati keep the heading (case insensitive word matching). Route trail and back behavior unchanged. Bumped JS version. Validation: three route-level VM tests cover actual function and decoded tournament lookup, both Europe examples, unknown city, ordinary FITP, all six special names and unchanged ITF; source UI verification and JS syntax passed. Live deploy verification pending publication.

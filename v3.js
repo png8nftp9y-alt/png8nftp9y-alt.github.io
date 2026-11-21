@@ -4545,12 +4545,28 @@ let adaptiveReplaceState = null;
 function adaptiveNavigationUrl() {
   return location.pathname + location.search + location.hash;
 }
+function adaptiveTournamentBackText(tournament, heading = "") {
+  const base = "← Torna al torneo";
+  const source = circuit(tournament || {});
+  if (source === "tennis-europe") {
+    const city = readableText(tournament?.city || tournamentLocationLabel(tournament || {}))
+      .split(",")[0].trim();
+    return base + " TE" + (city && !/da pubblicare/i.test(city) ? " " + city : "");
+  }
+  if (source === "fitp" && !/\b(?:super\s+next\s+gen|junior\s+next\s+gen|master|road\s+to\s+bologna|kinder|campionati)\b/i.test(tournament?.name || heading))
+    return base;
+  return heading ? base + " " + heading : base;
+}
 function adaptiveBackText() {
   const hash = location.hash;
   const names = {"":"alla Home","#home":"alla Home","#agenda":"all’Agenda","#calendar":"al Calendario","#players":"ai Giocatori"};
   if (Object.prototype.hasOwnProperty.call(names, hash)) return "← Torna " + names[hash];
   const heading = document.querySelector("#profileView.active .tournamentHero h2, #profileView.active .profileHero h2, #profileView.active .opponentProfileHero h2")?.textContent?.trim();
-  if (/^#tournament\//.test(hash)) return heading ? "← Torna al torneo " + heading : "← Torna al torneo";
+  if (/^#tournament\//.test(hash)) {
+    const key = decodeURIComponent(hash.slice("#tournament/".length));
+    const tournament = groups(false).find(item => tournamentKey(item) === key);
+    return adaptiveTournamentBackText(tournament, heading);
+  }
   if (/^#player-search\//.test(hash)) return "← Torna alla ricerca giocatori";
   return heading ? "← Torna a " + heading : "← Torna al profilo";
 }
