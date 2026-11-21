@@ -11240,3 +11240,7 @@ Fix targeted verification rejecting Mascaretti outside observed scope. Exact nat
 ## 2026-11-21 — Opponent acceptance immediately before the date
 
 Move acceptance out of the tournament-name heading into the right-aligned metadata group immediately before the date. Give label and date a 16px horizontal gap and wrap on narrow screens. Keep black normal-weight acceptance text; source and confirmation rules unchanged. Both asset versions incremented. Update the real renderer regression to verify ordering and absence from the title. Validate renderer and UI gates, syntax and release guard before push; live visual confirmation after deployment.
+
+
+## 2026-11-21 — Mascaretti visible history window
+Run 44846982099 confirms native Bari participation exists in D1, but hidden FITP ITF J60 BARI consumed the third slot before browser filtering. Filter hidden FITP ITF/CHALLENGER references before selecting backend and browser windows. Native Bari is retained; no data mutations. Forty focused window, document, entry, chronology and PUC regressions passed locally. Cache bumped. Remote deploy/readback pending.
