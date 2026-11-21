@@ -11268,3 +11268,5 @@ Validation: 38 targeted ranking tests passed, including four new regressions for
 ITF discovery 2026-11-21T07:52:11.514Z: 5 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-11-21T07:53:41.731Z: attempted 5, acquired 5, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+ITF Meta extraordinary 2026-11-21T07:54:49.160Z: attempted 1, acquired 0, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
