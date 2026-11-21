@@ -11283,3 +11283,5 @@ Stato finale concordato con l’utente: caso chiuso nel perimetro ITF già verif
 - Aggiornamenti successivi: liste e stati riflettono l’ultima sincronizzazione acquisita dai siti ufficiali, assunti come riferimento autorevole. Nuovi tornei continuano attraverso le pipeline ordinarie. Il recupero straordinario courtwatch-itf-draw-d1-backfill.yml è stato disattivato separatamente in 7bd83e2d8adc2ac3c11658ea096b4ec2b694f080.
 
 Validazione di questa chiusura: rilettura del report corrente e riconciliazione con gli esiti remoti e le conferme dell’utente già raccolti nella chat. Solo documentazione: nessun nuovo audit, acquisizione, modifica applicativa, scrittura D1/R2 o rilancio manuale.
+
+ITF discovery 2026-11-21T19:54:58.586Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
