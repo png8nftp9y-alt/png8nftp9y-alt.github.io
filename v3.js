@@ -3652,14 +3652,31 @@ function opponentFitpRankingText(metadata) {
 }
 function opponentEuropeRankingText(profile) {
   if (!profile) return '';
-  const itf=profile.itfJuniorRanking?itfRankingText(profile.itfJuniorRanking, true):'';
-  if (profile.ranking) {
+  const itf = profile.itfJuniorRanking;
+  const hasEurope = Number(profile.ranking) > 0;
+  const hasItf = Number.isInteger(itf?.ranking) && itf.ranking > 0;
+  const europeDate = String(profile.ranking_date || '').slice(0, 10);
+  const itfDate = String(itf?.rankingDate || '').slice(0, 10);
+  const dateValue = value => /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? Date.parse(value + 'T00:00:00Z') : NaN;
+  const sharedDate = hasEurope && hasItf &&
+    Number.isFinite(dateValue(europeDate)) && Number.isFinite(dateValue(itfDate)) &&
+    Math.abs(dateValue(europeDate) - dateValue(itfDate)) <= 10 * 86400000;
+  const labels = [];
+  if (hasEurope) {
     const category = /14$/.test(profile.category || '') ? ' U14' : /16$/.test(profile.category || '') ? ' U16' : '';
-    return [itf, `n°${profile.ranking} TE${category}${profile.ranking_date ? ` · (ranking del ${displayDate(profile.ranking_date)})` : ''}`].filter(Boolean).join(' · ');
+    labels.push(`n°${profile.ranking} TE${category}${!sharedDate && profile.ranking_date ? ` · (ranking del ${displayDate(profile.ranking_date)})` : ''}`);
+  } else if (!itf) {
+    const absent = profile.europeRankingStatus === 'unranked-u12' ? 'No ranking Europe U12'
+      : profile.europeRankingStatus === 'unranked' ? 'No ranking Europe' : '';
+    if (absent) labels.push(absent);
   }
-  if(itf)return itf;
-  return profile.europeRankingStatus === 'unranked-u12' ? 'No ranking Europe U12'
-    : profile.europeRankingStatus === 'unranked' ? 'No ranking Europe' : '';
+  if (itf) labels.push(itfRankingText(itf, !sharedDate));
+  if (sharedDate) {
+    const latest = europeDate > itfDate ? europeDate : itfDate;
+    labels.push(`(ranking Europe e ITF del ${displayDate(latest)})`);
+  }
+  return labels.filter(Boolean).join('\n');
 }
 function opponentTournamentAcceptanceLabel(tournament) {
   if (!['itf', 'tennis-europe'].includes(circuit(tournament)) || tournamentConcluded(tournament) ||
@@ -3684,8 +3701,17 @@ function renderOpponentHistory(data) {
   const profileRanking = $("opponentProfileRanking"),
     profile = data.profile || null;
   if (profileRanking) {
-    profileRanking.textContent = [opponentFitpRankingText(data.fitpMetadata), opponentEuropeRankingText(profile)].filter(Boolean).join(' · ');
+    profileRanking.textContent = [opponentFitpRankingText(data.fitpMetadata), opponentEuropeRankingText(profile)].filter(Boolean).join('\n');
     profileRanking.hidden = !profileRanking.textContent;
+    const rankingLines = profileRanking.textContent.split('\n');
+    const commonDate = rankingLines.at(-1);
+    if (/^\(ranking Europe e ITF del /.test(commonDate || '')) {
+      const fitp = rankingLines.slice(0, -3);
+      const international = rankingLines.slice(-3, -1);
+      profileRanking.innerHTML = fitp.map(label => `<span class="opponentRankingRow">${esc(label)}</span>`).join('\n') +
+        (fitp.length ? '\n' : '') + `<span class="opponentRankingShared"><span class="opponentRankingPair">${international.map(label => `<span class="opponentRankingRow">${esc(label)}</span>`).join('\n')}</span><span class="opponentRankingSharedDate">${esc(commonDate)}</span></span>`;
+    }
+
   }
   const nationality = $("opponentProfileCurrentNationality");
   if (nationality && profile?.nationality) {

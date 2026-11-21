@@ -642,3 +642,13 @@ button,a,[role="link"],summary{touch-action:manipulation}
 .opponentTournamentMeta{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px 16px;margin-left:auto}
 .opponentTournamentMeta .acceptanceLiveLabel{color:#000;font-weight:400;white-space:nowrap}
 .opponentTournamentMeta .opponentTournamentDates{margin-left:0}
+
+/* Opponent ranking rows and explicit shared Europe/ITF date. */
+.opponentProfileRanking{display:block;white-space:pre-line}
+.opponentProfileRanking[hidden]{display:none}
+
+/* Common date alongside both international ranking rows. */
+.opponentRankingRow{display:block}
+.opponentRankingShared{display:inline-grid;grid-template-columns:max-content minmax(0,1fr);column-gap:12px;align-items:center;max-width:100%;white-space:normal}
+.opponentRankingPair{display:flex;flex-direction:column}
+.opponentRankingSharedDate{align-self:center;overflow-wrap:anywhere}

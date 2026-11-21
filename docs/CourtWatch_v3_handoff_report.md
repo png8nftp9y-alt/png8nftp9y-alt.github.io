@@ -11315,3 +11315,9 @@ Admin Diagnostics now reads live GitHub workflow states through a private Cloudf
 The watchdog respects native GitHub disabled states and never dispatches or re-enables paused workflows. Its scheduler remains independently testable; mutations are only exposed through a named WorkerEntrypoint, never public HTTP. Ordinary/hotfix deployments verify that the watchdog entrypoint exists before installing the app binding. No new secrets, schedules or D1/R2 state writes. The public watchdog capability flag contains no credentials.
 
 Validation: 26 focused authentication, origin, independent-state, pagination, mutation-readback, pause/resume, no-retry and scheduler tests passed; the complete existing Worker check passed. App and watchdog dry-run bundles passed. Production installation and live operator interaction remain to be verified; no real workflow has been paused or enabled during preparation.
+
+## 2026-11-22 — Opponent ranking columns and shared publication date
+
+Opponent headers now show FITP, Europe, ITF on separate lines. Two positive international rankings with publication dates at most ten days apart show one explicitly labeled Europe e ITF date, using the newer publication. More distant dates remain attached to each ranking; absent/invalid dates or absent rankings never share a date. Observed-player rendering and data acquisition unchanged. JS/CSS cache versions advance numerically. Updated FITP renderer expectation and its already-missing empty ITF draw fixture. Validation: 24 ranking/API/renderer tests passed, including inclusive ten-day boundary, eleven days, reversed dates and missing values; source UI, syntax and committed release guard checked before publication. Live workflow confirmation pending.
+
+Shared-date layout: Europe and ITF form a two-row group with the date in the adjacent column, vertically centered. FITP remains above. The explicit Europe e ITF caption is retained. Added a grouping renderer check.

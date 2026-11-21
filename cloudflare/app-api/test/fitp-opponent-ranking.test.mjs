@@ -16,6 +16,7 @@ async function profile(metadata){
   playerEntryTournaments:async()=>[],
   otherCircuitOpponentHistory:async()=>[],
   opponentItfDocumentHistory:async()=>[],
+  itfDrawParticipationTournaments:async()=>[],
   enrichIdentityNationalities:async()=>{},
   resolveCircuitProfiles:async()=>new Map(),
   enrichPersonalTournamentPresentation:async x=>x,
@@ -67,7 +68,8 @@ test('header displays FITP, archive date and Europe without hiding either',()=>{
   fitpMetadata:{ranking:'3.2',source:'observed',observedAt:'2026-08-30'}
  });
  assert.equal(c.element.textContent,
-  '3.2 FITP · (dato osservato il 2026-08-30) · n°12 TE');
+  '3.2 FITP · (dato osservato il 2026-08-30)\n' +
+  'n°12 TE');
  assert.equal(c.element.hidden,false);
  c.renderOpponentHistory({tournaments:[],profile:null,fitpMetadata:{ranking:'1.11'}});
  assert.equal(c.element.textContent,'1.11 FITP');
