@@ -652,3 +652,10 @@ button,a,[role="link"],summary{touch-action:manipulation}
 .opponentRankingShared{display:inline-grid;grid-template-columns:max-content minmax(0,1fr);column-gap:12px;align-items:center;max-width:100%;white-space:normal}
 .opponentRankingPair{display:flex;flex-direction:column}
 .opponentRankingSharedDate{align-self:center;overflow-wrap:anywhere}
+
+/* Compact international rankings; only FITP has a small following gap. */
+.opponentProfileRanking{white-space:normal;line-height:1.45}
+.opponentProfileRanking .opponentRankingRow{margin:0;padding:0;line-height:1.45}
+.opponentProfileRanking .opponentRankingFitp:not(:last-child){margin-bottom:4px}
+.opponentRankingPair{gap:0}
+.opponentRankingShared{vertical-align:top;row-gap:0}

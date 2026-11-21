@@ -54,7 +54,7 @@ test('API preserves first-category and absent rankings',async()=>{
 
 test('header displays FITP, archive date and Europe without hiding either',()=>{
  const c={
-  displayDate:s=>s.slice(0,10),itfRankingText:()=>'',
+  esc:x=>String(x),displayDate:s=>s.slice(0,10),itfRankingText:()=>'',
   opponentHistoryProjection:x=>x,
   element:{textContent:'',hidden:true},
   $:id=>id==='opponentProfileRanking'?c.element:null

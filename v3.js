@@ -3703,15 +3703,17 @@ function renderOpponentHistory(data) {
   if (profileRanking) {
     profileRanking.textContent = [opponentFitpRankingText(data.fitpMetadata), opponentEuropeRankingText(profile)].filter(Boolean).join('\n');
     profileRanking.hidden = !profileRanking.textContent;
-    const rankingLines = profileRanking.textContent.split('\n');
+    const rankingLines = profileRanking.textContent.split('\n').filter(Boolean);
     const commonDate = rankingLines.at(-1);
+    const row = (label, fitp = false) => `<span class="opponentRankingRow${fitp ? ' opponentRankingFitp' : ''}">${esc(label)}</span>`;
     if (/^\(ranking Europe e ITF del /.test(commonDate || '')) {
       const fitp = rankingLines.slice(0, -3);
       const international = rankingLines.slice(-3, -1);
-      profileRanking.innerHTML = fitp.map(label => `<span class="opponentRankingRow">${esc(label)}</span>`).join('\n') +
-        (fitp.length ? '\n' : '') + `<span class="opponentRankingShared"><span class="opponentRankingPair">${international.map(label => `<span class="opponentRankingRow">${esc(label)}</span>`).join('\n')}</span><span class="opponentRankingSharedDate">${esc(commonDate)}</span></span>`;
+      profileRanking.innerHTML = fitp.map(label => row(label, true)).join('') +
+        `<span class="opponentRankingShared"><span class="opponentRankingPair">${international.map(label => row(label)).join('')}</span><span class="opponentRankingSharedDate">${esc(commonDate)}</span></span>`;
+    } else {
+      profileRanking.innerHTML = rankingLines.map((label, index) => row(label, index === 0 && Boolean(data.fitpMetadata?.ranking))).join('');
     }
-
   }
   const nationality = $("opponentProfileCurrentNationality");
   if (nationality && profile?.nationality) {
