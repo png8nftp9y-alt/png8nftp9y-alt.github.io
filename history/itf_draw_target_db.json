@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-11-21T19:09:26.611Z",
+  "generatedAt": "2026-11-21T19:16:23.942Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
@@ -999536,7 +999536,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T18:29:46.138Z",
+      "checkedAt": "2026-11-21T19:16:20.181Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -999661,8 +999661,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -999687,8 +999687,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -999700,8 +999700,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -999726,14 +999726,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1000071,7 +1000071,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T18:29:46.986Z",
+      "checkedAt": "2026-11-21T19:16:20.752Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1000089,13 +1000089,13 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T18:29:47.522Z",
+      "checkedAt": "2026-11-21T19:16:21.280Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 0,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 6,
+      "resolvedSections": 2,
+      "missingSections": 4,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -1000214,22 +1000214,22 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         },
         {
           "family": "B-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-Q-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -1000240,8 +1000240,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1000253,22 +1000253,22 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         },
         {
           "family": "G-S-Q",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 27,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -1000286,8 +1000286,627 @@
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
-      "eventCache": {}
+      "eventFailure": "GetDrawsheet_incapsula_challenge",
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800745271",
+              "name": "Ohad Cohen",
+              "givenName": "Ohad",
+              "familyName": "Cohen",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/ohad-cohen/800745271/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800735748",
+              "name": "Ron Suhovitsky",
+              "givenName": "Ron",
+              "familyName": "Suhovitsky",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/ron-suhovitsky/800735748/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800749885",
+              "name": "Roel Manashirov",
+              "givenName": "Roel",
+              "familyName": "Manashirov",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/roel-manashirov/800749885/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800664831",
+              "name": "Yair Dayan",
+              "givenName": "Yair",
+              "familyName": "Dayan",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/yair-dayan/800664831/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800848372",
+              "name": "Alon Hyman",
+              "givenName": "Alon",
+              "familyName": "Hyman",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/alon-hyman/800848372/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800654000",
+              "name": "Michael Sanin",
+              "givenName": "Michael",
+              "familyName": "Sanin",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/michael-sanin/800654000/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800792628",
+              "name": "Niv Selanikyo Gefen",
+              "givenName": "Niv",
+              "familyName": "Selanikyo Gefen",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/niv-selanikyo-gefen/800792628/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800823213",
+              "name": "Ido Ifargan-Frenkel",
+              "givenName": "Ido",
+              "familyName": "Ifargan-Frenkel",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/ido-ifargan-frenkel/800823213/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800685196",
+              "name": "Sky Reginiano",
+              "givenName": "Sky",
+              "familyName": "Reginiano",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/sky-reginiano/800685196/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800646478",
+              "name": "Samuel Geller",
+              "givenName": "Samuel",
+              "familyName": "Geller",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/samuel-geller/800646478/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800709056",
+              "name": "Alon Perl",
+              "givenName": "Alon",
+              "familyName": "Perl",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/alon-perl/800709056/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800874799",
+              "name": "Stav Chalamish",
+              "givenName": "Stav",
+              "familyName": "Chalamish",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/stav-chalamish/800874799/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800754033",
+              "name": "Amit Erlich",
+              "givenName": "Amit",
+              "familyName": "Erlich",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/amit-erlich/800754033/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800800208",
+              "name": "Oran Shimanov",
+              "givenName": "Oran",
+              "familyName": "Shimanov",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/oran-shimanov/800800208/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800825891",
+              "name": "Maayan Ron",
+              "givenName": "Maayan",
+              "familyName": "Ron",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/maayan-ron/800825891/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800786658",
+              "name": "Gora Kolker",
+              "givenName": "Gora",
+              "familyName": "Kolker",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/gora-kolker/800786658/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800683792",
+              "name": "URI STRETINER",
+              "givenName": "URI",
+              "familyName": "STRETINER",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/uri-stretiner/800683792/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751153",
+              "name": "Arel Maizlin",
+              "givenName": "Arel",
+              "familyName": "Maizlin",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/arel-maizlin/800751153/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800707624",
+              "name": "Yuval MERESSE",
+              "givenName": "Yuval",
+              "familyName": "MERESSE",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/yuval-meresse/800707624/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800707344",
+              "name": "Yanai Chen",
+              "givenName": "Yanai",
+              "familyName": "Chen",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/yanai-chen/800707344/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800794276",
+              "name": "Doron Hirsch",
+              "givenName": "Doron",
+              "familyName": "Hirsch",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/doron-hirsch/800794276/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800846988",
+              "name": "Itay Barnea",
+              "givenName": "Itay",
+              "familyName": "Barnea",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/itay-barnea/800846988/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800664679",
+              "name": "Nathanel Rozen",
+              "givenName": "Nathanel",
+              "familyName": "Rozen",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/nathanel-rozen/800664679/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800654236",
+              "name": "Leo Kadosh",
+              "givenName": "Leo",
+              "familyName": "Kadosh",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/leo-kadosh/800654236/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800630826",
+              "name": "David Rabinovich",
+              "givenName": "David",
+              "familyName": "Rabinovich",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/david-rabinovich/800630826/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800731485",
+              "name": "Yonatan Dvash",
+              "givenName": "Yonatan",
+              "familyName": "Dvash",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/yonatan-dvash/800731485/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800721357",
+              "name": "Oneal Urman",
+              "givenName": "Oneal",
+              "familyName": "Urman",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/oneal-urman/800721357/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800684466",
+              "name": "Liel Amar",
+              "givenName": "Liel",
+              "familyName": "Amar",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/liel-amar/800684466/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800665873",
+              "name": "Tom Kopel",
+              "givenName": "Tom",
+              "familyName": "Kopel",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/tom-kopel/800665873/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800660557",
+              "name": "Alon Meiri",
+              "givenName": "Alon",
+              "familyName": "Meiri",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/alon-meiri/800660557/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800707431",
+              "name": "Nir Garniek",
+              "givenName": "Nir",
+              "familyName": "Garniek",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/nir-garniek/800707431/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800728333",
+              "name": "Tomer Misholy Balsam",
+              "givenName": "Tomer",
+              "familyName": "Misholy Balsam",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/tomer-misholy-balsam/800728333/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-21T19:16:21.280Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-ISR-2026-002__B-S-Q-KO",
+            "storedAt": "2026-11-21T19:16:21.280Z"
+          }
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800791775",
+              "name": "Mika Terlo",
+              "givenName": "Mika",
+              "familyName": "Terlo",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/mika-terlo/800791775/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800886141",
+              "name": "Hila Mizrahi",
+              "givenName": "Hila",
+              "familyName": "Mizrahi",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/hila-mizrahi/800886141/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800841410",
+              "name": "Yali Ziv Vaknin",
+              "givenName": "Yali",
+              "familyName": "Ziv Vaknin",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/yali-ziv-vaknin/800841410/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800803514",
+              "name": "Alina Berzon",
+              "givenName": "Alina",
+              "familyName": "Berzon",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/alina-berzon/800803514/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800849121",
+              "name": "Gia Treisman",
+              "givenName": "Gia",
+              "familyName": "Treisman",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/gia-treisman/800849121/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800828875",
+              "name": "Ella Shani",
+              "givenName": "Ella",
+              "familyName": "Shani",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/ella-shani/800828875/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800868708",
+              "name": "Ophir Lugassi",
+              "givenName": "Ophir",
+              "familyName": "Lugassi",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/ophir-lugassi/800868708/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800833435",
+              "name": "Romi Elkayam",
+              "givenName": "Romi",
+              "familyName": "Elkayam",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/romi-elkayam/800833435/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800759149",
+              "name": "Gali Lissitzky",
+              "givenName": "Gali",
+              "familyName": "Lissitzky",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/gali-lissitzky/800759149/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745346",
+              "name": "Danielle Levitsky",
+              "givenName": "Danielle",
+              "familyName": "Levitsky",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/danielle-levitsky/800745346/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800873486",
+              "name": "Liana Shvarts Rudenko",
+              "givenName": "Liana",
+              "familyName": "Shvarts Rudenko",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/liana-shvarts-rudenko/800873486/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800847921",
+              "name": "Yuval Tapiero",
+              "givenName": "Yuval",
+              "familyName": "Tapiero",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/yuval-tapiero/800847921/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800823771",
+              "name": "Hila Tal",
+              "givenName": "Hila",
+              "familyName": "Tal",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/hila-tal/800823771/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800749917",
+              "name": "Alina Pankov",
+              "givenName": "Alina",
+              "familyName": "Pankov",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/alina-pankov/800749917/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800884223",
+              "name": "Shahar Avidan",
+              "givenName": "Shahar",
+              "familyName": "Avidan",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/shahar-avidan/800884223/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800749757",
+              "name": "Yael Lerner",
+              "givenName": "Yael",
+              "familyName": "Lerner",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/yael-lerner/800749757/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800828672",
+              "name": "Shaked Motay",
+              "givenName": "Shaked",
+              "familyName": "Motay",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/shaked-motay/800828672/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800874049",
+              "name": "Adi Korol",
+              "givenName": "Adi",
+              "familyName": "Korol",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/adi-korol/800874049/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800829958",
+              "name": "Daniela Staroviski",
+              "givenName": "Daniela",
+              "familyName": "Staroviski",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/daniela-staroviski/800829958/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800802077",
+              "name": "Nesya Mily Azulay",
+              "givenName": "Nesya Mily",
+              "familyName": "Azulay",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/nesya-mily-azulay/800802077/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800828343",
+              "name": "Romi Pesachov",
+              "givenName": "Romi",
+              "familyName": "Pesachov",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/romi-pesachov/800828343/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800796816",
+              "name": "Emma Segev",
+              "givenName": "Emma",
+              "familyName": "Segev",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/emma-segev/800796816/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800868067",
+              "name": "Alma Ayoub",
+              "givenName": "Alma",
+              "familyName": "Ayoub",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/alma-ayoub/800868067/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800826641",
+              "name": "Amaliya Pismennyi",
+              "givenName": "Amaliya",
+              "familyName": "Pismennyi",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/amaliya-pismennyi/800826641/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800821352",
+              "name": "Roni Razzer",
+              "givenName": "Roni",
+              "familyName": "Razzer",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/roni-razzer/800821352/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800803451",
+              "name": "Maya Suzan Edri",
+              "givenName": "Maya Suzan",
+              "familyName": "Edri",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/maya-suzan-edri/800803451/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800882722",
+              "name": "Polina",
+              "givenName": "Polina",
+              "familyName": "",
+              "nationalityCode": "ISR",
+              "profileLink": "/en/players/polina-/800882722/isr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-21T19:16:21.280Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-ISR-2026-002__G-S-Q-KO",
+            "storedAt": "2026-11-21T19:16:21.280Z"
+          }
+        }
+      }
     },
     "J-J30-LAT-2026-007": {
       "competitionId": "J-J30-LAT-2026-007",
@@ -1000295,7 +1000914,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T18:29:48.059Z",
+      "checkedAt": "2026-11-21T19:16:21.814Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1001010,7 +1001629,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T18:29:48.595Z",
+      "checkedAt": "2026-11-21T19:16:22.343Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1001028,7 +1001647,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T18:29:49.129Z",
+      "checkedAt": "2026-11-21T19:16:22.877Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1001583,7 +1002202,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T18:29:49.670Z",
+      "checkedAt": "2026-11-21T19:16:23.405Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1002458,7 +1003077,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T17:01:02.834Z",
+      "checkedAt": "2026-11-21T19:16:23.942Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
