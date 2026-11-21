@@ -11257,3 +11257,10 @@ Su richiesta dell’utente, disattivato `courtwatch-itf-draw-d1-backfill.yml` do
 ## 2026-11-21 — Restore monotonically increasing JavaScript asset version
 
 Worker 44849857084 passed source checks but release safety rejected the adaptive-back asset version: the guard parses numeric prefixes, so 20261121-back-tournament-labels was lower than the previous timestamp version. Replace it with a numeric value greater than all current JS/CSS numeric prefixes and the UTC timestamp. No application logic or safety checks changed. Installer runs the release guard on the actual committed change before push; deployment confirmation awaits the resulting workflow.
+
+
+## 2026-11-21 — Stable observed-player Tennis Europe rankings
+
+Keep cached ranking rows with their own latest-publication evidence when rendering an observed profile. Preserve that evidence during snapshot assembly and persist the live rank, rank date and publication dates together in the player record. Reopening and background rendering no longer temporarily hide a verified current rank. A newer publication and authoritative empty response still invalidate obsolete ranks; failed requests retain existing data. No extra requests, timers, D1 writes or changes to opponent ranking policy. Client cache version incremented.
+
+Validation: 38 targeted ranking tests passed, including four new regressions for reopening a reconstructed profile, retaining data on network failure, clearing obsolete rankings and snapshot assembly. Full Worker checks executed before delivery; production verification awaits publication.

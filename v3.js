@@ -550,8 +550,15 @@ const teRankHtml = (value) => {
     : "";
 };
 const playerRankingSummary = (player) => {
-  const cached = playerRankingCache.get(String(player?.id || "")),
-    labels = currentPlayerRankingLabels(player, cached?.rankings ?? null);
+  const cached = playerRankingCache.get(String(player?.id || ""));
+  if (cached?.latestRankingDates) {
+    // Cached rows and their publication evidence form one verified result.
+    const current = player?.tennisEuropeLatestRankingDates || {}, dates = cached.latestRankingDates;
+    player = {...player, tennisEuropeLatestRankingDates: Object.fromEntries(
+      [...new Set([...Object.keys(current), ...Object.keys(dates)])].map(category =>
+        [category, [current[category], dates[category]].filter(Boolean).sort().at(-1)]))};
+  }
+  const labels = currentPlayerRankingLabels(player, cached?.rankings ?? null);
   return labels.length
     ? `<span id="playerLiveRankings" class="playerAllRankings"> · ${labels.map(esc).join(" · ")}</span>`
     : '<span id="playerLiveRankings" class="playerAllRankings"></span>';
@@ -604,6 +611,12 @@ async function loadCurrentPlayerRanking(player) {
     const data = await playerRankingRequests.get(key);
     player.itfJuniorRanking=data.itfJuniorRanking||null;
     player.tennisEuropeLatestRankingDates=data.latestRankingDates||{};
+    const teRows = (data.rankings || []).filter(row => row?.ranking &&
+      currentRankingCategoryAllowed(row.category, player) && latestCurrentRankingRow(row, player));
+    const ageKey = row => 'u' + String(row.category || '').match(/(14|16)$/)?.[1];
+    player.tennisEuropeRankings = Object.fromEntries(teRows.map(row => [ageKey(row), row.ranking]));
+    player.tennisEuropeRankingDates = Object.fromEntries(teRows.map(row => [ageKey(row), row.ranking_date]));
+    player.tennisEuropeRanking = teRows.map(row => `n°${row.ranking} TE U${String(row.category).match(/(14|16)$/)?.[1]}`).join(' · ');
     const target = $("playerLiveRankings"),
       labels = currentPlayerRankingLabels(player, data.rankings || []);
     {
@@ -5279,6 +5292,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
                   retained.tennisEuropeRanking || retained.ranking,
                 tennisEuropeRankings: retained.tennisEuropeRankings,
                 tennisEuropeRankingDates: retained.tennisEuropeRankingDates,
+                tennisEuropeLatestRankingDates: retained.tennisEuropeLatestRankingDates,
               }
             : player;
         });
