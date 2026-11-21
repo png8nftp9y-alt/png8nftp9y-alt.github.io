@@ -11253,3 +11253,7 @@ Preserved ITF back labels. Europe uses TE plus the metadata city, excluding venu
 ## 2026-11-21 — Disattivazione recupero straordinario archivio tabelloni ITF
 
 Su richiesta dell’utente, disattivato `courtwatch-itf-draw-d1-backfill.yml` dopo l’analisi del picco D1 del 17 novembre: il run 44082520590 aveva registrato 588.882 righe scritte. Rimossi i trigger push e workflow_run; mantenuto workflow_dispatch con job bloccato da `if: ${{ false }}`, quindi anche l’avvio manuale non esegue download o import. Conservati codice di recupero e dati già presenti; nessuna modifica ai motori ordinari ITF. Validazione statica: trigger automatici assenti e job incondizionatamente disabilitato. Nessun workflow rilanciato. Limite: la modifica non annulla eventuali esecuzioni già avviate con versioni precedenti.
+
+## 2026-11-21 — Restore monotonically increasing JavaScript asset version
+
+Worker 44849857084 passed source checks but release safety rejected the adaptive-back asset version: the guard parses numeric prefixes, so 20261121-back-tournament-labels was lower than the previous timestamp version. Replace it with a numeric value greater than all current JS/CSS numeric prefixes and the UTC timestamp. No application logic or safety checks changed. Installer runs the release guard on the actual committed change before push; deployment confirmation awaits the resulting workflow.
