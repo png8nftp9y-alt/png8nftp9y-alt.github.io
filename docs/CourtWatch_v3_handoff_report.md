@@ -11266,3 +11266,5 @@ Keep cached ranking rows with their own latest-publication evidence when renderi
 Validation: 38 targeted ranking tests passed, including four new regressions for reopening a reconstructed profile, retaining data on network failure, clearing obsolete rankings and snapshot assembly. Full Worker checks executed before delivery; production verification awaits publication.
 
 ITF discovery 2026-11-21T07:52:11.514Z: 5 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-21T07:53:41.731Z: attempted 5, acquired 5, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
