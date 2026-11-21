@@ -35,3 +35,57 @@ test('ITF withdrawn acceptance without matches never occupies a history slot; ac
  assert.deepEqual(selected.map(t=>t.competitionId),['played4','played3','played2']);
  assert.ok(selected.every(t=>t.matches.length===1));
 });
+
+import vm from 'node:vm';import fs from 'node:fs';
+const browserSource=fs.readFileSync(new URL('../../../v3.js',import.meta.url),'utf8');
+const browserContext=vm.createContext({});
+vm.runInContext(browserSource.slice(browserSource.indexOf('function opponentTournamentWindow('),browserSource.indexOf('function opponentHistoryProjection(')),browserContext);
+const active={circuit:'tennis-europe',competitionId:'playing',startDate:'2026-11-16',endDate:'2026-11-25'};
+const result=(event,won,date='2026-11-20',round='Quarter-finals')=>({event,won,date,round,status:'completed',outcomeConfirmed:true});
+for(const [implementation,select] of [['Worker',opponentTournamentWindow],['browser',browserContext.opponentTournamentWindow]]){
+ test(implementation+': Stan Put keeps both Zapopan and Merida with unavailable results',()=>{
+  const rows=[{circuit:'itf',competitionId:'Zapopan',startDate:'2026-11-16',endDate:'2026-11-21',drawConfirmed:true,historyEvidence:'acquired_itf_draw_presence',matches:[]},{circuit:'itf',competitionId:'Merida',startDate:'2026-11-21',endDate:'2026-11-28',entryStatus:'active',matches:[]}];
+  const before=JSON.stringify(rows),out=select(rows,'2026-11-21');
+  assert.deepEqual(Array.from(out,t=>[t.competitionId,t.historyKind]),[['Merida','current'],['Zapopan','current']]);
+  assert.deepEqual(Array.from(select(out,'2026-11-21'),t=>[t.competitionId,t.historyKind]),Array.from(out,t=>[t.competitionId,t.historyKind]));
+  assert.equal(JSON.stringify(rows),before);
+  assert.deepEqual(Array.from(select(rows,'2026-11-22'),t=>[t.competitionId,t.historyKind]),[['Merida','current'],['Zapopan','past']]);
+ });
+ test(implementation+': a completed knockout loss ends participation before the tournament end',()=>{
+  const out=select([{...active,matches:[result('BS16',false)]}],'2026-11-21');
+  assert.equal(out[0].historyKind,'past');
+  assert.equal(out[0].endDate,'2026-11-25');
+  assert.equal(select([{...active,matches:[result('BS16',true)]}],'2026-11-21')[0].historyKind,'current');
+ });
+ test(implementation+': singles elimination does not finish a player still active in doubles',()=>{
+  const rows=[result('BS16',false),result('BD16',true)];
+  assert.equal(select([{...active,matches:rows}],'2026-11-21')[0].historyKind,'current');
+  rows.push(result('BD16',false,'2026-11-21','Semi-finals'));
+  assert.equal(select([{...active,matches:rows}],'2026-11-21')[0].historyKind,'past');
+  assert.equal(select([{...active,matches:[result('BS16',false)],event:'BD16'}],'2026-11-21')[0].historyKind,'current');
+ });
+ test(implementation+': pending outcomes, RR losses and qualifying-only losses never fabricate elimination',()=>{
+  const unknown={...result('BS16',false),outcomeConfirmed:false};
+  const pending={...result('BD16',false),status:'scheduled',outcomeConfirmed:false,score:''};
+  for(const matches of [[unknown],[{...result('BS16',false),roundRobin:true}],[result('B-S-Q-KO',false)],[result('BS16',false),pending],[{...result('BS16',false),status:'scheduled'}],[result('BS16',false,'2026-11-22')]]){
+   assert.equal(select([{...active,matches}],'2026-11-21')[0].historyKind,'current');
+  }
+  for(const circuit of ['itf','fitp'])assert.equal(select([{...active,circuit,matches:[]}],'2026-11-21')[0].historyKind,'current');
+ });
+ test(implementation+': main-draw evidence supersedes qualifying losses and final victories end participation',()=>{
+  assert.equal(select([{...active,matches:[result('B-S-Q-KO',false),result('B-S-M-KO',true,'2026-11-21','R16')]}],'2026-11-21')[0].historyKind,'current');
+  assert.equal(select([{...active,matches:[result('BS16',true,'2026-11-21','Final')]}],'2026-11-21')[0].historyKind,'past');
+ });
+ test(implementation+': early finishes share the three history slots, ordered by actual finish day',()=>{
+  const rows=[{...active,competitionId:'early',matches:[result('BS16',false,'2026-11-19')]},...[18,17,16].map(day=>({...active,competitionId:'ended'+day,startDate:'2026-11-10',endDate:'2026-11-'+day,matches:[result('BS16',false,'2026-11-'+day)]})),{...active,competitionId:'still',matches:[result('BS16',true)]}];
+  assert.deepEqual(Array.from(select(rows,'2026-11-21'),t=>[t.competitionId,t.historyKind]),[['still','current'],['early','past'],['ended18','past'],['ended17','past']]);
+ });
+}
+
+test('uncertain or qualifying results on the same day preserve the date fallback in both implementations',()=>{
+ for(const select of [opponentTournamentWindow,browserContext.opponentTournamentWindow]){
+  for(const matches of [[result('BS16',false,'2026-11-20','Q1')],[result('BS16',false),{...result('BS16',false),date:'',status:'scheduled',outcomeConfirmed:false}]])assert.equal(select([{...active,matches}],'2026-11-21')[0].historyKind,'current');
+  const sameDay=[result('BS16',true,'2026-11-20','Quarter-finals'),result('BS16',false,'2026-11-20','Semi-finals')];
+  for(const matches of [sameDay,[...sameDay].reverse()])assert.equal(select([{...active,matches}],'2026-11-21')[0].historyKind,'past');
+ }
+});
