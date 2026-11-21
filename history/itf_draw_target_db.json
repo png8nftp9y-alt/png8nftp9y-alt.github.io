@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-11-21T07:39:09.282Z",
+  "generatedAt": "2026-11-21T07:55:25.486Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
@@ -999055,7 +999055,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T07:39:06.069Z",
+      "checkedAt": "2026-11-21T07:55:22.352Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -999064,7 +999064,7 @@
       "missingSections": 0,
       "eventInventory": [],
       "families": [],
-      "eventFailure": null,
+      "eventFailure": "GetEventFilters_incapsula_challenge",
       "eventCache": {}
     },
     "J-J30-ZIM-2026-003": {
@@ -999073,7 +999073,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T07:39:06.607Z",
+      "checkedAt": "2026-11-21T07:55:22.875Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -999091,7 +999091,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T07:39:07.147Z",
+      "checkedAt": "2026-11-21T07:55:23.401Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1000116,7 +1000116,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T07:39:07.678Z",
+      "checkedAt": "2026-11-21T07:55:23.922Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1000134,25 +1000134,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T07:39:08.212Z",
-      "playersFound": 0,
-      "declaredSections": 0,
-      "acquiredSections": 0,
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 0,
-      "eventInventory": [],
-      "families": [],
-      "eventFailure": null,
-      "eventCache": {}
-    },
-    "J-J60-HUN-2026-003": {
-      "competitionId": "J-J60-HUN-2026-003",
-      "tournamentName": "J60 Dunakeszi",
-      "startDate": "2026-11-23",
-      "endDate": "2026-11-29",
-      "decision": "pending",
-      "checkedAt": "2026-11-21T07:39:08.745Z",
+      "checkedAt": "2026-11-21T07:55:24.443Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1000164,13 +1000146,31 @@
       "eventFailure": "GetEventFilters_incapsula_challenge",
       "eventCache": {}
     },
+    "J-J60-HUN-2026-003": {
+      "competitionId": "J-J60-HUN-2026-003",
+      "tournamentName": "J60 Dunakeszi",
+      "startDate": "2026-11-23",
+      "endDate": "2026-11-29",
+      "decision": "pending",
+      "checkedAt": "2026-11-21T07:55:24.963Z",
+      "playersFound": 0,
+      "declaredSections": 0,
+      "acquiredSections": 0,
+      "unusedAlternativeSections": 0,
+      "resolvedSections": 0,
+      "missingSections": 0,
+      "eventInventory": [],
+      "families": [],
+      "eventFailure": null,
+      "eventCache": {}
+    },
     "J-J60-TUR-2026-006": {
       "competitionId": "J-J60-TUR-2026-006",
       "tournamentName": "J60 Antalya",
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-21T07:39:09.282Z",
+      "checkedAt": "2026-11-21T07:55:25.486Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1000295,8 +1000295,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1000321,8 +1000321,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1000334,8 +1000334,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1000360,14 +1000360,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1000985,7 +1000985,7 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-21T07:39:05.503Z",
+      "checkedAt": "2026-11-21T07:55:21.595Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
