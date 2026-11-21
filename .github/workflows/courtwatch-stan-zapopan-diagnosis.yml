@@ -1,0 +1,55 @@
+name: Court Watch Stan Put Zapopan read-only diagnosis
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/courtwatch-stan-zapopan-diagnosis.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: '${{ github.sha }}'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Read exact identity, documents, participation and Worker response
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_D1_DATABASE_ID: cc3b23ac-7f90-4a4d-9ec3-44f0f22e6fda
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs/promises';
+          import worker from './cloudflare/app-api/src/index.js';
+          import {openReadOnlyD1} from './cloudflare/app-api/lib/read-only-d1-client.mjs';
+          import {itfDrawParticipationTournaments} from './cloudflare/app-api/lib/itf-draw-participations.mjs';
+          const native='800656311',competition='J-J300-MEX-2026-001';
+          const report={native,competition,checkedAt:new Date().toISOString(),metrics:{queries:0,rowsRead:0,rowsWritten:0}};
+          try {
+           const {query,db}=await openReadOnlyD1({onMetrics:rows=>{for(const r of rows){report.metrics.queries++;report.metrics.rowsRead+=r.meta?.rows_read||0;report.metrics.rowsWritten+=r.meta?.rows_written||0;if(r.meta?.rows_written)throw Error('unexpected_write');}}});
+           report.identity=await query("SELECT display_name FROM observed_players WHERE circuit='itf' AND official_id=? UNION SELECT display_name FROM search_acquired_players WHERE circuit='itf' AND official_id=? LIMIT 10",[native,native]);
+           report.entry=await query("SELECT source_player_id,display_name,payload FROM opponent_entry_profiles WHERE circuit='itf' AND source_player_id=?",[native]);
+           report.entry=report.entry.map(r=>({...r,payload:JSON.parse(r.payload)}));
+           report.documents=await query("SELECT draw_key,content_sha256,event,observed_at,chunk_count,content_bytes FROM itf_draw_documents WHERE competition_id=? ORDER BY event,observed_at DESC",[competition]);
+           report.links=await query("SELECT p.draw_key,p.content_sha256,p.source_player_id,p.tournament_id FROM itf_draw_participations p WHERE p.source_player_id=?",[native]);
+           report.confirmed=await itfDrawParticipationTournaments(db,[{sourceCircuit:'itf',sourcePlayerId:native}]);
+           const source=await fs.readFile('cloudflare/app-api/src/index.js','utf8'),email=source.match(/email:\s*['"]([^'"]+)['"]/)?.[1];
+           if(!email)throw Error('audit_account_not_resolved');
+           const response=await worker.fetch(new Request('https://audit.invalid/app/api/opponent-profile?profileId='+native+'&name=Stan%20Put',{headers:{'Cf-Access-Authenticated-User-Email':email}}),{DB:db},{});
+           report.workerStatus=response.status;report.worker=await response.json();
+           if(response.status!==200)throw Error('worker_status_'+response.status);
+           report.summary={documents:report.documents.length,links:report.links.length,zapopanLinked:report.confirmed.some(t=>t.competitionId===competition),selected:report.worker.tournaments?.map(t=>({circuit:t.circuit,id:t.competitionId,name:t.name,kind:t.historyKind,start:t.startDate,end:t.endDate,drawConfirmed:t.drawConfirmed,entryStatus:t.entryStatus}))};
+           report.status='checked';
+          }catch(e){report.status='failed';report.error=String(e?.message||e);}
+          finally{await fs.mkdir('artifacts',{recursive:true});await fs.writeFile('artifacts/stan-zapopan.json',JSON.stringify(report,null,2));console.log('STAN_ZAPOPAN_DIAG='+JSON.stringify(report));}
+          if(report.status!=='checked')process.exitCode=1;
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stan-zapopan-readonly
+          path: artifacts/stan-zapopan.json
+          retention-days: 7

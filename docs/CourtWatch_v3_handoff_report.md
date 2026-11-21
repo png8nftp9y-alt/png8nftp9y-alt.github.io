@@ -11285,3 +11285,8 @@ Stato finale concordato con l’utente: caso chiuso nel perimetro ITF già verif
 Validazione di questa chiusura: rilettura del report corrente e riconciliazione con gli esiti remoti e le conferme dell’utente già raccolti nella chat. Solo documentazione: nessun nuovo audit, acquisizione, modifica applicativa, scrittura D1/R2 o rilancio manuale.
 
 ITF discovery 2026-11-21T19:54:58.586Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+## 2026-11-21 — Diagnosi autorizzata Stan Put / J300 Zapopan
+
+L’utente ha esplicitamente autorizzato il controllo D1 di Stan Put (800656311) e Zapopan (J-J300-MEX-2026-001) e il salvataggio del risultato come artifact GitHub. Controllo singolo alla pubblicazione del proprio workflow, senza schedule o acquisizioni: identità, indice iscrizioni, documenti, associazioni native e replay Worker sui dati D1 tramite trasporto read-only esistente. Dati D1/R2 non modificati. Artifact conservato sette giorni; nessuna credenziale esportata. Sintassi JavaScript e YAML già verificate. Esito remoto ancora da leggere: non è una correzione né una certificazione della pagina live. Zapopan era già nel catalogo del 14 novembre; il firstSeenAt della mappa viene ricreato dal merge, quindi la precedente ipotesi di scoperta soltanto il 21 è ritirata.
