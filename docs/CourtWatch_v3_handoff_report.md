@@ -11248,3 +11248,8 @@ Run 44846982099 confirms native Bari participation exists in D1, but hidden FITP
 ## 2026-11-21 — Tournament-specific adaptive back labels
 
 Preserved ITF back labels. Europe uses TE plus the metadata city, excluding venue and country, and falls back to TE without an invented city. Ordinary FITP tournaments use the generic tournament label; names containing Super Next Gen, Junior Next Gen, Master, Road to Bologna, Kinder or Campionati keep the heading (case insensitive word matching). Route trail and back behavior unchanged. Bumped JS version. Validation: three route-level VM tests cover actual function and decoded tournament lookup, both Europe examples, unknown city, ordinary FITP, all six special names and unchanged ITF; source UI verification and JS syntax passed. Live deploy verification pending publication.
+
+
+## 2026-11-21 — Disattivazione recupero straordinario archivio tabelloni ITF
+
+Su richiesta dell’utente, disattivato `courtwatch-itf-draw-d1-backfill.yml` dopo l’analisi del picco D1 del 17 novembre: il run 44082520590 aveva registrato 588.882 righe scritte. Rimossi i trigger push e workflow_run; mantenuto workflow_dispatch con job bloccato da `if: ${{ false }}`, quindi anche l’avvio manuale non esegue download o import. Conservati codice di recupero e dati già presenti; nessuna modifica ai motori ordinari ITF. Validazione statica: trigger automatici assenti e job incondizionatamente disabilitato. Nessun workflow rilanciato. Limite: la modifica non annulla eventuali esecuzioni già avviate con versioni precedenti.

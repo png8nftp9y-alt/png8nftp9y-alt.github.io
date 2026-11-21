@@ -1,14 +1,7 @@
 name: Court Watch ITF complete draw archive D1 backfill
+# Disabled at user request after the one-off archive recovery.
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/courtwatch-itf-draw-d1-backfill.yml'
   workflow_dispatch:
-  workflow_run:
-    workflows: [Court Watch v3 archive 4291 ITF historical draws to R2, Court Watch ITF Hanko qualification recovery]
-    types: [completed]
-    branches: [main]
 
 permissions:
   contents: read
@@ -20,7 +13,7 @@ concurrency:
 
 jobs:
   backfill:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    if: ${{ false }} # Disabled: requires an explicit code change to reactivate.
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
