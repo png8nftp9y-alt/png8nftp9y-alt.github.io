@@ -6,7 +6,7 @@ const source=readFileSync(new URL('../../v3.js',import.meta.url),'utf8');
 const context=vm.createContext({circuit:t=>t.circuit,iso:()=> '2026-11-19',Date,
  $:()=>null,opponentHistoryProjection:x=>x,esc:x=>String(x),readableText:x=>x,
  state:{data:{tournaments:[]}},tournamentOfficialUrl:()=>'',tournamentSurfaceLabel:()=>'',
- opponentTournamentStatusHtml:()=>'',opponentTournamentEventLinks:()=>'',opponentTournamentDateLabel:()=>'',
+ opponentTournamentStatusHtml:()=>'',opponentTournamentEventLinks:()=>'',opponentTournamentDateLabel:()=> '23–29 novembre',
  opponentHistoryMatchSectionsHtml:()=>'',bindParticipantNavigation:()=>{}});
 const extract=(from,to)=>source.slice(source.indexOf(from),source.indexOf(to,source.indexOf(from)));
 vm.runInContext(extract('function tournamentConcluded(', 'function playerTournamentEligible('),context);
@@ -28,11 +28,13 @@ test('start date alone does not remove pending acceptance; official draw or acqu
  for(const status of ['withdrawn','excluded','cancelled'])assert.equal(label({...future,entryStatus:status}),'');
  assert.equal(label({...future,endDate:'2026-11-18'}),'');
 });
-test('actual opponent renderer places acceptance beside the tournament name and emits no Iscritto paragraph',()=>{
+test('actual opponent renderer places acceptance in the right metadata group before the date',()=>{
  const body={setAttribute(){},innerHTML:'',insertAdjacentHTML(){}};
  context.$=id=>id==='opponentTournamentHistory'?body:null;
  context.renderOpponentHistory({tournaments:[future]});
- assert.match(body.innerHTML,/<h4>.*Saint Paul.*Acceptance list: MD-12.*<\/h4>/);
+ assert.match(body.innerHTML,/<h4>.*Saint Paul.*<\/h4>/);
+ assert.doesNotMatch(body.innerHTML.match(/<h4>.*?<\/h4>/)[0],/Acceptance list/);
+ assert.match(body.innerHTML,/<span class="opponentTournamentMeta">.*Acceptance list: MD-12<\/span><time class="opponentTournamentDates">23–29 novembre<\/time><\/span>/);
  assert.doesNotMatch(body.innerHTML,/opponentTournamentEntry|Iscritto/);
  context.renderOpponentHistory({tournaments:[{...future,circuit:'fitp'}]});
  assert.doesNotMatch(body.innerHTML,/Acceptance list|Iscritto/);

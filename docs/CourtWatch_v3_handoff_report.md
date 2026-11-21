@@ -11235,3 +11235,8 @@ Acceptance list follows surface and indoor/outdoor conditions, in black normal-w
 
 ## 2026-11-21 — Explicit ITF opponent audit
 Fix targeted verification rejecting Mascaretti outside observed scope. Exact native lookup, maximum 10 IDs, explicit missing identity errors; include D1 participation and source evidence. No data writes. Five focused tests passed. Remote evidence and production repair remain pending.
+
+
+## 2026-11-21 — Opponent acceptance immediately before the date
+
+Move acceptance out of the tournament-name heading into the right-aligned metadata group immediately before the date. Give label and date a 16px horizontal gap and wrap on narrow screens. Keep black normal-weight acceptance text; source and confirmation rules unchanged. Both asset versions incremented. Update the real renderer regression to verify ordering and absence from the title. Validate renderer and UI gates, syntax and release guard before push; live visual confirmation after deployment.
