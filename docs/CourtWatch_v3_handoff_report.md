@@ -11264,3 +11264,5 @@ Worker 44849857084 passed source checks but release safety rejected the adaptive
 Keep cached ranking rows with their own latest-publication evidence when rendering an observed profile. Preserve that evidence during snapshot assembly and persist the live rank, rank date and publication dates together in the player record. Reopening and background rendering no longer temporarily hide a verified current rank. A newer publication and authoritative empty response still invalidate obsolete ranks; failed requests retain existing data. No extra requests, timers, D1 writes or changes to opponent ranking policy. Client cache version incremented.
 
 Validation: 38 targeted ranking tests passed, including four new regressions for reopening a reconstructed profile, retaining data on network failure, clearing obsolete rankings and snapshot assembly. Full Worker checks executed before delivery; production verification awaits publication.
+
+ITF discovery 2026-11-21T07:52:11.514Z: 5 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
