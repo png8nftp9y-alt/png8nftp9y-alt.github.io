@@ -676,7 +676,7 @@ const circuit = (x) => {
 function withoutPucItfReferences(data) {
   if (!data) return data;
   const fields = ["tournaments", "matches", "agenda", "results", "tournamentEntries"];
-  const isPuc = item => circuit(item) === "fitp";
+  const isPuc = item => !item?.manualEvent && circuit(item) === "fitp";
   const mentionsItf = item => /\b(?:ITF|CHALLENGER)\b/i.test([item?.tournamentName, item?.name, item?.nome_torneo, item?.description, item?.descrizione].filter(Boolean).join(" "));
   const ids = item => [item?.competitionId, item?.tournamentId, item?.tournamentKey].filter(Boolean).map(value => String(value).toUpperCase());
   const blocked = new Set();
@@ -2468,7 +2468,7 @@ function renderWeeklyAgenda() {
     ? `<div class="weeklyTournamentList">${tournaments
         .map(
           (tournament) =>
-            `<button type="button" class="weeklyTournament ${circuit(tournament)}" data-weekly-tournament="${esc(tournamentKey(tournament))}"><span class="weeklyTournamentCircuit">${esc(circuit(tournament) === "tennis-europe" ? "Tennis Europe" : circuit(tournament).toUpperCase())}</span><strong>${esc(tournamentDisplayName(tournament))}</strong><small>${esc(tournamentLocationLabel(tournament))}</small><span>${tournament.players.map((player) => `<b>${esc(player)}</b>`).join(", ")}</span></button>`,
+            `<button type="button" class="weeklyTournament ${circuit(tournament)}" data-event-color="${esc(tournament.eventColor || '')}" data-weekly-tournament="${esc(tournamentKey(tournament))}"><span class="weeklyTournamentCircuit">${esc(tournament.manualEvent ? "Evento manuale" : circuit(tournament) === "tennis-europe" ? "Tennis Europe" : circuit(tournament).toUpperCase())}</span><strong>${esc(tournamentDisplayName(tournament))}</strong><small>${esc(tournamentLocationLabel(tournament))}</small><span>${tournament.players.map((player) => `<b>${esc(player)}</b>`).join(", ")}</span></button>`,
         )
         .join("")}</div>`
     : '<div class="empty">Nessun giocatore iscritto a tornei in questa settimana.</div>';
@@ -2662,7 +2662,7 @@ function renderAgenda() {
         .join("")}</div>`
     : '<div class="empty">Nessuna partita confermata per questa giornata.</div>';
   const dailyAgenda = $("dailyAgenda");
-  if (!updateDailyAgenda(dailyAgenda, markup)) return;
+  if (!updateDailyAgenda(dailyAgenda, manualCalendarAgendaHtml(key) + markup)) return;
   dailyAgenda.querySelectorAll("[data-open-tournament]").forEach(
     (x) =>
       (x.onclick = (event) => {
@@ -2835,7 +2835,7 @@ function renderCalendar() {
             .filter(Boolean)
             .join(" ");
         const displayName = tournamentDisplayName(t);
-        return `<button class="tourBand ${cls}" style="grid-column:${s + 1}/${e + 2}${fadeStyle}" data-tournament="${esc(tournamentKey(t))}" title="${esc(displayName + " · " + loc + " · " + players + (t.playerIds.length > 3 ? " (" + t.playerIds.length + ")" : ""))}"><strong>${esc(displayName)}</strong><span>${esc(loc)} · ${playerNamesHtml}</span></button>`;
+        return `<button class="tourBand ${cls}" data-event-color="${esc(t.eventColor || '')}" style="grid-column:${s + 1}/${e + 2}${fadeStyle}" data-tournament="${esc(tournamentKey(t))}" title="${esc(displayName + " · " + loc + " · " + players + (t.playerIds.length > 3 ? " (" + t.playerIds.length + ")" : ""))}"><strong>${esc(displayName)}</strong><span>${esc(loc)} · ${playerNamesHtml}</span></button>`;
       })
       .join("")}</div></section>`;
   }
@@ -4043,7 +4043,7 @@ function renderProfile(id) {
         summerCenter = fitpSummerCenterPlace(t),
         place = summerCenter || agendaVenueLocation(t),
         courtConditions = tournamentSurfaceLabel(t);
-      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(displayDate(t.startDate))} – ${esc(displayDate(t.endDate))}${effectiveAcceptanceLabel(t) ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(effectiveAcceptanceLabel(t))}` : ""}</p></div><div class="profileTournamentMatches">${
+      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}" data-event-color="${esc(t.eventColor || '')}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button>${t.manualEvent ? ' <small>Evento manuale</small>' : ""}</h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(displayDate(t.startDate))} – ${esc(displayDate(t.endDate))}${effectiveAcceptanceLabel(t) ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(effectiveAcceptanceLabel(t))}` : ""}</p></div><div class="profileTournamentMatches">${
         matches.length
           ? matchHistorySectionsHtml(matches)
           : '<div class="empty">Nessuna partita pubblicata.</div>'
@@ -4087,6 +4087,7 @@ function matchHistorySectionsHtml(matches) {
   );
 }
 function tournamentOfficialUrl(t) {
+  if (t?.manualEvent) return "";
   const source = circuit(t),
     id = String(t.competitionId || "").trim(),
     url = String(t.sourceUrl || "").trim();
@@ -4123,6 +4124,7 @@ function agendaDrawCodeHtml(m, t) {
     : `<span class="type drawCode ${esc(gender)}">${esc(code)}</span>`;
 }
 function tournamentDrawLinks(t, matches) {
+  if (t?.manualEvent) return "";
   if (circuit(t) === "fitp") return fitpInlineDrawSlot(t);
   const draws = new Map();
   for (const m of matches) {
@@ -4147,6 +4149,7 @@ function tournamentDrawLinks(t, matches) {
     .join("");
 }
 function tournamentAcceptanceUrl(t) {
+  if (t?.manualEvent) return "";
   if (circuit(t) !== "tennis-europe") return "";
   const explicit = String(t.acceptanceListUrl || "").trim(),
     source = String(t.sourceUrl || "").trim(),
@@ -4316,7 +4319,7 @@ function renderTournament(key) {
     group.matches.push(m);
     byPlayer.set(m.playerId, group);
   }
-  const futureEurope = source === 'tennis-europe' && String(t.startDate || '') > iso(new Date());
+  const futureEurope = !t.manualEvent && source === 'tennis-europe' && String(t.startDate || '') > iso(new Date());
   const multiPlayer = (t.playerIds || []).length > 1 || byPlayer.size > 1;
   const sections = [...byPlayer.values()]
     .map((group) => {
@@ -4359,7 +4362,7 @@ function renderTournament(key) {
       const europeCategories = futureTournamentEuropeCategories(group.entry, rows, t);
       const matchRows = matchHistorySectionsHtml(rows);
       const playerHeading = `<button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${futureEurope ? `<span class="teRanking" data-future-europe-ranking="${esc(group.playerId)}" data-future-europe-categories="${esc(europeCategories.join(","))}">${playerRankingCache.has(String(group.playerId)) ? esc(" · " + futureTournamentEuropeRanking(playerRecord, playerRankingCache.get(String(group.playerId)), europeCategories)) : ""}</span>` : ""}${!futureEurope && playerRanking ? (["tennis-europe", "itf"].includes(source) ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button>`;
-      return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}">${playerHeading}<span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : "Iscritto"}${source === "fitp" ? ` · ${fitpTournamentSubscriptionHtml({...group.entry, circuit:source})}` : ""}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
+      return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}">${playerHeading}<span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : t.manualEvent ? "Inserito manualmente" : "Iscritto"}${!t.manualEvent && source === "fitp" ? ` · ${fitpTournamentSubscriptionHtml({...group.entry, circuit:source})}` : ""}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
     })
     .join("");
   const officialUrl = tournamentOfficialUrl(t),
@@ -4376,9 +4379,9 @@ function renderTournament(key) {
     surfaceLabel = tournamentSurfaceLabel(t),
     category = source === "tennis-europe" ? readableText(t.tournamentCategory || "") : "";
   $("profileContent").innerHTML =
-    `<div class="card tournamentHero"><div><h2>${title}</h2>${category ? `<p>${esc(category)}</p>` : ""}${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(displayDate(t.startDate) || "data da pubblicare")} – ${esc(displayDate(t.endDate) || "data da pubblicare")}</p></div><div class="tournamentHeroActions">${acceptanceLink}<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div></div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
+    `<div class="card tournamentHero" data-event-color="${esc(t.eventColor || '')}"><div><h2>${title}</h2>${t.manualEvent ? "<p>Evento inserito manualmente</p>" : ""}${category ? `<p>${esc(category)}</p>` : ""}${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(displayDate(t.startDate) || "data da pubblicare")} – ${esc(displayDate(t.endDate) || "data da pubblicare")}</p></div><div class="tournamentHeroActions">${acceptanceLink}<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div></div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
   if (futureEurope) loadFutureTournamentEuropeRankings(key, [...byPlayer.keys()].map(id => (state.data.players || []).find(player => player.id === id)).filter(Boolean));
-  if (source === "fitp") loadInlineFitpDrawLinks(t);
+  if (!t.manualEvent && source === "fitp") loadInlineFitpDrawLinks(t);
   bindParticipantNavigation($("profileContent"));
   if (multiPlayer)
     $("profileContent")
@@ -4991,7 +4994,72 @@ function updatePlayerGroupControls() {
     button.onclick = switchPlayerGroup;
   });
 }
+function manualCalendarAgendaHtml(day) {
+  return groups().filter(t => t.manualEvent && overlap(t, day, day)).map(t =>
+    `<section class="manualAgendaEvent" data-event-color="${esc(t.eventColor)}"><button type="button" class="inlinePlayerLink" data-open-tournament="${esc(tournamentKey(t))}">${esc(t.name)}</button><small>Evento manuale · ${esc(t.location)} · ${esc(t.startDate)} – ${esc(t.endDate)}</small><p>${t.people.map(p => `<button type="button" class="inlinePlayerLink" data-open-player="${esc(p.playerId)}">${esc(p.playerName)}</button>`).join(', ')}</p></section>`).join('');
+}
+function wireCalendarEvents() {
+  const dialog=$('calendarEventDialog'), form=$('calendarEventForm'), error=$('calendarEventError');
+  let busy=false, dialogGroup='';
+  const fail=message=>{error.textContent=message;};
+  const close=()=>{if(!busy)dialog.close();};
+  $('closeCalendarEvent').onclick=close;
+  dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault();});
+  const open=removal=>{
+    dialogGroup=PLAYER_GROUP;fail('');form.hidden=removal;$('calendarEventRemoval').hidden=!removal;
+    $('calendarEventTitle').textContent=removal?'Rimuovi torneo manuale':'Aggiungi torneo';
+    dialog.showModal();
+  };
+  $('addCalendarEvent').onclick=()=>{
+    form.reset();$('calendarEventPlayerSearch').value='';
+    const players=[...(state.data?.players||[])].filter(p=>!p.membershipPending).sort((a,b)=>a.name.localeCompare(b.name,'it'));
+    $('calendarEventPlayers').innerHTML=players.map(p=>`<label data-player-search="${esc(p.name.toLocaleLowerCase('it'))}"><input type="checkbox" name="playerIds" value="${esc(p.id)}">${esc(p.name)}</label>`).join('');
+    form.elements.startDate.value=iso(state.month);form.elements.endDate.value=iso(state.month);
+    open(false);form.elements.name.focus();
+  };
+  $('calendarEventPlayerSearch').oninput=event=>{
+    const q=event.target.value.toLocaleLowerCase('it').trim();
+    for(const label of $('calendarEventPlayers').querySelectorAll('label'))label.hidden=!label.dataset.playerSearch.includes(q);
+  };
+  async function api(method,body,id) {
+    const response=await fetch(PRIVATE_API+'/calendar-events'+(id?'?id='+encodeURIComponent(id):''),privateApiOptions({method,credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(20000)},dialogGroup));
+    const result=await response.json();if(!response.ok)throw Error(result.error==='player_not_in_group'?'Un giocatore non è più presente in questa sezione. Aggiorna la pagina.':'Salvataggio non riuscito. Riprova.');return result;
+  }
+  async function refreshManualEvents() {
+    const {events}=await api('GET');
+    if(dialogGroup!==PLAYER_GROUP)throw Error('La sezione è cambiata. Riapri il comando nel calendario.');
+    const ids=new Set((state.data.players||[]).map(p=>p.id));
+    const rows=events.flatMap(t=>t.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:t.id+'|'+playerId,competitionId:t.id,manualEventId:t.id,manualEvent:true,manual:true,name:t.name,location:t.location,startDate:t.startDate,endDate:t.endDate,circuit:['fitp','tennis-europe','itf'].includes(t.color)?t.color:'manual',eventColor:t.color,playerId,status:'manual',entryStatus:'manual'})));
+    state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
+    state.data={...state.data,tournaments:[...(state.data.tournaments||[]).filter(t=>!t.manualEvent),...rows]};
+    await saveCachedData(state.data);renderIfDataChanged(true);
+  }
+  form.onsubmit=async event=>{
+    event.preventDefault();if(busy)return;fail('');
+    const values=new FormData(form), playerIds=values.getAll('playerIds');
+    if(!playerIds.length){fail('Seleziona almeno un giocatore.');return;}
+    if(values.get('endDate')<values.get('startDate')){fail('La data finale deve essere uguale o successiva a quella iniziale.');return;}
+    if(dialogGroup!==PLAYER_GROUP){fail('La sezione è cambiata. Riapri il comando nel calendario.');return;}
+    busy=true;$('saveCalendarEvent').disabled=true;
+    try{await api('POST',{name:values.get('name'),location:values.get('location'),startDate:values.get('startDate'),endDate:values.get('endDate'),color:values.get('color'),playerIds});await refreshManualEvents();dialog.close();}
+    catch(e){fail(e.message);}finally{busy=false;$('saveCalendarEvent').disabled=false;}
+  };
+  $('removeCalendarEvent').onclick=async()=>{
+    open(true);const target=$('calendarEventRemoval');target.textContent='Caricamento…';
+    try{
+      const {events}=await api('GET');
+      target.innerHTML=events.length?events.map(t=>`<div class="calendarEventRemoveRow"><div><strong>${esc(t.name)}</strong><small>${esc(t.startDate)} – ${esc(t.endDate)} · ${esc(t.location)}</small></div><button type="button" class="btn" data-delete-event="${esc(t.id)}">Rimuovi</button></div>`).join(''):'Nessun torneo manuale da rimuovere.';
+      target.querySelectorAll('[data-delete-event]').forEach(button=>button.onclick=async()=>{
+        if(busy)return;if(dialogGroup!==PLAYER_GROUP){fail('La sezione è cambiata. Riapri il comando.');return;}
+        busy=true;button.disabled=true;fail('');
+        try{await api('DELETE',null,button.dataset.deleteEvent);button.closest('.calendarEventRemoveRow').remove();await refreshManualEvents();if(!target.querySelector('[data-delete-event]'))target.textContent='Nessun torneo manuale da rimuovere.';}
+        catch(e){fail(e.message);}finally{busy=false;button.disabled=false;}
+      });
+    }catch(e){fail(e.message);target.textContent='';}
+  };
+}
 function wire() {
+  wireCalendarEvents();
   updatePlayerGroupControls();
   addEventListener("popstate", () => {
     const group = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
@@ -5260,6 +5328,7 @@ function refreshKnownMatchResults() {
 }
 
 async function load(preparedProjection = null, preparedDocuments = null, refreshMembership = false) {
+  const manualRevision = state.manualCalendarRevision || 0;
   refreshKnownMatchResults();
   if(refreshMembership&&!preparedProjection)requestPlayerMembershipRefresh();
   if (loadRunning) return activeLoadCompletion;
@@ -5411,6 +5480,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
         staticGeneration >= previousGeneration;
       const today = iso(new Date());
       const retainedTournaments = (previous.tournaments || []).filter(t => {
+        if (t.manualEvent && freshApiTournaments) return false;
         const end = String(t.endDate || t.officialEndDate || t.startDate || "").slice(0,10);
         if (!/^\d{4}-\d{2}-\d{2}$/.test(end) || end < today) return true;
         if (universalProjectionFresh && freshApiTournaments && projectedPlayers.has(t.playerId)) return false;
@@ -5427,7 +5497,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
           ...retainedTournaments,
           ...((universalProjectionFresh && projection?.tournaments) || staticTournaments || previous.tournaments || []),
           ...(!universalProjectionFresh && (projection || staticTournaments) ? (projection ? (projection.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : cachedPersonalTournaments(previous, visiblePlayers)) : []),
-        ].map(t => [[t.playerId, t.circuit || t.sourceId || "", t.competitionId || t.id || t.name].join("|"), t])).values()].filter((x) => visibleIds.has(x.playerId)),
+        ].filter(t => !t.manualEvent).concat(((freshApiTournaments && manualRevision === (state.manualCalendarRevision || 0) ? projection?.tournaments : previous.tournaments) || []).filter(t => t.manualEvent)).map(t => [[t.playerId, t.circuit || t.sourceId || "", t.competitionId || t.id || t.name].join("|"), t])).values()].filter((x) => visibleIds.has(x.playerId)),
         matches: matches.filter((x) => visibleIds.has(x.playerId)),
         agenda: mergeAgenda(agenda, matches).filter((x) =>
           visibleIds.has(x.playerId),

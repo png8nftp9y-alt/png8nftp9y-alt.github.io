@@ -189,3 +189,17 @@ for(const change of ['fresh API','group switch','selection change'])test(`late I
  release({players:[{id:'old'}],tournaments:[{playerId:'old',competitionId:'quanta'}],cachedAt:999999});
  assert.equal(await pending,false);assert.equal(ctx.state.data.players[0].id,'fresh');
 });
+
+for(const scenario of ['newer static generation','removed past event','late snapshot after manual removal'])test('manual calendar persistence: '+scenario,async()=>{
+ const {ctx}=cacheContext();
+ const manual={id:'manual-id|base',competitionId:'manual-id',name:'Manual',playerId:'base',manualEvent:true,circuit:'fitp',startDate:'2026-01-01',endDate:'2026-01-02'};
+ const projection={group:'main',players:[{id:'base'}],membershipIds:['base'],tournaments:scenario==='removed past event'?[]:[manual],matches:[],generatedAt:'2026-01-01T00:00:00Z',snapshotReadAt:'2026-11-21T15:00:00Z'};
+ Object.assign(ctx,{loadRunning:false,uiSelectionRestored:true,confirmedCourtWatchPlayers:new Map(),FORMER_PLAYERS:new Set(),removedCourtWatchPlayers:new Set(),saveUiState(){},normalizeMatchProjection:x=>x,syncLabel(){},renderIfDataChanged(){},restoreUiScroll(){},agendaKey:m=>m.id,mergeAgenda:a=>a,refreshKnownMatchResults(){},applyKnownResultUpdates:x=>x,PLAYER_GROUP:'main',
+ apiProjection:async()=>{if(scenario==='late snapshot after manual removal'){ctx.state.manualCalendarRevision=1;ctx.state.data.tournaments=[];}return projection;},
+ v3json:async name=>name==='players.json'?{players:[{id:'base'}],generatedAt:'2026-11-21T00:00:00Z'}:name==='tournaments.json'?{tournaments:[{playerId:'base',name:'Automatic'}],generatedAt:'2026-11-21T00:00:00Z'}:{}});
+ ctx.state.data={players:[{id:'base'}],tournaments:[manual],matches:[]};
+ const loader=source.slice(source.indexOf('async function load('),source.indexOf('document.addEventListener("click", (event) => {',source.indexOf('async function load(')));
+ vm.runInContext(mergeSource+loader,ctx);await ctx.load();
+ assert.equal(ctx.state.data.tournaments.filter(t=>t.manualEvent).length,scenario==='newer static generation'?1:0);
+ assert.ok(ctx.state.data.tournaments.some(t=>t.name==='Automatic'));
+});

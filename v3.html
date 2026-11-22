@@ -18,7 +18,7 @@
       html[data-cw-refresh-preview] main.view { pointer-events: none; }
     </style>
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=20261121233546" />
+    <link rel="stylesheet" href="v3.css?v=20261122142601-manual-calendar" />
   </head>
   <body>
     <div class="shell">
@@ -165,7 +165,7 @@
         <section class="calendarPageLayout">
           <div class="card calendarCard" id="calendarCard">
             <div class="cardHead calendarHead">
-              <h2>Calendario</h2>
+              <div class="calendarTitleActions"><h2>Calendario</h2><button id="addCalendarEvent" class="btn icon" type="button" aria-label="Aggiungi torneo manuale" title="Aggiungi torneo manuale">+</button><button id="removeCalendarEvent" class="btn icon" type="button" aria-label="Rimuovi torneo manuale" title="Rimuovi torneo manuale">−</button></div>
               <div class="demographicFilters">
                 <details id="calendarCategory">
                   <summary>
@@ -382,6 +382,23 @@
         if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);else mount();
       })();
     </script>
-    <script crossorigin="anonymous" src="v3.js?v=20261121233546"></script>
-  </body>
+
+
+    <dialog id="calendarEventDialog" class="calendarEventDialog" aria-labelledby="calendarEventTitle">
+      <div class="calendarEventHeading"><h2 id="calendarEventTitle">Aggiungi torneo</h2><button type="button" class="btn" id="closeCalendarEvent" aria-label="Chiudi">×</button></div>
+      <form id="calendarEventForm">
+        <label>Nome del torneo<input name="name" required maxlength="160" autocomplete="off"></label>
+        <div class="calendarEventDates"><label>Dal<input name="startDate" type="date" required></label><label>Al<input name="endDate" type="date" required></label></div>
+        <label>Luogo<input name="location" required maxlength="200" autocomplete="off"></label>
+        <label>Tipologia e colore<select name="color" required><option value="fitp">Blu · FITP</option><option value="tennis-europe">Arancio · Tennis Europe</option><option value="itf">Verde · ITF</option><option value="purple">Viola · Raduni regionali</option><option value="red">Rosso · Gare a squadre</option><option value="gray">Grigio scuro · FIT Junior Program</option></select></label>
+        <fieldset><legend>Giocatori coinvolti</legend><input type="search" id="calendarEventPlayerSearch" aria-label="Cerca tra i giocatori" placeholder="Cerca giocatore"><div id="calendarEventPlayers" class="calendarEventPlayers"></div></fieldset>
+        <p class="muted">Inserito manualmente. Sarà visibile nel calendario, nell’agenda e nelle pagine dei giocatori selezionati.</p>
+        <button class="btn" type="submit" id="saveCalendarEvent">Salva torneo</button>
+      </form>
+      <div id="calendarEventRemoval" hidden></div>
+      <p id="calendarEventError" role="alert"></p>
+    </dialog>
+    <script crossorigin="anonymous" src="v3.js?v=20261122142601-manual-calendar"></script>
+
+</body>
 </html>
