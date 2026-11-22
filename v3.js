@@ -273,7 +273,7 @@ function saveRefreshView() {
     const html = clone.innerHTML;
     if (html.length > 1500000) {sessionStorage.removeItem(key); return;}
     sessionStorage.setItem(key, JSON.stringify({
-      version: "20261013-refresh-position", route: location.pathname + location.search + location.hash,
+      version: "20261122-manual-calendar-template", route: location.pathname + location.search + location.hash,
       viewId: view.id, html, y: Math.max(0, scrollY || 0),
       styles: [...document.head.querySelectorAll("style[id]")].map(style => ({id: style.id, css: style.textContent})),
     }));
@@ -5004,6 +5004,8 @@ function manualCalendarAgendaHtml(day, tournaments = groups()) {
 }
 function wireCalendarEvents() {
   const dialog=$('calendarEventDialog'), form=$('calendarEventForm'), error=$('calendarEventError');
+  // Optional calendar controls must never prevent navigation from being wired.
+  if (!['calendarEventDialog','calendarEventForm','calendarEventError','closeCalendarEvent','addCalendarEvent','removeCalendarEvent','calendarEventPlayerSearch','calendarEventPlayers','calendarEventRemoval','calendarEventTitle','saveCalendarEvent'].every(id => $(id))) return;
   let busy=false, dialogGroup='', requestId='';
   const fail=message=>{error.textContent=message;};
   const close=()=>{if(!busy)dialog.close();};

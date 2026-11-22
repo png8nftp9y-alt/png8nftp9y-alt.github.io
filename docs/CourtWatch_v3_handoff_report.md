@@ -11364,3 +11364,11 @@ Diagnostic Admin forms inherited no-referrer, which can produce an opaque null O
 - Regressione manual-agenda-render.test.mjs: quattro casi sul vero codice falliscono prima della correzione e passano dopo (viste per torneo/cronologica, con/senza evento manuale); verificati tre match, selezione di un solo giocatore, deselezione totale e singola chiamata groups. Aggiunta alla suite CI obbligatoria. Controlli locali mirati, cache JS aggiornata; run browser GitHub ancora necessari per certificare il deploy.
 
 ITF discovery 2026-11-22T15:09:59.873Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+## 2026-11-22 — Calendario: ripristino avvio dopo anteprima obsoleta
+
+- Causa: l’anteprima HTML salvata prima dei tornei manuali riutilizzava la stessa versione. Al reload sostituiva il calendario corrente senza i pulsanti +/−; wireCalendarEvents lanciava un TypeError prima di collegare la navigazione, lasciando attivo il blocco dei clic dell’anteprima.
+- Correzione: nuova versione condivisa dell’anteprima in HTML e JavaScript; rifiuto delle anteprime calendario prive dei due pulsanti; controllo dei widget opzionali prima del collegamento; nuova versione asset JavaScript. Dati locali e tornei persistenti restano invariati.
+- Verifica: regressioni eseguono lo script HTML reale e wireCalendarEvents con vecchia anteprima, anteprima incompleta, anteprima valida e widget assenti. Prima della correzione tre casi fallivano. Suite aggiunta al check CI.
+- Limite: verifica della pagina privata dal browser remoto bloccata da Cloudflare Access; necessario completamento dei workflow e riscontro sulla sessione autenticata dopo pubblicazione.

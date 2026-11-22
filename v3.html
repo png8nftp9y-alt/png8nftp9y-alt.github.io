@@ -303,7 +303,9 @@
           const group = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
           const saved = JSON.parse(sessionStorage.getItem("courtwatch-refresh-view-v1-" + group) || "null");
           const route = location.pathname + location.search + location.hash;
-          if (!saved || saved.version !== "20261013-refresh-position" || saved.route !== route || typeof saved.html !== "string" || saved.html.length > 1500000) return;
+          if (!saved || saved.version !== "20261122-manual-calendar-template" || saved.route !== route || typeof saved.html !== "string" || saved.html.length > 1500000) return;
+          // A preview is disposable: never replace current controls with an older template.
+          if (saved.viewId === "calendarView" && !["addCalendarEvent", "removeCalendarEvent"].every(id => new RegExp('id=["\']' + id + '["\']').test(saved.html))) return;
           const view = document.getElementById(saved.viewId);
           if (!view?.classList.contains("view")) return;
           for (const item of saved.styles || []) {
@@ -398,7 +400,7 @@
       <div id="calendarEventRemoval" hidden></div>
       <p id="calendarEventError" role="alert"></p>
     </dialog>
-    <script crossorigin="anonymous" src="v3.js?v=20261122150500-agenda-render-scope"></script>
+    <script crossorigin="anonymous" src="v3.js?v=20261122165000-calendar-startup"></script>
 
 </body>
 </html>
