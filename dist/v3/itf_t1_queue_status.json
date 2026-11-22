@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-22T18:02:04.766Z",
+  "generatedAt": "2026-11-22T18:08:26.588Z",
   "today": "2026-11-22",
   "windowEnd": "2026-11-25",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -11,17 +11,17 @@
     "complete": 1002,
     "cancelledNoDraws": 13,
     "resolved": 1015,
-    "missingDrawsTournaments": 22,
-    "unverifiable": 185,
-    "declaredDraws": 5885,
-    "acquiredDraws": 5803,
-    "missingDraws": 82,
-    "actionableUnverifiable": 8,
+    "missingDrawsTournaments": 23,
+    "unverifiable": 184,
+    "declaredDraws": 5890,
+    "acquiredDraws": 5804,
+    "missingDraws": 86,
+    "actionableUnverifiable": 7,
     "futureUnverifiable": 177,
     "ordinary": {
       "total": 30,
-      "missingDraws": 82,
-      "inventoryRequired": 8
+      "missingDraws": 86,
+      "inventoryRequired": 7
     },
     "extraordinaryA": {
       "total": 0,
@@ -1305,10 +1305,91 @@
             "family": "B-S-M",
             "structure": "KO",
             "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-22T18:03:46.597Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-22T18:03:46.597Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-22T18:03:46.597Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-22T18:03:46.597Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
+        "resolvedEvents": [],
+        "needsInventory": false,
+        "checkedAt": "2026-11-22T18:03:46.597Z",
+        "eligibleFrom": "2026-11-23"
+      },
+      {
+        "competitionId": "J-J30-POL-2026-008",
+        "tournamentName": "J30 Leszno",
+        "startDate": "2026-11-24",
+        "endDate": "2026-11-29",
+        "status": "inventory_required",
+        "inventoryError": "GetEventFilters_incapsula_challenge",
+        "knownDraws": null,
+        "acquiredDraws": null,
+        "missingDraws": null,
+        "missingEvents": [],
+        "resolvedEvents": [],
+        "needsInventory": true,
+        "checkedAt": "2026-11-22T18:02:58.304Z",
+        "eligibleFrom": "2026-11-23"
+      },
+      {
+        "competitionId": "J-J30-RSA-2026-002",
+        "tournamentName": "J30 Stellenbosch",
+        "startDate": "2026-11-24",
+        "endDate": "2026-11-29",
+        "status": "missing",
+        "inventoryError": null,
+        "knownDraws": 5,
+        "acquiredDraws": 1,
+        "missingDraws": 4,
+        "missingEvents": [
+          {
+            "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
+            "acquired": false,
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:19:46.559Z",
+            "lastAttemptAt": "2026-11-22T18:03:35.363Z",
             "rowParity": null,
             "sources": []
           },
@@ -1320,7 +1401,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:19:46.559Z",
+            "lastAttemptAt": "2026-11-22T18:03:35.363Z",
             "rowParity": null,
             "sources": []
           },
@@ -1332,7 +1413,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:19:46.559Z",
+            "lastAttemptAt": "2026-11-22T18:03:35.363Z",
             "rowParity": null,
             "sources": []
           },
@@ -1344,46 +1425,14 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:19:46.559Z",
+            "lastAttemptAt": "2026-11-22T18:03:35.363Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-22T17:19:46.559Z",
-        "eligibleFrom": "2026-11-23"
-      },
-      {
-        "competitionId": "J-J30-POL-2026-008",
-        "tournamentName": "J30 Leszno",
-        "startDate": "2026-11-24",
-        "endDate": "2026-11-29",
-        "status": "inventory_empty",
-        "inventoryError": "empty_inventory",
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
-        "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-11-22T17:19:03.124Z",
-        "eligibleFrom": "2026-11-23"
-      },
-      {
-        "competitionId": "J-J30-RSA-2026-002",
-        "tournamentName": "J30 Stellenbosch",
-        "startDate": "2026-11-24",
-        "endDate": "2026-11-29",
-        "status": "inventory_required",
-        "inventoryError": "GetEventFilters_incapsula_challenge",
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
-        "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-11-22T17:19:12.963Z",
+        "checkedAt": "2026-11-22T18:03:35.363Z",
         "eligibleFrom": "2026-11-23"
       },
       {
@@ -1405,7 +1454,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:19:45.930Z",
+            "lastAttemptAt": "2026-11-22T18:03:55.501Z",
             "rowParity": null,
             "sources": []
           },
@@ -1417,7 +1466,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:19:45.930Z",
+            "lastAttemptAt": "2026-11-22T18:03:55.501Z",
             "rowParity": null,
             "sources": []
           },
@@ -1429,7 +1478,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:19:45.930Z",
+            "lastAttemptAt": "2026-11-22T18:03:55.501Z",
             "rowParity": null,
             "sources": []
           },
@@ -1441,14 +1490,14 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:19:45.930Z",
+            "lastAttemptAt": "2026-11-22T18:03:55.501Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-22T17:19:45.930Z",
+        "checkedAt": "2026-11-22T18:03:55.501Z",
         "eligibleFrom": "2026-11-23"
       },
       {
@@ -1470,7 +1519,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:20:03.788Z",
+            "lastAttemptAt": "2026-11-22T18:04:13.610Z",
             "rowParity": null,
             "sources": []
           },
@@ -1482,7 +1531,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:20:03.788Z",
+            "lastAttemptAt": "2026-11-22T18:04:13.610Z",
             "rowParity": null,
             "sources": []
           },
@@ -1494,7 +1543,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:20:03.788Z",
+            "lastAttemptAt": "2026-11-22T18:04:13.610Z",
             "rowParity": null,
             "sources": []
           },
@@ -1506,14 +1555,14 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-22T17:20:03.788Z",
+            "lastAttemptAt": "2026-11-22T18:04:13.610Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-22T17:20:03.788Z",
+        "checkedAt": "2026-11-22T18:04:13.610Z",
         "eligibleFrom": "2026-11-23"
       },
       {
@@ -1521,29 +1570,29 @@
         "tournamentName": "J60 Stirling",
         "startDate": "2026-11-25",
         "endDate": "2026-11-29",
-        "status": "inventory_required",
-        "inventoryError": "GetEventFilters_incapsula_challenge",
+        "status": "inventory_empty",
+        "inventoryError": "empty_inventory",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-22T17:19:11.769Z",
+        "checkedAt": "2026-11-22T18:02:49.612Z",
         "eligibleFrom": "2026-11-24"
       }
     ],
     "total": 30,
-    "missingDraws": 82,
-    "acquiredDraws": 48,
+    "missingDraws": 86,
+    "acquiredDraws": 49,
     "missingByReason": {
       "draw_without_players": 64,
-      "incapsula_blocked": 18
+      "incapsula_blocked": 22
     },
     "byStatus": {
-      "missing": 22,
+      "missing": 23,
       "inventory_empty": 6,
-      "inventory_required": 2
+      "inventory_required": 1
     }
   },
   "extraordinary": {
@@ -4398,9 +4447,9 @@
     }
   },
   "audit": {
-    "urgentUnverifiable": 8,
+    "urgentUnverifiable": 7,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 8,
+    "actionableUnverifiable": 7,
     "futureUnverifiable": 177,
     "blocked": 0
   }
