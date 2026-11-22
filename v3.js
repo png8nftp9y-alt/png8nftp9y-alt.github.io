@@ -273,7 +273,7 @@ function saveRefreshView() {
     const html = clone.innerHTML;
     if (html.length > 1500000) {sessionStorage.removeItem(key); return;}
     sessionStorage.setItem(key, JSON.stringify({
-      version: "20261122-manual-calendar-template", route: location.pathname + location.search + location.hash,
+      version: "20261122-event-address-template", route: location.pathname + location.search + location.hash,
       viewId: view.id, html, y: Math.max(0, scrollY || 0),
       styles: [...document.head.querySelectorAll("style[id]")].map(style => ({id: style.id, css: style.textContent})),
     }));
@@ -863,6 +863,7 @@ function tennisEuropeVenueLocation(t, fallback = "") {
   return `${venue} · ${location}`;
 }
 function tournamentPlace(t) {
+  if(t?.manualEvent)return t.location||"";
   if (circuit(t) === "tennis-europe") return tennisEuropeVenueLocation(t);
   const compact = (value) => {
       const seen = new Set();
@@ -2468,7 +2469,7 @@ function renderWeeklyAgenda() {
     ? `<div class="weeklyTournamentList">${tournaments
         .map(
           (tournament) =>
-            `<button type="button" class="weeklyTournament ${circuit(tournament)}" data-event-color="${esc(tournament.eventColor || '')}" data-weekly-tournament="${esc(tournamentKey(tournament))}"><span class="weeklyTournamentCircuit">${esc(tournament.manualEvent ? "Evento manuale" : circuit(tournament) === "tennis-europe" ? "Tennis Europe" : circuit(tournament).toUpperCase())}</span><strong>${esc(tournamentDisplayName(tournament))}</strong><small>${esc(tournamentLocationLabel(tournament))}</small><span>${tournament.players.map((player) => `<b>${esc(player)}</b>`).join(", ")}</span></button>`,
+            `<button type="button" class="weeklyTournament ${circuit(tournament)}" data-event-color="${esc(tournament.eventColor || '')}" data-weekly-tournament="${esc(tournamentKey(tournament))}"><span class="weeklyTournamentCircuit">${esc(tournament.manualEvent ? calendarEventType(tournament) : circuit(tournament) === "tennis-europe" ? "Tennis Europe" : circuit(tournament).toUpperCase())}</span><strong>${esc(tournamentDisplayName(tournament))}</strong><small>${esc(tournamentLocationLabel(tournament))}</small><span>${tournament.players.map((player) => `<b>${esc(player)}</b>`).join(", ")}</span></button>`,
         )
         .join("")}</div>`
     : '<div class="empty">Nessun giocatore iscritto a tornei in questa settimana.</div>';
@@ -4044,7 +4045,7 @@ function renderProfile(id) {
         summerCenter = fitpSummerCenterPlace(t),
         place = summerCenter || agendaVenueLocation(t),
         courtConditions = tournamentSurfaceLabel(t);
-      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}" data-event-color="${esc(t.eventColor || '')}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button>${t.manualEvent ? ' <small>Evento manuale</small>' : ""}</h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(displayDate(t.startDate))} – ${esc(displayDate(t.endDate))}${effectiveAcceptanceLabel(t) ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(effectiveAcceptanceLabel(t))}` : ""}</p></div><div class="profileTournamentMatches">${
+      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}" data-event-color="${esc(t.eventColor || '')}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(eventDateLabel(t))}${effectiveAcceptanceLabel(t) ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(effectiveAcceptanceLabel(t))}` : ""}</p></div><div class="profileTournamentMatches">${
         matches.length
           ? matchHistorySectionsHtml(matches)
           : '<div class="empty">Nessuna partita pubblicata.</div>'
@@ -4363,13 +4364,13 @@ function renderTournament(key) {
       const europeCategories = futureTournamentEuropeCategories(group.entry, rows, t);
       const matchRows = matchHistorySectionsHtml(rows);
       const playerHeading = `<button class="inlinePlayerLink" data-open-player="${esc(group.playerId)}">${esc(readablePerson(group.playerName))}${participantDesignationHtml(participantDesignation(rows.find(row => participantDesignation(row, "player")), "player"))}${nationalityHtml(playerNationality)}${futureEurope ? `<span class="teRanking" data-future-europe-ranking="${esc(group.playerId)}" data-future-europe-categories="${esc(europeCategories.join(","))}">${playerRankingCache.has(String(group.playerId)) ? esc(" · " + futureTournamentEuropeRanking(playerRecord, playerRankingCache.get(String(group.playerId)), europeCategories)) : ""}</span>` : ""}${!futureEurope && playerRanking ? (["tennis-europe", "itf"].includes(source) ? teRankHtml(playerRanking) : ` <span class="playerRanking">· classifica ${esc(readableText(playerRanking))}</span>`) : ""}</button>`;
-      return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}">${playerHeading}<span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : t.manualEvent ? "Inserito manualmente" : "Iscritto"}${!t.manualEvent && source === "fitp" ? ` · ${fitpTournamentSubscriptionHtml({...group.entry, circuit:source})}` : ""}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
+      return `<section class="tournamentPlayer" data-tournament-player="${esc(playerKey)}"><div class="playerSectionHead${multiPlayer ? " expandableTournamentPlayer" : ""}">${playerHeading}<span>${liveLabel ? `<b class="acceptanceLiveLabel">${itfAcceptanceUrl ? `<a class="acceptanceListTextLink" href="${esc(itfAcceptanceUrl)}" target="_blank" rel="noopener">Acceptance list</a>` : "Acceptance list"}: ${esc(liveLabel)}</b>` : rows.length ? `${rows.length} ${rows.length === 1 ? "partita" : "partite"}` : t.manualEvent ? "" : "Iscritto"}${!t.manualEvent && source === "fitp" ? ` · ${fitpTournamentSubscriptionHtml({...group.entry, circuit:source})}` : ""}</span>${multiPlayer && rows.length ? '<button class="tournamentToggle tournamentPlayerToggle" type="button" aria-expanded="' + String(open) + '" aria-label="' + (open ? "Nascondi partite" : "Mostra partite") + '">⌄</button>' : ""}</div><div class="tournamentPlayerMatches"${open ? "" : " hidden"}>${matchRows}</div></section>`;
     })
     .join("");
   const officialUrl = tournamentOfficialUrl(t),
     acceptanceUrl = tournamentAcceptanceUrl(t),
     place = tournamentPlace(t, matches),
-    mapsUrl = tournamentMapsUrl(place),
+    mapsUrl = t.manualEvent && Number.isFinite(t.locationLat) && Number.isFinite(t.locationLon) ? `https://www.google.com/maps/search/?api=1&query=${t.locationLat},${t.locationLon}` : tournamentMapsUrl(place),
     title = officialUrl
       ? `<a class="tournamentOfficialTitle" href="${esc(officialUrl)}" target="_blank" rel="noopener">${esc(t.name)}</a>`
       : esc(t.name),
@@ -4380,7 +4381,11 @@ function renderTournament(key) {
     surfaceLabel = tournamentSurfaceLabel(t),
     category = source === "tennis-europe" ? readableText(t.tournamentCategory || "") : "";
   $("profileContent").innerHTML =
-    `<div class="card tournamentHero" data-event-color="${esc(t.eventColor || '')}"><div><h2>${title}</h2>${t.manualEvent ? "<p>Evento inserito manualmente</p>" : ""}${category ? `<p>${esc(category)}</p>` : ""}${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(displayDate(t.startDate) || "data da pubblicare")} – ${esc(displayDate(t.endDate) || "data da pubblicare")}</p></div><div class="tournamentHeroActions">${acceptanceLink}<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div></div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
+    `<div class="card tournamentHero" data-event-color="${esc(t.eventColor || '')}"><div><h2>${title}</h2>${category ? `<p>${esc(category)}</p>` : ""}${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(eventDateLabel(t))}</p></div><div class="tournamentHeroActions">${acceptanceLink}${t.manualEvent && ["purple","gray"].includes(t.eventColor) ? "" : `<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div>`}</div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
+  if(t.manualEvent) {
+    $("profileContent").insertAdjacentHTML("beforeend", '<section class="card calendarEventDeleteSection"><h3>Rimuovi evento</h3><p>Rimuove questo evento da calendario, agenda e pagine dei giocatori coinvolti.</p><button type="button" class="btn" id="removeCurrentCalendarEvent">Rimuovi evento</button><p id="removeCurrentCalendarEventError" role="alert"></p></section>');
+    $("removeCurrentCalendarEvent").onclick=()=>removeCalendarEventFromPage(t);
+  }
   if (futureEurope) loadFutureTournamentEuropeRankings(key, [...byPlayer.keys()].map(id => (state.data.players || []).find(player => player.id === id)).filter(Boolean));
   if (!t.manualEvent && source === "fitp") loadInlineFitpDrawLinks(t);
   bindParticipantNavigation($("profileContent"));
@@ -4995,12 +5000,65 @@ function updatePlayerGroupControls() {
     button.onclick = switchPlayerGroup;
   });
 }
+function calendarEventType(t) {
+  return ({purple:'Raduno federale',red:'Gara a squadre',gray:'FIT Junior Program',fitp:'FITP','tennis-europe':'Tennis Europe',itf:'ITF'})[t.eventColor] || '';
+}
+function eventDateLabel(t) {
+  const start=displayDate(t.startDate)||'data da pubblicare';
+  return !t.endDate || t.endDate===t.startDate ? start : start+' – '+displayDate(t.endDate);
+}
+async function removeCalendarEventFromPage(t) {
+  const button=$('removeCurrentCalendarEvent'), error=$('removeCurrentCalendarEventError'), group=PLAYER_GROUP;
+  if(button.disabled)return;
+  button.disabled=true;error.textContent='';
+  try {
+    const response=await fetch(PRIVATE_API+'/calendar-events?id='+encodeURIComponent(t.manualEventId||t.competitionId),privateApiOptions({method:'DELETE',credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(20000)},group));
+    if(!response.ok)throw Error('Rimozione non riuscita. Riprova.');
+    if(group!==PLAYER_GROUP)return;
+    state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
+    state.data={...state.data,tournaments:(state.data.tournaments||[]).filter(row=>!row.manualEvent || (row.manualEventId||row.competitionId)!==(t.manualEventId||t.competitionId))};
+    await saveCachedData(state.data);location.hash='calendar';renderIfDataChanged(true);
+  } catch(e){error.textContent=e.message;button.disabled=false;}
+}
 function manualCalendarAgendaHtml(day, tournaments = groups()) {
   return tournaments.filter(t => t.manualEvent && overlap(t, day, day)).map(t => {
     const people=t.people.filter(p => state.selected.has(p.playerId));
     if(!people.length)return '';
-    return `<section class="manualAgendaEvent" data-event-color="${esc(t.eventColor)}"><button type="button" class="inlinePlayerLink" data-open-tournament="${esc(tournamentKey(t))}">${esc(t.name)}</button><small>Evento manuale · ${esc(t.location)} · ${esc(t.startDate)} – ${esc(t.endDate)}</small><p>${people.map(p => `<button type="button" class="inlinePlayerLink" data-open-player="${esc(p.playerId)}">${esc(p.playerName)}</button>`).join(', ')}</p></section>`;
+    return `<section class="agendaTournamentBlock ${esc(circuit(t))}" data-event-color="${esc(t.eventColor)}"><header class="agendaTournamentHead"><div><h3><button data-open-tournament="${esc(tournamentKey(t))}">${esc(t.name)}</button><small>${esc(t.location)} · ${esc(eventDateLabel(t))}</small></h3></div><div class="agendaTournamentBadges"><span class="type" data-event-color="${esc(t.eventColor)}">${esc(calendarEventType(t))}</span></div></header><div class="agendaTournamentMatches"><div class="agendaMatchRow"><article class="agendaItem calendarEventParticipants"><div class="agendaMatchBody"><div class="agendaTitle">${people.map(p => `<button type="button" class="inlinePlayerLink" data-open-player="${esc(p.playerId)}">${esc(p.playerName)}</button>`).join(', ')}</div></div></article></div></div></section>`;
   }).join('');
+}
+function wireCalendarEventLocation(dialog) {
+  const input=$('calendarEventLocation'), results=$('calendarEventLocationResults'), status=$('calendarEventLocationStatus');
+  if(!input||!results||!status)return;
+  let timer,controller,sequence=0;
+  const cancel=()=>{clearTimeout(timer);controller?.abort();sequence++;};
+  dialog.addEventListener('close',cancel);
+  input.oninput=()=>{
+    cancel();input.dataset.lat='';input.dataset.lon='';results.innerHTML='';status.textContent='';
+    const query=input.value.trim(),id=sequence;
+    if(query.length<3)return;
+    timer=setTimeout(async()=>{
+      controller=new AbortController();status.textContent='Ricerca indirizzi…';
+      const timeout=setTimeout(()=>controller?.abort(),10000);
+      try {
+        const response=await fetch('https://photon.komoot.io/api/?q='+encodeURIComponent(query)+'&limit=5',{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});
+        if(!response.ok)throw Error('places_unavailable');
+        const data=await response.json();if(id!==sequence)return;
+        const places=(data.features||[]).map(feature=>{
+          const p=feature.properties||{},[lon,lat]=feature.geometry?.coordinates||[];
+          const address=[p.name,[p.street,p.housenumber].filter(Boolean).join(' '),[p.postcode,p.city||p.town||p.village].filter(Boolean).join(' '),p.state,p.country].filter(Boolean);
+          return {label:[...new Set(address)].join(', ').slice(0,200),lat,lon};
+        }).filter(p=>p.label&&Number.isFinite(p.lat)&&Number.isFinite(p.lon));
+        results.innerHTML=places.map((p,i)=>`<button type="button" class="btn" data-place-index="${i}">${esc(p.label)}</button>`).join('');
+        status.textContent=places.length?'Scegli l’indirizzo corretto.':'Nessun indirizzo trovato. Prova con città e via.';
+        results.querySelectorAll('[data-place-index]').forEach(button=>button.onclick=()=>{
+          const p=places[Number(button.dataset.placeIndex)];cancel();input.value=p.label;input.dataset.lat=String(p.lat);input.dataset.lon=String(p.lon);results.innerHTML='';
+          status.innerHTML=`Indirizzo selezionato · <a href="https://www.openstreetmap.org/?mlat=${p.lat}&mlon=${p.lon}#map=17/${p.lat}/${p.lon}" target="_blank" rel="noopener">Apri mappa</a>`;
+        });
+      } catch(e){if(id===sequence)status.textContent='Ricerca indirizzi non disponibile. Riprova tra poco.';}
+      finally{clearTimeout(timeout);}
+    },700);
+  };
 }
 function wireCalendarEvents() {
   const dialog=$('calendarEventDialog'), form=$('calendarEventForm'), error=$('calendarEventError');
@@ -5009,18 +5067,21 @@ function wireCalendarEvents() {
   let busy=false, dialogGroup='', requestId='';
   const fail=message=>{error.textContent=message;};
   const close=()=>{if(!busy)dialog.close();};
+  dialog.addEventListener('click',event=>{if(event.target!==dialog)return;const rect=dialog.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)close();});
+  wireCalendarEventLocation(dialog);
   $('closeCalendarEvent').onclick=close;
   dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault();});
   const open=removal=>{
     dialogGroup=PLAYER_GROUP;fail('');form.hidden=removal;$('calendarEventRemoval').hidden=!removal;
-    $('calendarEventTitle').textContent=removal?'Rimuovi torneo manuale':'Aggiungi torneo';
+    $('calendarEventTitle').textContent=removal?'Rimuovi evento':'Aggiungi torneo';
     dialog.showModal();
   };
   $('addCalendarEvent').onclick=()=>{
     form.reset();requestId=crypto.randomUUID();$('calendarEventPlayerSearch').value='';
+    const place=$('calendarEventLocation');if(place){place.value='';place.dataset.lat='';place.dataset.lon='';$('calendarEventLocationResults').innerHTML='';$('calendarEventLocationStatus').textContent='';}
     const players=[...(state.data?.players||[])].filter(p=>!p.membershipPending).sort((a,b)=>a.name.localeCompare(b.name,'it'));
     $('calendarEventPlayers').innerHTML=players.map(p=>`<label data-player-search="${esc(p.name.toLocaleLowerCase('it'))}"><input type="checkbox" name="playerIds" value="${esc(p.id)}">${esc(p.name)}</label>`).join('');
-    form.elements.startDate.value=iso(state.month);form.elements.endDate.value=iso(state.month);
+    form.elements.startDate.value=iso(state.month);form.elements.endDate.value='';
     open(false);form.elements.name.focus();
   };
   $('calendarEventPlayerSearch').oninput=event=>{
@@ -5035,7 +5096,7 @@ function wireCalendarEvents() {
     const {events}=await api('GET');
     if(dialogGroup!==PLAYER_GROUP)throw Error('La sezione è cambiata. Riapri il comando nel calendario.');
     const ids=new Set((state.data.players||[]).map(p=>p.id));
-    const rows=events.flatMap(t=>t.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:t.id+'|'+playerId,competitionId:t.id,manualEventId:t.id,manualEvent:true,manual:true,name:t.name,location:t.location,startDate:t.startDate,endDate:t.endDate,circuit:['fitp','tennis-europe','itf'].includes(t.color)?t.color:'manual',eventColor:t.color,playerId,status:'manual',entryStatus:'manual'})));
+    const rows=events.flatMap(t=>t.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:t.id+'|'+playerId,competitionId:t.id,manualEventId:t.id,manualEvent:true,manual:true,name:t.name,location:t.location,...(Number.isFinite(t.locationLat)?{locationLat:t.locationLat,locationLon:t.locationLon}:{}),startDate:t.startDate,endDate:t.endDate,circuit:['fitp','tennis-europe','itf'].includes(t.color)?t.color:'manual',eventColor:t.color,playerId,status:'manual',entryStatus:'manual'})));
     state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
     state.data={...state.data,tournaments:[...(state.data.tournaments||[]).filter(t=>!t.manualEvent),...rows]};
     await saveCachedData(state.data);renderIfDataChanged(true);
@@ -5044,17 +5105,19 @@ function wireCalendarEvents() {
     event.preventDefault();if(busy)return;fail('');
     const values=new FormData(form), playerIds=values.getAll('playerIds');
     if(!playerIds.length){fail('Seleziona almeno un giocatore.');return;}
-    if(values.get('endDate')<values.get('startDate')){fail('La data finale deve essere uguale o successiva a quella iniziale.');return;}
+    if(values.get('endDate') && values.get('endDate')<values.get('startDate')){fail('La data finale deve essere uguale o successiva a quella iniziale.');return;}
     if(dialogGroup!==PLAYER_GROUP){fail('La sezione è cambiata. Riapri il comando nel calendario.');return;}
+    const place=$('calendarEventLocation');
+    if(!place?.dataset.lat || !place?.dataset.lon){fail('Scegli un indirizzo dai risultati della ricerca del luogo.');return;}
     busy=true;$('saveCalendarEvent').disabled=true;
-    try{await api('POST',{requestId,name:values.get('name'),location:values.get('location'),startDate:values.get('startDate'),endDate:values.get('endDate'),color:values.get('color'),playerIds});await refreshManualEvents();dialog.close();}
+    try{await api('POST',{requestId,name:values.get('name'),location:place.value,locationLat:Number(place.dataset.lat),locationLon:Number(place.dataset.lon),startDate:values.get('startDate'),endDate:values.get('endDate')||values.get('startDate'),color:values.get('color'),playerIds});await refreshManualEvents();dialog.close();}
     catch(e){fail(e.message);}finally{busy=false;$('saveCalendarEvent').disabled=false;}
   };
   $('removeCalendarEvent').onclick=async()=>{
     open(true);const target=$('calendarEventRemoval');target.textContent='Caricamento…';
     try{
       const {events}=await api('GET');
-      target.innerHTML=events.length?events.map(t=>`<div class="calendarEventRemoveRow"><div><strong>${esc(t.name)}</strong><small>${esc(t.startDate)} – ${esc(t.endDate)} · ${esc(t.location)}</small></div><button type="button" class="btn" data-delete-event="${esc(t.id)}">Rimuovi</button></div>`).join(''):'Nessun torneo manuale da rimuovere.';
+      target.innerHTML=events.length?events.map(t=>`<div class="calendarEventRemoveRow"><div><strong>${esc(t.name)}</strong><small>${esc(eventDateLabel(t))} · ${esc(t.location)}</small></div><button type="button" class="btn" data-delete-event="${esc(t.id)}">Rimuovi</button></div>`).join(''):'Nessun torneo manuale da rimuovere.';
       target.querySelectorAll('[data-delete-event]').forEach(button=>button.onclick=async()=>{
         if(busy)return;if(dialogGroup!==PLAYER_GROUP){fail('La sezione è cambiata. Riapri il comando.');return;}
         busy=true;button.disabled=true;fail('');

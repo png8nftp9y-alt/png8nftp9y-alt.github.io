@@ -3,11 +3,13 @@ import {buildIncrementalSyncPlan} from './d1-incremental-sync.mjs';
 const colors = new Set(['fitp','tennis-europe','itf','purple','red','gray']);
 export function validateCalendarEvent(input) {
  const text=(v,n)=>typeof v==='string'?v.trim().slice(0,n):'';
- const name=text(input?.name,160),location=text(input?.location,200),startDate=text(input?.startDate,10),endDate=text(input?.endDate,10),color=input?.color;
+ const name=text(input?.name,160),location=text(input?.location,200),startDate=text(input?.startDate,10),endDate=text(input?.endDate,10)||startDate,color=input?.color;
  const validDate=v=>/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(Date.parse(v+'T12:00:00Z'))&&new Date(v+'T12:00:00Z').toISOString().slice(0,10)===v;
  const playerIds=Array.isArray(input?.playerIds)?[...new Set(input.playerIds)]:[];
  if(!name||!location||!validDate(startDate)||!validDate(endDate)||endDate<startDate||!colors.has(color)||!playerIds.length||playerIds.length>100||playerIds.some(id=>typeof id!=='string'||!id||id.length>160))throw Error('invalid_calendar_event');
- return {name,location,startDate,endDate,color,playerIds:playerIds.sort()};
+ const coords=input?.locationLat===undefined&&input?.locationLon===undefined?{}:{locationLat:input.locationLat,locationLon:input.locationLon};
+ if(Object.keys(coords).length&&(!Number.isFinite(coords.locationLat)||!Number.isFinite(coords.locationLon)||Math.abs(coords.locationLat)>90||Math.abs(coords.locationLon)>180))throw Error('invalid_calendar_event');
+ return {name,location,startDate,endDate,color,playerIds:playerIds.sort(),...coords};
 }
 export async function calendarEvents(db,userId,group) {
  // Release verification runs BEFORE migrations: inspect schema without a failed query.
@@ -20,7 +22,7 @@ export async function calendarEvents(db,userId,group) {
 export function calendarEventTournaments(events,selectedIds) {
  return events.flatMap(event=>event.playerIds.filter(id=>selectedIds.has(id)).map(playerId=>({
   id:event.id+'|'+playerId,competitionId:event.id,manualEventId:event.id,manualEvent:true,manual:true,
-  name:event.name,location:event.location,startDate:event.startDate,endDate:event.endDate,
+  name:event.name,location:event.location,...(Number.isFinite(event.locationLat)?{locationLat:event.locationLat,locationLon:event.locationLon}:{}),startDate:event.startDate,endDate:event.endDate,
   circuit:['fitp','tennis-europe','itf'].includes(event.color)?event.color:'manual',eventColor:event.color,
   playerId,status:'manual',entryStatus:'manual',calendarListLabel:''
  })));

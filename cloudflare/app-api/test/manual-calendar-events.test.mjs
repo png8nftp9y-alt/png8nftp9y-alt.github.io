@@ -68,3 +68,9 @@ test('pre-migration real replay checks schema before querying the absent table, 
   const after=d.writes();assert.deepEqual(await calendarEvents(db,owner,'main'),[]);assert.equal(db.failure,null);assert.match(sqls.at(-1),/FROM user_calendar_events WHERE user_id=\?/);assert.equal(d.writes(),after);
  }finally{d.close()}
 });
+
+test('geolocation and one-day events survive projection, legacy events stay readable',()=>{
+ const event=validateCalendarEvent({...input,endDate:'',locationLat:45.5918465,locationLon:9.2770933});assert.equal(event.endDate,event.startDate);
+ const rows=calendarEventTournaments([{...event,id:'manual-location'}],new Set([player]));assert.equal(rows[0].locationLat,event.locationLat);assert.equal(rows[0].locationLon,event.locationLon);assert.equal(validateCalendarEvent(input).locationLat,undefined);
+ for(const coords of [{locationLat:91,locationLon:9},{locationLat:45},{locationLat:'45',locationLon:9}])assert.throws(()=>validateCalendarEvent({...input,...coords}));
+});
