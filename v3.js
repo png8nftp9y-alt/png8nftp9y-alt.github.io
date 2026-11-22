@@ -2504,7 +2504,8 @@ function updateDailyAgenda(dailyAgenda, markup) {
   return true;
 }
 function renderAgenda() {
-  const resolveTournament = createMatchTournamentResolver(),
+  const agendaTournaments = groups(false),
+    resolveTournament = createMatchTournamentResolver(agendaTournaments),
     key = iso(state.agenda),
     items = dedupeAgendaMatches(
       (state.data.agenda || []).filter(
@@ -2662,7 +2663,7 @@ function renderAgenda() {
         .join("")}</div>`
     : '<div class="empty">Nessuna partita confermata per questa giornata.</div>';
   const dailyAgenda = $("dailyAgenda");
-  if (!updateDailyAgenda(dailyAgenda, manualCalendarAgendaHtml(key) + markup)) return;
+  if (!updateDailyAgenda(dailyAgenda, manualCalendarAgendaHtml(key, agendaTournaments) + markup)) return;
   dailyAgenda.querySelectorAll("[data-open-tournament]").forEach(
     (x) =>
       (x.onclick = (event) => {
@@ -4994,13 +4995,16 @@ function updatePlayerGroupControls() {
     button.onclick = switchPlayerGroup;
   });
 }
-function manualCalendarAgendaHtml(day) {
-  return groups().filter(t => t.manualEvent && overlap(t, day, day)).map(t =>
-    `<section class="manualAgendaEvent" data-event-color="${esc(t.eventColor)}"><button type="button" class="inlinePlayerLink" data-open-tournament="${esc(tournamentKey(t))}">${esc(t.name)}</button><small>Evento manuale · ${esc(t.location)} · ${esc(t.startDate)} – ${esc(t.endDate)}</small><p>${t.people.map(p => `<button type="button" class="inlinePlayerLink" data-open-player="${esc(p.playerId)}">${esc(p.playerName)}</button>`).join(', ')}</p></section>`).join('');
+function manualCalendarAgendaHtml(day, tournaments = groups()) {
+  return tournaments.filter(t => t.manualEvent && overlap(t, day, day)).map(t => {
+    const people=t.people.filter(p => state.selected.has(p.playerId));
+    if(!people.length)return '';
+    return `<section class="manualAgendaEvent" data-event-color="${esc(t.eventColor)}"><button type="button" class="inlinePlayerLink" data-open-tournament="${esc(tournamentKey(t))}">${esc(t.name)}</button><small>Evento manuale · ${esc(t.location)} · ${esc(t.startDate)} – ${esc(t.endDate)}</small><p>${people.map(p => `<button type="button" class="inlinePlayerLink" data-open-player="${esc(p.playerId)}">${esc(p.playerName)}</button>`).join(', ')}</p></section>`;
+  }).join('');
 }
 function wireCalendarEvents() {
   const dialog=$('calendarEventDialog'), form=$('calendarEventForm'), error=$('calendarEventError');
-  let busy=false, dialogGroup='';
+  let busy=false, dialogGroup='', requestId='';
   const fail=message=>{error.textContent=message;};
   const close=()=>{if(!busy)dialog.close();};
   $('closeCalendarEvent').onclick=close;
@@ -5011,7 +5015,7 @@ function wireCalendarEvents() {
     dialog.showModal();
   };
   $('addCalendarEvent').onclick=()=>{
-    form.reset();$('calendarEventPlayerSearch').value='';
+    form.reset();requestId=crypto.randomUUID();$('calendarEventPlayerSearch').value='';
     const players=[...(state.data?.players||[])].filter(p=>!p.membershipPending).sort((a,b)=>a.name.localeCompare(b.name,'it'));
     $('calendarEventPlayers').innerHTML=players.map(p=>`<label data-player-search="${esc(p.name.toLocaleLowerCase('it'))}"><input type="checkbox" name="playerIds" value="${esc(p.id)}">${esc(p.name)}</label>`).join('');
     form.elements.startDate.value=iso(state.month);form.elements.endDate.value=iso(state.month);
@@ -5041,7 +5045,7 @@ function wireCalendarEvents() {
     if(values.get('endDate')<values.get('startDate')){fail('La data finale deve essere uguale o successiva a quella iniziale.');return;}
     if(dialogGroup!==PLAYER_GROUP){fail('La sezione è cambiata. Riapri il comando nel calendario.');return;}
     busy=true;$('saveCalendarEvent').disabled=true;
-    try{await api('POST',{name:values.get('name'),location:values.get('location'),startDate:values.get('startDate'),endDate:values.get('endDate'),color:values.get('color'),playerIds});await refreshManualEvents();dialog.close();}
+    try{await api('POST',{requestId,name:values.get('name'),location:values.get('location'),startDate:values.get('startDate'),endDate:values.get('endDate'),color:values.get('color'),playerIds});await refreshManualEvents();dialog.close();}
     catch(e){fail(e.message);}finally{busy=false;$('saveCalendarEvent').disabled=false;}
   };
   $('removeCalendarEvent').onclick=async()=>{
