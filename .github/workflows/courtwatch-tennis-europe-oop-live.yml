@@ -17,6 +17,8 @@ on:
       - 'src/v3/tennis-europe-oop-real-html.test.mjs'
       - 'src/v3/fixtures/oop-real-cards/**'
       - 'src/v3/tennis-europe-oop-completeness.test.mjs'
+      - 'src/v3/tennis-europe-oop-unscheduled.test.mjs'
+      - 'src/v3/fixtures/te-soul-cup-20261123-not-scheduled.html'
       - 'src/v3/tennis-europe-source-discovery.mjs'
       - 'src/v3/tennis-europe-retirement.mjs'
       - 'src/v3/tennis-europe-retirement.test.mjs'
@@ -91,7 +93,7 @@ jobs:
             gh run download "$previous" --repo "${{ github.repository }}" --name tennis-europe-oop-live --dir dist/v3/previous-tennis-europe-oop
           fi
       - name: Verify draw walkover recovery
-        run: node --test src/v3/tennis-europe-oop-completeness.test.mjs src/v3/tennis-europe-oop-removals.test.mjs src/v3/tennis-europe-retirement.test.mjs src/v3/tennis-europe-source-discovery.test.mjs src/v3/tennis-europe-draw-walkovers.test.mjs src/v3/tennis-europe-inline-draw-walkovers.test.mjs src/v3/tennis-europe-round-robin-endpoint.test.mjs
+        run: node --test src/v3/tennis-europe-oop-unscheduled.test.mjs src/v3/tennis-europe-oop-completeness.test.mjs src/v3/tennis-europe-oop-removals.test.mjs src/v3/tennis-europe-retirement.test.mjs src/v3/tennis-europe-source-discovery.test.mjs src/v3/tennis-europe-draw-walkovers.test.mjs src/v3/tennis-europe-inline-draw-walkovers.test.mjs src/v3/tennis-europe-round-robin-endpoint.test.mjs
       - name: Acquire OOP and results from T-minus-one
         run: node src/v3/run-tennis-europe-oop-live.mjs
       - name: Audit official retirement evidence

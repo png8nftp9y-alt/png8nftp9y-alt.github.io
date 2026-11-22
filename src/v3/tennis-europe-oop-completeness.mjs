@@ -21,7 +21,8 @@ export function inventoryOopPage(html,competitionId,date){
   let drawUrl='';try{const href=block.match(/<a\b[^>]*href=["']([^"']*draw[^"']*)["']/i)?.[1]||'';const u=new URL(href.replace(/&amp;/g,'&'),'https://te.tournamentsoftware.com');if(href&&u.origin==='https://te.tournamentsoftware.com')drawUrl=u.href;}catch{}
   const rows=[...block.matchAll(/<div\b[^>]*class=["'](?:[^"']*\s)?match__row(?=\s|["'])[^"']*["'][^>]*>/gi)],winnerIds=[];
   for(let r=0;r<rows.length;r++)if(/\bhas-won\b/.test(rows[r][0]))for(const a of block.slice(rows[r].index,rows[r+1]?.index||block.length).matchAll(/<a\b[^>]*data-player-id=["']([^"']+)["']/gi))winnerIds.push(a[1]);
-  cards.push(resolveOopCard({...officialRetirement(block,`https://te.tournamentsoftware.com/tournament/${competitionId}/matches/${date}`),competitionId,date,event,round,players,drawUrl,score:walkover?'W/O':sets.join(' '),winnerIds:[...new Set(winnerIds)],bye:/\bBye\b/i.test(clean(block))&&players.length<=1,sourceUrl:`https://te.tournamentsoftware.com/tournament/${competitionId}/matches/${date}`,sourceHash:createHash('sha256').update(block).digest('hex'),evidenceHtml:block}));
+  const groupHeaders=[...source.slice(0,starts[i]).matchAll(/<h5\b[^>]*class=["'][^"']*\bmatch-group__header\b[^"']*["'][^>]*>([\s\S]*?)<\/h5>/gi)],groupLabel=clean(groupHeaders.at(-1)?.[1]||'');
+  cards.push(resolveOopCard({scheduleStatus:/^Not\s+scheduled$/i.test(groupLabel)?'official_not_scheduled':'',...officialRetirement(block,`https://te.tournamentsoftware.com/tournament/${competitionId}/matches/${date}`),competitionId,date,event,round,players,drawUrl,score:walkover?'W/O':sets.join(' '),winnerIds:[...new Set(winnerIds)],bye:/\bBye\b/i.test(clean(block))&&players.length<=1,sourceUrl:`https://te.tournamentsoftware.com/tournament/${competitionId}/matches/${date}`,sourceHash:createHash('sha256').update(block).digest('hex'),evidenceHtml:block}));
  }
  return {competitionId,date,sourceHash:createHash('sha256').update(source).digest('hex'),explicitEmpty:/\bNo matches found\b/i.test(clean(source)),cards};
 }
@@ -66,6 +67,11 @@ export function auditOopCompleteness({tournament,pages,matches,listingHtml='',as
   for(const card of page.cards){if(card.bye){byes++;continue;}
    const resolution=oopUserResolution(card);if(resolution?.kind==='walkover'){resolutions.push({kind:'walkover_without_identified_opponent',date:card.date,event:card.event,round:card.round,player:card.players[0],score:'W/O',sourceUrl:card.sourceUrl,sourceHash:card.sourceHash,confirmedBy:resolution.confirmedBy,confirmedOn:resolution.confirmedOn});continue;}
    const size=/^[BG]D\d{2}\b/i.test(card.event)?4:/^[BG]S\d{2}\b/i.test(card.event)?2:0;
+   // Native Not scheduled cards identify a pairing, not a dated OOP slot.
+   // Preserve the evidence explicitly; never fabricate court, time or match order.
+   if(card.scheduleStatus==='official_not_scheduled'&&size&&card.players.length===size&&new Set(card.players.map(p=>String(p.id))).size===size&&card.players.every(p=>p.id&&p.name)&&card.round&&card.drawUrl&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>=iso(asOf)){
+    resolutions.push({kind:'official_pairing_not_scheduled',schedulePending:true,date:card.date,dateSource:'official_listing_day_not_playing_date',event:card.event,round:card.round,players:card.players,drawUrl:card.drawUrl,sourceUrl:card.sourceUrl,sourceHash:card.sourceHash});continue;
+   }
    // A future/current scheduled slot may legitimately await its opponent.
    // Require the exact acquired slot, not merely an empty side in the source.
    if(size===2&&card.players.length===1&&card.round&&!card.score&&!card.winnerIds.length&&!card.retired&&iso(asOf)&&iso(card.date)>=iso(asOf)){
