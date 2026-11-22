@@ -273,7 +273,7 @@ function saveRefreshView() {
     const html = clone.innerHTML;
     if (html.length > 1500000) {sessionStorage.removeItem(key); return;}
     sessionStorage.setItem(key, JSON.stringify({
-      version: "20261122-full-event-template", route: location.pathname + location.search + location.hash,
+      version: "20261122-profile-event-place", route: location.pathname + location.search + location.hash,
       viewId: view.id, html, y: Math.max(0, scrollY || 0),
       styles: [...document.head.querySelectorAll("style[id]")].map(style => ({id: style.id, css: style.textContent})),
     }));
@@ -839,6 +839,20 @@ function calendarEventCity(t) {
   const candidates=parts.filter(value=>!regions.test(value)&&!/^\d+$/.test(value)&&!/^(?:via|viale|piazza|piazzale|corso|strada|vicolo|largo)\b/i.test(value));
   return candidates.at(-1)||'Città da pubblicare';
 }
+function cleanCalendarVenue(value) {
+  return readableText(value).replace(/\s*[-–—]?\s*\(?camp[oi]\s+copert[oi]\)?(?=\s*[,·]|$)/gi,'').trim();
+}
+function calendarEventProfilePlace(t) {
+  const city=calendarEventCity(t),first=String(t.location||'').split(',')[0].trim();
+  const rawVenue=t.locationVenue||t.venueName||t.clubName||t.club||(!/^(?:via|viale|piazza|piazzale|corso|strada|vicolo|largo|\d+)\b/i.test(first)&&first!==city?first:'');
+  const venue=cleanCalendarVenue(rawVenue);
+  const known=city.replace(/[’']/g,"'").toLocaleLowerCase('it').trim();
+  let province=readableText(t.locationProvince||t.province||'').replace(/^(?:Provincia di|Province of)\s+/i,'');
+  if(!province&&known==="palazzolo sull'oglio")province='BS';
+  if(province.toLocaleLowerCase('it')==='brescia')province='BS';
+  const cityProvince=province&&!city.toLocaleLowerCase('it').endsWith(' '+province.toLocaleLowerCase('it'))?city+' '+province:city;
+  return [venue,cityProvince].filter(Boolean).join(' · ');
+}
 function tournamentLocationLabel(t, fallback = "") {
   if(t?.manualEvent)return calendarEventCity(t);
   if (circuit(t) === "tennis-europe") {
@@ -874,7 +888,7 @@ function tennisEuropeVenueLocation(t, fallback = "") {
   return `${venue} · ${location}`;
 }
 function tournamentPlace(t) {
-  if(t?.manualEvent)return t.location||"";
+  if(t?.manualEvent)return cleanCalendarVenue(t.location||"");
   if (circuit(t) === "tennis-europe") return tennisEuropeVenueLocation(t);
   const compact = (value) => {
       const seen = new Set();
@@ -4068,8 +4082,8 @@ function renderProfile(id) {
             })
           : "",
         summerCenter = fitpSummerCenterPlace(t),
-        place = summerCenter || agendaVenueLocation(t),
-        courtConditions = tournamentSurfaceLabel(t);
+        place = t.manualEvent ? calendarEventProfilePlace(t) : summerCenter || agendaVenueLocation(t),
+        courtConditions = t.manualEvent ? '' : tournamentSurfaceLabel(t);
       return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}" data-federal-camp="${t.manualEvent&&t.eventColor==='purple'?'true':'false'}" data-event-color="${esc(t.eventColor || '')}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(eventDateLabel(t))}${effectiveAcceptanceLabel(t) ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(effectiveAcceptanceLabel(t))}` : ""}</p>${t.manualEvent&&t.eventColor==='purple'?`<div class="calendarEventProfileActions">${calendarEventAnalysisButton(t,id)}</div>`:''}</div><div class="profileTournamentMatches">${
         matches.length
           ? matchHistorySectionsHtml(matches)
@@ -5119,7 +5133,7 @@ async function openCalendarParticipants(t) {
     const event=events.find(e=>e.id===(t.manualEventId||t.competitionId));
     if(!event)throw Error('Evento non più disponibile. Aggiorna la pagina.');
     $('calendarEditName').value=event.name;$('calendarEditStart').value=event.startDate;$('calendarEditEnd').value=event.endDate===event.startDate?'':event.endDate;
-    const place=$('calendarEditLocation');place.value=event.location;place.dataset.lat=event.locationLat===undefined?'':String(event.locationLat);place.dataset.lon=event.locationLon===undefined?'':String(event.locationLon);place.dataset.city=event.locationCity||'';
+    const place=$('calendarEditLocation');place.value=event.location;place.dataset.lat=event.locationLat===undefined?'':String(event.locationLat);place.dataset.lon=event.locationLon===undefined?'':String(event.locationLon);place.dataset.city=event.locationCity||'';place.dataset.venue=event.locationVenue||'';place.dataset.province=event.locationProvince||'';
     $('calendarEditLocationResults').innerHTML='';$('calendarEditLocationStatus').textContent='';wireCalendarEventLocation(dialog,'calendarEdit');
     const selected=new Set(event.playerIds),players=(state.data.players||[]).filter(p=>!p.membershipPending).sort((a,b)=>a.name.localeCompare(b.name,'it'));
     list.innerHTML=players.map(p=>`<label data-player-search="${esc(p.name.toLocaleLowerCase('it'))}"><input type="checkbox" name="playerIds" value="${esc(p.id)}"${selected.has(p.id)?' checked':''}>${esc(p.name)}</label>`).join('');
@@ -5130,7 +5144,7 @@ async function openCalendarParticipants(t) {
       const playerIds=new FormData(form).getAll('playerIds');
       if(!playerIds.length){error.textContent='Seleziona almeno un giocatore.';return;}
       if(group!==PLAYER_GROUP){error.textContent='La sezione è cambiata. Riapri la modifica.';return;}
-      const fields={name:$('calendarEditName').value.trim(),startDate:$('calendarEditStart').value,endDate:$('calendarEditEnd').value||$('calendarEditStart').value,location:place.value,locationCity:place.dataset.city||''};
+      const fields={name:$('calendarEditName').value.trim(),startDate:$('calendarEditStart').value,endDate:$('calendarEditEnd').value||$('calendarEditStart').value,location:place.value,locationCity:place.dataset.city||'',locationVenue:place.dataset.venue||'',locationProvince:place.dataset.province||''};
       if(!fields.name||!fields.startDate||fields.endDate<fields.startDate){error.textContent='Controlla nome e date dell’evento.';return;}
       if(place.value!==event.location&&(!place.dataset.lat||!place.dataset.lon)){error.textContent='Scegli il nuovo indirizzo dai risultati della ricerca.';return;}
       if(place.dataset.lat&&place.dataset.lon){fields.locationLat=Number(place.dataset.lat);fields.locationLon=Number(place.dataset.lon);}
@@ -5141,7 +5155,7 @@ async function openCalendarParticipants(t) {
         if(!response.ok)throw Error(response.status===409?'L’evento è cambiato o esiste già con gli stessi dati. Chiudi e riapri la modifica.':'Salvataggio non riuscito. Riprova.');
         const result=await response.json();if(group!==PLAYER_GROUP)return;
         const updated=result.event,ids=new Set((state.data.players||[]).map(p=>p.id));
-        const rows=updated.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:updated.id+'|'+playerId,competitionId:updated.id,manualEventId:updated.id,manualEvent:true,manual:true,name:updated.name,location:updated.location,locationCity:updated.locationCity,locationLat:updated.locationLat,locationLon:updated.locationLon,startDate:updated.startDate,endDate:updated.endDate,circuit:['fitp','tennis-europe','itf'].includes(updated.color)?updated.color:'manual',eventColor:updated.color,playerId,eventAnalysis:updated.playerAnalyses?.[playerId]||'',status:'manual',entryStatus:'manual'}));
+        const rows=updated.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:updated.id+'|'+playerId,competitionId:updated.id,manualEventId:updated.id,manualEvent:true,manual:true,name:updated.name,location:updated.location,locationCity:updated.locationCity,locationVenue:updated.locationVenue,locationProvince:updated.locationProvince,locationLat:updated.locationLat,locationLon:updated.locationLon,startDate:updated.startDate,endDate:updated.endDate,circuit:['fitp','tennis-europe','itf'].includes(updated.color)?updated.color:'manual',eventColor:updated.color,playerId,eventAnalysis:updated.playerAnalyses?.[playerId]||'',status:'manual',entryStatus:'manual'}));
         state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
         state.data={...state.data,tournaments:[...(state.data.tournaments||[]).filter(row=>!row.manualEvent||(row.manualEventId||row.competitionId)!==event.id),...rows]};
         await saveCachedData(state.data);dialog.close();if(typeof location!=='undefined'&&location.hash===routeHash&&routeHash.startsWith('#tournament/'))location.hash='tournament/'+encodeURIComponent(tournamentKey(rows[0]));renderIfDataChanged(false);
@@ -5156,7 +5170,7 @@ function wireCalendarEventLocation(dialog, prefix = 'calendarEvent') {
   const cancel=()=>{clearTimeout(timer);controller?.abort();sequence++;};
   dialog.addEventListener('close',cancel);
   input.oninput=()=>{
-    cancel();input.dataset.lat='';input.dataset.lon='';input.dataset.city='';results.innerHTML='';status.textContent='';
+    cancel();input.dataset.lat='';input.dataset.lon='';input.dataset.city='';input.dataset.venue='';input.dataset.province='';results.innerHTML='';status.textContent='';
     const query=input.value.trim(),id=sequence;
     if(query.length<3)return;
     timer=setTimeout(async()=>{
@@ -5169,12 +5183,12 @@ function wireCalendarEventLocation(dialog, prefix = 'calendarEvent') {
         const places=(data.features||[]).map(feature=>{
           const p=feature.properties||{},[lon,lat]=feature.geometry?.coordinates||[];
           const address=[p.name,[p.street,p.housenumber].filter(Boolean).join(' '),[p.postcode,p.city||p.town||p.village].filter(Boolean).join(' '),p.state,p.country].filter(Boolean);
-          return {label:[...new Set(address)].join(', ').slice(0,200),city:String(p.city||p.town||p.village||p.municipality||((p.type==='city'||p.type==='town'||p.type==='village')?p.name:'')||'').trim().slice(0,120),lat,lon};
+          return {label:[...new Set(address)].join(', ').slice(0,200),venue:String(p.name||'').trim().slice(0,160),province:String(p.county||'').trim().slice(0,120),city:String(p.city||p.town||p.village||p.municipality||((p.type==='city'||p.type==='town'||p.type==='village')?p.name:'')||'').trim().slice(0,120),lat,lon};
         }).filter(p=>p.label&&Number.isFinite(p.lat)&&Number.isFinite(p.lon));
         results.innerHTML=places.map((p,i)=>`<button type="button" class="btn" data-place-index="${i}">${esc(p.label)}</button>`).join('');
         status.textContent=places.length?'Scegli l’indirizzo corretto.':'Nessun indirizzo trovato. Prova con città e via.';
         results.querySelectorAll('[data-place-index]').forEach(button=>button.onclick=()=>{
-          const p=places[Number(button.dataset.placeIndex)];cancel();input.value=p.label;input.dataset.lat=String(p.lat);input.dataset.lon=String(p.lon);input.dataset.city=p.city;results.innerHTML='';
+          const p=places[Number(button.dataset.placeIndex)];cancel();input.value=p.label;input.dataset.lat=String(p.lat);input.dataset.lon=String(p.lon);input.dataset.city=p.city;input.dataset.venue=p.venue;input.dataset.province=p.province;results.innerHTML='';
           status.innerHTML=`Indirizzo selezionato · <a href="https://www.openstreetmap.org/?mlat=${p.lat}&mlon=${p.lon}#map=17/${p.lat}/${p.lon}" target="_blank" rel="noopener">Apri mappa</a>`;
         });
       } catch(e){if(id===sequence)status.textContent='Ricerca indirizzi non disponibile. Riprova tra poco.';}
@@ -5200,7 +5214,7 @@ function wireCalendarEvents() {
   };
   $('addCalendarEvent').onclick=()=>{
     form.reset();requestId=crypto.randomUUID();$('calendarEventPlayerSearch').value='';
-    const place=$('calendarEventLocation');if(place){place.value='';place.dataset.lat='';place.dataset.lon='';place.dataset.city='';$('calendarEventLocationResults').innerHTML='';$('calendarEventLocationStatus').textContent='';}
+    const place=$('calendarEventLocation');if(place){place.value='';place.dataset.lat='';place.dataset.lon='';place.dataset.city='';place.dataset.venue='';place.dataset.province='';$('calendarEventLocationResults').innerHTML='';$('calendarEventLocationStatus').textContent='';}
     const players=[...(state.data?.players||[])].filter(p=>!p.membershipPending).sort((a,b)=>a.name.localeCompare(b.name,'it'));
     $('calendarEventPlayers').innerHTML=players.map(p=>`<label data-player-search="${esc(p.name.toLocaleLowerCase('it'))}"><input type="checkbox" name="playerIds" value="${esc(p.id)}">${esc(p.name)}</label>`).join('');
     form.elements.startDate.value=iso(state.month);form.elements.endDate.value='';
@@ -5218,7 +5232,7 @@ function wireCalendarEvents() {
     const {events}=await api('GET');
     if(dialogGroup!==PLAYER_GROUP)throw Error('La sezione è cambiata. Riapri il comando nel calendario.');
     const ids=new Set((state.data.players||[]).map(p=>p.id));
-    const rows=events.flatMap(t=>t.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:t.id+'|'+playerId,competitionId:t.id,manualEventId:t.id,manualEvent:true,manual:true,name:t.name,location:t.location,locationCity:t.locationCity,...(Number.isFinite(t.locationLat)?{locationLat:t.locationLat,locationLon:t.locationLon}:{}),startDate:t.startDate,endDate:t.endDate,circuit:['fitp','tennis-europe','itf'].includes(t.color)?t.color:'manual',eventColor:t.color,playerId,eventAnalysis:t.playerAnalyses?.[playerId]||'',status:'manual',entryStatus:'manual'})));
+    const rows=events.flatMap(t=>t.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:t.id+'|'+playerId,competitionId:t.id,manualEventId:t.id,manualEvent:true,manual:true,name:t.name,location:t.location,locationCity:t.locationCity,locationVenue:t.locationVenue,locationProvince:t.locationProvince,...(Number.isFinite(t.locationLat)?{locationLat:t.locationLat,locationLon:t.locationLon}:{}),startDate:t.startDate,endDate:t.endDate,circuit:['fitp','tennis-europe','itf'].includes(t.color)?t.color:'manual',eventColor:t.color,playerId,eventAnalysis:t.playerAnalyses?.[playerId]||'',status:'manual',entryStatus:'manual'})));
     state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
     state.data={...state.data,tournaments:[...(state.data.tournaments||[]).filter(t=>!t.manualEvent),...rows]};
     await saveCachedData(state.data);renderIfDataChanged(true);
@@ -5232,7 +5246,7 @@ function wireCalendarEvents() {
     const place=$('calendarEventLocation');
     if(!place?.dataset.lat || !place?.dataset.lon){fail('Scegli un indirizzo dai risultati della ricerca del luogo.');return;}
     busy=true;$('saveCalendarEvent').disabled=true;
-    try{await api('POST',{requestId,name:values.get('name'),location:place.value,locationCity:place.dataset.city||'',locationLat:Number(place.dataset.lat),locationLon:Number(place.dataset.lon),startDate:values.get('startDate'),endDate:values.get('endDate')||values.get('startDate'),color:values.get('color'),playerIds});await refreshManualEvents();dialog.close();}
+    try{await api('POST',{requestId,name:values.get('name'),location:place.value,locationCity:place.dataset.city||'',locationVenue:place.dataset.venue||'',locationProvince:place.dataset.province||'',locationLat:Number(place.dataset.lat),locationLon:Number(place.dataset.lon),startDate:values.get('startDate'),endDate:values.get('endDate')||values.get('startDate'),color:values.get('color'),playerIds});await refreshManualEvents();dialog.close();}
     catch(e){fail(e.message);}finally{busy=false;$('saveCalendarEvent').disabled=false;}
   };
   $('removeCalendarEvent').onclick=async()=>{

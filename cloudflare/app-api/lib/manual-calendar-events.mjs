@@ -12,7 +12,7 @@ export function validateCalendarEvent(input) {
  const analyses=input?.playerAnalyses;
  if(analyses!==undefined&&(!analyses||typeof analyses!=='object'||Array.isArray(analyses)||Object.keys(analyses).length>100||Object.entries(analyses).some(([id,value])=>!id||id.length>160||typeof value!=='string'||value.length>20000)))throw Error('invalid_calendar_event');
  const playerAnalyses=Object.fromEntries(Object.entries(analyses||{}).filter(([,value])=>value.trim()).map(([id,value])=>[id,value.trim()]).sort(([a],[b])=>a.localeCompare(b)));
- return {name,location,startDate,endDate,color,playerIds:playerIds.sort(),...coords,...(Object.keys(playerAnalyses).length?{playerAnalyses}:{}),...(text(input?.locationCity,120)?{locationCity:text(input.locationCity,120)}:{})};
+ return {name,location,startDate,endDate,color,playerIds:playerIds.sort(),...coords,...(Object.keys(playerAnalyses).length?{playerAnalyses}:{}),...(text(input?.locationCity,120)?{locationCity:text(input.locationCity,120)}:{}),...(text(input?.locationVenue,160)?{locationVenue:text(input.locationVenue,160)}:{}),...(text(input?.locationProvince,120)?{locationProvince:text(input.locationProvince,120)}:{})};
 }
 async function rawCalendarEvents(db,userId,group) {
  // Release verification runs BEFORE migrations: inspect schema without a failed query.
@@ -33,7 +33,7 @@ export function associateCalendarEvents(events) {
  for(const event of events) {
   const key=calendarEventIdentity(event),current=grouped.get(key);
   if(!current){grouped.set(key,{...event,playerIds:[...event.playerIds]});continue;}
-  if(!current.locationCity&&event.locationCity)current.locationCity=event.locationCity;
+  for(const key of ['locationCity','locationVenue','locationProvince'])if(!current[key]&&event[key])current[key]=event[key];
   if(event.playerAnalyses||current.playerAnalyses)current.playerAnalyses={...event.playerAnalyses,...current.playerAnalyses};
   current.playerIds=[...new Set([...current.playerIds,...event.playerIds])].sort();
   if(current.locationLat===undefined&&event.locationLat!==undefined){current.locationLat=event.locationLat;current.locationLon=event.locationLon;}
@@ -51,7 +51,7 @@ async function eventIdentityId(event) {
 export function calendarEventTournaments(events,selectedIds) {
  return events.flatMap(event=>event.playerIds.filter(id=>selectedIds.has(id)).map(playerId=>({
   id:event.id+'|'+playerId,competitionId:event.id,manualEventId:event.id,manualEvent:true,manual:true,
-  name:event.name,location:event.location,...(event.locationCity?{locationCity:event.locationCity}:{}),...(Number.isFinite(event.locationLat)?{locationLat:event.locationLat,locationLon:event.locationLon}:{}),startDate:event.startDate,endDate:event.endDate,
+  name:event.name,location:event.location,...(event.locationVenue?{locationVenue:event.locationVenue}:{}),...(event.locationProvince?{locationProvince:event.locationProvince}:{}),...(event.locationCity?{locationCity:event.locationCity}:{}),...(Number.isFinite(event.locationLat)?{locationLat:event.locationLat,locationLon:event.locationLon}:{}),startDate:event.startDate,endDate:event.endDate,
   circuit:['fitp','tennis-europe','itf'].includes(event.color)?event.color:'manual',eventColor:event.color,
   playerId,eventAnalysis:event.playerAnalyses?.[playerId]||'',status:'manual',entryStatus:'manual',calendarListLabel:''
  })));
@@ -84,7 +84,7 @@ export async function writeCalendarEvent(request,db,userId,group,membership) {
    const playerAnalyses={...previous.playerAnalyses,[id]:body.analysis};
    try{next=validateCalendarEvent({...previous,playerAnalyses})}catch{return {status:400,error:'invalid_calendar_event'}}
   } else {
-   const fields=Object.fromEntries(['name','location','startDate','endDate','locationCity','locationLat','locationLon'].filter(key=>Object.hasOwn(body,key)).map(key=>[key,body[key]]));
+   const fields=Object.fromEntries(['name','location','startDate','endDate','locationCity','locationVenue','locationProvince','locationLat','locationLon'].filter(key=>Object.hasOwn(body,key)).map(key=>[key,body[key]]));
    try{next=validateCalendarEvent({...previous,...fields,playerIds:body.playerIds??previous.playerIds})}catch{return {status:400,error:'invalid_calendar_event'}}
    if(!next.playerIds.every(id=>allowed.has(id)))return {status:403,error:'player_not_in_group'};
    if(next.location!==previous.location&&(!Number.isFinite(body.locationLat)||!Number.isFinite(body.locationLon)))return {status:400,error:'invalid_calendar_event'};
@@ -109,7 +109,7 @@ export async function writeCalendarEvent(request,db,userId,group,membership) {
  if(!event.playerIds.every(id=>ids.has(id)))return {status:403,error:'player_not_in_group'};
  const all=await rawCalendarEvents(db,userId,group),matching=all.filter(row=>calendarEventIdentity(row)===calendarEventIdentity(event));
  const previous=associateCalendarEvents(matching)[0];
- if(previous)event={...validateCalendarEvent(previous),...(previous.locationLat===undefined&&event.locationLat!==undefined?{locationLat:event.locationLat,locationLon:event.locationLon}:{}),...(!previous.locationCity&&event.locationCity?{locationCity:event.locationCity}:{}),playerIds:[...new Set([...previous.playerIds,...event.playerIds])].sort()};
+ if(previous)event={...validateCalendarEvent(previous),...(previous.locationLat===undefined&&event.locationLat!==undefined?{locationLat:event.locationLat,locationLon:event.locationLon}:{}),...Object.fromEntries(['locationCity','locationVenue','locationProvince'].filter(key=>!previous[key]&&event[key]).map(key=>[key,event[key]])),playerIds:[...new Set([...previous.playerIds,...event.playerIds])].sort()};
  if(event.playerIds.length>100)return {status:409,error:'calendar_event_player_limit'};
  const id=previous?.id||await eventIdentityId(event),current=await stored(id),payload=JSON.stringify(event);
  const delta=plan(current?[{id,payload:JSON.stringify(validateCalendarEvent(JSON.parse(current.payload)))}]:[],[{id,payload}]);

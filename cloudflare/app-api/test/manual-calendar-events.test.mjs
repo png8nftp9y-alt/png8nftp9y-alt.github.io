@@ -181,3 +181,11 @@ test('a participant addition racing an analysis save cannot erase the saved note
   const saved=(await calendarEvents(d.db,owner,'main'))[0];assert.equal(saved.playerAnalyses[player],'Nota concorrente');assert.deepEqual(saved.playerIds,[player,'second'].sort());
  }finally{d.close()}
 });
+
+test('resolved club and province survive persistence, projection and full event edit',async()=>{
+ const d=fixture();try{
+  const call=r=>worker.fetch(r,{DB:d.db}),body={...input,locationVenue:'Accademia Tennis Vavassori',locationCity:"Palazzolo sull'Oglio",locationProvince:'Brescia'};
+  const {event}=await(await call(req('POST',body))).json();assert.equal(event.locationVenue,body.locationVenue);assert.equal(event.locationProvince,'Brescia');const projected=calendarEventTournaments([event],new Set([player]));assert.equal(projected[0].locationProvince,'Brescia');assert.equal(projected[0].locationVenue,body.locationVenue);
+  const response=await call(req('PATCH',{id:event.id,expectedPlayerIds:event.playerIds,expectedEvent:event,playerIds:event.playerIds,name:'Raduno aggiornato'}));assert.equal(response.status,200);const saved=(await response.json()).event;assert.equal(saved.locationProvince,'Brescia');assert.equal(saved.locationVenue,body.locationVenue);
+ }finally{d.close()}
+});

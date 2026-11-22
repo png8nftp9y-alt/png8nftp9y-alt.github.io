@@ -122,12 +122,12 @@ test('agenda camps show municipality, one participant line and the uppercase fed
  const markup=x.ctx.manualCalendarAgendaHtml(event.startDate,[t]);assert.match(markup,/Raduno Under 10/);assert.match(markup,/Palazzolo sull’Oglio/);assert.doesNotMatch(markup,/Via Milano|25036|Lombardia|Italia/);assert.equal((markup.match(/class="agendaTitle calendarEventParticipantLine"/g)||[]).length,1);assert.match(markup,/RADUNO FEDERALE/);
 });
 test('actual player profile displays event analysis; camp headers never receive match statistics',()=>{
- const x=harness(),camp={...event,playerId:'p1',competitionId:event.id,manualEventId:event.id,manualEvent:true,eventColor:'purple',eventAnalysis:'Nota'};
+ const x=harness(),camp={...event,location:"Accademia Tennis Vavassori- campo coperto, Via Alessandro Manzoni, 25036 Palazzolo sull'Oglio, Lombardia, Italia",playerId:'p1',competitionId:event.id,manualEventId:event.id,manualEvent:true,eventColor:'purple',eventAnalysis:'Nota'};
  x.ctx.state.data.tournaments=[camp];x.ctx.state.data.matches=[];
- Object.assign(x.ctx,{location:{hash:''},activeOpponentRouteKey:'',playerTournamentEligible:()=>true,circuit:()=> 'manual',tournamentKey:()=>event.id,fitpSummerCenterPlace:()=>'',agendaVenueLocation:()=> 'Palazzolo sull’Oglio',tournamentSurfaceLabel:()=>'',effectiveAcceptanceLabel:()=>'',initials:()=>'',readablePerson:x=>x,playerCircuitLinksHtml:()=>'',personalPlayerAffiliationHtml:()=>'',playerBirthLabel:()=>'',playerRankingSummary:()=>'',loadCurrentPlayerRanking(){},bindParticipantNavigation(){}});
+ Object.assign(x.ctx,{location:{hash:''},activeOpponentRouteKey:'',playerTournamentEligible:()=>true,circuit:()=> 'manual',tournamentKey:()=>event.id,fitpSummerCenterPlace:()=>'',agendaVenueLocation:()=> 'Palazzolo sull’Oglio',tournamentSurfaceLabel:()=>'',effectiveAcceptanceLabel:()=>'',initials:()=>'',readableText:x=>x,readablePerson:x=>x,playerCircuitLinksHtml:()=>'',personalPlayerAffiliationHtml:()=>'',playerBirthLabel:()=>'',playerRankingSummary:()=>'',loadCurrentPlayerRanking(){},bindParticipantNavigation(){}});
  for(const id of ['homeView','profileView'])x.node(id).classList={add(){},remove(){}};
- vm.runInContext(source.slice(source.indexOf('function calendarEventAnalysisButton('),source.indexOf('async function openCalendarParticipants('))+source.slice(source.indexOf('function renderProfile(id)'),source.indexOf('function matchHistoryRowHtml(')),x.ctx);x.ctx.renderProfile('p1');
- const markup=x.node('profileContent').innerHTML;assert.match(markup,/data-federal-camp="true"/);assert.match(markup,/data-calendar-analysis-player="p1"/);assert.match(markup,/hasAnalysis/);assert.doesNotMatch(markup,/data-match-analysis/);
+ vm.runInContext(source.slice(source.indexOf('function calendarEventCity('),source.indexOf('function tournamentLocationLabel('))+source.slice(source.indexOf('function calendarEventAnalysisButton('),source.indexOf('async function openCalendarParticipants('))+source.slice(source.indexOf('function renderProfile(id)'),source.indexOf('function matchHistoryRowHtml(')),x.ctx);x.ctx.renderProfile('p1');
+ const markup=x.node('profileContent').innerHTML;assert.match(markup,/Accademia Tennis Vavassori · Palazzolo sull&#39;Oglio BS|Accademia Tennis Vavassori · Palazzolo sull'Oglio BS/);assert.doesNotMatch(markup,/campo coperto|Via Alessandro Manzoni|25036/);assert.match(markup,/data-federal-camp="true"/);assert.match(markup,/data-calendar-analysis-player="p1"/);assert.match(markup,/hasAnalysis/);assert.doesNotMatch(markup,/data-match-analysis/);
  let stats=0;const body={hidden:false},head={insertAdjacentHTML(){stats++}},section={dataset:{federalCamp:'true'},querySelectorAll:()=>[],querySelector:q=>q==='.profileTournamentMatches'?body:head};
  x.ctx.list={querySelectorAll:()=>[section]};x.ctx.openProfileTournamentKeys=new Set();
  const start=source.indexOf('  for (const section of list?.querySelectorAll(".profileTournament") || []) {',source.indexOf('renderProfile = function (id)'));
@@ -150,4 +150,13 @@ test('event analysis UI saves and deletes notes through calendar events without 
   vm.runInContext(source.slice(source.indexOf('async function openCalendarEventAnalysis('),source.indexOf('function calendarEventAnalysisButton(')),x.ctx);await x.ctx.openCalendarEventAnalysis(event.id,'p1');
   assert.equal(patch.analysisPlayerId,'p1');assert.equal(patch.expectedAnalysis,'Nota precedente');assert.equal(patch.analysis,action==='delete'?'':'Nota aggiornata');assert.equal(x.ctx.state.data.matches.length,1);assert.equal(x.ctx.state.data.matches[0].id,'official-match');assert.equal(x.ctx.state.data.tournaments.find(t=>t.manualEvent).eventAnalysis,action==='delete'?'':'Nota aggiornata');
  }
+});
+
+test('camp profile venue displays club, city and province without the indoor suffix; full stored address is preserved',()=>{
+ const ctx={readableText:v=>String(v||'')};vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function calendarEventCity('),source.indexOf('function tournamentLocationLabel(')),ctx);
+ const location="Accademia Tennis Vavassori- campo coperto, Via Alessandro Manzoni, 25036 Palazzolo sull'Oglio, Lombardia, Italia";
+ assert.equal(ctx.calendarEventProfilePlace({location}),"Accademia Tennis Vavassori · Palazzolo sull'Oglio BS");
+ assert.equal(ctx.calendarEventProfilePlace({location,locationVenue:'Accademia Tennis Vavassori- campo coperto',locationCity:"Palazzolo sull'Oglio",locationProvince:'Brescia'}),"Accademia Tennis Vavassori · Palazzolo sull'Oglio BS");
+ assert.doesNotMatch(ctx.cleanCalendarVenue(location),/campo coperto/i);assert.match(ctx.cleanCalendarVenue(location),/Via Alessandro Manzoni/);assert.match(location,/campo coperto/);
+ assert.equal(ctx.calendarEventProfilePlace({location:'Via Milano 12, 20900 Monza, Lombardia, Italia',locationVenue:'Circolo di prova',locationCity:'Monza',locationProvince:'MB'}),'Circolo di prova · Monza MB');
 });

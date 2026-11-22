@@ -18,7 +18,7 @@
       html[data-cw-refresh-preview] main.view { pointer-events: none; }
     </style>
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=20261122200000-full-event" />
+    <link rel="stylesheet" href="v3.css?v=20261122203000-profile-event-place" />
   </head>
   <body>
     <div class="shell">
@@ -303,7 +303,7 @@
           const group = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
           const saved = JSON.parse(sessionStorage.getItem("courtwatch-refresh-view-v1-" + group) || "null");
           const route = location.pathname + location.search + location.hash;
-          if (!saved || saved.version !== "20261122-full-event-template" || saved.route !== route || typeof saved.html !== "string" || saved.html.length > 1500000) return;
+          if (!saved || saved.version !== "20261122-profile-event-place" || saved.route !== route || typeof saved.html !== "string" || saved.html.length > 1500000) return;
           // A preview is disposable: never replace current controls with an older template.
           if (saved.viewId === "calendarView" && !["addCalendarEvent", "removeCalendarEvent"].every(id => new RegExp('id=["\']' + id + '["\']').test(saved.html))) return;
           const view = document.getElementById(saved.viewId);
@@ -401,7 +401,7 @@
       <div id="calendarEventRemoval" hidden></div>
       <p id="calendarEventError" role="alert"></p>
     </dialog>
-    <script crossorigin="anonymous" src="v3.js?v=20261122200000-full-event"></script>
+    <script crossorigin="anonymous" src="v3.js?v=20261122203000-profile-event-place"></script>
 
 </body>
 </html>
