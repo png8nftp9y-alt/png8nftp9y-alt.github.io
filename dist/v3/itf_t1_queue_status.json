@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-22T00:17:07.227Z",
+  "generatedAt": "2026-11-22T00:27:47.276Z",
   "today": "2026-11-22",
   "windowEnd": "2026-11-25",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -1264,7 +1264,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-21T23:26:02.604Z",
+        "checkedAt": "2026-11-22T00:17:55.088Z",
         "eligibleFrom": "2026-11-23"
       },
       {
@@ -1280,7 +1280,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-21T23:26:03.999Z",
+        "checkedAt": "2026-11-22T00:17:57.363Z",
         "eligibleFrom": "2026-11-23"
       },
       {
@@ -1296,7 +1296,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-21T23:26:05.015Z",
+        "checkedAt": "2026-11-22T00:17:57.440Z",
         "eligibleFrom": "2026-11-23"
       },
       {
@@ -1315,10 +1315,10 @@
             "family": "B-S-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "draw_without_players",
-            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
-            "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-21T23:26:35.206Z",
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-22T00:18:52.074Z",
             "rowParity": null,
             "sources": []
           },
@@ -1327,10 +1327,10 @@
             "family": "B-D-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "draw_without_players",
-            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
-            "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-21T23:26:35.206Z",
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-22T00:18:52.074Z",
             "rowParity": null,
             "sources": []
           },
@@ -1339,10 +1339,10 @@
             "family": "G-S-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "draw_without_players",
-            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
-            "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-21T23:26:35.206Z",
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-22T00:18:52.074Z",
             "rowParity": null,
             "sources": []
           },
@@ -1351,17 +1351,17 @@
             "family": "G-D-M",
             "structure": "KO",
             "acquired": false,
-            "reasonCode": "draw_without_players",
-            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
-            "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-21T23:26:35.206Z",
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-22T00:18:52.074Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-21T23:26:35.206Z",
+        "checkedAt": "2026-11-22T00:18:52.074Z",
         "eligibleFrom": "2026-11-23"
       },
       {
@@ -1369,15 +1369,15 @@
         "tournamentName": "J60 Gifu",
         "startDate": "2026-11-24",
         "endDate": "2026-11-29",
-        "status": "inventory_empty",
-        "inventoryError": "empty_inventory",
+        "status": "inventory_required",
+        "inventoryError": "GetEventFilters_incapsula_challenge",
         "knownDraws": null,
         "acquiredDraws": null,
         "missingDraws": null,
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-21T23:26:02.370Z",
+        "checkedAt": "2026-11-22T00:18:05.875Z",
         "eligibleFrom": "2026-11-23"
       },
       {
@@ -1393,7 +1393,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-21T23:26:02.510Z",
+        "checkedAt": "2026-11-22T00:17:57.361Z",
         "eligibleFrom": "2026-11-24"
       }
     ],
@@ -1401,12 +1401,13 @@
     "missingDraws": 71,
     "acquiredDraws": 35,
     "missingByReason": {
-      "draw_without_players": 54,
-      "incapsula_blocked": 17
+      "draw_without_players": 50,
+      "incapsula_blocked": 21
     },
     "byStatus": {
       "missing": 18,
-      "inventory_empty": 12
+      "inventory_empty": 11,
+      "inventory_required": 1
     }
   },
   "extraordinary": {
