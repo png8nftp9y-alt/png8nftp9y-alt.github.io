@@ -1319,6 +1319,7 @@ async function saveDurableOpponent(name, event, profileId, requestKey, data) {
     } catch {db.close(); resolve(false);}
   });
 }
+let opponentDurableRestore = null;
 async function restoreDurableOpponents() {
   const db = await openProjectionDatabase();
   if (!db) return;
@@ -3919,6 +3920,16 @@ async function loadOpponentHistory(name, event = "", profileId = "", refresh = f
       renderOpponentHistory(data);
     }
   } catch {
+    // A fast failed API is not evidence of empty history while IndexedDB opens.
+    if (typeof opponentDurableRestore !== 'undefined' && opponentDurableRestore)
+      await opponentDurableRestore.catch(() => {});
+    if (activeOpponentRouteKey !== routeKey) return;
+    const recovered = preparedOpponentHistory(name, event, profileId);
+    if (recovered && !recovered.historyPending) {
+      saveActiveOpponent(requestKey, recovered);
+      renderOpponentHistory(recovered);
+      return;
+    }
     if (body) {
       body.setAttribute("aria-busy", "false");
     }
@@ -6015,7 +6026,8 @@ async function startCourtWatch() {
   wire();
   wireAccount();
   // Start the network immediately; mobile IndexedDB may take seconds to open.
-  const restoring = Promise.all([restoreDurableProjection(), restoreDurableOpponents()]);
+  opponentDurableRestore = restoreDurableOpponents();
+  const restoring = Promise.all([restoreDurableProjection(), opponentDurableRestore]);
   initialProjectionRequest = load(null,null,true);
   route();
   if (state.data) {

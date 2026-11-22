@@ -11403,3 +11403,12 @@ ITF discovery 2026-11-22T15:09:59.873Z: 0 newly discovered future tournaments; M
 - Compatibilità: per eventi precedenti senza campo città si estrae il comune dal segmento CAP/comune già salvato; supportata anche la precedente etichetta italiana senza CAP. Nessuna riscrittura automatica del raduno esistente o perdita di indirizzo.
 - Verifica: renderer reale del calendario con Raduno Under 10/Palazzolo sull’Oglio/due partecipanti, nuovo campo e vecchia etichetta; assenza di via/CAP/centro/regione nel markup e tooltip; API SQLite verifica salvataggio, proiezione e modifica partecipanti mantenendo indirizzo completo. Suite mirata e policy D1 eseguite.
 - Limite: i vecchi luoghi testuali non strutturati hanno una ricostruzione conservativa; i nuovi salvataggi usano il campo città della ricerca. Test browser della pagina privata dopo deploy. Nessun polling o rilancio.
+
+
+## 2026-11-22 — Ripristino storico avversario prima dell’errore offline
+
+- Run esaminato: 45045654604, job verify 137279573106, fallimento tools/verify-shared-match-refresh-browser.mjs:170 (observedEmptyOpponent=true). I 116 test iniziali, etichette e layout agenda sono passati; replay Others successivo saltato.
+- Causa: al reload senza cache localStorage, un fallimento rapido dell’API aggiorna lo storico a non disponibile prima che la lettura asincrona IndexedDB recuperi le partite del giorno precedente. La partita appare poi ma il controllo rileva correttamente il vuoto transitorio.
+- Correzione: condivisione della promessa di recupero locale già avviata, attesa solo nel percorso di errore dell’avversario, nuova lettura della cache dopo il recupero e ripristino dello storico. Nessuna attesa aggiuntiva per avvio o risposte API riuscite. Controllo della rotta prima di cambiare il DOM. Il test browser resta invariato.
+- Validazione: test riproducibile fallito prima/passato dopo, recupero ritardato, indisponibilità locale con Riprova e cambio pagina; 38 test mirati passati. Regressione aggiunta al workflow Others e al check. Versione asset aggiornata.
+- Limite: browser Chromium locale bloccato dalle restrizioni socket dell’ambiente; il controllo completo browser sarà eseguito dal workflow alla pubblicazione. Nessun rilancio o polling automatico.
