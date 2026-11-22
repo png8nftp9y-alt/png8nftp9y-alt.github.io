@@ -30,3 +30,15 @@ test('real Worker authenticates Admin before mutations',async()=>{
  assert.equal((await worker.fetch(request(),env)).status,401);assert.equal(writes,0);
  assert.equal((await worker.fetch(request('pause',{Authorization:'Basic '+btoa('admin:fixture-admin')}),env)).status,303);assert.equal(writes,1);
 });
+
+test('opaque and missing origins cannot change workflow state',async()=>{
+ let writes=0;const env={AUTOMATION_CONTROL:{set:async()=>{writes++;}}};
+ assert.equal((await changeAutomation(request('pause',{Origin:'null'}),env,{})).status,403);
+ const missing=request();missing.headers.delete('Origin');
+ assert.equal((await changeAutomation(missing,env,{})).status,403);assert.equal(writes,0);
+});
+test('diagnostic native forms retain same-origin referrer policy',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const source=await readFile(new URL('../src/index.js',import.meta.url),'utf8');
+ assert.ok(source.includes("...(['id','diagnostica'].includes(view)?{'Referrer-Policy':'same-origin'}:{})"));
+});
