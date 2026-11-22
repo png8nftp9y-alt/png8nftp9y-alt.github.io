@@ -273,7 +273,7 @@ function saveRefreshView() {
     const html = clone.innerHTML;
     if (html.length > 1500000) {sessionStorage.removeItem(key); return;}
     sessionStorage.setItem(key, JSON.stringify({
-      version: "20261122-event-editor-template", route: location.pathname + location.search + location.hash,
+      version: "20261122-event-city-template", route: location.pathname + location.search + location.hash,
       viewId: view.id, html, y: Math.max(0, scrollY || 0),
       styles: [...document.head.querySelectorAll("style[id]")].map(style => ({id: style.id, css: style.textContent})),
     }));
@@ -829,7 +829,18 @@ function fitpSummerCenterPlace(t) {
     ? `Centro estivo FITP · ${fitpAddressCase(match[1].trim())}`
     : "";
 }
+function calendarEventCity(t) {
+  if(t.locationCity)return readableText(t.locationCity);
+  const parts=String(t.location||'').split(',').map(value=>value.trim()).filter(Boolean);
+  // Older Photon labels stored the postcode and municipality in one segment.
+  const postal=parts.find(value=>/^\d{5}\s+\p{L}/u.test(value));
+  if(postal)return postal.replace(/^\d{5}\s+/,'');
+  const regions=/^(?:Italia|Italy|Lombardia|Piemonte|Liguria|Veneto|Trentino[- ]Alto Adige|Friuli[- ]Venezia Giulia|Valle d’Aosta|Valle d'Aosta|Emilia[- ]Romagna|Toscana|Umbria|Marche|Lazio|Abruzzo|Molise|Campania|Puglia|Basilicata|Calabria|Sicilia|Sardegna)$/i;
+  const candidates=parts.filter(value=>!regions.test(value)&&!/^\d+$/.test(value)&&!/^(?:via|viale|piazza|piazzale|corso|strada|vicolo|largo)\b/i.test(value));
+  return candidates.at(-1)||'Città da pubblicare';
+}
 function tournamentLocationLabel(t, fallback = "") {
+  if(t?.manualEvent)return calendarEventCity(t);
   if (circuit(t) === "tennis-europe") {
     const venue = readableText(t?.venueName || ""),
       parts = readableText(t?.location || t?.city || fallback)
@@ -5077,7 +5088,7 @@ async function openCalendarParticipants(t) {
         if(!response.ok)throw Error(response.status===409?'I partecipanti sono cambiati. Chiudi e riapri la modifica.':'Salvataggio non riuscito. Riprova.');
         const result=await response.json();if(group!==PLAYER_GROUP)return;
         const updated=result.event,ids=new Set((state.data.players||[]).map(p=>p.id));
-        const rows=updated.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:updated.id+'|'+playerId,competitionId:updated.id,manualEventId:updated.id,manualEvent:true,manual:true,name:updated.name,location:updated.location,locationLat:updated.locationLat,locationLon:updated.locationLon,startDate:updated.startDate,endDate:updated.endDate,circuit:['fitp','tennis-europe','itf'].includes(updated.color)?updated.color:'manual',eventColor:updated.color,playerId,status:'manual',entryStatus:'manual'}));
+        const rows=updated.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:updated.id+'|'+playerId,competitionId:updated.id,manualEventId:updated.id,manualEvent:true,manual:true,name:updated.name,location:updated.location,locationCity:updated.locationCity,locationLat:updated.locationLat,locationLon:updated.locationLon,startDate:updated.startDate,endDate:updated.endDate,circuit:['fitp','tennis-europe','itf'].includes(updated.color)?updated.color:'manual',eventColor:updated.color,playerId,status:'manual',entryStatus:'manual'}));
         state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
         state.data={...state.data,tournaments:[...(state.data.tournaments||[]).filter(row=>!row.manualEvent||(row.manualEventId||row.competitionId)!==event.id),...rows]};
         await saveCachedData(state.data);dialog.close();renderIfDataChanged(false);
@@ -5092,7 +5103,7 @@ function wireCalendarEventLocation(dialog) {
   const cancel=()=>{clearTimeout(timer);controller?.abort();sequence++;};
   dialog.addEventListener('close',cancel);
   input.oninput=()=>{
-    cancel();input.dataset.lat='';input.dataset.lon='';results.innerHTML='';status.textContent='';
+    cancel();input.dataset.lat='';input.dataset.lon='';input.dataset.city='';results.innerHTML='';status.textContent='';
     const query=input.value.trim(),id=sequence;
     if(query.length<3)return;
     timer=setTimeout(async()=>{
@@ -5105,12 +5116,12 @@ function wireCalendarEventLocation(dialog) {
         const places=(data.features||[]).map(feature=>{
           const p=feature.properties||{},[lon,lat]=feature.geometry?.coordinates||[];
           const address=[p.name,[p.street,p.housenumber].filter(Boolean).join(' '),[p.postcode,p.city||p.town||p.village].filter(Boolean).join(' '),p.state,p.country].filter(Boolean);
-          return {label:[...new Set(address)].join(', ').slice(0,200),lat,lon};
+          return {label:[...new Set(address)].join(', ').slice(0,200),city:String(p.city||p.town||p.village||p.municipality||((p.type==='city'||p.type==='town'||p.type==='village')?p.name:'')||'').trim().slice(0,120),lat,lon};
         }).filter(p=>p.label&&Number.isFinite(p.lat)&&Number.isFinite(p.lon));
         results.innerHTML=places.map((p,i)=>`<button type="button" class="btn" data-place-index="${i}">${esc(p.label)}</button>`).join('');
         status.textContent=places.length?'Scegli l’indirizzo corretto.':'Nessun indirizzo trovato. Prova con città e via.';
         results.querySelectorAll('[data-place-index]').forEach(button=>button.onclick=()=>{
-          const p=places[Number(button.dataset.placeIndex)];cancel();input.value=p.label;input.dataset.lat=String(p.lat);input.dataset.lon=String(p.lon);results.innerHTML='';
+          const p=places[Number(button.dataset.placeIndex)];cancel();input.value=p.label;input.dataset.lat=String(p.lat);input.dataset.lon=String(p.lon);input.dataset.city=p.city;results.innerHTML='';
           status.innerHTML=`Indirizzo selezionato · <a href="https://www.openstreetmap.org/?mlat=${p.lat}&mlon=${p.lon}#map=17/${p.lat}/${p.lon}" target="_blank" rel="noopener">Apri mappa</a>`;
         });
       } catch(e){if(id===sequence)status.textContent='Ricerca indirizzi non disponibile. Riprova tra poco.';}
@@ -5136,7 +5147,7 @@ function wireCalendarEvents() {
   };
   $('addCalendarEvent').onclick=()=>{
     form.reset();requestId=crypto.randomUUID();$('calendarEventPlayerSearch').value='';
-    const place=$('calendarEventLocation');if(place){place.value='';place.dataset.lat='';place.dataset.lon='';$('calendarEventLocationResults').innerHTML='';$('calendarEventLocationStatus').textContent='';}
+    const place=$('calendarEventLocation');if(place){place.value='';place.dataset.lat='';place.dataset.lon='';place.dataset.city='';$('calendarEventLocationResults').innerHTML='';$('calendarEventLocationStatus').textContent='';}
     const players=[...(state.data?.players||[])].filter(p=>!p.membershipPending).sort((a,b)=>a.name.localeCompare(b.name,'it'));
     $('calendarEventPlayers').innerHTML=players.map(p=>`<label data-player-search="${esc(p.name.toLocaleLowerCase('it'))}"><input type="checkbox" name="playerIds" value="${esc(p.id)}">${esc(p.name)}</label>`).join('');
     form.elements.startDate.value=iso(state.month);form.elements.endDate.value='';
@@ -5154,7 +5165,7 @@ function wireCalendarEvents() {
     const {events}=await api('GET');
     if(dialogGroup!==PLAYER_GROUP)throw Error('La sezione è cambiata. Riapri il comando nel calendario.');
     const ids=new Set((state.data.players||[]).map(p=>p.id));
-    const rows=events.flatMap(t=>t.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:t.id+'|'+playerId,competitionId:t.id,manualEventId:t.id,manualEvent:true,manual:true,name:t.name,location:t.location,...(Number.isFinite(t.locationLat)?{locationLat:t.locationLat,locationLon:t.locationLon}:{}),startDate:t.startDate,endDate:t.endDate,circuit:['fitp','tennis-europe','itf'].includes(t.color)?t.color:'manual',eventColor:t.color,playerId,status:'manual',entryStatus:'manual'})));
+    const rows=events.flatMap(t=>t.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:t.id+'|'+playerId,competitionId:t.id,manualEventId:t.id,manualEvent:true,manual:true,name:t.name,location:t.location,locationCity:t.locationCity,...(Number.isFinite(t.locationLat)?{locationLat:t.locationLat,locationLon:t.locationLon}:{}),startDate:t.startDate,endDate:t.endDate,circuit:['fitp','tennis-europe','itf'].includes(t.color)?t.color:'manual',eventColor:t.color,playerId,status:'manual',entryStatus:'manual'})));
     state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
     state.data={...state.data,tournaments:[...(state.data.tournaments||[]).filter(t=>!t.manualEvent),...rows]};
     await saveCachedData(state.data);renderIfDataChanged(true);
@@ -5168,7 +5179,7 @@ function wireCalendarEvents() {
     const place=$('calendarEventLocation');
     if(!place?.dataset.lat || !place?.dataset.lon){fail('Scegli un indirizzo dai risultati della ricerca del luogo.');return;}
     busy=true;$('saveCalendarEvent').disabled=true;
-    try{await api('POST',{requestId,name:values.get('name'),location:place.value,locationLat:Number(place.dataset.lat),locationLon:Number(place.dataset.lon),startDate:values.get('startDate'),endDate:values.get('endDate')||values.get('startDate'),color:values.get('color'),playerIds});await refreshManualEvents();dialog.close();}
+    try{await api('POST',{requestId,name:values.get('name'),location:place.value,locationCity:place.dataset.city||'',locationLat:Number(place.dataset.lat),locationLon:Number(place.dataset.lon),startDate:values.get('startDate'),endDate:values.get('endDate')||values.get('startDate'),color:values.get('color'),playerIds});await refreshManualEvents();dialog.close();}
     catch(e){fail(e.message);}finally{busy=false;$('saveCalendarEvent').disabled=false;}
   };
   $('removeCalendarEvent').onclick=async()=>{

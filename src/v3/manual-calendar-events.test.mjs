@@ -105,3 +105,12 @@ test('event deletion uses the same confirmation style as player removal and No n
   await controls[accept?'[data-removal-yes]':'[data-removal-no]'].onclick();assert.equal(deletes,accept?1:0);assert.equal(dialog.closed,true);
  }
 });
+
+test('real calendar shows event name, municipality and all players while retaining full address for the event page',()=>{
+ const location='Centro sportivo, Via Milano 12, 25036 Palazzolo sull’Oglio, Lombardia, Italia',t={name:'Raduno Under 10',location,manualEvent:true,circuit:'manual',eventColor:'purple',startDate:'2026-12-01',endDate:'2026-12-01',players:['Anna','Luca'],playerIds:['p1','p2']};
+ for(const structured of [false,true]){
+  const nodes={},node=id=>nodes[id]??={},ctx={state:{month:new Date('2026-12-01T12:00:00')},$:node,document:{querySelectorAll:()=>[]},circuit:t=>t.circuit,readableText:v=>String(v||''),fitpSummerCenterPlace:()=>'',cityCountry:v=>v,monthFmt:()=> 'dicembre',monday:d=>{const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x},add:(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x},iso:d=>d.toISOString().slice(0,10),fmt:()=>'',groups:()=>[{...t,...(structured?{locationCity:'Palazzolo sull’Oglio'}:{})}],overlap:(t,a,b)=>t.startDate<=b&&t.endDate>=a,tournamentDisplayName:t=>t.name,tournamentKey:()=> 'test',esc:escape};
+  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function calendarEventCity('),source.indexOf('function tennisEuropeVenueLocation('))+source.slice(source.indexOf('function renderCalendar()'),source.indexOf('function syncPlayersColumnHeight()')),ctx);ctx.renderCalendar();
+  const markup=node('calendar').innerHTML;assert.match(markup,/Raduno Under 10/);assert.match(markup,/Palazzolo sull’Oglio/);assert.match(markup,/Anna/);assert.match(markup,/Luca/);assert.doesNotMatch(markup,/Via Milano|25036|Centro sportivo|Lombardia|Italia/);assert.equal(t.location,location);
+ }
+});

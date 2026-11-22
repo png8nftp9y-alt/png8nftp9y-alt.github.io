@@ -9,7 +9,7 @@ export function validateCalendarEvent(input) {
  if(!name||!location||!validDate(startDate)||!validDate(endDate)||endDate<startDate||!colors.has(color)||!playerIds.length||playerIds.length>100||playerIds.some(id=>typeof id!=='string'||!id||id.length>160))throw Error('invalid_calendar_event');
  const coords=input?.locationLat===undefined&&input?.locationLon===undefined?{}:{locationLat:input.locationLat,locationLon:input.locationLon};
  if(Object.keys(coords).length&&(!Number.isFinite(coords.locationLat)||!Number.isFinite(coords.locationLon)||Math.abs(coords.locationLat)>90||Math.abs(coords.locationLon)>180))throw Error('invalid_calendar_event');
- return {name,location,startDate,endDate,color,playerIds:playerIds.sort(),...coords};
+ return {name,location,startDate,endDate,color,playerIds:playerIds.sort(),...coords,...(text(input?.locationCity,120)?{locationCity:text(input.locationCity,120)}:{})};
 }
 async function rawCalendarEvents(db,userId,group) {
  // Release verification runs BEFORE migrations: inspect schema without a failed query.
@@ -30,6 +30,7 @@ export function associateCalendarEvents(events) {
  for(const event of events) {
   const key=calendarEventIdentity(event),current=grouped.get(key);
   if(!current){grouped.set(key,{...event,playerIds:[...event.playerIds]});continue;}
+  if(!current.locationCity&&event.locationCity)current.locationCity=event.locationCity;
   current.playerIds=[...new Set([...current.playerIds,...event.playerIds])].sort();
   if(current.locationLat===undefined&&event.locationLat!==undefined){current.locationLat=event.locationLat;current.locationLon=event.locationLon;}
  }
@@ -46,7 +47,7 @@ async function eventIdentityId(event) {
 export function calendarEventTournaments(events,selectedIds) {
  return events.flatMap(event=>event.playerIds.filter(id=>selectedIds.has(id)).map(playerId=>({
   id:event.id+'|'+playerId,competitionId:event.id,manualEventId:event.id,manualEvent:true,manual:true,
-  name:event.name,location:event.location,...(Number.isFinite(event.locationLat)?{locationLat:event.locationLat,locationLon:event.locationLon}:{}),startDate:event.startDate,endDate:event.endDate,
+  name:event.name,location:event.location,...(event.locationCity?{locationCity:event.locationCity}:{}),...(Number.isFinite(event.locationLat)?{locationLat:event.locationLat,locationLon:event.locationLon}:{}),startDate:event.startDate,endDate:event.endDate,
   circuit:['fitp','tennis-europe','itf'].includes(event.color)?event.color:'manual',eventColor:event.color,
   playerId,status:'manual',entryStatus:'manual',calendarListLabel:''
  })));
@@ -90,7 +91,7 @@ export async function writeCalendarEvent(request,db,userId,group,membership) {
  if(!event.playerIds.every(id=>ids.has(id)))return {status:403,error:'player_not_in_group'};
  const all=await rawCalendarEvents(db,userId,group),matching=all.filter(row=>calendarEventIdentity(row)===calendarEventIdentity(event));
  const previous=associateCalendarEvents(matching)[0];
- if(previous)event={...validateCalendarEvent(previous),...(previous.locationLat===undefined&&event.locationLat!==undefined?{locationLat:event.locationLat,locationLon:event.locationLon}:{}),playerIds:[...new Set([...previous.playerIds,...event.playerIds])].sort()};
+ if(previous)event={...validateCalendarEvent(previous),...(previous.locationLat===undefined&&event.locationLat!==undefined?{locationLat:event.locationLat,locationLon:event.locationLon}:{}),...(!previous.locationCity&&event.locationCity?{locationCity:event.locationCity}:{}),playerIds:[...new Set([...previous.playerIds,...event.playerIds])].sort()};
  if(event.playerIds.length>100)return {status:409,error:'calendar_event_player_limit'};
  const id=previous?.id||await eventIdentityId(event),current=await stored(id),payload=JSON.stringify(event);
  const delta=plan(current?[{id,payload:JSON.stringify(validateCalendarEvent(JSON.parse(current.payload)))}]:[],[{id,payload}]);

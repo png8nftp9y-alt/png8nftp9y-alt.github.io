@@ -11395,3 +11395,11 @@ ITF discovery 2026-11-22T15:09:59.873Z: 0 newly discovered future tournaments; M
 - Nuove creazioni: unico tipo viola Raduno federale nel modulo e controllo lato API; precedenti tipi restano leggibili e modificabili/rimuovibili se manuali. Tornei automatici esclusi dai comandi.
 - Verifica: test API per sostituzione partecipanti, assenza di scritture a dati identici, rifiuto di richieste obsolete/estranee/vuote, altri tipi nuovi rifiutati; test UI eseguono il dialogo reale e verificano toolbar/griglia. Check completo concluso con successo (921 test); dopo gli ultimi ritocchi eseguite nuovamente tutte le 63 verifiche mirate. Policy D1 superata sul file modificato.
 - Limite: Chromium locale non disponibile per restrizioni socket; verifica visiva della sessione privata e test browser remoti dopo deploy. Nessun rilancio o polling automatico.
+
+## 2026-11-22 — Calendario raduni: solo nome, città e giocatori
+
+- Richiesta: stessa sintesi dei circuiti nel calendario; esempio Raduno Under 10, Palazzolo sull’Oglio e partecipanti, senza indirizzo completo.
+- Correzione: locationCity separata dall’indirizzo selezionato con Photon, validata e mantenuta nel payload/proiezioni/PATCH partecipanti. Il calendario mensile e settimanale usano solo il comune per gli eventi manuali; la pagina evento conserva indirizzo e coordinate della mappa. Identità di associazione eventi invariata.
+- Compatibilità: per eventi precedenti senza campo città si estrae il comune dal segmento CAP/comune già salvato; supportata anche la precedente etichetta italiana senza CAP. Nessuna riscrittura automatica del raduno esistente o perdita di indirizzo.
+- Verifica: renderer reale del calendario con Raduno Under 10/Palazzolo sull’Oglio/due partecipanti, nuovo campo e vecchia etichetta; assenza di via/CAP/centro/regione nel markup e tooltip; API SQLite verifica salvataggio, proiezione e modifica partecipanti mantenendo indirizzo completo. Suite mirata e policy D1 eseguite.
+- Limite: i vecchi luoghi testuali non strutturati hanno una ricostruzione conservativa; i nuovi salvataggi usano il campo città della ricerca. Test browser della pagina privata dopo deploy. Nessun polling o rilancio.

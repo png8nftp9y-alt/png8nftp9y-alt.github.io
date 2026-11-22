@@ -139,3 +139,12 @@ test('new events accept only federal camps, existing other event types stay read
   assert.equal((await calendarEvents(d.db,owner,'main'))[0].color,'red');
  }finally{d.close()}
 });
+
+test('municipality survives save, projection and participant edit without replacing full address',async()=>{
+ const d=fixture();try{
+  const call=r=>worker.fetch(r,{DB:d.db}),location='Via Milano 12, 25036 Palazzolo sull’Oglio, Lombardia, Italia';
+  const first=await(await call(req('POST',{...input,location,locationCity:'Palazzolo sull’Oglio'}))).json();assert.equal(first.event.location,location);assert.equal(first.event.locationCity,'Palazzolo sull’Oglio');
+  const events=await calendarEvents(d.db,owner,'main'),rows=calendarEventTournaments(events,new Set([player]));assert.equal(rows[0].locationCity,'Palazzolo sull’Oglio');assert.equal(rows[0].location,location);
+  const edited=await(await call(req('PATCH',{id:first.event.id,expectedPlayerIds:[player],playerIds:[player]}))).json();assert.equal(edited.event.locationCity,'Palazzolo sull’Oglio');assert.equal(edited.event.location,location);
+ }finally{d.close()}
+});
