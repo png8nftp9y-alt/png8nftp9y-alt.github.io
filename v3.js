@@ -273,7 +273,7 @@ function saveRefreshView() {
     const html = clone.innerHTML;
     if (html.length > 1500000) {sessionStorage.removeItem(key); return;}
     sessionStorage.setItem(key, JSON.stringify({
-      version: "20261122-event-address-template", route: location.pathname + location.search + location.hash,
+      version: "20261122-event-editor-template", route: location.pathname + location.search + location.hash,
       viewId: view.id, html, y: Math.max(0, scrollY || 0),
       styles: [...document.head.querySelectorAll("style[id]")].map(style => ({id: style.id, css: style.textContent})),
     }));
@@ -2664,7 +2664,9 @@ function renderAgenda() {
         .join("")}</div>`
     : '<div class="empty">Nessuna partita confermata per questa giornata.</div>';
   const dailyAgenda = $("dailyAgenda");
-  if (!updateDailyAgenda(dailyAgenda, manualCalendarAgendaHtml(key, agendaTournaments) + markup)) return;
+  const manualMarkup=manualCalendarAgendaHtml(key, agendaTournaments);
+  const combinedMarkup=manualMarkup ? (blocks.length ? markup.replace('<div class="agendaList">','<div class="agendaList">'+manualMarkup) : '<div class="agendaList">'+manualMarkup+'</div>') : markup;
+  if (!updateDailyAgenda(dailyAgenda, combinedMarkup)) return;
   dailyAgenda.querySelectorAll("[data-open-tournament]").forEach(
     (x) =>
       (x.onclick = (event) => {
@@ -4382,10 +4384,9 @@ function renderTournament(key) {
     category = source === "tennis-europe" ? readableText(t.tournamentCategory || "") : "";
   $("profileContent").innerHTML =
     `<div class="card tournamentHero" data-event-color="${esc(t.eventColor || '')}"><div><h2>${title}</h2>${category ? `<p>${esc(category)}</p>` : ""}${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(eventDateLabel(t))}</p></div><div class="tournamentHeroActions">${acceptanceLink}${t.manualEvent && ["purple","gray"].includes(t.eventColor) ? "" : `<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div>`}</div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
-  if(t.manualEvent) {
-    $("profileContent").insertAdjacentHTML("beforeend", '<section class="card calendarEventDeleteSection"><h3>Rimuovi evento</h3><p>Rimuove questo evento da calendario, agenda e pagine dei giocatori coinvolti.</p><button type="button" class="btn" id="removeCurrentCalendarEvent">Rimuovi evento</button><p id="removeCurrentCalendarEventError" role="alert"></p></section>');
-    $("removeCurrentCalendarEvent").onclick=()=>removeCalendarEventFromPage(t);
-  }
+  const remove=$('removeProfilePlayer'),edit=$('editCalendarEventParticipants');
+  if(edit)edit.hidden=!t.manualEvent;
+  if(t.manualEvent){remove.hidden=false;remove.disabled=false;remove.textContent='Rimuovi evento';remove.title='Rimuovi evento';remove.setAttribute('aria-label','Rimuovi evento');remove.onclick=()=>requestCalendarEventRemoval(t);if(edit)edit.onclick=()=>openCalendarParticipants(t);}
   if (futureEurope) loadFutureTournamentEuropeRankings(key, [...byPlayer.keys()].map(id => (state.data.players || []).find(player => player.id === id)).filter(Boolean));
   if (!t.manualEvent && source === "fitp") loadInlineFitpDrawLinks(t);
   bindParticipantNavigation($("profileContent"));
@@ -4446,6 +4447,7 @@ let openProfileTournamentKeys = new Set(
     : [],
 );
 renderProfile = function (id) {
+  const edit=$("editCalendarEventParticipants");if(edit)edit.hidden=true;
   const remove = $("removeProfilePlayer");
   remove.hidden = false;
   remove.disabled = false;
@@ -4714,6 +4716,8 @@ function adaptiveGoBack() {
 }
 
 function route() {
+  const eventEdit=$("editCalendarEventParticipants");if(eventEdit)eventEdit.hidden=true;
+  const eventError=$("removeCurrentCalendarEventError");if(eventError)eventError.textContent="";
   const requestedGroup = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
   if (groupSwitchRunning && requestedGroup !== PLAYER_GROUP) return;
   syncAdaptiveNavigation();
@@ -5007,8 +5011,25 @@ function eventDateLabel(t) {
   const start=displayDate(t.startDate)||'data da pubblicare';
   return !t.endDate || t.endDate===t.startDate ? start : start+' – '+displayDate(t.endDate);
 }
+function requestCalendarEventRemoval(t) {
+  if(!t?.manualEvent||document.getElementById('calendarEventRemovalDialog'))return;
+  const trigger=document.activeElement,dialog=document.createElement('dialog');
+  dialog.id='calendarEventRemovalDialog';dialog.className='playerRemovalDialog';dialog.setAttribute('aria-labelledby','calendarEventRemovalQuestion');
+  dialog.innerHTML=`<div class="playerRemovalIcon" aria-hidden="true">⚠️</div><h2 id="calendarEventRemovalQuestion">Sei davvero sicuro di voler rimuovere ${esc(t.name)} da Courtwatch?</h2><p class="playerRemovalError" role="alert" hidden></p><div class="playerRemovalActions"><button type="button" class="btn" data-removal-no autofocus>No</button><button type="button" class="btn" data-removal-yes>Sì</button></div>`;
+  document.body.append(dialog);
+  const yes=dialog.querySelector('[data-removal-yes]'),no=dialog.querySelector('[data-removal-no]'),error=dialog.querySelector('.playerRemovalError');let pending=false;
+  const close=()=>{if(pending)return;dialog.close();dialog.remove();if(trigger?.isConnected)trigger.focus();};
+  no.onclick=close;dialog.oncancel=e=>{e.preventDefault();close();};
+  yes.onclick=async()=>{
+    if(pending)return;pending=true;yes.disabled=no.disabled=true;error.hidden=true;yes.textContent='Rimozione…';
+    const removed=await removeCalendarEventFromPage(t);pending=false;
+    if(removed){close();return;}
+    error.textContent=$('removeCurrentCalendarEventError').textContent||'Rimozione non riuscita. Riprova.';error.hidden=false;yes.disabled=no.disabled=false;yes.textContent='Sì';
+  };
+  dialog.showModal();no.focus();
+}
 async function removeCalendarEventFromPage(t) {
-  const button=$('removeCurrentCalendarEvent'), error=$('removeCurrentCalendarEventError'), group=PLAYER_GROUP;
+  const button=$('removeProfilePlayer'), error=$('removeCurrentCalendarEventError'), group=PLAYER_GROUP;
   if(button.disabled)return;
   button.disabled=true;error.textContent='';
   try {
@@ -5017,15 +5038,52 @@ async function removeCalendarEventFromPage(t) {
     if(group!==PLAYER_GROUP)return;
     state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
     state.data={...state.data,tournaments:(state.data.tournaments||[]).filter(row=>!row.manualEvent || (row.manualEventId||row.competitionId)!==(t.manualEventId||t.competitionId))};
-    await saveCachedData(state.data);location.hash='calendar';renderIfDataChanged(true);
-  } catch(e){error.textContent=e.message;button.disabled=false;}
+    await saveCachedData(state.data);location.hash='calendar';renderIfDataChanged(true);return true;
+  } catch(e){error.textContent=e.message;button.disabled=false;return false;}
 }
 function manualCalendarAgendaHtml(day, tournaments = groups()) {
   return tournaments.filter(t => t.manualEvent && overlap(t, day, day)).map(t => {
     const people=t.people.filter(p => state.selected.has(p.playerId));
     if(!people.length)return '';
-    return `<section class="agendaTournamentBlock ${esc(circuit(t))}" data-event-color="${esc(t.eventColor)}"><header class="agendaTournamentHead"><div><h3><button data-open-tournament="${esc(tournamentKey(t))}">${esc(t.name)}</button><small>${esc(t.location)} · ${esc(eventDateLabel(t))}</small></h3></div><div class="agendaTournamentBadges"><span class="type" data-event-color="${esc(t.eventColor)}">${esc(calendarEventType(t))}</span></div></header><div class="agendaTournamentMatches"><div class="agendaMatchRow"><article class="agendaItem calendarEventParticipants"><div class="agendaMatchBody"><div class="agendaTitle">${people.map(p => `<button type="button" class="inlinePlayerLink" data-open-player="${esc(p.playerId)}">${esc(p.playerName)}</button>`).join(', ')}</div></div></article></div></div></section>`;
+    return `<section class="agendaTournamentBlock ${esc(circuit(t))}"><header class="agendaTournamentHead"><div><h3><button data-open-tournament="${esc(tournamentKey(t))}">${esc(t.name)}</button><small>${esc(t.location)}</small></h3></div><div class="agendaTournamentBadges"><span class="type" data-event-color="${esc(t.eventColor)}">${esc(calendarEventType(t))}</span></div></header><div class="agendaTournamentMatches">${people.map(p=>`<div class="agendaMatchRow matches-1"><article class="agendaItem calendarEventParticipants"><div class="agendaWhen"><div class="agendaWhenDetails"><time>${esc(eventDateLabel(t))}</time></div></div><div class="agendaMatchBody"><div class="agendaTitle"><button type="button" class="inlinePlayerLink" data-open-player="${esc(p.playerId)}">${esc(p.playerName)}</button></div></div></article></div>`).join('')}</div></section>`;
   }).join('');
+}
+async function openCalendarParticipants(t) {
+  const dialog=$('calendarParticipantsDialog'),form=$('calendarParticipantsForm'),list=$('calendarParticipantsList'),error=$('calendarParticipantsError'),save=$('saveCalendarParticipants'),search=$('calendarParticipantsSearch'),group=PLAYER_GROUP;
+  if(!dialog||!form||!list||!error||!save||!search)return;
+  let busy=false;const token=Symbol();dialog.courtWatchEditToken=token;form.onsubmit=e=>e.preventDefault();
+  error.textContent='';list.textContent='Caricamento…';save.disabled=true;search.value='';dialog.showModal();
+  const close=()=>{if(!busy)dialog.close();};$('closeCalendarParticipants').onclick=close;
+  dialog.oncancel=e=>{if(busy)e.preventDefault();};
+  dialog.onclick=e=>{if(e.target!==dialog)return;const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)close();};
+  try {
+    const response=await fetch(PRIVATE_API+'/calendar-events',privateApiOptions({credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(20000)},group));
+    if(!response.ok)throw Error('Caricamento non riuscito. Riapri la modifica.');
+    const {events}=await response.json();if(group!==PLAYER_GROUP||!dialog.open||dialog.courtWatchEditToken!==token)return;
+    const event=events.find(e=>e.id===(t.manualEventId||t.competitionId));
+    if(!event)throw Error('Evento non più disponibile. Aggiorna la pagina.');
+    const selected=new Set(event.playerIds),players=(state.data.players||[]).filter(p=>!p.membershipPending).sort((a,b)=>a.name.localeCompare(b.name,'it'));
+    list.innerHTML=players.map(p=>`<label data-player-search="${esc(p.name.toLocaleLowerCase('it'))}"><input type="checkbox" name="playerIds" value="${esc(p.id)}"${selected.has(p.id)?' checked':''}>${esc(p.name)}</label>`).join('');
+    search.oninput=()=>{const q=search.value.trim().toLocaleLowerCase('it');for(const label of list.querySelectorAll('label'))label.hidden=!label.dataset.playerSearch.includes(q);};
+    save.disabled=false;
+    form.onsubmit=async e=>{
+      e.preventDefault();if(busy)return;error.textContent='';
+      const playerIds=new FormData(form).getAll('playerIds');
+      if(!playerIds.length){error.textContent='Seleziona almeno un giocatore.';return;}
+      if(group!==PLAYER_GROUP){error.textContent='La sezione è cambiata. Riapri la modifica.';return;}
+      busy=true;save.disabled=true;
+      try {
+        const response=await fetch(PRIVATE_API+'/calendar-events',privateApiOptions({method:'PATCH',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:event.id,playerIds,expectedPlayerIds:event.playerIds}),signal:AbortSignal.timeout(20000)},group));
+        if(!response.ok)throw Error(response.status===409?'I partecipanti sono cambiati. Chiudi e riapri la modifica.':'Salvataggio non riuscito. Riprova.');
+        const result=await response.json();if(group!==PLAYER_GROUP)return;
+        const updated=result.event,ids=new Set((state.data.players||[]).map(p=>p.id));
+        const rows=updated.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:updated.id+'|'+playerId,competitionId:updated.id,manualEventId:updated.id,manualEvent:true,manual:true,name:updated.name,location:updated.location,locationLat:updated.locationLat,locationLon:updated.locationLon,startDate:updated.startDate,endDate:updated.endDate,circuit:['fitp','tennis-europe','itf'].includes(updated.color)?updated.color:'manual',eventColor:updated.color,playerId,status:'manual',entryStatus:'manual'}));
+        state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
+        state.data={...state.data,tournaments:[...(state.data.tournaments||[]).filter(row=>!row.manualEvent||(row.manualEventId||row.competitionId)!==event.id),...rows]};
+        await saveCachedData(state.data);dialog.close();renderIfDataChanged(false);
+      } catch(e){error.textContent=e.message;}finally{busy=false;save.disabled=false;}
+    };
+  } catch(e){error.textContent=e.message;}
 }
 function wireCalendarEventLocation(dialog) {
   const input=$('calendarEventLocation'), results=$('calendarEventLocationResults'), status=$('calendarEventLocationStatus');
@@ -5073,7 +5131,7 @@ function wireCalendarEvents() {
   dialog.addEventListener('cancel',event=>{if(busy)event.preventDefault();});
   const open=removal=>{
     dialogGroup=PLAYER_GROUP;fail('');form.hidden=removal;$('calendarEventRemoval').hidden=!removal;
-    $('calendarEventTitle').textContent=removal?'Rimuovi evento':'Aggiungi torneo';
+    $('calendarEventTitle').textContent=removal?'Rimuovi evento':'Aggiungi raduno federale';
     dialog.showModal();
   };
   $('addCalendarEvent').onclick=()=>{

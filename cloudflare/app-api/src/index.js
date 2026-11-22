@@ -239,7 +239,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
   const memberSelection=`SELECT courtwatch_id FROM ${membership} u WHERE user_id=? AND ${playerMembershipGuard(group)}`;
   if(apiPath==='/calendar-events'){
     if(request.method==='GET')return privateJson({events:await calendarEvents(env.DB,user.id,group)});
-    if(!['POST','DELETE'].includes(request.method))return privateJson({error:'method_not_allowed'},405);
+    if(!['POST','PATCH','DELETE'].includes(request.method))return privateJson({error:'method_not_allowed'},405);
     if(request.headers.get('Origin')!==url.origin)return privateJson({error:'origin_not_allowed'},403);
     const result=await writeCalendarEvent(request,env.DB,user.id,group,membership);return privateJson(result,result.status||200);
   }

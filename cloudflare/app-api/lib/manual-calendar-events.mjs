@@ -61,7 +61,29 @@ export async function writeCalendarEvent(request,db,userId,group,membership) {
   if(matching.length)await db.batch(matching.map(row=>db.prepare('DELETE FROM user_calendar_events WHERE user_id=? AND player_group=? AND id=?').bind(userId,group,row.id)));
   return {success:true,id};
  }
+ if(request.method==='PATCH') {
+  let body;try{body=await request.json()}catch{return {status:400,error:'invalid_calendar_event'}}
+  if(!/^manual-[a-f0-9-]{36}$/.test(body?.id||'')||!Array.isArray(body.expectedPlayerIds))return {status:400,error:'invalid_calendar_event'};
+  const all=await rawCalendarEvents(db,userId,group),target=all.find(row=>row.id===body.id);
+  if(!target)return {status:404,error:'calendar_event_not_found'};
+  const matching=all.filter(row=>calendarEventIdentity(row)===calendarEventIdentity(target)),previous=associateCalendarEvents(matching)[0];
+  if(JSON.stringify([...new Set(body.expectedPlayerIds)].sort())!==JSON.stringify(previous.playerIds))return {status:409,error:'calendar_event_changed'};
+  let next;try{next=validateCalendarEvent({...previous,playerIds:body.playerIds})}catch{return {status:400,error:'invalid_calendar_event'}}
+  const rows=await db.prepare(`SELECT courtwatch_id FROM ${membership} WHERE user_id=?`).bind(userId).all(),allowed=new Set((rows.results||[]).map(row=>row.courtwatch_id));
+  if(!next.playerIds.every(id=>allowed.has(id)))return {status:403,error:'player_not_in_group'};
+  const current=await stored(previous.id);
+  if(!current||JSON.stringify(validateCalendarEvent(JSON.parse(current.payload)).playerIds)!==JSON.stringify(matching.find(row=>row.id===previous.id).playerIds))return {status:409,error:'calendar_event_changed'};
+  const payload=JSON.stringify(next),delta=plan([{id:previous.id,payload:current.payload}],[{id:previous.id,payload}]);
+  const statements=[];
+  if(delta.writes)statements.push(db.prepare('UPDATE user_calendar_events SET payload=? WHERE user_id=? AND player_group=? AND id=? AND payload=?').bind(payload,userId,group,previous.id,current.payload));
+  for(const duplicate of matching.filter(row=>row.id!==previous.id))statements.push(db.prepare('DELETE FROM user_calendar_events WHERE user_id=? AND player_group=? AND id=? AND EXISTS (SELECT 1 FROM user_calendar_events WHERE user_id=? AND player_group=? AND id=? AND payload=?)').bind(userId,group,duplicate.id,userId,group,previous.id,payload));
+  if(statements.length)await db.batch(statements);
+  const saved=await stored(previous.id);
+  if(saved.payload!==payload)return {status:409,error:'calendar_event_changed'};
+  return {success:true,event:{...next,id:previous.id}};
+ }
  let event,body;try{body=await request.json();event=validateCalendarEvent(body)}catch{return {status:400,error:'invalid_calendar_event'}}
+ if(event.color!=='purple')return {status:400,error:'unsupported_calendar_event_type'};
  if(body.requestId!==undefined&&!/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/.test(body.requestId))return {status:400,error:'invalid_calendar_event'};
  const rows=await db.prepare(`SELECT courtwatch_id FROM ${membership} WHERE user_id=?`).bind(userId).all();
  const ids=new Set((rows.results||[]).map(row=>row.courtwatch_id));

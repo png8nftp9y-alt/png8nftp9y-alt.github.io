@@ -6,7 +6,7 @@ import worker from '../src/index.js';
 import {readOnlyReplayDb} from '../../../tools/read-only-replay-db.mjs';
 import {validateCalendarEvent,calendarEvents,calendarEventTournaments,writeCalendarEvent} from '../lib/manual-calendar-events.mjs';
 const owner='user-federico-181099',player='manual-player';
-const input={name:'Torneo scuola <test>',location:'Monza',startDate:'2026-12-01',endDate:'2026-12-03',color:'tennis-europe',playerIds:[player]};
+const input={name:'Torneo scuola <test>',location:'Monza',startDate:'2026-12-01',endDate:'2026-12-03',color:'purple',playerIds:[player]};
 function fixture(){const d=database({identityMapping:true});d.execute('CREATE TABLE user_calendar_events(user_id TEXT,player_group TEXT,id TEXT,payload TEXT,created_at TEXT,PRIMARY KEY(user_id,player_group,id)) WITHOUT ROWID');d.execute('INSERT INTO user_app_players VALUES(?,?,?)',[owner,player,'2026-11-21']);return d;}
 const req=(method,body,{group='main',auth=true,origin='https://test',id=''}={})=>new Request('https://test/app/api/calendar-events'+(id?'?id='+id:''),{method,headers:{...(auth?{'Cf-Access-Authenticated-User-Email':'federico181099@gmail.com'}:{}),'X-CourtWatch-Group':group,'Origin':origin,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
 test('D1_TEST_INITIAL_IMPORT: saved event survives a second device, projects each selected player, deletes only user-owned manual rows',async()=>{
@@ -14,7 +14,7 @@ test('D1_TEST_INITIAL_IMPORT: saved event survives a second device, projects eac
   const call=r=>worker.fetch(r,{DB:d.db});
   const saved=await call(req('POST',input));assert.equal(saved.status,200);const {event}=await saved.json();assert.match(event.id,/^manual-/);
   const before=d.writes(),second=await call(req('GET'));assert.equal(second.headers.get('Cache-Control'),'no-store');const list=(await second.json()).events;assert.equal(list.length,1);assert.equal(d.writes(),before);
-  const rows=calendarEventTournaments(list,new Set([player]));assert.equal(rows.length,1);assert.equal(rows[0].manualEvent,true);assert.equal(rows[0].circuit,'tennis-europe');assert.equal(rows[0].competitionId,event.id);assert.equal(rows[0].playerId,player);assert.equal(rows[0].location,'Monza');assert.equal(rows[0].score,undefined);
+  const rows=calendarEventTournaments(list,new Set([player]));assert.equal(rows.length,1);assert.equal(rows[0].manualEvent,true);assert.equal(rows[0].circuit,'manual');assert.equal(rows[0].competitionId,event.id);assert.equal(rows[0].playerId,player);assert.equal(rows[0].location,'Monza');assert.equal(rows[0].score,undefined);
   assert.deepEqual(calendarEventTournaments(list,new Set(['different'])),[]);
   assert.deepEqual(await calendarEvents(d.db,'another-user','main'),[]);assert.deepEqual((await (await call(req('GET',null,{group:'others'}))).json()).events,[]);
   assert.equal((await call(req('DELETE',null,{id:event.id,group:'others'}))).status,200);assert.equal((await calendarEvents(d.db,owner,'main')).length,1);
@@ -80,7 +80,7 @@ test('same event with a second player reuses identity, preserves shared fields a
   d.execute('INSERT INTO user_app_players VALUES(?,?,?)',[owner,'second','2026-11-21']);
   const call=r=>worker.fetch(r,{DB:d.db});
   const first=await (await call(req('POST',{...input,color:'purple'}))).json();const before=d.writes();
-  const next=await (await call(req('POST',{...input,name:'  TORNEO   SCUOLA <TEST> ',location:' MONZA ',playerIds:['second'],color:'red'}))).json();
+  const next=await (await call(req('POST',{...input,name:'  TORNEO   SCUOLA <TEST> ',location:' MONZA ',playerIds:['second'],color:'purple'}))).json();
   assert.equal(next.event.id,first.event.id);assert.equal(next.event.name,input.name);assert.equal(next.event.location,input.location);assert.equal(next.event.color,'purple');assert.deepEqual(next.event.playerIds,[player,'second'].sort());assert.equal(d.writes()-before,1);
   const unchanged=d.writes();await call(req('POST',{...input,playerIds:['second']}));assert.equal(d.writes(),unchanged);
   const events=await calendarEvents(d.db,owner,'main');assert.equal(events.length,1);const projected=calendarEventTournaments(events,new Set([player,'second']));assert.equal(projected.length,2);assert.equal(projected[0].competitionId,projected[1].competitionId);
@@ -115,4 +115,27 @@ test('two concurrent creates and two concurrent additions never lose participant
    const events=await calendarEvents(d.db,owner,'main');assert.equal(events.length,1);assert.deepEqual(events[0].playerIds,(preexisting?[player,'second','third']:['second','third']).sort());
   }finally{d.close()}
  }
+});
+
+test('participant edit replaces selection, retains event identity and metadata, rejects stale and foreign edits',async()=>{
+ const d=fixture();try{
+  d.execute('INSERT INTO user_app_players VALUES(?,?,?)',[owner,'second','2026-11-21']);
+  const call=r=>worker.fetch(r,{DB:d.db}),created=await(await call(req('POST',input))).json(),id=created.event.id;
+  const patch={id,expectedPlayerIds:[player],playerIds:['second']},before=d.writes();
+  const response=await call(req('PATCH',patch));assert.equal(response.status,200);const {event}=await response.json();assert.equal(event.id,id);assert.equal(event.name,input.name);assert.deepEqual(event.playerIds,['second']);assert.equal(d.writes()-before,1);
+  const unchanged=d.writes();assert.equal((await call(req('PATCH',{...patch,expectedPlayerIds:['second']}))).status,200);assert.equal(d.writes(),unchanged);
+  assert.equal((await call(req('PATCH',patch))).status,409);
+  assert.equal((await call(req('PATCH',{...patch,expectedPlayerIds:['second'],playerIds:['stranger']}))).status,403);
+  assert.equal((await call(req('PATCH',{...patch,expectedPlayerIds:['second'],playerIds:[]}))).status,400);
+  assert.equal((await call(req('PATCH',patch,{group:'others'}))).status,404);
+  assert.equal((await call(req('PATCH',patch,{origin:'https://evil.test'}))).status,403);
+  assert.equal((await call(req('PATCH',patch,{auth:false}))).status,401);assert.equal(d.writes(),unchanged);
+ }finally{d.close()}
+});
+test('new events accept only federal camps, existing other event types stay readable',async()=>{
+ const d=fixture();try{
+  const call=r=>worker.fetch(r,{DB:d.db}),before=d.writes();for(const color of ['fitp','tennis-europe','itf','red','gray'])assert.equal((await call(req('POST',{...input,color}))).status,400);
+  assert.equal(d.writes(),before);d.execute('INSERT INTO user_calendar_events VALUES(?,?,?,?,?)',[owner,'main','manual-11111111-2222-3333-4444-555555555555',JSON.stringify({...input,color:'red'}),'2026-11-22']);
+  assert.equal((await calendarEvents(d.db,owner,'main'))[0].color,'red');
+ }finally{d.close()}
 });

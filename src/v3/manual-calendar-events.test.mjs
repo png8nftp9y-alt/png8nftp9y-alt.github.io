@@ -13,11 +13,11 @@ function harness(){
  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function wireCalendarEvents()'),source.indexOf('function wire()')),ctx);ctx.wireCalendarEvents();
  return{ctx,node,values,requests,counts:()=>({saved,renders})};
 }
-test('calendar controls precede categories; form collects dates, place, players and six color choices',()=>{
+test('calendar controls precede categories; form collects dates, place, players and only federal camps',()=>{
  assert.ok(html.indexOf('id="addCalendarEvent"')<html.indexOf('id="calendarCategory"'));
  assert.ok(html.indexOf('id="removeCalendarEvent"')<html.indexOf('id="calendarCategory"'));
  for(const field of ['name','location','startDate','endDate','color'])assert.match(html,new RegExp('name="'+field+'"'));
- for(const color of ['fitp','tennis-europe','itf','purple','red','gray'])assert.ok(html.includes('value="'+color+'"'));
+ assert.match(html,/option value="purple"/);const types=html.slice(html.indexOf('<select name="color"'),html.indexOf('</select>',html.indexOf('<select name="color"')));for(const color of ['fitp','tennis-europe','itf','red','gray'])assert.ok(!types.includes('value="'+color+'"'));
 });
 test('save projects all involved players immediately without touching automatic tournaments or creating fake matches',async()=>{
  const x=harness();x.node('addCalendarEvent').onclick();x.node('calendarEventLocation').dataset={lat:'45.5',lon:'9.2'};x.node('calendarEventLocation').value='Monza';await x.node('calendarEventForm').onsubmit({preventDefault(){}});
@@ -69,10 +69,39 @@ test('actual tournament page: federal camp has no draws, one date, real map and 
  for(const color of ['purple','red']){
   const x=harness(),t={manualEvent:true,manualEventId:event.id,competitionId:event.id,name:'Raduno',eventColor:color,circuit:'manual',location:'Via Boccaccio 3',locationLat:45.59,locationLon:9.27,startDate:'2026-12-01',endDate:'2026-12-01',people:[],playerIds:[]};
   Object.assign(x.ctx,{groups:()=>[t],tournamentKey:()=>event.id,tournamentPageKey:event.id,circuit:()=> 'manual',openTournamentPlayerKeys:new Set(),saveUiState(){},tournamentOfficialUrl:()=>'',tournamentAcceptanceUrl:()=>'',tournamentPlace:()=>t.location,tournamentMapsUrl:()=>'',tournamentDrawLinks:()=>'',tournamentSurfaceLabel:()=>'',bindParticipantNavigation(){},location:{hash:''}});
-  for(const id of ['homeView','profileView'])x.node(id).classList={add(){},remove(){}};
+  for(const node of [x.node('removeProfilePlayer')])node.setAttribute=()=>{};for(const id of ['homeView','profileView'])x.node(id).classList={add(){},remove(){}};
   x.node('profileContent').insertAdjacentHTML=function(_,markup){this.innerHTML+=markup};
   vm.runInContext(source.slice(source.indexOf('function calendarEventType('),source.indexOf('function wireCalendarEventLocation('))+source.slice(source.indexOf('function renderTournament(key)'),source.indexOf('const renderProfileWithoutStats')),x.ctx);
   x.ctx.renderTournament(event.id);const markup=x.node('profileContent').innerHTML;
-  assert.equal(markup.includes('Tabelloni:'),color!=='purple');assert.match(markup,/Rimuovi evento/);assert.match(markup,/query=45.59,9.27/);assert.equal((markup.match(/2026-12-01/g)||[]).length,1);assert.doesNotMatch(markup,/Inserito manualmente|Evento manuale/);
+  assert.equal(markup.includes('Tabelloni:'),color!=='purple');assert.equal(x.node('removeProfilePlayer').textContent,'Rimuovi evento');assert.equal(x.node('editCalendarEventParticipants').hidden,false);assert.match(markup,/query=45.59,9.27/);assert.equal((markup.match(/2026-12-01/g)||[]).length,1);assert.doesNotMatch(markup,/Inserito manualmente|Evento manuale/);
+ }
+});
+
+test('pencil editor loads checked players and replaces participants in all local projections',async()=>{
+ const x=harness(),existing={...event,playerIds:['p1']};x.ctx.tournamentKey=()=>event.id;x.ctx.renderTournament=()=>{};
+ x.ctx.state.data.tournaments.push({manualEvent:true,manualEventId:event.id,playerId:'p1'});x.values.set('playerIds',['p2']);
+ x.ctx.fetch=async(url,options)=>{x.requests.push({url,options});return{ok:true,json:async()=>options.method==='PATCH'?{event:{...existing,playerIds:['p2']}}:{events:[existing]}}};
+ vm.runInContext(source.slice(source.indexOf('async function openCalendarParticipants('),source.indexOf('function wireCalendarEventLocation(')),x.ctx);
+ await x.ctx.openCalendarParticipants({manualEventId:event.id});assert.match(x.node('calendarParticipantsList').innerHTML,/value="p1" checked/);assert.doesNotMatch(x.node('calendarParticipantsList').innerHTML,/value="p2" checked/);
+ await x.node('calendarParticipantsForm').onsubmit({preventDefault(){}});const request=x.requests.find(r=>r.options.method==='PATCH');assert.deepEqual(JSON.parse(request.options.body).expectedPlayerIds,['p1']);assert.deepEqual(JSON.parse(request.options.body).playerIds,['p2']);
+ assert.equal(x.ctx.state.data.tournaments.filter(t=>t.manualEvent).length,1);assert.equal(x.ctx.state.data.tournaments.find(t=>t.manualEvent).playerId,'p2');assert.ok(x.ctx.state.data.tournaments.some(t=>t.id==='official'));assert.equal(x.node('calendarParticipantsDialog').open,false);
+});
+test('event controls share player-removal toolbar and agenda uses both standard grid columns',()=>{
+ const toolbar=html.slice(html.indexOf('<div class="profileNav">'),html.indexOf('<div id="profileContent"'));
+ assert.match(toolbar,/class="profileNavActions"/);assert.ok(toolbar.indexOf('id="removeProfilePlayer"')<toolbar.indexOf('id="editCalendarEventParticipants"'));
+ assert.doesNotMatch(source,/calendarEventDeleteSection/);
+ const t={...event,circuit:'manual',eventColor:'purple',manualEvent:true,people:[{playerId:'p1',playerName:'Anna'},{playerId:'p2',playerName:'Luca'}]},x=harness();
+ Object.assign(x.ctx,{circuit:t=>t.circuit,tournamentKey:()=>event.id,overlap:()=>true});x.ctx.state.selected=new Set(['p1','p2']);vm.runInContext(source.slice(source.indexOf('function calendarEventType('),source.indexOf('function wireCalendarEventLocation(')),x.ctx);
+ const rendered=x.ctx.manualCalendarAgendaHtml(event.startDate,[t]);assert.equal((rendered.match(/class="agendaWhen"/g)||[]).length,2);assert.equal((rendered.match(/class="agendaMatchBody"/g)||[]).length,2);assert.equal((rendered.match(/class="agendaMatchRow matches-1"/g)||[]).length,2);
+ const css=readFileSync(new URL('../../v3.css',import.meta.url),'utf8');assert.doesNotMatch(css,/\.agendaTournamentBlock\[data-event-color\].*\.agendaTournamentHead/);assert.doesNotMatch(css,/\.profileTournament\[data-event-color\]:not\([^)]*\) \.profileTournamentHead/);
+});
+
+test('event deletion uses the same confirmation style as player removal and No never deletes',async()=>{
+ for(const accept of [false,true]){
+  const controls={},node=id=>controls[id]??={focus(){},disabled:false},dialog={setAttribute(){},querySelector:node,showModal(){},close(){this.closed=true},remove(){}};let deletes=0;
+  const ctx={esc:escape,document:{getElementById:()=>null,createElement:()=>dialog,body:{append(){}}},removeCalendarEventFromPage:async()=>{deletes++;return true}};
+  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function requestCalendarEventRemoval('),source.indexOf('async function removeCalendarEventFromPage(')),ctx);
+  ctx.requestCalendarEventRemoval({manualEvent:true,name:'Raduno federale'});assert.equal(dialog.className,'playerRemovalDialog');assert.match(dialog.innerHTML,/Sei davvero sicuro/);assert.equal(deletes,0);
+  await controls[accept?'[data-removal-yes]':'[data-removal-no]'].onclick();assert.equal(deletes,accept?1:0);assert.equal(dialog.closed,true);
  }
 });

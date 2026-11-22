@@ -18,7 +18,7 @@
       html[data-cw-refresh-preview] main.view { pointer-events: none; }
     </style>
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=20261122173000-calendar-details" />
+    <link rel="stylesheet" href="v3.css?v=20261122181500-calendar-editor" />
   </head>
   <body>
     <div class="shell">
@@ -283,16 +283,16 @@
       <main id="profileView" class="view">
         <div class="profileNav">
           <button id="backHome" class="btn back">← Indietro</button
-          ><button
+          ><div class="profileNavActions"><button
             id="removeProfilePlayer"
             class="btn removeProfilePlayer"
             title="Rimuovi giocatore"
             aria-label="Rimuovi giocatore"
           >
             Rimuovi giocatore
-          </button>
+          </button><button type="button" id="editCalendarEventParticipants" class="btn icon" title="Modifica partecipanti" aria-label="Modifica partecipanti" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 3 5 5-12 12-6 1 1-6Z M14 5l5 5"/></svg></button></div>
         </div>
-        <div id="profileContent"></div>
+        <p id="removeCurrentCalendarEventError" role="alert"></p><div id="profileContent"></div>
       </main>
     </div>
     <script>
@@ -303,7 +303,7 @@
           const group = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
           const saved = JSON.parse(sessionStorage.getItem("courtwatch-refresh-view-v1-" + group) || "null");
           const route = location.pathname + location.search + location.hash;
-          if (!saved || saved.version !== "20261122-event-address-template" || saved.route !== route || typeof saved.html !== "string" || saved.html.length > 1500000) return;
+          if (!saved || saved.version !== "20261122-event-editor-template" || saved.route !== route || typeof saved.html !== "string" || saved.html.length > 1500000) return;
           // A preview is disposable: never replace current controls with an older template.
           if (saved.viewId === "calendarView" && !["addCalendarEvent", "removeCalendarEvent"].every(id => new RegExp('id=["\']' + id + '["\']').test(saved.html))) return;
           const view = document.getElementById(saved.viewId);
@@ -386,21 +386,22 @@
     </script>
 
 
+    <dialog id="calendarParticipantsDialog" class="calendarEventDialog" aria-labelledby="calendarParticipantsTitle"><div class="calendarEventHeading"><h2 id="calendarParticipantsTitle">Modifica partecipanti</h2><button class="btn" type="button" id="closeCalendarParticipants" aria-label="Chiudi">×</button></div><form id="calendarParticipantsForm"><fieldset><legend>Giocatori coinvolti</legend><input type="search" id="calendarParticipantsSearch" placeholder="Cerca giocatore" aria-label="Cerca giocatore"><div id="calendarParticipantsList" class="calendarEventPlayers"></div></fieldset><p id="calendarParticipantsError" role="alert"></p><button type="submit" class="btn" id="saveCalendarParticipants">Salva partecipanti</button></form></dialog>
     <dialog id="calendarEventDialog" class="calendarEventDialog" aria-labelledby="calendarEventTitle">
-      <div class="calendarEventHeading"><h2 id="calendarEventTitle">Aggiungi torneo</h2><button type="button" class="btn" id="closeCalendarEvent" aria-label="Chiudi">×</button></div>
+      <div class="calendarEventHeading"><h2 id="calendarEventTitle">Aggiungi raduno federale</h2><button type="button" class="btn" id="closeCalendarEvent" aria-label="Chiudi">×</button></div>
       <form id="calendarEventForm">
-        <label>Nome del torneo<input name="name" required maxlength="160" autocomplete="off"></label>
+        <label>Nome del raduno<input name="name" required maxlength="160" autocomplete="off"></label>
         <div class="calendarEventDates"><label>Data iniziale<input name="startDate" type="date" required></label><label>Data finale (solo se più giorni)<input name="endDate" type="date"></label></div>
         <label>Luogo o circolo<input id="calendarEventLocation" name="location" required maxlength="200" autocomplete="off" aria-describedby="calendarEventLocationStatus" placeholder="Cerca circolo, città o indirizzo"></label><div id="calendarEventLocationResults" class="calendarEventLocationResults"></div><p id="calendarEventLocationStatus" role="status" class="muted"></p><small>Ricerca luoghi: Photon · © OpenStreetMap contributors</small>
-        <label>Tipologia e colore<select name="color" required><option value="fitp">Blu · FITP</option><option value="tennis-europe">Arancio · Tennis Europe</option><option value="itf">Verde · ITF</option><option value="purple">Viola · Raduni federali</option><option value="red">Rosso · Gare a squadre</option><option value="gray">Grigio scuro · FIT Junior Program</option></select></label>
+        <label>Tipologia<select name="color" required><option value="purple">Viola · Raduno federale</option></select></label>
         <fieldset><legend>Giocatori coinvolti</legend><input type="search" id="calendarEventPlayerSearch" aria-label="Cerca tra i giocatori" placeholder="Cerca giocatore"><div id="calendarEventPlayers" class="calendarEventPlayers"></div></fieldset>
 
-        <button class="btn" type="submit" id="saveCalendarEvent">Salva torneo</button>
+        <button class="btn" type="submit" id="saveCalendarEvent">Salva raduno</button>
       </form>
       <div id="calendarEventRemoval" hidden></div>
       <p id="calendarEventError" role="alert"></p>
     </dialog>
-    <script crossorigin="anonymous" src="v3.js?v=20261122173000-calendar-details"></script>
+    <script crossorigin="anonymous" src="v3.js?v=20261122181500-calendar-editor"></script>
 
 </body>
 </html>
