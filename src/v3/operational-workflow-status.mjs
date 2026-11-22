@@ -12,7 +12,7 @@ export async function collectWorkflowStatus({catalog,previous={},event={},repo,t
  const old=new Map((previous.workflowStates||previous.items||[]).map(x=>[x.workflow,x]));
  const observed=new Map();for(const run of [...recent,...(event.workflow_run?[event.workflow_run]:[])]){const key=file(run);if(!observed.has(key)||newer(run,observed.get(key))||run.id===observed.get(key).id)observed.set(key,run);}
  const core=new Map(operationalTargets.map(x=>[x[1],x]));let next=0;const states=new Array(catalog.length);
- async function worker(){while(next<catalog.length){const index=next++,entry=catalog[index],prior=old.get(entry.workflow),target=core.get(entry.workflow);let run=prior?.latestRun,checkedAt=prior?.checkedAt,error=null,completed=prior?.completedRun;
+ async function worker(){while(next<catalog.length){const index=next++,entry=catalog[index],prior=old.get(entry.workflow),target=core.get(entry.workflow);let run=prior?.latestRun,checkedAt=prior?.checkedAt,error=null,workflowState=null,completed=prior?.completedRun;
   const current=observed.get(entry.workflow);if(current&&(!run||newer(current,run)||current.id===run.id)){run=current;checkedAt=now;}
   // Core motors retain exact per-workflow checks. Other workflows are seeded once;
   // later event/recent evidence updates them without re-fetching the whole archive.
@@ -20,10 +20,11 @@ export async function collectWorkflowStatus({catalog,previous={},event={},repo,t
    if(list[0]&&(!run||newer(list[0],run)||list[0].id===run.id))run=list[0];
    completed=list.find(x=>x.status==='completed'&&!['cancelled','skipped'].includes(x.conclusion))||completed;checkedAt=now;
   }catch(e){error=e.message;}}
+  if(target){try{const metadata=await request('/actions/workflows/'+entry.workflow);workflowState=metadata.state||null;}catch(e){error=error||e.message;}}
   if(run?.status==='completed'&&!['cancelled','skipped'].includes(run.conclusion)&&(!completed||newer(run,completed)||run.id===completed.id))completed=run;
-  states[index]={workflow:entry.workflow,label:target?.[0]||entry.label,latestRun:compact(run),completedRun:compact(completed),checkedAt,error};
+  states[index]={workflow:entry.workflow,label:target?.[0]||entry.label,latestRun:compact(run),completedRun:compact(completed),checkedAt,error,workflowState};
  }}
  await Promise.all(Array.from({length:Math.min(4,catalog.length)},worker));
- const items=operationalTargets.map(([label,workflow,maxAge])=>{const state=states.find(x=>x.workflow===workflow),run=state?.completedRun,age=run?(Date.parse(now)-Date.parse(run.updated_at))/60000:Infinity;return{label,workflow,critical:true,status:state?.error||!run?'yellow':run.conclusion!=='success'?'red':age>maxAge?'yellow':'green',latestRun:state?.latestRun,completedRun:run,checkedAt:state?.checkedAt,runId:run?.id||null,url:run?.html_url||null,generatedAt:run?.updated_at||null,detail:(state?.error||run?.conclusion||'nessuna verifica')+' · '+(Number.isFinite(age)?Math.round(age)+' min fa':'data n/d')};});
+ const items=operationalTargets.map(([label,workflow,maxAge])=>{const state=states.find(x=>x.workflow===workflow),run=state?.completedRun,age=run?(Date.parse(now)-Date.parse(run.updated_at))/60000:Infinity;const paused=['disabled_manually','disabled_inactivity'].includes(state?.workflowState);return{label,workflow,paused,workflowState:state?.workflowState||null,critical:!paused,status:state?.error||!run?'yellow':run.conclusion!=='success'?'red':age>maxAge?'yellow':'green',latestRun:state?.latestRun,completedRun:run,checkedAt:state?.checkedAt,runId:run?.id||null,url:run?.html_url||null,generatedAt:run?.updated_at||null,detail:(paused?'In pausa · ultimo run: ':'')+(state?.error||run?.conclusion||'nessuna verifica')+' · '+(Number.isFinite(age)?Math.round(age)+' min fa':'data n/d')};});
  return{generatedAt:now,items,workflowStates:states,runs:recent.map(compact),runsError};
 }

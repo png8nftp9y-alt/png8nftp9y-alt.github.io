@@ -14,11 +14,11 @@ export function renderCurrentWorkflows(doc){
  const states=operationalWorkflowRows(doc);
  const checks=new Map(doc.items.map(item=>[item.workflow,item]));
  const rows=states.map(item=>{
-  const check=checks.get(item.workflow),latest=item.latestRun,failed=check?.status==='red';
+  const check=checks.get(item.workflow),latest=item.latestRun,failed=check?.status==='red'&&!check?.paused;
   const failedRun=check?.completedRun||item.completedRun||(check?.runId?{id:check.runId,html_url:check.url,updated_at:check.generatedAt,status:'completed',conclusion:'failure'}:null);
   const run=failed?(failedRun||latest):latest,status=failed?'failure':run?(run.status==='completed'?run.conclusion:run.status):'non disponibile';
   const active=latest&&latest.status!=='completed'?latest:null;
-  return `<tr><td><b>${esc(item.label||item.workflow)}</b></td><td><span class="pill ${tone(status)}">${esc(status)}</span>${failed?'<br><small>Questo fallimento determina il rosso complessivo.</small>':''}${item.error?'<br><small>Ultima acquisizione non disponibile</small>':''}</td><td>${esc(stamp(run?.updated_at||run?.created_at))}<br><small>Verificato: ${esc(stamp(item.checkedAt))}</small></td><td>${link(run)}${failed&&active?'<br><small>Nuova esecuzione '+esc(active.status)+' · '+link(active)+'</small>':''}</td></tr>`;
+  return `<tr><td><b>${esc(item.label||item.workflow)}</b></td><td><span class="pill ${tone(status)}">${esc(status)}</span>${failed?'<br><small>Questo fallimento determina il rosso complessivo.</small>':''}${check?.paused?'<br><small>In pausa: escluso dallo stato complessivo.</small>':''}${item.error?'<br><small>Ultima acquisizione non disponibile</small>':''}</td><td>${esc(stamp(run?.updated_at||run?.created_at))}<br><small>Verificato: ${esc(stamp(item.checkedAt))}</small></td><td>${link(run)}${failed&&active?'<br><small>Nuova esecuzione '+esc(active.status)+' · '+link(active)+'</small>':''}</td></tr>`;
  }).join('');
  return `<h2>Workflow e watchdog</h2><p class="muted">Solo acquisizioni, pubblicazioni e controlli operativi dell’app. Stati acquisiti nella stessa lettura di Copertura e dei controlli applicativi. Evidenza del ${esc(stamp(doc.generatedAt))}. La pagina conserva questa lettura fino a Aggiorna diagnostica.</p><table><thead><tr><th>Flusso</th><th>Stato</th><th>Ultimo aggiornamento</th><th>Riferimento</th></tr></thead><tbody>${rows}</tbody></table>`;
 }

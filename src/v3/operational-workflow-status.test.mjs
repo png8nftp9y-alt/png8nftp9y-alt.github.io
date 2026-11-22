@@ -8,5 +8,15 @@ test('all catalog workflows seed once; current success supersedes retained failu
  calls.length=0;await collectWorkflowStatus({catalog,previous:result,repo:'x/y',now,fetcher:get});assert.equal(calls.length,1);
 });
 test('one failed request remains explicit and cannot become a false green; every core is individually checked',async()=>{
- const calls=[];const result=await collectWorkflowStatus({catalog:[{workflow:'courtwatch-cloudflare-app-api.yml',label:'D1'},{workflow:'missing.yml',label:'Missing'}],repo:'x/y',now,fetcher:async url=>{calls.push(url);return new Response('',{status:503})}});assert.equal(calls.length,3);assert.equal(result.runsError,'GitHub HTTP 503');assert.equal(result.items.find(x=>x.label==='D1 generale').status,'yellow');assert.equal(result.workflowStates[1].latestRun,null);assert.match(result.workflowStates[1].error,/503/);
+ const calls=[];const result=await collectWorkflowStatus({catalog:[{workflow:'courtwatch-cloudflare-app-api.yml',label:'D1'},{workflow:'missing.yml',label:'Missing'}],repo:'x/y',now,fetcher:async url=>{calls.push(url);return new Response('',{status:503})}});assert.equal(calls.length,4);assert.equal(result.runsError,'GitHub HTTP 503');assert.equal(result.items.find(x=>x.label==='D1 generale').status,'yellow');assert.equal(result.workflowStates[1].latestRun,null);assert.match(result.workflowStates[1].error,/503/);
+});
+
+test('only a currently verified pause excludes a failed workflow from overall status',async()=>{
+ const workflow='courtwatch-v3-itf-safety-120d.yml';
+ for(const state of ['disabled_manually','disabled_inactivity','active','unavailable']){
+  const result=await collectWorkflowStatus({catalog:[{workflow,label:'120d'}],repo:'x/y',now,fetcher:async url=>url.includes('/runs?')?Response.json({workflow_runs:[run(9,workflow,'failure')]}):state==='unavailable'?new Response('',{status:503}):Response.json({state})});
+  const item=result.items.find(x=>x.workflow===workflow),paused=state.startsWith('disabled_');
+  assert.equal(item.critical,!paused);assert.equal(item.paused,paused);assert.equal(item.completedRun.id,9);
+  assert.equal(item.status,state==='unavailable'?'yellow':'red');
+ }
 });
