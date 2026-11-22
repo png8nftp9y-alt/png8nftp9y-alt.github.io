@@ -2518,7 +2518,7 @@ function renderAgenda() {
   $("agendaGoToday").hidden = key === iso(new Date());
   if (!$("weeklyAgendaPanel").hidden) renderWeeklyAgenda();
   if ($("agendaMode")) $("agendaMode").value = state.agendaMode;
-  const groups = new Map();
+  const tournamentGroups = new Map();
   for (const m of items) {
     const tournament = resolveTournament(m),
       identity = [
@@ -2528,7 +2528,7 @@ function renderAgenda() {
           m.tournamentName ||
           tournament?.name,
       ].join("|"),
-      group = groups.get(identity) || {
+      group = tournamentGroups.get(identity) || {
         tournament,
         matches: [],
         firstOrder: agendaEstimatedMinutes(m),
@@ -2536,15 +2536,15 @@ function renderAgenda() {
     group.matches.push(m);
     group.matches.sort(agendaChronologicalCompare);
     group.firstOrder = Math.min(group.firstOrder, agendaEstimatedMinutes(m));
-    groups.set(identity, group);
+    tournamentGroups.set(identity, group);
   }
   const categoryPlans = new Map();
-  for (const { tournament, matches } of groups.values()) {
+  for (const { tournament, matches } of tournamentGroups.values()) {
     const plan = agendaTournamentCategoryPlan(matches, tournament);
     for (const match of matches) categoryPlans.set(match, plan);
   }
   const sourceRank = { itf: 0, "tennis-europe": 1, fitp: 2 };
-  const tournamentBlocks = [...groups.values()].sort(
+  const tournamentBlocks = [...tournamentGroups.values()].sort(
     (a, b) =>
       (sourceRank[circuit(a.matches[0])] ?? 9) -
         (sourceRank[circuit(b.matches[0])] ?? 9) ||

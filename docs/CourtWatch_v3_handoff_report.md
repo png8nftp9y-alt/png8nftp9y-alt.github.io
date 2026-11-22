@@ -11356,3 +11356,9 @@ Admin pause/resume controls moved into the existing Workflow e watchdog table in
 
 ### 2026-11-22 — Workflow pause form origin
 Diagnostic Admin forms inherited no-referrer, which can produce an opaque null Origin for a native POST and fail the strict same-origin guard before any workflow mutation. Serve Diagnostica with same-origin referrer policy as already done for Identity. Keep authentication and exact Origin validation unchanged; no workflow is paused/resumed or dispatched by this change. Validation: targeted Admin automation tests, including null/foreign origin rejection. Actual browser and deployment verification remain pending.
+
+
+## 2026-11-22 — Tornei manuali: correzione esecuzione agenda
+- Commit 482ba437: mobile 45034088768 e Others 45034088719 falliscono con 0 partite invece di 3; Worker 45034088872 e D1 45034088756 si fermano nel Functional Shield su navigazione agenda, con deploy/migrazione saltati. Non è lo stesso errore CPU dei run precedenti.
+- Causa riprodotta eseguendo il vero renderAgenda: ReferenceError Cannot access 'groups' before initialization. La mappa locale groups nasconde la funzione globale groups(false) introdotta per riusare l'indice tornei. Rinominata soltanto la mappa locale in tournamentGroups, conservando una sola costruzione dell'indice e tutti i dati, filtri, eventi e risultati. Nessun test di sicurezza allentato.
+- Regressione manual-agenda-render.test.mjs: quattro casi sul vero codice falliscono prima della correzione e passano dopo (viste per torneo/cronologica, con/senza evento manuale); verificati tre match, selezione di un solo giocatore, deselezione totale e singola chiamata groups. Aggiunta alla suite CI obbligatoria. Controlli locali mirati, cache JS aggiornata; run browser GitHub ancora necessari per certificare il deploy.
