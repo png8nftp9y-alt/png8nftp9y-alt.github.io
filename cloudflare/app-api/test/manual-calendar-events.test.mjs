@@ -148,3 +148,36 @@ test('municipality survives save, projection and participant edit without replac
   const edited=await(await call(req('PATCH',{id:first.event.id,expectedPlayerIds:[player],playerIds:[player]}))).json();assert.equal(edited.event.locationCity,'Palazzolo sull’Oglio');assert.equal(edited.event.location,location);
  }finally{d.close()}
 });
+
+test('full event editor updates name, place, coordinates, dates and players with the same ID; stale edits never overwrite',async()=>{
+ const d=fixture();try{
+  d.execute('INSERT INTO user_app_players VALUES(?,?,?)',[owner,'second','2026-11-21']);const call=r=>worker.fetch(r,{DB:d.db});
+  const {event}=await(await call(req('POST',input))).json(),body={id:event.id,expectedPlayerIds:event.playerIds,expectedEvent:event,name:'Raduno Under 10',location:'Via Boccaccio 3, Monza',locationCity:'Monza',locationLat:45.59,locationLon:9.27,startDate:'2026-12-04',endDate:'2026-12-05',playerIds:['second']};
+  const response=await call(req('PATCH',body));assert.equal(response.status,200);const updated=(await response.json()).event;assert.equal(updated.id,event.id);assert.equal(updated.name,body.name);assert.equal(updated.location,body.location);assert.equal(updated.locationLat,body.locationLat);assert.equal(updated.startDate,body.startDate);assert.deepEqual(updated.playerIds,['second']);
+  const before=d.writes();assert.equal((await call(req('PATCH',body))).status,409);assert.equal(d.writes(),before);
+  const retry={...body,expectedPlayerIds:updated.playerIds,expectedEvent:updated};assert.equal((await call(req('PATCH',retry))).status,200);assert.equal(d.writes(),before);
+  for(const patch of [{name:''},{endDate:'2026-12-01'},{locationLat:999}])assert.equal((await call(req('PATCH',{...retry,...patch}))).status,400);
+ }finally{d.close()}
+});
+test('event analysis persists per player, adds no match, survives metadata edits and deletes idempotently',async()=>{
+ const d=fixture();try{
+  const call=r=>worker.fetch(r,{DB:d.db}),{event}=await(await call(req('POST',input))).json(),body={id:event.id,expectedPlayerIds:event.playerIds,analysisPlayerId:player,analysis:'Nota del raduno',expectedAnalysis:''};
+  assert.equal((await call(req('PATCH',body))).status,200);let saved=(await calendarEvents(d.db,owner,'main'))[0];assert.equal(saved.playerAnalyses[player],'Nota del raduno');const rows=calendarEventTournaments([saved],new Set([player]));assert.equal(rows[0].eventAnalysis,'Nota del raduno');assert.equal(rows[0].matches,undefined);
+  const before=d.writes();assert.equal((await call(req('PATCH',{...body,expectedAnalysis:body.analysis}))).status,200);assert.equal(d.writes(),before);assert.equal((await call(req('PATCH',{...body,analysis:'Stale edit'}))).status,409);
+  assert.equal((await call(req('PATCH',{id:event.id,expectedPlayerIds:event.playerIds,name:'Titolo aggiornato',playerIds:event.playerIds}))).status,200);saved=(await calendarEvents(d.db,owner,'main'))[0];assert.equal(saved.playerAnalyses[player],body.analysis);
+  assert.equal((await call(req('PATCH',{...body,analysisPlayerId:'other'}))).status,403);
+  assert.equal((await call(req('PATCH',{...body,analysis:'',expectedAnalysis:body.analysis}))).status,200);saved=(await calendarEvents(d.db,owner,'main'))[0];assert.equal(saved.playerAnalyses,undefined);
+  const removed=d.writes();assert.equal((await call(req('PATCH',{...body,analysis:'',expectedAnalysis:''}))).status,200);assert.equal(d.writes(),removed);
+ }finally{d.close()}
+});
+
+test('a participant addition racing an analysis save cannot erase the saved note',async()=>{
+ const d=fixture();try{
+  d.execute('INSERT INTO user_app_players VALUES(?,?,?)',[owner,'second','2026-11-21']);const call=r=>worker.fetch(r,{DB:d.db});const {event}=await(await call(req('POST',input))).json();
+  let release,arrive;const blocked=new Promise(resolve=>{release=resolve}),atWrite=new Promise(resolve=>{arrive=resolve});
+  const db={...d.db,batch:async statements=>{arrive();await blocked;return d.db.batch(statements)}};
+  const adding=writeCalendarEvent(req('POST',{...input,playerIds:['second']}),db,owner,'main','user_app_players');await atWrite;
+  assert.equal((await call(req('PATCH',{id:event.id,expectedPlayerIds:[player],analysisPlayerId:player,analysis:'Nota concorrente',expectedAnalysis:''}))).status,200);release();await adding;
+  const saved=(await calendarEvents(d.db,owner,'main'))[0];assert.equal(saved.playerAnalyses[player],'Nota concorrente');assert.deepEqual(saved.playerIds,[player,'second'].sort());
+ }finally{d.close()}
+});

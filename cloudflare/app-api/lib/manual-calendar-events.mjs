@@ -9,7 +9,10 @@ export function validateCalendarEvent(input) {
  if(!name||!location||!validDate(startDate)||!validDate(endDate)||endDate<startDate||!colors.has(color)||!playerIds.length||playerIds.length>100||playerIds.some(id=>typeof id!=='string'||!id||id.length>160))throw Error('invalid_calendar_event');
  const coords=input?.locationLat===undefined&&input?.locationLon===undefined?{}:{locationLat:input.locationLat,locationLon:input.locationLon};
  if(Object.keys(coords).length&&(!Number.isFinite(coords.locationLat)||!Number.isFinite(coords.locationLon)||Math.abs(coords.locationLat)>90||Math.abs(coords.locationLon)>180))throw Error('invalid_calendar_event');
- return {name,location,startDate,endDate,color,playerIds:playerIds.sort(),...coords,...(text(input?.locationCity,120)?{locationCity:text(input.locationCity,120)}:{})};
+ const analyses=input?.playerAnalyses;
+ if(analyses!==undefined&&(!analyses||typeof analyses!=='object'||Array.isArray(analyses)||Object.keys(analyses).length>100||Object.entries(analyses).some(([id,value])=>!id||id.length>160||typeof value!=='string'||value.length>20000)))throw Error('invalid_calendar_event');
+ const playerAnalyses=Object.fromEntries(Object.entries(analyses||{}).filter(([,value])=>value.trim()).map(([id,value])=>[id,value.trim()]).sort(([a],[b])=>a.localeCompare(b)));
+ return {name,location,startDate,endDate,color,playerIds:playerIds.sort(),...coords,...(Object.keys(playerAnalyses).length?{playerAnalyses}:{}),...(text(input?.locationCity,120)?{locationCity:text(input.locationCity,120)}:{})};
 }
 async function rawCalendarEvents(db,userId,group) {
  // Release verification runs BEFORE migrations: inspect schema without a failed query.
@@ -31,6 +34,7 @@ export function associateCalendarEvents(events) {
   const key=calendarEventIdentity(event),current=grouped.get(key);
   if(!current){grouped.set(key,{...event,playerIds:[...event.playerIds]});continue;}
   if(!current.locationCity&&event.locationCity)current.locationCity=event.locationCity;
+  if(event.playerAnalyses||current.playerAnalyses)current.playerAnalyses={...event.playerAnalyses,...current.playerAnalyses};
   current.playerIds=[...new Set([...current.playerIds,...event.playerIds])].sort();
   if(current.locationLat===undefined&&event.locationLat!==undefined){current.locationLat=event.locationLat;current.locationLon=event.locationLon;}
  }
@@ -49,7 +53,7 @@ export function calendarEventTournaments(events,selectedIds) {
   id:event.id+'|'+playerId,competitionId:event.id,manualEventId:event.id,manualEvent:true,manual:true,
   name:event.name,location:event.location,...(event.locationCity?{locationCity:event.locationCity}:{}),...(Number.isFinite(event.locationLat)?{locationLat:event.locationLat,locationLon:event.locationLon}:{}),startDate:event.startDate,endDate:event.endDate,
   circuit:['fitp','tennis-europe','itf'].includes(event.color)?event.color:'manual',eventColor:event.color,
-  playerId,status:'manual',entryStatus:'manual',calendarListLabel:''
+  playerId,eventAnalysis:event.playerAnalyses?.[playerId]||'',status:'manual',entryStatus:'manual',calendarListLabel:''
  })));
 }
 export async function writeCalendarEvent(request,db,userId,group,membership) {
@@ -69,11 +73,25 @@ export async function writeCalendarEvent(request,db,userId,group,membership) {
   if(!target)return {status:404,error:'calendar_event_not_found'};
   const matching=all.filter(row=>calendarEventIdentity(row)===calendarEventIdentity(target)),previous=associateCalendarEvents(matching)[0];
   if(JSON.stringify([...new Set(body.expectedPlayerIds)].sort())!==JSON.stringify(previous.playerIds))return {status:409,error:'calendar_event_changed'};
-  let next;try{next=validateCalendarEvent({...previous,playerIds:body.playerIds})}catch{return {status:400,error:'invalid_calendar_event'}}
+  if(body.expectedEvent){try{if(JSON.stringify(validateCalendarEvent(body.expectedEvent))!==JSON.stringify(validateCalendarEvent(previous)))return {status:409,error:'calendar_event_changed'};}catch{return {status:400,error:'invalid_calendar_event'}}}
   const rows=await db.prepare(`SELECT courtwatch_id FROM ${membership} WHERE user_id=?`).bind(userId).all(),allowed=new Set((rows.results||[]).map(row=>row.courtwatch_id));
-  if(!next.playerIds.every(id=>allowed.has(id)))return {status:403,error:'player_not_in_group'};
+  let next;
+  if(body.analysisPlayerId!==undefined){
+   const id=body.analysisPlayerId;
+   if(!previous.playerIds.includes(id)||!allowed.has(id))return {status:403,error:'player_not_in_group'};
+   if(typeof body.analysis!=='string'||body.analysis.length>20000)return {status:400,error:'invalid_calendar_event'};
+   if(body.expectedAnalysis!==(previous.playerAnalyses?.[id]||''))return {status:409,error:'calendar_event_changed'};
+   const playerAnalyses={...previous.playerAnalyses,[id]:body.analysis};
+   try{next=validateCalendarEvent({...previous,playerAnalyses})}catch{return {status:400,error:'invalid_calendar_event'}}
+  } else {
+   const fields=Object.fromEntries(['name','location','startDate','endDate','locationCity','locationLat','locationLon'].filter(key=>Object.hasOwn(body,key)).map(key=>[key,body[key]]));
+   try{next=validateCalendarEvent({...previous,...fields,playerIds:body.playerIds??previous.playerIds})}catch{return {status:400,error:'invalid_calendar_event'}}
+   if(!next.playerIds.every(id=>allowed.has(id)))return {status:403,error:'player_not_in_group'};
+   if(next.location!==previous.location&&(!Number.isFinite(body.locationLat)||!Number.isFinite(body.locationLon)))return {status:400,error:'invalid_calendar_event'};
+   if(all.some(row=>!matching.some(old=>old.id===row.id)&&calendarEventIdentity(row)===calendarEventIdentity(next)))return {status:409,error:'calendar_event_exists'};
+  }
   const current=await stored(previous.id);
-  if(!current||JSON.stringify(validateCalendarEvent(JSON.parse(current.payload)).playerIds)!==JSON.stringify(matching.find(row=>row.id===previous.id).playerIds))return {status:409,error:'calendar_event_changed'};
+  if(!current||JSON.stringify(validateCalendarEvent(JSON.parse(current.payload)))!==JSON.stringify(validateCalendarEvent(matching.find(row=>row.id===previous.id))))return {status:409,error:'calendar_event_changed'};
   const payload=JSON.stringify(next),delta=plan([{id:previous.id,payload:current.payload}],[{id:previous.id,payload}]);
   const statements=[];
   if(delta.writes)statements.push(db.prepare('UPDATE user_calendar_events SET payload=? WHERE user_id=? AND player_group=? AND id=? AND payload=?').bind(payload,userId,group,previous.id,current.payload));
@@ -98,7 +116,7 @@ export async function writeCalendarEvent(request,db,userId,group,membership) {
  if(delta.inserts.length&&all.length>=500)return {status:409,error:'calendar_event_limit'};
  // Merge participants inside the atomic upsert too: concurrent submissions must
  // never overwrite each other's players, even if both read the earlier payload.
- const mergedPayload="json_set(excluded.payload,'$.playerIds',json((SELECT json_group_array(value) FROM (SELECT value FROM json_each(user_calendar_events.payload,'$.playerIds') UNION SELECT value FROM json_each(excluded.payload,'$.playerIds') ORDER BY value))))";
+ const mergedPayload="json_set(json_patch(user_calendar_events.payload,json_remove(excluded.payload,'$.playerAnalyses')),'$.playerIds',json((SELECT json_group_array(value) FROM (SELECT value FROM json_each(user_calendar_events.payload,'$.playerIds') UNION SELECT value FROM json_each(excluded.payload,'$.playerIds') ORDER BY value))))";
  const statements=[];
  if(delta.writes)statements.push(db.prepare(`INSERT INTO user_calendar_events(user_id,player_group,id,payload,created_at) VALUES(?,?,?,?,?) ON CONFLICT(user_id,player_group,id) DO UPDATE SET payload=${mergedPayload} WHERE payload<>${mergedPayload} AND json_array_length(${mergedPayload},'$.playerIds')<=100`).bind(userId,group,id,payload,new Date().toISOString()));
  for(const duplicate of matching.filter(row=>row.id!==id))statements.push(db.prepare("DELETE FROM user_calendar_events WHERE user_id=? AND player_group=? AND id=? AND NOT EXISTS (SELECT 1 FROM json_each(user_calendar_events.payload,'$.playerIds') old WHERE old.value NOT IN (SELECT value FROM json_each((SELECT payload FROM user_calendar_events WHERE user_id=? AND player_group=? AND id=?),'$.playerIds')))").bind(userId,group,duplicate.id,userId,group,id));

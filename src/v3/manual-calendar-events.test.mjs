@@ -9,7 +9,7 @@ function harness(){
  const nodes=new Map(),node=id=>{if(!nodes.has(id))nodes.set(id,{dataset:{},value:'',innerHTML:'',textContent:'',hidden:false,disabled:false,addEventListener(){},showModal(){this.open=true},close(){this.open=false},querySelectorAll(){return[]},focus(){},reset(){}});return nodes.get(id)};
  const values=new Map(Object.entries({...event,playerIds:event.playerIds}));const form=node('calendarEventForm');form.elements={name:{focus(){}},startDate:{value:''},endDate:{value:''}};
  let saved=0,renders=0,events=[],requests=[];
- const ctx={wireCalendarEventLocation(){},displayDate:x=>x,state:{data:{players:[{id:'p1',name:'Anna'},{id:'p2',name:'Luca'}],tournaments:[{id:'official',playerId:'p1'}]},month:new Date('2026-12-01')},PLAYER_GROUP:'main',$:node,esc:escape,iso:()=>event.startDate,PRIVATE_API:'/app/api',crypto:{randomUUID:()=> 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'},privateApiOptions:(options,group)=>({...options,group}),AbortSignal,FormData:class{get(k){return values.get(k)}getAll(k){return values.get(k)||[]}},saveCachedData:async()=>{saved++},renderIfDataChanged:()=>{renders++},fetch:async(url,options)=>{requests.push({url,options});if(options.method==='POST')events=[event];return {ok:true,json:async()=>({events})}}};
+ const ctx={wireCalendarEventLocation(){},calendarEventCity:t=>t.location,displayDate:x=>x,state:{data:{players:[{id:'p1',name:'Anna'},{id:'p2',name:'Luca'}],tournaments:[{id:'official',playerId:'p1'}]},month:new Date('2026-12-01')},PLAYER_GROUP:'main',$:node,esc:escape,iso:()=>event.startDate,PRIVATE_API:'/app/api',crypto:{randomUUID:()=> 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'},privateApiOptions:(options,group)=>({...options,group}),AbortSignal,FormData:class{get(k){return values.get(k)}getAll(k){return values.get(k)||[]}},saveCachedData:async()=>{saved++},renderIfDataChanged:()=>{renders++},fetch:async(url,options)=>{requests.push({url,options});if(options.method==='POST')events=[event];return {ok:true,json:async()=>({events})}}};
  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function wireCalendarEvents()'),source.indexOf('function wire()')),ctx);ctx.wireCalendarEvents();
  return{ctx,node,values,requests,counts:()=>({saved,renders})};
 }
@@ -30,13 +30,13 @@ test('invalid range, missing players and group switch never send writes',async()
 });
 test('daily agenda uses event dates, escapes names and links both players and tournament without claiming a played match',()=>{
  const tournament={...event,eventColor:event.color,manualEvent:true,people:[{playerId:'p1',playerName:'Anna <test>'},{playerId:'p2',playerName:'Luca'}]};
- const ctx={wireCalendarEventLocation(){},displayDate:x=>x,circuit:t=>t.circuit||'manual',state:{selected:new Set(['p1','p2'])},esc:escape,groups:()=>[tournament],overlap:(t,a,b)=>t.startDate<=b&&t.endDate>=a,tournamentKey:()=>event.id};vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function calendarEventType('),source.indexOf('function wireCalendarEvents(')),ctx);
+ const ctx={wireCalendarEventLocation(){},calendarEventCity:t=>t.location,displayDate:x=>x,circuit:t=>t.circuit||'manual',state:{selected:new Set(['p1','p2'])},esc:escape,groups:()=>[tournament],overlap:(t,a,b)=>t.startDate<=b&&t.endDate>=a,tournamentKey:()=>event.id};vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function calendarEventAnalysisButton('),source.indexOf('function wireCalendarEvents(')),ctx);
  const markup=ctx.manualCalendarAgendaHtml('2026-12-02');assert.match(markup,/data-open-tournament="manual-/);assert.match(markup,/data-open-player="p1"/);assert.match(markup,/data-open-player="p2"/);assert.match(markup,/ITF &lt;Scuola&gt;/);assert.match(markup,/Anna &lt;test&gt;/);assert.doesNotMatch(markup,/<Scuola>|6-0|Iscritto/);assert.equal(ctx.manualCalendarAgendaHtml('2026-12-04'),'');
 });
 
 test('daily manual events reuse the existing tournament index and preserve selected players',()=>{
- let calls=0;const t={...event,manualEvent:true,eventColor:event.color,people:[{playerId:'p1',playerName:'Anna'},{playerId:'p2',playerName:'Luca'}]},ctx={displayDate:x=>x,circuit:t=>t.circuit||'manual',state:{selected:new Set(['p1'])},esc:escape,groups:()=>{calls++;return[t]},overlap:()=>true,tournamentKey:()=>event.id};
- vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function calendarEventType('),source.indexOf('function wireCalendarEvents(')),ctx);
+ let calls=0;const t={...event,manualEvent:true,eventColor:event.color,people:[{playerId:'p1',playerName:'Anna'},{playerId:'p2',playerName:'Luca'}]},ctx={calendarEventCity:t=>t.location,displayDate:x=>x,circuit:t=>t.circuit||'manual',state:{selected:new Set(['p1'])},esc:escape,groups:()=>{calls++;return[t]},overlap:()=>true,tournamentKey:()=>event.id};
+ vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function calendarEventAnalysisButton('),source.indexOf('function wireCalendarEvents(')),ctx);
  const html=ctx.manualCalendarAgendaHtml(event.startDate,[t]);assert.equal(calls,0);assert.match(html,/Anna/);assert.doesNotMatch(html,/Luca/);ctx.state.selected.clear();assert.equal(ctx.manualCalendarAgendaHtml(event.startDate,[t]),'');
  const render=source.slice(source.indexOf('function renderAgenda()'),source.indexOf('function tournamentKey('));
  assert.match(render,/createMatchTournamentResolver\(agendaTournaments\)/);assert.match(render,/manualCalendarAgendaHtml\(key, agendaTournaments\)/);
@@ -52,7 +52,7 @@ test('one-day save sends only one date value and selected coordinates; unselecte
  const body=JSON.parse(x.requests[0].options.body);assert.equal(body.endDate,body.startDate);assert.equal(body.locationLat,45.5918465);assert.match(body.location,/Boccaccio/);
 });
 test('remove event updates all projections only after successful deletion',async()=>{
- for(const ok of [true,false]){const x=harness();vm.runInContext(source.slice(source.indexOf('function calendarEventType('),source.indexOf('function wireCalendarEventLocation(')),x.ctx);x.ctx.location={hash:'#tournament/test'};
+ for(const ok of [true,false]){const x=harness();vm.runInContext(source.slice(source.indexOf('function calendarEventAnalysisButton('),source.indexOf('function wireCalendarEventLocation(')),x.ctx);x.ctx.location={hash:'#tournament/test'};
  x.ctx.state.data.tournaments.push({manualEvent:true,manualEventId:'mine'},{manualEvent:true,manualEventId:'other'});x.ctx.fetch=async()=>({ok});await x.ctx.removeCalendarEventFromPage({manualEventId:'mine'});
  assert.equal(x.ctx.state.data.tournaments.some(t=>t.manualEventId==='mine'),!ok);assert.ok(x.ctx.state.data.tournaments.some(t=>t.manualEventId==='other'));assert.equal(x.ctx.location.hash,ok?'calendar':'#tournament/test');}
 });
@@ -71,7 +71,7 @@ test('actual tournament page: federal camp has no draws, one date, real map and 
   Object.assign(x.ctx,{groups:()=>[t],tournamentKey:()=>event.id,tournamentPageKey:event.id,circuit:()=> 'manual',openTournamentPlayerKeys:new Set(),saveUiState(){},tournamentOfficialUrl:()=>'',tournamentAcceptanceUrl:()=>'',tournamentPlace:()=>t.location,tournamentMapsUrl:()=>'',tournamentDrawLinks:()=>'',tournamentSurfaceLabel:()=>'',bindParticipantNavigation(){},location:{hash:''}});
   for(const node of [x.node('removeProfilePlayer')])node.setAttribute=()=>{};for(const id of ['homeView','profileView'])x.node(id).classList={add(){},remove(){}};
   x.node('profileContent').insertAdjacentHTML=function(_,markup){this.innerHTML+=markup};
-  vm.runInContext(source.slice(source.indexOf('function calendarEventType('),source.indexOf('function wireCalendarEventLocation('))+source.slice(source.indexOf('function renderTournament(key)'),source.indexOf('const renderProfileWithoutStats')),x.ctx);
+  vm.runInContext(source.slice(source.indexOf('function calendarEventAnalysisButton('),source.indexOf('function wireCalendarEventLocation('))+source.slice(source.indexOf('function renderTournament(key)'),source.indexOf('const renderProfileWithoutStats')),x.ctx);
   x.ctx.renderTournament(event.id);const markup=x.node('profileContent').innerHTML;
   assert.equal(markup.includes('Tabelloni:'),color!=='purple');assert.equal(x.node('removeProfilePlayer').textContent,'Rimuovi evento');assert.equal(x.node('editCalendarEventParticipants').hidden,false);assert.match(markup,/query=45.59,9.27/);assert.equal((markup.match(/2026-12-01/g)||[]).length,1);assert.doesNotMatch(markup,/Inserito manualmente|Evento manuale/);
  }
@@ -91,8 +91,8 @@ test('event controls share player-removal toolbar and agenda uses both standard 
  assert.match(toolbar,/class="profileNavActions"/);assert.ok(toolbar.indexOf('id="removeProfilePlayer"')<toolbar.indexOf('id="editCalendarEventParticipants"'));
  assert.doesNotMatch(source,/calendarEventDeleteSection/);
  const t={...event,circuit:'manual',eventColor:'purple',manualEvent:true,people:[{playerId:'p1',playerName:'Anna'},{playerId:'p2',playerName:'Luca'}]},x=harness();
- Object.assign(x.ctx,{circuit:t=>t.circuit,tournamentKey:()=>event.id,overlap:()=>true});x.ctx.state.selected=new Set(['p1','p2']);vm.runInContext(source.slice(source.indexOf('function calendarEventType('),source.indexOf('function wireCalendarEventLocation(')),x.ctx);
- const rendered=x.ctx.manualCalendarAgendaHtml(event.startDate,[t]);assert.equal((rendered.match(/class="agendaWhen"/g)||[]).length,2);assert.equal((rendered.match(/class="agendaMatchBody"/g)||[]).length,2);assert.equal((rendered.match(/class="agendaMatchRow matches-1"/g)||[]).length,2);
+ Object.assign(x.ctx,{circuit:t=>t.circuit,tournamentKey:()=>event.id,overlap:()=>true});x.ctx.state.selected=new Set(['p1','p2']);vm.runInContext(source.slice(source.indexOf('function calendarEventAnalysisButton('),source.indexOf('function wireCalendarEventLocation(')),x.ctx);
+ const rendered=x.ctx.manualCalendarAgendaHtml(event.startDate,[t]);assert.equal((rendered.match(/class="agendaWhen"/g)||[]).length,1);assert.equal((rendered.match(/class="agendaMatchBody"/g)||[]).length,1);assert.equal((rendered.match(/class="agendaMatchRow matches-1"/g)||[]).length,1);
  const css=readFileSync(new URL('../../v3.css',import.meta.url),'utf8');assert.doesNotMatch(css,/\.agendaTournamentBlock\[data-event-color\].*\.agendaTournamentHead/);assert.doesNotMatch(css,/\.profileTournament\[data-event-color\]:not\([^)]*\) \.profileTournamentHead/);
 });
 
@@ -112,5 +112,42 @@ test('real calendar shows event name, municipality and all players while retaini
   const nodes={},node=id=>nodes[id]??={},ctx={state:{month:new Date('2026-12-01T12:00:00')},$:node,document:{querySelectorAll:()=>[]},circuit:t=>t.circuit,readableText:v=>String(v||''),fitpSummerCenterPlace:()=>'',cityCountry:v=>v,monthFmt:()=> 'dicembre',monday:d=>{const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));return x},add:(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x},iso:d=>d.toISOString().slice(0,10),fmt:()=>'',groups:()=>[{...t,...(structured?{locationCity:'Palazzolo sull’Oglio'}:{})}],overlap:(t,a,b)=>t.startDate<=b&&t.endDate>=a,tournamentDisplayName:t=>t.name,tournamentKey:()=> 'test',esc:escape};
   vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function calendarEventCity('),source.indexOf('function tennisEuropeVenueLocation('))+source.slice(source.indexOf('function renderCalendar()'),source.indexOf('function syncPlayersColumnHeight()')),ctx);ctx.renderCalendar();
   const markup=node('calendar').innerHTML;assert.match(markup,/Raduno Under 10/);assert.match(markup,/Palazzolo sull’Oglio/);assert.match(markup,/Anna/);assert.match(markup,/Luca/);assert.doesNotMatch(markup,/Via Milano|25036|Centro sportivo|Lombardia|Italia/);assert.equal(t.location,location);
+ }
+});
+
+test('agenda camps show municipality, one participant line and the uppercase federal badge',()=>{
+ const x=harness(),t={...event,name:'Raduno Under 10',location:'Via Milano 12, 25036 Palazzolo sull’Oglio, Lombardia, Italia',eventColor:'purple',manualEvent:true,people:[{playerId:'p1',playerName:'Anna'},{playerId:'p2',playerName:'Luca'}]};
+ Object.assign(x.ctx,{readableText:v=>v,circuit:()=> 'manual',tournamentKey:()=>event.id,overlap:()=>true});x.ctx.state.selected=new Set(['p1','p2']);
+ vm.runInContext(source.slice(source.indexOf('function calendarEventCity('),source.indexOf('function tournamentLocationLabel('))+source.slice(source.indexOf('function calendarEventAnalysisButton('),source.indexOf('async function openCalendarParticipants(')),x.ctx);
+ const markup=x.ctx.manualCalendarAgendaHtml(event.startDate,[t]);assert.match(markup,/Raduno Under 10/);assert.match(markup,/Palazzolo sull’Oglio/);assert.doesNotMatch(markup,/Via Milano|25036|Lombardia|Italia/);assert.equal((markup.match(/class="agendaTitle calendarEventParticipantLine"/g)||[]).length,1);assert.match(markup,/RADUNO FEDERALE/);
+});
+test('actual player profile displays event analysis; camp headers never receive match statistics',()=>{
+ const x=harness(),camp={...event,playerId:'p1',competitionId:event.id,manualEventId:event.id,manualEvent:true,eventColor:'purple',eventAnalysis:'Nota'};
+ x.ctx.state.data.tournaments=[camp];x.ctx.state.data.matches=[];
+ Object.assign(x.ctx,{location:{hash:''},activeOpponentRouteKey:'',playerTournamentEligible:()=>true,circuit:()=> 'manual',tournamentKey:()=>event.id,fitpSummerCenterPlace:()=>'',agendaVenueLocation:()=> 'Palazzolo sull’Oglio',tournamentSurfaceLabel:()=>'',effectiveAcceptanceLabel:()=>'',initials:()=>'',readablePerson:x=>x,playerCircuitLinksHtml:()=>'',personalPlayerAffiliationHtml:()=>'',playerBirthLabel:()=>'',playerRankingSummary:()=>'',loadCurrentPlayerRanking(){},bindParticipantNavigation(){}});
+ for(const id of ['homeView','profileView'])x.node(id).classList={add(){},remove(){}};
+ vm.runInContext(source.slice(source.indexOf('function calendarEventAnalysisButton('),source.indexOf('async function openCalendarParticipants('))+source.slice(source.indexOf('function renderProfile(id)'),source.indexOf('function matchHistoryRowHtml(')),x.ctx);x.ctx.renderProfile('p1');
+ const markup=x.node('profileContent').innerHTML;assert.match(markup,/data-federal-camp="true"/);assert.match(markup,/data-calendar-analysis-player="p1"/);assert.match(markup,/hasAnalysis/);assert.doesNotMatch(markup,/data-match-analysis/);
+ let stats=0;const body={hidden:false},head={insertAdjacentHTML(){stats++}},section={dataset:{federalCamp:'true'},querySelectorAll:()=>[],querySelector:q=>q==='.profileTournamentMatches'?body:head};
+ x.ctx.list={querySelectorAll:()=>[section]};x.ctx.openProfileTournamentKeys=new Set();
+ const start=source.indexOf('  for (const section of list?.querySelectorAll(".profileTournament") || []) {',source.indexOf('renderProfile = function (id)'));
+ const end=source.indexOf('  const circuitSelect',start);vm.runInContext(source.slice(start,end),x.ctx);assert.equal(stats,0);assert.equal(body.hidden,true);
+});
+test('full pencil editor sends updated event details and preserves optimistic version',async()=>{
+ const x=harness(),existing={...event,playerIds:['p1']};x.ctx.state.data.tournaments.push({manualEvent:true,manualEventId:event.id,playerId:'p1'});let saved;
+ x.ctx.fetch=async(url,options)=>({ok:true,json:async()=>{if(options.method==='PATCH'){saved=JSON.parse(options.body);return{event:{...existing,...saved}}}return{events:[existing]}}});
+ vm.runInContext(source.slice(source.indexOf('async function openCalendarParticipants('),source.indexOf('function wireCalendarEventLocation(')),x.ctx);await x.ctx.openCalendarParticipants({manualEventId:event.id});
+ x.node('calendarEditName').value='Raduno nuovo';x.node('calendarEditStart').value='2026-12-05';x.node('calendarEditEnd').value='2026-12-06';const place=x.node('calendarEditLocation');place.value='Monza, Via Boccaccio 3';place.dataset={lat:'45.59',lon:'9.27',city:'Monza'};
+ await x.node('calendarParticipantsForm').onsubmit({preventDefault(){}});assert.equal(saved.name,'Raduno nuovo');assert.equal(saved.locationCity,'Monza');assert.equal(saved.startDate,'2026-12-05');assert.equal(saved.endDate,'2026-12-06');assert.equal(saved.expectedEvent.name,event.name);
+});
+
+test('event analysis UI saves and deletes notes through calendar events without creating or editing matches',async()=>{
+ for(const action of ['save','delete']){
+  const x=harness(),controls={},editor={hidden:true,querySelector:q=>controls[q]??={},querySelectorAll:()=>[]};let patch;
+  const existing={...event,playerIds:['p1'],playerAnalyses:{p1:'Nota precedente'}};x.ctx.state.data.matches=[{id:'official-match'}];x.ctx.state.data.tournaments.push({manualEvent:true,manualEventId:event.id,playerId:'p1'});
+  Object.assign(x.ctx,{analysisEditor:()=>editor,editMatchAnalysis:async(initial,canDelete,title)=>{assert.equal(initial,'Nota precedente');assert.equal(title,'Analisi del raduno');return{action,analysis:'Nota aggiornata'}},alert:message=>assert.fail(message)});
+  x.ctx.fetch=async(url,options)=>{assert.ok(url.endsWith('/calendar-events'));if(options.method==='PATCH'){patch=JSON.parse(options.body);return{ok:true,json:async()=>({event:{...existing,playerAnalyses:action==='delete'?{}:{p1:'Nota aggiornata'}}})}}return{ok:true,json:async()=>({events:[existing]})}};
+  vm.runInContext(source.slice(source.indexOf('async function openCalendarEventAnalysis('),source.indexOf('function calendarEventAnalysisButton(')),x.ctx);await x.ctx.openCalendarEventAnalysis(event.id,'p1');
+  assert.equal(patch.analysisPlayerId,'p1');assert.equal(patch.expectedAnalysis,'Nota precedente');assert.equal(patch.analysis,action==='delete'?'':'Nota aggiornata');assert.equal(x.ctx.state.data.matches.length,1);assert.equal(x.ctx.state.data.matches[0].id,'official-match');assert.equal(x.ctx.state.data.tournaments.find(t=>t.manualEvent).eventAnalysis,action==='delete'?'':'Nota aggiornata');
  }
 });

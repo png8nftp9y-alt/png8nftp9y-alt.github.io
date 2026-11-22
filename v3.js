@@ -273,7 +273,7 @@ function saveRefreshView() {
     const html = clone.innerHTML;
     if (html.length > 1500000) {sessionStorage.removeItem(key); return;}
     sessionStorage.setItem(key, JSON.stringify({
-      version: "20261122-event-city-template", route: location.pathname + location.search + location.hash,
+      version: "20261122-full-event-template", route: location.pathname + location.search + location.hash,
       viewId: view.id, html, y: Math.max(0, scrollY || 0),
       styles: [...document.head.querySelectorAll("style[id]")].map(style => ({id: style.id, css: style.textContent})),
     }));
@@ -1750,7 +1750,7 @@ function analysisEditor() {
   );
   return $("matchAnalysisEditor");
 }
-function editMatchAnalysis(initial, canDelete) {
+function editMatchAnalysis(initial, canDelete, title = 'Analisi della partita') {
   const editor = analysisEditor(),
     text = editor.querySelector(".analysisEditorText"),
     error = editor.querySelector(".analysisEditorError"),
@@ -1758,6 +1758,7 @@ function editMatchAnalysis(initial, canDelete) {
     remove = editor.querySelector(".analysisEditorDelete"),
     cancel = editor.querySelector(".analysisEditorCancel"),
     close = editor.querySelector(".analysisEditorClose");
+  editor.querySelector('#matchAnalysisTitle').textContent=title;
   text.value = initial || "";
   error.hidden = true;
   error.textContent = "";
@@ -4020,7 +4021,7 @@ function renderProfile(id) {
   const ts = (state.data.tournaments || []).filter(
       (t) => t.playerId === id && playerTournamentEligible(t),
     ),
-    ms = (state.data.matches || []).filter((m) => m.playerId === id),
+    ms = (state.data.matches || []).filter((m) => m.playerId === id && !m.manualEvent),
     keyOf = (x) =>
       circuit(x) +
       "|" +
@@ -4069,7 +4070,7 @@ function renderProfile(id) {
         summerCenter = fitpSummerCenterPlace(t),
         place = summerCenter || agendaVenueLocation(t),
         courtConditions = tournamentSurfaceLabel(t);
-      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}" data-event-color="${esc(t.eventColor || '')}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(eventDateLabel(t))}${effectiveAcceptanceLabel(t) ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(effectiveAcceptanceLabel(t))}` : ""}</p></div><div class="profileTournamentMatches">${
+      return `<section class="profileTournament" data-profile-tournament="${esc(keyOf(t))}" data-federal-camp="${t.manualEvent&&t.eventColor==='purple'?'true':'false'}" data-event-color="${esc(t.eventColor || '')}"><div class="profileTournamentHead">${tKey ? `<h3><i class="sourceDot ${circuit(t)}"></i><button data-open-tournament="${esc(tKey)}">${esc(t.name || "Torneo")}</button></h3>` : `<h3><i class="sourceDot ${circuit(t)}"></i>${esc(t.name || "Torneo")}</h3>`}<p>${esc([place, courtConditions].filter(Boolean).join(" · "))} · ${esc(eventDateLabel(t))}${effectiveAcceptanceLabel(t) ? ` · ${circuit(t) === "tennis-europe" ? "Acceptance list: " : ""}${esc(effectiveAcceptanceLabel(t))}` : ""}</p>${t.manualEvent&&t.eventColor==='purple'?`<div class="calendarEventProfileActions">${calendarEventAnalysisButton(t,id)}</div>`:''}</div><div class="profileTournamentMatches">${
         matches.length
           ? matchHistorySectionsHtml(matches)
           : '<div class="empty">Nessuna partita pubblicata.</div>'
@@ -4485,7 +4486,7 @@ renderProfile = function (id) {
     profileFilterPlayerId = id;
   }
   renderProfileWithoutStats(id);
-  const matches = (state.data.matches || []).filter((m) => m.playerId === id),
+  const matches = (state.data.matches || []).filter((m) => m.playerId === id && !m.manualEvent),
     hero = $("profileContent").querySelector(".profileHero"),
     list = $("profileContent").querySelector(".profileTournamentList"),
     head = list?.querySelector(".cardHead");
@@ -4511,6 +4512,7 @@ renderProfile = function (id) {
       body = section.querySelector(".profileTournamentMatches"),
       sectionHead = section.querySelector(".profileTournamentHead"),
       sectionKey = section.dataset.profileTournament || "";
+    if(section.dataset.federalCamp==='true'){if(body)body.hidden=true;continue;}
     if (body) body.hidden = !openProfileTournamentKeys.has(sectionKey);
     if (sectionHead)
       sectionHead.insertAdjacentHTML(
@@ -5026,6 +5028,38 @@ function updatePlayerGroupControls() {
     button.onclick = switchPlayerGroup;
   });
 }
+async function openCalendarEventAnalysis(id, playerId) {
+  const group=PLAYER_GROUP,editor=analysisEditor(),text=editor.querySelector('.analysisEditorText'),error=editor.querySelector('.analysisEditorError');
+  editor.querySelector('#matchAnalysisTitle').textContent='Analisi del raduno';editor.hidden=false;text.disabled=true;text.value='Caricamento…';error.hidden=true;
+  for(const button of editor.querySelectorAll('.analysisEditorActions button'))button.disabled=true;
+  editor.querySelector('.analysisEditorClose').disabled=false;editor.querySelector('.analysisEditorClose').onclick=()=>{editor.hidden=true;};
+  let event;
+  try {
+    const response=await fetch(PRIVATE_API+'/calendar-events',privateApiOptions({cache:'no-store',credentials:'same-origin',signal:AbortSignal.timeout(20000)},group));
+    if(!response.ok)throw Error('Analisi temporaneamente non disponibile.');
+    const {events}=await response.json();if(group!==PLAYER_GROUP||editor.hidden)return;
+    event=events.find(row=>row.id===id&&row.playerIds.includes(playerId));if(!event)throw Error('Raduno non più disponibile per questo giocatore.');
+  } catch(e){text.value='';error.textContent=e.message;error.hidden=false;return;}
+  text.disabled=false;for(const button of editor.querySelectorAll('.analysisEditorActions button'))button.disabled=false;
+  const initial=event.playerAnalyses?.[playerId]||'';
+  let draft=initial;
+  while(group===PLAYER_GROUP){
+    const edit=await editMatchAnalysis(draft,Boolean(initial),'Analisi del raduno');if(!edit)return;
+    draft=edit.action==='delete'?'':edit.analysis;
+    try {
+      const response=await fetch(PRIVATE_API+'/calendar-events',privateApiOptions({method:'PATCH',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,analysisPlayerId:playerId,analysis:draft,expectedAnalysis:initial,expectedPlayerIds:event.playerIds}),signal:AbortSignal.timeout(20000)},group));
+      if(!response.ok)throw Error(response.status===409?'L’analisi è cambiata su un altro dispositivo. Riapri il raduno.':'Salvataggio non riuscito. Riprova.');
+      const {event:updated}=await response.json();if(group!==PLAYER_GROUP)return;
+      state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
+      state.data={...state.data,tournaments:(state.data.tournaments||[]).map(row=>row.manualEvent&&(row.manualEventId||row.competitionId)===id?{...row,eventAnalysis:updated.playerAnalyses?.[row.playerId]||''}:row)};
+      await saveCachedData(state.data);renderIfDataChanged(false);return;
+    } catch(e){alert(e.message);}
+  }
+}
+function calendarEventAnalysisButton(t, playerId) {
+  const label=t.eventAnalysis?'Modifica analisi raduno':'Inserisci analisi raduno';
+  return `<button type="button" class="matchAnalysisButton${t.eventAnalysis?' hasAnalysis':''}" data-calendar-analysis="${esc(t.manualEventId||t.competitionId)}" data-calendar-analysis-player="${esc(playerId)}" aria-label="${label}" title="${label}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5V22l2.5-1.5H19a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v13a1.5 1.5 0 0 0 1 1.5ZM7 8h10M7 12h10M7 16h6"/></svg></button>`;
+}
 function calendarEventType(t) {
   return ({purple:'Raduno federale',red:'Gara a squadre',gray:'FIT Junior Program',fitp:'FITP','tennis-europe':'Tennis Europe',itf:'ITF'})[t.eventColor] || '';
 }
@@ -5067,7 +5101,7 @@ function manualCalendarAgendaHtml(day, tournaments = groups()) {
   return tournaments.filter(t => t.manualEvent && overlap(t, day, day)).map(t => {
     const people=t.people.filter(p => state.selected.has(p.playerId));
     if(!people.length)return '';
-    return `<section class="agendaTournamentBlock ${esc(circuit(t))}"><header class="agendaTournamentHead"><div><h3><button data-open-tournament="${esc(tournamentKey(t))}">${esc(t.name)}</button><small>${esc(t.location)}</small></h3></div><div class="agendaTournamentBadges"><span class="type" data-event-color="${esc(t.eventColor)}">${esc(calendarEventType(t))}</span></div></header><div class="agendaTournamentMatches">${people.map(p=>`<div class="agendaMatchRow matches-1"><article class="agendaItem calendarEventParticipants"><div class="agendaWhen"><div class="agendaWhenDetails"><time>${esc(eventDateLabel(t))}</time></div></div><div class="agendaMatchBody"><div class="agendaTitle"><button type="button" class="inlinePlayerLink" data-open-player="${esc(p.playerId)}">${esc(p.playerName)}</button></div></div></article></div>`).join('')}</div></section>`;
+    return `<section class="agendaTournamentBlock ${esc(circuit(t))}"><header class="agendaTournamentHead"><div><h3><button data-open-tournament="${esc(tournamentKey(t))}">${esc(t.name)}</button><small>${esc(calendarEventCity(t))}</small></h3></div><div class="agendaTournamentBadges"><span class="type ${t.eventColor==='purple'?'federalCampBadge':''}">${t.eventColor==='purple'?'RADUNO FEDERALE':esc(calendarEventType(t))}</span></div></header><div class="agendaTournamentMatches"><div class="agendaMatchRow matches-1"><article class="agendaItem calendarEventParticipants"><div class="agendaWhen"><div class="agendaWhenDetails"><time>${esc(eventDateLabel(t))}</time></div></div><div class="agendaMatchBody"><div class="agendaTitle calendarEventParticipantLine">${people.map(p=>`<button type="button" class="inlinePlayerLink" data-open-player="${esc(p.playerId)}">${esc(p.playerName)}</button>`).join('<span class="calendarParticipantSeparator">·</span>')}</div></div></article></div></div></section>`;
   }).join('');
 }
 async function openCalendarParticipants(t) {
@@ -5084,6 +5118,9 @@ async function openCalendarParticipants(t) {
     const {events}=await response.json();if(group!==PLAYER_GROUP||!dialog.open||dialog.courtWatchEditToken!==token)return;
     const event=events.find(e=>e.id===(t.manualEventId||t.competitionId));
     if(!event)throw Error('Evento non più disponibile. Aggiorna la pagina.');
+    $('calendarEditName').value=event.name;$('calendarEditStart').value=event.startDate;$('calendarEditEnd').value=event.endDate===event.startDate?'':event.endDate;
+    const place=$('calendarEditLocation');place.value=event.location;place.dataset.lat=event.locationLat===undefined?'':String(event.locationLat);place.dataset.lon=event.locationLon===undefined?'':String(event.locationLon);place.dataset.city=event.locationCity||'';
+    $('calendarEditLocationResults').innerHTML='';$('calendarEditLocationStatus').textContent='';wireCalendarEventLocation(dialog,'calendarEdit');
     const selected=new Set(event.playerIds),players=(state.data.players||[]).filter(p=>!p.membershipPending).sort((a,b)=>a.name.localeCompare(b.name,'it'));
     list.innerHTML=players.map(p=>`<label data-player-search="${esc(p.name.toLocaleLowerCase('it'))}"><input type="checkbox" name="playerIds" value="${esc(p.id)}"${selected.has(p.id)?' checked':''}>${esc(p.name)}</label>`).join('');
     search.oninput=()=>{const q=search.value.trim().toLocaleLowerCase('it');for(const label of list.querySelectorAll('label'))label.hidden=!label.dataset.playerSearch.includes(q);};
@@ -5093,22 +5130,27 @@ async function openCalendarParticipants(t) {
       const playerIds=new FormData(form).getAll('playerIds');
       if(!playerIds.length){error.textContent='Seleziona almeno un giocatore.';return;}
       if(group!==PLAYER_GROUP){error.textContent='La sezione è cambiata. Riapri la modifica.';return;}
+      const fields={name:$('calendarEditName').value.trim(),startDate:$('calendarEditStart').value,endDate:$('calendarEditEnd').value||$('calendarEditStart').value,location:place.value,locationCity:place.dataset.city||''};
+      if(!fields.name||!fields.startDate||fields.endDate<fields.startDate){error.textContent='Controlla nome e date dell’evento.';return;}
+      if(place.value!==event.location&&(!place.dataset.lat||!place.dataset.lon)){error.textContent='Scegli il nuovo indirizzo dai risultati della ricerca.';return;}
+      if(place.dataset.lat&&place.dataset.lon){fields.locationLat=Number(place.dataset.lat);fields.locationLon=Number(place.dataset.lon);}
+      const routeHash=typeof location==='undefined'?'':location.hash;
       busy=true;save.disabled=true;
       try {
-        const response=await fetch(PRIVATE_API+'/calendar-events',privateApiOptions({method:'PATCH',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:event.id,playerIds,expectedPlayerIds:event.playerIds}),signal:AbortSignal.timeout(20000)},group));
-        if(!response.ok)throw Error(response.status===409?'I partecipanti sono cambiati. Chiudi e riapri la modifica.':'Salvataggio non riuscito. Riprova.');
+        const response=await fetch(PRIVATE_API+'/calendar-events',privateApiOptions({method:'PATCH',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:event.id,...fields,playerIds,expectedPlayerIds:event.playerIds,expectedEvent:event}),signal:AbortSignal.timeout(20000)},group));
+        if(!response.ok)throw Error(response.status===409?'L’evento è cambiato o esiste già con gli stessi dati. Chiudi e riapri la modifica.':'Salvataggio non riuscito. Riprova.');
         const result=await response.json();if(group!==PLAYER_GROUP)return;
         const updated=result.event,ids=new Set((state.data.players||[]).map(p=>p.id));
-        const rows=updated.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:updated.id+'|'+playerId,competitionId:updated.id,manualEventId:updated.id,manualEvent:true,manual:true,name:updated.name,location:updated.location,locationCity:updated.locationCity,locationLat:updated.locationLat,locationLon:updated.locationLon,startDate:updated.startDate,endDate:updated.endDate,circuit:['fitp','tennis-europe','itf'].includes(updated.color)?updated.color:'manual',eventColor:updated.color,playerId,status:'manual',entryStatus:'manual'}));
+        const rows=updated.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:updated.id+'|'+playerId,competitionId:updated.id,manualEventId:updated.id,manualEvent:true,manual:true,name:updated.name,location:updated.location,locationCity:updated.locationCity,locationLat:updated.locationLat,locationLon:updated.locationLon,startDate:updated.startDate,endDate:updated.endDate,circuit:['fitp','tennis-europe','itf'].includes(updated.color)?updated.color:'manual',eventColor:updated.color,playerId,eventAnalysis:updated.playerAnalyses?.[playerId]||'',status:'manual',entryStatus:'manual'}));
         state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
         state.data={...state.data,tournaments:[...(state.data.tournaments||[]).filter(row=>!row.manualEvent||(row.manualEventId||row.competitionId)!==event.id),...rows]};
-        await saveCachedData(state.data);dialog.close();renderIfDataChanged(false);
+        await saveCachedData(state.data);dialog.close();if(typeof location!=='undefined'&&location.hash===routeHash&&routeHash.startsWith('#tournament/'))location.hash='tournament/'+encodeURIComponent(tournamentKey(rows[0]));renderIfDataChanged(false);
       } catch(e){error.textContent=e.message;}finally{busy=false;save.disabled=false;}
     };
   } catch(e){error.textContent=e.message;}
 }
-function wireCalendarEventLocation(dialog) {
-  const input=$('calendarEventLocation'), results=$('calendarEventLocationResults'), status=$('calendarEventLocationStatus');
+function wireCalendarEventLocation(dialog, prefix = 'calendarEvent') {
+  const input=$(prefix+'Location'), results=$(prefix+'LocationResults'), status=$(prefix+'LocationStatus');
   if(!input||!results||!status)return;
   let timer,controller,sequence=0;
   const cancel=()=>{clearTimeout(timer);controller?.abort();sequence++;};
@@ -5176,7 +5218,7 @@ function wireCalendarEvents() {
     const {events}=await api('GET');
     if(dialogGroup!==PLAYER_GROUP)throw Error('La sezione è cambiata. Riapri il comando nel calendario.');
     const ids=new Set((state.data.players||[]).map(p=>p.id));
-    const rows=events.flatMap(t=>t.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:t.id+'|'+playerId,competitionId:t.id,manualEventId:t.id,manualEvent:true,manual:true,name:t.name,location:t.location,locationCity:t.locationCity,...(Number.isFinite(t.locationLat)?{locationLat:t.locationLat,locationLon:t.locationLon}:{}),startDate:t.startDate,endDate:t.endDate,circuit:['fitp','tennis-europe','itf'].includes(t.color)?t.color:'manual',eventColor:t.color,playerId,status:'manual',entryStatus:'manual'})));
+    const rows=events.flatMap(t=>t.playerIds.filter(id=>ids.has(id)).map(playerId=>({id:t.id+'|'+playerId,competitionId:t.id,manualEventId:t.id,manualEvent:true,manual:true,name:t.name,location:t.location,locationCity:t.locationCity,...(Number.isFinite(t.locationLat)?{locationLat:t.locationLat,locationLon:t.locationLon}:{}),startDate:t.startDate,endDate:t.endDate,circuit:['fitp','tennis-europe','itf'].includes(t.color)?t.color:'manual',eventColor:t.color,playerId,eventAnalysis:t.playerAnalyses?.[playerId]||'',status:'manual',entryStatus:'manual'})));
     state.manualCalendarRevision=(state.manualCalendarRevision||0)+1;
     state.data={...state.data,tournaments:[...(state.data.tournaments||[]).filter(t=>!t.manualEvent),...rows]};
     await saveCachedData(state.data);renderIfDataChanged(true);
@@ -5748,6 +5790,8 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
   }
 }
 document.addEventListener("click", (event) => {
+  const camp=event.target.closest('[data-calendar-analysis]');
+  if(camp){event.preventDefault();event.stopPropagation();openCalendarEventAnalysis(camp.dataset.calendarAnalysis,camp.dataset.calendarAnalysisPlayer);return;}
   const button = event.target.closest("[data-match-analysis]");
   if (!button) return;
   event.preventDefault();
@@ -5769,7 +5813,7 @@ renderProfile = function (id) {
     head = list?.querySelector(".cardHead"),
     filters = $("profileContent").querySelector(".profileMatchFilter"),
     hero = $("profileContent").querySelector(".profileHero"),
-    matches = (state.data.matches || []).filter((m) => m.playerId === id),
+    matches = (state.data.matches || []).filter((m) => m.playerId === id && !m.manualEvent),
     today = iso(new Date()),
     currentYear = String(new Date().getFullYear()),
     statusFromDates = (start, end) =>

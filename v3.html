@@ -18,7 +18,7 @@
       html[data-cw-refresh-preview] main.view { pointer-events: none; }
     </style>
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=20261122193000-opponent-restore" />
+    <link rel="stylesheet" href="v3.css?v=20261122200000-full-event" />
   </head>
   <body>
     <div class="shell">
@@ -290,7 +290,7 @@
             aria-label="Rimuovi giocatore"
           >
             Rimuovi giocatore
-          </button><button type="button" id="editCalendarEventParticipants" class="btn icon" title="Modifica partecipanti" aria-label="Modifica partecipanti" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 3 5 5-12 12-6 1 1-6Z M14 5l5 5"/></svg></button></div>
+          </button><button type="button" id="editCalendarEventParticipants" class="btn icon" title="Modifica evento" aria-label="Modifica evento" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 3 5 5-12 12-6 1 1-6Z M14 5l5 5"/></svg></button></div>
         </div>
         <p id="removeCurrentCalendarEventError" role="alert"></p><div id="profileContent"></div>
       </main>
@@ -303,7 +303,7 @@
           const group = /(?:^|[?&])group=others(?:&|$)/.test(location.search) ? "others" : "main";
           const saved = JSON.parse(sessionStorage.getItem("courtwatch-refresh-view-v1-" + group) || "null");
           const route = location.pathname + location.search + location.hash;
-          if (!saved || saved.version !== "20261122-event-city-template" || saved.route !== route || typeof saved.html !== "string" || saved.html.length > 1500000) return;
+          if (!saved || saved.version !== "20261122-full-event-template" || saved.route !== route || typeof saved.html !== "string" || saved.html.length > 1500000) return;
           // A preview is disposable: never replace current controls with an older template.
           if (saved.viewId === "calendarView" && !["addCalendarEvent", "removeCalendarEvent"].every(id => new RegExp('id=["\']' + id + '["\']').test(saved.html))) return;
           const view = document.getElementById(saved.viewId);
@@ -386,7 +386,7 @@
     </script>
 
 
-    <dialog id="calendarParticipantsDialog" class="calendarEventDialog" aria-labelledby="calendarParticipantsTitle"><div class="calendarEventHeading"><h2 id="calendarParticipantsTitle">Modifica partecipanti</h2><button class="btn" type="button" id="closeCalendarParticipants" aria-label="Chiudi">×</button></div><form id="calendarParticipantsForm"><fieldset><legend>Giocatori coinvolti</legend><input type="search" id="calendarParticipantsSearch" placeholder="Cerca giocatore" aria-label="Cerca giocatore"><div id="calendarParticipantsList" class="calendarEventPlayers"></div></fieldset><p id="calendarParticipantsError" role="alert"></p><button type="submit" class="btn" id="saveCalendarParticipants">Salva partecipanti</button></form></dialog>
+    <dialog id="calendarParticipantsDialog" class="calendarEventDialog" aria-labelledby="calendarParticipantsTitle"><div class="calendarEventHeading"><h2 id="calendarParticipantsTitle">Modifica evento</h2><button class="btn" type="button" id="closeCalendarParticipants" aria-label="Chiudi">×</button></div><form id="calendarParticipantsForm"><label>Nome evento<input id="calendarEditName" required maxlength="160"></label><div class="calendarEventDates"><label>Data iniziale<input id="calendarEditStart" type="date" required></label><label>Data finale (solo se più giorni)<input id="calendarEditEnd" type="date"></label></div><label>Luogo o circolo<input id="calendarEditLocation" required maxlength="200" autocomplete="off" aria-describedby="calendarEditLocationStatus"></label><div id="calendarEditLocationResults" class="calendarEventLocationResults"></div><p id="calendarEditLocationStatus" role="status" class="muted"></p><small>Ricerca luoghi: Photon · © OpenStreetMap contributors</small><fieldset><legend>Giocatori coinvolti</legend><input type="search" id="calendarParticipantsSearch" placeholder="Cerca giocatore" aria-label="Cerca giocatore"><div id="calendarParticipantsList" class="calendarEventPlayers"></div></fieldset><p id="calendarParticipantsError" role="alert"></p><button type="submit" class="btn" id="saveCalendarParticipants">Salva evento</button></form></dialog>
     <dialog id="calendarEventDialog" class="calendarEventDialog" aria-labelledby="calendarEventTitle">
       <div class="calendarEventHeading"><h2 id="calendarEventTitle">Aggiungi raduno federale</h2><button type="button" class="btn" id="closeCalendarEvent" aria-label="Chiudi">×</button></div>
       <form id="calendarEventForm">
@@ -401,7 +401,7 @@
       <div id="calendarEventRemoval" hidden></div>
       <p id="calendarEventError" role="alert"></p>
     </dialog>
-    <script crossorigin="anonymous" src="v3.js?v=20261122193000-opponent-restore"></script>
+    <script crossorigin="anonymous" src="v3.js?v=20261122200000-full-event"></script>
 
 </body>
 </html>
