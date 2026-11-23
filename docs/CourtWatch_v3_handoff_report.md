@@ -11440,3 +11440,5 @@ Read current GitHub workflow state for each critical operational target. Confirm
 - Statistiche: confermati il guard esistente contro tournamentStats sui raduni, l’icona analisi per giocatore e l’assenza di partite sintetiche. Nessuna modifica a statistiche o luoghi dei tornei automatici.
 - Verifica: renderer reale del profilo con etichetta Photon esatta, assenza suffisso/via/CAP, icona analisi e nessun inserimento di statistiche; API SQLite verifica persistenza/proiezione/PATCH di circolo e provincia. 74 test mirati passati; verificatore analisi/avvio verde; ulteriore esecuzione UI dopo il rafforzamento della regressione passata.
 - Limite: per altri vecchi indirizzi privi della provincia non si inventa una sigla: la nuova ricerca del luogo fornisce il campo. Browser privato non verificato localmente. Nessun polling o rilancio automatico.
+
+ITF discovery 2026-11-23T22:52:32.296Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
