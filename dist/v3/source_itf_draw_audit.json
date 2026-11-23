@@ -1,6 +1,6 @@
 {
   "version": 16,
-  "generatedAt": "2026-11-23T14:28:21.040Z",
+  "generatedAt": "2026-11-23T14:55:29.806Z",
   "status": "itf_t_minus_one_technical_pending",
   "summary": {
     "mode": "live_t_minus_1_historical_acquisition",
@@ -10,26 +10,26 @@
     "pendingTournaments": 1,
     "declaredSections": 6,
     "requestedSections": 4,
-    "acquiredSections": 2,
+    "acquiredSections": 4,
     "unusedAlternativeSections": 0,
     "declaredButUnusedSections": 0,
-    "resolvedSections": 2,
-    "missingSections": 4,
-    "newSectionsCached": 0,
+    "resolvedSections": 4,
+    "missingSections": 2,
+    "newSectionsCached": 2,
     "newTerminalAlternatives": 0,
     "newDeclaredButUnused": 0,
     "newPolicyResolutions": 0,
-    "retrySections": 4,
+    "retrySections": 2,
     "technicalErrorSections": 0,
     "missingArtifactSections": 0,
-    "notPublishedOrIncompleteSections": 4,
+    "notPublishedOrIncompleteSections": 2,
     "confirmedInDraw": 0,
     "removedByReliableDrawAbsence": 0,
-    "globalCompleteTournaments": 608,
+    "globalCompleteTournaments": 609,
     "globalCancelledNoDraws": 13,
-    "globalPendingTotal": 71,
-    "globalPendingTechnical": 35,
-    "globalPendingPublication": 36,
+    "globalPendingTotal": 70,
+    "globalPendingTechnical": 36,
+    "globalPendingPublication": 34,
     "technicalPendingCompetitionIds": [
       "J-J100-AUT-2026-002",
       "J-J100-ALG-2026-001",
@@ -64,6 +64,7 @@
       "J-J100-TUR-2026-006",
       "J-J100-USA-2026-002",
       "J-J100-USA-2026-004",
+      "J-J100-PER-2026-002",
       "J-J30-AUS-2026-006",
       "J-J30-ZIM-2026-003"
     ],
@@ -80,8 +81,6 @@
       "J-J100-MEX-2026-001",
       "J-J100-RSA-2026-001",
       "J-J100-SWE-2026-002",
-      "J-J100-PER-2026-002",
-      "J-J200-NOR-2026-001",
       "J-J30-AIA-2026-004",
       "J-J30-BRN-2026-004",
       "J-J30-CAM-2026-003",
@@ -108,16 +107,16 @@
   },
   "audit": [
     {
-      "competitionId": "J-J60-JPN-2026-003",
-      "tournamentName": "J60 Gifu",
+      "competitionId": "J-J30-ISR-2026-002",
+      "tournamentName": "J30 Haifa (CLOSED)",
       "decision": "pending",
       "playersFound": [],
       "declaredSections": 6,
-      "acquiredSections": 2,
+      "acquiredSections": 4,
       "unusedAlternativeSections": 0,
       "declaredButUnusedSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 4,
+      "resolvedSections": 4,
+      "missingSections": 2,
       "sections": [
         {
           "event": "B-S-M-KO",
@@ -136,9 +135,9 @@
         {
           "event": "B-D-M-KO",
           "family": "B-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         },
         {
           "event": "G-S-M-KO",
@@ -157,9 +156,9 @@
         {
           "event": "G-D-M-KO",
           "family": "G-D-M",
-          "acquired": false,
-          "resolved": false,
-          "status": "pending"
+          "acquired": true,
+          "resolved": true,
+          "status": "acquired"
         }
       ],
       "families": [
@@ -191,14 +190,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -221,7 +220,7 @@
           "events": [
             {
               "event": "G-S-Q-KO",
-              "players": 32,
+              "players": 27,
               "error": null,
               "failureType": null,
               "resolved": true
@@ -230,14 +229,14 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
