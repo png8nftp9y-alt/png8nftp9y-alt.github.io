@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-11-23T10:32:08.665Z",
+  "generatedAt": "2026-11-23T10:48:03.321Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
@@ -1017343,7 +1017343,7 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-23T09:26:21.070Z",
+      "checkedAt": "2026-11-23T10:48:00.640Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1018078,7 +1018078,7 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-23T09:26:21.625Z",
+      "checkedAt": "2026-11-23T10:48:01.195Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1018633,7 +1018633,7 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-23T09:26:22.168Z",
+      "checkedAt": "2026-11-23T10:48:01.741Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 1,
@@ -1018740,8 +1018740,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1018766,8 +1018766,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1018779,8 +1018779,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1018792,14 +1018792,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1019063,13 +1019063,13 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-23T09:26:22.672Z",
+      "checkedAt": "2026-11-23T10:48:02.271Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 3,
+      "acquiredSections": 4,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 3,
-      "missingSections": 3,
+      "resolvedSections": 4,
+      "missingSections": 2,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -1019183,14 +1019183,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -1020063,6 +1020063,340 @@
             "taskId": "J-J30-TPE-2026-005__G-S-M-KO",
             "storedAt": "2026-11-23T05:22:11.795Z"
           }
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800708498",
+              "name": "Bing-Huan Tsai",
+              "givenName": "Bing-Huan",
+              "familyName": "Tsai",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/bing-huan-tsai/800708498/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800838393",
+              "name": "Ezra Britton",
+              "givenName": "Ezra",
+              "familyName": "Britton",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/ezra-britton/800838393/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800757973",
+              "name": "YU-CHENG LI",
+              "givenName": "YU-CHENG",
+              "familyName": "LI",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yu-cheng-li/800757973/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800833789",
+              "name": "Yau-yu Ho",
+              "givenName": "Yau-yu",
+              "familyName": "Ho",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yau-yu-ho/800833789/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800803501",
+              "name": "Yu Cheng Lin",
+              "givenName": "Yu Cheng",
+              "familyName": "Lin",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yu-cheng-lin/800803501/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743451",
+              "name": "Kai-Cheng Tsai",
+              "givenName": "Kai-Cheng",
+              "familyName": "Tsai",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/kai-cheng-tsai/800743451/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800761983",
+              "name": "Hong Xuan Chen",
+              "givenName": "Hong Xuan",
+              "familyName": "Chen",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/hong-xuan-chen/800761983/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800760376",
+              "name": "YU-CHUN WANG",
+              "givenName": "YU-CHUN",
+              "familyName": "WANG",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yu-chun-wang/800760376/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745567",
+              "name": "Sazu Isqaqavut",
+              "givenName": "Sazu",
+              "familyName": "Isqaqavut",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/sazu-isqaqavut/800745567/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800757810",
+              "name": "ZHAO-HONG JIAN",
+              "givenName": "ZHAO-HONG",
+              "familyName": "JIAN",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/zhao-hong-jian/800757810/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800839209",
+              "name": "Jin-cheng Yeh",
+              "givenName": "Jin-cheng",
+              "familyName": "Yeh",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/jin-cheng-yeh/800839209/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791271",
+              "name": "Cheng-En Tsai",
+              "givenName": "Cheng-En",
+              "familyName": "Tsai",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/cheng-en-tsai/800791271/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800773750",
+              "name": "TZU-I HUANG",
+              "givenName": "TZU-I",
+              "familyName": "HUANG",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/tzu-i-huang/800773750/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800762354",
+              "name": "Yusheng Tseng",
+              "givenName": "Yusheng",
+              "familyName": "Tseng",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yusheng-tseng/800762354/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781550",
+              "name": "Yau-Hsuan Chan",
+              "givenName": "Yau-Hsuan",
+              "familyName": "Chan",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yau-hsuan-chan/800781550/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800759825",
+              "name": "YU-MIN LIN",
+              "givenName": "YU-MIN",
+              "familyName": "LIN",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yu-min-lin/800759825/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800760613",
+              "name": "KAI-CHENG PENG",
+              "givenName": "KAI-CHENG",
+              "familyName": "PENG",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/kai-cheng-peng/800760613/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800833785",
+              "name": "Yau-an Ho",
+              "givenName": "Yau-an",
+              "familyName": "Ho",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yau-an-ho/800833785/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800809606",
+              "name": "Max Johansson",
+              "givenName": "Max",
+              "familyName": "Johansson",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/max-johansson/800809606/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800847109",
+              "name": "Yueh-Tse Wu",
+              "givenName": "Yueh-Tse",
+              "familyName": "Wu",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yueh-tse-wu/800847109/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800841534",
+              "name": "Shang-Kun Peng",
+              "givenName": "Shang-Kun",
+              "familyName": "Peng",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/shang-kun-peng/800841534/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800779916",
+              "name": "Jui En Tsai",
+              "givenName": "Jui En",
+              "familyName": "Tsai",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/jui-en-tsai/800779916/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800781631",
+              "name": "Dylan Liu",
+              "givenName": "Dylan",
+              "familyName": "Liu",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/dylan-liu/800781631/usa/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800758454",
+              "name": "Weibo Huang",
+              "givenName": "Weibo",
+              "familyName": "Huang",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/weibo-huang/800758454/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800707123",
+              "name": "Kousuke Ko",
+              "givenName": "Kousuke",
+              "familyName": "Ko",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/kousuke-ko/800707123/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800787600",
+              "name": "Joel Teng",
+              "givenName": "Joel",
+              "familyName": "Teng",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/joel-teng/800787600/aus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800759174",
+              "name": "TSUNG-SHENG YANG",
+              "givenName": "TSUNG-SHENG",
+              "familyName": "YANG",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/tsung-sheng-yang/800759174/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800865395",
+              "name": "Tzu-Yi Chen",
+              "givenName": "Tzu-Yi",
+              "familyName": "Chen",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/tzu-yi-chen/800865395/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800802548",
+              "name": "Wei-Cheng Tang",
+              "givenName": "Wei-Cheng",
+              "familyName": "Tang",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/wei-cheng-tang/800802548/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800756410",
+              "name": "Bo-yen Ou yang",
+              "givenName": "Bo-yen",
+              "familyName": "Ou yang",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/bo-yen-ou-yang/800756410/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800777679",
+              "name": "Yen-chia Tseng",
+              "givenName": "Yen-chia",
+              "familyName": "Tseng",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yen-chia-tseng/800777679/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800838866",
+              "name": "Shang Yu Cheng",
+              "givenName": "Shang Yu",
+              "familyName": "Cheng",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/shang-yu-cheng/800838866/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-23T10:48:02.271Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-TPE-2026-005__B-S-M-KO",
+            "storedAt": "2026-11-23T10:48:02.271Z"
+          }
         }
       }
     },
@@ -1020072,7 +1020406,7 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-23T09:26:23.688Z",
+      "checkedAt": "2026-11-23T10:48:03.321Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1020947,7 +1021281,7 @@
       "startDate": "2026-11-25",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-23T09:26:23.177Z",
+      "checkedAt": "2026-11-23T10:48:02.801Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
