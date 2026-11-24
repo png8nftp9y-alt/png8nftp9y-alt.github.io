@@ -80,9 +80,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: "${{ needs.engine-source.outputs.sha }}"
-          fetch-depth: 0
+          fetch-depth: 1
+          fetch-tags: false
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - name: Verify shallow publication safety
+        run: node --test tools/tests/itf-shallow-publication.test.mjs
       - name: Configure R2
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
@@ -122,7 +125,7 @@ jobs:
           cp history/itf_draw_target_db.json "$RUNNER_TEMP/itf-incoming-state.json"
           published=false
           for attempt in 1 2 3 4 5; do
-            git fetch origin main
+            git fetch --no-tags --depth=1 origin +refs/heads/main:refs/remotes/origin/main
             git reset --hard origin/main
             cp history/itf_draw_target_db.json "$RUNNER_TEMP/itf-current-state.json"
             tar -xf "$RUNNER_TEMP/itf-validated.tar"
