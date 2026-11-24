@@ -4314,9 +4314,59 @@ function futureTournamentEuropeCategories(entry, rows = [], tournament = {}) {
   const played = [...new Set(rows.flatMap(read))];
   return played.length ? played : read(tournament);
 }
+const catalogueTournamentPages = new Map();
+async function tournamentSearchRequest(query='',cursor='',signal,detail) {
+ const params=new URLSearchParams(detail||{q:query,cursor});
+ const response=await fetch(PRIVATE_API+'/tournament-search?'+params,privateApiOptions({cache:'no-store',signal:signal||AbortSignal.timeout(30000)}));
+ if(!response.ok)throw Error('tournament_search_unavailable');return response.json();
+}
+function tournamentSearchRow(t){
+ return `<button type="button" class="playerSearchSuggestion tournamentSearchResult" data-catalogue-circuit="${esc(t.circuit)}" data-catalogue-id="${esc(t.competitionId)}"><strong>${esc(t.name)}</strong><small>${esc([t.circuit==='tennis-europe'?'Tennis Europe':String(t.circuit).toUpperCase(),t.venueName,t.location,eventDateLabel(t)].filter(Boolean).join(' · '))}</small></button>`;
+}
+function bindTournamentSearchRows(root){
+ root.querySelectorAll('[data-catalogue-id]').forEach(button=>button.onclick=()=>{hideTournamentSearch();location.hash='#catalog-tournament/'+encodeURIComponent(button.dataset.catalogueCircuit)+'/'+encodeURIComponent(button.dataset.catalogueId);});
+}
+function hideTournamentSearch(){const box=$('tournamentSearchSuggestions');if(box)box.hidden=true;$('tournamentSearchInput')?.setAttribute('aria-expanded','false');}
+async function renderCatalogueTournament(circuitName,id){
+ const hash=location.hash;$('removeProfilePlayer').hidden=true;$('profileView').classList.add('active');$('profileContent').innerHTML='<div class="empty" role="status">Caricamento torneo…</div>';
+ try{
+  const local=groups(false).find(t=>circuit(t)===circuitName&&String(t.competitionId||'').toUpperCase()===id.toUpperCase());
+  if(local){renderTournament(tournamentKey(local));return;}
+  const data=await tournamentSearchRequest('','',undefined,{circuit:circuitName,competitionId:id});if(location.hash!==hash)return;
+  if(!data.tournament){$('profileContent').innerHTML='<div class="empty">Torneo non trovato nel catalogo.</div>';return;}
+  // Match the live group after the request too: the initial snapshot may have arrived meanwhile.
+  const current=groups(false).find(t=>circuit(t)===circuitName&&String(t.competitionId||'').toUpperCase()===id.toUpperCase());
+  if(current){renderTournament(tournamentKey(current));return;}
+  const t={...data.tournament,people:[],playerIds:[],catalogueOnly:true},key=tournamentKey(t);catalogueTournamentPages.set(key,t);renderTournament(key);
+ }catch{if(location.hash===hash){$('profileContent').innerHTML='<div class="empty">Torneo temporaneamente non disponibile. <button type="button" id="retryCatalogueTournament">Riprova</button></div>';$('retryCatalogueTournament').onclick=()=>renderCatalogueTournament(circuitName,id);}}
+}
+async function renderTournamentSearchPage(query){
+ hideTournamentSearch();$('removeProfilePlayer').hidden=true;$('profileView').classList.add('active');
+ $('profileContent').innerHTML=`<section class="card"><div class="cardHead"><div><h2>Risultati tornei</h2><p>Ricerca: ${esc(query)}</p></div></div><div id="tournamentSearchPageRows"></div><button type="button" class="btn" id="tournamentSearchMore">Caricamento…</button><p id="tournamentSearchPageError" role="status"></p></section>`;
+ const hash=location.hash;let cursor='',busy=false,results=[];
+ async function next(){if(busy||location.hash!==hash)return;busy=true;const button=$('tournamentSearchMore');button.disabled=true;$('tournamentSearchPageError').textContent='';
+ try{const data=await tournamentSearchRequest(query,cursor);if(location.hash!==hash)return;results.push(...data.results);cursor=data.nextCursor||'';$('tournamentSearchPageRows').innerHTML=results.length?results.map(tournamentSearchRow).join(''):'<div class="empty">Nessun torneo trovato.</div>';bindTournamentSearchRows($('tournamentSearchPageRows'));button.hidden=!cursor;button.textContent='Mostra altri';}
+ catch{if(location.hash===hash){$('tournamentSearchPageError').textContent='Ricerca temporaneamente non disponibile.';button.hidden=false;button.textContent='Riprova';}}
+ finally{busy=false;if(location.hash===hash)button.disabled=false;}}
+ $('tournamentSearchMore').onclick=next;await next();
+}
+function wireTournamentSearch(){
+ const form=$('tournamentSearchForm'),input=$('tournamentSearchInput'),box=$('tournamentSearchSuggestions');if(!form||!input||!box)return;
+ let timer,controller,sequence=0;
+ input.oninput=()=>{clearTimeout(timer);controller?.abort();const seq=++sequence,q=input.value.trim();if(q.length<2){hideTournamentSearch();return;}
+ timer=setTimeout(async()=>{controller=new AbortController();box.hidden=false;input.setAttribute('aria-expanded','true');box.innerHTML='<div class="empty" role="status">Ricerca in corso…</div>';
+ try{const data=await tournamentSearchRequest(q,'',controller.signal);if(sequence!==seq)return;box.innerHTML=data.results.length?data.results.slice(0,10).map(tournamentSearchRow).join(''):'<div class="empty">Nessun torneo trovato.</div>';bindTournamentSearchRows(box);}
+ catch(e){if(sequence===seq&&e.name!=='AbortError'){box.innerHTML='<button type="button" class="playerSearchSuggestion" data-tournament-search-retry>Ricerca non disponibile. Riprova.</button>';box.querySelector('button').onclick=input.oninput;}}
+ },300);};
+ form.onsubmit=event=>{event.preventDefault();const q=input.value.trim();if(q.length<2)return;clearTimeout(timer);++sequence;controller?.abort();hideTournamentSearch();location.hash='#tournament-search/'+encodeURIComponent(q);};
+ input.onkeydown=event=>{if(event.key==='Escape'){clearTimeout(timer);++sequence;controller?.abort();hideTournamentSearch();}if(event.key==='ArrowDown'&&!box.hidden){event.preventDefault();box.querySelector('button')?.focus();}};
+ box.onkeydown=event=>{const buttons=[...box.querySelectorAll('button')],i=buttons.indexOf(document.activeElement);if(event.key==='Escape'){hideTournamentSearch();input.focus();}else if(['ArrowDown','ArrowUp'].includes(event.key)){event.preventDefault();buttons[(i+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}};
+ document.addEventListener('click',event=>{if(!form.contains(event.target)){clearTimeout(timer);++sequence;controller?.abort();hideTournamentSearch();}});
+}
+
 function renderTournament(key) {
   $("removeProfilePlayer").hidden = true;
-  const t = groups(false).find((x) => tournamentKey(x) === key);
+  const t = groups(false).find((x) => tournamentKey(x) === key) || (typeof catalogueTournamentPages !== 'undefined' ? catalogueTournamentPages.get(key) : null);
   if (!t) {
     location.hash = "";
     return;
@@ -4421,11 +4471,12 @@ function renderTournament(key) {
     category = source === "tennis-europe" ? readableText(t.tournamentCategory || "") : "";
   $("profileContent").innerHTML =
     `<div class="card tournamentHero" data-event-color="${esc(t.eventColor || '')}"><div><h2>${title}</h2>${category ? `<p>${esc(category)}</p>` : ""}${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(eventDateLabel(t))}</p></div><div class="tournamentHeroActions">${acceptanceLink}${t.manualEvent && ["purple","gray"].includes(t.eventColor) ? "" : `<div class="tournamentDraws"><b>Tabelloni:</b><span>${drawLinks || "—"}</span></div>`}</div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
+  if(t.catalogueOnly){$('profileContent').querySelector('.tournamentMatches')?.remove();$('profileContent').querySelector('.tournamentHeroActions')?.remove();}
   const remove=$('removeProfilePlayer'),edit=$('editCalendarEventParticipants');
   if(edit)edit.hidden=!t.manualEvent;
   if(t.manualEvent){remove.hidden=false;remove.disabled=false;remove.textContent='Rimuovi evento';remove.title='Rimuovi evento';remove.setAttribute('aria-label','Rimuovi evento');remove.onclick=()=>requestCalendarEventRemoval(t);if(edit)edit.onclick=()=>openCalendarParticipants(t);}
   if (futureEurope) loadFutureTournamentEuropeRankings(key, [...byPlayer.keys()].map(id => (state.data.players || []).find(player => player.id === id)).filter(Boolean));
-  if (!t.manualEvent && source === "fitp") loadInlineFitpDrawLinks(t);
+  if (!t.manualEvent && !t.catalogueOnly && source === "fitp") loadInlineFitpDrawLinks(t);
   bindParticipantNavigation($("profileContent"));
   if (multiPlayer)
     $("profileContent")
@@ -4770,6 +4821,8 @@ function route() {
     legacyOpponent = location.hash.match(
       /^#opponent\/([^/]+)\/([^/]+)\/(\d+)$/,
     ),
+    tournamentSearch = location.hash.match(/^#tournament-search\/(.+)$/),
+    catalogueTournament = location.hash.match(/^#catalog-tournament\/([^/]+)\/(.+)$/),
     playerSearch = location.hash.match(/^#player-search\/(.+)$/),
     tournament = location.hash.match(/^#tournament\/(.+)$/),
     primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
@@ -4809,7 +4862,9 @@ function route() {
     openTournamentPlayerKeys.clear();
     saveUiState();
   }
-  if (playerSearch) renderPlayerSearchPage(decodeURIComponent(playerSearch[1]));
+  if (tournamentSearch) renderTournamentSearchPage(decodeURIComponent(tournamentSearch[1]));
+  else if(catalogueTournament) renderCatalogueTournament(decodeURIComponent(catalogueTournament[1]),decodeURIComponent(catalogueTournament[2]));
+  else if (playerSearch) renderPlayerSearchPage(decodeURIComponent(playerSearch[1]));
   else if (player && state.data) renderProfile(decodeURIComponent(player[1]));
   else if (currentOpponent)
     renderOpponentProfile(
@@ -5264,6 +5319,7 @@ function wireCalendarEvents() {
   };
 }
 function wire() {
+  wireTournamentSearch();
   wireCalendarEvents();
   updatePlayerGroupControls();
   addEventListener("popstate", () => {

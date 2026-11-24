@@ -18,7 +18,7 @@
       html[data-cw-refresh-preview] main.view { pointer-events: none; }
     </style>
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=20261122203000-profile-event-place" />
+    <link rel="stylesheet" href="v3.css?v=20261124221249" />
   </head>
   <body>
     <div class="shell">
@@ -228,6 +228,7 @@
                   </select></label
                 >
               </div>
+              <form id="tournamentSearchForm" class="playerSearchForm tournamentSearchForm" role="search" autocomplete="off"><label class="srOnly" for="tournamentSearchInput">Cerca tornei per nome, circolo, città o data</label><input id="tournamentSearchInput" type="search" placeholder="Cerca tornei…" aria-label="Cerca tornei per nome, circolo, città o data" aria-controls="tournamentSearchSuggestions" aria-expanded="false" maxlength="160"><div id="tournamentSearchSuggestions" class="playerSearchSuggestions" hidden></div></form>
               <button id="toggleAll" class="btn">Deseleziona tutti</button>
             </div>
             <div class="filters">
@@ -305,7 +306,7 @@
           const route = location.pathname + location.search + location.hash;
           if (!saved || saved.version !== "20261122-profile-event-place" || saved.route !== route || typeof saved.html !== "string" || saved.html.length > 1500000) return;
           // A preview is disposable: never replace current controls with an older template.
-          if (saved.viewId === "calendarView" && !["addCalendarEvent", "removeCalendarEvent"].every(id => new RegExp('id=["\']' + id + '["\']').test(saved.html))) return;
+          if (saved.viewId === "calendarView" && !["addCalendarEvent", "removeCalendarEvent", "tournamentSearchInput"].every(id => new RegExp('id=["\']' + id + '["\']').test(saved.html))) return;
           const view = document.getElementById(saved.viewId);
           if (!view?.classList.contains("view")) return;
           for (const item of saved.styles || []) {
@@ -401,7 +402,7 @@
       <div id="calendarEventRemoval" hidden></div>
       <p id="calendarEventError" role="alert"></p>
     </dialog>
-    <script crossorigin="anonymous" src="v3.js?v=20261122203000-profile-event-place"></script>
+    <script crossorigin="anonymous" src="v3.js?v=20261124221249"></script>
 
 </body>
 </html>

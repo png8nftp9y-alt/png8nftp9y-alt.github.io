@@ -1,3 +1,4 @@
+import {searchTournaments} from '../lib/tournament-search.mjs';
 import {automationControlPage,changeAutomation} from '../lib/admin-automation-control.mjs';
 import {calendarEvents,calendarEventTournaments,writeCalendarEvent} from '../lib/manual-calendar-events.mjs';
 import {itfDrawParticipationTournaments} from '../lib/itf-draw-participations.mjs';
@@ -233,6 +234,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
   const user=await timing.measure('authentication',()=>accessUser(request,env));if(!user)return privateJson({error:'access_authentication_required'},401);
   const device=await timing.measure('device',()=>recordDevice(request,env,user,path));if(device.revoked)return privateJson({error:'device_revoked'},403);
   const apiPath=path.replace(/^\/app(?:-api|\/api)/,'');
+  if(apiPath==='/tournament-search'&&request.method==='GET'){try{return privateJson(await searchTournaments(env.RUNTIME_DOCUMENTS,{query:url.searchParams.get('q')||'',cursor:url.searchParams.get('cursor')||'',circuit:url.searchParams.get('circuit')||'',competitionId:url.searchParams.get('competitionId')||''}));}catch(error){return privateJson({error:'tournament_search_unavailable'},error.message==='invalid_tournament_cursor'?400:503);}}
   if(apiPath==='/fitp-draw-links'&&request.method==='GET'){try{return privateJson(await loadFitpDrawLinks(url.searchParams.get('competitionId')||''))}catch(error){return privateJson({error:error.status===400?error.message:'fitp_draw_links_unavailable'},error.status||502)}}
   let group;try{group=playerListGroup(request.headers.get('X-CourtWatch-Group')||'main')}catch(error){return privateJson({error:error.message},400)}
   const membership=playerMembershipTable(group);
