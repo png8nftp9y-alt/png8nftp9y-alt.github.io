@@ -11442,3 +11442,5 @@ Read current GitHub workflow state for each critical operational target. Confirm
 - Limite: per altri vecchi indirizzi privi della provincia non si inventa una sigla: la nuova ricerca del luogo fornisce il campo. Browser privato non verificato localmente. Nessun polling o rilancio automatico.
 
 ITF discovery 2026-11-23T22:52:32.296Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF discovery 2026-11-24T10:35:06.822Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
