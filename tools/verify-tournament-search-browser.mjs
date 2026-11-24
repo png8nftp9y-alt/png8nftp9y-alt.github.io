@@ -16,11 +16,11 @@ try{for(const group of ['main','others']){
  const input=page.locator('#tournamentSearchInput');await input.fill('monza');await page.locator('#tournamentSearchSuggestions button').first().waitFor();
  assert.equal(await page.locator('#tournamentSearchSuggestions button').count(),2);
  await page.keyboard.press('Enter');await page.locator('#tournamentSearchPageRows button').first().waitFor();assert.equal(await page.locator('#tournamentSearchPageRows button').count(),2);
- await page.locator('[data-catalogue-id="SEARCH-F1"]').click();await page.locator('.tournamentPlayer').waitFor();assert.match(await page.locator('.tournamentPlayer').textContent(),/Test Player/);
- await page.goBack();await page.locator('#tournamentSearchPageRows button').first().waitFor();await page.locator('[data-catalogue-id="SEARCH-I1"]').click();await page.locator('.tournamentHero h2').waitFor();
+ await page.locator('#tournamentSearchPageRows [data-catalogue-id="SEARCH-F1"]').click();await page.locator('.tournamentPlayer').waitFor();assert.match(await page.locator('.tournamentPlayer').textContent(),/Test Player/);
+ await page.goBack();await page.locator('#tournamentSearchPageRows button').first().waitFor();await page.locator('#tournamentSearchPageRows [data-catalogue-id="SEARCH-I1"]').click();await page.locator('.tournamentHero h2').waitFor();
  assert.match(await page.locator('.tournamentHero h2').textContent(),/J30 Cuneo/);assert.equal(await page.locator('.tournamentPlayer,.tournamentMatches,.tournamentHeroActions').count(),0);
  await page.reload();await page.locator('.tournamentHero h2').waitFor();assert.match(await page.locator('.tournamentHero h2').textContent(),/J30 Cuneo/);
  await page.evaluate(()=>{location.hash='#calendar';});await input.waitFor({state:'visible'});
- for(const width of [390,1280]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.getElementById('tournamentSearchForm').nextElementSibling.id),'toggleAll');}
+ for(const width of [320,390,768,1024,1280]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.getElementById('tournamentSearchForm').nextElementSibling.id),'toggleAll');assert.ok(await page.evaluate(()=>{const ids=['tournamentSearchForm','tournamentSearchInput','toggleAll'];return ids.every(id=>{const r=document.getElementById(id).getBoundingClientRect();return r.left>=0&&r.right<=innerWidth+1;});}),`calendar search controls must fit ${width}px`);}
  assert.deepEqual(errors,[]);await page.close();
 }console.log('Tournament search: suggestions, Enter results, tracked/empty pages and reload passed for both groups.');}finally{await browser.close();}

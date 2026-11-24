@@ -683,3 +683,6 @@ button,a,[role="link"],summary{touch-action:manipulation}
 .tournamentSearchForm{margin-left:auto;min-width:190px;max-width:360px;flex:1}.tournamentSearchForm input{width:100%}.tournamentSearchResult{display:block;width:100%;text-align:left}.tournamentSearchResult strong,.tournamentSearchResult small{display:block}.tournamentSearchResult small{color:var(--muted);margin-top:3px}.tournamentSearchForm .playerSearchSuggestions{z-index:40;min-width:min(340px,85vw);max-height:360px;overflow-y:auto}@media(max-width:650px){.tournamentSearchForm{min-width:150px;max-width:none}.tournamentSearchForm .playerSearchSuggestions{left:0;right:0;min-width:0}}
 
 .calendarHead .tournamentSearchForm{order:0;width:auto;margin-top:0;margin-bottom:0}.tournamentSearchForm .playerSearchSuggestions{position:absolute;top:calc(100% + 5px);margin-top:0}
+
+/* Keep tournament search and Select all together at tablet and phone widths. */
+.calendarHead{flex-wrap:wrap}.calendarSearchControls{display:flex;align-items:center;gap:8px;flex:1 1 360px;min-width:0;max-width:100%}.calendarSearchControls .tournamentSearchForm{flex:1 1 0;min-width:0;max-width:none;margin:0}.calendarSearchControls #toggleAll{flex:0 0 auto;margin-left:0}.calendarSearchControls .playerSearchSuggestions{width:100%;min-width:0;right:0;left:0}
