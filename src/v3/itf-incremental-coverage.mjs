@@ -1,3 +1,4 @@
+import {applyConfirmedCancellations} from './itf-cancelled-tournaments.mjs';
 import fs from 'node:fs/promises';
 import {applyUserQualificationResolutions} from './itf-user-resolved-qualifications.mjs';
 import {AUDIT_CRITERION} from './itf-audit-acquisition-policy.mjs';
@@ -22,7 +23,7 @@ export function mergeCoverageCatalog(audit,catalog,{now=new Date().toISOString()
   rows.set(id,{competitionId:id,tournamentName:t.tournamentName||t.name||id,startDate:t.startDate,endDate:t.endDate,sourceUrl:t.sourceUrl||'',category:t.category||'',classification:'unverifiable',status:'inventory_required',error:null,events:[],checks:[],missingEvents:[],declaredDraws:null,acquiredDraws:null,missingDraws:null,inventoryRequired:true,catalogAddedAt:now});
   additions.add(id);
  }
- const tournaments=[...rows.values()].sort((a,b)=>a.competitionId.localeCompare(b.competitionId));
+ const tournaments=applyConfirmedCancellations({tournaments:[...rows.values()]}).tournaments.sort((a,b)=>a.competitionId.localeCompare(b.competitionId));
  const sum=k=>tournaments.reduce((n,t)=>n+Number(t[k]||0),0),complete=tournaments.filter(t=>t.classification==='complete').length,cancelledNoDraws=tournaments.filter(t=>t.classification==='cancelled_no_draws').length;
  return{...audit,tournaments,incrementalCatalogIds:[...additions].sort(),catalogGeneratedAt:catalog.generatedAt,catalogRejected:rejected,summary:{...audit.summary,catalogChecked:tournaments.length,complete,cancelledNoDraws,resolved:complete+cancelledNoDraws,unverifiable:tournaments.filter(t=>t.classification==='unverifiable').length,missingDrawsTournaments:tournaments.filter(t=>t.classification==='missing_draws').length,declaredDraws:sum('declaredDraws'),acquiredDraws:sum('acquiredDraws'),missingDraws:sum('missingDraws'),missingByReason:tournaments.flatMap(t=>t.missingEvents||[]).reduce((o,e)=>(o[e.reasonCode]=(o[e.reasonCode]||0)+1,o),{})}};
 }

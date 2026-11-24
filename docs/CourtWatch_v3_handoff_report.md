@@ -11444,3 +11444,12 @@ Read current GitHub workflow state for each critical operational target. Confirm
 ITF discovery 2026-11-23T22:52:32.296Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF discovery 2026-11-24T10:35:06.822Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+## 2026-11-24 — Tornei ITF cancellati: attesa tabelloni risolta
+
+- Richiesta: i tornei ufficialmente cancellati, come J30 Manama, devono essere risolti in Admin e non attendere tabelloni inesistenti.
+- Causa: la coda consentiva soltanto le 13 cancellazioni della baseline e il catalogo incrementale manteneva le nuove cancellazioni tra gli inventari da verificare.
+- Modifica: riconoscimento della dicitura CANCELLED/CANCELED nel catalogo con URL HTTPS ITF e ID torneo corrispondente; conversione a cancelled_no_draws senza dichiarare acquisizioni, conservando i precedenti controlli come prova diagnostica. Conteggio cancellazioni dinamico, conservazione di tutte le cancellazioni baseline. Nessuna esclusione di tornei senza cancellazione esplicita né di partite/tabelloni già acquisiti.
+- Componenti: itf-cancelled-tournaments, catalogo incrementale e pianificatore condiviso da Admin e motori di copertura. Nessuna modifica diretta a D1 o R2.
+- Validazione: 24 test mirati passati su cancellazioni, catalogo incrementale, code, inventario vuoto e diagnostica del sistema. Nessun polling o rilancio automatico. Applicazione remota da confermare dopo pubblicazione e normale rigenerazione diagnostica; la copertura 120d precedentemente sospesa non viene riattivata.
