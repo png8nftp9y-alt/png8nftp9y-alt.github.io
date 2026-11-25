@@ -11498,3 +11498,12 @@ ITF Meta ordinary 2026-11-25T09:18:28.069Z: attempted 6, acquired 6, ordinary 0,
 
 ### 2026-11-25 — Reset abandoned and restored tournament searches
 Clear search text after selection, Enter, clicking outside the form, startup and pageshow (including back-forward cache restoration). Abort pending suggestions and advance the request sequence on dismissal so stale results cannot reopen the dropdown. Clear text and suggestions in the restored calendar preview before it becomes visible. Keep the submitted query in the result route. Extend existing browser verification with selection, outside click, reload and persisted pageshow cases for both groups. No player or API changes. Validation: targeted existing Node suites, syntax and release guard; full browser verification remains required on GitHub.
+
+
+## 2026-11-25 — Three exact user-reviewed identity groups
+
+User confirmed: Mazzotta FITP 4212935483 with TE 15678cb2-db84-4b66-ac44-cc0d342e8c99; Pepe FITP 8098741909 with TE ec094789-4dfc-42d5-9076-1e8e3f3b9a20 and ITF 800704508; Gallo FITP 7031382569 with ITF 800773740. Other same-name FITP IDs remain separate. No nationality override was requested or added; original ITA/USA evidence is retained.
+
+Added a bounded one-time D1 workflow, exact native-ID partition manifest, incremental application/readback script and SQLite fixtures/tests. The script simulates partitions before writing, preserves original sources, saves exact review decisions, verifies distinct homonyms and closes only these three cases. Missing/new native IDs stop before writes; completed replay writes zero rows. No external discovery, workflow enable/disable, source deletion or full-database resync.
+
+Validation: 23 Node tests passed (three-reviewed-identities, player-identity-mapping and identity-review-queue), including SQLite application, original-source preservation, replay after an ordinary source update, zero-write replay and incomplete/new-ID guards. Workflow YAML and embedded shell validated. Live D1 application remains to be verified in the new workflow run after publication.
