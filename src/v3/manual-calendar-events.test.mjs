@@ -13,9 +13,11 @@ function harness(){
  vm.createContext(ctx);vm.runInContext(source.slice(source.indexOf('function wireCalendarEvents()'),source.indexOf('function wire()')),ctx);ctx.wireCalendarEvents();
  return{ctx,node,values,requests,counts:()=>({saved,renders})};
 }
-test('calendar controls precede categories; form collects dates, place, players and only federal camps',()=>{
- assert.ok(html.indexOf('id="addCalendarEvent"')<html.indexOf('id="calendarCategory"'));
- assert.ok(html.indexOf('id="removeCalendarEvent"')<html.indexOf('id="calendarCategory"'));
+test('calendar event controls follow players and precede month; form collects dates, place, players and only federal camps',()=>{
+ assert.ok(html.indexOf('id="playerFilters"')<html.indexOf('id="addCalendarEvent"'));
+ assert.ok(html.indexOf('id="addCalendarEvent"')<html.indexOf('class="calendarMonthNav"'));
+ assert.ok(html.indexOf('id="playerFilters"')<html.indexOf('id="removeCalendarEvent"'));
+ assert.ok(html.indexOf('id="removeCalendarEvent"')<html.indexOf('class="calendarMonthNav"'));
  for(const field of ['name','location','startDate','endDate','color'])assert.match(html,new RegExp('name="'+field+'"'));
  assert.match(html,/option value="purple"/);const types=html.slice(html.indexOf('<select name="color"'),html.indexOf('</select>',html.indexOf('<select name="color"')));for(const color of ['fitp','tennis-europe','itf','red','gray'])assert.ok(!types.includes('value="'+color+'"'));
 });
