@@ -172,7 +172,11 @@ try {
     await page.waitForFunction(() => document.querySelector('.opponentProfileHero h2')?.textContent === 'Opponent A');
     assert.equal(await page.locator('#opponentTournamentHistory .unifiedMatchRow').count(), 1);
 
-    // With no local match history, wait for the real snapshot instead of claiming zero.
+    // Refresh an already visible player profile after its data caches become incomplete.
+    // Navigate while the complete cache still exists, so pagehide saves a real profile preview.
+    await page.goto(target);
+    await page.waitForFunction(() => document.querySelector('#profileContent [data-stat="all"]')?.textContent === '3');
+    assert.equal(await page.locator('#profileContent .unifiedMatchRow').count(), 3);
     await page.evaluate(async () => {
       const empty = {...calendarCacheSnapshot(state.data, Date.now() + 2000), matches: [], agenda: []};
       localStorage.setItem(CALENDAR_CACHE, JSON.stringify(empty));
@@ -180,12 +184,11 @@ try {
       await writeDurableProjection(empty);
     });
     offline = false; partial = false; empty = false; holdSnapshot = true;
-    await page.goto(target);
     await page.reload();
     await page.waitForFunction(() => loadRunning);
     assert.equal(await page.locator('[data-profile-loading]').count(), 0);
     const pendingStat = page.locator('#profileContent [data-stat="all"]');
-    if (await pendingStat.count()) assert.equal(await pendingStat.textContent(), '3', `${group}: a refresh preview must retain the last known count`);
+    assert.equal(await pendingStat.textContent(), '3', `${group}: a refresh preview must retain the last known count`);
     assert.equal(typeof releaseSnapshot, 'function');
     holdSnapshot = false; releaseSnapshot();
     await page.waitForFunction(() => state.data?.matches?.some(m => m.id === 'full-double'));

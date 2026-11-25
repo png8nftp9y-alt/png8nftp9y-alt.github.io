@@ -13,7 +13,7 @@ test('untracked tournament opens metadata only; late responses cannot replace an
  const {context,rendered}=setup();await context.renderCatalogueTournament('itf','ID1');assert.deepEqual(rendered,['ID1|itf']);const t=vm.runInContext("catalogueTournamentPages.get('ID1|itf')",context);assert.equal(t.catalogueOnly,true);assert.equal(t.people.length,0);
  context.fetch=async()=>{context.location.hash='#calendar';return{ok:true,json:async()=>({tournament:{competitionId:'ID2',circuit:'itf'}})};};await context.renderCatalogueTournament('itf','ID2');assert.equal(rendered.length,1);
 });
-test('calendar search precedes selection; routes and heading-only rendering are wired',async()=>{
- const html=await readFile(new URL('../../v3.html',import.meta.url),'utf8');assert.match(html,/id="tournamentSearchForm"[\s\S]*?<\/form>\s*<button id="toggleAll"/);
+test('calendar tournament tools follow players and precede month; routes and heading-only rendering are wired',async()=>{
+ const html=await readFile(new URL('../../v3.html',import.meta.url),'utf8');const players=html.indexOf('id="playerFilters"'),toolbar=html.indexOf('id="calendarTournamentToolbar"'),search=html.indexOf('id="tournamentSearchForm"'),month=html.indexOf('class="calendarMonthNav"');assert.ok(players<toolbar&&toolbar<search&&search<month);const header=html.slice(html.indexOf('class="cardHead calendarHead"'),players);assert.match(header,/class="demographicFilters"/);assert.match(header,/id="toggleAll"/);assert.doesNotMatch(header,/calendarTitleActions|tournamentSearchForm/);
  assert.match(source,/if \(tournamentSearch\) renderTournamentSearchPage/);assert.match(source,/if\(t\.catalogueOnly\)\{[\s\S]*?querySelector\('\.tournamentMatches'\)\?\.remove/);
 });
