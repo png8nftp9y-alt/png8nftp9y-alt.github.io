@@ -11543,3 +11543,11 @@ Production run 45706901150 joined the official Pepe identities but the final ver
 Fix: explicitly bind only that retained source to the confirmed FITP/TE pair, using an additional versioned rule so the prior saved rule is preserved. Native scope validation ignores only this exact permitted empty-ID source and still rejects unknown/missing official IDs. Final readback also verifies the retained row belongs to the approved person. No broad name merge, nationality override, raw-source change or deletion.
 
 Validation: 24 targeted identity tests passed; production-shaped SQLite fixture covers multiple observed/search variants, empty acceptance ID, pre-existing rules from the failed attempt, exact retained binding, raw preservation and zero-write completed replay. Live D1 verification remains pending the next automatic push run.
+
+
+## 2026-11-25 — Correzione controlli CI dopo visualizzazione tabelloni
+
+- Run coinvolti: Worker 45710761661, D1/API 45710761739, CRUD 45710761460 e browser Altri 45710761563.
+- Causa verificata nei log: i primi tre falliscono nel test isolato fitp-subscription-dates con ReferenceError loadInternationalTournamentDrawLinks; il renderer estratto viene eseguito in una VM che non caricava la nuova dipendenza. Il browser Cerca fallisce alla riga 21 perché il vecchio requisito imponeva zero tournamentHeroActions nei tornei senza osservati, mentre ora la sezione deve contenere tutti i tabelloni disponibili.
+- Correzione: la VM registra separatamente il caricamento FITP e internazionale e ne verifica circuito, numero di chiamate e identità torneo. Il browser conserva l’assenza di giocatori/partite/acceptance list, aggiunge un catalogo ITF di prova con ID e URL validi e verifica i due link pubblicati, la sezione visibile e l’assenza di messaggi. Nessun controllo disabilitato; nessuna modifica a UI, dati, API o motori.
+- Validazione: 31 test mirati su renderer, tabelloni e filtro dinamico passati; sintassi verificatore browser verde. Il browser Chromium locale non è installabile dal CDN (HTTP 403), quindi l’esecuzione del verificatore Playwright resta da confermare su GitHub. Nessun rilancio automatico. I deploy precedenti si sono fermati prima della pubblicazione Worker.

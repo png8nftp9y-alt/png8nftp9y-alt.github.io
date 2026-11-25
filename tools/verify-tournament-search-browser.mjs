@@ -1,13 +1,14 @@
 import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {chromium} from 'playwright';
 const assets=Object.fromEntries(await Promise.all(['v3.html','v3.js','v3.css'].map(async p=>[p,await readFile(new URL('../'+p,import.meta.url),'utf8')])));
 const tracked={circuit:'fitp',competitionId:'SEARCH-F1',name:'Open Circolo Test',venueName:'Circolo Test',location:'Monza',startDate:'2026-11-24',endDate:'2026-11-30'};
-const empty={...tracked,circuit:'itf',competitionId:'SEARCH-I1',name:'J30 Cuneo',location:'Cuneo'};
+const empty={...tracked,circuit:'itf',competitionId:'J-J30-ITA-2026-999',name:'J30 Cuneo',location:'Cuneo',sourceUrl:'https://www.itftennis.com/en/tournament/j30-cuneo/ita/2026/j-j30-ita-2026-999/'};
 const browser=await chromium.launch({headless:true,executablePath:process.env.COURTWATCH_TEST_CHROMIUM||undefined});
 try{for(const group of ['main','others']){
  const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/*',async route=>{const url=new URL(route.request().url()),name=url.pathname.split('/').pop();
   if(assets[name])return route.fulfill({body:assets[name],contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':'text/html'});
   if(url.pathname.endsWith('/tournament-search'))return route.fulfill({json:url.searchParams.has('competitionId')?{tournament:empty}:{results:[tracked,empty],total:2,nextCursor:''}});
+  if(url.pathname.endsWith('/tournament-draw-links'))return route.fulfill({json:{circuit:empty.circuit,competitionId:empty.competitionId,complete:true,draws:[{event:'B-S-M-KO',drawUrl:empty.sourceUrl+'draws-and-results/'},{event:'G-D-M-KO',drawUrl:empty.sourceUrl+'draws-and-results/'}]}});
   if(url.pathname.endsWith('/session'))return route.fulfill({json:{user:{displayName:'Test',role:'admin'}}});
   if(url.pathname.endsWith('/app-snapshot'))return route.fulfill({json:{group,players:[{id:'search-player',name:'Test Player',userAdded:true,sex:'F',birthYear:2012}],tournaments:[{...tracked,playerId:'search-player',playerName:'Test Player'}],matches:[],agenda:[]}});
   return route.fulfill({json:{players:[],tournaments:[],matches:[],agenda:[],results:[],rankings:[]}});
@@ -17,8 +18,9 @@ try{for(const group of ['main','others']){
  assert.equal(await page.locator('#tournamentSearchSuggestions button').count(),2);
  await page.keyboard.press('Enter');assert.equal(await input.inputValue(),'');await page.locator('#tournamentSearchPageRows button').first().waitFor();assert.equal(await page.locator('#tournamentSearchPageRows button').count(),2);
  await page.locator('#tournamentSearchPageRows [data-catalogue-id="SEARCH-F1"]').click();await page.locator('.tournamentPlayer').waitFor();assert.match(await page.locator('.tournamentPlayer').textContent(),/Test Player/);
- await page.goBack();await page.locator('#tournamentSearchPageRows button').first().waitFor();await page.locator('#tournamentSearchPageRows [data-catalogue-id="SEARCH-I1"]').click();await page.locator('.tournamentHero h2').waitFor();
- assert.match(await page.locator('.tournamentHero h2').textContent(),/J30 Cuneo/);assert.equal(await page.locator('.tournamentPlayer,.tournamentMatches,.tournamentHeroActions').count(),0);
+ await page.goBack();await page.locator('#tournamentSearchPageRows button').first().waitFor();await page.locator('#tournamentSearchPageRows [data-catalogue-id="J-J30-ITA-2026-999"]').click();await page.locator('.tournamentHero h2').waitFor();
+ assert.match(await page.locator('.tournamentHero h2').textContent(),/J30 Cuneo/);assert.equal(await page.locator('.tournamentPlayer,.tournamentMatches,.tournamentAcceptanceLink').count(),0);
+ await page.waitForFunction(()=>document.querySelectorAll('.tournamentDraws a.tournamentDrawLink').length===2);assert.equal(await page.locator('.tournamentDraws').isVisible(),true);assert.match(await page.locator('.tournamentDraws').textContent(),/SM18 Tabellone principale/);assert.match(await page.locator('.tournamentDraws').textContent(),/DF18 Tabellone principale/);assert.doesNotMatch(await page.locator('.tournamentDraws').textContent(),/Caricamento|Nessun|inventario|aggiornamento|Riprova/);
  await page.reload();await page.locator('.tournamentHero h2').waitFor();assert.match(await page.locator('.tournamentHero h2').textContent(),/J30 Cuneo/);
  await page.evaluate(()=>{location.hash='#calendar';});await input.waitFor({state:'visible'});
  for(const width of [320,390,768,1024,1280]){await page.setViewportSize({width,height:900});assert.ok(await page.evaluate(()=>{const r=id=>document.getElementById(id).getBoundingClientRect(),p=r('playerFilters'),t=r('calendarTournamentToolbar'),s=r('tournamentSearchForm'),a=r('addCalendarEvent'),m=document.querySelector('.calendarMonthNav').getBoundingClientRect();return p.bottom<=t.top+1&&m.top>=t.top&&m.bottom<=t.bottom&&a.right<=s.left&&Math.abs(a.top+a.height/2-s.top-s.height/2)<2&&s.width<=261&&(innerWidth<=700||Math.abs(m.top+m.height/2-s.top-s.height/2)<2);}),`calendar controls and month must share the toolbar below players at ${width}px`);assert.ok(await page.evaluate(()=>{const ids=['tournamentSearchForm','tournamentSearchInput','toggleAll'];return ids.every(id=>{const r=document.getElementById(id).getBoundingClientRect();return r.left>=0&&r.right<=innerWidth+1;});}),`calendar search controls must fit ${width}px`);}
