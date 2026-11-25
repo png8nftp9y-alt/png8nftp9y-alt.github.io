@@ -18,7 +18,7 @@ test('current-version but incomplete calendar preview cannot remove current cont
  const {view,ctx}=reload({version,route:'/app#calendar',viewId:'calendarView',html:'BROKEN PREVIEW',styles:[]});assert.match(view.innerHTML,/id="addCalendarEvent"/);assert.equal(ctx.document.documentElement.dataset.cwRefreshPreview,undefined);
 });
 test('valid current preview still preserves calendar content and scroll restoration',()=>{
- const version=/version:\s*"([^"]+)"/.exec(js.slice(js.indexOf('function saveRefreshView()'),js.indexOf('const fmt =')))[1],cached='id="addCalendarEvent" id="removeCalendarEvent" id="tournamentSearchInput" id="calendarTournamentToolbar" SAVED CALENDAR';
+ const version=/version:\s*"([^"]+)"/.exec(js.slice(js.indexOf('function saveRefreshView()'),js.indexOf('const fmt =')))[1],cached='id="addCalendarEvent" id="removeCalendarEvent" id="tournamentSearchInput" id="calendarTournamentToolbar" id="calendarUnifiedToolbar" SAVED CALENDAR';
  const {view,ctx}=reload({version,route:'/app#calendar',viewId:'calendarView',html:cached,y:320,styles:[]});assert.equal(view.innerHTML,cached);assert.equal(ctx.window.courtWatchRefreshPreview.y,320);
 });
 test('missing manual widgets cannot throw before core application navigation is wired',()=>{

@@ -11482,3 +11482,7 @@ Tournament search run45502320496 passed its search scenarios and failed a later 
 
 ### 2026-11-25 — Align manual-calendar test with requested toolbar location
 Worker run45535137686 failed source check because manual-calendar-events.test.mjs still required plus/minus before Category. The requested layout now places both below player chips and above month navigation. Assert these new bounds for both buttons, preserving all form and event behavior tests. Browser runs45535137728 (including tournament search and shared refresh) and45535137659 passed. Application files unchanged. Validation: manual-calendar, search, saved-template and player Node suites plus release guard.
+
+
+### 2026-11-25 — Unified calendar month and tournament controls
+Remove border below demographic header and below tournament toolbar. Move existing month navigation into the toolbar between title/plus/minus and right-aligned search (260px maximum). At widths up to700px, month navigation wraps inside the same toolbar to avoid horizontal overflow. IDs and handlers preserved; no player-profile changes. Saved calendar previews require the new toolbar marker. Validation: existing calendar/event/search/template Node suites and release guard; actual browser layout remains for CI.

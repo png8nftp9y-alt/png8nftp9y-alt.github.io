@@ -18,7 +18,7 @@
       html[data-cw-refresh-preview] main.view { pointer-events: none; }
     </style>
     <title>Court Watch</title>
-    <link rel="stylesheet" href="v3.css?v=20261125024444" />
+    <link rel="stylesheet" href="v3.css?v=20261125030433" />
   </head>
   <body>
     <div class="shell">
@@ -232,8 +232,8 @@
             <div class="filters">
               <div id="playerFilters" class="chips"></div>
             </div>
-            <div id="calendarTournamentToolbar" class="calendarTournamentToolbar"><div class="calendarTitleActions"><h2>Calendario</h2><button id="addCalendarEvent" class="btn icon" type="button" aria-label="Aggiungi torneo manuale" title="Aggiungi torneo manuale">+</button><button id="removeCalendarEvent" class="btn icon" type="button" aria-label="Rimuovi torneo manuale" title="Rimuovi torneo manuale">−</button></div><form id="tournamentSearchForm" class="playerSearchForm tournamentSearchForm" role="search" autocomplete="off"><label class="srOnly" for="tournamentSearchInput">Cerca tornei per nome, circolo, città o data</label><input id="tournamentSearchInput" type="search" placeholder="Cerca tornei…" aria-label="Cerca tornei per nome, circolo, città o data" aria-controls="tournamentSearchSuggestions" aria-expanded="false" maxlength="160"><div id="tournamentSearchSuggestions" class="playerSearchSuggestions" hidden></div></form></div>
-            <div class="calendarMonthNav"><button id="prevCalendarMonth" class="btn icon" type="button" aria-label="Mese precedente del solo calendario">‹</button><div id="calendarMonthLabel" class="calendarMonthLabel"></div><button id="calendarGoToday" class="btn agendaGoToday" type="button" hidden>Oggi</button><button id="nextCalendarMonth" class="btn icon" type="button" aria-label="Mese successivo del solo calendario">›</button></div>
+            <div id="calendarTournamentToolbar" class="calendarTournamentToolbar"><span id="calendarUnifiedToolbar" hidden></span><div class="calendarTitleActions"><h2>Calendario</h2><button id="addCalendarEvent" class="btn icon" type="button" aria-label="Aggiungi torneo manuale" title="Aggiungi torneo manuale">+</button><button id="removeCalendarEvent" class="btn icon" type="button" aria-label="Rimuovi torneo manuale" title="Rimuovi torneo manuale">−</button></div><div class="calendarMonthNav"><button id="prevCalendarMonth" class="btn icon" type="button" aria-label="Mese precedente del solo calendario">‹</button><div id="calendarMonthLabel" class="calendarMonthLabel"></div><button id="calendarGoToday" class="btn agendaGoToday" type="button" hidden>Oggi</button><button id="nextCalendarMonth" class="btn icon" type="button" aria-label="Mese successivo del solo calendario">›</button></div><form id="tournamentSearchForm" class="playerSearchForm tournamentSearchForm" role="search" autocomplete="off"><label class="srOnly" for="tournamentSearchInput">Cerca tornei per nome, circolo, città o data</label><input id="tournamentSearchInput" type="search" placeholder="Cerca tornei…" aria-label="Cerca tornei per nome, circolo, città o data" aria-controls="tournamentSearchSuggestions" aria-expanded="false" maxlength="160"><div id="tournamentSearchSuggestions" class="playerSearchSuggestions" hidden></div></form></div>
+
             <div class="legend">
               <span class="fitp">FITP</span
               ><span class="tennis-europe">Tennis Europe</span
@@ -305,7 +305,7 @@
           const route = location.pathname + location.search + location.hash;
           if (!saved || saved.version !== "20261122-profile-event-place" || saved.route !== route || typeof saved.html !== "string" || saved.html.length > 1500000) return;
           // A preview is disposable: never replace current controls with an older template.
-          if (saved.viewId === "calendarView" && !["addCalendarEvent", "removeCalendarEvent", "tournamentSearchInput", "calendarTournamentToolbar"].every(id => new RegExp('id=["\']' + id + '["\']').test(saved.html))) return;
+          if (saved.viewId === "calendarView" && !["addCalendarEvent", "removeCalendarEvent", "tournamentSearchInput", "calendarTournamentToolbar", "calendarUnifiedToolbar"].every(id => new RegExp('id=["\']' + id + '["\']').test(saved.html))) return;
           const view = document.getElementById(saved.viewId);
           if (!view?.classList.contains("view")) return;
           for (const item of saved.styles || []) {
@@ -401,7 +401,7 @@
       <div id="calendarEventRemoval" hidden></div>
       <p id="calendarEventError" role="alert"></p>
     </dialog>
-    <script crossorigin="anonymous" src="v3.js?v=20261125024444"></script>
+    <script crossorigin="anonymous" src="v3.js?v=20261125030433"></script>
 
 </body>
 </html>
