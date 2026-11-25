@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-25T04:46:32.666Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-25T04:52:36.774Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -1005656,13 +1005656,13 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T04:36:48.702Z",
+      "checkedAt": "2026-11-25T04:52:32.307Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 2,
+      "acquiredSections": 4,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 4,
+      "resolvedSections": 4,
+      "missingSections": 2,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -1005781,8 +1005781,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1005802,14 +1005802,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -1005820,8 +1005820,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1005841,19 +1005841,19 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1006392,6 +1006392,674 @@
             "taskId": "J-J30-AUS-2026-006__G-S-Q-KO",
             "storedAt": "2026-11-21T11:46:11.370Z"
           }
+        },
+        "B-D-M-KO": {
+          "family": "B-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800846243",
+              "name": "Knox Treasure",
+              "givenName": "Knox",
+              "familyName": "Treasure",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/knox-treasure/800846243/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800792883",
+              "name": "Elisha Wee",
+              "givenName": "Elisha",
+              "familyName": "Wee",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/elisha-wee/800792883/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800859215",
+              "name": "Goran Girski",
+              "givenName": "Goran",
+              "familyName": "Girski",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/goran-girski/800859215/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800856316",
+              "name": "Leon Goh",
+              "givenName": "Leon",
+              "familyName": "Goh",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/leon-goh/800856316/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800849738",
+              "name": "Rafael Fauster",
+              "givenName": "Rafael",
+              "familyName": "Fauster",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/rafael-fauster/800849738/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800820370",
+              "name": "Jake Karathra",
+              "givenName": "Jake",
+              "familyName": "Karathra",
+              "nationalityCode": "NZL",
+              "profileLink": "/en/players/jake-karathra/800820370/nzl/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800747188",
+              "name": "Aidan Chan",
+              "givenName": "Aidan",
+              "familyName": "Chan",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/aidan-chan/800747188/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800726124",
+              "name": "Lincoln Duckett",
+              "givenName": "Lincoln",
+              "familyName": "Duckett",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/lincoln-duckett/800726124/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800805768",
+              "name": "Prachanda Komarla",
+              "givenName": "Prachanda",
+              "familyName": "Komarla",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/prachanda-komarla/800805768/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800779073",
+              "name": "Lakshay Madankumar",
+              "givenName": "Lakshay",
+              "familyName": "Madankumar",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/lakshay-madankumar/800779073/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800832329",
+              "name": "Thoma Bogatyrev",
+              "givenName": "Thoma",
+              "familyName": "Bogatyrev",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/thoma-bogatyrev/800832329/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800829075",
+              "name": "Caleb Gwinnell-Sheather",
+              "givenName": "Caleb",
+              "familyName": "Gwinnell-Sheather",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/caleb-gwinnell-sheather/800829075/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800719212",
+              "name": "Varit Lertsinthapanont",
+              "givenName": "Varit",
+              "familyName": "Lertsinthapanont",
+              "nationalityCode": "THA",
+              "profileLink": "/en/players/varit-lertsinthapanont/800719212/tha/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800804780",
+              "name": "Lucas Sirbu",
+              "givenName": "Lucas",
+              "familyName": "Sirbu",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/lucas-sirbu/800804780/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800719936",
+              "name": "Angelantonio ERRICO",
+              "givenName": "Angelantonio",
+              "familyName": "ERRICO",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/angelantonio-errico/800719936/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800823816",
+              "name": "Jackson Ralph",
+              "givenName": "Jackson",
+              "familyName": "Ralph",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/jackson-ralph/800823816/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800759030",
+              "name": "Lennox Kelly",
+              "givenName": "Lennox",
+              "familyName": "Kelly",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/lennox-kelly/800759030/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800830152",
+              "name": "Trey Phillips",
+              "givenName": "Trey",
+              "familyName": "Phillips",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/trey-phillips/800830152/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800838976",
+              "name": "Noah Kaneda-Hession",
+              "givenName": "Noah",
+              "familyName": "Kaneda-Hession",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/noah-kaneda-hession/800838976/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800825952",
+              "name": "Aleksandr Kharkov",
+              "givenName": "Aleksandr",
+              "familyName": "Kharkov",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/aleksandr-kharkov/800825952/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800885847",
+              "name": "Rohan Tejani",
+              "givenName": "Rohan",
+              "familyName": "Tejani",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/rohan-tejani/800885847/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800869431",
+              "name": "Max Winstanley",
+              "givenName": "Max",
+              "familyName": "Winstanley",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/max-winstanley/800869431/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800813471",
+              "name": "Charles Kindt",
+              "givenName": "Charles",
+              "familyName": "Kindt",
+              "nationalityCode": "NZL",
+              "profileLink": "/en/players/charles-kindt/800813471/nzl/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800767741",
+              "name": "Ethan Ning",
+              "givenName": "Ethan",
+              "familyName": "Ning",
+              "nationalityCode": "NZL",
+              "profileLink": "/en/players/ethan-ning/800767741/nzl/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800828892",
+              "name": "Ken Dalla Pozza",
+              "givenName": "Ken",
+              "familyName": "Dalla Pozza",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/ken-dalla-pozza/800828892/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800834950",
+              "name": "Nicholas Scott",
+              "givenName": "Nicholas",
+              "familyName": "Scott",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/nicholas-scott/800834950/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800807248",
+              "name": "Shaurya Phogat",
+              "givenName": "Shaurya",
+              "familyName": "Phogat",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/shaurya-phogat/800807248/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800851959",
+              "name": "Nick Stoyanov",
+              "givenName": "Nick",
+              "familyName": "Stoyanov",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/nick-stoyanov/800851959/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800858604",
+              "name": "Will Brooks-Gay",
+              "givenName": "Will",
+              "familyName": "Brooks-Gay",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/will-brooks-gay/800858604/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800824386",
+              "name": "Tyler Zeuschner",
+              "givenName": "Tyler",
+              "familyName": "Zeuschner",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/tyler-zeuschner/800824386/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800724586",
+              "name": "Benjamin Galvao",
+              "givenName": "Benjamin",
+              "familyName": "Galvao",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/benjamin-galvao/800724586/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800702531",
+              "name": "Marc Joe Sutisna",
+              "givenName": "Marc Joe",
+              "familyName": "Sutisna",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/marc-joe-sutisna/800702531/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-25T04:52:32.307Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-AUS-2026-006__B-D-M-KO",
+            "storedAt": "2026-11-25T04:52:32.307Z"
+          }
+        },
+        "G-D-M-KO": {
+          "family": "G-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800784877",
+              "name": "Jasmin Heapes",
+              "givenName": "Jasmin",
+              "familyName": "Heapes",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/jasmin-heapes/800784877/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800732205",
+              "name": "Elise Virr",
+              "givenName": "Elise",
+              "familyName": "Virr",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/elise-virr/800732205/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800829304",
+              "name": "Sadie Gillard",
+              "givenName": "Sadie",
+              "familyName": "Gillard",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/sadie-gillard/800829304/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800829318",
+              "name": "Amelia Hilton",
+              "givenName": "Amelia",
+              "familyName": "Hilton",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/amelia-hilton/800829318/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800713276",
+              "name": "Ana Maric",
+              "givenName": "Ana",
+              "familyName": "Maric",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/ana-maric/800713276/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800764441",
+              "name": "Claudia Shearwood",
+              "givenName": "Claudia",
+              "familyName": "Shearwood",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/claudia-shearwood/800764441/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800808984",
+              "name": "Isabelle Chiew",
+              "givenName": "Isabelle",
+              "familyName": "Chiew",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/isabelle-chiew/800808984/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800768275",
+              "name": "Liana Polozani",
+              "givenName": "Liana",
+              "familyName": "Polozani",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/liana-polozani/800768275/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800772471",
+              "name": "Belis Gulener",
+              "givenName": "Belis",
+              "familyName": "Gulener",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/belis-gulener/800772471/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800828894",
+              "name": "Jocelyn Jia",
+              "givenName": "Jocelyn",
+              "familyName": "Jia",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/jocelyn-jia/800828894/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800804812",
+              "name": "Sunmer Royall",
+              "givenName": "Sunmer",
+              "familyName": "Royall",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/sunmer-royall/800804812/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800715103",
+              "name": "Dhevieena Sarawanan",
+              "givenName": "Dhevieena",
+              "familyName": "Sarawanan",
+              "nationalityCode": "MAS",
+              "profileLink": "/en/players/dhevieena-sarawanan/800715103/mas/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800828955",
+              "name": "Grace Janjua",
+              "givenName": "Grace",
+              "familyName": "Janjua",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/grace-janjua/800828955/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800860556",
+              "name": "Emily Liang",
+              "givenName": "Emily",
+              "familyName": "Liang",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/emily-liang/800860556/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800845513",
+              "name": "Mariam Elagaty",
+              "givenName": "Mariam",
+              "familyName": "Elagaty",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/mariam-elagaty/800845513/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800836523",
+              "name": "Cleo Stuart",
+              "givenName": "Cleo",
+              "familyName": "Stuart",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/cleo-stuart/800836523/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800869092",
+              "name": "Audrey Chen",
+              "givenName": "Audrey",
+              "familyName": "Chen",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/audrey-chen/800869092/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800805619",
+              "name": "Eva Ishchenko",
+              "givenName": "Eva",
+              "familyName": "Ishchenko",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/eva-ishchenko/800805619/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800807606",
+              "name": "Charlotte Mweemba",
+              "givenName": "Charlotte",
+              "familyName": "Mweemba",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/charlotte-mweemba/800807606/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800770906",
+              "name": "Misty Woodhouse",
+              "givenName": "Misty",
+              "familyName": "Woodhouse",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/misty-woodhouse/800770906/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800867935",
+              "name": "Taona Mashaya",
+              "givenName": "Taona",
+              "familyName": "Mashaya",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/taona-mashaya/800867935/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800858097",
+              "name": "Anna Zhao",
+              "givenName": "Anna",
+              "familyName": "Zhao",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/anna-zhao/800858097/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800852659",
+              "name": "Kyla Guirguis",
+              "givenName": "Kyla",
+              "familyName": "Guirguis",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/kyla-guirguis/800852659/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800748007",
+              "name": "Jovana Novakovic",
+              "givenName": "Jovana",
+              "familyName": "Novakovic",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/jovana-novakovic/800748007/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800774183",
+              "name": "Lily Khonsavang",
+              "givenName": "Lily",
+              "familyName": "Khonsavang",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/lily-khonsavang/800774183/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800712951",
+              "name": "Naomi-Mariana Vakadranu",
+              "givenName": "Naomi-Mariana",
+              "familyName": "Vakadranu",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/naomi-mariana-vakadranu/800712951/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800809698",
+              "name": "Sophie Bacea - Anton",
+              "givenName": "Sophie",
+              "familyName": "Bacea - Anton",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/sophie-bacea-anton/800809698/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800875417",
+              "name": "Elaine Wang",
+              "givenName": "Elaine",
+              "familyName": "Wang",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/elaine-wang/800875417/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800865293",
+              "name": "Evie Curtin",
+              "givenName": "Evie",
+              "familyName": "Curtin",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/evie-curtin/800865293/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800818132",
+              "name": "Imogen Hoppo",
+              "givenName": "Imogen",
+              "familyName": "Hoppo",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/imogen-hoppo/800818132/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800728968",
+              "name": "Amaya Muench",
+              "givenName": "Amaya",
+              "familyName": "Muench",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/amaya-muench/800728968/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800833483",
+              "name": "Latasha Thimmaiah",
+              "givenName": "Latasha",
+              "familyName": "Thimmaiah",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/latasha-thimmaiah/800833483/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-25T04:52:32.307Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-AUS-2026-006__G-D-M-KO",
+            "storedAt": "2026-11-25T04:52:32.307Z"
+          }
         }
       }
     },
@@ -1006419,7 +1007087,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T04:36:49.196Z",
+      "checkedAt": "2026-11-25T04:52:33.032Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1006954,7 +1007622,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T04:36:49.581Z",
+      "checkedAt": "2026-11-25T04:52:33.675Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1007529,7 +1008197,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T04:36:49.963Z",
+      "checkedAt": "2026-11-25T04:52:34.270Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -1009022,7 +1009690,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T04:36:50.351Z",
+      "checkedAt": "2026-11-25T04:52:35.094Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1009737,7 +1010405,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T04:36:50.741Z",
+      "checkedAt": "2026-11-25T04:52:35.647Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1009862,8 +1010530,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1009888,8 +1010556,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1009901,8 +1010569,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1009927,14 +1010595,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1010492,7 +1011160,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T04:36:51.120Z",
+      "checkedAt": "2026-11-25T04:52:36.201Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1015448,7 +1016116,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T04:36:51.517Z",
+      "checkedAt": "2026-11-25T04:52:36.774Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 1,
