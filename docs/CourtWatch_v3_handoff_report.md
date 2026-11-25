@@ -11492,3 +11492,5 @@ Remove border below demographic header and below tournament toolbar. Move existi
 Browser run45537411932 failed320px toolbar bounds. Shared mobile playerSearchForm sets order3, matching the wrapped month navigation order3; DOM order therefore put the full-width month before the search. Explicitly set calendar toolbar search order0 so title/buttons and search precede the wrapped month. Remove the month-label bottom border as requested. Keep browser assertions unchanged. Validation: targeted Node checks and release guard; actual browser confirmation remains required.
 
 ITF discovery 2026-11-25T09:17:21.043Z: 6 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+ITF Meta ordinary 2026-11-25T09:18:28.069Z: attempted 6, acquired 6, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
