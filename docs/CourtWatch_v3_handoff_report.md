@@ -11534,3 +11534,12 @@ Validation: 23 Node tests passed (three-reviewed-identities, player-identity-map
 - Mantenuto il passaggio dinamico tutti→osservati e il riuso della normale pagina torneo quando la partecipazione del nuovo osservato entra nella proiezione personale.
 
 - Verifica finale solo-link: 69 test passati; sintassi frontend/API, analisi e policy D1 verdi.
+
+
+## 2026-11-25 — Resume three identity decisions with retained Pepe acceptance evidence
+
+Production run 45706901150 joined the official Pepe identities but the final verifier treated a retained acceptance row with no native ID as an unexpected native identity. D1 readback confirmed the three official circuits share canonical cw-82f9fe1e219958bc38a48124ce244262, while exact retained source acceptance|acquired|tennis-europe|name:447d6a354aae4fa1ad348775 retained its prior canonical.
+
+Fix: explicitly bind only that retained source to the confirmed FITP/TE pair, using an additional versioned rule so the prior saved rule is preserved. Native scope validation ignores only this exact permitted empty-ID source and still rejects unknown/missing official IDs. Final readback also verifies the retained row belongs to the approved person. No broad name merge, nationality override, raw-source change or deletion.
+
+Validation: 24 targeted identity tests passed; production-shaped SQLite fixture covers multiple observed/search variants, empty acceptance ID, pre-existing rules from the failed attempt, exact retained binding, raw preservation and zero-write completed replay. Live D1 verification remains pending the next automatic push run.

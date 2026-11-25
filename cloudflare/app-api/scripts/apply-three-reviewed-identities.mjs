@@ -10,7 +10,7 @@ export const approval=JSON.parse(await fs.readFile(new URL('../data/user-approve
 const marker='approvedThreeIdentityReviews:20261125:v1';
 const native=r=>r.circuit+'|'+String(r.official_id||r.officialId||'').toLowerCase();
 const identity=key=>{const [circuit,officialId]=key.split('|');return{circuit,officialId}};
-export function approvedRules(){return approval.groups.flatMap(g=>g.partitions.flatMap((part,index)=>part.slice(1).map((key,i)=>({key:'confirmedPlayerCircuitLink:review-20261125:'+g.caseId+':'+index+':'+i,value:JSON.stringify({nameKey:g.nameKey,identities:[identity(part[0]),identity(key)],reason:'Explicit user identity decision 25 November 2026',...(g.currentNationality?{currentNationality:g.currentNationality}:{})})}))));}
+export function approvedRules(){return approval.groups.flatMap(g=>g.partitions.flatMap((part,index)=>part.slice(1).map((key,i)=>({key:'confirmedPlayerCircuitLink:review-20261125:'+g.caseId+':'+index+':'+i+(g.sourceKeys?.length&&index===0&&i===0?':retained-v2':''),value:JSON.stringify({nameKey:g.nameKey,identities:[identity(part[0]),identity(key)],...(g.sourceKeys?.length&&index===0&&i===0?{sourceKeys:g.sourceKeys}:{}),reason:'Explicit user identity decision 25 November 2026',...(g.currentNationality?{currentNationality:g.currentNationality}:{})})}))));}
 async function readSources(query){return query(`SELECT l.*,COALESCE(a.canonical_id,l.canonical_id) AS person_id,
  CASE WHEN o.source_key IS NOT NULL THEN 'observed_players' WHEN s.source_key IS NOT NULL THEN 'search_acquired_players' WHEN c.id IS NOT NULL THEN 'app_players' WHEN u.courtwatch_id IS NOT NULL THEN 'user_app_player_additions' ELSE '' END AS source_table,
  COALESCE(o.payload,s.payload,c.payload,u.payload) AS payload FROM player_circuit_identities l
@@ -23,13 +23,14 @@ async function readSources(query){return query(`SELECT l.*,COALESCE(a.canonical_
 export function verifyPartitions(rows){
  const verified=[];
  for(const g of approval.groups){
-  const wanted=new Set(g.partitions.flat()),group=rows.filter(r=>r.name_key===g.nameKey&&r.circuit!=='courtwatch'),seen=new Set(group.map(native));
+  const wanted=new Set(g.partitions.flat()),group=rows.filter(r=>r.name_key===g.nameKey&&r.circuit!=='courtwatch'),seen=new Set(group.filter(r=>r.official_id).map(native));
   if(seen.size!==wanted.size||[...wanted].some(key=>!seen.has(key)))throw Error('review_native_scope_changed:'+g.nameKey);
   const people=g.partitions.map(part=>{
    const ids=new Set(group.filter(r=>part.includes(native(r))).map(r=>r.person_id||r.canonical_id));
    if(ids.size!==1)throw Error('review_partition_not_unified:'+g.nameKey);
    return [...ids][0];
   });
+  for(const sourceKey of g.sourceKeys||[]){const retained=group.find(r=>r.source_key===sourceKey);if(retained&&(retained.person_id||retained.canonical_id)!==people[0])throw Error('review_retained_source_not_unified:'+g.nameKey);}
   if(new Set(people).size!==people.length)throw Error('review_separate_profiles_merged:'+g.nameKey);
   verified.push({name:g.nameKey,partitions:g.partitions.map((ids,i)=>({ids,canonicalId:people[i]}))});
  }
@@ -49,11 +50,12 @@ export async function applyThreeReviews(query){
  if(before.length>200||approval.groups.length!==3||rules.length!==4)throw Error('review_manifest_invalid');
  const originals=before.filter(r=>r.circuit!=='courtwatch');
  const required=new Set(approval.groups.flatMap(g=>g.partitions.flat()));
- const present=new Set(originals.map(native));
+ const present=new Set(originals.filter(r=>r.official_id).map(native));
  if(required.size!==present.size||[...required].some(k=>!present.has(k)))throw Error('review_native_scope_changed');
  if(originals.some(r=>!r.payload||!r.source_table))throw Error('review_original_source_missing');
  const allowed=new Set(approval.groups.flatMap(g=>g.partitions.flat()));
- if(originals.some(r=>!allowed.has(native(r))))throw Error('review_unexpected_native_id');
+ const retained=new Set(approval.groups.flatMap(g=>g.sourceKeys||[]));
+ if(originals.some(r=>!allowed.has(native(r))&&!(retained.has(r.source_key)&&!r.official_id)))throw Error('review_unexpected_native_id');
  const existing=await query("SELECT key,value FROM app_state WHERE key LIKE 'confirmedPlayerCircuitLink:%' ORDER BY key");
  const allRules=[...existing.filter(r=>!rules.some(w=>w.key===r.key)),...rules].map(r=>JSON.parse(r.value));
  // Simulate every merge and separation before the first mutation.

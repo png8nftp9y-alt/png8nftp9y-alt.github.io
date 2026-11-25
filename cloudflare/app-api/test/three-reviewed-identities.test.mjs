@@ -42,3 +42,25 @@ test('new native IDs reopen review and prevent applying an outdated decision',as
   const before=d.writes();await assert.rejects(applyThreeReviews(d.query),/native_scope_changed/);assert.equal(d.writes(),before);
  }finally{d.close();}
 });
+
+test('production source variants complete the same approved partitions',async()=>{
+ const actual=JSON.parse(fs.readFileSync(new URL('./fixtures/three-reviewed-live-before.json',import.meta.url)));
+ const d=database({identityMapping:true});try{
+  for(const r of actual){
+   d.execute('INSERT INTO '+r.source_table+'(source_key,circuit,official_id,normalized_name,display_name,payload) VALUES(?,?,?,?,?,?)',[r.source_key,r.circuit,r.official_id,r.normalized_name,r.display_name,r.payload]);
+   d.execute('INSERT INTO player_identity_people(canonical_id,name_key,payload) VALUES(?,?,?) ON CONFLICT DO NOTHING',[r.canonical_id,r.name_key,'{}']);
+   d.execute('INSERT INTO player_circuit_identities(source_key,canonical_id,name_key,circuit,official_id,normalized_name,display_name,birth_year,nationality,profile_url) VALUES(?,?,?,?,?,?,?,?,?,?)',[r.source_key,r.canonical_id,r.name_key,r.circuit,r.official_id,r.normalized_name,r.display_name,r.birth_year,r.nationality,r.profile_url]);
+  }
+  // Resume after the first production attempt already saved the original rules.
+  for(const rule of approvedRules()){
+   const value=JSON.parse(rule.value);delete value.sourceKeys;
+   d.execute('INSERT INTO app_state(key,value,updated_at) VALUES(?,?,?)',[rule.key.replace(':retained-v2',''),JSON.stringify(value),'2026-11-25']);
+  }
+  const raw=d.execute('SELECT * FROM observed_players ORDER BY source_key');
+  const result=await applyThreeReviews(d.query);assert.equal(result.summary.closedCases,3);
+  assert.deepEqual(d.execute('SELECT * FROM observed_players ORDER BY source_key'),raw);
+  const links=d.execute("SELECT * FROM player_circuit_identities WHERE name_key='ENRICO PEPE'");
+  assert.equal(new Set(links.map(r=>r.canonical_id)).size,1);
+  const before=d.writes();assert.equal((await applyThreeReviews(d.query)).status,'already_completed');assert.equal(d.writes(),before);
+ }finally{d.close();}
+});
