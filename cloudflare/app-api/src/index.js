@@ -1,3 +1,4 @@
+import {loadTournamentDrawCatalogue} from '../lib/tournament-draw-catalogue.mjs';
 import {searchTournaments} from '../lib/tournament-search.mjs';
 import {automationControlPage,changeAutomation} from '../lib/admin-automation-control.mjs';
 import {calendarEvents,calendarEventTournaments,writeCalendarEvent} from '../lib/manual-calendar-events.mjs';
@@ -235,6 +236,7 @@ async function protectedApp(request,env,path,url,timing=playerLoadTiming()){
   const device=await timing.measure('device',()=>recordDevice(request,env,user,path));if(device.revoked)return privateJson({error:'device_revoked'},403);
   const apiPath=path.replace(/^\/app(?:-api|\/api)/,'');
   if(apiPath==='/tournament-search'&&request.method==='GET'){try{return privateJson(await searchTournaments(env.RUNTIME_DOCUMENTS,{query:url.searchParams.get('q')||'',cursor:url.searchParams.get('cursor')||'',circuit:url.searchParams.get('circuit')||'',competitionId:url.searchParams.get('competitionId')||''}));}catch(error){return privateJson({error:'tournament_search_unavailable'},error.message==='invalid_tournament_cursor'?400:503);}}
+  if(apiPath==='/tournament-draw-links'&&request.method==='GET'){try{const circuit=url.searchParams.get('circuit')||'',competitionId=url.searchParams.get('competitionId')||'';if(!(circuit==='itf'?/^J-[A-Z0-9]+-[A-Z]{3}-\d{4}-\d{3}$/i.test(competitionId):circuit==='tennis-europe'&&/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(competitionId)))return privateJson({error:'invalid_draw_tournament'},400);const result=await searchTournaments(env.RUNTIME_DOCUMENTS,{circuit,competitionId});if(!result.tournament)return privateJson({error:'tournament_not_found'},404);return privateJson(await loadTournamentDrawCatalogue(result.tournament,{archive:env.ARCHIVE}));}catch{return privateJson({error:'tournament_draw_catalogue_unavailable'},503);}}
   if(apiPath==='/fitp-draw-links'&&request.method==='GET'){try{return privateJson(await loadFitpDrawLinks(url.searchParams.get('competitionId')||''))}catch(error){return privateJson({error:error.status===400?error.message:'fitp_draw_links_unavailable'},error.status||502)}}
   let group;try{group=playerListGroup(request.headers.get('X-CourtWatch-Group')||'main')}catch(error){return privateJson({error:error.message},400)}
   const membership=playerMembershipTable(group);

@@ -593,9 +593,9 @@ button,a,[role="link"],summary{touch-action:manipulation}
 @media(max-width:650px){.agendaFilter{flex:1 1 100%}.agendaFilterMenu{width:100%;max-width:100%}.agendaFilters{padding:10px}.agendaFilter summary{font-size:13px}}
 
 /* FITP_CATEGORY_ROWS */
-.tournamentDraws [data-fitp-draw-links]{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
+.tournamentDraws :is([data-fitp-draw-links],[data-international-draw-links]){display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
 .fitpDrawCategoryRow{display:flex;flex-wrap:wrap;align-items:center;gap:5px;width:100%}
-.tournamentDraws:has([data-fitp-draw-links]){align-items:flex-start;flex-wrap:nowrap}
+.tournamentDraws:has(:is([data-fitp-draw-links],[data-international-draw-links])){align-items:flex-start;flex-wrap:nowrap}
 
 /* FITP_AGE_ROWS */
 .fitpDrawAgeRow{display:flex;flex-wrap:wrap;align-items:center;gap:5px;width:100%}
@@ -606,14 +606,14 @@ button,a,[role="link"],summary{touch-action:manipulation}
 
 /* FITP_DRAW_HEADER_WIDTH */
 @media(min-width:651px){
- .tournamentHero:has([data-fitp-draw-links])>div:first-child{flex:1 1 0;min-width:0}
- .tournamentHero:has([data-fitp-draw-links]) .tournamentHeroActions{flex:0 0 auto;width:max-content;max-width:65%;min-width:0}
- .tournamentHero:has([data-fitp-draw-links]) .tournamentDraws{max-width:100%;min-width:0}
- .tournamentHero:has([data-fitp-draw-links]) .tournamentDraws>span{min-width:0;max-width:100%}
- .tournamentHero:has([data-fitp-draw-links]) [data-fitp-draw-links]{min-width:0;max-width:100%;overflow-x:auto}
- .tournamentHero:has([data-fitp-draw-links]) .fitpDrawAgeRow{flex-wrap:nowrap;width:max-content;min-width:100%}
- .tournamentHero:has([data-fitp-draw-links]) .fitpDrawAgeLabel,
- .tournamentHero:has([data-fitp-draw-links]) .tournamentDrawLink{flex-shrink:0;white-space:nowrap}
+ .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links]))>div:first-child{flex:1 1 0;min-width:0}
+ .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .tournamentHeroActions{flex:0 0 auto;width:max-content;max-width:65%;min-width:0}
+ .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .tournamentDraws{max-width:100%;min-width:0}
+ .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .tournamentDraws>span{min-width:0;max-width:100%}
+ .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) :is([data-fitp-draw-links],[data-international-draw-links]){min-width:0;max-width:100%;overflow-x:auto}
+ .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .fitpDrawAgeRow{flex-wrap:nowrap;width:max-content;min-width:100%}
+ .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .fitpDrawAgeLabel,
+ .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .tournamentDrawLink{flex-shrink:0;white-space:nowrap}
 }
 
 .type.tennisEuropeCategory{background:#7040a0;color:#fff}
@@ -695,3 +695,6 @@ button,a,[role="link"],summary{touch-action:manipulation}
 
 /* Override the shared mobile player-search order inside the calendar toolbar. */
 .calendarTournamentToolbar>.tournamentSearchForm{order:0}.calendarTournamentToolbar .calendarMonthLabel{border-bottom:0}
+
+/* Empty draw sections stay hidden even when the header uses flex layout. */
+.tournamentHero .tournamentDraws[hidden]{display:none!important}

@@ -11507,3 +11507,30 @@ User confirmed: Mazzotta FITP 4212935483 with TE 15678cb2-db84-4b66-ac44-cc0d342
 Added a bounded one-time D1 workflow, exact native-ID partition manifest, incremental application/readback script and SQLite fixtures/tests. The script simulates partitions before writing, preserves original sources, saves exact review decisions, verifies distinct homonyms and closes only these three cases. Missing/new native IDs stop before writes; completed replay writes zero rows. No external discovery, workflow enable/disable, source deletion or full-database resync.
 
 Validation: 23 Node tests passed (three-reviewed-identities, player-identity-mapping and identity-review-queue), including SQLite application, original-source preservation, replay after an ordinary source update, zero-write replay and incomplete/new-ID guards. Workflow YAML and embedded shell validated. Live D1 application remains to be verified in the new workflow run after publication.
+
+
+## 2026-11-25 — Tabelloni Tennis Europe e ITF impaginati come FITP
+
+- Richiesta: stessa impaginazione e ordinamento dei pulsanti tabelloni FITP nelle pagine torneo Europe e ITF.
+- Causa ITF: il renderer richiedeva un codice evento con età (BS14), non riconosceva i codici nativi B-S-M-KO e ignorava i nomi tabellone già salvati nelle iscrizioni, come Girls Singles Qualifying.
+- Modifica: righe per Under crescente con le medesime classi FITP, ordine SM/SF/DM/DF/DX, qualificazioni prima del principale e distinzione dei gironi. Visualizzazione dei tabelloni ricavabili dalle partite e dai nomi draw delle iscrizioni già presenti. Collegamenti diretti conservati quando disponibili; per ITF il fallback è la pagina ufficiale Draws and Results, senza inventare URL diretti a sezioni. Corretto il suffisso duplicato draws-and-results. La presentazione iniziale riutilizza i dati già presenti; nessuna modifica ai risultati.
+- Integrità: nessuna fascia inventata per Europe con più età; ITF junior J-* usa Under 18; nessun tabellone generato per raduni. I tornei privi di eventi noti mostrano lo stato vuoto. Layout CSS FITP esteso al contenitore internazionale e cache JS/CSS aggiornata.
+- Verifica: 49 test mirati passati su tabelloni internazionali/FITP, classifiche torneo, avvio e interazioni mobile; verificatore analisi/avvio e controllo sintassi verdi. Nuova regressione aggiunta al check CI. Chromium locale non avviabile: verifica visiva su browser reale da completare dopo pubblicazione.
+
+### Estensione: catalogo completo senza osservati, filtro dinamico con osservati
+
+- Il torneo del Cerca mantiene la sezione tabelloni anche senza giocatori. FITP usa il catalogo già esistente, Europe carica soltanto l’indice pubblico dei tabelloni su richiesta, ITF legge l’inventario di acquisizione ufficiale da R2. La nuova API privata convalida circuito/ID e appartenenza al catalogo; nessuna scrittura D1, nessuna lettura dei risultati completi ITF. Gli indici pubblici hanno cache breve e non conservano appartenenze private. La risoluzione del torneo riutilizza il lettore dei metadati già usato dal Cerca.
+- Il filtro si ricalcola da giocatori, iscrizioni e partite correnti dell’account, indipendentemente dalla selezione calendario. L’aggiunta di X con partecipazione in Y fa usare la normale pagina osservata dello stesso torneo Y, senza duplicare record o creare partite. Rimosso l’ultimo osservato torna il catalogo completo. Le risposte tardive non ripristinano tabelloni estranei. Il filtro FITP usa lo stesso ambito aggiornato.
+- Le pagine del Cerca cercano il gruppo osservato prima e dopo la richiesta di metadati: quando la normale acquisizione di X aggiunge Y a calendario e storico, tutti i percorsi aprono la medesima pagina. Non si inventa una partecipazione solo perché X è stato aggiunto.
+- Limite esplicito: ITF elenca i tabelloni pubblicati e acquisiti nell’inventario R2; l’elenco non presume pubblicati i tabelloni non verificati, senza affermare che nessun altro tabellone esiste. Blocchi della fonte Europe sono errori riprovabili, non cataloghi vuoti. Nessun recupero integrale avviato dalla pagina.
+- Ulteriore verifica: test su transizione catalogo→osservati, selezione calendario vuota, rimozione osservato, risposta asincrona tardiva, identità circuito/torneo, cache FITP, riuso della stessa pagina e catalogo API. Nessuna modifica dei dati di appartenenza o delle regole calendario/storico.
+
+- Esito complessivo dopo l’estensione: 64 test mirati passati, verificatore analisi e sintassi frontend/API verdi.
+
+### Revisione finale: solo link pubblicati, nessun messaggio tabelloni
+
+- Rimossi dalla presentazione i messaggi di caricamento, elenco vuoto, inventario incompleto e indisponibilità dei tabelloni. La sezione Tabelloni è nascosta finché non contiene un link, anche con il layout flex. Stessa regola per FITP, Europe e ITF. I fallimenti non vengono rappresentati come tabelloni disponibili.
+- ITF: se l’inventario acquisito non è completo, lettura dei filtri ufficiali GetEventFilters e verifica GetDrawsheet per i soli eventi non provati, con massimo due richieste parallele e termine complessivo di 12 secondi. Il link viene aggiunto soltanto in presenza di giocatori pubblicati; strutture vuote/BYE non generano pulsanti. Nessun retry automatico, bypass o memorizzazione di partite/risultati. Le informazioni di completezza restano interne e non sono mostrate nella pagina.
+- Mantenuto il passaggio dinamico tutti→osservati e il riuso della normale pagina torneo quando la partecipazione del nuovo osservato entra nella proiezione personale.
+
+- Verifica finale solo-link: 69 test passati; sintassi frontend/API, analisi e policy D1 verdi.

@@ -18,8 +18,8 @@ test('concurrent renders share a request, cached navigation does not poll',async
  const t={competitionId:id,people:[{playerId:"observed",subscriptionRegistrations:[{category:"Doppio Femminile Under 14"}]}]};const a=ctx.loadInlineFitpDrawLinks(t),b=ctx.loadInlineFitpDrawLinks(t);assert.equal(count,1);resolve();await Promise.all([a,b]);assert.match(slot.innerHTML,/>DF14<\/a>/);
  await ctx.loadInlineFitpDrawLinks(t);assert.equal(count,1);assert.match(ctx.fitpInlineDrawSlot(t),/>DF14<\/a>/);assert.doesNotMatch(code,/setInterval|setTimeout/);
 });
-test('upstream error is visible and not cached as an empty list',async()=>{
- let count=0;const {ctx,slot}=context(async()=>{count++;return new Response('',{status:502})});await ctx.loadInlineFitpDrawLinks({competitionId:id});assert.match(slot.textContent,/temporaneamente non disponibili/);await ctx.loadInlineFitpDrawLinks({competitionId:id});assert.equal(count,2);
+test('upstream error leaves the draw section empty and is not cached as an empty list',async()=>{
+ let count=0;const {ctx,slot}=context(async()=>{count++;return new Response('',{status:502})});await ctx.loadInlineFitpDrawLinks({competitionId:id});assert.equal(slot.innerHTML,'');await ctx.loadInlineFitpDrawLinks({competitionId:id});assert.equal(count,2);
 });
 test('one row per age combines singles and doubles, pink female links preserve IDs',()=>{
  const {ctx}=context();
