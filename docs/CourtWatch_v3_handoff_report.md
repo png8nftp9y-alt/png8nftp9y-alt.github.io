@@ -11494,3 +11494,7 @@ Browser run45537411932 failed320px toolbar bounds. Shared mobile playerSearchFor
 ITF discovery 2026-11-25T09:17:21.043Z: 6 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
 
 ITF Meta ordinary 2026-11-25T09:18:28.069Z: attempted 6, acquired 6, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
+
+
+### 2026-11-25 — Reset abandoned and restored tournament searches
+Clear search text after selection, Enter, clicking outside the form, startup and pageshow (including back-forward cache restoration). Abort pending suggestions and advance the request sequence on dismissal so stale results cannot reopen the dropdown. Clear text and suggestions in the restored calendar preview before it becomes visible. Keep the submitted query in the result route. Extend existing browser verification with selection, outside click, reload and persisted pageshow cases for both groups. No player or API changes. Validation: targeted existing Node suites, syntax and release guard; full browser verification remains required on GitHub.

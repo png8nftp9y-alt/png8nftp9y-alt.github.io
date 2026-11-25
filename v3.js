@@ -4324,7 +4324,7 @@ function tournamentSearchRow(t){
  return `<button type="button" class="playerSearchSuggestion tournamentSearchResult" data-catalogue-circuit="${esc(t.circuit)}" data-catalogue-id="${esc(t.competitionId)}"><strong>${esc(t.name)}</strong><small>${esc([t.circuit==='tennis-europe'?'Tennis Europe':String(t.circuit).toUpperCase(),t.venueName,t.location,eventDateLabel(t)].filter(Boolean).join(' · '))}</small></button>`;
 }
 function bindTournamentSearchRows(root){
- root.querySelectorAll('[data-catalogue-id]').forEach(button=>button.onclick=()=>{hideTournamentSearch();location.hash='#catalog-tournament/'+encodeURIComponent(button.dataset.catalogueCircuit)+'/'+encodeURIComponent(button.dataset.catalogueId);});
+ root.querySelectorAll('[data-catalogue-id]').forEach(button=>button.onclick=()=>{hideTournamentSearch();const input=$('tournamentSearchInput');if(input)input.value='';location.hash='#catalog-tournament/'+encodeURIComponent(button.dataset.catalogueCircuit)+'/'+encodeURIComponent(button.dataset.catalogueId);});
 }
 function hideTournamentSearch(){const box=$('tournamentSearchSuggestions');if(box)box.hidden=true;$('tournamentSearchInput')?.setAttribute('aria-expanded','false');}
 async function renderCatalogueTournament(circuitName,id){
@@ -4353,15 +4353,17 @@ async function renderTournamentSearchPage(query){
 function wireTournamentSearch(){
  const form=$('tournamentSearchForm'),input=$('tournamentSearchInput'),box=$('tournamentSearchSuggestions');if(!form||!input||!box)return;
  let timer,controller,sequence=0;
+ const reset=()=>{clearTimeout(timer);++sequence;controller?.abort();input.value='';box.innerHTML='';hideTournamentSearch();};
+ reset();window.addEventListener('pageshow',reset);
  input.oninput=()=>{clearTimeout(timer);controller?.abort();const seq=++sequence,q=input.value.trim();if(q.length<2){hideTournamentSearch();return;}
  timer=setTimeout(async()=>{controller=new AbortController();box.hidden=false;input.setAttribute('aria-expanded','true');box.innerHTML='<div class="empty" role="status">Ricerca in corso…</div>';
  try{const data=await tournamentSearchRequest(q,'',controller.signal);if(sequence!==seq)return;box.innerHTML=data.results.length?data.results.slice(0,10).map(tournamentSearchRow).join(''):'<div class="empty">Nessun torneo trovato.</div>';bindTournamentSearchRows(box);}
  catch(e){if(sequence===seq&&e.name!=='AbortError'){box.innerHTML='<button type="button" class="playerSearchSuggestion" data-tournament-search-retry>Ricerca non disponibile. Riprova.</button>';box.querySelector('button').onclick=input.oninput;}}
  },300);};
- form.onsubmit=event=>{event.preventDefault();const q=input.value.trim();if(q.length<2)return;clearTimeout(timer);++sequence;controller?.abort();hideTournamentSearch();location.hash='#tournament-search/'+encodeURIComponent(q);};
+ form.onsubmit=event=>{event.preventDefault();const q=input.value.trim();if(q.length<2)return;clearTimeout(timer);++sequence;controller?.abort();hideTournamentSearch();input.value='';location.hash='#tournament-search/'+encodeURIComponent(q);};
  input.onkeydown=event=>{if(event.key==='Escape'){clearTimeout(timer);++sequence;controller?.abort();hideTournamentSearch();}if(event.key==='ArrowDown'&&!box.hidden){event.preventDefault();box.querySelector('button')?.focus();}};
  box.onkeydown=event=>{const buttons=[...box.querySelectorAll('button')],i=buttons.indexOf(document.activeElement);if(event.key==='Escape'){hideTournamentSearch();input.focus();}else if(['ArrowDown','ArrowUp'].includes(event.key)){event.preventDefault();buttons[(i+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}};
- document.addEventListener('click',event=>{if(!form.contains(event.target)){clearTimeout(timer);++sequence;controller?.abort();hideTournamentSearch();}});
+ document.addEventListener('click',event=>{if(!form.contains(event.target))reset();});
 }
 
 function renderTournament(key) {
