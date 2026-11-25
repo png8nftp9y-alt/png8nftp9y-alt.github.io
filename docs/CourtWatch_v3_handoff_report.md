@@ -11486,3 +11486,7 @@ Worker run45535137686 failed source check because manual-calendar-events.test.mj
 
 ### 2026-11-25 — Unified calendar month and tournament controls
 Remove border below demographic header and below tournament toolbar. Move existing month navigation into the toolbar between title/plus/minus and right-aligned search (260px maximum). At widths up to700px, month navigation wraps inside the same toolbar to avoid horizontal overflow. IDs and handlers preserved; no player-profile changes. Saved calendar previews require the new toolbar marker. Validation: existing calendar/event/search/template Node suites and release guard; actual browser layout remains for CI.
+
+
+### 2026-11-25 — Calendar search mobile flex order
+Browser run45537411932 failed320px toolbar bounds. Shared mobile playerSearchForm sets order3, matching the wrapped month navigation order3; DOM order therefore put the full-width month before the search. Explicitly set calendar toolbar search order0 so title/buttons and search precede the wrapped month. Remove the month-label bottom border as requested. Keep browser assertions unchanged. Validation: targeted Node checks and release guard; actual browser confirmation remains required.
