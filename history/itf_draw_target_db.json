@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-25T06:46:28.542Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-25T06:51:33.759Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -1005656,7 +1005656,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T06:36:04.254Z",
+      "checkedAt": "2026-11-25T06:51:29.385Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -1007087,7 +1007087,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T06:36:04.973Z",
+      "checkedAt": "2026-11-25T06:51:30.016Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1007212,8 +1007212,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1007238,8 +1007238,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1007251,8 +1007251,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1007277,14 +1007277,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1007622,7 +1007622,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T06:36:05.435Z",
+      "checkedAt": "2026-11-25T06:51:30.655Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1008197,7 +1008197,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T06:36:05.890Z",
+      "checkedAt": "2026-11-25T06:51:31.258Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 4,
@@ -1009690,7 +1009690,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T06:36:06.326Z",
+      "checkedAt": "2026-11-25T06:51:31.904Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1010405,7 +1010405,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T06:36:06.775Z",
+      "checkedAt": "2026-11-25T06:51:32.527Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1011159,14 +1011159,14 @@
       "tournamentName": "J30 Manila",
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
-      "decision": "pending",
-      "checkedAt": "2026-11-25T06:36:07.217Z",
+      "decision": "complete",
+      "checkedAt": "2026-11-25T06:51:33.130Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 2,
+      "acquiredSections": 6,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 4,
+      "resolvedSections": 6,
+      "missingSections": 0,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -1011280,14 +1011280,14 @@
       "families": [
         {
           "family": "B-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 2,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -1011306,27 +1011306,27 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 30,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
         {
           "family": "G-S-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-S-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 2,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -1011345,14 +1011345,14 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
@@ -1011705,6 +1011705,722 @@
             "complete": true,
             "taskId": "J-J30-PHI-2026-001__G-S-Q-KO",
             "storedAt": "2026-11-21T12:14:14.661Z"
+          }
+        },
+        "B-S-M-KO": {
+          "family": "B-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800676616",
+              "name": "Milan Popov",
+              "givenName": "Milan",
+              "familyName": "Popov",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/milan-popov/800676616/rus/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745540",
+              "name": "Aahaan Mishra",
+              "givenName": "Aahaan",
+              "familyName": "Mishra",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/aahaan-mishra/800745540/ind/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-25T06:51:33.130Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-PHI-2026-001__B-S-M-KO",
+            "storedAt": "2026-11-25T06:51:33.130Z"
+          }
+        },
+        "B-D-M-KO": {
+          "family": "B-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800765326",
+              "name": "Komang Bagus Wahyu Purustama",
+              "givenName": "Komang Bagus Wahyu",
+              "familyName": "Purustama",
+              "nationalityCode": "INA",
+              "profileLink": "/en/players/komang-bagus-wahyu-purustama/800765326/ina/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800670352",
+              "name": "Rangga Wisnu Kresna Rafansyah",
+              "givenName": "Rangga Wisnu Kresna",
+              "familyName": "Rafansyah",
+              "nationalityCode": "INA",
+              "profileLink": "/en/players/rangga-wisnu-kresna-rafansyah/800670352/ina/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800709485",
+              "name": "Gavin Kraut",
+              "givenName": "Gavin",
+              "familyName": "Kraut",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/gavin-kraut/800709485/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800793988",
+              "name": "Felizardo Iii Lota",
+              "givenName": "Felizardo Iii",
+              "familyName": "Lota",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/felizardo-iii-lota/800793988/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800687966",
+              "name": "Liam de Bruijn",
+              "givenName": "Liam",
+              "familyName": "de Bruijn",
+              "nationalityCode": "NED",
+              "profileLink": "/en/players/liam-de-bruijn/800687966/ned/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800813180",
+              "name": "Vivaan Nehra",
+              "givenName": "Vivaan",
+              "familyName": "Nehra",
+              "nationalityCode": "AUS",
+              "profileLink": "/en/players/vivaan-nehra/800813180/aus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800717026",
+              "name": "Aqil Adibi Rahiman",
+              "givenName": "Aqil",
+              "familyName": "Adibi Rahiman",
+              "nationalityCode": "MAS",
+              "profileLink": "/en/players/aqil-adibi-rahiman/800717026/mas/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800825148",
+              "name": "Yi-Ming Liu",
+              "givenName": "Yi-Ming",
+              "familyName": "Liu",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/yi-ming-liu/800825148/tpe/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800745540",
+              "name": "Aahaan Mishra",
+              "givenName": "Aahaan",
+              "familyName": "Mishra",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/aahaan-mishra/800745540/ind/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800842111",
+              "name": "Yunhan Zheng",
+              "givenName": "Yunhan",
+              "familyName": "Zheng",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/yunhan-zheng/800842111/chn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800873876",
+              "name": "Kenji Kue",
+              "givenName": "Kenji",
+              "familyName": "Kue",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/kenji-kue/800873876/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800836865",
+              "name": "Augusto Enrique Ledesma Villalon",
+              "givenName": "Augusto Enrique Ledesma",
+              "familyName": "Villalon",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/augusto-enrique-ledesma-villalon/800836865/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800700825",
+              "name": "Phillipe Bawono",
+              "givenName": "Phillipe",
+              "familyName": "Bawono",
+              "nationalityCode": "INA",
+              "profileLink": "/en/players/phillipe-bawono/800700825/ina/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800730732",
+              "name": "Jacob Wong",
+              "givenName": "Jacob",
+              "familyName": "Wong",
+              "nationalityCode": "MAS",
+              "profileLink": "/en/players/jacob-wong/800730732/mas/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800872394",
+              "name": "Francisco Iii De Juan",
+              "givenName": "Francisco Iii",
+              "familyName": "De Juan",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/francisco-iii-de-juan/800872394/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800881774",
+              "name": "Jairus Peralta",
+              "givenName": "Jairus",
+              "familyName": "Peralta",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/jairus-peralta/800881774/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800741470",
+              "name": "William Edward Man Kei JONES",
+              "givenName": "William Edward Man Kei",
+              "familyName": "JONES",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/william-edward-man-kei-jones/800741470/hkg/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800760024",
+              "name": "Dylan Andrea Jorquera",
+              "givenName": "Dylan Andrea",
+              "familyName": "Jorquera",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/dylan-andrea-jorquera/800760024/ita/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800793084",
+              "name": "Anthony Bjorn Castigador",
+              "givenName": "Anthony Bjorn",
+              "familyName": "Castigador",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/anthony-bjorn-castigador/800793084/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800852911",
+              "name": "Rafaello Xavier Munozco",
+              "givenName": "Rafaello Xavier",
+              "familyName": "Munozco",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/rafaello-xavier-munozco/800852911/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800767515",
+              "name": "Doyul JANG",
+              "givenName": "Doyul",
+              "familyName": "JANG",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/doyul-jang/800767515/kor/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800721383",
+              "name": "Myeongdo Jang",
+              "givenName": "Myeongdo",
+              "familyName": "Jang",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/myeongdo-jang/800721383/kor/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800738228",
+              "name": "Lucas Sebastian Go",
+              "givenName": "Lucas Sebastian",
+              "familyName": "Go",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/lucas-sebastian-go/800738228/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800792489",
+              "name": "Chen En Zheng",
+              "givenName": "Chen En",
+              "familyName": "Zheng",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/chen-en-zheng/800792489/tpe/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800817709",
+              "name": "Cristiano Matteo Calingasan",
+              "givenName": "Cristiano Matteo",
+              "familyName": "Calingasan",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/cristiano-matteo-calingasan/800817709/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800862218",
+              "name": "Krelz Jan Gecosala",
+              "givenName": "Krelz Jan",
+              "familyName": "Gecosala",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/krelz-jan-gecosala/800862218/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800758042",
+              "name": "Pradyumna Tatachar",
+              "givenName": "Pradyumna",
+              "familyName": "Tatachar",
+              "nationalityCode": "IND",
+              "profileLink": "/en/players/pradyumna-tatachar/800758042/ind/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800744989",
+              "name": "Dexter Yu",
+              "givenName": "Dexter",
+              "familyName": "Yu",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/dexter-yu/800744989/hkg/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800718979",
+              "name": "Elroi Chiripamberi",
+              "givenName": "Elroi",
+              "familyName": "Chiripamberi",
+              "nationalityCode": "ZIM",
+              "profileLink": "/en/players/elroi-chiripamberi/800718979/zim/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800676616",
+              "name": "Milan Popov",
+              "givenName": "Milan",
+              "familyName": "Popov",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/milan-popov/800676616/rus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-25T06:51:33.130Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-PHI-2026-001__B-D-M-KO",
+            "storedAt": "2026-11-25T06:51:33.130Z"
+          }
+        },
+        "G-S-M-KO": {
+          "family": "G-S-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800665221",
+              "name": "Jana Jelena Nicole Diaz",
+              "givenName": "Jana Jelena Nicole",
+              "familyName": "Diaz",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/jana-jelena-nicole-diaz/800665221/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800685173",
+              "name": "Ha-an Park",
+              "givenName": "Ha-an",
+              "familyName": "Park",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/ha-an-park/800685173/kor/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-25T06:51:33.130Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-PHI-2026-001__G-S-M-KO",
+            "storedAt": "2026-11-25T06:51:33.130Z"
+          }
+        },
+        "G-D-M-KO": {
+          "family": "G-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800665221",
+              "name": "Jana Jelena Nicole Diaz",
+              "givenName": "Jana Jelena Nicole",
+              "familyName": "Diaz",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/jana-jelena-nicole-diaz/800665221/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800793501",
+              "name": "Louraine Jallorina",
+              "givenName": "Louraine",
+              "familyName": "Jallorina",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/louraine-jallorina/800793501/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800685173",
+              "name": "Ha-an Park",
+              "givenName": "Ha-an",
+              "familyName": "Park",
+              "nationalityCode": "KOR",
+              "profileLink": "/en/players/ha-an-park/800685173/kor/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800797181",
+              "name": "Mei Uchida",
+              "givenName": "Mei",
+              "familyName": "Uchida",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/mei-uchida/800797181/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800670142",
+              "name": "Mathea Heje",
+              "givenName": "Mathea",
+              "familyName": "Heje",
+              "nationalityCode": "NOR",
+              "profileLink": "/en/players/mathea-heje/800670142/nor/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800630946",
+              "name": "Agata Ulikhina",
+              "givenName": "Agata",
+              "familyName": "Ulikhina",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/agata-ulikhina/800630946/rus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800872278",
+              "name": "Ma Angelica Dela Cerna",
+              "givenName": "Ma Angelica",
+              "familyName": "Dela Cerna",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/ma-angelica-dela-cerna/800872278/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800823802",
+              "name": "Michaela Suarez",
+              "givenName": "Michaela",
+              "familyName": "Suarez",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/michaela-suarez/800823802/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800769314",
+              "name": "Quorra Princy",
+              "givenName": "Quorra",
+              "familyName": "Princy",
+              "nationalityCode": "INA",
+              "profileLink": "/en/players/quorra-princy/800769314/ina/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800748704",
+              "name": "Callista Rosiana",
+              "givenName": "Callista",
+              "familyName": "Rosiana",
+              "nationalityCode": "INA",
+              "profileLink": "/en/players/callista-rosiana/800748704/ina/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800812266",
+              "name": "Ayl Xyza Gonzaga",
+              "givenName": "Ayl Xyza",
+              "familyName": "Gonzaga",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/ayl-xyza-gonzaga/800812266/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800690960",
+              "name": "Yuki Mae Madrio",
+              "givenName": "Yuki Mae",
+              "familyName": "Madrio",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/yuki-mae-madrio/800690960/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800737135",
+              "name": "Amanda Wen En Teng",
+              "givenName": "Amanda Wen En",
+              "familyName": "Teng",
+              "nationalityCode": "MAS",
+              "profileLink": "/en/players/amanda-wen-en-teng/800737135/mas/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800737136",
+              "name": "Audrey Wen Si Teng",
+              "givenName": "Audrey Wen Si",
+              "familyName": "Teng",
+              "nationalityCode": "MAS",
+              "profileLink": "/en/players/audrey-wen-si-teng/800737136/mas/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800882127",
+              "name": "Ma Caroliean Fiel",
+              "givenName": "Ma Caroliean",
+              "familyName": "Fiel",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/ma-caroliean-fiel/800882127/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800748627",
+              "name": "Ella Mhae Paglalunan",
+              "givenName": "Ella Mhae",
+              "familyName": "Paglalunan",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/ella-mhae-paglalunan/800748627/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800773584",
+              "name": "Erynne Francesca Ong",
+              "givenName": "Erynne Francesca",
+              "familyName": "Ong",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/erynne-francesca-ong/800773584/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800774987",
+              "name": "Noemi Valdes",
+              "givenName": "Noemi",
+              "familyName": "Valdes",
+              "nationalityCode": "USA",
+              "profileLink": "/en/players/noemi-valdes/800774987/usa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800858503",
+              "name": "Kathlyn Ann Bugna",
+              "givenName": "Kathlyn Ann",
+              "familyName": "Bugna",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/kathlyn-ann-bugna/800858503/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800797813",
+              "name": "Maristella Torrecampo",
+              "givenName": "Maristella",
+              "familyName": "Torrecampo",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/maristella-torrecampo/800797813/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800815766",
+              "name": "Shaner Gabaldon",
+              "givenName": "Shaner",
+              "familyName": "Gabaldon",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/shaner-gabaldon/800815766/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800757031",
+              "name": "Sabine Dasha See",
+              "givenName": "Sabine Dasha",
+              "familyName": "See",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/sabine-dasha-see/800757031/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800748827",
+              "name": "Nana Ohkawa",
+              "givenName": "Nana",
+              "familyName": "Ohkawa",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/nana-ohkawa/800748827/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800769005",
+              "name": "Kirana Zahra Wibowo",
+              "givenName": "Kirana Zahra",
+              "familyName": "Wibowo",
+              "nationalityCode": "INA",
+              "profileLink": "/en/players/kirana-zahra-wibowo/800769005/ina/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800790408",
+              "name": "Maner Li",
+              "givenName": "Maner",
+              "familyName": "Li",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/maner-li/800790408/chn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800750975",
+              "name": "Akane MASUKO",
+              "givenName": "Akane",
+              "familyName": "MASUKO",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/akane-masuko/800750975/jpn/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800837087",
+              "name": "Mitchellen Alexa Cruspero",
+              "givenName": "Mitchellen Alexa",
+              "familyName": "Cruspero",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/mitchellen-alexa-cruspero/800837087/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791891",
+              "name": "Francine Madeleine Du Wong",
+              "givenName": "Francine Madeleine Du",
+              "familyName": "Wong",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/francine-madeleine-du-wong/800791891/phi/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800820975",
+              "name": "Sing Yu Guo",
+              "givenName": "Sing Yu",
+              "familyName": "Guo",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/sing-yu-guo/800820975/hkg/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800725873",
+              "name": "Yuman Wu",
+              "givenName": "Yuman",
+              "familyName": "Wu",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/yuman-wu/800725873/hkg/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800796042",
+              "name": "Lena Lin",
+              "givenName": "Lena",
+              "familyName": "Lin",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/lena-lin/800796042/hkg/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800773672",
+              "name": "Assyifa khansa putri Raga",
+              "givenName": "Assyifa khansa putri",
+              "familyName": "Raga",
+              "nationalityCode": "INA",
+              "profileLink": "/en/players/assyifa-khansa-putri-raga/800773672/ina/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-25T06:51:33.130Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-PHI-2026-001__G-D-M-KO",
+            "storedAt": "2026-11-25T06:51:33.130Z"
           }
         }
       }
@@ -1016116,7 +1016832,7 @@
       "startDate": "2026-11-23",
       "endDate": "2026-11-28",
       "decision": "pending",
-      "checkedAt": "2026-11-25T06:36:07.678Z",
+      "checkedAt": "2026-11-25T06:51:33.759Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 1,
