@@ -4146,7 +4146,7 @@ function tournamentDrawUrl(t, m) {
   const explicit = readableText(
     m?.drawUrl || m?.drawsUrl || m?.eventUrl || m?.drawSourceUrl || "",
   );
-  if (/^https?:\/\//i.test(explicit)) return explicit;
+  if (/^https?:\/\//i.test(explicit) || /^\/app\/api\/tournament-draw-view\?/.test(explicit)) return explicit;
   const source = readableText(m?.sourceUrl || "");
   if (/^https?:\/\//i.test(source) && /(?:draw|tabellon)/i.test(source))
     return source;
@@ -4193,23 +4193,31 @@ function internationalDrawDescriptor(t, row) {
   const legacy = agendaEventCode(row);
   const gender = native ? native[1].toUpperCase() : compact ? compact[1][0].toUpperCase() : /\b(?:girls?|female|femminile|women)\b/i.test(raw) ? "G" : /\b(?:boys?|male|maschile|men)\b/i.test(raw) ? "B" : /\b(?:mixed|misto)\b/i.test(raw) ? "X" : "";
   const kind = native ? native[2].toUpperCase() : compact ? compact[1][1].toUpperCase() : /\b(?:doubles?|doppio)\b/i.test(raw) ? "D" : /\b(?:singles?|singolare)\b/i.test(raw) ? "S" : "";
-  const ageText = `${t.tournamentCategory || ""} ${t.ageCategory || ""}`;
+  const ageText = `${t.tournamentCategory || ""} ${t.ageCategory || ""} ${t.category || ""}`;
   const categoryAges = [...new Set([...ageText.matchAll(/\b(?:UNDER\s*|U)?(10|12|14|16|18)\b/gi)].map(match => Number(match[1])))];
-  const age = Number(legacy.match(/(\d{2})$/)?.[1] || compact?.[2] || (source === "itf" && /^J-/i.test(String(t.competitionId || "")) ? 18 : categoryAges.length === 1 ? categoryAges[0] : 0));
+  const age = Number(legacy.match(/(\d{2})$/)?.[1] || compact?.[2] || raw.match(/\b(?:singles?|doubles?)\s*(10|12|14|16|18)\b/i)?.[1] || (source === "itf" && /^J-/i.test(String(t.competitionId || "")) ? 18 : categoryAges.length === 1 ? categoryAges[0] : 0));
   if (!gender || !kind || ![10,12,14,16,18].includes(age)) return null;
   const qualifying = native ? native[3].toUpperCase() === "Q" : /\b(?:qualifying|qualifications?|qualificazioni|qualif)\b/i.test(raw);
-  const structure = native?.[4]?.toUpperCase() || (/\b(?:round\s*robin|RR|girone)\b/i.test(raw) ? "RR" : "KO");
+  const group = [row.groupName,row.groupDesc,row.group,row.groupNumber,row.groupId,raw.match(/\b(?:group|gruppo|pool|girone)\s+([A-Z0-9]+)\b/i)?.[1]].map(x=>String(x??" ").trim()).find(Boolean)||"";
+  const structure = native?.[4]?.toUpperCase() || (group || /\b(?:round\s*robin|RR|girone)\b/i.test(raw) ? "RR" : "KO");
+  if(structure === "RR" && !group)return null;
   const phase = qualifying ? "Qualificazioni" : /\b(?:consolation|consolazione)\b/i.test(raw) ? "Consolazione" : /\bbonus\b/i.test(raw) ? "Bonus" : "Tabellone principale";
   const category = kind + (gender === "G" ? "F" : gender === "B" ? "M" : "X") + age;
   let url = "";
   try {
-    const candidate = new URL(tournamentDrawUrl(t, row));
+    const candidate = new URL(tournamentDrawUrl(t, row), typeof location === "undefined" ? "https://courtwatch.invalid" : location.origin);
     const hosts = source === "itf" ? ["www.itftennis.com","itftennis.com"] : ["te.tournamentsoftware.com","www.tenniseurope.org","tenniseurope.org"];
-    if (candidate.protocol === "https:" && hosts.includes(candidate.hostname) && !candidate.username && !candidate.password) url = candidate.href;
+    const localGroup = structure === "RR" && group && candidate.pathname === "/app/api/tournament-draw-view" && candidate.origin === (typeof location === "undefined" ? "https://courtwatch.invalid" : location.origin) && candidate.searchParams.get('competitionId')?.toUpperCase() === String(t.competitionId).toUpperCase() && candidate.searchParams.get('group') === group;
+    if ((candidate.protocol === "https:" && hosts.includes(candidate.hostname) || localGroup) && !candidate.username && !candidate.password) url = candidate.href;
   } catch {}
   if (!url) return null;
-  return {age, category, gender, kind, phase, structure, url,
-    key: category + "|" + phase + "|" + structure + "|" + (row.catalogueDraw ? row.drawId || "" : ""),
+  if(structure==='RR'){
+    const target=new URL(url);
+    if(source==='itf'&&target.pathname!=='/app/api/tournament-draw-view')return null;
+    if(source==='tennis-europe'&&!/\/draw\/\d+\/?$/i.test(target.pathname)&&!(/\/draw\.aspx$/i.test(target.pathname)&&target.searchParams.has('draw')))return null;
+  }
+  return {age, category, gender, kind, phase, structure, group, url,
+    key: category + "|" + phase + "|" + structure + "|" + (structure === "RR" ? group || row.drawId || url : row.catalogueDraw ? row.drawId || "" : ""),
     kindOrder: ["SM","SF","DM","DF","DX"].indexOf(category.slice(0,2)),
     phaseOrder: qualifying ? 0 : phase === "Tabellone principale" ? 1 : 2,
     explicitUrl: Boolean(row.drawUrl || row.drawsUrl || row.eventUrl || row.drawSourceUrl)};
@@ -4228,6 +4236,8 @@ function internationalTournamentDrawHtml(t, matches) {
   for (const row of rows) {
     const draw = internationalDrawDescriptor(t, row);
     if (!draw) continue;
+    if(draw.structure === "RR" && !draw.group && rows.some(other=>{const d=internationalDrawDescriptor(t,other);return d?.group && d.category===draw.category && d.phase===draw.phase;}))continue;
+    if(row.event && !/\b[BG]-[SD]-[MQ]-KO\b/i.test(row.event) && !row.drawUrl && !row.drawsUrl && !row.drawSourceUrl && draw.structure==='KO' && rows.some(other=>{const d=internationalDrawDescriptor(t,other);return d?.structure==='RR'&&d.group&&d.category===draw.category&&d.phase===draw.phase;}))continue;
     const previous = draws.get(draw.key);
     if (!previous || (!previous.explicitUrl && draw.explicitUrl)) draws.set(draw.key, draw);
   }
@@ -4237,7 +4247,7 @@ function internationalTournamentDrawHtml(t, matches) {
       .sort((a,b) => a.kindOrder-b.kindOrder || a.phaseOrder-b.phaseOrder || a.structure.localeCompare(b.structure))
       .map(draw => {
         const color = draw.gender === "G" ? "fitpDrawFemale" : draw.gender === "X" ? "fitpDrawMixed" : "fitpDrawMale";
-        const label = `${draw.category} ${draw.phase}${draw.structure === "RR" ? " · Gironi" : ""}`;
+        const label = draw.structure === "RR" ? `${draw.category} Round Robin${draw.group ? " - Gruppo " + draw.group.replace(/^(?:group|gruppo|pool|girone)\s*/i, "") : ""}` : `${draw.category} ${draw.phase}`;
         return `<a class="type tournamentDrawLink ${color}" href="${esc(draw.url)}" target="_blank" rel="noopener noreferrer" aria-label="Apri tabellone ${esc(label)}">${esc(label)}</a>`;
       }).join("");
     return `<span class="fitpDrawAgeRow" data-international-draw-age="U${age}"><b class="fitpDrawAgeLabel">Under ${age}</b>${links}</span>`;
@@ -4245,13 +4255,39 @@ function internationalTournamentDrawHtml(t, matches) {
   return `<span data-international-draw-links="${esc(internationalDrawCatalogueKey(t))}">${html}</span>`;
 }
 // INTERNATIONAL_TOURNAMENT_DRAW_LINKS_END
+function observedCatalogueDraws(scope,draws){
+  const norm = v=>String(v||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(' ').sort().join(' ');
+  const people=(scope.tournament.people||[]), ids=new Set([...people,...scope.matches].map(p=>String(p.playerId)));
+  const players=typeof state==='undefined'?[]:(state.data?.players||[]).filter(p=>ids.has(String(p.id)));
+  const known=[...scope.matches,...people.flatMap(p=>[p,...(p.draws||[]).map(d=>typeof d==='string'?{event:d}:d)])];
+  return draws.filter(draw=>{
+    const d=internationalDrawDescriptor(scope.tournament,draw);if(!d)return false;
+    if((draw.participants||[]).some(person=>{
+      const native=String(person.id||'').toLowerCase(),name=norm(person.name);
+      return players.some(p=>{
+        const source=circuit(scope.tournament),refs=[...(source==='itf'?[p.worldTennisId,p.profileSync?.itf?.profileId]:[p.profileSync?.tennisEurope?.profileId]),...(circuit(p)===source?[p.sourcePlayerId]:[]),...(p.circuitProfiles||[]).filter(x=>x.circuit===source).flatMap(x=>[x.profileId,x.url?.match(/(?:player-profile\/|\/)(800\d{6}|[a-f0-9-]{36})(?:\/|$)/i)?.[1]])].filter(Boolean).map(x=>String(x).toLowerCase());
+        if(refs.length&&native&&refs.includes(native))return true;
+        if(refs.length&&native&&/^(?:800\d{6}|[a-f0-9-]{36})$/i.test(native))return false;
+        return name&&norm(p.name)===name&&players.filter(x=>norm(x.name)===name).length===1&&new Set(draws.flatMap(x=>x.participants||[]).filter(x=>norm(x.name)===name).map(x=>x.id||name)).size===1;
+      });
+    }))return true;
+    return known.some(row=>{
+      const k=internationalDrawDescriptor(scope.tournament,row);if(!k)return false;
+      if(d.structure==='RR')return k.structure==='RR'&&((d.group&&k.group===d.group)||k.explicitUrl&&k.url===d.url);
+      return k.category===d.category&&k.phase===d.phase&&k.structure===d.structure;
+    });
+  }).map(row=>({...row,catalogueDraw:false}));
+}
 function tournamentDrawLinks(t, matches) {
   if (t?.manualEvent) return "";
   if (circuit(t) === "fitp") return fitpInlineDrawSlot(t);
   if (["tennis-europe", "itf"].includes(circuit(t))) {
     const scope=tournamentObservedDrawScope(t,matches);
-    if(scope.hasObserved)return internationalTournamentDrawHtml(scope.tournament,scope.matches);
     const saved=internationalDrawCatalogueCache.get(internationalDrawCatalogueKey(t));
+    if(scope.hasObserved){
+      const acquired = saved && Date.now()-saved.savedAt<300000 ? observedCatalogueDraws(scope,saved.draws) : [];
+      return internationalTournamentDrawHtml(scope.tournament,[...scope.matches,...acquired]);
+    }
     if(saved&&Date.now()-saved.savedAt<300000){
       const html=internationalTournamentDrawHtml({...t,people:[],draws:[]},saved.draws.map(row=>({...row,catalogueDraw:true})));
       return html;
@@ -4264,26 +4300,27 @@ async function loadInternationalTournamentDrawLinks(t) {
   const key=internationalDrawCatalogueKey(t);
   const slot=()=>[...document.querySelectorAll('[data-international-draw-links]')].find(node=>node.dataset.internationalDrawLinks===key);
   const refresh=()=>{const target=slot(),host=target?.closest?.('.tournamentDraws');if(target)target.outerHTML=tournamentDrawLinks(t,[]);if(host)host.hidden=!host.querySelector('a.tournamentDrawLink');};
-  if(tournamentObservedDrawScope(t).hasObserved){refresh();return;}
+  const withParticipants=tournamentObservedDrawScope(t).hasObserved;
   const saved=internationalDrawCatalogueCache.get(key);
-  if(saved&&Date.now()-saved.savedAt<300000){refresh();return;}
-  let pending=internationalDrawCatalogueRequests.get(key);
+  if(saved&&Date.now()-saved.savedAt<300000&&(!withParticipants||saved.participantsLoaded)){refresh();return;}
+  const requestKey=key+'|'+withParticipants;
+  let pending=internationalDrawCatalogueRequests.get(requestKey);
   if(!pending){
     pending=(async()=>{
-      const params=new URLSearchParams({circuit:circuit(t),competitionId:t.competitionId});
+      const params=new URLSearchParams({circuit:circuit(t),competitionId:t.competitionId,...(withParticipants?{withParticipants:'1'}:{})});
       const response=await fetch(PRIVATE_API+'/tournament-draw-links?'+params,privateApiOptions({cache:'no-store',signal:AbortSignal.timeout(20000)}));
       if(!response.ok)throw Error('draw_catalogue_unavailable');
       const data=await response.json();
       if(data.circuit!==circuit(t)||String(data.competitionId||'').toUpperCase()!==String(t.competitionId).toUpperCase()||!Array.isArray(data.draws)||typeof data.complete!=='boolean')throw Error('draw_catalogue_invalid');
-      internationalDrawCatalogueCache.set(key,{draws:data.draws,complete:data.complete,savedAt:Date.now()});
+      if(withParticipants||!internationalDrawCatalogueCache.get(key)?.participantsLoaded)internationalDrawCatalogueCache.set(key,{draws:data.draws,complete:data.complete,participantsLoaded:withParticipants,savedAt:Date.now()});
       if(internationalDrawCatalogueCache.size>40)internationalDrawCatalogueCache.delete(internationalDrawCatalogueCache.keys().next().value);
-    })();internationalDrawCatalogueRequests.set(key,pending);
+    })();internationalDrawCatalogueRequests.set(requestKey,pending);
   }
   try{await pending;refresh();}
   catch{
     if(tournamentObservedDrawScope(t).hasObserved){refresh();return;}
     const target=slot();if(target){target.textContent='';const host=target.closest?.('.tournamentDraws');if(host)host.hidden=true;}
-  }finally{if(internationalDrawCatalogueRequests.get(key)===pending)internationalDrawCatalogueRequests.delete(key);}
+  }finally{if(internationalDrawCatalogueRequests.get(requestKey)===pending)internationalDrawCatalogueRequests.delete(requestKey);}
 }
 function tournamentAcceptanceUrl(t) {
   if (t?.manualEvent) return "";

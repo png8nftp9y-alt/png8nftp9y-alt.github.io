@@ -1,3 +1,4 @@
+import {drawParticipants,itfDocumentDraws} from './acquired-tournament-draws.mjs';
 // Read-only publication discovery. No match/result persistence or database access.
 export function itfEventFilters(json){
  const out=new Map();
@@ -19,7 +20,7 @@ export function publishedItfDraw(json){
  if((json.playerId||json.worldTennisId)&&String(json.familyName||json.givenName||json.name||'').trim()&&!/^bye$/i.test(String(json.name||json.familyName||'')))return true;
  return Object.values(json).some(value=>value&&typeof value==='object'&&publishedItfDraw(value));
 }
-export async function officialItfDrawLinks(tournament,{fetcher=fetch,known=[]}={}){
+export async function officialItfDrawLinks(tournament,{fetcher=fetch,known=[],withParticipants=false}={}){
  const id=String(tournament.competitionId||'').toUpperCase();
  if(!/^J-[A-Z0-9]+-[A-Z]{3}-\d{4}-\d{3}$/.test(id))throw Error('invalid_itf_tournament');
  const base='https://www.itftennis.com/tennis/api/TournamentApi',deadline=AbortSignal.timeout(12000);
@@ -28,13 +29,21 @@ export async function officialItfDrawLinks(tournament,{fetcher=fetch,known=[]}={
  const url=new URL(tournament.drawsResultsUrl||tournament.sourceUrl);
  if(url.protocol!=='https:'||!['www.itftennis.com','itftennis.com'].includes(url.hostname)||!url.pathname.toUpperCase().split('/').includes(id))throw Error('invalid_itf_draw_source');
  url.pathname=url.pathname.replace(/\/(?:draws-and-results|acceptance-list)\/?$/,'/').replace(/\/?$/,'/draws-and-results/');url.search='';url.hash='';
- const draws=new Map(known.map(draw=>[draw.event,draw]));let complete=true;
+ const draws=new Map(known.map(draw=>[draw.drawId||draw.event,draw]));let complete=filters.length>0;
  // Two bounded source requests at a time; only missing publication metadata is checked.
- const pending=filters.filter(filter=>!draws.has(filter.event));
+ const pending=filters.filter(filter=>!known.some(d=>d.event===filter.event&&(!withParticipants||d.participants?.length)&&(!filter.event.endsWith('-RR')||d.group)));
  for(let i=0;i<pending.length;i+=2)await Promise.all(pending.slice(i,i+2).map(async filter=>{
   try{
    const params=new URLSearchParams({tournamentId:String(filter.tournamentId),tourType:String(filter.tourType||'N'),weekNumber:String(filter.weekNumber||0),playerTypeCode:filter.playerTypeCode,matchTypeCode:filter.matchTypeCode,eventClassificationCode:filter.eventClassificationCode,drawsheetStructureCode:filter.drawsheetStructureCode});
-   if(publishedItfDraw(await read(base+'/GetDrawsheet?'+params)))draws.set(filter.event,{event:filter.event,drawUrl:url.href});
+   const sheet=await read(base+'/GetDrawsheet?'+params);
+   if(publishedItfDraw(sheet)){
+    if(filter.event.endsWith('-RR')){
+     const groups=[];function walk(v){if(Array.isArray(v)){v.forEach(walk);return;}if(!v||typeof v!=='object')return;for(const [key,value] of Object.entries(v)){if(key==='rrGroups'&&Array.isArray(value))groups.push(...value);else if(value&&typeof value==='object')walk(value);}}walk(sheet);
+     for(const group of groups){const label=[group.groupName,group.groupDesc,group.poolName,group.groupNumber,group.groupId].map(x=>String(x??'').trim()).find(Boolean)||'';if(!label)continue;const matches=[];function collect(v,round=''){if(Array.isArray(v)){v.forEach(x=>collect(x,round));return;}if(!v||typeof v!=='object')return;const name=v.roundDesc??v.roundName??round;if(Array.isArray(v.teams)){matches.push({...v,round:name,group:label});return;}Object.values(v).forEach(x=>collect(x,name));}collect(group);
+      for(const draw of itfDocumentDraws({event:filter.event,matches}, {...tournament,drawsResultsUrl:url.href})){draws.set(draw.drawId,draw);}
+     }
+    }else draws.set(filter.event,{event:filter.event,drawUrl:url.href,participants:drawParticipants(sheet)});
+   }
   }catch{complete=false;}
  }));
  return {draws:[...draws.values()],complete};

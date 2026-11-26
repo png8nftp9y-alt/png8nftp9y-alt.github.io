@@ -1,3 +1,4 @@
+import {acquiredItfDraws} from './acquired-tournament-draws.mjs';
 import {officialItfDrawLinks} from './official-itf-draw-links.mjs';
 // Public draw metadata only. Never cache user membership or player filtering here.
 const guid=/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
@@ -13,7 +14,7 @@ export function europeCatalogueDraws(html,id){
   const event=decode(match[2].replace(/<[^>]+>/g,' ')).replace(/\s+/g,' ').trim();
   if(!/\b(?:[BGX][SD]\d{2}|boys?|girls?|singles?|doubles?)\b/i.test(event))continue;
   if(found.has(number)&&found.get(number).event.length>=event.length)continue;
-  found.set(number,{event,drawId:number,drawUrl:`https://te.tournamentsoftware.com/tournament/${id}/draw/${number}`});
+  found.set(number,{event,group:(event.match(/\b(?:group|gruppo|pool|girone)\s+([A-Z0-9]+)\b/i)||[])[1]||'',drawId:number,drawUrl:`https://te.tournamentsoftware.com/tournament/${id}/draw/${number}`});
  }
  return [...found.values()].sort((a,b)=>Number(a.drawId)-Number(b.drawId));
 }
@@ -42,8 +43,8 @@ export function createTournamentDrawCatalogue(){
    itfSnapshot=audit;itfLoadedAt=Date.now();return audit;
   })();itfPending=request;try{return await request;}finally{if(itfPending===request)itfPending=null;}
  }
- return async function load(tournament,{archive,fetcher=fetch}={}){
-  const circuit=tournament.circuit,id=String(tournament.competitionId||''),key=circuit+'|'+id.toUpperCase();
+ return async function load(tournament,{archive,db,withParticipants=false,fetcher=fetch}={}){
+  const circuit=tournament.circuit,id=String(tournament.competitionId||''),key=circuit+'|'+id.toUpperCase()+'|'+(withParticipants?'participants':'links');
   if(circuit==='itf'){
    if(!/^J-[A-Z0-9]+-[A-Z]{3}-\d{4}-\d{3}$/i.test(id))throw Error('invalid_draw_tournament');
    const saved=cache.get(key);if(saved&&Date.now()-saved.at<300000)return saved.value;
@@ -51,8 +52,11 @@ export function createTournamentDrawCatalogue(){
    const request=(async()=>{
     let stored={draws:[],complete:false};
     try{stored=itfCatalogueDraws(await itfAudit(archive),tournament);}catch{}
+    const acquired=await acquiredItfDraws(db,tournament);
+    if(acquired.length){const events=new Set(acquired.map(d=>d.event));stored={...stored,draws:[...stored.draws.filter(d=>!events.has(d.event)),...acquired]};}
     let result=stored;
-    if(!stored.complete)try{result=await officialItfDrawLinks(tournament,{fetcher,known:stored.draws});}catch{}
+    if(!stored.complete||stored.draws.some(d=>d.event?.endsWith('-RR')&&!d.group)||withParticipants&&stored.draws.some(d=>!d.participants?.length))try{result=await officialItfDrawLinks(tournament,{fetcher,known:stored.draws,withParticipants});}catch{}
+    const grouped=new Set(result.draws.filter(d=>d.group).map(d=>d.event));result={...result,draws:result.draws.filter(d=>!d.event?.endsWith('-RR')||d.group||!grouped.has(d.event))};
     const value={circuit,competitionId:id,...result};
     if(result.complete){cache.set(key,{at:Date.now(),value});if(cache.size>40)cache.delete(cache.keys().next().value);}
     return value;
@@ -62,14 +66,39 @@ export function createTournamentDrawCatalogue(){
   const saved=cache.get(key);if(saved&&Date.now()-saved.at<300000)return saved.value;
   if(pending.has(key))return pending.get(key);
   const request=(async()=>{
-   const response=await fetcher(`https://te.tournamentsoftware.com/tournament/${id}/draws`,{headers:{Accept:'text/html'},signal:AbortSignal.timeout(15000),redirect:'error'});
-   if(!response.ok)throw Error('europe_draw_catalogue_unavailable');
-   const html=await response.text();
-   if(/incapsula|captcha|access denied|verify you are human|sign in to continue/i.test(html))throw Error('europe_draw_catalogue_blocked');
-   const draws=europeCatalogueDraws(html,id);
-   if(!draws.length&&!/no draws|no draws available|draws have not|geen schema/i.test(html))throw Error('europe_draw_catalogue_unverified');
+   const origin='https://te.tournamentsoftware.com',deadline=AbortSignal.timeout(16000);
+   async function page(url){
+    for(let redirects=0;redirects<4;redirects++){
+     const response=await fetcher(url,{headers:{Accept:'text/html'},signal:AbortSignal.any([deadline,AbortSignal.timeout(6000)]),redirect:'manual'});
+     if([301,302,303,307,308].includes(response.status)){const next=new URL(response.headers.get('location')||'',url);const target=next.pathname.match(/^\/tournament\/([^/]+)(?:\/|$)/i)?.[1]||next.searchParams.get('id');if(next.origin!==origin||String(target||'').toUpperCase()!==id.toUpperCase())throw Error('europe_draw_redirect');url=next.href;continue;}
+     if(!response.ok)throw Error('europe_draw_catalogue_unavailable');const html=await response.text();
+     if(/_Incapsula_Resource|captcha|access denied|verify you are human|name=["']CookiePurposes/i.test(html))throw Error('europe_draw_catalogue_blocked');return html;
+    }throw Error('europe_draw_redirect_limit');
+   }
+   let html='',draws=[],verifiedEmpty=false;
+   for(const path of [`/sport/draws.aspx?id=${id}`,`/tournament/${id}/draws`]){
+    try{html=await page(origin+path);draws=europeCatalogueDraws(html,id);verifiedEmpty=/no draws(?: available)?|draws have not|geen schema/i.test(html);if(draws.length||verifiedEmpty)break;}catch{}
+   }
+   if(!draws.length&&!verifiedEmpty)throw Error('europe_draw_catalogue_unverified');
+   if(withParticipants){
+    if(draws.length>64)throw Error('europe_draw_catalogue_too_large');
+    for(let i=0;i<draws.length;i+=4)await Promise.all(draws.slice(i,i+4).map(async draw=>{try{
+     let body=await page(draw.drawUrl);
+     const action=(body.match(/<form\b[^>]*action=["']([^"']*\/Get(?:Draw|Matches)Content[^"']*)/i)||[])[1];
+     if(action){const url=new URL(decode(action),origin),expected=`/tournament/${id}/draw/${draw.drawId}/get`;if(url.origin!==origin||!url.pathname.toLowerCase().startsWith(expected.toLowerCase()))throw Error('europe_draw_endpoint');body+=await page(url.href);}
+     draw.participants=europeDrawParticipants(body);
+    }catch{draw.participants=[];}}));
+   }
    const value={circuit,competitionId:id,draws,complete:true};cache.set(key,{at:Date.now(),value});if(cache.size>40)cache.delete(cache.keys().next().value);return value;
   })();pending.set(key,request);try{return await request;}finally{if(pending.get(key)===request)pending.delete(key);}
  };
 }
 export const loadTournamentDrawCatalogue=createTournamentDrawCatalogue();
+
+export function europeDrawParticipants(html){
+ const rows=new Map();
+ for(const m of String(html).matchAll(/<a\b[^>]*(?:href\s*=\s*["'][^"']*(?:player\.aspx|player-profile\/)[^"']*["']|data-player-id=["'][^"']+["'])[^>]*>[\s\S]*?<\/a>/gi)){
+  const tag=m[0],href=decode((tag.match(/href=["']([^"']*)/i)||[])[1]),native=(href.match(/player-profile\/([a-f0-9-]{36})/i)||[])[1]||(tag.match(/data-player-id=["']([^"']+)/i)||[])[1]||(href.match(/[?&]player=(\d+)/i)?.[1]?'entry:'+href.match(/[?&]player=(\d+)/i)[1]:''),name=decode(tag.replace(/<[^>]*>/g,' ')).replace(/\s+/g,' ').replace(/\s*\[(?:\d+|Q|WC|LL)\]\s*$/i,'').trim();
+  if(name&&!/^bye$/i.test(name))rows.set(native+'|'+name,{id:native,name});
+ }return [...rows.values()];
+}

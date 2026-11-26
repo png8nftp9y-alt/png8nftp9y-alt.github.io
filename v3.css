@@ -610,8 +610,8 @@ button,a,[role="link"],summary{touch-action:manipulation}
  .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .tournamentHeroActions{flex:0 0 auto;width:max-content;max-width:65%;min-width:0}
  .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .tournamentDraws{max-width:100%;min-width:0}
  .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .tournamentDraws>span{min-width:0;max-width:100%}
- .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) :is([data-fitp-draw-links],[data-international-draw-links]){min-width:0;max-width:100%;overflow-x:auto}
- .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .fitpDrawAgeRow{flex-wrap:nowrap;width:max-content;min-width:100%}
+ .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) :is([data-fitp-draw-links],[data-international-draw-links]){min-width:0;max-width:100%;overflow-x:visible}
+ .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .fitpDrawAgeRow{flex-wrap:wrap;width:100%;min-width:0}
  .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .fitpDrawAgeLabel,
  .tournamentHero:has(:is([data-fitp-draw-links],[data-international-draw-links])) .tournamentDrawLink{flex-shrink:0;white-space:nowrap}
 }
@@ -698,3 +698,8 @@ button,a,[role="link"],summary{touch-action:manipulation}
 
 /* Empty draw sections stay hidden even when the header uses flex layout. */
 .tournamentHero .tournamentDraws[hidden]{display:none!important}
+
+/* Published draws wrap at every viewport, including long Round Robin labels. */
+.tournamentDraws :is([data-fitp-draw-links],[data-international-draw-links]){max-width:100%;overflow:visible}
+.tournamentDraws .fitpDrawAgeRow{min-width:0;flex-wrap:wrap}
+.tournamentDraws .tournamentDrawLink{max-width:100%;white-space:normal!important;overflow-wrap:anywhere}

@@ -38,8 +38,8 @@ test('match duplicates collapse, direct Europe draw links win over tournament fa
  assert.equal((html.match(/<a /g)||[]).length,1);assert.match(html,/draw=7/);assert.match(html,/&amp;/);
 });
 test('round robins and qualifying keep separate identities',()=>{
- const html=renderer().tournamentDrawLinks(itf,[{event:'G-S-M-RR'},{event:'G-S-M-KO'},{event:'G-S-Q-KO'}]);
- assert.equal((html.match(/<a /g)||[]).length,3);assert.match(html,/Gironi/);assert.match(html,/Qualificazioni/);
+ const html=renderer().tournamentDrawLinks(itf,[{event:'G-S-M-RR',group:'A',drawUrl:'/app/api/tournament-draw-view?circuit=itf&competitionId='+itf.competitionId+'&event=G-S-M-RR&group=A'},{event:'G-S-M-KO'},{event:'G-S-Q-KO'}]);
+ assert.equal((html.match(/<a /g)||[]).length,3);assert.match(html,/Round Robin/);assert.match(html,/Qualificazioni/);
 });
 test('ITF official URL is not duplicated when it already ends with draws or acceptance',()=>{
  const c=renderer();
