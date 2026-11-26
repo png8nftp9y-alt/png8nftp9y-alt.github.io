@@ -11586,3 +11586,10 @@ Validation: 18 Node tests passed, JS syntax checks, YAML/shell validation, full 
 - Grafica: eliminate le regole nowrap/overflow orizzontale; link su più righe a tutte le larghezze, inclusi titoli lunghi. Nessuna dicitura di inventario, caricamento o errore introdotta nella pagina torneo.
 - Validazione: regressioni su qualificazioni sole, partecipazione RR di Danesi, più osservati in gruppi differenti, omonimi/ID, link ITF puntuale, integrità documenti, redirect e HTML ufficiale Tennis Europe. Chromium: 16 link RR a 360/620/650/900/1200/1440 px senza overflow; verificatore Cerca passato nei gruppi main/Altri. Suite API completa: 988 test passati, zero fallimenti; ulteriori 62 test mirati passati sulla revisione finale, due verifiche binding R2/hotfix verdi, sintassi JS e verificatore analisi verdi. Dopo riallineamento a main sono stati conservati gli aggiornamenti FITP e il report remoto. La verifica grafica agenda passa in entrambi i gruppi e nove larghezze.
 - Limite: non si trasformano errori della fonte ufficiale o documenti incompleti in tabelloni inventati. Verifica live del gruppo specifico di Danesi e deploy da confermare dopo pubblicazione utente; nessun polling o rilancio automatico.
+
+
+## 2026-11-26 — Correzione incremento numerico cache tabelloni
+
+- Run 45891764535: check-source verde, release-safety bloccata perché 20261126-draw-groups-wrap e 20261126-offline-history-order hanno la stessa parte numerica. Il deploy Worker era saltato.
+- Correzione limitata ai riferimenti JS/CSS in v3.html: revisione intera strettamente maggiore di quelle note, senza Number o perdita di precisione. Nessuna modifica alla logica tabelloni o ai dati.
+- Validazione: riprodotto il blocco del guard sul commit pubblicato; controllo release reale e regressioni cache eseguiti con esito verde dopo incremento. Nessun polling o rilancio automatico.
