@@ -1290,7 +1290,13 @@ async function restoreDurableProjection() {
   const restored = {...newer,
     matches: mergeKnownMatches(older?.matches, newer.matches).filter(match => ids.has(match.playerId))};
   durableProjectionFallback = restored;
-  return applyCachedProjection(restored);
+  const applied = applyCachedProjection(restored);
+  // A fallback load may already have queued an empty snapshot while this disk
+  // read was pending. Commit recovered history after that older write, using
+  // the same ordered queue, so a later offline navigation cannot lose it.
+  if (applied && JSON.stringify(restored.matches) !== JSON.stringify(current?.matches || []))
+    Promise.resolve(saveCachedData(restored)).catch(error => console.warn("Archivio locale non disponibile", error));
+  return applied;
 }
 function saveCachedData(data) {
   const snapshot = calendarCacheSnapshot(data, Date.now());

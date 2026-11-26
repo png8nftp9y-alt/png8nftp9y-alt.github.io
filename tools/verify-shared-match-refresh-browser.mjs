@@ -173,6 +173,10 @@ try {
     assert.equal(await page.locator('#opponentTournamentHistory .unifiedMatchRow').count(), 1);
 
     // Refresh an already visible player profile after its data caches become incomplete.
+    // The restored history must also be committed after any earlier empty fallback.
+    await page.evaluate(() => projectionWriteQueue);
+    const durableBeforeReturn = await page.evaluate(async () => (await readDurableProjection())?.matches?.map(match => match.id).sort());
+    assert.deepEqual(durableBeforeReturn, [...before].sort(), `${group}: durable history must survive before offline navigation, not just remain in memory`);
     // Navigate while the complete cache still exists, so pagehide saves a real profile preview.
     await page.goto(target);
     await page.waitForFunction(() => document.querySelector('#profileContent [data-stat="all"]')?.textContent === '3');

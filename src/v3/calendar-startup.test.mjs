@@ -203,3 +203,15 @@ for(const scenario of ['newer static generation','removed past event','late snap
  assert.equal(ctx.state.data.tournaments.filter(t=>t.manualEvent).length,scenario==='newer static generation'?1:0);
  assert.ok(ctx.state.data.tournaments.some(t=>t.name==='Automatic'));
 });
+
+for(const group of ['main','others'])test(`${group}: recovered durable history is committed after an empty fallback already queued for persistence`,async()=>{
+ const empty={group,players:[{id:'a'}],tournaments:[],matches:[],cachedAt:2,personalProjectionComplete:true};
+ const {ctx}=cacheContext({calendar:JSON.stringify(empty)});ctx.PLAYER_GROUP=group;vm.runInContext(mergeSource,ctx);
+ let release;const writes=[];ctx.readDurableProjection=()=>new Promise(resolve=>{release=resolve;});ctx.writeDurableProjection=async snapshot=>{writes.push(Array.from(snapshot.matches,m=>m.id));return true;};
+ const restoring=ctx.restoreDurableProjection();
+ ctx.saveCachedData(empty);
+ release({...empty,cachedAt:1,matches:[{id:'old',playerId:'a',circuit:'tennis-europe',score:'6-4 6-3'},{id:'recent',playerId:'a',circuit:'tennis-europe'},{id:'double',playerId:'a',circuit:'tennis-europe'}]});
+ assert.equal(await restoring,true);await vm.runInContext('projectionWriteQueue',ctx);
+ assert.deepEqual(writes,[[],['old','recent','double']]);assert.equal(ctx.cachedData().matches.length,3);assert.equal(ctx.state.data.matches[0].score,'6-4 6-3');
+ ctx.state.data=null;ctx.restoreCachedProjectionBeforeFirstRender();assert.equal(ctx.state.data.matches.length,3);
+});
