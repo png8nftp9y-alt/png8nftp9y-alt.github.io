@@ -1,16 +1,16 @@
 {
   "version": "cw-v3-fitp-entry-cache-v1",
-  "generatedAt": "2026-11-26T02:40:52.831Z",
-  "status": "fitp_entries_complete_from_versioned_participant_cache",
+  "generatedAt": "2026-11-26T03:06:44.769Z",
+  "status": "fitp_entries_complete_from_cache_with_retained_refresh_errors",
   "source": "Validated provincial FITP catalog plus permanent official P.U.C. participant snapshots. Active/future tournaments refresh every run; concluded tournaments remain queryable for future player onboarding.",
   "coverageFrom": "2025-12-18",
   "tournamentsInput": 7224,
   "baseTournamentsInput": 6165,
   "archivedTournamentsInput": 7224,
   "participantSnapshots": 7224,
-  "participantSnapshotsRefreshed": 414,
-  "participantSnapshotsReused": 6810,
-  "refreshQueue": 414,
+  "participantSnapshotsRefreshed": 345,
+  "participantSnapshotsReused": 6879,
+  "refreshQueue": 346,
   "fullScan": false,
   "concurrency": 20,
   "participantsScanned": 525350,
@@ -54,6 +54,20 @@
   "byDiscoveryMethod": {
     "fitp_permanent_tournament_archive_versioned_participant_cache_card_strict": 435
   },
-  "errors": [],
-  "refreshErrors": []
+  "errors": [
+    {
+      "competitionId": "90E94D6F-AB16-4845-BC02-4124DC4E15D4",
+      "tournamentName": "3° edizione \" ANDREA  TURRIZIANI OPEN\"",
+      "retainedPreviousCache": true,
+      "error": "fitp_participant_response_invalid"
+    }
+  ],
+  "refreshErrors": [
+    {
+      "competitionId": "90E94D6F-AB16-4845-BC02-4124DC4E15D4",
+      "tournamentName": "3° edizione \" ANDREA  TURRIZIANI OPEN\"",
+      "retainedPreviousCache": true,
+      "error": "fitp_participant_response_invalid"
+    }
+  ]
 }
