@@ -1,3 +1,4 @@
+import {reuseStartedFitpSnapshot,validateFitpParticipantResponse} from './fitp-history-continuity.mjs';
 import {fitpSubscriptionRegistrations} from './fitp-subscription-dates.mjs';
 import fs from 'node:fs/promises';
 import {gzip,gunzip} from 'node:zlib';
@@ -42,6 +43,7 @@ const cached={...(previousCache.tournaments||{})};
 const currentIds=new Set(map.tournaments.filter(t=>t.circuit==='fitp'&&String(t.sourceCode)==='1').map(t=>String(t.competitionId).toUpperCase()));
 function needsRefresh(t){
   const old=cached[t.competitionId];
+  if(reuseStartedFitpSnapshot(t,old,TODAY))return false;
   if(!old||FORCE_FULL)return true;
   const hasTrackedPlayer=(old.participants||[]).some(p=>trackedCards.has(card(p.membershipCard)));
   if(hasTrackedPlayer&&(!old.venueName||!old.address))return true;
@@ -52,7 +54,7 @@ function needsRefresh(t){
 }
 const queue=tournaments.filter(needsRefresh);
 const errors=[];let cursor=0,refreshed=0;
-async function worker(){while(cursor<queue.length){const t=queue[cursor++],previous=cached[t.competitionId]||{};try{const d=await post('/api/v3/puc/competizione/dettaglio',{competitionUid:t.sourceCompetitionId||t.competitionId}),rows=[];for(const draw of d?.Tournaments||[])collect(draw.Participants||[],draw.TournamentDescription||draw.Description||'Lista iscritti P.U.C.',rows);cached[t.competitionId]={competitionId:t.competitionId,tournamentName:d?.Description||t.tournamentName,location:[d?.Municipality||'',d?.Province||''].filter(Boolean).join(' ')||t.location,venueName:d?.TennisClub||previous.venueName||t.club||'',address:d?.Address||previous.address||'',startDate:iso(d?.From)||t.startDate,endDate:iso(d?.To)||t.endDate,sourceUrl:t.sourceUrl,fetchedAt:NOW,participants:dedupe(rows)};refreshed++}catch(e){errors.push({competitionId:t.competitionId,tournamentName:t.tournamentName,retainedPreviousCache:Boolean(cached[t.competitionId]),error:e.message})}}}
+async function worker(){while(cursor<queue.length){const t=queue[cursor++],previous=cached[t.competitionId]||{};try{const d=validateFitpParticipantResponse(await post('/api/v3/puc/competizione/dettaglio',{competitionUid:t.sourceCompetitionId||t.competitionId}),t.sourceCompetitionId||t.competitionId),rows=[];for(const draw of d?.Tournaments||[])collect(draw.Participants||[],draw.TournamentDescription||draw.Description||'Lista iscritti P.U.C.',rows);cached[t.competitionId]={competitionId:t.competitionId,tournamentName:d?.Description||t.tournamentName,location:[d?.Municipality||'',d?.Province||''].filter(Boolean).join(' ')||t.location,venueName:d?.TennisClub||previous.venueName||t.club||'',address:d?.Address||previous.address||'',startDate:iso(d?.From)||t.startDate,endDate:iso(d?.To)||t.endDate,sourceUrl:t.sourceUrl,fetchedAt:NOW,participants:dedupe(rows)};refreshed++}catch(e){errors.push({competitionId:t.competitionId,tournamentName:t.tournamentName,retainedPreviousCache:Boolean(cached[t.competitionId]),error:e.message})}}}
 await Promise.all(Array.from({length:CONCURRENCY},worker));
 const missing=tournaments.filter(t=>!cached[t.competitionId]);
 if(missing.length||errors.filter(e=>!e.retainedPreviousCache).length>80)throw Error(`FITP participant cache incomplete: ${missing.length} tournaments missing, ${errors.length} refresh errors`);

@@ -32,7 +32,7 @@ const entries = [...unique.values()].sort((a,b) => String(a.startDate).localeCom
 const currentIds = new Set(entries.map(idOf));
 const removed = (previous.entries || []).filter(entry => !currentIds.has(idOf(entry))).map(entry => ({ id: idOf(entry), playerId: entry.playerId, competitionId: entry.competitionId, removedAt: NOW, reason: 'not_in_latest_complete_official_list' }));
 
-await writeJson('history/player_tournaments.json', { version: 'cw-v3-calendar-history-v1', generatedAt: NOW, rule: 'Contains only confirmed FITP registrations that must remain on the calendar. Cancelled or absent registrations are removed after a successful source build.', entries });
+await writeJson('history/player_tournaments.json', { version: 'cw-v3-calendar-history-v1', generatedAt: NOW, rule: 'Confirmed FITP registration history. Published registrations are frozen from tournament start; only pre-start registrations may change after a complete source build.', entries });
 await writeJson('history/audit.json', { version: 'cw-v3-calendar-history-audit-v1', generatedAt: NOW, sourceGeneratedAt: source.generatedAt, entries: entries.length, removedThisRun: removed.length, removed });
 
 const calendar = await readJson('dist/v3/tournaments.json', { tournaments: [] });

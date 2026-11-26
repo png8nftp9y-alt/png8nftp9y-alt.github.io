@@ -1,3 +1,4 @@
+import {mergeFitpRegistrationHistory} from './fitp-history-continuity.mjs';
 import {latestFitpEntryRankings} from './fitp-entry-ranking.mjs';
 import {fitpSubscriptionDates,fitpSubscriptionRegistrations} from './fitp-subscription-dates.mjs';
 import fs from "node:fs/promises";
@@ -289,7 +290,10 @@ const teEntries = [...(te.entries || []), ...(teHistory.entries || [])]
     });
   })
   .filter((e) => e.playerId && e.startDate && validDate(e.endDate));
-const fitpEntries = (fitp.entries || [])
+const previousFitp = await readJson('dist/v3/entries_fitp.json', {tournamentEntries:[]});
+const recoveredFitp = await readJson('history/fitp-confirmed-history-recovery.json', {entries:[]});
+const fitpRows = mergeFitpRegistrationHistory({current:fitp.entries||[],previous:previousFitp.tournamentEntries||[],recovered:recoveredFitp.entries||[],players:playersDoc.players||[],today:NOW.slice(0,10)});
+const fitpEntries = fitpRows
   .map((r) => {
     const official =
         fitpTournamentById.get(String(r.competitionId || "").toUpperCase()) ||
@@ -325,7 +329,7 @@ const fitpEntries = (fitp.entries || [])
   .filter(
     (e) => e.playerId && validDate(e.endDate) && !externalTournamentInFitp(e),
   );
-const fitpExternalExcluded = (fitp.entries || []).length - fitpEntries.length;
+const fitpExternalExcluded = (fitp.entries || []).filter(externalTournamentInFitp).length;
 const itfEntries = [...(itfHistory.entries || []), ...(itf.entries || [])].map(
   (r) => {
     const id = String(r.competitionId || "").toUpperCase(),
