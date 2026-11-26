@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-26T11:01:21.895Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-26T11:06:25.254Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -1033909,7 +1033909,7 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-26T10:52:18.726Z",
+      "checkedAt": "2026-11-26T11:06:24.277Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1034644,7 +1034644,7 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-26T10:52:19.278Z",
+      "checkedAt": "2026-11-26T11:06:24.802Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1034769,8 +1034769,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1034795,8 +1034795,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1034808,8 +1034808,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1034834,14 +1034834,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": null,
+      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1035199,13 +1035199,13 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-26T10:52:19.848Z",
+      "checkedAt": "2026-11-26T11:06:25.254Z",
       "playersFound": 0,
       "declaredSections": 5,
-      "acquiredSections": 1,
+      "acquiredSections": 3,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 1,
-      "missingSections": 4,
+      "resolvedSections": 3,
+      "missingSections": 2,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -1035327,14 +1035327,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 32,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -1035353,14 +1035353,14 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 26,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
@@ -1035619,6 +1035619,614 @@
             "complete": true,
             "taskId": "J-J30-RSA-2026-002__B-S-Q-KO",
             "storedAt": "2026-11-22T18:07:58.570Z"
+          }
+        },
+        "B-D-M-KO": {
+          "family": "B-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800850678",
+              "name": "Joel Badza",
+              "givenName": "Joel",
+              "familyName": "Badza",
+              "nationalityCode": "ZIM",
+              "profileLink": "/en/players/joel-badza/800850678/zim/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800677693",
+              "name": "Tshepang Maisela",
+              "givenName": "Tshepang",
+              "familyName": "Maisela",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/tshepang-maisela/800677693/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800750065",
+              "name": "Matthew Goodchild",
+              "givenName": "Matthew",
+              "familyName": "Goodchild",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/matthew-goodchild/800750065/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800857136",
+              "name": "Nathan Herbert",
+              "givenName": "Nathan",
+              "familyName": "Herbert",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/nathan-herbert/800857136/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800850117",
+              "name": "Alexander Lee Pieber",
+              "givenName": "Alexander Lee",
+              "familyName": "Pieber",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/alexander-lee-pieber/800850117/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800822182",
+              "name": "Johan Nicolaas Theron",
+              "givenName": "Johan Nicolaas",
+              "familyName": "Theron",
+              "nationalityCode": "NAM",
+              "profileLink": "/en/players/johan-nicolaas-theron/800822182/nam/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800750169",
+              "name": "Jamie Roux",
+              "givenName": "Jamie",
+              "familyName": "Roux",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/jamie-roux/800750169/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800884686",
+              "name": "Tristan Van Der Merwe",
+              "givenName": "Tristan",
+              "familyName": "Van Der Merwe",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/tristan-van-der-merwe/800884686/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800812665",
+              "name": "Lukas Calitz",
+              "givenName": "Lukas",
+              "familyName": "Calitz",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/lukas-calitz/800812665/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800750201",
+              "name": "Luhan Van Niekerk",
+              "givenName": "Luhan",
+              "familyName": "Van Niekerk",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/luhan-van-niekerk/800750201/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800732550",
+              "name": "Devilliers Lamprecht",
+              "givenName": "Devilliers",
+              "familyName": "Lamprecht",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/devilliers-lamprecht/800732550/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800821728",
+              "name": "Matthew Miller",
+              "givenName": "Matthew",
+              "familyName": "Miller",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/matthew-miller/800821728/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800837161",
+              "name": "Damyan Avramovski",
+              "givenName": "Damyan",
+              "familyName": "Avramovski",
+              "nationalityCode": "BUL",
+              "profileLink": "/en/players/damyan-avramovski/800837161/bul/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800749294",
+              "name": "Boris Radkov",
+              "givenName": "Boris",
+              "familyName": "Radkov",
+              "nationalityCode": "BUL",
+              "profileLink": "/en/players/boris-radkov/800749294/bul/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800740484",
+              "name": "Noah Parker",
+              "givenName": "Noah",
+              "familyName": "Parker",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/noah-parker/800740484/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800782077",
+              "name": "Rocco Van Tonder",
+              "givenName": "Rocco",
+              "familyName": "Van Tonder",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/rocco-van-tonder/800782077/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800750022",
+              "name": "Alexander Bell",
+              "givenName": "Alexander",
+              "familyName": "Bell",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/alexander-bell/800750022/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800885943",
+              "name": "Alexander Antonio Reichl",
+              "givenName": "Alexander Antonio",
+              "familyName": "Reichl",
+              "nationalityCode": "GER",
+              "profileLink": "/en/players/alexander-antonio-reichl/800885943/ger/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800884967",
+              "name": "Matteo Coppini",
+              "givenName": "Matteo",
+              "familyName": "Coppini",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/matteo-coppini/800884967/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800885089",
+              "name": "Joshua Hoffman",
+              "givenName": "Joshua",
+              "familyName": "Hoffman",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/joshua-hoffman/800885089/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800864775",
+              "name": "Alec Koch",
+              "givenName": "Alec",
+              "familyName": "Koch",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/alec-koch/800864775/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800821721",
+              "name": "Evan Krige",
+              "givenName": "Evan",
+              "familyName": "Krige",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/evan-krige/800821721/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800750071",
+              "name": "William Harding",
+              "givenName": "William",
+              "familyName": "Harding",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/william-harding/800750071/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800674613",
+              "name": "Kalle Hommersom",
+              "givenName": "Kalle",
+              "familyName": "Hommersom",
+              "nationalityCode": "NED",
+              "profileLink": "/en/players/kalle-hommersom/800674613/ned/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800826561",
+              "name": "Jaden Van Der Westhuizen",
+              "givenName": "Jaden",
+              "familyName": "Van Der Westhuizen",
+              "nationalityCode": "GER",
+              "profileLink": "/en/players/jaden-van-der-westhuizen/800826561/ger/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800668349",
+              "name": "Zachary Verret",
+              "givenName": "Zachary",
+              "familyName": "Verret",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/zachary-verret/800668349/gbr/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800754772",
+              "name": "Ronan Patrick Gorton",
+              "givenName": "Ronan Patrick",
+              "familyName": "Gorton",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/ronan-patrick-gorton/800754772/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800778000",
+              "name": "Frederik Johannes Rheeder",
+              "givenName": "Frederik Johannes",
+              "familyName": "Rheeder",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/frederik-johannes-rheeder/800778000/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800846488",
+              "name": "Ungakum Lavela",
+              "givenName": "Ungakum",
+              "familyName": "Lavela",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/ungakum-lavela/800846488/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800809862",
+              "name": "Mbali Ndlabu",
+              "givenName": "Mbali",
+              "familyName": "Ndlabu",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/mbali-ndlabu/800809862/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800680293",
+              "name": "Oscar Grant-Rosendahl",
+              "givenName": "Oscar",
+              "familyName": "Grant-Rosendahl",
+              "nationalityCode": "DEN",
+              "profileLink": "/en/players/oscar-grant-rosendahl/800680293/den/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800815021",
+              "name": "Alessio Vigoriti",
+              "givenName": "Alessio",
+              "familyName": "Vigoriti",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/alessio-vigoriti/800815021/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-26T11:06:25.254Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-RSA-2026-002__B-D-M-KO",
+            "storedAt": "2026-11-26T11:06:25.254Z"
+          }
+        },
+        "G-D-M-KO": {
+          "family": "G-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800749890",
+              "name": "Charlotte Bouwer",
+              "givenName": "Charlotte",
+              "familyName": "Bouwer",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/charlotte-bouwer/800749890/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800749030",
+              "name": "JENNA THERON",
+              "givenName": "JENNA",
+              "familyName": "THERON",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/jenna-theron/800749030/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800849872",
+              "name": "Lisa Jonker",
+              "givenName": "Lisa",
+              "familyName": "Jonker",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/lisa-jonker/800849872/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800845773",
+              "name": "Liah Lucila Leon Rodriguez",
+              "givenName": "Liah Lucila",
+              "familyName": "Leon Rodriguez",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/liah-lucila-leon-rodriguez/800845773/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800758419",
+              "name": "Yan Ki CHAN",
+              "givenName": "Yan Ki",
+              "familyName": "CHAN",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/yan-ki-chan/800758419/hkg/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800817412",
+              "name": "Nayla Waldherr",
+              "givenName": "Nayla",
+              "familyName": "Waldherr",
+              "nationalityCode": "LIE",
+              "profileLink": "/en/players/nayla-waldherr/800817412/lie/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800783601",
+              "name": "Leticia Zandamela",
+              "givenName": "Leticia",
+              "familyName": "Zandamela",
+              "nationalityCode": "MOZ",
+              "profileLink": "/en/players/leticia-zandamela/800783601/moz/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800747948",
+              "name": "Lorena Zandamela",
+              "givenName": "Lorena",
+              "familyName": "Zandamela",
+              "nationalityCode": "MOZ",
+              "profileLink": "/en/players/lorena-zandamela/800747948/moz/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800888297",
+              "name": "Munke Blom",
+              "givenName": "Munke",
+              "familyName": "Blom",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/munke-blom/800888297/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800888342",
+              "name": "Lara Schwabe",
+              "givenName": "Lara",
+              "familyName": "Schwabe",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/lara-schwabe/800888342/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800850855",
+              "name": "Tatum Ann Mac Naughton",
+              "givenName": "Tatum Ann",
+              "familyName": "Mac Naughton",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/tatum-ann-mac-naughton/800850855/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800830934",
+              "name": "Taylor Van Der Merwe",
+              "givenName": "Taylor",
+              "familyName": "Van Der Merwe",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/taylor-van-der-merwe/800830934/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800854999",
+              "name": "Lika Claassens",
+              "givenName": "Lika",
+              "familyName": "Claassens",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/lika-claassens/800854999/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800856026",
+              "name": "Mandie Claassens",
+              "givenName": "Mandie",
+              "familyName": "Claassens",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/mandie-claassens/800856026/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800803133",
+              "name": "Romy Lenz",
+              "givenName": "Romy",
+              "familyName": "Lenz",
+              "nationalityCode": "GER",
+              "profileLink": "/en/players/romy-lenz/800803133/ger/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800766610",
+              "name": "Tatum Venter",
+              "givenName": "Tatum",
+              "familyName": "Venter",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/tatum-venter/800766610/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800795157",
+              "name": "Paballo Chuene",
+              "givenName": "Paballo",
+              "familyName": "Chuene",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/paballo-chuene/800795157/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800874687",
+              "name": "Phemelo Kedige",
+              "givenName": "Phemelo",
+              "familyName": "Kedige",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/phemelo-kedige/800874687/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800824331",
+              "name": "Ella Jonker",
+              "givenName": "Ella",
+              "familyName": "Jonker",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/ella-jonker/800824331/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800850417",
+              "name": "Winnie Masemola",
+              "givenName": "Winnie",
+              "familyName": "Masemola",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/winnie-masemola/800850417/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800850437",
+              "name": "Carli Erasmus",
+              "givenName": "Carli",
+              "familyName": "Erasmus",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/carli-erasmus/800850437/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800847094",
+              "name": "Liyabukwa Magigaba",
+              "givenName": "Liyabukwa",
+              "familyName": "Magigaba",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/liyabukwa-magigaba/800847094/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800873905",
+              "name": "Emma Van Rooyen",
+              "givenName": "Emma",
+              "familyName": "Van Rooyen",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/emma-van-rooyen/800873905/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800878707",
+              "name": "Hanri Van Rooyen",
+              "givenName": "Hanri",
+              "familyName": "Van Rooyen",
+              "nationalityCode": "RSA",
+              "profileLink": "/en/players/hanri-van-rooyen/800878707/rsa/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800672178",
+              "name": "Eliska Drevojanova",
+              "givenName": "Eliska",
+              "familyName": "Drevojanova",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/eliska-drevojanova/800672178/cze/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800661382",
+              "name": "Ilaria Rondinelli",
+              "givenName": "Ilaria",
+              "familyName": "Rondinelli",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/ilaria-rondinelli/800661382/ita/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-26T11:06:25.254Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-RSA-2026-002__G-D-M-KO",
+            "storedAt": "2026-11-26T11:06:25.254Z"
           }
         }
       }
