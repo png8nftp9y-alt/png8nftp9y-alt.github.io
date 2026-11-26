@@ -1,11 +1,10 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';
-import {itfDocumentDraws,acquiredItfDraws,drawGroupPage} from '../lib/acquired-tournament-draws.mjs';
+import {itfDocumentDraws,acquiredItfDraws} from '../lib/acquired-tournament-draws.mjs';
 const t={circuit:'itf',competitionId:'J-J30-HUN-2026-002',name:'J30 Szentes',sourceUrl:'https://www.itftennis.com/en/tournament/j30-szentes/hun/2026/j-j30-hun-2026-002/'};
 const match=group=>({group,round:'Round 1',teams:[{players:[{id:'800792690',name:'Martina Danesi'}],score:'6 6'},{players:[{id:'800123456',name:'Other Player'}],score:'2 3'}]});
-test('ITF RR groups are individual exact links with only their own players and matches',()=>{
- const draws=itfDocumentDraws({event:'G-S-M-RR',matches:[match('A'),{...match('B'),teams:[{players:[{id:'800234567',name:'Another Player'}]}]}]},t);assert.equal(draws.length,2);assert.equal(draws[0].group,'A');assert.deepEqual(draws[1].participants.map(p=>p.id),['800234567']);assert.match(draws[0].drawUrl,/group=A/);assert.match(draws[1].drawUrl,/group=B/);assert.notEqual(draws[0].drawUrl,draws[1].drawUrl);
- const html=drawGroupPage(t,draws[0]);assert.match(html,/Martina Danesi/);assert.doesNotMatch(html,/Another Player/);assert.match(html,/6 6/);assert.doesNotMatch(drawGroupPage({...t,name:'<script>alert(1)</script>'},draws[0]),/<script>/);
- assert.deepEqual(itfDocumentDraws({event:'G-S-M-RR',matches:[match('')]},t),[]);
+test('ITF RR groups retain their own participants and use the official event print URL, never an app page',()=>{
+ const draws=itfDocumentDraws({event:'G-S-M-RR',matches:[match('A'),{...match('B'),teams:[{players:[{id:'800234567',name:'Another Player'}]}]}]},t);assert.equal(draws.length,2);assert.equal(draws[0].group,'A');assert.deepEqual(draws[1].participants.map(p=>p.id),['800234567']);assert.equal(new URL(draws[0].drawUrl).hostname,'www.itftennis.com');assert.match(draws[0].drawUrl,/drawsheetStructureCode=RR/);assert.equal(draws[0].drawUrl,draws[1].drawUrl);assert.doesNotMatch(draws[0].drawUrl,/app\/api/);
+ assert.equal(itfDocumentDraws({event:'G-S-M-RR',matches:[match('')]},t)[0].event,'G-S-M-RR');
 });
 test('indexed acquired documents verify exact competition, hash and chunk sequence before returning links',async()=>{
  const doc={competitionId:t.competitionId,event:'G-S-M-KO',matches:[match('')]},text=JSON.stringify(doc),hash=createHash('sha256').update(text).digest('hex');let broken=false;const calls=[];

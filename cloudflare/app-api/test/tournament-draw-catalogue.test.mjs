@@ -25,7 +25,7 @@ test('explicit empty publication is distinct from a technical failure',async()=>
 const itf={circuit:'itf',competitionId:'J-J30-SRB-2026-002',sourceUrl:'https://www.itftennis.com/en/tournament/j30-nis/srb/2026/j-j30-srb-2026-002/'};
 test('ITF uses all acquired events from R2, independent of observed players, and exposes incomplete scope',()=>{
  const row={competitionId:itf.competitionId,classification:'missing_draws',checks:[{event:'B-S-M-KO',acquired:true},{event:'G-S-M-KO',acquired:true},{event:'G-D-M-KO',acquired:false}]};
- let r=itfCatalogueDraws({tournaments:[row]},itf);assert.equal(r.draws.length,2);assert.equal(r.complete,false);assert(r.draws.every(d=>d.drawUrl.endsWith('/draws-and-results/')));
+ let r=itfCatalogueDraws({tournaments:[row]},itf);assert.equal(r.draws.length,2);assert.equal(r.complete,false);assert(r.draws.every(d=>d.drawUrl.includes('/draws-and-results/print/')));
  r=itfCatalogueDraws({tournaments:[{...row,classification:'complete'}]},itf);assert.equal(r.complete,true);
  assert.deepEqual(itfCatalogueDraws({tournaments:[{...row,classification:'cancelled_no_draws'}]},itf),{draws:[],complete:true});
 });

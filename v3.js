@@ -4146,7 +4146,7 @@ function tournamentDrawUrl(t, m) {
   const explicit = readableText(
     m?.drawUrl || m?.drawsUrl || m?.eventUrl || m?.drawSourceUrl || "",
   );
-  if (/^https?:\/\//i.test(explicit) || /^\/app\/api\/tournament-draw-view\?/.test(explicit)) return explicit;
+  if (/^https?:\/\//i.test(explicit)) return explicit;
   const source = readableText(m?.sourceUrl || "");
   if (/^https?:\/\//i.test(source) && /(?:draw|tabellon)/i.test(source))
     return source;
@@ -4200,27 +4200,26 @@ function internationalDrawDescriptor(t, row) {
   const qualifying = native ? native[3].toUpperCase() === "Q" : /\b(?:qualifying|qualifications?|qualificazioni|qualif)\b/i.test(raw);
   const group = [row.groupName,row.groupDesc,row.group,row.groupNumber,row.groupId,raw.match(/\b(?:group|gruppo|pool|girone)\s+([A-Z0-9]+)\b/i)?.[1]].map(x=>String(x??" ").trim()).find(Boolean)||"";
   const structure = native?.[4]?.toUpperCase() || (group || /\b(?:round\s*robin|RR|girone)\b/i.test(raw) ? "RR" : "KO");
-  if(structure === "RR" && !group)return null;
+  if(structure === "RR" && !group && source!=="itf")return null;
   const phase = qualifying ? "Qualificazioni" : /\b(?:consolation|consolazione)\b/i.test(raw) ? "Consolazione" : /\bbonus\b/i.test(raw) ? "Bonus" : "Tabellone principale";
   const category = kind + (gender === "G" ? "F" : gender === "B" ? "M" : "X") + age;
   let url = "";
   try {
     const candidate = new URL(tournamentDrawUrl(t, row), typeof location === "undefined" ? "https://courtwatch.invalid" : location.origin);
     const hosts = source === "itf" ? ["www.itftennis.com","itftennis.com"] : ["te.tournamentsoftware.com","www.tenniseurope.org","tenniseurope.org"];
-    const localGroup = structure === "RR" && group && candidate.pathname === "/app/api/tournament-draw-view" && candidate.origin === (typeof location === "undefined" ? "https://courtwatch.invalid" : location.origin) && candidate.searchParams.get('competitionId')?.toUpperCase() === String(t.competitionId).toUpperCase() && candidate.searchParams.get('group') === group;
-    if ((candidate.protocol === "https:" && hosts.includes(candidate.hostname) || localGroup) && !candidate.username && !candidate.password) url = candidate.href;
+    if(candidate.protocol==='https:'&&hosts.includes(candidate.hostname)&&!candidate.username&&!candidate.password)url=candidate.href;
   } catch {}
   if (!url) return null;
   if(structure==='RR'){
     const target=new URL(url);
-    if(source==='itf'&&target.pathname!=='/app/api/tournament-draw-view')return null;
+    if(source==='itf'&&!['www.itftennis.com','itftennis.com'].includes(target.hostname))return null;
     if(source==='tennis-europe'&&!/\/draw\/\d+\/?$/i.test(target.pathname)&&!(/\/draw\.aspx$/i.test(target.pathname)&&target.searchParams.has('draw')))return null;
   }
   return {age, category, gender, kind, phase, structure, group, url,
     key: category + "|" + phase + "|" + structure + "|" + (structure === "RR" ? group || row.drawId || url : row.catalogueDraw ? row.drawId || "" : ""),
     kindOrder: ["SM","SF","DM","DF","DX"].indexOf(category.slice(0,2)),
     phaseOrder: qualifying ? 0 : phase === "Tabellone principale" ? 1 : 2,
-    explicitUrl: Boolean(row.drawUrl || row.drawsUrl || row.eventUrl || row.drawSourceUrl)};
+    explicitUrl: Boolean(row.drawUrl || row.drawsUrl || row.eventUrl || row.drawSourceUrl), specificUrl:/\/draws-and-results\/print\//.test(url)};
 }
 function internationalTournamentDrawHtml(t, matches) {
   const rows = [...(matches || [])];
@@ -4239,17 +4238,17 @@ function internationalTournamentDrawHtml(t, matches) {
     if(draw.structure === "RR" && !draw.group && rows.some(other=>{const d=internationalDrawDescriptor(t,other);return d?.group && d.category===draw.category && d.phase===draw.phase;}))continue;
     if(row.event && !/\b[BG]-[SD]-[MQ]-KO\b/i.test(row.event) && !row.drawUrl && !row.drawsUrl && !row.drawSourceUrl && draw.structure==='KO' && rows.some(other=>{const d=internationalDrawDescriptor(t,other);return d?.structure==='RR'&&d.group&&d.category===draw.category&&d.phase===draw.phase;}))continue;
     const previous = draws.get(draw.key);
-    if (!previous || (!previous.explicitUrl && draw.explicitUrl)) draws.set(draw.key, draw);
+    if (!previous || (!previous.explicitUrl && draw.explicitUrl)||(!previous.specificUrl&&draw.specificUrl)) draws.set(draw.key, draw);
   }
   const ages = [...new Set([...draws.values()].map(draw => draw.age))].sort((a,b) => a-b);
   const html = ages.map(age => {
-    const links = [...draws.values()].filter(draw => draw.age === age)
-      .sort((a,b) => a.kindOrder-b.kindOrder || a.phaseOrder-b.phaseOrder || a.structure.localeCompare(b.structure))
-      .map(draw => {
-        const color = draw.gender === "G" ? "fitpDrawFemale" : draw.gender === "X" ? "fitpDrawMixed" : "fitpDrawMale";
-        const label = draw.structure === "RR" ? `${draw.category} Round Robin${draw.group ? " - Gruppo " + draw.group.replace(/^(?:group|gruppo|pool|girone)\s*/i, "") : ""}` : `${draw.category} ${draw.phase}`;
-        return `<a class="type tournamentDrawLink ${color}" href="${esc(draw.url)}" target="_blank" rel="noopener noreferrer" aria-label="Apri tabellone ${esc(label)}">${esc(label)}</a>`;
-      }).join("");
+    const ordered=[...draws.values()].filter(draw=>draw.age===age).sort((a,b)=>a.kindOrder-b.kindOrder||a.phaseOrder-b.phaseOrder||(a.structure==='RR'?-1:1)-(b.structure==='RR'?-1:1)||String(a.group).localeCompare(String(b.group),undefined,{numeric:true})||a.url.localeCompare(b.url,undefined,{numeric:true}));
+    const categories=[...new Set(ordered.map(d=>d.category))];
+    const links=categories.map(category=>'<span class="internationalDrawCategoryRow" data-international-draw-category="'+esc(category)+'">'+ordered.filter(draw=>draw.category===category).map(draw=>{
+      const color=draw.gender==='G'?'fitpDrawFemale':draw.gender==='X'?'fitpDrawMixed':'fitpDrawMale';
+      const label=draw.structure==='RR'?`${draw.category} Round Robin${draw.group?' - Gruppo '+draw.group.replace(/^(?:group|gruppo|pool|girone)\s*/i,''):''}`:`${draw.category} ${draw.phase}`;
+      return `<a class="type tournamentDrawLink ${color}" href="${esc(draw.url)}" target="_blank" rel="noopener noreferrer" aria-label="Apri tabellone ${esc(label)}">${esc(label)}</a>`;
+    }).join('')+'</span>').join('');
     return `<span class="fitpDrawAgeRow" data-international-draw-age="U${age}"><b class="fitpDrawAgeLabel">Under ${age}</b>${links}</span>`;
   }).join("");
   return `<span data-international-draw-links="${esc(internationalDrawCatalogueKey(t))}">${html}</span>`;

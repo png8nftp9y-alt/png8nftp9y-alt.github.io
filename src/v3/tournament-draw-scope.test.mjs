@@ -95,10 +95,10 @@ test('observed tournament still loads publication metadata and requests particip
 test('native ID mismatch never associates a namesake draw',()=>{
  const {ctx}=context();ctx.state.data.players=[{id:'a',name:'Same Name',profileSync:{tennisEurope:{profileId:'11111111-1111-1111-1111-111111111111'}}}];ctx.state.data.tournaments=[{...t,playerId:'a',draws:[]}];seed(ctx,[{event:'BS12 - Group C',group:'C',drawId:'3',drawUrl:`https://te.tournamentsoftware.com/tournament/${id}/draw/3`,participants:[{id:'22222222-2222-2222-2222-222222222222',name:'Same Name'}]}]);assert.doesNotMatch(ctx.tournamentDrawLinks(t,[]),/<a /);
 });
-test('ITF RR group URLs open the exact protected group view and never the generic main draw',()=>{
+test('ITF RR labels retain groups but every target is on the official ITF site',()=>{
  const {ctx}=context(),itf={circuit:'itf',competitionId:'J-J30-HUN-2026-002',sourceUrl:'https://www.itftennis.com/en/tournament/j30-szentes/hun/2026/j-j30-hun-2026-002/'};
- const rows=['A','B'].map(group=>({event:'G-S-M-RR',group,drawUrl:'/app/api/tournament-draw-view?'+new URLSearchParams({circuit:'itf',competitionId:itf.competitionId,event:'G-S-M-RR',group})}));
- const html=ctx.internationalTournamentDrawHtml(itf,rows);assert.equal((html.match(/<a /g)||[]).length,2);assert.match(html,/group=A/);assert.match(html,/group=B/);assert.match(html,/tournament-draw-view/);assert.doesNotMatch(html,/Tabellone principale/);
+ const rows=['A','B'].map(group=>({event:'G-S-M-RR',group,drawUrl:'https://www.itftennis.com/en/tournament/draws-and-results/print/?tournamentId=1100202888&playerTypeCode=G&matchTypeCode=S&eventClassificationCode=M&drawsheetStructureCode=RR'}));
+ const html=ctx.internationalTournamentDrawHtml(itf,rows);assert.equal((html.match(/<a /g)||[]).length,2);assert.match(html,/Round Robin - Gruppo A/);assert.match(html,/Round Robin - Gruppo B/);assert.match(html,/itftennis\.com.*print\//);assert.doesNotMatch(html,/app\/api/);assert.doesNotMatch(html,/Tabellone principale/);
 });
 test('real archived Szentes evidence identifies Danesi in RR even when the frontend has only her Europe profile',()=>{
  const evidence=JSON.parse(fs.readFileSync(new URL('./fixtures/szentes-danesi-draw-evidence.json',import.meta.url),'utf8'));
@@ -106,6 +106,6 @@ test('real archived Szentes evidence identifies Danesi in RR even when the front
  const {ctx}=context(),sz={circuit:'itf',competitionId:evidence.competitionId,sourceUrl:'https://www.itftennis.com/en/tournament/j30-szentes/hun/2026/j-j30-hun-2026-002/'};
  ctx.state.data.players=[{id:'martina-danesi',name:'Martina Danesi',profileSync:{tennisEurope:{profileId:'46010E1A-5310-41AB-95AF-6D1B0BC54EB6'}}}];ctx.state.data.tournaments=[{...sz,playerId:'martina-danesi',draws:['Girls Singles Qualifying']}];
  // The label A here is a test group, not a claim about Danesi's official group.
- ctx.rows=[{event:evidence.event,group:'A',participants:evidence.players,drawUrl:'/app/api/tournament-draw-view?'+new URLSearchParams({circuit:'itf',competitionId:evidence.competitionId,event:evidence.event,group:'A'})}];vm.runInContext(`internationalDrawCatalogueCache.set('itf|${evidence.competitionId}',{draws:rows,savedAt:Date.now()})`,ctx);
+ ctx.rows=[{event:evidence.event,group:'A',participants:evidence.players,drawUrl:'https://www.itftennis.com/en/tournament/draws-and-results/print/?tournamentId=1100202888&playerTypeCode=G&matchTypeCode=S&eventClassificationCode=M&drawsheetStructureCode=RR'}];vm.runInContext(`internationalDrawCatalogueCache.set('itf|${evidence.competitionId}',{draws:rows,savedAt:Date.now()})`,ctx);
  assert.match(ctx.tournamentDrawLinks(sz,[]),/Round Robin - Gruppo A/);
 });

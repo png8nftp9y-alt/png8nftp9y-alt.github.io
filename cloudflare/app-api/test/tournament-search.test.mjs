@@ -25,3 +25,15 @@ test('endpoint authenticates before reading any catalogue',async()=>{
  const response=await worker.fetch(new Request('https://app.test/app-api/tournament-search?q=Monza'),{DB:{prepare(){calls++;throw Error('unexpected read');}}});
  assert.equal(response.status,401);assert.equal(calls,0);
 });
+test('Italian and English place names match the same tournaments in both directions',async()=>{
+ const r=reader([{...row,competitionId:'BEL',city:'Belgrade',name:'Belgrade Open'},{...row,competitionId:'ROM',city:'Roma',name:'Torneo Roma'},{...row,competitionId:'MUN',city:'München',name:'Munich Open'}]);
+ for(const q of ['belgrado','belgrade','beograd'])assert.equal((await searchTournaments(r,{query:q})).results[0].competitionId,'BEL');
+ for(const q of ['roma','rome'])assert.equal((await searchTournaments(r,{query:q})).results[0].competitionId,'ROM');
+ for(const q of ['monaco di baviera','munich','munchen'])assert.equal((await searchTournaments(r,{query:q})).results[0].competitionId,'MUN');
+ assert.equal((await searchTournaments(r,{query:'belgrado open'})).results[0].competitionId,'BEL');assert.equal((await searchTournaments(r,{query:'belgrado monza'})).results.length,0);
+});
+test('archived tournament outside the current catalogue is read by stable primary key and its source URL is retained',async()=>{
+ const {storedTournamentByNativeId}=await import('../lib/tournament-search.mjs');const {stableId}=await import('../../../src/v3/universal-data-model.mjs');const id='J-J30-SUI-2026-005',expected=stableId('tournament','itf',id),row={circuit:'itf',sourceTournamentId:id,name:'Agno 1',source:{url:'https://www.itftennis.com/en/tournament/j30-agno/sui/2026/j-j30-sui-2026-005/'}};let calls=0;
+ const db={prepare(sql){assert.match(sql,/WHERE id IN/);assert.doesNotMatch(sql,/WHERE circuit|LIKE/);return {bind(...keys){assert(keys.includes(expected));calls++;return{first:async()=>({payload:JSON.stringify(row)})}}}}};const t=await storedTournamentByNativeId(db,'itf',id);assert.equal(calls,1);assert.equal(t.competitionId,id);assert.equal(t.sourceUrl,row.source.url);
+ row.sourceTournamentId='J-J30-SUI-2026-004';await assert.rejects(storedTournamentByNativeId(db,'itf',id),/identity/);
+});

@@ -20,7 +20,7 @@ test('source failure retains proven links and never manufactures a new draw',asy
  const fetcher=async url=>{calls++;return url.includes('GetEventFilters')?Response.json({filters:[combo(),combo('G')]}):new Response('blocked',{status:403});};
  const result=await officialItfDrawLinks(t,{fetcher,known});assert.deepEqual(result.draws,known);assert.equal(result.complete,false);assert.equal(calls,2);
 });
-test('official RR sheet produces exact group views and retains round/participant context',async()=>{
+test('official RR sheet produces external ITF links and retains round/participant context',async()=>{
  const fetcher=async url=>Response.json(url.includes('GetEventFilters')?{filters:[{...combo('G'),drawsheetStructureCode:'RR'}]}:{rrGroups:['A','B'].map((groupName,i)=>({groupName,rounds:[{roundDesc:'Round 1',matches:[{teams:[{players:[{playerId:800792690+i,givenName:'Player',familyName:groupName}]}]}]}]}))});
- const result=await officialItfDrawLinks(t,{fetcher,withParticipants:true});assert.equal(result.draws.length,2);assert.equal(result.draws[0].group,'A');assert.equal(result.draws[1].group,'B');assert.match(result.draws[0].drawUrl,/group=A/);assert.equal(result.draws[0].matches[0].round,'Round 1');assert.equal(result.draws[1].participants[0].name,'Player B');
+ const result=await officialItfDrawLinks(t,{fetcher,withParticipants:true});assert.equal(result.draws.length,2);assert.equal(result.draws[0].group,'A');assert.equal(result.draws[1].group,'B');assert.match(result.draws[0].drawUrl,/itftennis\.com.*print\//);assert.match(result.draws[0].drawUrl,/drawsheetStructureCode=RR/);assert.equal(result.draws[0].matches[0].round,'Round 1');assert.equal(result.draws[1].participants[0].name,'Player B');
 });

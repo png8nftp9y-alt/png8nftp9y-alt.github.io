@@ -1,3 +1,4 @@
+import {officialItfDrawUrl} from './itf-official-draw-url.mjs';
 import {drawParticipants,itfDocumentDraws} from './acquired-tournament-draws.mjs';
 // Read-only publication discovery. No match/result persistence or database access.
 export function itfEventFilters(json){
@@ -40,9 +41,9 @@ export async function officialItfDrawLinks(tournament,{fetcher=fetch,known=[],wi
     if(filter.event.endsWith('-RR')){
      const groups=[];function walk(v){if(Array.isArray(v)){v.forEach(walk);return;}if(!v||typeof v!=='object')return;for(const [key,value] of Object.entries(v)){if(key==='rrGroups'&&Array.isArray(value))groups.push(...value);else if(value&&typeof value==='object')walk(value);}}walk(sheet);
      for(const group of groups){const label=[group.groupName,group.groupDesc,group.poolName,group.groupNumber,group.groupId].map(x=>String(x??'').trim()).find(Boolean)||'';if(!label)continue;const matches=[];function collect(v,round=''){if(Array.isArray(v)){v.forEach(x=>collect(x,round));return;}if(!v||typeof v!=='object')return;const name=v.roundDesc??v.roundName??round;if(Array.isArray(v.teams)){matches.push({...v,round:name,group:label});return;}Object.values(v).forEach(x=>collect(x,name));}collect(group);
-      for(const draw of itfDocumentDraws({event:filter.event,matches}, {...tournament,drawsResultsUrl:url.href})){draws.set(draw.drawId,draw);}
+      for(const draw of itfDocumentDraws({event:filter.event,matches}, {...tournament,drawsResultsUrl:url.href})){draws.set(draw.drawId,{...draw,drawUrl:officialItfDrawUrl(tournament,filter.event,{tournamentId:filter.tournamentId})});}
      }
-    }else draws.set(filter.event,{event:filter.event,drawUrl:url.href,participants:drawParticipants(sheet)});
+    }else draws.set(filter.event,{event:filter.event,drawUrl:officialItfDrawUrl(tournament,filter.event,{tournamentId:filter.tournamentId}),participants:drawParticipants(sheet)});
    }
   }catch{complete=false;}
  }));

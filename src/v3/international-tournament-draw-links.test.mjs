@@ -38,7 +38,7 @@ test('match duplicates collapse, direct Europe draw links win over tournament fa
  assert.equal((html.match(/<a /g)||[]).length,1);assert.match(html,/draw=7/);assert.match(html,/&amp;/);
 });
 test('round robins and qualifying keep separate identities',()=>{
- const html=renderer().tournamentDrawLinks(itf,[{event:'G-S-M-RR',group:'A',drawUrl:'/app/api/tournament-draw-view?circuit=itf&competitionId='+itf.competitionId+'&event=G-S-M-RR&group=A'},{event:'G-S-M-KO'},{event:'G-S-Q-KO'}]);
+ const html=renderer().tournamentDrawLinks(itf,[{event:'G-S-M-RR',group:'A',drawUrl:itf.sourceUrl+'draws-and-results/'},{event:'G-S-M-KO'},{event:'G-S-Q-KO'}]);
  assert.equal((html.match(/<a /g)||[]).length,3);assert.match(html,/Round Robin/);assert.match(html,/Qualificazioni/);
 });
 test('ITF official URL is not duplicated when it already ends with draws or acceptance',()=>{
@@ -68,4 +68,13 @@ test('Europe catalog age is used only when unambiguous, never the first age of a
  assert.match(c.tournamentDrawLinks({...te,tournamentCategory:'14 & Under'},[{event:'Girls Singles'}]),/>SF14 /);
  assert.doesNotMatch(c.tournamentDrawLinks({...te,tournamentCategory:'U12 · Category 1 / U14 · Category 2'},[{event:'Girls Singles'}]),/<a /);
  assert.match(c.tournamentDrawLinks({...te,tournamentCategory:'U12 / U14'},[{event:'GS14'}]),/>SF14 /);
+});
+test('Forli categories have stable rows and RR groups use natural numeric order',()=>{
+ const c=renderer(),t={circuit:'tennis-europe',competitionId:'00523E1D-06C9-430A-B8B9-851B401381E3'},make=(event,n)=>({event,drawUrl:`https://te.tournamentsoftware.com/tournament/${t.competitionId}/draw/${n}`});
+ const html=c.internationalTournamentDrawHtml(t,[make('GS12 - Group 10',10),make('BS12 - Group 2',2),make('BS12 - Group 1',1),make('GS12 - Group 2',12),make('BD12',3),make('GD12',4)]);
+ assert.deepEqual([...html.matchAll(/data-international-draw-category="([^"]+)"/g)].map(m=>m[1]),['SM12','SF12','DM12','DF12']);assert(html.indexOf('SM12 Round Robin - Gruppo 1')<html.indexOf('SM12 Round Robin - Gruppo 2'));assert(html.indexOf('SF12 Round Robin - Gruppo 2')<html.indexOf('SF12 Round Robin - Gruppo 10'));
+});
+test('ITF official print URLs replace generic fallbacks for the same draw and app pages are never accepted',()=>{
+ const c=renderer(),url='https://www.itftennis.com/en/tournament/draws-and-results/print/?tournamentId=1100202888&playerTypeCode=G&matchTypeCode=S&eventClassificationCode=Q&drawsheetStructureCode=KO';
+ const html=c.internationalTournamentDrawHtml({...itf,draws:['Girls Singles Qualifying']},[{event:'G-S-Q-KO',drawUrl:url}]);assert.equal((html.match(/<a /g)||[]).length,1);assert.match(html,/print\//);assert.doesNotMatch(html,/app\/api/);
 });

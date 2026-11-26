@@ -1,3 +1,4 @@
+import {tournamentLocationWords} from './tournament-location-aliases.mjs';
 // Public catalogue metadata only. Private player membership is never cached here.
 const sources=[['fitp','dist/v3/source_fitp_tournaments.json'],['tennis-europe','dist/v3/source_tennis_europe_tournaments_sharded.json'],['itf','dist/v3/source_itf_history_tournaments.json'],['itf','dist/v3/source_itf_tournaments.json']];
 const normalize=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
@@ -11,7 +12,7 @@ export function buildTournamentSearchIndex(documents){
   const t={...old,...row,circuit:c,competitionId:id,name:row.tournamentName||row.name||old.name||id,location:row.location||row.city||old.location||'',venueName:row.venueName||row.clubName||row.club||old.venueName||'',address:row.address||row.clubAddress||old.address||''};
   map.set(key,t);
  }}
- return [...map.values()].sort((a,b)=>String(b.startDate||'').localeCompare(String(a.startDate||''))||a.circuit.localeCompare(b.circuit)||a.competitionId.localeCompare(b.competitionId)).map(t=>({t,text:normalize([t.name,t.location,t.city,t.venueName,t.venue,t.address,t.hostNation,t.competitionId,t.circuit,dateWords(t.startDate),dateWords(t.endDate)].filter(Boolean).join(' '))}));
+ return [...map.values()].sort((a,b)=>String(b.startDate||'').localeCompare(String(a.startDate||''))||a.circuit.localeCompare(b.circuit)||a.competitionId.localeCompare(b.competitionId)).map(t=>({t,text:normalize([t.name,t.location,t.city,t.venueName,t.venue,t.address,t.hostNation,t.competitionId,t.circuit,dateWords(t.startDate),dateWords(t.endDate),tournamentLocationWords([t.location,t.city,t.venue,t.address,t.hostNation].filter(Boolean).join(' '))].filter(Boolean).join(' '))}));
 }
 async function index(reader){
  const release=await reader.release(),paths=[...sources.map(s=>s[1]),'history/itf_official_metadata.json'];
@@ -27,4 +28,15 @@ export async function searchTournaments(reader,{query='',cursor='',circuit='',co
  const dateMatch=/^(\d{4})-(\d{2})-(\d{2})$/.exec(query.trim()),italian=/^(\d{1,2})[/.](\d{1,2})[/.](\d{4})$/.exec(query.trim()),date=dateMatch?dateMatch[0]:italian?`${italian[3]}-${italian[2].padStart(2,'0')}-${italian[1].padStart(2,'0')}`:'';
  const found=rows.filter(r=>date?(String(r.t.startDate||'')<=date&&String(r.t.endDate||r.t.startDate||'')>=date):terms.every(term=>r.text.includes(term))),results=found.slice(offset,offset+50).map(r=>r.t);
  return {results,total:found.length,nextCursor:offset+50<found.length?String(offset+50):''};
+}
+
+// D1_READ_ONLY: at most three primary-key probes, no catalogue/table scan.
+export async function storedTournamentByNativeId(db,circuit,competitionId){
+ const sourceId=String(competitionId||'').toUpperCase();
+ const nativeKeys=[...new Set([String(competitionId||''),sourceId,String(competitionId||'').toLowerCase()])];
+ const keys=await Promise.all(nativeKeys.map(async value=>{const raw=circuit+'|'+value,digest=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(raw)));return 'tournament_'+[...digest].map(v=>v.toString(16).padStart(2,'0')).join('').slice(0,24);}));
+ const row=await db.prepare('SELECT payload FROM tournaments WHERE id IN ('+keys.map(()=>'?').join(',')+') LIMIT 1').bind(...keys).first();
+ if(!row)return null;const t=JSON.parse(row.payload||'{}');
+ if(t.circuit!==circuit||String(t.competitionId||t.sourceTournamentId||'').toUpperCase()!==sourceId)throw Error('stored_tournament_identity');
+ return {...t,circuit,competitionId:sourceId,sourceUrl:t.sourceUrl||t.source?.url||'',name:t.name||t.tournamentName||sourceId};
 }

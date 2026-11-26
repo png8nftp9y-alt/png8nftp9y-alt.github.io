@@ -1,3 +1,4 @@
+import {officialItfDrawUrl} from './itf-official-draw-url.mjs';
 import {acquiredItfDraws} from './acquired-tournament-draws.mjs';
 import {officialItfDrawLinks} from './official-itf-draw-links.mjs';
 // Public draw metadata only. Never cache user membership or player filtering here.
@@ -26,7 +27,7 @@ export function itfCatalogueDraws(audit,tournament){
  let parsed;try{parsed=new URL(official);}catch{return {draws:[],complete:false};}
  if(parsed.protocol!=='https:'||!['www.itftennis.com','itftennis.com'].includes(parsed.hostname)||!parsed.pathname.toUpperCase().split('/').includes(id))throw Error('invalid_itf_draw_source');
  const events=[...new Set((row.checks||[]).filter(c=>c.acquired===true&&/^[BG]-[SD]-[MQ]-(?:KO|RR)$/.test(c.event)).map(c=>c.event))];
- return {draws:events.map(event=>({event,drawUrl:parsed.href})),complete:row.classification==='complete'};
+ return {draws:events.map(event=>({event,drawUrl:officialItfDrawUrl(tournament,event)})),complete:row.classification==='complete'};
 }
 export function createTournamentDrawCatalogue(){
  const cache=new Map(),pending=new Map();
