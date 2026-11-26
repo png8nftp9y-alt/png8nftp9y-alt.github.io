@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-26T11:31:41.214Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-26T11:35:26.843Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -1033909,7 +1033909,7 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-26T11:24:51.261Z",
+      "checkedAt": "2026-11-26T11:35:26.043Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1034034,8 +1034034,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1034099,14 +1034099,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1034644,13 +1034644,13 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-26T11:24:52.035Z",
+      "checkedAt": "2026-11-26T11:35:26.468Z",
       "playersFound": 0,
       "declaredSections": 6,
-      "acquiredSections": 2,
+      "acquiredSections": 4,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 2,
-      "missingSections": 4,
+      "resolvedSections": 4,
+      "missingSections": 2,
       "eventInventory": [
         {
           "event": "B-S-M-KO",
@@ -1034790,14 +1034790,14 @@
         },
         {
           "family": "B-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "B-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 24,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         },
@@ -1034829,14 +1034829,14 @@
         },
         {
           "family": "G-D-M",
-          "populated": false,
+          "populated": true,
           "events": [
             {
               "event": "G-D-M-KO",
-              "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
-              "resolved": false
+              "players": 26,
+              "error": null,
+              "failureType": null,
+              "resolved": true
             }
           ]
         }
@@ -1035190,6 +1035190,534 @@
             "taskId": "J-J30-POL-2026-008__G-S-Q-KO",
             "storedAt": "2026-11-22T19:16:15.324Z"
           }
+        },
+        "B-D-M-KO": {
+          "family": "B-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800709169",
+              "name": "Aleksander Bialowolski",
+              "givenName": "Aleksander",
+              "familyName": "Bialowolski",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/aleksander-bialowolski/800709169/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800799172",
+              "name": "Jakub Jedryka",
+              "givenName": "Jakub",
+              "familyName": "Jedryka",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/jakub-jedryka/800799172/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800654571",
+              "name": "Jacek Biernacki",
+              "givenName": "Jacek",
+              "familyName": "Biernacki",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/jacek-biernacki/800654571/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800742999",
+              "name": "Antoni Gajewski",
+              "givenName": "Antoni",
+              "familyName": "Gajewski",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/antoni-gajewski/800742999/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800664233",
+              "name": "Vojta Jaros",
+              "givenName": "Vojta",
+              "familyName": "Jaros",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/vojta-jaros/800664233/cze/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800680290",
+              "name": "Ondrej Kacin",
+              "givenName": "Ondrej",
+              "familyName": "Kacin",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/ondrej-kacin/800680290/cze/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800654035",
+              "name": "Artsiom Askirka",
+              "givenName": "Artsiom",
+              "familyName": "Askirka",
+              "nationalityCode": "BLR",
+              "profileLink": "/en/players/artsiom-askirka/800654035/blr/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800651765",
+              "name": "Ulad Dalbusin",
+              "givenName": "Ulad",
+              "familyName": "Dalbusin",
+              "nationalityCode": "BLR",
+              "profileLink": "/en/players/ulad-dalbusin/800651765/blr/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800696966",
+              "name": "Mikolaj Solarz",
+              "givenName": "Mikolaj",
+              "familyName": "Solarz",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/mikolaj-solarz/800696966/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800735449",
+              "name": "Antonio Tejerina",
+              "givenName": "Antonio",
+              "familyName": "Tejerina",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/antonio-tejerina/800735449/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800712709",
+              "name": "Igor Bartnik",
+              "givenName": "Igor",
+              "familyName": "Bartnik",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/igor-bartnik/800712709/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800733065",
+              "name": "Franciszek Niezwiesny",
+              "givenName": "Franciszek",
+              "familyName": "Niezwiesny",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/franciszek-niezwiesny/800733065/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800818089",
+              "name": "Alan Molodecki",
+              "givenName": "Alan",
+              "familyName": "Molodecki",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/alan-molodecki/800818089/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800647882",
+              "name": "Maksymilian Zurek",
+              "givenName": "Maksymilian",
+              "familyName": "Zurek",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/maksymilian-zurek/800647882/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800714580",
+              "name": "Jakub Kolowiecki",
+              "givenName": "Jakub",
+              "familyName": "Kolowiecki",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/jakub-kolowiecki/800714580/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800646107",
+              "name": "Emil Makiela",
+              "givenName": "Emil",
+              "familyName": "Makiela",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/emil-makiela/800646107/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800697257",
+              "name": "Alexej Buba",
+              "givenName": "Alexej",
+              "familyName": "Buba",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/alexej-buba/800697257/cze/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800683780",
+              "name": "Dominik Klar",
+              "givenName": "Dominik",
+              "familyName": "Klar",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/dominik-klar/800683780/cze/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800732811",
+              "name": "Oliwier Kowzan",
+              "givenName": "Oliwier",
+              "familyName": "Kowzan",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/oliwier-kowzan/800732811/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800674922",
+              "name": "BLAZEJ KRZYSKO",
+              "givenName": "BLAZEJ",
+              "familyName": "KRZYSKO",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/blazej-krzysko/800674922/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800679550",
+              "name": "Marcin Voigt",
+              "givenName": "Marcin",
+              "familyName": "Voigt",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/marcin-voigt/800679550/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800679547",
+              "name": "Tomasz Voigt",
+              "givenName": "Tomasz",
+              "familyName": "Voigt",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/tomasz-voigt/800679547/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800748743",
+              "name": "Mikolaj Karpinski",
+              "givenName": "Mikolaj",
+              "familyName": "Karpinski",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/mikolaj-karpinski/800748743/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800665702",
+              "name": "Szymon Karpinski",
+              "givenName": "Szymon",
+              "familyName": "Karpinski",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/szymon-karpinski/800665702/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-26T11:35:26.468Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-POL-2026-008__B-D-M-KO",
+            "storedAt": "2026-11-26T11:35:26.468Z"
+          }
+        },
+        "G-D-M-KO": {
+          "family": "G-D-M",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800735013",
+              "name": "Julia Berke",
+              "givenName": "Julia",
+              "familyName": "Berke",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/julia-berke/800735013/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800774130",
+              "name": "Anna Holovash",
+              "givenName": "Anna",
+              "familyName": "Holovash",
+              "nationalityCode": "UKR",
+              "profileLink": "/en/players/anna-holovash/800774130/ukr/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800755217",
+              "name": "Kaja Gora",
+              "givenName": "Kaja",
+              "familyName": "Gora",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/kaja-gora/800755217/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800693571",
+              "name": "Sara Sebastyanska",
+              "givenName": "Sara",
+              "familyName": "Sebastyanska",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/sara-sebastyanska/800693571/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800694926",
+              "name": "Varvara Karanchuk",
+              "givenName": "Varvara",
+              "familyName": "Karanchuk",
+              "nationalityCode": "BLR",
+              "profileLink": "/en/players/varvara-karanchuk/800694926/blr/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800575332",
+              "name": "Nadezhda Shamenkova",
+              "givenName": "Nadezhda",
+              "familyName": "Shamenkova",
+              "nationalityCode": "RUS",
+              "profileLink": "/en/players/nadezhda-shamenkova/800575332/rus/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800733378",
+              "name": "Lilly Jedrzejak",
+              "givenName": "Lilly",
+              "familyName": "Jedrzejak",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/lilly-jedrzejak/800733378/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800656529",
+              "name": "Alicja Szweda",
+              "givenName": "Alicja",
+              "familyName": "Szweda",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/alicja-szweda/800656529/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800734468",
+              "name": "Polina Kutuzova",
+              "givenName": "Polina",
+              "familyName": "Kutuzova",
+              "nationalityCode": "UKR",
+              "profileLink": "/en/players/polina-kutuzova/800734468/ukr/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800695646",
+              "name": "Michalina Mrozkowiak",
+              "givenName": "Michalina",
+              "familyName": "Mrozkowiak",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/michalina-mrozkowiak/800695646/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800692721",
+              "name": "Lidia Filipowicz",
+              "givenName": "Lidia",
+              "familyName": "Filipowicz",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/lidia-filipowicz/800692721/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800728251",
+              "name": "Aleksandra Matysiak",
+              "givenName": "Aleksandra",
+              "familyName": "Matysiak",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/aleksandra-matysiak/800728251/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800735687",
+              "name": "Marcelina Paliczka",
+              "givenName": "Marcelina",
+              "familyName": "Paliczka",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/marcelina-paliczka/800735687/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800681928",
+              "name": "Bara Sulakova",
+              "givenName": "Bara",
+              "familyName": "Sulakova",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/bara-sulakova/800681928/cze/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800813757",
+              "name": "Mia Tomczak",
+              "givenName": "Mia",
+              "familyName": "Tomczak",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/mia-tomczak/800813757/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800886142",
+              "name": "Maria Werblinska",
+              "givenName": "Maria",
+              "familyName": "Werblinska",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/maria-werblinska/800886142/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743118",
+              "name": "Nicole Kurylova",
+              "givenName": "Nicole",
+              "familyName": "Kurylova",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/nicole-kurylova/800743118/cze/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800713377",
+              "name": "Amelie Tvrzska",
+              "givenName": "Amelie",
+              "familyName": "Tvrzska",
+              "nationalityCode": "CZE",
+              "profileLink": "/en/players/amelie-tvrzska/800713377/cze/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800709894",
+              "name": "Matilda Chedryk",
+              "givenName": "Matilda",
+              "familyName": "Chedryk",
+              "nationalityCode": "UKR",
+              "profileLink": "/en/players/matilda-chedryk/800709894/ukr/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800743957",
+              "name": "Nadia Stawowiak",
+              "givenName": "Nadia",
+              "familyName": "Stawowiak",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/nadia-stawowiak/800743957/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791310",
+              "name": "Julia Dzieciol",
+              "givenName": "Julia",
+              "familyName": "Dzieciol",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/julia-dzieciol/800791310/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800731528",
+              "name": "Natasza Kleszcz",
+              "givenName": "Natasza",
+              "familyName": "Kleszcz",
+              "nationalityCode": "POL",
+              "profileLink": "/en/players/natasza-kleszcz/800731528/pol/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800735690",
+              "name": "Maruschka Blaskovicova",
+              "givenName": "Maruschka",
+              "familyName": "Blaskovicova",
+              "nationalityCode": "SVK",
+              "profileLink": "/en/players/maruschka-blaskovicova/800735690/svk/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800694005",
+              "name": "Simona Novakova",
+              "givenName": "Simona",
+              "familyName": "Novakova",
+              "nationalityCode": "SVK",
+              "profileLink": "/en/players/simona-novakova/800694005/svk/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800664480",
+              "name": "Dariia Iorsh",
+              "givenName": "Dariia",
+              "familyName": "Iorsh",
+              "nationalityCode": "UKR",
+              "profileLink": "/en/players/dariia-iorsh/800664480/ukr/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800707121",
+              "name": "Clarissa Santi",
+              "givenName": "Clarissa",
+              "familyName": "Santi",
+              "nationalityCode": "ITA",
+              "profileLink": "/en/players/clarissa-santi/800707121/ita/jt/d/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-26T11:35:26.468Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-POL-2026-008__G-D-M-KO",
+            "storedAt": "2026-11-26T11:35:26.468Z"
+          }
         }
       }
     },
@@ -1035199,7 +1035727,7 @@
       "startDate": "2026-11-24",
       "endDate": "2026-11-29",
       "decision": "pending",
-      "checkedAt": "2026-11-26T11:24:52.557Z",
+      "checkedAt": "2026-11-26T11:35:26.843Z",
       "playersFound": 0,
       "declaredSections": 5,
       "acquiredSections": 3,
