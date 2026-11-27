@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import crypto from 'node:crypto';
 
 export const NOW = new Date().toISOString();
-export const TODAY = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+export const TODAY = new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Rome',year:'numeric',month:'2-digit',day:'2-digit'}).format(process.env.ITF_CALENDAR_RUN_CREATED_AT ? new Date(process.env.ITF_CALENDAR_RUN_CREATED_AT) : new Date());
 export const HISTORY_FROM = '2025-12-18';
 export const PAST_DAYS = Number(process.env.ITF_PAST_DAYS || 240);
 export const HORIZON_DAYS = Number(process.env.ITF_HORIZON_DAYS || 730);
