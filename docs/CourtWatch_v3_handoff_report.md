@@ -11685,3 +11685,9 @@ Verification: real UI before/after reproduction, repeated refresh and both merge
 Limitations: runtime results require the authorized publication to run with existing Cloudflare secrets. The before audit replays candidate Worker code against pre-publication D1 state with the pre-fix UI filter; it is not a captured old production browser. Expected history is based on recorded configured-player confirmations, indexed native match evidence in D1 and the retained before reference. No claim is made about historical private browser visibility or evidence already deleted from every source. Historical published projection coverage is 7 October–26 November 02:47 UTC, not a complete private-group history.
 
 Validation: the app-api source check chain and Europe regression/audit tests pass locally. Runtime audit requires the existing publication secrets.
+
+
+## 2026-11-27 — Ripristino fixture replay read-only dopo dipendenza Europe
+- D1/API 46078820620 e Hotfix 46078702896 bloccati dagli stessi tre test: ERR_MODULE_NOT_FOUND per tools/lib/europe-draw-evidence.mjs nella copia temporanea del replay.
+- La fixture conserva ora la struttura tools/ e cloudflare/app-api/, copiando il modulo reale e le sue tre dipendenze; nessuno stub del lettore di evidenza. Restano testati successo HTTP 200, errore HTTP 500, errore D1 7500 intercettato e rimozione snapshot obsoleto.
+- Validazione: l'intero gruppo di 102 test richiesto da release-safety passa, inclusi i tre prima falliti. Nessuna modifica a codice applicativo, query, controlli di rilascio o permessi. Nessun rilancio automatico.
