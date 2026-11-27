@@ -27,7 +27,7 @@ jobs:
             return data.created_at;
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: node --test src/v3/itf-calendar-window.test.mjs
+      - run: node --test src/v3/itf-calendar-window.test.mjs tools/tests/select-itf-map-artifacts.test.mjs
       - id: source
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   shard:
@@ -48,7 +48,7 @@ jobs:
       - run: ITF_REGION_SHARD=${{ matrix.region }} node src/v3/discover-itf-tournaments-shard.mjs
       - uses: actions/upload-artifact@v4
         if: always()
-        with: {name: 'itf-tournaments-${{ matrix.region }}', path: 'dist/v3/shards/itf/tournaments-${{ matrix.region }}.json'}
+        with: {name: 'itf-tournaments-${{ matrix.region }}', path: 'dist/v3/shards/itf/tournaments-${{ matrix.region }}.json', overwrite: true}
   publish:
     needs: [engine-source, shard]
     env:
@@ -65,8 +65,22 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - id: map-artifacts
+        name: Select latest artifact for each ITF region
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const {selectItfMapArtifacts} = await import(`${process.env.GITHUB_WORKSPACE}/tools/select-itf-map-artifacts.mjs`);
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              owner: context.repo.owner, repo: context.repo.repo, run_id: context.runId, per_page: 100
+            });
+            return selectItfMapArtifacts(artifacts).join(',');
       - uses: actions/download-artifact@v4
-        with: {path: dist/v3/shards/itf, merge-multiple: true}
+        with:
+          artifact-ids: '${{ steps.map-artifacts.outputs.result }}'
+          path: dist/v3/shards/itf
+          merge-multiple: true
       - run: node src/v3/merge-itf-tournament-shards.mjs
       - id: publish
         name: Publish atomically
