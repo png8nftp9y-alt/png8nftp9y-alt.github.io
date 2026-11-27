@@ -4261,6 +4261,16 @@ function internationalTournamentDrawHtml(t, matches) {
     const previous = draws.get(draw.key);
     if (!previous || (!previous.explicitUrl && draw.explicitUrl)||(!previous.specificUrl&&draw.specificUrl)) draws.set(draw.key, draw);
   }
+  // Public catalogue: one RR link per category, opening the complete official listing.
+  if(circuit(t)==='tennis-europe'&&t.collapseUnobservedRR){
+    const collapsed=new Map();
+    for(const draw of draws.values()){
+      const key=draw.structure==='RR'?draw.category+'|'+draw.phase+'|RR':draw.key;
+      if(collapsed.has(key))continue;
+      collapsed.set(key,draw.structure==='RR'?{...draw,key,group:'',url:'https://te.tournamentsoftware.com/sport/draws.aspx?id='+encodeURIComponent(t.competitionId)}:draw);
+    }
+    draws.clear();for(const [key,draw] of collapsed)draws.set(key,draw);
+  }
   const ages = [...new Set([...draws.values()].map(draw => draw.age))].sort((a,b) => a-b);
   const html = ages.map(age => {
     const ordered=[...draws.values()].filter(draw=>draw.age===age).sort((a,b)=>a.kindOrder-b.kindOrder||a.phaseOrder-b.phaseOrder||(a.structure==='RR'?-1:1)-(b.structure==='RR'?-1:1)||String(a.group).localeCompare(String(b.group),undefined,{numeric:true})||a.url.localeCompare(b.url,undefined,{numeric:true}));
@@ -4324,7 +4334,7 @@ function tournamentDrawLinks(t, matches) {
       return internationalTournamentDrawHtml(scope.tournament,[...scope.matches,...acquired]);
     }
     if(saved&&Date.now()-saved.savedAt<300000){
-      const html=internationalTournamentDrawHtml({...t,people:[],draws:[],event:"",draw:"",categoryCode:""},saved.draws.map(row=>({...row,catalogueDraw:true})));
+      const html=internationalTournamentDrawHtml({...t,people:[],draws:[],event:"",draw:"",categoryCode:"",collapseUnobservedRR:true},saved.draws.map(row=>({...row,catalogueDraw:true})));
       return html;
     }
     return `<span data-international-draw-links="${esc(internationalDrawCatalogueKey(t))}"></span>`;

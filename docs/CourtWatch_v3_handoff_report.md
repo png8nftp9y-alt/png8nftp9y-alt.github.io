@@ -11691,3 +11691,11 @@ Validation: the app-api source check chain and Europe regression/audit tests pas
 - D1/API 46078820620 e Hotfix 46078702896 bloccati dagli stessi tre test: ERR_MODULE_NOT_FOUND per tools/lib/europe-draw-evidence.mjs nella copia temporanea del replay.
 - La fixture conserva ora la struttura tools/ e cloudflare/app-api/, copiando il modulo reale e le sue tre dipendenze; nessuno stub del lettore di evidenza. Restano testati successo HTTP 200, errore HTTP 500, errore D1 7500 intercettato e rimozione snapshot obsoleto.
 - Validazione: l'intero gruppo di 102 test richiesto da release-safety passa, inclusi i tre prima falliti. Nessuna modifica a codice applicativo, query, controlli di rilascio o permessi. Nessun rilancio automatico.
+
+
+## 2026-11-28 — RR compatto nei tornei Europe senza osservati
+- Conferma utente: Rotterdam ora espone tutti i 28 draw; richiesta una presentazione meno affollata.
+- Solo nel catalogo senza osservati, i gironi RR della medesima categoria/fase vengono raccolti in un link SM12 RR, SF12 RR ecc. che apre l'elenco ufficiale completo /sport/draws.aspx?id=...; nessun collegamento al solo primo gruppo, a print o a pagine interne.
+- I tornei osservati conservano i link precisi ai gruppi dei giocatori. L'aggiunta di un osservato ricalcola immediatamente il filtro sulla medesima cache, che conserva tutti i 28 metadati originali. Qualificazioni, playoff e doppi invariati.
+- Rotterdam: 14 pulsanti invece di 28, inclusi due RR aggregati; 4 qualificazioni ancora visibili. Due RR puntano allo stesso elenco ufficiale completo, che include anche le altre categorie.
+- Verifica browser completa in main e Altri: Rotterdam compatto, Forlì solo due gruppi osservati. Regressioni per categorie espresse per esteso e passaggio catalogo/osservati; cache asset incrementata.

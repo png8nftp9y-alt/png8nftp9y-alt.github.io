@@ -84,9 +84,9 @@ test('Europe RR: two observed players in different groups create two precise lin
  // The generic entry must not add an invented main draw alongside acquired groups.
  assert.doesNotMatch(html,/Tabellone principale/);
 });
-test('full-text Europe age and per-group keys work without a compact category code',()=>{
+test('full-text Europe category names consolidate RR in unobserved catalogues',()=>{
  const {ctx}=context();seed(ctx,[{event:'Boys Singles 12 - Group A',drawId:'1',drawUrl:`https://te.tournamentsoftware.com/tournament/${id}/draw/1`},{event:'Boys Singles 12 - Group B',drawId:'2',drawUrl:`https://te.tournamentsoftware.com/tournament/${id}/draw/2`}]);
- const html=ctx.tournamentDrawLinks(t,[]);assert.equal((html.match(/<a /g)||[]).length,2);assert.match(html,/Group A/);assert.match(html,/Group B/);assert.doesNotMatch(html,/Tabellone principale/);
+ const html=ctx.tournamentDrawLinks(t,[]);assert.equal((html.match(/<a /g)||[]).length,1);assert.match(html,/>SM12 RR</);assert.doesNotMatch(html,/Group A|Group B|Tabellone principale/);
 });
 test('observed tournament still loads publication metadata and requests participants',async()=>{
  const {ctx,slot}=context();ctx.state.data.players=[{id:'a',name:'First Player'}];ctx.state.data.tournaments=[{...t,playerId:'a',draws:['BS12']}];let request='';
@@ -103,10 +103,10 @@ test('every ITF catalogue page has one direct non-print external link without ob
   const html=ctx.tournamentDrawLinks(t,[]);assert.equal((html.match(/<a /g)||[]).length,1);assert.match(html,/>Tabelloni<\/a>/);assert.doesNotMatch(html,/print|app\/api|acceptance-list/);
  }
 });
-test('unobserved Rotterdam renders all 28 actual official links with both ages, all four qualifications and sixteen RR groups',async()=>{
+test('unobserved Rotterdam preserves the 28-draw inventory and renders 14 links with one RR link per category',async()=>{
  const {europeCatalogueDraws}=await import('../../cloudflare/app-api/lib/tournament-draw-catalogue.mjs');const competitionId='E6C27FE1-A487-440E-9C38-AE8717B4FDE5',body=fs.readFileSync(new URL('./fixtures/rotterdam-2026-draw-list.html',import.meta.url),'utf8'),{ctx}=context();
  ctx.rows=europeCatalogueDraws(body,competitionId);vm.runInContext(`internationalDrawCatalogueCache.set('tennis-europe|${competitionId}',{draws:rows,complete:true,savedAt:Date.now()})`,ctx);
- const html=ctx.tournamentDrawLinks({circuit:'tennis-europe',competitionId,catalogueOnly:true,tournamentCategory:'U12 / U14'},[]);const urls=[...html.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map(m=>m[1]);assert.equal(urls.length,28);assert.equal(new Set(urls).size,28);assert.equal((html.match(/>SQ(?:12|14)<\/a>/g)||[]).length,4);assert.equal((html.match(/>S[MF]12 RR Group /g)||[]).length,16);assert.match(html,/>Under 12</);assert.match(html,/>Under 14</);
+ const html=ctx.tournamentDrawLinks({circuit:'tennis-europe',competitionId,catalogueOnly:true,tournamentCategory:'U12 / U14'},[]);const urls=[...html.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map(m=>m[1]);assert.equal(ctx.rows.length,28);assert.equal(urls.length,14);assert.equal(new Set(urls).size,13);assert.equal((html.match(/>SQ(?:12|14)<\/a>/g)||[]).length,4);assert.equal((html.match(/>S[MF]12 RR<\/a>/g)||[]).length,2);assert.doesNotMatch(html,/RR Group /);assert.match(html,/>Under 12</);assert.match(html,/>Under 14</);
 });
 test('Forli: a boys group A cannot expose girls, different-age or doubles group A',()=>{
  const {ctx}=context(),forli={circuit:'tennis-europe',competitionId:'00523E1D-06C9-430A-B8B9-851B401381E3'};
@@ -118,9 +118,16 @@ test('Rotterdam: withdrawn/excluded source rows cannot turn a catalogue-only tou
  const {europeCatalogueDraws}=await import('../../cloudflare/app-api/lib/tournament-draw-catalogue.mjs');const competitionId='E6C27FE1-A487-440E-9C38-AE8717B4FDE5',body=fs.readFileSync(new URL('./fixtures/rotterdam-2026-draw-list.html',import.meta.url),'utf8'),{ctx}=context(),rotterdam={circuit:'tennis-europe',competitionId,catalogueOnly:true};
  ctx.state.data.players=[{id:'boy'},{id:'girl'}];ctx.state.data.tournaments=[{...rotterdam,playerId:'boy',status:'withdrawn',draws:['Boys Singles 14 Main Draw']},{...rotterdam,playerId:'girl',status:'excluded',draws:['Girls Singles 14 Main Draw']}];
  ctx.rows=europeCatalogueDraws(body,competitionId);vm.runInContext(`internationalDrawCatalogueCache.set('tennis-europe|${competitionId}',{draws:rows,complete:true,savedAt:Date.now()})`,ctx);
- assert.equal(ctx.tournamentObservedDrawScope(rotterdam).hasObserved,false);const html=ctx.tournamentDrawLinks(rotterdam,[]);assert.equal((html.match(/<a /g)||[]).length,28);assert.equal((html.match(/>SQ(?:12|14)<\/a>/g)||[]).length,4);assert.equal((html.match(/>S[MF]12 RR Group /g)||[]).length,16);
+ assert.equal(ctx.tournamentObservedDrawScope(rotterdam).hasObserved,false);const html=ctx.tournamentDrawLinks(rotterdam,[]);assert.equal((html.match(/<a /g)||[]).length,14);assert.equal((html.match(/>SQ(?:12|14)<\/a>/g)||[]).length,4);assert.equal((html.match(/>S[MF]12 RR<\/a>/g)||[]).length,2);assert.doesNotMatch(html,/RR Group /);
 });
 test('inactive players do not restrict public draws, while a real observed match remains authoritative',()=>{
  const {ctx}=context();seed(ctx,draws);ctx.state.data.players=[{id:'x',active:false}];ctx.state.data.tournaments=[{...t,playerId:'x',draws:['BS14']}];assert.equal(ctx.tournamentObservedDrawScope(t).hasObserved,false);assert.match(ctx.tournamentDrawLinks(t,[]),/>DF14</);
  ctx.state.data.players[0].active=true;ctx.state.data.tournaments[0].status='withdrawn';ctx.state.data.matches=[{...t,playerId:'x',event:'BS14'}];assert.equal(ctx.tournamentObservedDrawScope(t).hasObserved,true);assert.doesNotMatch(ctx.tournamentDrawLinks(t,[]),/>DF14</);
+});
+
+test('catalogue RR consolidation reverses immediately when an observed player joins a group',()=>{
+ const {ctx}=context();const rows=['A','B'].map((group,i)=>({event:'BS14 - Group '+group,group,drawId:String(i+1),drawUrl:`https://te.tournamentsoftware.com/tournament/${id}/draw/${i+1}`}));seed(ctx,rows);
+ let html=ctx.tournamentDrawLinks(t,[]);assert.equal((html.match(/<a /g)||[]).length,1);assert.match(html,/>SM14 RR</);assert.match(html,/sport\/draws\.aspx\?id=/);
+ ctx.state.data.players=[{id:'p'}];ctx.state.data.tournaments=[{...t,playerId:'p'}];ctx.state.data.matches=[{...t,playerId:'p',event:'BS14 - Group B',drawUrl:rows[1].drawUrl}];
+ html=ctx.tournamentDrawLinks(t,[]);assert.equal((html.match(/<a /g)||[]).length,1);assert.match(html,/>SM14 RR Group B</);assert.doesNotMatch(html,/sport\/draws\.aspx/);
 });

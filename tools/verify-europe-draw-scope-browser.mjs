@@ -24,14 +24,14 @@ try{for(const group of ['main','others']){
  });
  await page.goto(`https://courtwatch.test/v3.html?group=${group}#calendar`);await page.waitForFunction(()=>typeof state!=='undefined'&&state.data?.players?.length===3&&!loadRunning);
  await page.evaluate(id=>{location.hash='#catalog-tournament/tennis-europe/'+id;},rid);
- await page.waitForFunction(()=>document.querySelectorAll('.tournamentDraws a.tournamentDrawLink').length===28);
+ await page.waitForFunction(()=>document.querySelectorAll('.tournamentDraws a.tournamentDrawLink').length===14);
  assert.equal(await page.locator('.tournamentPlayer').count(),0);
  assert.equal(await page.locator('.tournamentDraws a').filter({hasText:/^SQ/}).count(),4);
- assert.equal(await page.locator('.tournamentDraws a').filter({hasText:/RR Group/}).count(),16);
+ assert.equal(await page.locator('.tournamentDraws a').filter({hasText:/RR$/}).count(),2);
  await page.evaluate(id=>{location.hash='#catalog-tournament/tennis-europe/'+id;},fid);
  await page.waitForFunction(()=>document.querySelector('.tournamentHero h2')?.textContent.includes('Forli')&&document.querySelectorAll('.tournamentDraws a.tournamentDrawLink').length===2);
  await page.waitForLoadState('networkidle');
  const links=await page.locator('.tournamentDraws a').evaluateAll(nodes=>nodes.map(a=>({text:a.textContent,href:a.href})));
  assert.equal(links.length,2);assert.ok(links.every(a=>/^SM12 RR Group [AB]$/.test(a.text)));assert.ok(links.every(a=>/\/draw\/[12]$/.test(a.href)));
  assert.deepEqual(errors,[]);await page.close();
-}console.log('Europe full app, main and others: Rotterdam all 28 draws; Forli only the two observed boys groups.');}finally{await browser.close();}
+}console.log('Europe full app, main and others: Rotterdam 28 draws in 14 links with two category RR links; Forli only the two observed boys groups.');}finally{await browser.close();}
