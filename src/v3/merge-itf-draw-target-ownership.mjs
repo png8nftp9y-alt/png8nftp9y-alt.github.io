@@ -1,3 +1,4 @@
+import {preserveConfirmedItfTargets, itfTargetEvidence} from './itf-confirmed-history.mjs';
 import fs from 'node:fs/promises';
 
 const [mode,currentFile,incomingFile,outputFile]=process.argv.slice(2);
@@ -9,7 +10,8 @@ const [current,incoming]=await Promise.all([read(currentFile),read(incomingFile)
 if(typeof current.targets!=='object'||typeof current.tournaments!=='object'||typeof incoming.targets!=='object'||typeof incoming.tournaments!=='object'){
   throw new Error('Invalid ITF draw target state');
 }
-const targets=mode==='acceptance'?incoming.targets:current.targets;
+const targets=preserveConfirmedItfTargets(mode==='acceptance'?incoming.targets:current.targets,
+ [...itfTargetEvidence(current),...itfTargetEvidence(incoming)],new Date().toISOString().slice(0,10));
 const tournaments=mode==='t-minus-one'?incoming.tournaments:current.tournaments;
 const merged={...current,...incoming,targets,tournaments,targetCount:Object.keys(targets).length};
 await fs.writeFile(outputFile,JSON.stringify(merged,null,2)+'\n');

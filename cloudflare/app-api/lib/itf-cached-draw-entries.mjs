@@ -10,13 +10,20 @@ export function cachedItfDrawEntries(database,{from='2025-12-18'}={}){
    for(const player of draw.players||[]){
     const id=String(player.id||player.playerId||'');if(!id||seen.has(id))continue;seen.add(id);
     const name=String(player.name||[player.givenName,player.familyName].filter(Boolean).join(' ')).trim();if(!name)continue;
-    out.push({id,name,tournament:{competitionId,name:t.tournamentName||competitionId,startDate,endDate,sourceUrl:t.eventInventory?.find(e=>e.event===event)?.combo?.sourceUrl||'',calendarState:'draw_confirmed',entryStatus:'official_draw',drawConfirmed:true,calendarListLabel:'',event}});
+    out.push({id,name,tournament:{competitionId,name:t.tournamentName||competitionId,startDate,endDate,sourceUrl:t.eventInventory?.find(e=>e.event===event)?.combo?.sourceUrl||'',calendarState:'draw_confirmed',entryStatus:'official_draw',drawConfirmed:true,historyEvidence:'acquired_itf_draw_presence',calendarListLabel:'',event}});
    }
   }
  }
  return out;
 }
-export function mergeItfDrawTournament(previous={},draw){
- const withdrawn=/withdrawn|removed|excluded/i.test(String(previous.entryStatus||''))||/^W(?:-|$)/i.test(String(previous.acceptanceCode||''));
- return {...previous,...draw,location:previous.location||draw.location||'',entryStatus:withdrawn?'withdrawn':'official_draw',acceptanceCode:withdrawn?previous.acceptanceCode:'',acceptancePosition:null,calendarListLabel:''};
+export function mergeItfDrawTournament(previous={},draw,{asOf=new Date().toISOString().slice(0,10)}={}){
+ const withdrawn=/withdrawn|removed|excluded/i.test([previous.entryStatus,previous.status].join(' '))||/^W(?:-|$)/i.test(String(previous.acceptanceCode||''));
+ const cancelled=previous.cancelled===true||previous.canceled===true||/cancelled|canceled|annullat/i.test([previous.status,previous.entryStatus,previous.tournamentStatus].join(' '));
+ const begun=draw.drawConfirmed===true;
+ if(cancelled&&!begun)return {...previous};
+ return {...previous,...draw,location:previous.location||draw.location||'',
+  cancelled:begun?false:previous.cancelled,canceled:begun?false:previous.canceled,
+  status:begun&&(withdrawn||cancelled)?'detected':previous.status,
+  entryStatus:withdrawn&&!begun?'withdrawn':'official_draw',
+  acceptanceCode:withdrawn&&!begun?previous.acceptanceCode:'',acceptanceList:withdrawn&&!begun?previous.acceptanceList:'',acceptancePosition:null,calendarListLabel:''};
 }

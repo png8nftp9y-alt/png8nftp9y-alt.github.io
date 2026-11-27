@@ -2728,7 +2728,28 @@ function tournamentCancelled(t) {
   return t?.cancelled === true || t?.canceled === true || t?.source?.cancelled === true ||
     /cancelled|canceled|annullat/i.test([t?.status,t?.tournamentStatus,t?.source?.status].filter(Boolean).join(" "));
 }
+// Keep already verified begun ITF history when a later projection repeats old acceptance data.
+function verifiedItfTournament(t, today = iso(new Date())) {
+  const start = String(t?.qualificationStartDate || t?.startDate || t?.officialStartDate || '').slice(0,10);
+  return Boolean(t?.playerId && t?.competitionId && t.circuit === 'itf' && (t.drawConfirmed === true || /draw_confirmed|official_draw|confirmed_in_official_draw/i.test([t.calendarState,t.entryStatus].join(' '))));
+}
+function mergeVerifiedItfTournamentRows(rows, today = iso(new Date())) {
+  const merged = new Map();
+  for (const row of rows || []) {
+    const key = [row.playerId, row.circuit || row.sourceId || '', String(row.competitionId || row.id || row.name).toUpperCase()].join('|');
+    const old = merged.get(key);
+    const proof = t => Boolean(t && (t.drawConfirmed === true || /draw_confirmed|official_draw|confirmed_in_official_draw/i.test([t.calendarState,t.entryStatus].join(' '))));
+    const start = String(old?.qualificationStartDate || old?.startDate || old?.officialStartDate || '').slice(0,10);
+    if (row.playerId && row.competitionId && row.circuit === 'itf' && old && proof(old)) {
+      const next = {...old,...row,calendarState:'draw_confirmed',entryStatus:'official_draw',drawConfirmed:true,cancelled:false,canceled:false,acceptanceCode:'',acceptancePosition:null,acceptanceList:'',calendarListLabel:''};
+      if (/withdrawn|removed|excluded|ritirat|cancelled|canceled/i.test(next.status || '')) next.status = 'detected';
+      merged.set(key,next);
+    } else merged.set(key,row);
+  }
+  return [...merged.values()];
+}
 function playerTournamentEligible(t) {
+  if (t?.circuit === 'itf' && (t.drawConfirmed === true || /draw_confirmed|official_draw|confirmed_in_official_draw/i.test([t.calendarState,t.entryStatus].join(' ')))) return true;
   if (tournamentCancelled(t)) return false;
   if (/withdrawn|removed|excluded|ritirat/i.test([t?.entryStatus,t?.status,t?.acceptanceList].join(" ")) || /^W(?:-|$)/i.test(String(t?.acceptanceCode || ""))) return false;
   const confirmed = /draw_confirmed|official_draw/i.test([t?.calendarState,t?.entryStatus].join(" ")) || t?.drawConfirmed === true;
@@ -3070,11 +3091,11 @@ async function refreshAfterPlayerAddition(epoch, group, playerId, {membershipSyn
     // Preserve confirmed past history and every other player's tournaments.
     const retained = (previous.tournaments || []).filter(t => {
       if (t.playerId !== playerId) return true;
+      if (verifiedItfTournament(t, today)) return true;
       const end = String(t.endDate || t.officialEndDate || t.startDate || '').slice(0,10);
       return !/^\d{4}-\d{2}-\d{2}$/.test(end) || end < today;
     });
-    const tournaments = [...new Map([...retained, ...data.tournaments].map(t =>
-      [[t.playerId,t.circuit,t.competitionId || t.id].join('|'),t])).values()];
+    const tournaments = mergeVerifiedItfTournamentRows([...retained, ...data.tournaments]);
     const hash = location.hash, y = typeof scrollY === 'number' ? scrollY : null;
     state.data = normalizeMatchProjection(applyKnownResultUpdates({...previous,
       players: previous.players.map(p => {if(p.id!==playerId)return p;const enriched={...p,...data.players[0]};delete enriched.membershipPending;return enriched;}),
@@ -5892,6 +5913,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
       const today = iso(new Date());
       const retainedTournaments = (previous.tournaments || []).filter(t => {
         if (t.manualEvent && freshApiTournaments) return false;
+        if (verifiedItfTournament(t, today)) return true;
         const end = String(t.endDate || t.officialEndDate || t.startDate || "").slice(0,10);
         if (!/^\d{4}-\d{2}-\d{2}$/.test(end) || end < today) return true;
         if (universalProjectionFresh && freshApiTournaments && projectedPlayers.has(t.playerId)) return false;
@@ -5904,11 +5926,11 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
         personalProjectionComplete: Boolean(projection) || previous.personalProjectionComplete === true,
         snapshotReadAt: freshApiTournaments ? projection.snapshotReadAt : previous.snapshotReadAt,
         players: visiblePlayers,
-        tournaments: [...new Map([
+        tournaments: mergeVerifiedItfTournamentRows([
           ...retainedTournaments,
           ...((universalProjectionFresh && projection?.tournaments) || staticTournaments || previous.tournaments || []),
           ...(!universalProjectionFresh && (projection || staticTournaments) ? (projection ? (projection.tournaments || []).filter(t => projectedPlayers.get(t.playerId)?.userAdded) : cachedPersonalTournaments(previous, visiblePlayers)) : []),
-        ].filter(t => !t.manualEvent).concat(((freshApiTournaments && manualRevision === (state.manualCalendarRevision || 0) ? projection?.tournaments : previous.tournaments) || []).filter(t => t.manualEvent)).map(t => [[t.playerId, t.circuit || t.sourceId || "", t.competitionId || t.id || t.name].join("|"), t])).values()].filter((x) => visibleIds.has(x.playerId)),
+        ].filter(t => !t.manualEvent).concat(((freshApiTournaments && manualRevision === (state.manualCalendarRevision || 0) ? projection?.tournaments : previous.tournaments) || []).filter(t => t.manualEvent))).filter((x) => visibleIds.has(x.playerId)),
         matches: matches.filter((x) => visibleIds.has(x.playerId)),
         agenda: mergeAgenda(agenda, matches).filter((x) =>
           visibleIds.has(x.playerId),

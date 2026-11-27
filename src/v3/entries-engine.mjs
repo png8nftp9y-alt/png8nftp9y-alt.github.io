@@ -1,3 +1,6 @@
+import {gunzipSync} from 'node:zlib';
+import {configuredItfDrawPresences} from './itf-draw-presence-registry.mjs';
+import {mergeConfirmedItfHistory, confirmedItfEntry, itfTargetEvidence} from './itf-confirmed-history.mjs';
 import {mergeFitpRegistrationHistory} from './fitp-history-continuity.mjs';
 import {latestFitpEntryRankings} from './fitp-entry-ranking.mjs';
 import {fitpSubscriptionDates,fitpSubscriptionRegistrations} from './fitp-subscription-dates.mjs';
@@ -86,6 +89,7 @@ function entry(row) {
     acceptanceLastUpdated: row.acceptanceLastUpdated || "",
     acceptanceListPublished: row.acceptanceListPublished || false,
     entryStatus: row.entryStatus || "",
+    ...(c === 'itf' && confirmedItfEntry(row) ? {calendarState:'draw_confirmed', drawConfirmed:true, drawConfirmedAt:row.drawConfirmedAt || ''} : {}),
     ...(c === "fitp" ? {subscriptionDates: fitpSubscriptionDates(row), subscriptionRegistrations: fitpSubscriptionRegistrations(row)} : {}),
   };
 }
@@ -138,6 +142,7 @@ function toTournament(e) {
     acceptanceLastUpdated: e.acceptanceLastUpdated,
     acceptanceListPublished: e.acceptanceListPublished,
     entryStatus: e.entryStatus,
+    ...(e.circuit === 'itf' && confirmedItfEntry(e) ? {calendarState:'draw_confirmed', drawConfirmed:true, drawConfirmedAt:e.drawConfirmedAt || ''} : {}),
     ...(e.circuit === "fitp" ? {subscriptionDates: e.subscriptionDates || [], subscriptionRegistrations: e.subscriptionRegistrations || []} : {}),
   };
 }
@@ -330,7 +335,13 @@ const fitpEntries = fitpRows
     (e) => e.playerId && validDate(e.endDate) && !externalTournamentInFitp(e),
   );
 const fitpExternalExcluded = (fitp.entries || []).filter(externalTournamentInFitp).length;
-const itfEntries = [...(itfHistory.entries || []), ...(itf.entries || [])].map(
+const confirmedRecovery = await readJson('history/itf-confirmed-draw-recovery.json', {entries:[]});
+const confirmedTargets = await readJson('history/itf_draw_target_db.json', {targets:{}});
+const previousItfEntries = await readJson('dist/v3/entries_itf.json', {entries:[]});
+const permanentDrawPresences = JSON.parse(gunzipSync(await fs.readFile('history/itf-confirmed-draw-presences.json.gz')));
+const mappedDrawPresences = configuredItfDrawPresences(permanentDrawPresences.entries || [], [...(itfHistory.entries || []), ...(itf.entries || []), ...itfTargetEvidence(confirmedTargets), ...(confirmedRecovery.entries || [])]);
+const itfEntries = mergeConfirmedItfHistory([...(itfHistory.entries || []), ...(itf.entries || [])],
+ [...(previousItfEntries.entries || []), ...itfTargetEvidence(confirmedTargets), ...(confirmedRecovery.entries || []), ...mappedDrawPresences], NOW.slice(0,10)).map(
   (r) => {
     const id = String(r.competitionId || "").toUpperCase(),
       official = itfTournamentById.get(id) || {},

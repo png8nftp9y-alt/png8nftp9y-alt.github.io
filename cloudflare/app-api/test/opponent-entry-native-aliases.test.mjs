@@ -26,7 +26,7 @@ test('native lookup is not made ambiguous by retained aliases; genuine homonyms 
 });
 import fs from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import {gzipSync} from 'node:zlib';import {spawnSync} from 'node:child_process';import {fileURLToPath} from 'node:url';
 test('generator SQL preserves aliases, imports all three circuits, and identical replay applies zero SQLite changes',async()=>{
- const dir=await fs.mkdtemp(path.join(os.tmpdir(),'entry-alias-'));const script=fileURLToPath(new URL('../scripts/generate-opponent-entry-seed.mjs',import.meta.url));
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'entry-alias-'));await fs.writeFile(path.join(dir,'draw-registry.json.gz'),gzipSync(JSON.stringify({entries:[]})));const script=fileURLToPath(new URL('../scripts/generate-opponent-entry-seed.mjs',import.meta.url));
  try{
   await fs.mkdir(path.join(dir,'tmp/opponent-entries'),{recursive:true});
   const tournament={competitionId:'T1',startDate:'2026-10-01',endDate:'2026-10-20',tournamentName:'Example'};
@@ -37,7 +37,7 @@ test('generator SQL preserves aliases, imports all three circuits, and identical
   const python=`import sqlite3,json,sys\nx=json.load(sys.stdin);c=sqlite3.connect(x['db']);c.execute('CREATE TABLE IF NOT EXISTS opponent_entry_profiles(circuit TEXT,source_player_id TEXT,normalized_name TEXT,display_name TEXT,payload TEXT,updated_at TEXT,PRIMARY KEY(circuit,source_player_id))');c.execute('CREATE TABLE IF NOT EXISTS app_state(key TEXT PRIMARY KEY,value TEXT,updated_at TEXT)');before=c.total_changes\nfor sql in x.get('sql',[]):c.executescript(sql)\nc.commit();c.row_factory=sqlite3.Row;print(json.dumps({'changes':c.total_changes-before,'rows':[dict(r) for r in c.execute('SELECT * FROM opponent_entry_profiles')]}))`;
   const execute=sql=>{const r=spawnSync('python3',['-c',python],{input:JSON.stringify({db,sql}),encoding:'utf8'});assert.ifError(r.error);assert.equal(r.status,0,r.stderr);return JSON.parse(r.stdout)};
   let state=execute(["INSERT INTO opponent_entry_profiles VALUES('tennis-europe','name:known person','known person','Known Person','old historical tournaments','old');"]);
-  async function generate(){await fs.writeFile(path.join(dir,'tmp/opponent-entry-remote.json'),JSON.stringify(state));const r=spawnSync(process.execPath,[script],{cwd:dir,encoding:'utf8'});assert.ifError(r.error);assert.equal(r.status,0,r.stderr);const sql=await Promise.all((await fs.readdir(path.join(dir,'seed-opponent-entries'))).filter(f=>f.endsWith('.sql')).sort().map(f=>fs.readFile(path.join(dir,'seed-opponent-entries',f),'utf8')));return{state:execute(sql),stdout:r.stdout}}
+  async function generate(){await fs.writeFile(path.join(dir,'tmp/opponent-entry-remote.json'),JSON.stringify(state));const r=spawnSync(process.execPath,[script],{cwd:dir,encoding:'utf8',env:{...process.env,ITF_CONFIRMED_DRAW_REGISTRY_FILE:path.join(dir,'draw-registry.json.gz')}});assert.ifError(r.error);assert.equal(r.status,0,r.stderr);const sql=await Promise.all((await fs.readdir(path.join(dir,'seed-opponent-entries'))).filter(f=>f.endsWith('.sql')).sort().map(f=>fs.readFile(path.join(dir,'seed-opponent-entries',f),'utf8')));return{state:execute(sql),stdout:r.stdout}}
   let result=await generate();state=result.state;assert.equal(state.rows.length,5);const itfProfile=JSON.parse(state.rows.find(r=>r.source_player_id==='800000001').payload);assert.equal(itfProfile.tournaments[0].drawConfirmed,true);assert.equal(itfProfile.tournaments[0].entryStatus,'official_draw');assert.equal(state.rows.find(r=>r.source_player_id===old.source_player_id).payload,'old historical tournaments');assert.match(result.stdout,/"retainedLegacyAliases":1/);
   result=await generate();assert.equal(result.state.changes,0);assert.match(result.stdout,/"inserted":0,"changed":0,"deleted":0/);
   docs.fitp_participant_cache.tournaments.T1.participants=[{membershipCard:'87654321',full1:'Updated Fitp Person'}];
@@ -49,7 +49,7 @@ test('generator SQL preserves aliases, imports all three circuits, and identical
   const hash=await fs.readFile(path.join(dir,'seed-opponent-entries/hash.txt'),'utf8');
   // Preparation must succeed with no exported D1 state and emit no SQL.
   await fs.rm(path.join(dir,'tmp/opponent-entry-remote.json'));
-  let prepared=spawnSync(process.execPath,[script,'--prepare'],{cwd:dir,encoding:'utf8'});
+  let prepared=spawnSync(process.execPath,[script,'--prepare'],{cwd:dir,encoding:'utf8',env:{...process.env,ITF_CONFIRMED_DRAW_REGISTRY_FILE:path.join(dir,'draw-registry.json.gz')}});
   assert.equal(prepared.status,0,prepared.stderr);
   assert.equal(await fs.readFile(path.join(dir,'seed-opponent-entries/hash.txt'),'utf8'),hash);
   assert.deepEqual(await fs.readdir(path.join(dir,'seed-opponent-entries')),['hash.txt']);
@@ -59,23 +59,23 @@ test('generator SQL preserves aliases, imports all three circuits, and identical
   await fs.symlink(path.dirname(script),path.join(dir,'scripts'),'dir');
   const bin=path.join(dir,'bin');await fs.mkdir(bin);
   await fs.writeFile(path.join(bin,'npx'),`#!/usr/bin/env node\nconst fs=require('fs');const sql=process.argv.at(-1);if(sql!=="SELECT value FROM app_state WHERE key='opponentEntryHash'")throw Error('Unexpected D1 query: '+sql);process.stdout.write(JSON.stringify([{results:[{value:fs.readFileSync('seed-opponent-entries/hash.txt','utf8').trim()}]}]));\n`,{mode:0o755});
-  const unchanged=spawnSync('bash',['-e','-c',step],{cwd:dir,env:{...process.env,PATH:bin+path.delimiter+process.env.PATH},encoding:'utf8'});
+  const unchanged=spawnSync('bash',['-e','-c',step],{cwd:dir,env:{...process.env,ITF_CONFIRMED_DRAW_REGISTRY_FILE:path.join(dir,'draw-registry.json.gz'),PATH:bin+path.delimiter+process.env.PATH},encoding:'utf8'});
   assert.equal(unchanged.status,0,unchanged.stderr);assert.match(unchanged.stdout,/OPPONENT_ENTRY_IMPORT_SKIPPED/);
   assert.equal((await fs.readdir(path.join(dir,'seed-opponent-entries'))).some(name=>name.endsWith('.sql')),false);
 
   await fs.writeFile(path.join(dir,'tmp/opponent-entry-remote.json'),JSON.stringify(state));
   // Reuse the prepared rows: no second decompression/rebuild of source inputs.
   await fs.rm(path.join(dir,'tmp/opponent-entries'),{recursive:true});
-  prepared=spawnSync(process.execPath,[script,'--from-prepared'],{cwd:dir,encoding:'utf8'});
+  prepared=spawnSync(process.execPath,[script,'--from-prepared'],{cwd:dir,encoding:'utf8',env:{...process.env,ITF_CONFIRMED_DRAW_REGISTRY_FILE:path.join(dir,'draw-registry.json.gz')}});
   assert.equal(prepared.status,0,prepared.stderr);
   const preparedSql=await fs.readFile(path.join(dir,'seed-opponent-entries/000.sql'),'utf8');
   assert.equal(execute([preparedSql]).changes,0);
   const savedPath=path.join(dir,'tmp/opponent-entry-desired.json'),saved=JSON.parse(await fs.readFile(savedPath,'utf8'));
   saved.rows[0].displayName='tampered';await fs.writeFile(savedPath,JSON.stringify(saved));
-  prepared=spawnSync(process.execPath,[script,'--from-prepared'],{cwd:dir,encoding:'utf8'});
+  prepared=spawnSync(process.execPath,[script,'--from-prepared'],{cwd:dir,encoding:'utf8',env:{...process.env,ITF_CONFIRMED_DRAW_REGISTRY_FILE:path.join(dir,'draw-registry.json.gz')}});
   assert.notEqual(prepared.status,0);assert.match(prepared.stderr,/checksum mismatch/);
   saved.complete=false;await fs.writeFile(savedPath,JSON.stringify(saved));
-  prepared=spawnSync(process.execPath,[script,'--from-prepared'],{cwd:dir,encoding:'utf8'});
+  prepared=spawnSync(process.execPath,[script,'--from-prepared'],{cwd:dir,encoding:'utf8',env:{...process.env,ITF_CONFIRMED_DRAW_REGISTRY_FILE:path.join(dir,'draw-registry.json.gz')}});
   assert.notEqual(prepared.status,0);assert.match(prepared.stderr,/source incomplete/);
 
  }finally{await fs.rm(dir,{recursive:true,force:true})}

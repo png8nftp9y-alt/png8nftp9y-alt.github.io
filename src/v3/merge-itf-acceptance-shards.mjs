@@ -1,3 +1,4 @@
+import {preserveConfirmedItfTargets, itfTargetEvidence} from './itf-confirmed-history.mjs';
 import fs from "node:fs/promises";
 import { gunzipSync, gzipSync } from "node:zlib";
 import crypto from "node:crypto";
@@ -140,6 +141,9 @@ for (const [key, withdrawal] of withdrawnByKey) {
     lastDrawCheckedAt: NOW,
   };
 }
+const recoveredDraws = await readJson('history/itf-confirmed-draw-recovery.json', {entries:[]});
+const stableEvidence = [...itfTargetEvidence(oldTargets), ...(priorSource.entries || []), ...(recoveredDraws.entries || [])];
+Object.assign(targets, preserveConfirmedItfTargets(targets, stableEvidence, NOW.slice(0,10)));
 const visible = new Map(
   (scanMode === "known_targets_fast" ? priorSource.entries || [] : []).map(
     (e) => [`${e.playerId}|${e.competitionId}`, e],
@@ -155,8 +159,11 @@ for (const e of current) {
       : e,
   );
 }
-for (const key of withdrawnByKey.keys()) visible.delete(key);
+for (const key of withdrawnByKey.keys()) if (targets[key]?.drawDecision !== 'confirmed') visible.delete(key);
 for (const [key, target] of Object.entries(targets)) {
+  if (target.drawDecision === 'confirmed' && target.drawEntry) {
+    visible.set(key, target.drawEntry); continue;
+  }
   if (
     visible.has(key) ||
     target.drawDecision === "removed" ||

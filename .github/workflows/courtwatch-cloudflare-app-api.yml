@@ -40,6 +40,8 @@ on:
       - 'data.json'
       - 'players.json'
       - 'dist/v3/tournament_entries.json'
+      - 'history/itf-confirmed-draw-presences.json.gz'
+      - 'src/v3/itf-draw-presence-registry.mjs'
       - 'dist/v3/tournaments.json'
       - 'dist/v3/agenda.json'
       - 'dist/v3/results.json'
@@ -92,6 +94,7 @@ jobs:
         working-directory: cloudflare/app-api
     env:
       GITHUB_TOKEN: ${{ github.token }}
+      ITF_FORCE_OBSERVED_AUDIT: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Fix ITF profile history stability') && '1' || '0' }}
       # D1_WRITE_POLICY: incremental
       # A newly synchronized player must rebuild the observed index once; routine runs keep the no-op path.
       D1_SKIP_OBSERVED: ${{ ((github.event_name == 'workflow_dispatch' && inputs.full_refresh) || (github.event_name == 'push' && (github.event.head_commit.message == 'Sync official Court Watch players' || startsWith(github.event.head_commit.message, 'Repair D1 observed index')))) && '0' || '1' }}
@@ -186,6 +189,9 @@ jobs:
             done
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+      - name: Capture observed ITF history before this repair
+        if: env.ITF_FORCE_OBSERVED_AUDIT == '1'
+        run: node ../../tools/audit-observed-itf-history.mjs before
       - name: Build and import opponent tournament entries
         run: |
           node scripts/generate-opponent-entry-seed.mjs --prepare
@@ -194,8 +200,10 @@ jobs:
             --command "SELECT value FROM app_state WHERE key='opponentEntryHash'" > remote-opponent-entry-hash.json
           REMOTE_ENTRY_HASH=$(node -e "const fs=require('fs'),x=JSON.parse(fs.readFileSync('remote-opponent-entry-hash.json','utf8'));let found='';const walk=v=>{if(!v||found)return;if(Array.isArray(v))return v.forEach(walk);if(typeof v==='object'){if(typeof v.value==='string')found=v.value;else Object.values(v).forEach(walk)}};walk(x);process.stdout.write(found)")
           if [ -n "$REMOTE_ENTRY_HASH" ] && [ "$LOCAL_ENTRY_HASH" = "$REMOTE_ENTRY_HASH" ]; then
+            if [ -n "${GITHUB_ENV:-}" ]; then echo "ITF_ENTRY_RECOVERY_CHANGED=false" >> "$GITHUB_ENV"; fi
             echo "OPPONENT_ENTRY_IMPORT_SKIPPED unchanged=$LOCAL_ENTRY_HASH rows_written=0"
           else
+            if [ -n "${GITHUB_ENV:-}" ]; then echo "ITF_ENTRY_RECOVERY_CHANGED=true" >> "$GITHUB_ENV"; fi
             node scripts/export-opponent-entry-state.mjs
             node scripts/generate-opponent-entry-seed.mjs --from-prepared
             for sql_file in seed-opponent-entries/*.sql; do
@@ -203,6 +211,17 @@ jobs:
               npx wrangler d1 execute courtwatch-app --remote --config wrangler.generated.jsonc --file "$sql_file"
             done
           fi
+      - name: Verify all retained ITF draw presences in D1
+        if: env.ITF_ENTRY_RECOVERY_CHANGED == 'true'
+        run: node scripts/verify-itf-draw-presence-recovery.mjs
+      - name: Retain ITF draw recovery verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: itf-draw-presence-recovery
+          path: cloudflare/app-api/tmp/itf-draw-presence-recovery-report.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Recover missing clubs for personal FITP players
         run: node scripts/sync-personal-fitp-clubs.mjs
       - name: Apply user-confirmed personal birth years
@@ -217,6 +236,17 @@ jobs:
         run: npm run verify
       - name: Verify fresh D1 runtime release before deployment
         run: node scripts/sync-runtime-documents-d1.mjs
+      - name: Verify every observed ITF history after publication
+        if: env.ITF_FORCE_OBSERVED_AUDIT == '1'
+        run: node ../../tools/audit-observed-itf-history.mjs after
+      - name: Retain observed ITF before and after findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: observed-itf-history-before-after
+          path: cloudflare/app-api/tmp/observed-itf-history-*.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Validate Worker API
         run: npx wrangler deploy --dry-run --config wrangler.generated.jsonc
       - name: Deploy Worker API

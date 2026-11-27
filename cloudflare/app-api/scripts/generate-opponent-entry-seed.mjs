@@ -1,3 +1,4 @@
+import {mergeItfDrawPresences} from '../../../src/v3/itf-draw-presence-registry.mjs';
 import {itfAlternateDrawDecision} from '../lib/itf-alternate-draw-decision.mjs';
 import {bucketKey,entryBucket} from '../lib/opponent-entry-buckets.mjs';
 import {fitpSubscriptionDates,mergeFitpSubscriptionDates,fitpSubscriptionRegistrations,mergeFitpSubscriptionRegistrations} from '../../../src/v3/fitp-subscription-dates.mjs';
@@ -23,7 +24,11 @@ function add(circuit,officialId,name,tournament){const displayName=clean(name),n
 for(const snapshot of Object.values(fitp.tournaments||{})){const startDate=iso(snapshot.startDate),endDate=iso(snapshot.endDate);if(endDate&&endDate<FROM)continue;const tournament={competitionId:String(snapshot.competitionId||'').toUpperCase(),name:snapshot.tournamentName||'Torneo FITP',location:snapshot.location||'',venueName:snapshot.venueName||'',address:snapshot.address||'',startDate,endDate,sourceUrl:snapshot.sourceUrl||'',entryStatus:'iscritto'};for(const player of snapshot.participants||[])add('fitp',card(player.membershipCard),player.full1||player.full2,{...tournament,draw:player.draw||'',ranking:player.ranking||'',subscriptionDates:fitpSubscriptionDates(player),subscriptionRegistrations:fitpSubscriptionRegistrations(player)})}
 const officialDraws=JSON.parse(await fs.readFile(`${INPUT}/itf_draw_target_db.json`,'utf8'));
 for(const player of itf.participants||[]){const startDate=iso(player.startDate),endDate=iso(player.endDate);if(endDate&&endDate<FROM)continue;add('itf',player.worldTennisId||player.id||player.playerId||player.worldTennisNumber,[player.name||player.playerName,[player.firstName,player.lastName].filter(Boolean).join(' ')].find(Boolean),{competitionId:String(player.competitionId||'').toUpperCase(),name:player.tournamentName||player.competitionName||'Torneo ITF',location:player.location||player.city||'',startDate,endDate,sourceUrl:player.sourceUrl||player.tournamentUrl||'',entryStatus:player.entryStatus||player.acceptanceCode||'iscritto',acceptanceCode:player.acceptanceCode||'',acceptancePosition:player.acceptancePosition??null,event:player.event||player.category||'',...itfAlternateDrawDecision(player,officialDraws.tournaments?.[String(player.competitionId||'').toUpperCase()])})}
-for(const entry of cachedItfDrawEntries(officialDraws,{from:FROM})){
+const permanentDraws=JSON.parse(gunzipSync(await fs.readFile(process.env.ITF_CONFIRMED_DRAW_REGISTRY_FILE||'../../history/itf-confirmed-draw-presences.json.gz')));
+const liveDrawRows=cachedItfDrawEntries(officialDraws,{from:FROM});
+const begunRows=mergeItfDrawPresences(liveDrawRows,permanentDraws.entries||[]);
+const confirmedDrawRows=[...new Map([...liveDrawRows,...begunRows].map(e=>[e.id+'|'+e.tournament.competitionId,e])).values()];
+for(const entry of confirmedDrawRows){
  const previous=profiles.get('itf|'+entry.id)?.tournaments.get(entry.tournament.competitionId);
  add('itf',entry.id,entry.name,mergeItfDrawTournament(previous,entry.tournament));
 }

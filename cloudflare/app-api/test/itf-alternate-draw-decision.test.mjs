@@ -39,14 +39,14 @@ test('exclusion flows through both page selectors, preserves genuine draw eviden
 
 import fs from 'node:fs/promises';import os from 'node:os';import path from 'node:path';import {gzipSync} from 'node:zlib';import {spawnSync} from 'node:child_process';import {fileURLToPath} from 'node:url';
 test('real incremental generator emits exclusion only with complete draws and retains partial alternates',async()=>{
- const dir=await fs.mkdtemp(path.join(os.tmpdir(),'itf-alternate-'));
+ const dir=await fs.mkdtemp(path.join(os.tmpdir(),'itf-alternate-'));await fs.writeFile(path.join(dir,'draw-registry.json.gz'),gzipSync(JSON.stringify({entries:[]})));
  try{
   const input=path.join(dir,'tmp/opponent-entries');await fs.mkdir(input,{recursive:true});
   const t={competitionId:'T',startDate:'2026-10-30',endDate:'2026-11-05'};
   const documents={fitp_participant_cache:{tournaments:{T:{...t,participants:[{membershipCard:'12345678',full1:'FITP Player'}]}}},itf_participant_cache:{participants:[{...t,...player,name:'ITF Player'}]},tennis_europe_participant_cache:{status:'tennis_europe_participant_cache_complete',tournaments:{T:{...t,participants:[{participantId:'TE-1',playerName:'TE Player'}]}}}};
   for(const [name,doc]of Object.entries(documents))await fs.writeFile(path.join(input,name+'.json.gz'),gzipSync(JSON.stringify(doc)));
   const script=fileURLToPath(new URL('../scripts/generate-opponent-entry-seed.mjs',import.meta.url));
-  async function prepare(s){await fs.writeFile(path.join(input,'itf_draw_target_db.json'),JSON.stringify({tournaments:{T:{...t,...s}}}));const result=spawnSync(process.execPath,[script,'--prepare'],{cwd:dir,encoding:'utf8'});assert.equal(result.status,0,result.stderr);const doc=JSON.parse(await fs.readFile(path.join(dir,'tmp/opponent-entry-desired.json'),'utf8'));return doc.rows.find(r=>r.circuit==='itf'&&r.sourcePlayerId===player.worldTennisId).tournaments[0];}
+  async function prepare(s){await fs.writeFile(path.join(input,'itf_draw_target_db.json'),JSON.stringify({tournaments:{T:{...t,...s}}}));const result=spawnSync(process.execPath,[script,'--prepare'],{cwd:dir,encoding:'utf8',env:{...process.env,ITF_CONFIRMED_DRAW_REGISTRY_FILE:path.join(dir,'draw-registry.json.gz')}});assert.equal(result.status,0,result.stderr);const doc=JSON.parse(await fs.readFile(path.join(dir,'tmp/opponent-entry-desired.json'),'utf8'));return doc.rows.find(r=>r.circuit==='itf'&&r.sourcePlayerId===player.worldTennisId).tournaments[0];}
   const full=state();assert.equal((await prepare(full)).entryStatus,'excluded');
   delete full.eventCache['G-S-Q-KO'];const partial=await prepare(full);assert.equal(partial.acceptanceCode,'A');assert.notEqual(partial.entryStatus,'excluded');
  }finally{await fs.rm(dir,{recursive:true,force:true});}

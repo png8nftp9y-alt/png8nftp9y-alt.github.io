@@ -263,6 +263,7 @@ jobs:
             cp dist/v3/source_itf_draw_audit.json "dist/v3/audits/itf-t1-batch/$id.json"
           done
           node src/v3/maintain-itf-database.mjs
+          node src/v3/build-itf-draw-presence-registry.mjs history/itf_draw_target_db.json history/itf-confirmed-draw-recovery.json
           node src/v3/entries-engine.mjs
           node src/v3/reconcile-itf-t1-strict-audit.mjs /tmp/itf-audit-state.json draw-tasks /tmp/itf-audit-state.json
           endpoint="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
@@ -280,21 +281,23 @@ jobs:
           node src/v3/compact-universal-git-files.mjs
           snapshot=/tmp/courtwatch-itf-publish
           rm -rf "$snapshot"; mkdir -p "$snapshot"
-          files=("dist/v3/source_itf_entries.json" "dist/v3/source_itf_draw_audit.json" "dist/v3/itf_system_diagnostics.json" "history/itf_draw_target_db.json" "history/itf_player_tournament_db.json" "history/itf_database_audit.json" "dist/v3/universal/tournaments.json" "dist/v3/universal/matches.json" "dist/v3/universal/results.json" "dist/v3/itf_t1_queue_status.json" "dist/v3/itf_t1_extraordinary_batch.json")
+          files=("history/itf-confirmed-draw-presences.json.gz" "dist/v3/source_itf_entries.json" "dist/v3/source_itf_draw_audit.json" "dist/v3/itf_system_diagnostics.json" "history/itf_draw_target_db.json" "history/itf_player_tournament_db.json" "history/itf_database_audit.json" "dist/v3/universal/tournaments.json" "dist/v3/universal/matches.json" "dist/v3/universal/results.json" "dist/v3/itf_t1_queue_status.json" "dist/v3/itf_t1_extraordinary_batch.json")
           for file in "${files[@]}"; do test -f "$file" || continue; mkdir -p "$snapshot/$(dirname "$file")"; cp "$file" "$snapshot/$file"; done
           for attempt in 1 2 3; do
             git fetch --depth=1 origin main; git reset --hard origin/main
+            cp history/itf-confirmed-draw-presences.json.gz /tmp/itf-current-draw-presences.json.gz
             cp history/itf_draw_target_db.json /tmp/itf-current-state.json
             cp "$snapshot/history/itf_draw_target_db.json" /tmp/itf-incoming-state.json
             cp -R "$snapshot"/* ./
             node src/v3/merge-itf-draw-target-ownership.mjs t-minus-one /tmp/itf-current-state.json /tmp/itf-incoming-state.json history/itf_draw_target_db.json
+            node src/v3/build-itf-draw-presence-registry.mjs /tmp/itf-current-draw-presences.json.gz history/itf_draw_target_db.json history/itf-confirmed-draw-recovery.json
             node src/v3/entries-engine.mjs
             aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3 cp "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" /tmp/itf-audit-state.json --only-show-errors
             node src/v3/synchronize-itf-coverage-catalog.mjs /tmp/itf-audit-state.json
             aws --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" s3 cp /tmp/itf-audit-state.json "s3://$R2_BUCKET/itf/audits/official-draw-parity/coverage-v3-current.json" --only-show-errors
             node src/v3/build-itf-t1-extraordinary-batch.mjs
             node src/v3/build-itf-t1-admin-status.mjs
-            git add dist/v3/source_itf_entries.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json dist/v3/universal/tournaments.json dist/v3/universal/matches.json dist/v3/universal/results.json dist/v3/itf_t1_queue_status.json dist/v3/itf_t1_extraordinary_batch.json
+            git add history/itf-confirmed-draw-presences.json.gz dist/v3/source_itf_entries.json dist/v3/source_itf_draw_audit.json dist/v3/itf_system_diagnostics.json history/itf_draw_target_db.json history/itf_player_tournament_db.json history/itf_database_audit.json dist/v3/entries_itf.json dist/v3/tournament_entries.json dist/v3/tournaments.json dist/v3/sync_status.json dist/v3/diagnostics.json dist/v3/entries_log.json dist/v3/universal/tournaments.json dist/v3/universal/matches.json dist/v3/universal/results.json dist/v3/itf_t1_queue_status.json dist/v3/itf_t1_extraordinary_batch.json
             if git diff --cached --quiet; then echo "No validated ITF T-1 changes"; exit 0; fi
             git commit -m "Publish validated ITF T-1 decisions"
             git push origin HEAD:main && exit 0

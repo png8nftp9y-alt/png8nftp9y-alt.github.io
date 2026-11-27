@@ -1,3 +1,4 @@
+import {confirmedItfEntry} from './itf-confirmed-history.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -12,7 +13,7 @@ test('PUC timestamps retain their source day, deduplicate and reject invalid/mis
 });
 
 test('calendar entry and player tournament retain FITP registration dates without adding them to other circuits',()=>{
- const source=readFileSync(new URL('src/v3/entries-engine.mjs',root),'utf8'),context={fitpSubscriptionDates,fitpSubscriptionRegistrations,slug:v=>v,NOW:'2026-10-14'};
+ const source=readFileSync(new URL('src/v3/entries-engine.mjs',root),'utf8'),context={confirmedItfEntry,fitpSubscriptionDates,fitpSubscriptionRegistrations,slug:v=>v,NOW:'2026-10-14'};
  vm.createContext(context);vm.runInContext(source.slice(source.indexOf('function entry(row)'),source.indexOf('function ageHours(')),context);
  const entry=context.entry({circuit:'fitp',playerId:'one',competitionId:'T',subscriptionDates:['2026-09-16T08:33:22.397']});
  assert.deepEqual(Array.from(entry.subscriptionDates),['2026-09-16']);

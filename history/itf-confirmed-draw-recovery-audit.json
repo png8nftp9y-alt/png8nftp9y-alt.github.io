@@ -1,0 +1,21 @@
+{
+  "versionsChecked": 9976,
+  "recoveredPresences": 0,
+  "recoveredPlayers": 0,
+  "unresolved": [],
+  "structuralVersionsChecked": 9976,
+  "version": 1,
+  "periodFrom": "2026-10-07T00:01:01Z",
+  "periodThrough": "2026-11-26T02:47:11Z",
+  "currentRegistryPresences": 56428,
+  "currentRegistryPlayers": 15074,
+  "currentRegistryTournaments": 667,
+  "meaning": "No additional native-ID draw participation was absent from the available current positive draw evidence. This does not certify D1 or browser visibility; deployment verifies the complete registry against D1 entry profiles.",
+  "method": "Inspect native-ID changes, deleted sections, relocated copies, tournament removals and populated/error transitions across all available draw-target Git versions; retain exact-ID positive draw evidence. Include previously recorded explicit draw confirmations. No acceptance-only promotion.",
+  "knownRegressions": [
+    "15ea57df50959a64c5c71ecd44c3d5ff48f7916c erased Aila drawEntry",
+    "cached draw entries omitted historyEvidence required by opponent history window",
+    "cached draw merge kept stale withdrawn/excluded acceptance over begun official draw presence"
+  ],
+  "d1Verification": "Pending publication, verify-itf-draw-presence-recovery.mjs must report missingCount=0."
+}

@@ -13,9 +13,9 @@ export function hasPersonalDrawPresence(entry){
 export function personalLiveEntry(entry){
  const result={...entry};
  const cancelled=entry?.cancelled===true||entry?.canceled===true||/cancelled|canceled|annullat/i.test([entry?.status,entry?.entryStatus,entry?.tournamentStatus,entry?.source?.status].join(' '));
- if(!cancelled&&hasPersonalDrawPresence(entry)&&['itf','tennis-europe'].includes(entry.circuit)){
+ if((!cancelled||entry.circuit==='itf')&&hasPersonalDrawPresence(entry)&&['itf','tennis-europe'].includes(entry.circuit)){
   // T-1: an official draw participant overrides the earlier acceptance withdrawal.
-  return {...result,status:/withdrawn|removed|excluded|ritirat/i.test(String(entry.status||''))?'detected':entry.status,
+  return {...result,...(entry.circuit==='itf'?{cancelled:false,canceled:false}:{}),status:/withdrawn|removed|excluded|ritirat|cancelled|canceled/i.test(String(entry.status||''))?'detected':entry.status,
    calendarState:'draw_confirmed',entryStatus:'official_draw',acceptanceCode:'',acceptancePosition:null,acceptanceList:'',calendarListLabel:''};
  }
  if(personalTournamentWithdrawn(entry))return {...result,status:'withdrawn',entryStatus:'withdrawn',calendarListLabel:''};

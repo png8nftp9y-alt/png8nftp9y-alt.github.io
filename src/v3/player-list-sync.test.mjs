@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const source = readFileSync(new URL('../../v3.js', import.meta.url), 'utf8');
-const mergeSource = source.slice(source.indexOf('function mergeKnownMatches('), source.indexOf('function clearDemographicFilters('));
+const mergeSource = source.slice(source.indexOf('function mergeKnownMatches('), source.indexOf('function clearDemographicFilters(')) + source.slice(source.indexOf('function tournamentCancelled('), source.indexOf('function playerTournamentEligible('));
 const agendaSource = source.slice(source.indexOf('function mergeAgenda('), source.indexOf('function mergeKnownMatches('));
 const loader = source.slice(source.indexOf('async function load('), source.indexOf('document.addEventListener("click", (event) => {', source.indexOf('async function load(')));
 const label = source.slice(source.indexOf('function syncLabel('), source.indexOf('function unavailableLabel('));
