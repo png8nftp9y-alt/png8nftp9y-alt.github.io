@@ -11699,3 +11699,9 @@ Validation: the app-api source check chain and Europe regression/audit tests pas
 - I tornei osservati conservano i link precisi ai gruppi dei giocatori. L'aggiunta di un osservato ricalcola immediatamente il filtro sulla medesima cache, che conserva tutti i 28 metadati originali. Qualificazioni, playoff e doppi invariati.
 - Rotterdam: 14 pulsanti invece di 28, inclusi due RR aggregati; 4 qualificazioni ancora visibili. Due RR puntano allo stesso elenco ufficiale completo, che include anche le altre categorie.
 - Verifica browser completa in main e Altri: Rotterdam compatto, Forlì solo due gruppi osservati. Regressioni per categorie espresse per esteso e passaggio catalogo/osservati; cache asset incrementata.
+
+
+## 2026-11-28 — Singolari e doppi sulla stessa riga
+- Richiesta utente: affiancare i doppi ai singolari nelle righe dei tabelloni Europe. Ogni fascia di età ora presenta una riga maschile SM/DM e una femminile SF/DF, con eventuale misto separato.
+- Conservati ordine delle fasi, gruppi osservati, link RR compatti del catalogo, colori e ritorno a capo su schermi stretti. Nessuna modifica ai link, alla selezione dei tabelloni, a FITP o al link unico ITF.
+- Validazione: 31 regressioni renderer/scope passate; Chromium con singolari e doppi sulla stessa riga desktop, ritorno a capo senza overflow a sei larghezze; Rotterdam completo a tre larghezze e app completa main/Altri con RR compatto e Forlì filtrato. Cache asset incrementata.

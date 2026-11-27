@@ -19,7 +19,8 @@ try{const page=await browser.newPage();for(const width of [360,620,650,900,1200,
 }
  const forliRows=['GD12','GS12 - Group 10','BS12 - Group 2','GS12 - Group 2','BS12 - Group 1','BD12'].map((event,i)=>({event,drawUrl:`https://te.tournamentsoftware.com/tournament/${id}/draw/${i+1}`}));
  await page.setViewportSize({width:1200,height:900});await page.setContent(`<style>${css}</style><main><div class="card tournamentHero"><div><h2>7° MEMORIAL GAIO CAMPORESI</h2><p>📍 Tennis Villa Carpena, Forlì, Italy</p></div><div class="tournamentHeroActions"><div class="tournamentDraws"><b>Tabelloni:</b><span>${ctx.internationalTournamentDrawHtml(t,forliRows)}</span></div></div></div></main>`);
- assert.deepEqual(await page.locator('[data-international-draw-category]').evaluateAll(nodes=>nodes.map(n=>n.dataset.internationalDrawCategory)),['SM12','SF12','DM12','DF12']);
+ assert.deepEqual(await page.locator('[data-international-draw-category]').evaluateAll(nodes=>nodes.map(n=>n.dataset.internationalDrawCategory)),['SM12 DM12','SF12 DF12']);
+ const sameLine=await page.locator('[data-international-draw-category]').evaluateAll(rows=>rows.every(row=>{const links=[...row.querySelectorAll('a')];return new Set(links.map(a=>Math.round(a.getBoundingClientRect().top))).size===1;}));assert(sameLine,'singles and doubles of the same gender must share a desktop row');
  if(process.env.COURTWATCH_DRAW_SCREENSHOT)await page.screenshot({path:process.env.COURTWATCH_DRAW_SCREENSHOT,fullPage:true});
  const rotterdamId='E6C27FE1-A487-440E-9C38-AE8717B4FDE5',official=await readFile(new URL('../src/v3/fixtures/rotterdam-2026-draw-list.html',import.meta.url),'utf8');
  const complete=ctx.internationalTournamentDrawHtml({circuit:'tennis-europe',competitionId:rotterdamId},europeCatalogueDraws(official,rotterdamId));

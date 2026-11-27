@@ -4274,8 +4274,8 @@ function internationalTournamentDrawHtml(t, matches) {
   const ages = [...new Set([...draws.values()].map(draw => draw.age))].sort((a,b) => a-b);
   const html = ages.map(age => {
     const ordered=[...draws.values()].filter(draw=>draw.age===age).sort((a,b)=>a.kindOrder-b.kindOrder||a.phaseOrder-b.phaseOrder||(a.structure==='RR'?-1:1)-(b.structure==='RR'?-1:1)||String(a.group).localeCompare(String(b.group),undefined,{numeric:true})||a.url.localeCompare(b.url,undefined,{numeric:true}));
-    const categories=[...new Set(ordered.map(d=>d.category))];
-    const links=categories.map(category=>'<span class="internationalDrawCategoryRow" data-international-draw-category="'+esc(category)+'">'+ordered.filter(draw=>draw.category===category).map(draw=>{
+    const categories=[...new Set(ordered.map(d=>d.gender))];
+    const links=categories.map(category=>'<span class="internationalDrawCategoryRow" data-international-draw-category="'+esc(ordered.filter(draw=>draw.gender===category).map(draw=>draw.category).filter((value,index,array)=>array.indexOf(value)===index).join(' '))+'">'+ordered.filter(draw=>draw.gender===category).map(draw=>{
       const color=draw.gender==='G'?'fitpDrawFemale':draw.gender==='X'?'fitpDrawMixed':'fitpDrawMale';
       const group=draw.group.replace(/^(?:group|gruppo|pool|girone)\s*/i,'');
       const label=draw.structure==='RR'?`${draw.category} RR${group?' Group '+group:''}`:draw.phase==='Qualificazioni'?`${draw.kind}Q${draw.age}`:draw.phase==='Tabellone principale'?draw.category:`${draw.category} ${draw.phase==='Consolazione'?'Cons.':draw.phase}`;
