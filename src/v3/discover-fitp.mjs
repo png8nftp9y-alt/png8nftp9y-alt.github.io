@@ -31,18 +31,30 @@ if(!Array.isArray(map.tournaments)||map.tournaments.length<MIN_CATALOG)throw Err
 // Preserve the existing CourtWatch history key when FITP replaces its identifier.
 const previousFitpId='DD755302-4D29-4D9E-93AA-EF394C46ED72';
 const currentFitpId='6255A305-5F40-4E08-AC3C-519818BD50BB';
+// User-confirmed replacement: same Turriziani event, official ID and dates changed.
+const replacementIds=new Map([[currentFitpId,previousFitpId],['C8269487-76FE-4059-B4F6-7D77ED3C2396','90E94D6F-AB16-4845-BC02-4124DC4E15D4']]);
+const catalogIds=new Set(map.tournaments.filter(t=>t.circuit==='fitp'&&String(t.sourceCode)==='1').map(t=>String(t.competitionId).toUpperCase()));
+const activeReplacements=[...replacementIds].filter(([source])=>catalogIds.has(source));
+const replacedOldIds=new Set(activeReplacements.map(([,old])=>old));
 const previousArchive=await readJson(ARCHIVE,{tournaments:[]}), archive=new Map();
 for(const t of previousArchive.tournaments||[])if(t.competitionId)archive.set(String(t.competitionId).toUpperCase(),t);
 function record(t){return{circuit:'fitp',competitionId:String(t.competitionId||'').toUpperCase(),tournamentName:t.tournamentName||t.name||'',location:t.location||'',club:t.club||'',startDate:iso(t.startDate),endDate:iso(t.endDate),sourceCode:String(t.sourceCode||'1'),sourceUrl:t.sourceUrl||'https://www.fitp.it/Tornei/Dettaglio-Competizione?competitionId='+encodeURIComponent(t.competitionId||''),firstCatalogSeenAt:t.firstCatalogSeenAt||NOW,lastCatalogSeenAt:NOW}}
-for(const t of map.tournaments){if(t.circuit!=='fitp'||!t.competitionId||String(t.sourceCode)!=='1')continue;const sourceId=String(t.competitionId).toUpperCase(),id=sourceId===currentFitpId?previousFitpId:sourceId,old=archive.get(id);archive.set(id,{...old,...record(t),competitionId:id,sourceCompetitionId:sourceId,firstCatalogSeenAt:old?.firstCatalogSeenAt||NOW})}
+for(const t of map.tournaments){if(t.circuit!=='fitp'||!t.competitionId||String(t.sourceCode)!=='1')continue;const sourceId=String(t.competitionId).toUpperCase();if(replacedOldIds.has(sourceId))continue;const id=replacementIds.get(sourceId)||sourceId,old=archive.get(id);archive.set(id,{...old,...record(t),competitionId:id,sourceCompetitionId:sourceId,firstCatalogSeenAt:old?.firstCatalogSeenAt||NOW})}
+for(const [source] of activeReplacements)archive.delete(source);
 for(const id of VERIFIED)if(!archive.has(id))archive.set(id,record({competitionId:id,tournamentName:'Verified official P.U.C. competition'}));
 const tournaments=[...archive.values()].filter(t=>t.competitionId&&(!t.endDate||t.endDate>=FROM)).sort((a,b)=>String(a.startDate).localeCompare(String(b.startDate))||a.competitionId.localeCompare(b.competitionId));
 let previousCache=await readGzipJson(CACHE,null);
 if(!previousCache)previousCache=await readJson(LEGACY_CACHE,{tournaments:{}});
 const cached={...(previousCache.tournaments||{})};
+for(const [source,id] of activeReplacements){
+ const native=cached[source],old=cached[id];
+ if(native&&(!old||Date.parse(native.fetchedAt||0)>=Date.parse(old.fetchedAt||0)))cached[id]={...native,competitionId:id,sourceCompetitionId:source};
+ delete cached[source];
+}
 const currentIds=new Set(map.tournaments.filter(t=>t.circuit==='fitp'&&String(t.sourceCode)==='1').map(t=>String(t.competitionId).toUpperCase()));
 function needsRefresh(t){
   const old=cached[t.competitionId];
+  if(t.sourceCompetitionId&&t.sourceCompetitionId!==t.competitionId&&old?.sourceCompetitionId!==t.sourceCompetitionId)return true;
   if(reuseStartedFitpSnapshot(t,old,TODAY))return false;
   if(!old||FORCE_FULL)return true;
   const hasTrackedPlayer=(old.participants||[]).some(p=>trackedCards.has(card(p.membershipCard)));
@@ -54,7 +66,7 @@ function needsRefresh(t){
 }
 const queue=tournaments.filter(needsRefresh);
 const errors=[];let cursor=0,refreshed=0;
-async function worker(){while(cursor<queue.length){const t=queue[cursor++],previous=cached[t.competitionId]||{};try{const d=validateFitpParticipantResponse(await post('/api/v3/puc/competizione/dettaglio',{competitionUid:t.sourceCompetitionId||t.competitionId}),t.sourceCompetitionId||t.competitionId),rows=[];for(const draw of d?.Tournaments||[])collect(draw.Participants||[],draw.TournamentDescription||draw.Description||'Lista iscritti P.U.C.',rows);cached[t.competitionId]={competitionId:t.competitionId,tournamentName:d?.Description||t.tournamentName,location:[d?.Municipality||'',d?.Province||''].filter(Boolean).join(' ')||t.location,venueName:d?.TennisClub||previous.venueName||t.club||'',address:d?.Address||previous.address||'',startDate:iso(d?.From)||t.startDate,endDate:iso(d?.To)||t.endDate,sourceUrl:t.sourceUrl,fetchedAt:NOW,participants:dedupe(rows)};refreshed++}catch(e){errors.push({competitionId:t.competitionId,tournamentName:t.tournamentName,retainedPreviousCache:Boolean(cached[t.competitionId]),error:e.message})}}}
+async function worker(){while(cursor<queue.length){const t=queue[cursor++],previous=cached[t.competitionId]||{};try{const d=validateFitpParticipantResponse(await post('/api/v3/puc/competizione/dettaglio',{competitionUid:t.sourceCompetitionId||t.competitionId}),t.sourceCompetitionId||t.competitionId),rows=[];for(const draw of d?.Tournaments||[])collect(draw.Participants||[],draw.TournamentDescription||draw.Description||'Lista iscritti P.U.C.',rows);cached[t.competitionId]={competitionId:t.competitionId,sourceCompetitionId:t.sourceCompetitionId||t.competitionId,tournamentName:d?.Description||t.tournamentName,location:[d?.Municipality||'',d?.Province||''].filter(Boolean).join(' ')||t.location,venueName:d?.TennisClub||previous.venueName||t.club||'',address:d?.Address||previous.address||'',startDate:iso(d?.From)||t.startDate,endDate:iso(d?.To)||t.endDate,sourceUrl:t.sourceUrl,fetchedAt:NOW,participants:dedupe(rows)};refreshed++}catch(e){errors.push({competitionId:t.competitionId,tournamentName:t.tournamentName,retainedPreviousCache:Boolean(cached[t.competitionId]),error:e.message})}}}
 await Promise.all(Array.from({length:CONCURRENCY},worker));
 const missing=tournaments.filter(t=>!cached[t.competitionId]);
 if(missing.length||errors.filter(e=>!e.retainedPreviousCache).length>80)throw Error(`FITP participant cache incomplete: ${missing.length} tournaments missing, ${errors.length} refresh errors`);

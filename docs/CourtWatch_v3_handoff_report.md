@@ -11661,3 +11661,7 @@ ITF discovery 2026-11-27T12:24:19.134Z: 3 newly discovered future tournaments; M
 ITF Meta ordinary 2026-11-27T12:25:48.784Z: attempted 3, acquired 3, ordinary 0, extraordinary 1. Partial metadata preserved; official D1 sync follows.
 
 ITF discovery 2026-11-27T21:46:09.219Z: 0 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
+
+
+### 2026-11-27 — User-confirmed Turriziani FITP identifier replacement
+FITP detail for90E94D6F-AB16-4845-BC02-4124DC4E15D4 returns204; C8269487-76FE-4059-B4F6-7D77ED3C2396 returns200 with the same event/club and updated dates. User explicitly confirmed identity. Extend the existing official-ID replacement mapping while keeping the original CourtWatch history key. If both rows remain in the rolling catalog, only the current source updates the archive; remove duplicate native archive keys. Consolidate native participant cache under the history key, retaining the freshest snapshot. Force one verified refresh when a cached snapshot was fetched under the replaced ID, even if updated dates mean the event has started. Record the source ID in new snapshots. Preserve response validation and all unrelated warnings. Test actual discovery offline for both catalog orders, one-time current-ID refresh, canonical entry/dates/URL, duplicate-cache consolidation and failed refresh retention. No production acquisition or workflow launched by the patch installer.
