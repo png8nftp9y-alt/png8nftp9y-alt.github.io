@@ -11651,3 +11651,5 @@ Follow-up target-state verification: all 9,976 archived monitored-target version
 ## 2026-11-27 — Final user rule: permanent from official draw confirmation
 
 The user clarified that a documented ITF draw confirmation must remain visible from the moment it is acquired, including before the start date. This supersedes the previous begun-event restriction and automatic cancellation exception. Remove those automatic demotion paths in the permanent native registry, source/target publication, cached entry projection, personal live-entry reader and both UI refresh paths. Keep the confirmed participation visible even if later acceptance data carries W, excluded, cancelled or no row; no match result is fabricated. User-controlled player removal and list ownership still work: evidence retention does not re-add a removed player to a membership list. FITP and Tennis Europe rules are unchanged. Tests were updated specifically for this clarified requirement; ordinary unconfirmed withdrawal behavior remains unchanged.
+
+ITF discovery 2026-11-27T03:48:06.974Z: 5 newly discovered future tournaments; Meta ordinary only for new IDs; incomplete queue preserved.
