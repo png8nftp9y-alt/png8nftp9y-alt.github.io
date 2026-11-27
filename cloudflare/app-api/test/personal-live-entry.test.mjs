@@ -52,8 +52,8 @@ test('Calandra W-7 acceptance cannot hide certified WC draw presence, in either 
   assert.equal(personalLiveEntry(acceptance).status,'withdrawn');
  }
 });
-test('draw evidence never revives a cancelled tournament',()=>{
+test('FITP automatic cancellation remains outside the international permanent-proof rule',()=>{
  for(const cancellation of [{cancelled:true},{canceled:true},{tournamentStatus:'cancelled'},{status:'cancelled'}]){
-  const row=personalLiveEntry({circuit:'tennis-europe',calendarState:'draw_confirmed',entryStatus:'official_draw',...cancellation});assert.equal(row.status,'withdrawn');
+  const row=personalLiveEntry({circuit:'fitp',calendarState:'draw_confirmed',entryStatus:'official_draw',...cancellation});assert.equal(row.status,'withdrawn');
  }
 });

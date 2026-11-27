@@ -118,18 +118,14 @@ for (const e of acceptanceEntries) {
     calendarListLabel: e.calendarListLabel || '', acceptanceList: e.acceptanceList || '',
     isWildcard: (e.calendarListLabel || '').toUpperCase() === 'WC' || /wild\s*card/i.test(e.entryStatus || ''),
     activeInLatestAcceptance: true, monitoringStatus: 'active',
-    calendarVisibleNow: Boolean(visible), calendarState: visible?.calendarState || 'acceptance_list',
+    calendarVisibleNow: previous.permanenceStatus === 'draw_confirmed_permanent' || Boolean(visible), calendarState: previous.permanenceStatus === 'draw_confirmed_permanent' ? 'draw_confirmed' : visible?.calendarState || 'acceptance_list',
     firstAcceptanceSeenAt: previous.firstAcceptanceSeenAt || iso(acceptanceData.generatedAt),
     lastAcceptanceSeenAt: iso(acceptanceData.generatedAt), acceptanceRemovedAt: null,
     drawVerification: draw ? { checkedAt: drawAuditData.generatedAt || NOW, daysFromStart: draw.daysFromStart, decision: draw.decision, qualifying: draw.qualifying, main: draw.main } : previous.drawVerification,
-    // A reliable rejection is authoritative even if an older run had already
-    // marked the relation permanent. This matters when a later-published final
-    // singles phase (main draw or groups) proves that the player is absent.
-    permanenceStatus: String(draw?.decision || '').startsWith('removed_')
-      ? 'rejected_by_complete_singles_draws'
-      : previous.permanenceStatus === 'draw_confirmed_permanent' || visible?.calendarState === 'draw_confirmed'
-        ? 'draw_confirmed_permanent'
-        : 'pending_t_minus_1_engine',
+    // A positive official draw confirmation cannot be revoked by a later partial/changed read.
+    permanenceStatus: previous.permanenceStatus === 'draw_confirmed_permanent' || visible?.calendarState === 'draw_confirmed'
+      ? 'draw_confirmed_permanent'
+      : String(draw?.decision || '').startsWith('removed_') ? 'rejected_by_complete_singles_draws' : 'pending_t_minus_1_engine',
     timeline,
   };
 }
@@ -162,7 +158,7 @@ for (const [key, previous] of Object.entries(relations)) {
         ? 'possible_pre_tournament_withdrawal_or_list_removal'
         : 'acceptance_absent_during_tournament_draw_verification_required';
     relations[key] = {
-      ...previous, activeInLatestAcceptance: false, calendarVisibleNow: concluded && !rejectedByDraw,
+      ...previous, activeInLatestAcceptance: false, calendarVisibleNow: previous.permanenceStatus === 'draw_confirmed_permanent' || concluded && !rejectedByDraw,
       monitoringStatus: absenceKind, acceptanceRemovedAt: NOW, acceptanceAbsenceKind: absenceKind,
       permanenceStatus: previous.permanenceStatus === 'draw_confirmed_permanent' ? previous.permanenceStatus : rejectedByDraw ? previous.permanenceStatus : concluded ? 'retained_pending_draw_verification' : 'not_on_live_calendar',
       timeline: appendChange(previous.timeline, snapshot),
@@ -212,7 +208,7 @@ const historyEntries = [...permanentEntries, ...pendingVerificationEntries];
 const relationsOutput = {
   version: 1, generatedAt: NOW, sourceGeneratedAt: acceptanceData.generatedAt,
   status: 'tennis_europe_player_tournament_database_complete',
-  policy: 'Change-only timeline. Acceptance-list absence is recorded after a complete 16-shard scan. Calendar permanence remains pending until the T-1 singles draw verifier is finalized.',
+  policy: 'Change-only timeline. Acceptance-list absence is recorded after a complete 16-shard scan. Positive official draw confirmation is permanent; acceptance-only relations remain subject to draw verification.',
   relationCount: relationValues.length, activeAcceptanceCount: relationValues.filter(r => r.activeInLatestAcceptance).length,
   calendarVisibleCount: relationValues.filter(r => r.calendarVisibleNow).length,
   drawConfirmedPermanentCount: permanentEntries.length, retainedPendingDrawVerificationCount: pendingVerificationEntries.length,
@@ -231,5 +227,5 @@ const audit = {
   withdrawalsDetectedThisRun: possiblePreTournamentWithdrawals,
   calendarAuthorityChanged: false,
 };
-await Promise.all([writeJson(CATALOG_FILE, catalogOutput), writeJson(RELATIONS_FILE, relationsOutput), writeJson(AUDIT_FILE, audit), writeJson(HISTORY_ENTRIES_FILE,{version:1,generatedAt:NOW,status:'tennis_europe_calendar_history_complete',policy:'Concluded entries retain their last valid acceptance state while T-1 draw verification is missing or inconclusive. Only a reliable complete singles-draw rejection may remove them.',entries:historyEntries})]);
+await Promise.all([writeJson(CATALOG_FILE, catalogOutput), writeJson(RELATIONS_FILE, relationsOutput), writeJson(AUDIT_FILE, audit), writeJson(HISTORY_ENTRIES_FILE,{version:1,generatedAt:NOW,status:'tennis_europe_calendar_history_complete',policy:'Concluded entries retain their last valid acceptance state while T-1 draw verification is missing or inconclusive. Positive official draw confirmations cannot be revoked by later acceptance or negative draw reads.',entries:historyEntries})]);
 console.log(JSON.stringify(audit, null, 2));

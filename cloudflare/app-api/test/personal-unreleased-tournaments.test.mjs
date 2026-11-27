@@ -12,3 +12,9 @@ d.row_factory=sqlite3.Row;print(json.dumps([dict(r) for r in d.execute(x['sql'],
 `;const r=spawnSync('python3',['-c',py],{input:JSON.stringify({sql,params}),encoding:'utf8'});assert.ifError(r.error);assert.equal(r.status,0,r.stderr);return{results:JSON.parse(r.stdout)};}}}}}};
 const out=await personalUnreleasedTournamentHistory(DB,[{id:'owned',sourceCircuit:'itf',sourcePlayerId:'800000001'}]);assert.equal(calls,2);assert.equal(out.length,8);assert.ok(out.every(t=>t.playerId==='owned'&&t.calendarState==='draw_confirmed'));assert.equal(out.some(t=>t.competitionId==='OTHER'),false);
 });
+test('configured Europe players receive native tournament proof before deferred matches, with bounded exact ID variants',async()=>{
+ const native='aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',seen=[];
+ const db={prepare(sql){return {bind(raw){return {all:async()=>{seen.push({sql,raw});if(sql.includes('itf_draw_participations'))return {results:[]};const links=JSON.parse(raw);assert.equal(links.length,2);assert.ok(links.every(x=>x.playerId==='configured'&&x.circuit==='tennis-europe'));return {results:[{player_id:'configured',circuit:'tennis-europe',tournament_id:'t',source_tournament_id:'TE-X',tournament_payload:'{"name":"Official Europe"}'}]};}}}}}};
+ const rows=await personalUnreleasedTournamentHistory(db,[],[{id:'configured',profileSync:{tennisEurope:{profileId:native}}}]);
+ assert.equal(rows.length,1);assert.equal(rows[0].entryStatus,'official_draw');assert.equal(rows[0].playerId,'configured');assert.equal(seen.length,1);
+});

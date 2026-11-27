@@ -1,7 +1,9 @@
 import {itfDrawParticipationTournaments} from './itf-draw-participations.mjs';
 import {playerCircuitIdentities} from './player-circuit-profiles.mjs';
 export async function personalUnreleasedTournamentHistory(db,players,presencePlayers=players){
- const links=players.flatMap(player=>playerCircuitIdentities(player).filter(link=>['itf','fitp'].includes(link.circuit)).map(link=>({...link,playerId:player.id})));
+ const candidates=[...new Map([...players,...presencePlayers].map(p=>[p.id,p])).values()];
+ const direct=new Set(players.map(p=>p.id));
+ const links=candidates.flatMap(player=>playerCircuitIdentities(player).filter(link=>link.circuit==='tennis-europe'||direct.has(player.id)&&['itf','fitp'].includes(link.circuit)).flatMap(link=>[...new Set(link.circuit==='tennis-europe'?[link.profileId.toLowerCase(),link.profileId.toUpperCase()]:[link.profileId])].map(profileId=>({...link,profileId,playerId:player.id}))));
  if(!links.length)return itfDrawParticipationTournaments(db,presencePlayers);
  const rows=(await db.prepare(`WITH links AS (SELECT json_extract(value,'$.profileId') AS native_id,json_extract(value,'$.circuit') AS circuit,json_extract(value,'$.playerId') AS player_id FROM json_each(?))
  SELECT DISTINCT links.player_id,links.circuit,m.tournament_id,t.source_tournament_id,t.payload AS tournament_payload FROM links CROSS JOIN match_participants p ON p.source_player_id=links.native_id CROSS JOIN matches m ON m.id=p.match_id AND m.circuit=links.circuit CROSS JOIN tournaments t ON t.id=m.tournament_id`).bind(JSON.stringify(links)).all()).results||[];

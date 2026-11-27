@@ -94,6 +94,7 @@ jobs:
         working-directory: cloudflare/app-api
     env:
       GITHUB_TOKEN: ${{ github.token }}
+      TE_FORCE_OBSERVED_AUDIT: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Fix Europe permanent draw confirmations') && '1' || '0' }}
       ITF_FORCE_OBSERVED_AUDIT: ${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Fix ITF profile history stability') && '1' || '0' }}
       # D1_WRITE_POLICY: incremental
       # A newly synchronized player must rebuild the observed index once; routine runs keep the no-op path.
@@ -189,6 +190,9 @@ jobs:
             done
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+      - name: Capture observed Europe history before this repair
+        if: env.TE_FORCE_OBSERVED_AUDIT == '1'
+        run: node ../../tools/audit-observed-europe-history.mjs before
       - name: Capture observed ITF history before this repair
         if: env.ITF_FORCE_OBSERVED_AUDIT == '1'
         run: node ../../tools/audit-observed-itf-history.mjs before
@@ -247,6 +251,17 @@ jobs:
           path: cloudflare/app-api/tmp/observed-itf-history-*.json
           if-no-files-found: ignore
           retention-days: 7
+      - name: Verify observed Europe permanent confirmations
+        if: env.TE_FORCE_OBSERVED_AUDIT == '1'
+        run: node ../../tools/audit-observed-europe-history.mjs after
+      - name: Retain observed Europe before and after findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: observed-europe-history-before-after
+          path: cloudflare/app-api/tmp/observed-europe-history-*.json
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Validate Worker API
         run: npx wrangler deploy --dry-run --config wrangler.generated.jsonc
       - name: Deploy Worker API

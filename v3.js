@@ -2728,10 +2728,10 @@ function tournamentCancelled(t) {
   return t?.cancelled === true || t?.canceled === true || t?.source?.cancelled === true ||
     /cancelled|canceled|annullat/i.test([t?.status,t?.tournamentStatus,t?.source?.status].filter(Boolean).join(" "));
 }
-// Keep already verified begun ITF history when a later projection repeats old acceptance data.
+// Preserve positive ITF and Tennis Europe draw evidence through later acceptance projections.
 function verifiedItfTournament(t, today = iso(new Date())) {
   const start = String(t?.qualificationStartDate || t?.startDate || t?.officialStartDate || '').slice(0,10);
-  return Boolean(t?.playerId && t?.competitionId && t.circuit === 'itf' && (t.drawConfirmed === true || /draw_confirmed|official_draw|confirmed_in_official_draw/i.test([t.calendarState,t.entryStatus].join(' '))));
+  return Boolean(t?.playerId && t?.competitionId && ['itf','tennis-europe'].includes(t.circuit) && (t.drawConfirmed === true || /draw_confirmed|official_draw|confirmed_in_official_draw/i.test([t.calendarState,t.entryStatus].join(' '))));
 }
 function mergeVerifiedItfTournamentRows(rows, today = iso(new Date())) {
   const merged = new Map();
@@ -2740,7 +2740,7 @@ function mergeVerifiedItfTournamentRows(rows, today = iso(new Date())) {
     const old = merged.get(key);
     const proof = t => Boolean(t && (t.drawConfirmed === true || /draw_confirmed|official_draw|confirmed_in_official_draw/i.test([t.calendarState,t.entryStatus].join(' '))));
     const start = String(old?.qualificationStartDate || old?.startDate || old?.officialStartDate || '').slice(0,10);
-    if (row.playerId && row.competitionId && row.circuit === 'itf' && old && proof(old)) {
+    if (row.playerId && row.competitionId && ['itf','tennis-europe'].includes(row.circuit) && old && proof(old)) {
       const next = {...old,...row,calendarState:'draw_confirmed',entryStatus:'official_draw',drawConfirmed:true,cancelled:false,canceled:false,acceptanceCode:'',acceptancePosition:null,acceptanceList:'',calendarListLabel:''};
       if (/withdrawn|removed|excluded|ritirat|cancelled|canceled/i.test(next.status || '')) next.status = 'detected';
       merged.set(key,next);
@@ -2749,7 +2749,7 @@ function mergeVerifiedItfTournamentRows(rows, today = iso(new Date())) {
   return [...merged.values()];
 }
 function playerTournamentEligible(t) {
-  if (t?.circuit === 'itf' && (t.drawConfirmed === true || /draw_confirmed|official_draw|confirmed_in_official_draw/i.test([t.calendarState,t.entryStatus].join(' ')))) return true;
+  if (['itf','tennis-europe'].includes(t?.circuit) && (t.drawConfirmed === true || /draw_confirmed|official_draw|confirmed_in_official_draw/i.test([t.calendarState,t.entryStatus].join(' ')))) return true;
   if (tournamentCancelled(t)) return false;
   if (/withdrawn|removed|excluded|ritirat/i.test([t?.entryStatus,t?.status,t?.acceptanceList].join(" ")) || /^W(?:-|$)/i.test(String(t?.acceptanceCode || ""))) return false;
   const confirmed = /draw_confirmed|official_draw/i.test([t?.calendarState,t?.entryStatus].join(" ")) || t?.drawConfirmed === true;

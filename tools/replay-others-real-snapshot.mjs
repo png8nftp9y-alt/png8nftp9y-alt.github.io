@@ -1,4 +1,5 @@
 // D1_READ_ONLY: guarded
+import {readObservedEuropeEvidence} from './lib/europe-draw-evidence.mjs';
 import {readOnlyReplayDb} from './read-only-replay-db.mjs';
 import worker from '../cloudflare/app-api/src/index.js';
 import fs from 'node:fs/promises';
@@ -18,6 +19,6 @@ const DB=readOnlyReplayDb(async(sql,params)=>{
  const result=(await cf(base+'/'+(db.uuid||db.id)+'/query',{method:'POST',body:JSON.stringify({sql,params})}))[0];
  if(result.success===false)throw Error(clean(result.error));return result;
 },{limit:2,log:row=>console.log(JSON.stringify(row))});
-const start=Date.now();let result;try{const response=await worker.fetch(new Request('https://local.invalid/app/api/app-snapshot',{headers:{'Cf-Access-Authenticated-User-Email':email,'X-CourtWatch-Group':replayGroup}}),{DB},{});const body=await response.json();if(DB.failure)throw DB.failure;if(response.status===200&&(body.group!==replayGroup||!Array.isArray(body.players)||!Array.isArray(body.tournaments)||!Array.isArray(body.matches)))throw Error('snapshot_contract_incomplete');if(response.status===200)await fs.writeFile(snapshotPath,JSON.stringify(body));result={status:response.status,ms:Date.now()-start,queries:DB.queries,players:body.players?.length,tournaments:body.tournaments?.length,matches:body.matches?.length,error:body.error||''};}catch(e){result={status:'diagnostic_failed',ms:Date.now()-start,queries:DB.queries,error:clean(e.message)}}
+const start=Date.now();let result;try{const response=await worker.fetch(new Request('https://local.invalid/app/api/app-snapshot',{headers:{'Cf-Access-Authenticated-User-Email':email,'X-CourtWatch-Group':replayGroup}}),{DB},{});const body=await response.json();if(DB.failure)throw DB.failure;if(response.status===200&&(body.group!==replayGroup||!Array.isArray(body.players)||!Array.isArray(body.tournaments)||!Array.isArray(body.matches)))throw Error('snapshot_contract_incomplete');if(response.status===200&&process.env.COURTWATCH_AUDIT_EUROPE==='1')body.europeDrawEvidence=await readObservedEuropeEvidence(DB,body.players);if(response.status===200)await fs.writeFile(snapshotPath,JSON.stringify(body));result={status:response.status,ms:Date.now()-start,queries:DB.queries,players:body.players?.length,tournaments:body.tournaments?.length,matches:body.matches?.length,error:body.error||''};}catch(e){result={status:'diagnostic_failed',ms:Date.now()-start,queries:DB.queries,error:clean(e.message)}}
 console.log('OTHERS_READ_ONLY_RESULT='+JSON.stringify(result));
 if(result.status!==200)process.exitCode=1;

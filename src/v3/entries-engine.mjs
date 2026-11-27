@@ -1,3 +1,4 @@
+import {confirmedEurope,mergeConfirmedEurope,europeRelationEvidence} from './tennis-europe-confirmed-history.mjs';
 import {gunzipSync} from 'node:zlib';
 import {configuredItfDrawPresences} from './itf-draw-presence-registry.mjs';
 import {mergeConfirmedItfHistory, confirmedItfEntry, itfTargetEvidence} from './itf-confirmed-history.mjs';
@@ -89,7 +90,7 @@ function entry(row) {
     acceptanceLastUpdated: row.acceptanceLastUpdated || "",
     acceptanceListPublished: row.acceptanceListPublished || false,
     entryStatus: row.entryStatus || "",
-    ...(c === 'itf' && confirmedItfEntry(row) ? {calendarState:'draw_confirmed', drawConfirmed:true, drawConfirmedAt:row.drawConfirmedAt || ''} : {}),
+    ...((c === 'itf' && confirmedItfEntry(row) || c === 'tennis-europe' && confirmedEurope(row)) ? {calendarState:'draw_confirmed', drawConfirmed:true, drawConfirmedAt:row.drawConfirmedAt || ''} : {}),
     ...(c === "fitp" ? {subscriptionDates: fitpSubscriptionDates(row), subscriptionRegistrations: fitpSubscriptionRegistrations(row)} : {}),
   };
 }
@@ -142,7 +143,7 @@ function toTournament(e) {
     acceptanceLastUpdated: e.acceptanceLastUpdated,
     acceptanceListPublished: e.acceptanceListPublished,
     entryStatus: e.entryStatus,
-    ...(e.circuit === 'itf' && confirmedItfEntry(e) ? {calendarState:'draw_confirmed', drawConfirmed:true, drawConfirmedAt:e.drawConfirmedAt || ''} : {}),
+    ...((e.circuit === 'itf' && confirmedItfEntry(e) || e.circuit === 'tennis-europe' && confirmedEurope(e)) ? {calendarState:'draw_confirmed', drawConfirmed:true, drawConfirmedAt:e.drawConfirmedAt || ''} : {}),
     ...(e.circuit === "fitp" ? {subscriptionDates: e.subscriptionDates || [], subscriptionRegistrations: e.subscriptionRegistrations || []} : {}),
   };
 }
@@ -280,7 +281,12 @@ const itfTournamentById = new Map(
 const itfOfficialMetadata = await readJson("history/itf_official_metadata.json", {
   tournaments: {},
 });
-const teEntries = [...(te.entries || []), ...(teHistory.entries || [])]
+const tePermanent = await readJson('history/tennis-europe-confirmed-presences.json',{entries:[]});
+const tePrevious = await readJson('dist/v3/entries_tennis_europe.json',{tournamentEntries:[]});
+const teRelations = await readJson('history/tennis_europe_player_tournament_db.json',{relations:{}});
+const teEvidence = mergeConfirmedEurope([], [...(tePermanent.entries||[]),...(tePrevious.tournamentEntries||[]),...europeRelationEvidence(teRelations),...(te.entries||[]),...(teHistory.entries||[])]);
+await writeJson('history/tennis-europe-confirmed-presences.json',{version:1,entries:teEvidence});
+const teEntries = mergeConfirmedEurope([...(te.entries || []), ...(teHistory.entries || [])],teEvidence)
   .map((r) => {
     const official =
       teTournamentById.get(String(r.competitionId || "").toUpperCase()) || {};

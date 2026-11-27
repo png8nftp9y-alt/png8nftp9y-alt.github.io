@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import {confirmedEurope,mergeConfirmedEurope,europeRelationEvidence} from './tennis-europe-confirmed-history.mjs';
 
 const NOW = new Date().toISOString();
 const TODAY = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Rome', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
@@ -400,7 +401,8 @@ const [data, relationsData, historicalAuditData] = await Promise.all([
   readJson(RELATIONS_FILE, { relations: {} }),
   readJson(HISTORICAL_AUDIT_FILE, { audit: [] }),
 ]);
-const original = Array.isArray(data.entries) ? data.entries : [];
+const permanent = await readJson('history/tennis-europe-confirmed-presences.json',{entries:[]});
+const original = mergeConfirmedEurope(Array.isArray(data.entries)?data.entries:[],[...(permanent.entries||[]),...europeRelationEvidence(relationsData)]);
 const priorRelations = relationsData?.relations || {};
 const historicalDecisions = new Map((historicalAuditData?.audit || []).map(item => [
   [item.playerId, item.competitionId, item.event || 'singles'].join('|'), item,
@@ -422,6 +424,11 @@ for (const entry of original) {
       daysFromStart: daysFromStart(entry),
       decision: 'skipped_targeted_backfill_other_player',
     });
+    continue;
+  }
+  if (confirmedEurope(entry)) {
+    kept.push(entry);
+    audit.push({playerId:entry.playerId,competitionId:entry.competitionId,event:entry.acceptanceEvent||entry.event,decision:'kept_permanent_positive_draw_confirmation'});
     continue;
   }
   const wanted = drawTypeWanted(entry);
