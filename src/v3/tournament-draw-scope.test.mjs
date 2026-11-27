@@ -9,6 +9,7 @@ function context(){
  const slot={dataset:{internationalDrawLinks:'tennis-europe|'+id},outerHTML:'',textContent:'',append(){}};
  const ctx={URL,URLSearchParams,Map,Set,Date,AbortSignal,Response,PRIVATE_API:'/app/api',privateApiOptions:x=>x,esc,circuit:t=>t.circuit,readableText:v=>String(v||''),state:{data:{players:[],tournaments:[],matches:[]},selected:new Set()},document:{querySelectorAll:()=>[slot],createElement:()=>({})},navigator:{userAgent:'Macintosh'}};
  vm.createContext(ctx);
+ vm.runInContext(js.slice(js.indexOf('const active = (t) =>'),js.indexOf('const overlap =')),ctx);
  vm.runInContext(js.slice(js.indexOf('function agendaGenderClass('),js.indexOf('function agendaRoundCode(')),ctx);
  vm.runInContext(js.slice(js.indexOf('function tournamentOfficialUrl('),js.indexOf('function tournamentAcceptanceUrl(')),ctx);
  vm.runInContext(js.split('// FITP_INLINE_DRAW_LINKS_START')[1].split('// FITP_INLINE_DRAW_LINKS_END')[0],ctx);
@@ -106,4 +107,20 @@ test('unobserved Rotterdam renders all 28 actual official links with both ages, 
  const {europeCatalogueDraws}=await import('../../cloudflare/app-api/lib/tournament-draw-catalogue.mjs');const competitionId='E6C27FE1-A487-440E-9C38-AE8717B4FDE5',body=fs.readFileSync(new URL('./fixtures/rotterdam-2026-draw-list.html',import.meta.url),'utf8'),{ctx}=context();
  ctx.rows=europeCatalogueDraws(body,competitionId);vm.runInContext(`internationalDrawCatalogueCache.set('tennis-europe|${competitionId}',{draws:rows,complete:true,savedAt:Date.now()})`,ctx);
  const html=ctx.tournamentDrawLinks({circuit:'tennis-europe',competitionId,catalogueOnly:true,tournamentCategory:'U12 / U14'},[]);const urls=[...html.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map(m=>m[1]);assert.equal(urls.length,28);assert.equal(new Set(urls).size,28);assert.equal((html.match(/>SQ(?:12|14)<\/a>/g)||[]).length,4);assert.equal((html.match(/>S[MF]12 RR Group /g)||[]).length,16);assert.match(html,/>Under 12</);assert.match(html,/>Under 14</);
+});
+test('Forli: a boys group A cannot expose girls, different-age or doubles group A',()=>{
+ const {ctx}=context(),forli={circuit:'tennis-europe',competitionId:'00523E1D-06C9-430A-B8B9-851B401381E3'};
+ ctx.state.data.players=[{id:'boy',name:'Observed Boy'}];ctx.state.data.tournaments=[{...forli,playerId:'boy'}];ctx.state.data.matches=[{...forli,playerId:'boy',event:'BS12 - Group A',drawUrl:`https://te.tournamentsoftware.com/tournament/${forli.competitionId}/draw/1`}];
+ ctx.rows=['BS12 - Group A','GS12 - Group A','BS14 - Group A','BD12 - Group A'].map((event,i)=>({event,group:'A',drawId:String(i+1),drawUrl:`https://te.tournamentsoftware.com/tournament/${forli.competitionId}/draw/${i+1}`}));vm.runInContext(`internationalDrawCatalogueCache.set('tennis-europe|${forli.competitionId}',{draws:rows,complete:true,participantsLoaded:true,savedAt:Date.now()})`,ctx);
+ const html=ctx.tournamentDrawLinks(forli,[]);assert.equal((html.match(/<a /g)||[]).length,1);assert.match(html,/>SM12 RR Group A/);assert.doesNotMatch(html,/>SF12|>SM14|>DM12|draw\/2|draw\/3|draw\/4/);
+});
+test('Rotterdam: withdrawn/excluded source rows cannot turn a catalogue-only tournament into a two-main-draw observed page',async()=>{
+ const {europeCatalogueDraws}=await import('../../cloudflare/app-api/lib/tournament-draw-catalogue.mjs');const competitionId='E6C27FE1-A487-440E-9C38-AE8717B4FDE5',body=fs.readFileSync(new URL('./fixtures/rotterdam-2026-draw-list.html',import.meta.url),'utf8'),{ctx}=context(),rotterdam={circuit:'tennis-europe',competitionId,catalogueOnly:true};
+ ctx.state.data.players=[{id:'boy'},{id:'girl'}];ctx.state.data.tournaments=[{...rotterdam,playerId:'boy',status:'withdrawn',draws:['Boys Singles 14 Main Draw']},{...rotterdam,playerId:'girl',status:'excluded',draws:['Girls Singles 14 Main Draw']}];
+ ctx.rows=europeCatalogueDraws(body,competitionId);vm.runInContext(`internationalDrawCatalogueCache.set('tennis-europe|${competitionId}',{draws:rows,complete:true,savedAt:Date.now()})`,ctx);
+ assert.equal(ctx.tournamentObservedDrawScope(rotterdam).hasObserved,false);const html=ctx.tournamentDrawLinks(rotterdam,[]);assert.equal((html.match(/<a /g)||[]).length,28);assert.equal((html.match(/>SQ(?:12|14)<\/a>/g)||[]).length,4);assert.equal((html.match(/>S[MF]12 RR Group /g)||[]).length,16);
+});
+test('inactive players do not restrict public draws, while a real observed match remains authoritative',()=>{
+ const {ctx}=context();seed(ctx,draws);ctx.state.data.players=[{id:'x',active:false}];ctx.state.data.tournaments=[{...t,playerId:'x',draws:['BS14']}];assert.equal(ctx.tournamentObservedDrawScope(t).hasObserved,false);assert.match(ctx.tournamentDrawLinks(t,[]),/>DF14</);
+ ctx.state.data.players[0].active=true;ctx.state.data.tournaments[0].status='withdrawn';ctx.state.data.matches=[{...t,playerId:'x',event:'BS14'}];assert.equal(ctx.tournamentObservedDrawScope(t).hasObserved,true);assert.doesNotMatch(ctx.tournamentDrawLinks(t,[]),/>DF14</);
 });

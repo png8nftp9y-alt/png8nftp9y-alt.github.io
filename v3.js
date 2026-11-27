@@ -4196,8 +4196,8 @@ function tournamentObservedDrawScope(t, fallbackMatches = []) {
   if (typeof state === "undefined" || !state.data) return {hasObserved:!t.catalogueOnly,tournament:t,matches:fallbackMatches};
   const source=circuit(t),id=String(t.competitionId||"").toUpperCase();
   const same=row=>circuit(row)===source&&String(row.competitionId||"").toUpperCase()===id;
-  const observed=new Set((state.data.players||[]).map(player=>String(player.id)));
-  const people=(state.data.tournaments||[]).filter(row=>same(row)&&observed.has(String(row.playerId)));
+  const observed=new Set((state.data.players||[]).filter(player=>player.active!==false).map(player=>String(player.id)));
+  const people=(state.data.tournaments||[]).filter(row=>same(row)&&observed.has(String(row.playerId))&&active(row));
   const matches=(state.data.matches||[]).filter(row=>same(row)&&observed.has(String(row.playerId)));
   return {hasObserved:people.length>0||matches.length>0,tournament:{...t,...(people[0]||{}),draws:people[0]?.draws||[],event:people[0]?.event||"",draw:people[0]?.draw||"",categoryCode:people[0]?.categoryCode||"",people,playerIds:[...new Set([...people,...matches].map(row=>row.playerId))]},matches};
 }
@@ -4295,6 +4295,7 @@ function observedCatalogueDraws(scope,draws){
     }))return true;
     return known.some(row=>{
       const k=internationalDrawDescriptor(scope.tournament,row);if(!k)return false;
+      if(k.category!==d.category||k.phase!==d.phase)return false;
       if(d.structure==='RR')return k.structure==='RR'&&((d.group&&k.group===d.group)||k.explicitUrl&&k.url===d.url);
       return k.category===d.category&&k.phase===d.phase&&k.structure===d.structure;
     });

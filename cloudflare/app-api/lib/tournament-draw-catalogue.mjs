@@ -109,7 +109,7 @@ export function createTournamentDrawCatalogue(){
     for(let i=0;i<draws.length;i+=4)await Promise.all(draws.slice(i,i+4).map(async draw=>{try{
      let body=await page(draw.drawUrl);
      const action=(body.match(/<form\b[^>]*action=["']([^"']*\/Get(?:Draw|Matches)Content[^"']*)/i)||[])[1];
-     if(action){const url=new URL(decode(action),origin),expected=`/tournament/${id}/draw/${draw.drawId}/get`;if(url.origin!==origin||!url.pathname.toLowerCase().startsWith(expected.toLowerCase()))throw Error('europe_draw_endpoint');body+=await page(url.href);}
+     if(action){const url=new URL(decode(action),origin),expected=`/tournament/${id}/draw/${draw.drawId}/get`;if(url.origin!==origin||!url.pathname.toLowerCase().startsWith(expected.toLowerCase()))throw Error('europe_draw_endpoint');body=await page(url.href);}
      draw.participants=europeDrawParticipants(body);
     }catch{draw.participants=[];}}));
    }

@@ -66,3 +66,10 @@ test('a draw-detail page with a few related links is never certified or cached a
  const fs=await import('node:fs/promises');const pages=JSON.parse(await fs.readFile(new URL('../../../src/v3/fixtures/europe-draw-results/pages.json',import.meta.url),'utf8'));const load=createTournamentDrawCatalogue(),competitionId='F065F194-9CF9-46A7-92C9-E97A47ECA6EA';let calls=0;
  for(let i=0;i<2;i++)await assert.rejects(load({...t,competitionId},{fetcher:async()=>{calls++;return new Response(pages['romania-shell.html']);}}),/unverified/);assert.equal(calls,4);
 });
+test('draw participants come from the exact draw fragment, excluding unrelated players in the page shell',async()=>{
+ const profile='11111111-1111-1111-1111-111111111111';const load=createTournamentDrawCatalogue();const result=await load(t,{withParticipants:true,fetcher:async url=>{
+  if(url.includes('/sport/draws.aspx'))return new Response('<h3>Draws</h3><a href="/tournament/'+id+'/draw/1">GS12 - Group A</a>');
+  if(url.includes('GetDrawContent'))return new Response('<a href="/sport/player.aspx?id='+id+'&player=2">Other Player</a>');
+  return new Response('<a href="/player-profile/'+profile+'">Observed Girl</a><form action="/tournament/'+id+'/Draw/1/GetDrawContent?tabindex=1"></form>');
+ }});assert.deepEqual(result.draws[0].participants,[{id:'entry:2',name:'Other Player'}]);assert(!result.draws[0].participants.some(p=>p.name==='Observed Girl'));
+});

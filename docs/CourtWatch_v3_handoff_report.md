@@ -11665,3 +11665,11 @@ ITF discovery 2026-11-27T21:46:09.219Z: 0 newly discovered future tournaments; M
 
 ### 2026-11-27 — User-confirmed Turriziani FITP identifier replacement
 FITP detail for90E94D6F-AB16-4845-BC02-4124DC4E15D4 returns204; C8269487-76FE-4059-B4F6-7D77ED3C2396 returns200 with the same event/club and updated dates. User explicitly confirmed identity. Extend the existing official-ID replacement mapping while keeping the original CourtWatch history key. If both rows remain in the rolling catalog, only the current source updates the archive; remove duplicate native archive keys. Consolidate native participant cache under the history key, retaining the freshest snapshot. Force one verified refresh when a cached snapshot was fetched under the replaced ID, even if updated dates mean the event has started. Record the source ID in new snapshots. Preserve response validation and all unrelated warnings. Test actual discovery offline for both catalog orders, one-time current-ID refresh, canonical entry/dates/URL, duplicate-cache consolidation and failed refresh retention. No production acquisition or workflow launched by the patch installer.
+
+
+## 2026-11-27 — Scope tabelloni Europe: Rotterdam e Forlì
+- Il filtro osservati usa giocatori attivi e iscrizioni ammesse dal medesimo predicato active del calendario; ritirati/esclusi non restringono il catalogo pubblico. Le partite realmente disputate restano prova di partecipazione.
+- Gironi con nome uguale non possono incrociare sesso, fascia di età o singolare/doppio: il fallback richiede categoria e fase corrispondenti.
+- Quando disponibile il frammento ufficiale GetDrawContent, i partecipanti vengono letti dal frammento, senza collegamenti a giocatori estranei presenti nella cornice della pagina.
+- Regressioni: elenco ufficiale Rotterdam con 28 draw e iscrizioni ritirate/escluse; Forlì gironi A/B maschili e femminili omonimi; giocatori inattivi; link estranei nella cornice. Browser completo main/Altri: Rotterdam 28 link (4 qualificazioni, 16 gironi), Forlì solo i due gironi maschili osservati; prova aggiunta al workflow browser.
+- Il caso Rotterdam riproduce un difetto di scope verificato nel codice; lo snapshot personale remoto dell’utente non è stato letto. Nessuna modifica a risultati o scritture D1, nessun rilancio automatico.
