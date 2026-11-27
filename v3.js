@@ -4137,7 +4137,7 @@ function tournamentOfficialUrl(t) {
   if (t?.manualEvent) return "";
   const source = circuit(t),
     id = String(t.competitionId || "").trim(),
-    url = String(t.sourceUrl || "").trim();
+    url = String(t.sourceUrl || t.drawsResultsUrl || t.source?.url || "").trim();
   if (source === "tennis-europe" && id)
     return `https://te.tournamentsoftware.com/tournament/${encodeURIComponent(id)}`;
   return url;
@@ -4201,7 +4201,7 @@ function internationalDrawDescriptor(t, row) {
   const group = [row.groupName,row.groupDesc,row.group,row.groupNumber,row.groupId,raw.match(/\b(?:group|gruppo|pool|girone)\s+([A-Z0-9]+)\b/i)?.[1]].map(x=>String(x??" ").trim()).find(Boolean)||"";
   const structure = native?.[4]?.toUpperCase() || (group || /\b(?:round\s*robin|RR|girone)\b/i.test(raw) ? "RR" : "KO");
   if(structure === "RR" && !group && source!=="itf")return null;
-  const phase = qualifying ? "Qualificazioni" : /\b(?:consolation|consolazione)\b/i.test(raw) ? "Consolazione" : /\bbonus\b/i.test(raw) ? "Bonus" : "Tabellone principale";
+  const phase = qualifying ? "Qualificazioni" : /\b(?:playoff|play-off)\b/i.test(raw) ? "Playoff" : /\b(?:consolation|consolazione)\b/i.test(raw) ? "Consolazione" : /\bbonus\b/i.test(raw) ? "Bonus" : "Tabellone principale";
   const category = kind + (gender === "G" ? "F" : gender === "B" ? "M" : "X") + age;
   let url = "";
   try {
@@ -4246,10 +4246,12 @@ function internationalTournamentDrawHtml(t, matches) {
     const categories=[...new Set(ordered.map(d=>d.category))];
     const links=categories.map(category=>'<span class="internationalDrawCategoryRow" data-international-draw-category="'+esc(category)+'">'+ordered.filter(draw=>draw.category===category).map(draw=>{
       const color=draw.gender==='G'?'fitpDrawFemale':draw.gender==='X'?'fitpDrawMixed':'fitpDrawMale';
-      const label=draw.structure==='RR'?`${draw.category} Round Robin${draw.group?' - Gruppo '+draw.group.replace(/^(?:group|gruppo|pool|girone)\s*/i,''):''}`:`${draw.category} ${draw.phase}`;
-      return `<a class="type tournamentDrawLink ${color}" href="${esc(draw.url)}" target="_blank" rel="noopener noreferrer" aria-label="Apri tabellone ${esc(label)}">${esc(label)}</a>`;
+      const group=draw.group.replace(/^(?:group|gruppo|pool|girone)\s*/i,'');
+      const label=draw.structure==='RR'?`${draw.category} RR${group?' Group '+group:''}`:draw.phase==='Qualificazioni'?`${draw.kind}Q${draw.age}`:draw.phase==='Tabellone principale'?draw.category:`${draw.category} ${draw.phase==='Consolazione'?'Cons.':draw.phase}`;
+      const fullLabel=`${draw.category} ${draw.structure==='RR'?'Round Robin':draw.phase}${draw.group?' Group '+group:''}`;
+      return `<a class="type tournamentDrawLink ${color}" href="${esc(draw.url)}" target="_blank" rel="noopener noreferrer" title="${esc(fullLabel)}" aria-label="Apri tabellone ${esc(fullLabel)}">${esc(label)}</a>`;
     }).join('')+'</span>').join('');
-    return `<span class="fitpDrawAgeRow" data-international-draw-age="U${age}"><b class="fitpDrawAgeLabel">Under ${age}</b>${links}</span>`;
+    return `<span class="fitpDrawAgeRow" data-international-draw-age="U${age}">${ages.length>1 ? `<b class="fitpDrawAgeLabel">Under ${age}</b>` : ""}${links}</span>`;
   }).join("");
   return `<span data-international-draw-links="${esc(internationalDrawCatalogueKey(t))}">${html}</span>`;
 }
@@ -4277,8 +4279,20 @@ function observedCatalogueDraws(scope,draws){
     });
   }).map(row=>({...row,catalogueDraw:false}));
 }
+function itfTournamentDrawLink(t){
+  const candidates=[t.drawsResultsUrl,t.sourceUrl,t.source?.url,t.homepageUrl];
+  for(const value of candidates){try{
+    const u=new URL(value);
+    if(u.protocol!=='https:'||!['www.itftennis.com','itftennis.com'].includes(u.hostname)||u.username||u.password)continue;
+    if(!u.pathname.toUpperCase().split('/').includes(String(t.competitionId||'').toUpperCase()))continue;
+    u.pathname=u.pathname.replace(/\/(?:draws-and-results|acceptance-list|order-of-play)\/?$/i,'/').replace(/\/?$/,'/draws-and-results/');u.search='';u.hash='';
+    return `<a class="tournamentDrawLink itfAllDrawsLink" href="${esc(u.href)}" target="_blank" rel="noopener noreferrer">Tabelloni</a>`;
+  }catch{}}
+  return '';
+}
 function tournamentDrawLinks(t, matches) {
   if (t?.manualEvent) return "";
+  if (circuit(t) === "itf") return itfTournamentDrawLink(t);
   if (circuit(t) === "fitp") return fitpInlineDrawSlot(t);
   if (["tennis-europe", "itf"].includes(circuit(t))) {
     const scope=tournamentObservedDrawScope(t,matches);
@@ -4288,7 +4302,7 @@ function tournamentDrawLinks(t, matches) {
       return internationalTournamentDrawHtml(scope.tournament,[...scope.matches,...acquired]);
     }
     if(saved&&Date.now()-saved.savedAt<300000){
-      const html=internationalTournamentDrawHtml({...t,people:[],draws:[]},saved.draws.map(row=>({...row,catalogueDraw:true})));
+      const html=internationalTournamentDrawHtml({...t,people:[],draws:[],event:"",draw:"",categoryCode:""},saved.draws.map(row=>({...row,catalogueDraw:true})));
       return html;
     }
     return `<span data-international-draw-links="${esc(internationalDrawCatalogueKey(t))}"></span>`;
@@ -4296,6 +4310,7 @@ function tournamentDrawLinks(t, matches) {
   return "";
 }
 async function loadInternationalTournamentDrawLinks(t) {
+  if(circuit(t)!=="tennis-europe")return;
   const key=internationalDrawCatalogueKey(t);
   const slot=()=>[...document.querySelectorAll('[data-international-draw-links]')].find(node=>node.dataset.internationalDrawLinks===key);
   const refresh=()=>{const target=slot(),host=target?.closest?.('.tournamentDraws');if(target)target.outerHTML=tournamentDrawLinks(t,[]);if(host)host.hidden=!host.querySelector('a.tournamentDrawLink');};
@@ -4604,14 +4619,14 @@ function renderTournament(key) {
     surfaceLabel = tournamentSurfaceLabel(t),
     category = source === "tennis-europe" ? readableText(t.tournamentCategory || "") : "";
   $("profileContent").innerHTML =
-    `<div class="card tournamentHero" data-event-color="${esc(t.eventColor || '')}"><div><h2>${title}</h2>${category ? `<p>${esc(category)}</p>` : ""}${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(eventDateLabel(t))}</p></div><div class="tournamentHeroActions">${acceptanceLink}${t.manualEvent && ["purple","gray"].includes(t.eventColor) ? "" : `<div class="tournamentDraws"${/<a\s/i.test(drawLinks) ? "" : " hidden"}><b>Tabelloni:</b><span>${drawLinks}</span></div>`}</div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
+    `<div class="card tournamentHero" data-event-color="${esc(t.eventColor || '')}"><div><h2>${title}</h2>${category ? `<p>${esc(category)}</p>` : ""}${surfaceLabel ? `<p class="tournamentSurface">${esc(surfaceLabel)}</p>` : ""}<p>📍 ${mapsUrl ? `<a class="tournamentMapsLink" href="${esc(mapsUrl)}" target="_blank" rel="noopener">${esc(place)}</a>` : esc(place)}</p><p>📅 ${esc(eventDateLabel(t))}</p></div><div class="tournamentHeroActions">${acceptanceLink}${t.manualEvent && ["purple","gray"].includes(t.eventColor) ? "" : `<div class="tournamentDraws"${/<a\s/i.test(drawLinks) ? "" : " hidden"}>${source === "itf" ? "" : "<b>Tabelloni:</b>"}<span>${drawLinks}</span></div>`}</div></div><div class="card tournamentMatches">${sections || '<div class="empty">Nessun match ancora pubblicato per i nostri giocatori.</div>'}</div>`;
   if(t.catalogueOnly){$('profileContent').querySelector('.tournamentMatches')?.remove();$('profileContent').querySelector('.tournamentAcceptanceLink')?.remove();}
   const remove=$('removeProfilePlayer'),edit=$('editCalendarEventParticipants');
   if(edit)edit.hidden=!t.manualEvent;
   if(t.manualEvent){remove.hidden=false;remove.disabled=false;remove.textContent='Rimuovi evento';remove.title='Rimuovi evento';remove.setAttribute('aria-label','Rimuovi evento');remove.onclick=()=>requestCalendarEventRemoval(t);if(edit)edit.onclick=()=>openCalendarParticipants(t);}
   if (futureEurope) loadFutureTournamentEuropeRankings(key, [...byPlayer.keys()].map(id => (state.data.players || []).find(player => player.id === id)).filter(Boolean));
   if (!t.manualEvent && source === "fitp") loadInlineFitpDrawLinks(t);
-  if (!t.manualEvent && ["tennis-europe","itf"].includes(source)) loadInternationalTournamentDrawLinks(t);
+  if (!t.manualEvent && source === "tennis-europe") loadInternationalTournamentDrawLinks(t);
   bindParticipantNavigation($("profileContent"));
   if (multiPlayer)
     $("profileContent")

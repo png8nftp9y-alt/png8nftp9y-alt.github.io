@@ -4,10 +4,10 @@ import {officialItfDrawLinks} from './official-itf-draw-links.mjs';
 // Public draw metadata only. Never cache user membership or player filtering here.
 const guid=/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
 const decode=value=>String(value||'').replace(/&amp;/gi,'&').replace(/&#39;|&apos;/gi,"'").replace(/&quot;/gi,'"').replace(/&nbsp;/gi,' ');
-export function europeCatalogueDraws(html,id){
+export function europeCatalogueDraws(html,id,pageUrl=`https://te.tournamentsoftware.com/sport/draws.aspx?id=${id}`){
  const found=new Map();
  for(const match of String(html).matchAll(/<a\b[^>]*href\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
-  let url;try{url=new URL(decode(match[1]),'https://te.tournamentsoftware.com');}catch{continue;}
+  let url;try{url=new URL(decode(match[1]),pageUrl);}catch{continue;}
   if(url.protocol!=='https:'||url.hostname!=='te.tournamentsoftware.com')continue;
   const modern=url.pathname.match(/^\/tournament\/([^/]+)\/draw\/(\d+)\/?$/i),legacy=/^\/sport\/draw\.aspx$/i.test(url.pathname);
   const tournament=modern?.[1]||(legacy?url.searchParams.get('id'):''),number=modern?.[2]||(legacy?url.searchParams.get('draw'):'');
@@ -68,19 +68,42 @@ export function createTournamentDrawCatalogue(){
   if(pending.has(key))return pending.get(key);
   const request=(async()=>{
    const origin='https://te.tournamentsoftware.com',deadline=AbortSignal.timeout(16000);
+   const cookies=new Map();let consented=false;
+   async function request(url,init={}){
+    const response=await fetcher(url,{...init,headers:{Accept:'text/html','User-Agent':'Mozilla/5.0 CourtWatch-v3-draw-links/1.0','Accept-Language':'en-GB,en;q=0.9',...(cookies.size?{Cookie:[...cookies].map(([k,v])=>k+'='+v).join('; ')}:{}),...init.headers},signal:AbortSignal.any([deadline,AbortSignal.timeout(6000)]),redirect:'manual'});
+    const values=response.headers.getSetCookie?.()||[response.headers.get('set-cookie')||''];
+    for(const value of values)for(const part of value.split(/,(?=\s*[^;,=]+=[^;,]*)/)){const pair=part.split(';')[0],i=pair.indexOf('=');if(i>0)cookies.set(pair.slice(0,i).trim(),pair.slice(i+1));}
+    return response;
+   }
+   function sameTournament(url){const target=url.pathname.match(/^\/tournament\/([^/]+)(?:\/|$)/i)?.[1]||url.searchParams.get('id');return url.origin===origin&&String(target||'').toUpperCase()===id.toUpperCase();}
+   async function consent(wallUrl,returnUrl){
+    if(consented||wallUrl.origin!==origin||!/^\/cookiewall\/?$/i.test(wallUrl.pathname))throw Error('europe_cookie_consent_unavailable');
+    const wall=await request(wallUrl.href);if(!wall.ok)throw Error('europe_cookie_consent_unavailable');const body=await wall.text();
+    if(!/<form\b[^>]*action=["']\/cookiewall\/Save["']/i.test(body))throw Error('europe_cookie_form_unverified');
+    const form=new URLSearchParams({ReturnUrl:returnUrl.pathname+returnUrl.search,SettingsOpen:'false',CookiePurposes:'1'});
+    const result=await request(origin+'/cookiewall/Save',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:form.toString()});
+    if(!result.ok&&![302,303].includes(result.status))throw Error('europe_cookie_consent_failed');
+    const target=result.headers.get('location');if(target&&!sameTournament(new URL(target,origin)))throw Error('europe_cookie_return_unverified');consented=true;
+   }
    async function page(url){
-    for(let redirects=0;redirects<4;redirects++){
-     const response=await fetcher(url,{headers:{Accept:'text/html'},signal:AbortSignal.any([deadline,AbortSignal.timeout(6000)]),redirect:'manual'});
-     if([301,302,303,307,308].includes(response.status)){const next=new URL(response.headers.get('location')||'',url);const target=next.pathname.match(/^\/tournament\/([^/]+)(?:\/|$)/i)?.[1]||next.searchParams.get('id');if(next.origin!==origin||String(target||'').toUpperCase()!==id.toUpperCase())throw Error('europe_draw_redirect');url=next.href;continue;}
+    const requested=new URL(url);
+    for(let redirects=0;redirects<6;redirects++){
+     const response=await request(url);
+     if([301,302,303,307,308].includes(response.status)){
+      const next=new URL(response.headers.get('location')||'',url);
+      if(next.origin===origin&&/^\/cookiewall\/?$/i.test(next.pathname)){await consent(next,requested);url=requested.href;continue;}
+      if(!sameTournament(next))throw Error('europe_draw_redirect');url=next.href;continue;
+     }
      if(!response.ok)throw Error('europe_draw_catalogue_unavailable');const html=await response.text();
-     if(/_Incapsula_Resource|captcha|access denied|verify you are human|name=["']CookiePurposes/i.test(html))throw Error('europe_draw_catalogue_blocked');return html;
+     if(/name=["']CookiePurposes/i.test(html)){await consent(new URL('/cookiewall/?returnurl='+encodeURIComponent(requested.pathname+requested.search),origin),requested);url=requested.href;continue;}
+     if(/_Incapsula_Resource|captcha|access denied|verify you are human/i.test(html))throw Error('europe_draw_catalogue_blocked');return html;
     }throw Error('europe_draw_redirect_limit');
    }
-   let html='',draws=[],verifiedEmpty=false;
+   let html='',draws=[],verifiedEmpty=false,inventoryComplete=false;
    for(const path of [`/sport/draws.aspx?id=${id}`,`/tournament/${id}/draws`]){
-    try{html=await page(origin+path);draws=europeCatalogueDraws(html,id);verifiedEmpty=/no draws(?: available)?|draws have not|geen schema/i.test(html);if(draws.length||verifiedEmpty)break;}catch{}
+    try{html=await page(origin+path);draws=europeCatalogueDraws(html,id,origin+path);verifiedEmpty=/no draws(?: available)?|draws have not|geen schema/i.test(html);inventoryComplete=draws.length>0&&/class=["'][^"']*\bdrawname\b|<th\b[^>]*>\s*Draw(?:\s|<)|<h[1-6]\b[^>]*>\s*Draws\s*<\/h[1-6]>/i.test(html);if(inventoryComplete||verifiedEmpty)break;}catch{}
    }
-   if(!draws.length&&!verifiedEmpty)throw Error('europe_draw_catalogue_unverified');
+   if(!inventoryComplete&&!verifiedEmpty)throw Error('europe_draw_catalogue_unverified');
    if(withParticipants){
     if(draws.length>64)throw Error('europe_draw_catalogue_too_large');
     for(let i=0;i<draws.length;i+=4)await Promise.all(draws.slice(i,i+4).map(async draw=>{try{
