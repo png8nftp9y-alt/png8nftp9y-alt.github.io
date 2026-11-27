@@ -52,7 +52,7 @@ test('FITP uses the same live scope and keeps its public catalogue independent o
 test('catalog route always resolves an existing observed group before cached metadata',async()=>{
  const {ctx}=context();let calls=0,current=[],rendered=[];const node={classList:{add(){}},innerHTML:'',hidden:false};
  ctx.$=()=>node;ctx.location={hash:'#catalog-tournament/tennis-europe/'+id};ctx.groups=selected=>{assert.equal(selected,false);return current;};ctx.tournamentKey=row=>row.circuit+'|'+row.competitionId;ctx.tournamentSearchRequest=async()=>{calls++;return {tournament:t}};ctx.renderTournament=key=>rendered.push({key,observed:current.length});
- vm.runInContext('const catalogueTournamentPages=new Map();'+js.slice(js.indexOf('async function renderCatalogueTournament('),js.indexOf('async function renderTournamentSearchPage(')),ctx);
+ vm.runInContext('const catalogueTournamentPages=new Map();const catalogueTournamentRequests=new Map();'+js.slice(js.indexOf('async function renderCatalogueTournament('),js.indexOf('async function renderTournamentSearchPage(')),ctx);
  await ctx.renderCatalogueTournament(t.circuit,id);assert.equal(calls,1);
  current=[{...t,people:[{playerId:'x'}],catalogueOnly:false}];await ctx.renderCatalogueTournament(t.circuit,id);assert.equal(calls,1);assert.equal(rendered[1].observed,1);assert.equal(rendered[0].key,rendered[1].key);
 });

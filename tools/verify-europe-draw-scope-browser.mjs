@@ -13,12 +13,12 @@ const tournaments=[...players.slice(0,2).map(p=>({...forli,playerId:p.id,playerN
 const matches=players.slice(0,2).map((p,i)=>({...forli,playerId:p.id,playerName:p.name,event:fd[i].event,drawUrl:fd[i].drawUrl,round:'RR',opponent:'Other Player',score:'6-1 6-1',result:'W',date:'2026-02-15'}));
 const browser=await chromium.launch({headless:true,executablePath:process.env.COURTWATCH_TEST_CHROMIUM||undefined});
 try{for(const group of ['main','others']){
- const page=await browser.newPage(),errors=[];page.on('pageerror',e=>errors.push(String(e)));
+ const page=await browser.newPage(),errors=[];let metadataRequests=0;page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/*',async route=>{const u=new URL(route.request().url()),name=u.pathname.split('/').pop();
   if(assets[name])return route.fulfill({body:assets[name],contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':'text/html'});
   if(u.pathname.endsWith('/session'))return route.fulfill({json:{user:{displayName:'Test',role:'admin'}}});
   if(u.pathname.endsWith('/app-snapshot'))return route.fulfill({json:{group,players,tournaments,matches,agenda:[]}});
-  if(u.pathname.endsWith('/tournament-search'))return route.fulfill({json:{tournament:u.searchParams.get('competitionId')===rid?rotterdam:forli}});
+  if(u.pathname.endsWith('/tournament-search')){metadataRequests++;return route.fulfill({json:{tournament:u.searchParams.get('competitionId')===rid?rotterdam:forli}});}
   if(u.pathname.endsWith('/tournament-draw-links')){const id=u.searchParams.get('competitionId');return route.fulfill({json:{circuit,competitionId:id,complete:true,draws:id===rid?rd:fd}});}
   return route.fulfill({json:{players:[],tournaments:[],matches:[],agenda:[],results:[],rankings:[]}});
  });
@@ -26,6 +26,12 @@ try{for(const group of ['main','others']){
  await page.evaluate(id=>{location.hash='#catalog-tournament/tennis-europe/'+id;},rid);
  await page.waitForFunction(()=>document.querySelectorAll('.tournamentDraws a.tournamentDrawLink').length===14);
  assert.equal(await page.locator('.tournamentPlayer').count(),0);
+ assert.equal(await page.locator('.tournamentAcceptanceLink').count(),1);assert.equal(await page.locator('.tournamentAcceptanceLink').getAttribute('href'),`https://te.tournamentsoftware.com/sport/acceptancelist.aspx?id=${rid}`);
+ const metadataBefore=metadataRequests;
+ await page.evaluate(()=>{window.catalogueLoadingFlashes=0;window.catalogueObserver=new MutationObserver(records=>{for(const record of records)for(const node of record.addedNodes)if(node.textContent?.includes('Caricamento torneo'))window.catalogueLoadingFlashes++;});window.catalogueObserver.observe(document.getElementById('profileContent'),{childList:true,subtree:true});route();route();route();});
+ await page.waitForLoadState('networkidle');assert.equal(metadataRequests,metadataBefore);assert.equal(await page.evaluate(()=>window.catalogueLoadingFlashes),0);
+ await page.evaluate(()=>window.catalogueObserver.disconnect());
+
  assert.equal(await page.locator('.tournamentDraws a').filter({hasText:/^SQ/}).count(),4);
  assert.equal(await page.locator('.tournamentDraws a').filter({hasText:/RR$/}).count(),2);
  await page.evaluate(id=>{location.hash='#catalog-tournament/tennis-europe/'+id;},fid);
@@ -33,5 +39,8 @@ try{for(const group of ['main','others']){
  await page.waitForLoadState('networkidle');
  const links=await page.locator('.tournamentDraws a').evaluateAll(nodes=>nodes.map(a=>({text:a.textContent,href:a.href})));
  assert.equal(links.length,2);assert.ok(links.every(a=>/^SM12 RR Group [AB]$/.test(a.text)));assert.ok(links.every(a=>/\/draw\/[12]$/.test(a.href)));
+
+ assert.equal(await page.locator('.tournamentAcceptanceLink').count(),1);
+ for(const width of [360,650,1200]){await page.setViewportSize({width,height:900});assert(await page.locator('.tournamentAcceptanceLink').evaluate(a=>{const r=a.getBoundingClientRect(),p=a.parentElement.getBoundingClientRect();return Math.abs(r.right-p.right)<2&&r.right<=innerWidth+1;}),'acceptance list must align right at '+width);}
  assert.deepEqual(errors,[]);await page.close();
 }console.log('Europe full app, main and others: Rotterdam 28 draws in 14 links with two category RR links; Forli only the two observed boys groups.');}finally{await browser.close();}

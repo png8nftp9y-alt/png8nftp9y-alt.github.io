@@ -11705,3 +11705,10 @@ Validation: the app-api source check chain and Europe regression/audit tests pas
 - Richiesta utente: affiancare i doppi ai singolari nelle righe dei tabelloni Europe. Ogni fascia di età ora presenta una riga maschile SM/DM e una femminile SF/DF, con eventuale misto separato.
 - Conservati ordine delle fasi, gruppi osservati, link RR compatti del catalogo, colori e ritorno a capo su schermi stretti. Nessuna modifica ai link, alla selezione dei tabelloni, a FITP o al link unico ITF.
 - Validazione: 31 regressioni renderer/scope passate; Chromium con singolari e doppi sulla stessa riga desktop, ritorno a capo senza overflow a sei larghezze; Rotterdam completo a tre larghezze e app completa main/Altri con RR compatto e Forlì filtrato. Cache asset incrementata.
+
+
+## 2026-11-28 — Pagina torneo Cerca stabile e acceptance Europe
+- I refresh delle proiezioni richiamavano renderCatalogueTournament, che svuotava subito la scheda e richiedeva nuovamente i metadati: alternanza visibile scheda/Caricamento torneo. Ora risolve prima il gruppo osservato, poi i metadati pubblici in cache (massimo 40), e condivide una sola richiesta in corso per circuito/ID. Errori riprovabili e risposte tardive di altre rotte restano gestiti.
+- La navigazione catalogo non azzera più la memoria delle sezioni giocatore aperte nel torneo.
+- Nei tornei Europe del Cerca viene conservato il link Acceptance List già prodotto dal renderer. Pulsante allineato al margine destro dell'area azioni, anche nei tornei osservati e su mobile; tabelloni invariati.
+- Validazione: regressioni su refresh ripetuti, una richiesta in corso, riuso cache, promozione a osservato e retry dopo errore; browser app completa main/Altri con zero nuove richieste metadati e zero placeholder durante refresh ripetuti; acceptance presente per Rotterdam da Cerca e Forlì osservato, allineata a destra a 360/650/1200px. Cerca esistente FITP/ITF e reload passano. Nessuna scrittura/query D1 aggiunta; cache asset incrementata.

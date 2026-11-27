@@ -17,3 +17,11 @@ test('calendar tournament tools follow players and precede month; routes and hea
  const html=await readFile(new URL('../../v3.html',import.meta.url),'utf8');const players=html.indexOf('id="playerFilters"'),toolbar=html.indexOf('id="calendarTournamentToolbar"'),search=html.indexOf('id="tournamentSearchForm"'),month=html.indexOf('class="calendarMonthNav"');assert.ok(players<toolbar&&toolbar<month&&month<search);const header=html.slice(html.indexOf('class="cardHead calendarHead"'),players);assert.match(header,/class="demographicFilters"/);assert.match(header,/id="toggleAll"/);assert.doesNotMatch(header,/calendarTitleActions|tournamentSearchForm/);
  assert.match(source,/if \(tournamentSearch\) renderTournamentSearchPage/);assert.match(source,/if\(t\.catalogueOnly\)\{[\s\S]*?querySelector\('\.tournamentMatches'\)\?\.remove/);
 });
+test('refreshes share pending metadata and reuse the rendered catalogue without showing loading again',async()=>{
+ const {context,rendered,element}=setup();let finish,calls=0;context.fetch=()=>{calls++;return new Promise(resolve=>finish=()=>resolve({ok:true,json:async()=>({tournament:{name:'J30 Test',circuit:'itf',competitionId:'ID1'}})}));};
+ const first=context.renderCatalogueTournament('itf','ID1');element('profileContent').innerHTML='keep pending page';const repeated=context.renderCatalogueTournament('itf','ID1');assert.equal(calls,1);assert.equal(element('profileContent').innerHTML,'keep pending page');finish();await Promise.all([first,repeated]);assert.equal(rendered.length,1);
+ element('profileContent').innerHTML='rendered tournament';await context.renderCatalogueTournament('itf','ID1');assert.equal(calls,1);assert.equal(element('profileContent').innerHTML,'rendered tournament');assert.equal(rendered.length,2);
+});
+test('failed metadata request can retry instead of remaining stuck in the pending map',async()=>{
+ const {context,rendered}=setup();context.fetch=async()=>({ok:false});await context.renderCatalogueTournament('itf','ID1');context.fetch=async()=>({ok:true,json:async()=>({tournament:{circuit:'itf',competitionId:'ID1'}})});await context.renderCatalogueTournament('itf','ID1');assert.equal(rendered.length,1);
+});
