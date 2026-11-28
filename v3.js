@@ -2399,6 +2399,74 @@ function sameAgendaMatch(a, b) {
       [b.court, b.time, b.round, agendaCourtMatchNumber(b)].join("|")
   );
 }
+// Reconcile completed Europe results from draw and OOP sources without deleting source evidence.
+function dedupeVerifiedEuropeResults(items) {
+  const text = value => String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const list = value => (Array.isArray(value) ? value : String(value || '').split(/\s*\/\s*/)).map(text).filter(Boolean).sort();
+  const date = m => {
+    const value = String(m.date || '').replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
+    return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(Date.parse(value+'T00:00:00Z')) && new Date(value+'T00:00:00Z').toISOString().slice(0,10) === value ? value : '';
+  };
+  const score = m => {
+    const value = String(m.score || m.result || '').trim().toUpperCase();
+    if (/^(?:W[\s.\/-]*O\.?|WALK[\s-]*OVER)$/.test(value)) return 'WO';
+    return /\d\s*-\s*\d/.test(value) ? value.replace(/[\s\[\]]/g,'') : '';
+  };
+  const round = m => {
+    const value = text(m.round);
+    return ({qf:'quarter final',quarterfinal:'quarter final',quarterfinals:'quarter final','quarter finals':'quarter final',sf:'semi final',semifinal:'semi final',semifinals:'semi final','semi finals':'semi final',f:'final',finals:'final'})[value] || value;
+  };
+  const event = m => {
+    const raw = [m.event,m.draw,m.eventType].filter(Boolean).join(' '),code = raw.match(/\b[BG][SD]\d{2}\b/i)?.[0];
+    return code ? code.toUpperCase() : '';
+  };
+  const draw = m => {
+    if (m.drawId) return String(m.drawId).toLowerCase();
+    try { const u = new URL(m.drawUrl || m.drawSourceUrl); return String(u.searchParams.get('draw') || u.pathname.match(/\/draws?\/([^/]+)\/?$/i)?.[1] || '').toLowerCase(); } catch { return ''; }
+  };
+  const phase = m => { const value=text([m.event,m.draw,m.phase].filter(Boolean).join(' '));return /qualif/.test(value)?'qualifying':/main draw|main|principale/.test(value)?'main':''; };
+  const group = m => text(m.groupName || m.group || m.pool || '');
+  const native = values => (Array.isArray(values)?values:[]).map(v=>String(v||'').toLowerCase()).filter(v=>/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(v)).sort();
+  const agreeIds = (a,b,field) => { const x=native(a[field]),y=native(b[field]);return !x.length || !y.length || x.join('|')===y.join('|'); };
+  const compatible = (a,b) => {
+    if (phase(a) && phase(b) && phase(a)!==phase(b) || draw(a) && draw(b) && draw(a)!==draw(b) || group(a) && group(b) && group(a)!==group(b)) return false;
+    if (!agreeIds(a,b,'partnerTeProfileIds') || !agreeIds(a,b,'opponentTeProfileIds')) return false;
+    for (const field of ['won','advances']) if (typeof a[field]==='boolean' && typeof b[field]==='boolean' && a[field]!==b[field]) return false;
+    // A generic round-robin label cannot identify one encounter, even with the same score.
+    if (/round robin|group|girone/.test(round(a)) && !(draw(a) && draw(a)===draw(b) && group(a) && group(a)===group(b))) return false;
+    return true;
+  };
+  const quality = m => (date(m)?10000:0) + (m.sourceKind==='official_oop_result'?100:0) + Object.values(m).filter(v=>v!==undefined&&v!==null&&v!==''&&(!Array.isArray(v)||v.length)).length;
+  const buckets=new Map();
+  for (const m of items) {
+    if (circuit(m)!=='tennis-europe' || m.manual || m.manualEvent || m.agendaOnly || !m.playerId || !m.competitionId || !score(m) || !round(m) || !event(m)) continue;
+    // Invalid nonempty dates are not treated as an undated source.
+    if (m.date && !date(m)) continue;
+    const partners=list(m.partner),opponents=list(m.opponentOptions?.length?m.opponentOptions:m.opponent);
+    const doubles=/^[BG]D/.test(event(m));
+    if (doubles ? partners.length!==1 || opponents.length!==2 : partners.length!==0 || opponents.length!==1) continue;
+    if ([...partners,...opponents].some(n=>n.split(' ').length<2)) continue;
+    const key=JSON.stringify([m.playerId,String(m.competitionId).toLowerCase(),event(m),round(m),partners,opponents,score(m)]);
+    const rows=buckets.get(key)||[];rows.push(m);buckets.set(key,rows);
+  }
+  const replacement=new Map();
+  for (const rows of buckets.values()) {
+    const clusters=[];
+    for (const m of rows.filter(date).sort((a,b)=>quality(b)-quality(a))) {
+      const candidates=clusters.filter(c=>date(c.best)===date(m)&&c.rows.every(other=>compatible(other,m)));
+      if (candidates.length===1) { const c=candidates[0];c.rows.push(m);replacement.set(m,c.best); }
+      else clusters.push({best:m,rows:[m]});
+    }
+    for (const m of rows.filter(m=>!date(m))) {
+      const candidates=clusters.filter(c=>c.rows.every(other=>compatible(other,m)));
+      if (candidates.length===1) replacement.set(m,candidates[0].best);
+    }
+  }
+  const seen=new Set(),result=[];
+  for (const m of items) { const row=replacement.get(m)||m;if(!seen.has(row)){seen.add(row);result.push(row);} }
+  return result;
+}
+
 function dedupeAgendaMatches(items) {
   const name = v => String(v || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
   const opponents = match => (match.opponentOptions?.length ? match.opponentOptions : String(match.opponent || '').split(/\s*\/\s*/)).map(name).filter(Boolean);
@@ -2446,7 +2514,7 @@ function dedupeAgendaMatches(items) {
       else bucket.withoutId.push(match);
     }
   }
-  return unique;
+  return dedupeVerifiedEuropeResults(unique);
 }
 function canonicalPlayerMatches(items) {
   const players = new Map();

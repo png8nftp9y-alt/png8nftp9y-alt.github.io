@@ -5,7 +5,7 @@ import {pathToFileURL} from 'node:url';
 // advanced while waiting. A failing check always stops the remaining steps.
 export const releaseSafetyCommands={
  local:[
-  ['node','--test','tools/courtwatch-refresh-contract.test.mjs','tools/tests/release-safety.test.mjs'],
+  ['node','--test','tools/courtwatch-refresh-contract.test.mjs','tools/tests/release-safety.test.mjs','src/v3/europe-result-dedupe.test.mjs'],
   ['node','--test','tools/tests/snapshot-match-coverage.test.mjs','tools/tests/release-cache-version.test.mjs'],
   ['node','tools/courtwatch-release-guard.mjs'],
   ['node','tools/courtwatch-functional-shield.mjs'],
