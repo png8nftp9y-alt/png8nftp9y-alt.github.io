@@ -4458,7 +4458,9 @@ async function loadInternationalTournamentDrawLinks(t) {
   }finally{if(internationalDrawCatalogueRequests.get(requestKey)===pending)internationalDrawCatalogueRequests.delete(requestKey);}
 }
 function tournamentAcceptanceUrl(t) {
-  if (t?.manualEvent || circuit(t) !== 'tennis-europe') return '';
+  if (t?.manualEvent) return '';
+  if (circuit(t) === 'itf') { const id=String(t.competitionId||'').trim().toUpperCase();return /^J-[A-Z0-9]+-[A-Z]{3}-\d{4}-\d{3}$/.test(id)?'/app/api/tournament-acceptance-list?competitionId='+encodeURIComponent(id):''; }
+  if (circuit(t) !== 'tennis-europe') return '';
   const id=String(t.competitionId||'').trim();
   for(const value of [t.acceptanceListUrl,t.sourceUrl]){
     if(!value)continue;
