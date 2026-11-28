@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-28T14:37:45.174Z",
+  "generatedAt": "2026-11-28T14:43:07.262Z",
   "today": "2026-11-28",
   "windowEnd": "2026-12-01",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -11,17 +11,17 @@
     "complete": 1031,
     "cancelledNoDraws": 19,
     "resolved": 1050,
-    "missingDrawsTournaments": 10,
-    "unverifiable": 176,
-    "declaredDraws": 5979,
-    "acquiredDraws": 5938,
-    "missingDraws": 41,
-    "actionableUnverifiable": 9,
+    "missingDrawsTournaments": 11,
+    "unverifiable": 175,
+    "declaredDraws": 5985,
+    "acquiredDraws": 5939,
+    "missingDraws": 46,
+    "actionableUnverifiable": 8,
     "futureUnverifiable": 167,
     "ordinary": {
       "total": 19,
-      "missingDraws": 41,
-      "inventoryRequired": 9
+      "missingDraws": 46,
+      "inventoryRequired": 8
     },
     "extraordinaryA": {
       "total": 0,
@@ -499,7 +499,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:26.313Z",
+            "lastAttemptAt": "2026-11-28T14:39:03.541Z",
             "rowParity": null,
             "sources": []
           },
@@ -511,7 +511,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:26.313Z",
+            "lastAttemptAt": "2026-11-28T14:39:03.541Z",
             "rowParity": null,
             "sources": []
           },
@@ -523,7 +523,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:26.313Z",
+            "lastAttemptAt": "2026-11-28T14:39:03.541Z",
             "rowParity": null,
             "sources": []
           },
@@ -535,14 +535,14 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:26.313Z",
+            "lastAttemptAt": "2026-11-28T14:39:03.541Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-28T14:09:26.313Z",
+        "checkedAt": "2026-11-28T14:39:03.541Z",
         "eligibleFrom": "2026-11-29"
       },
       {
@@ -550,15 +550,76 @@
         "tournamentName": "J30 Saint-Paul",
         "startDate": "2026-11-30",
         "endDate": "2026-12-05",
-        "status": "inventory_empty",
-        "inventoryError": "empty_inventory",
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "status": "missing",
+        "inventoryError": null,
+        "knownDraws": 6,
+        "acquiredDraws": 1,
+        "missingDraws": 5,
+        "missingEvents": [
+          {
+            "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-28T14:39:04.583Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-28T14:39:04.583Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-28T14:39:04.583Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-Q-KO",
+            "family": "G-S-Q",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-28T14:39:04.583Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-28T14:39:04.583Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-11-28T14:08:52.842Z",
+        "needsInventory": false,
+        "checkedAt": "2026-11-28T14:39:04.583Z",
         "eligibleFrom": "2026-11-29"
       },
       {
@@ -574,7 +635,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-28T14:08:52.721Z",
+        "checkedAt": "2026-11-28T14:38:23.016Z",
         "eligibleFrom": "2026-11-29"
       },
       {
@@ -596,7 +657,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:25.320Z",
+            "lastAttemptAt": "2026-11-28T14:39:25.611Z",
             "rowParity": null,
             "sources": []
           },
@@ -608,7 +669,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:25.320Z",
+            "lastAttemptAt": "2026-11-28T14:39:25.611Z",
             "rowParity": null,
             "sources": []
           },
@@ -620,7 +681,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:25.320Z",
+            "lastAttemptAt": "2026-11-28T14:39:25.611Z",
             "rowParity": null,
             "sources": []
           },
@@ -632,14 +693,14 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:25.320Z",
+            "lastAttemptAt": "2026-11-28T14:39:25.611Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-28T14:09:25.320Z",
+        "checkedAt": "2026-11-28T14:39:25.611Z",
         "eligibleFrom": "2026-11-29"
       },
       {
@@ -661,7 +722,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:47.183Z",
+            "lastAttemptAt": "2026-11-28T14:39:47.048Z",
             "rowParity": null,
             "sources": []
           },
@@ -673,7 +734,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:47.183Z",
+            "lastAttemptAt": "2026-11-28T14:39:47.048Z",
             "rowParity": null,
             "sources": []
           },
@@ -685,7 +746,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:47.183Z",
+            "lastAttemptAt": "2026-11-28T14:39:47.048Z",
             "rowParity": null,
             "sources": []
           },
@@ -697,14 +758,14 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T14:09:47.183Z",
+            "lastAttemptAt": "2026-11-28T14:39:47.048Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-28T14:09:47.183Z",
+        "checkedAt": "2026-11-28T14:39:47.048Z",
         "eligibleFrom": "2026-11-29"
       },
       {
@@ -720,7 +781,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-28T14:08:56.802Z",
+        "checkedAt": "2026-11-28T14:38:22.464Z",
         "eligibleFrom": "2026-11-29"
       },
       {
@@ -736,7 +797,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-28T14:08:54.792Z",
+        "checkedAt": "2026-11-28T14:38:22.803Z",
         "eligibleFrom": "2026-11-29"
       },
       {
@@ -752,7 +813,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-28T14:08:52.667Z",
+        "checkedAt": "2026-11-28T14:38:23.785Z",
         "eligibleFrom": "2026-11-30"
       },
       {
@@ -854,15 +915,15 @@
       }
     ],
     "total": 19,
-    "missingDraws": 41,
-    "acquiredDraws": 19,
+    "missingDraws": 46,
+    "acquiredDraws": 20,
     "missingByReason": {
-      "draw_without_players": 33,
-      "incapsula_blocked": 8
+      "draw_without_players": 37,
+      "incapsula_blocked": 9
     },
     "byStatus": {
-      "missing": 10,
-      "inventory_empty": 9
+      "missing": 11,
+      "inventory_empty": 8
     }
   },
   "extraordinary": {
@@ -3557,9 +3618,9 @@
     }
   },
   "audit": {
-    "urgentUnverifiable": 9,
+    "urgentUnverifiable": 8,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 9,
+    "actionableUnverifiable": 8,
     "futureUnverifiable": 167,
     "blocked": 0
   }
