@@ -13,17 +13,24 @@ const tournaments=[...players.slice(0,2).map(p=>({...forli,playerId:p.id,playerN
 const matches=players.slice(0,2).map((p,i)=>({...forli,playerId:p.id,playerName:p.name,event:fd[i].event,drawUrl:fd[i].drawUrl,round:'RR',opponent:'Other Player',score:'6-1 6-1',result:'W',date:'2026-02-15'}));
 const browser=await chromium.launch({headless:true,executablePath:process.env.COURTWATCH_TEST_CHROMIUM||undefined});
 try{for(const group of ['main','others']){
- const page=await browser.newPage(),errors=[];let metadataRequests=0;page.on('pageerror',e=>errors.push(String(e)));
+ const page=await browser.newPage(),errors=[];let metadataRequests=0,releaseDraws,drawsStarted;const drawReady=new Promise(r=>drawsStarted=r);page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/*',async route=>{const u=new URL(route.request().url()),name=u.pathname.split('/').pop();
   if(assets[name])return route.fulfill({body:assets[name],contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':'text/html'});
   if(u.pathname.endsWith('/session'))return route.fulfill({json:{user:{displayName:'Test',role:'admin'}}});
   if(u.pathname.endsWith('/app-snapshot'))return route.fulfill({json:{group,players,tournaments,matches,agenda:[]}});
   if(u.pathname.endsWith('/tournament-search')){metadataRequests++;return route.fulfill({json:{tournament:u.searchParams.get('competitionId')===rid?rotterdam:forli}});}
-  if(u.pathname.endsWith('/tournament-draw-links')){const id=u.searchParams.get('competitionId');return route.fulfill({json:{circuit,competitionId:id,complete:true,draws:id===rid?rd:fd}});}
+  if(u.pathname.endsWith('/tournament-draw-links')){const id=u.searchParams.get('competitionId');if(id===rid){await new Promise(r=>{releaseDraws=r;drawsStarted();});}return route.fulfill({json:{circuit,competitionId:id,complete:true,draws:id===rid?rd:fd}});}
   return route.fulfill({json:{players:[],tournaments:[],matches:[],agenda:[],results:[],rankings:[]}});
  });
  await page.goto(`https://courtwatch.test/v3.html?group=${group}#calendar`);await page.waitForFunction(()=>typeof state!=='undefined'&&state.data?.players?.length===3&&!loadRunning);
  await page.evaluate(id=>{location.hash='#catalog-tournament/tennis-europe/'+id;},rid);
+ await page.locator('.tournamentHero h2').waitFor();
+ await drawReady;
+ assert.equal(await page.locator('.tournamentAcceptanceLink').count(),1);
+ const immediate=page.locator('.tournamentDraws .europeAllDrawsLink');await immediate.waitFor();
+ assert.equal(await immediate.textContent(),'Tabelloni');assert.equal(await immediate.getAttribute('href'),`https://te.tournamentsoftware.com/sport/draws.aspx?id=${rid}`);
+ assert.equal(await page.locator('.tournamentDraws').isVisible(),true);
+ releaseDraws();
  await page.waitForFunction(()=>document.querySelectorAll('.tournamentDraws a.tournamentDrawLink').length===14);
  assert.equal(await page.locator('.tournamentPlayer').count(),0);
  assert.equal(await page.locator('.tournamentAcceptanceLink').count(),1);assert.equal(await page.locator('.tournamentAcceptanceLink').getAttribute('href'),`https://te.tournamentsoftware.com/sport/acceptancelist.aspx?id=${rid}`);

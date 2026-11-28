@@ -4416,11 +4416,16 @@ function tournamentDrawLinks(t, matches) {
       const acquired = saved && Date.now()-saved.savedAt<300000 ? observedCatalogueDraws(scope,saved.draws) : [];
       return internationalTournamentDrawHtml(scope.tournament,[...scope.matches,...acquired]);
     }
+    // The official public draw index is known from the tournament ID: never
+    // hide the entire draw section while the individual draw inventory loads.
+    const id=String(t.competitionId||'').trim();
+    const indexLink=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(id)
+      ? `<a class="tournamentDrawLink europeAllDrawsLink" href="https://te.tournamentsoftware.com/sport/draws.aspx?id=${esc(encodeURIComponent(id))}" target="_blank" rel="noopener noreferrer">Tabelloni</a>` : '';
     if(saved&&Date.now()-saved.savedAt<300000){
       const html=internationalTournamentDrawHtml({...t,people:[],draws:[],event:"",draw:"",categoryCode:"",collapseUnobservedRR:true},saved.draws.map(row=>({...row,catalogueDraw:true})));
-      return html;
+      if(/<a\s/i.test(html))return html;
     }
-    return `<span data-international-draw-links="${esc(internationalDrawCatalogueKey(t))}"></span>`;
+    return `<span data-international-draw-links="${esc(internationalDrawCatalogueKey(t))}">${indexLink}</span>`;
   }
   return "";
 }
@@ -4448,7 +4453,8 @@ async function loadInternationalTournamentDrawLinks(t) {
   try{await pending;refresh();}
   catch{
     if(tournamentObservedDrawScope(t).hasObserved){refresh();return;}
-    const target=slot();if(target){target.textContent='';const host=target.closest?.('.tournamentDraws');if(host)host.hidden=true;}
+    // Keep the native public link usable after timeout/offline; do not blank it.
+    refresh();
   }finally{if(internationalDrawCatalogueRequests.get(requestKey)===pending)internationalDrawCatalogueRequests.delete(requestKey);}
 }
 function tournamentAcceptanceUrl(t) {

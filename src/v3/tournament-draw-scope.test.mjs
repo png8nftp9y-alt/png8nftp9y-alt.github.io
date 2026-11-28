@@ -131,3 +131,17 @@ test('catalogue RR consolidation reverses immediately when an observed player jo
  ctx.state.data.players=[{id:'p'}];ctx.state.data.tournaments=[{...t,playerId:'p'}];ctx.state.data.matches=[{...t,playerId:'p',event:'BS14 - Group B',drawUrl:rows[1].drawUrl}];
  html=ctx.tournamentDrawLinks(t,[]);assert.equal((html.match(/<a /g)||[]).length,1);assert.match(html,/>SM14 RR Group B</);assert.doesNotMatch(html,/sport\/draws\.aspx/);
 });
+
+test('unobserved Europe exposes the official draw index synchronously while inventory is pending and after failure',async()=>{
+ const {ctx,slot}=context();let reject;
+ const first=ctx.tournamentDrawLinks(t,[]);assert.match(first,/>Tabelloni<\/a>/);assert.match(first,new RegExp('sport/draws\\.aspx\\?id='+id));assert.match(first,/target="_blank"/);
+ ctx.fetch=()=>new Promise((_,r)=>reject=r);const pending=ctx.loadInternationalTournamentDrawLinks(t);
+ assert.equal(ctx.tournamentDrawLinks(t,[]),first);reject(Error('offline'));await pending;
+ assert.match(slot.outerHTML,/>Tabelloni<\/a>/);assert.equal(ctx.tournamentDrawLinks(t,[]),first);
+ seed(ctx,[]);assert.match(ctx.tournamentDrawLinks(t,[]),/>Tabelloni<\/a>/);
+ ctx.state.data.players=[{id:'p'}];ctx.state.data.tournaments=[{...t,playerId:'p'}];
+ assert.doesNotMatch(ctx.tournamentDrawLinks(t,[]),/europeAllDrawsLink/);
+});
+test('the immediate public draw link rejects invalid native IDs',()=>{
+ const {ctx}=context();assert.doesNotMatch(ctx.tournamentDrawLinks({...t,competitionId:'not-a-native-id'},[]),/<a /);
+});
