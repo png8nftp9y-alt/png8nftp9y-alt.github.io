@@ -11741,3 +11741,7 @@ Validation: screenshot reconstruction uses deliberately distinct synthetic IDs a
 - verify-analysis-ui.mjs estraeva dedupeAgendaMatches in una VM isolata senza la nuova dedupeVerifiedEuropeResults, causando ReferenceError dopo l'integrazione della correzione Ghiselli.
 - Il controllo esegue ora anche il vero helper e fornisce URL nella VM. Nessuno stub né disattivazione del controllo; codice applicativo invariato.
 - Validazione: verify-analysis-ui verde e sei regressioni Europe result dedupe passate. Il recupero terminale conserva la patch acceptance già applicata e usa la copia persistente indicata dall'utente.
+
+
+### 2026-11-28 — Select newly observed players and retain calendar on refresh
+Persist the IDs already known to each group's calendar separately from selected IDs. Reconcile new memberships into the selection while retaining explicit deselections for known players, including deselect-all. Initialize legacy saved selections conservatively without guessing which deselections were intentional; switch the known-ID baseline together with each group's UI state. On reload preserve a matching saved calendar preview when only membership or an empty initial cache is available, until durable/full tournament projection can replace it. Keep normal cold-start loading and completed empty calendars legitimate. No player history, API or acquisition changes. Validation: focused selection/reload regressions, existing calendar/player tests, source syntax and release guard; real browser checks required in CI.

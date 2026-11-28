@@ -163,6 +163,12 @@ const state = {
   selected: new Set(
     Array.isArray(restoredUi.selected) ? restoredUi.selected : [],
   ),
+  knownPlayerIds: Array.isArray(restoredUi.knownPlayerIds) ? new Set(restoredUi.knownPlayerIds) : null,
+  reconcileSelection(players) {
+    const known = this.knownPlayerIds;
+    for (const player of players || []) if (known && !known.has(player.id)) this.selected.add(player.id);
+    this.knownPlayerIds = new Set([...(known || []), ...(players || []).map(player => player.id)]);
+  },
   pickerView: "years",
   pickerYear: restoredAgenda.getFullYear(),
   pickerMonth: restoredAgenda.getMonth(),
@@ -222,12 +228,14 @@ const iso = (d) => {
   monday = (d) => add(d, -((d.getDay() + 6) % 7));
 function saveUiState() {
   try {
+    if (state.data && uiSelectionRestored) state.reconcileSelection?.(state.data.players);
     localStorage.setItem(
       UI_STATE_CACHE,
       JSON.stringify({
         agenda: iso(state.agenda),
         month: `${state.month.getFullYear()}-${String(state.month.getMonth() + 1).padStart(2, "0")}`,
         selected: state.data && uiSelectionRestored ? [...state.selected] : restoredUi.selected,
+        knownPlayerIds: state.knownPlayerIds ? [...state.knownPlayerIds] : restoredUi.knownPlayerIds,
         agendaMode: state.agendaMode,
         categoryFilters: [...state.categoryFilters],
         sexFilter: state.sexFilter,
@@ -1204,6 +1212,7 @@ function cachedData() {
 }
 function applyCachedProjection(saved) {
   if (!validProjection(saved)) return false;
+  state.reconcileSelection?.(saved.players);
   state.data = saved;
   if (!uiSelectionRestored) {
     saved.players.forEach(player => state.selected.add(player.id));
@@ -2040,6 +2049,7 @@ function applyDemographicSelection() {
   );
 }
 function renderFilters() {
+  state.reconcileSelection?.(state.data.players);
   const compareNames = new Intl.Collator("it", {sensitivity: "base"}).compare;
   const all = [...(state.data.players || [])].sort((a, b) =>
       compareNames(readablePerson(a.name), readablePerson(b.name)),
@@ -5096,6 +5106,14 @@ function route() {
     tournament = location.hash.match(/^#tournament\/(.+)$/),
     primaryView = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
   const requestedHash = location.hash;
+  const calendarPreview = primaryView === "calendar" && window.courtWatchRefreshPreview;
+  if (calendarPreview && calendarPreview.route === location.pathname + location.search + location.hash &&
+      (!state.data || (state.initialMatchProjectionPending && (state.data.membershipOnly || !state.data.tournaments?.length)))) {
+    Promise.resolve(initialProjectionRequest || load()).then(() => {
+      if (location.hash === requestedHash && !state.initialMatchProjectionPending) route();
+    });
+    return;
+  }
   if (player && (!state.data || (state.initialMatchProjectionPending &&
       (!hasAvailablePlayerProfile(decodeURIComponent(player[1])) || shouldKeepPlayerRefreshPreview(decodeURIComponent(player[1])))))) {
     Promise.resolve(initialProjectionRequest || load()).then(() => {
@@ -5325,6 +5343,7 @@ async function changePlayerGroup(targetGroup, fromHistory = false) {
     CALENDAR_CACHE = "courtwatch-v3-calendar-v1" + suffix;
     UI_STATE_CACHE = "courtwatch-v3-ui-state-v1" + GROUP_CACHE_SUFFIX;
     restoredUi = savedUiState();
+    state.knownPlayerIds = Array.isArray(restoredUi.knownPlayerIds) ? new Set(restoredUi.knownPlayerIds) : new Set(projection.players.map(player => player.id));
     state.data = projection;
     state.initialMatchProjectionPending=projection.membershipOnly===true;
     durableProjectionFallback = cached;
@@ -6019,6 +6038,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
         return !(freshStaticTournaments && staticPlayers.some(p => p.id === t.playerId && !p.userAdded));
       });
       if (selectionEpoch !== (state.playerSelectionEpoch || 0)) return;
+      if (Array.isArray(previous.players)) state.reconcileSelection?.(previous.players);
       state.data = {
         group: PLAYER_GROUP,
         personalProjectionComplete: Boolean(projection) || previous.personalProjectionComplete === true,
@@ -6054,6 +6074,7 @@ async function load(preparedProjection = null, preparedDocuments = null, refresh
         ).toISOString(),
       };
       state.data = normalizeMatchProjection(applyKnownResultUpdates(state.data));
+      state.reconcileSelection?.(state.data.players);
       if (projection && state.initialMatchProjectionPending) {
         state.initialMatchProjectionPending = false;
         renderedDataSignature = "";
