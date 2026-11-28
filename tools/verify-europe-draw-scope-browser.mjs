@@ -5,7 +5,7 @@ import {europeCatalogueDraws} from '../cloudflare/app-api/lib/tournament-draw-ca
 const assets=Object.fromEntries(await Promise.all(['v3.html','v3.js','v3.css'].map(async name=>[name,await readFile(new URL('../'+name,import.meta.url),'utf8')])));
 const circuit='tennis-europe',rid='E6C27FE1-A487-440E-9C38-AE8717B4FDE5',fid='00523E1D-06C9-430A-B8B9-851B401381E3';
 const tournament=(competitionId,name)=>({circuit,competitionId,name,location:'Test City',startDate:'2026-02-14',endDate:'2026-02-22',sourceUrl:`https://te.tournamentsoftware.com/tournament/${competitionId}`});
-const rotterdam=tournament(rid,'Robey FOCUS tennis academy open 2026'),forli=tournament(fid,'Forli');
+const rotterdam={...tournament(rid,'Robey FOCUS tennis academy open 2026'),acceptanceListUrl:`https://te.tournamentsoftware.com/sport/acceptancelist?id=${rid}`} ,forli=tournament(fid,'Forli');
 const rd=europeCatalogueDraws(await readFile(new URL('../src/v3/fixtures/rotterdam-2026-draw-list.html',import.meta.url),'utf8'),rid);
 const fd=['BS12 - Group A','BS12 - Group B','GS12 - Group A','GS12 - Group B'].map((event,i)=>({event,group:i%2?'B':'A',drawId:String(i+1),drawUrl:`https://te.tournamentsoftware.com/tournament/${fid}/draw/${i+1}`}));
 const players=[{id:'boy-a',name:'Observed Boy A',sex:'M'},{id:'boy-b',name:'Observed Boy B',sex:'M'},{id:'girl',name:'Observed Girl',sex:'F'}].map(p=>({...p,userAdded:true,birthYear:2014}));

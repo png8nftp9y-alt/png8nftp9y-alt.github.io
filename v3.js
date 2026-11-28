@@ -4437,16 +4437,21 @@ async function loadInternationalTournamentDrawLinks(t) {
   }finally{if(internationalDrawCatalogueRequests.get(requestKey)===pending)internationalDrawCatalogueRequests.delete(requestKey);}
 }
 function tournamentAcceptanceUrl(t) {
-  if (t?.manualEvent) return "";
-  if (circuit(t) !== "tennis-europe") return "";
-  const explicit = String(t.acceptanceListUrl || "").trim(),
-    source = String(t.sourceUrl || "").trim(),
-    id = String(t.competitionId || "").trim();
-  if (explicit) return explicit;
-  if (/acceptancelist/i.test(source)) return source;
-  return id
-    ? `https://te.tournamentsoftware.com/sport/acceptancelist.aspx?id=${encodeURIComponent(id)}`
-    : "";
+  if (t?.manualEvent || circuit(t) !== 'tennis-europe') return '';
+  const id=String(t.competitionId||'').trim();
+  for(const value of [t.acceptanceListUrl,t.sourceUrl]){
+    if(!value)continue;
+    try{
+      const u=new URL(String(value),'https://te.tournamentsoftware.com');
+      if(u.protocol!=='https:'||u.hostname!=='te.tournamentsoftware.com'||u.username||u.password)continue;
+      if(/^\/sport\/acceptancelist(?:\.aspx)?\/?$/i.test(u.pathname)){
+        if(id&&String(u.searchParams.get('id')||'').toUpperCase()!==id.toUpperCase())continue;
+        u.pathname='/sport/acceptancelist.aspx';return u.href;
+      }
+      if(id&&u.pathname.toUpperCase().startsWith('/TOURNAMENT/'+id.toUpperCase()+'/')&&/\/acceptance-?list\/?$/i.test(u.pathname))return u.href;
+    }catch{}
+  }
+  return id?'https://te.tournamentsoftware.com/sport/acceptancelist.aspx?id='+encodeURIComponent(id):'';
 }
 function itfAcceptanceListUrl(t, entry) {
   if (circuit(t) !== "itf") return "";

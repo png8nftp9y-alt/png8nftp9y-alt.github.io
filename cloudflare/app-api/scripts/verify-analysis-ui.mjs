@@ -121,9 +121,9 @@ assert.ok(hasSource('https://te.tournamentsoftware.com/tournament/'), 'opponent 
 assert.ok(hasSource('bindParticipantNavigation($("profileContent"))'), 'profile and tournament pages must bind participant links');
 assert.ok(hasSource('opponentHistoryCourtWatch') && hasSource('bindParticipantNavigation(body)'), 'CourtWatch players in opponent history must open their full profile');
 assert.ok(hasSource('function dedupeAgendaMatches('), 'agenda deduplication function must exist');
-const agendaContext={circuit:m=>m.circuit,agendaCourtMatchNumber:m=>Number(m.courtMatchNumber)||0,sameAgendaMatch:(a,b)=>Boolean(a.matchId)&&a.matchId===b.matchId};
+const agendaContext={URL,circuit:m=>m.circuit,agendaCourtMatchNumber:m=>Number(m.courtMatchNumber)||0,sameAgendaMatch:(a,b)=>Boolean(a.matchId)&&a.matchId===b.matchId};
 vm.createContext(agendaContext);
-const agendaStart=source.indexOf('function dedupeAgendaMatches('),agendaEnd=source.indexOf('function agendaMatchRows(',agendaStart);
+const agendaStart=source.indexOf('function dedupeVerifiedEuropeResults('),agendaEnd=source.indexOf('function agendaMatchRows(',agendaStart);
 assert.ok(agendaStart>=0&&agendaEnd>agendaStart,'agenda deduplication block must exist');
 vm.runInContext(source.slice(agendaStart,agendaEnd),agendaContext);
 const sharedMatch={matchId:'shared-test',circuit:'tennis-europe',date:'2026-10-13'};

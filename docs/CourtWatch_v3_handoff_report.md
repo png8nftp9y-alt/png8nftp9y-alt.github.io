@@ -11729,3 +11729,15 @@ Problem: Edoardo Ghiselli, Horni Mecholupy Open 2026 (Prague), showed the same d
 Change: shared Europe match normalization now recognizes completed results across different IDs using exact observed-player scope, tournament, event category, normalized round, complete teammate/opponent names and score. Conflicting native IDs, draw IDs, groups and outcomes remain separate. Undated rows are suppressed only when exactly one compatible dated encounter exists. A generic round-robin label without a specific matching draw/group cannot merge. Dated copies are preferred without rewriting source records or assigning dates to ambiguous rows. This applies to TCL and Altri through the shared matches/agenda projection; it does not remove official source evidence from D1.
 
 Validation: screenshot reconstruction uses deliberately distinct synthetic IDs and verifies two total matches/two losses, retained 7 January and opponent rankings, in both input orders. Regressions cover same-day IDs, distinct phases/dates/players/events/participants/native IDs/draws/outcomes, manual rows, agenda-only advancements and incomplete identity. Existing agenda, doubles grouping, snapshot coverage and release-safety tests pass. The new regression is part of mandatory shared release safety, without removing any checks. Cache revision increases relative to the current main asset. Local browser Shield could not run because no usable Chromium binary is installed; CI retains the required browser gate.
+
+
+## 2026-11-28 — Correzione URL acceptance Europe del catalogo
+- Causa verificata Rotterdam: il catalogo e i documenti source contengono /sport/acceptancelist?id=... senza .aspx; il renderer dava precedenza al valore esplicito errato. Il link ufficiale del menu Draws punta a /sport/acceptancelist.aspx?id=... e apre la lista BS12.
+- Il renderer normalizza i vecchi URL, mantiene i parametri evento dei link osservati validi e ricostruisce il link del torneo se il metadato è invalido o riferito a un altro ID. Anche i due discovery producono ora .aspx, evitando nuovi metadati errati. I documenti storici non richiedono una migrazione.
+- Test mirati per Rotterdam legacy, link osservato con event, URL relativo, valore null testuale, origine estranea e ID diverso. Prova browser main/Altri usa il metadato Rotterdam realmente errato e verifica l'href finale corretto, preservando acceptance osservati e layout. Nessuna scrittura D1 e nessun rilancio.
+
+
+## 2026-11-28 — Dipendenza dedupe Europe nel controllo analisi UI
+- verify-analysis-ui.mjs estraeva dedupeAgendaMatches in una VM isolata senza la nuova dedupeVerifiedEuropeResults, causando ReferenceError dopo l'integrazione della correzione Ghiselli.
+- Il controllo esegue ora anche il vero helper e fornisce URL nella VM. Nessuno stub né disattivazione del controllo; codice applicativo invariato.
+- Validazione: verify-analysis-ui verde e sei regressioni Europe result dedupe passate. Il recupero terminale conserva la patch acceptance già applicata e usa la copia persistente indicata dall'utente.
