@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "generatedAt": "2026-11-28T19:13:52.985Z",
+  "generatedAt": "2026-11-28T19:21:41.537Z",
   "today": "2026-11-28",
   "windowEnd": "2026-12-01",
   "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
@@ -11,17 +11,17 @@
     "complete": 1031,
     "cancelledNoDraws": 19,
     "resolved": 1050,
-    "missingDrawsTournaments": 12,
-    "unverifiable": 174,
-    "declaredDraws": 5991,
-    "acquiredDraws": 5941,
-    "missingDraws": 50,
-    "actionableUnverifiable": 7,
+    "missingDrawsTournaments": 13,
+    "unverifiable": 173,
+    "declaredDraws": 5997,
+    "acquiredDraws": 5943,
+    "missingDraws": 54,
+    "actionableUnverifiable": 6,
     "futureUnverifiable": 167,
     "ordinary": {
       "total": 19,
-      "missingDraws": 50,
-      "inventoryRequired": 7
+      "missingDraws": 54,
+      "inventoryRequired": 6
     },
     "extraordinaryA": {
       "total": 0,
@@ -878,7 +878,7 @@
         "missingEvents": [],
         "resolvedEvents": [],
         "needsInventory": true,
-        "checkedAt": "2026-11-28T18:44:34.336Z",
+        "checkedAt": "2026-11-28T19:14:34.161Z",
         "eligibleFrom": "2026-11-30"
       },
       {
@@ -886,15 +886,64 @@
         "tournamentName": "J60 Bucharest",
         "startDate": "2026-12-01",
         "endDate": "2026-12-06",
-        "status": "inventory_required",
-        "inventoryError": "GetEventFilters_incapsula_challenge",
-        "knownDraws": null,
-        "acquiredDraws": null,
-        "missingDraws": null,
-        "missingEvents": [],
+        "status": "missing",
+        "inventoryError": null,
+        "knownDraws": 6,
+        "acquiredDraws": 2,
+        "missingDraws": 4,
+        "missingEvents": [
+          {
+            "event": "B-S-M-KO",
+            "family": "B-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-28T19:14:58.780Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "B-D-M-KO",
+            "family": "B-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-28T19:14:58.780Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-S-M-KO",
+            "family": "G-S-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "draw_without_players",
+            "detail": "tabellone restituito senza giocatori; acquisizione non completata",
+            "lastError": "draw_not_published_or_incomplete",
+            "lastAttemptAt": "2026-11-28T19:14:58.780Z",
+            "rowParity": null,
+            "sources": []
+          },
+          {
+            "event": "G-D-M-KO",
+            "family": "G-D-M",
+            "structure": "KO",
+            "acquired": false,
+            "reasonCode": "incapsula_blocked",
+            "detail": "richiesta bloccata da Incapsula",
+            "lastError": "GetDrawsheet_incapsula_challenge",
+            "lastAttemptAt": "2026-11-28T19:14:58.780Z",
+            "rowParity": null,
+            "sources": []
+          }
+        ],
         "resolvedEvents": [],
-        "needsInventory": true,
-        "checkedAt": "2026-11-28T18:44:38.356Z",
+        "needsInventory": false,
+        "checkedAt": "2026-11-28T19:14:58.780Z",
         "eligibleFrom": "2026-11-30"
       },
       {
@@ -916,7 +965,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T18:45:21.347Z",
+            "lastAttemptAt": "2026-11-28T19:14:57.340Z",
             "rowParity": null,
             "sources": []
           },
@@ -928,7 +977,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T18:45:21.347Z",
+            "lastAttemptAt": "2026-11-28T19:14:57.340Z",
             "rowParity": null,
             "sources": []
           },
@@ -940,7 +989,7 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T18:45:21.347Z",
+            "lastAttemptAt": "2026-11-28T19:14:57.340Z",
             "rowParity": null,
             "sources": []
           },
@@ -952,28 +1001,27 @@
             "reasonCode": "draw_without_players",
             "detail": "tabellone restituito senza giocatori; acquisizione non completata",
             "lastError": "draw_not_published_or_incomplete",
-            "lastAttemptAt": "2026-11-28T18:45:21.347Z",
+            "lastAttemptAt": "2026-11-28T19:14:57.340Z",
             "rowParity": null,
             "sources": []
           }
         ],
         "resolvedEvents": [],
         "needsInventory": false,
-        "checkedAt": "2026-11-28T18:45:21.347Z",
+        "checkedAt": "2026-11-28T19:14:57.340Z",
         "eligibleFrom": "2026-11-30"
       }
     ],
     "total": 19,
-    "missingDraws": 50,
-    "acquiredDraws": 22,
+    "missingDraws": 54,
+    "acquiredDraws": 24,
     "missingByReason": {
-      "draw_without_players": 46,
-      "incapsula_blocked": 4
+      "draw_without_players": 49,
+      "incapsula_blocked": 5
     },
     "byStatus": {
-      "missing": 12,
-      "inventory_empty": 6,
-      "inventory_required": 1
+      "missing": 13,
+      "inventory_empty": 6
     }
   },
   "extraordinary": {
@@ -3668,9 +3716,9 @@
     }
   },
   "audit": {
-    "urgentUnverifiable": 7,
+    "urgentUnverifiable": 6,
     "concludedUnverifiable": 0,
-    "actionableUnverifiable": 7,
+    "actionableUnverifiable": 6,
     "futureUnverifiable": 167,
     "blocked": 0
   }
