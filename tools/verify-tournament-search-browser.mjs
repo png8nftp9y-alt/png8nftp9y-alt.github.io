@@ -4,10 +4,10 @@ const tracked={circuit:'fitp',competitionId:'SEARCH-F1',name:'Open Circolo Test'
 const empty={...tracked,circuit:'itf',competitionId:'J-J30-ITA-2026-999',name:'J30 Cuneo',location:'Cuneo',sourceUrl:'https://www.itftennis.com/en/tournament/j30-cuneo/ita/2026/j-j30-ita-2026-999/'};
 const browser=await chromium.launch({headless:true,executablePath:process.env.COURTWATCH_TEST_CHROMIUM||undefined});
 try{for(const group of ['main','others']){
- const page=await browser.newPage(),errors=[];let itfDrawRequests=0;page.on('pageerror',e=>errors.push(String(e)));
+ const page=await browser.newPage(),errors=[];let itfDrawRequests=0,holdDetails=false,releaseDetail,detailStarted;const detailReady=new Promise(r=>detailStarted=r);page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/*',async route=>{const url=new URL(route.request().url()),name=url.pathname.split('/').pop();
   if(assets[name])return route.fulfill({body:assets[name],contentType:name.endsWith('.js')?'application/javascript':name.endsWith('.css')?'text/css':'text/html'});
-  if(url.pathname.endsWith('/tournament-search'))return route.fulfill({json:url.searchParams.has('competitionId')?{tournament:empty}:{results:[tracked,empty],total:2,nextCursor:''}});
+  if(url.pathname.endsWith('/tournament-search')){if(url.searchParams.has('competitionId')&&holdDetails){await new Promise(r=>{releaseDetail=r;detailStarted();});}return route.fulfill({json:url.searchParams.has('competitionId')?{tournament:empty}:{results:[tracked,empty],total:2,nextCursor:''}});}
   if(url.pathname.endsWith('/tournament-draw-links')){itfDrawRequests++;return route.fulfill({json:{circuit:empty.circuit,competitionId:empty.competitionId,complete:true,draws:[{event:'B-S-M-KO',drawUrl:empty.sourceUrl+'draws-and-results/'},{event:'G-D-M-KO',drawUrl:empty.sourceUrl+'draws-and-results/'}]}});}
   if(url.pathname.endsWith('/session'))return route.fulfill({json:{user:{displayName:'Test',role:'admin'}}});
   if(url.pathname.endsWith('/app-snapshot'))return route.fulfill({json:{group,players:[{id:'search-player',name:'Test Player',userAdded:true,sex:'F',birthYear:2012}],tournaments:[{...tracked,playerId:'search-player',playerName:'Test Player'}],matches:[],agenda:[]}});
@@ -18,8 +18,8 @@ try{for(const group of ['main','others']){
  assert.equal(await page.locator('#tournamentSearchSuggestions button').count(),2);
  await page.keyboard.press('Enter');assert.equal(await input.inputValue(),'');await page.locator('#tournamentSearchPageRows button').first().waitFor();assert.equal(await page.locator('#tournamentSearchPageRows button').count(),2);
  await page.locator('#tournamentSearchPageRows [data-catalogue-id="SEARCH-F1"]').click();await page.locator('.tournamentPlayer').waitFor();assert.match(await page.locator('.tournamentPlayer').textContent(),/Test Player/);
- await page.goBack();await page.locator('#tournamentSearchPageRows button').first().waitFor();await page.locator('#tournamentSearchPageRows [data-catalogue-id="J-J30-ITA-2026-999"]').click();await page.locator('.tournamentHero h2').waitFor();
- assert.match(await page.locator('.tournamentHero h2').textContent(),/J30 Cuneo/);assert.equal(await page.locator('.tournamentPlayer,.tournamentMatches,.tournamentAcceptanceLink').count(),0);
+ await page.goBack();await page.locator('#tournamentSearchPageRows button').first().waitFor();holdDetails=true;await page.locator('#tournamentSearchPageRows [data-catalogue-id="J-J30-ITA-2026-999"]').click();await page.locator('.tournamentHero h2').waitFor();
+ assert.match(await page.locator('.tournamentHero h2').textContent(),/J30 Cuneo/);assert.equal(await page.getByText('Caricamento torneo…',{exact:true}).count(),0);await page.waitForFunction(()=>document.querySelector('.tournamentHero h2')?.textContent.includes('Cuneo'));await detailReady;holdDetails=false;assert.equal(typeof releaseDetail,'function');releaseDetail();assert.equal(await page.locator('.tournamentPlayer,.tournamentMatches,.tournamentAcceptanceLink').count(),0);
  assert.equal(await page.locator('.tournamentDraws a.tournamentDrawLink').count(),1);assert.equal(await page.locator('.tournamentDraws').textContent(),'Tabelloni');assert.equal(await page.locator('.tournamentDraws a').getAttribute('href'),empty.sourceUrl+'draws-and-results/');assert.equal(itfDrawRequests,0,'ITF must not wait for or request a draw inventory');
  await page.reload();await page.locator('.tournamentHero h2').waitFor();assert.match(await page.locator('.tournamentHero h2').textContent(),/J30 Cuneo/);assert.equal(await page.locator('.tournamentDraws a').textContent(),'Tabelloni');assert.equal(itfDrawRequests,0);
  await page.evaluate(()=>{location.hash='#calendar';});await input.waitFor({state:'visible'});

@@ -2881,6 +2881,7 @@ function groups(selectedOnly = true) {
   );
 }
 function renderCalendar() {
+  if (state.initialMatchProjectionPending && window.courtWatchRefreshPreview?.route === location.pathname + location.search + location.hash) return;
   const first = new Date(
       state.month.getFullYear(),
       state.month.getMonth(),
@@ -2998,6 +2999,7 @@ function renderCalendar() {
           "tournament/" + encodeURIComponent(x.dataset.tournament);
       }),
   );
+  saveRefreshView();
 }
 function syncPlayersColumnHeight() {
   const calendar = $("calendarCard"),
@@ -3388,6 +3390,9 @@ function renderDiagnostics() {
     `<div class="diagLights">${items.length ? items.map((x) => `<div class="diagLight ${esc(x.status)}"><span aria-hidden="true">${statusEmoji(x.status)}</span><b>${esc(x.label)}</b></div>`).join("") : `<div class="diagLight ${esc(overall)}"><span aria-hidden="true">${statusEmoji(overall)}</span><b>Motore V3</b></div>`}</div>`;
 }
 function renderHome() {
+  // Startup helpers can render outside route(); retain the reload view there too.
+  if (location.hash === '#calendar' && state.initialMatchProjectionPending &&
+      window.courtWatchRefreshPreview?.route === location.pathname + location.search + location.hash) return;
   const section = location.hash.match(/^#(agenda|calendar|players)$/)?.[1] || "home";
   if (section === "agenda" || section === "calendar") renderFilters();
   if(state.data?.membershipOnly&&(section==='agenda'||section==='calendar')){
@@ -4578,10 +4583,19 @@ function futureTournamentEuropeCategories(entry, rows = [], tournament = {}) {
 }
 const catalogueTournamentPages = new Map();
 const catalogueTournamentRequests = new Map();
+const catalogueTournamentSummaries = new Map();
+function rememberTournamentSearchResults(rows) {
+ for (const t of rows || []) {
+  if (!t.competitionId || !t.circuit) continue;
+  const key=t.circuit+'|'+String(t.competitionId).toUpperCase();
+  catalogueTournamentSummaries.set(key,{...t,people:[],playerIds:[],catalogueOnly:true});
+  if(catalogueTournamentSummaries.size>200)catalogueTournamentSummaries.delete(catalogueTournamentSummaries.keys().next().value);
+ }
+}
 async function tournamentSearchRequest(query='',cursor='',signal,detail) {
  const params=new URLSearchParams(detail||{q:query,cursor});
  const response=await fetch(PRIVATE_API+'/tournament-search?'+params,privateApiOptions({cache:'no-store',signal:signal||AbortSignal.timeout(30000)}));
- if(!response.ok)throw Error('tournament_search_unavailable');return response.json();
+ if(!response.ok)throw Error('tournament_search_unavailable');const data=await response.json();rememberTournamentSearchResults(data.results);return data;
 }
 function tournamentSearchRow(t){
  return `<button type="button" class="playerSearchSuggestion tournamentSearchResult" data-catalogue-circuit="${esc(t.circuit)}" data-catalogue-id="${esc(t.competitionId)}"><strong>${esc(t.name)}</strong><small>${esc([t.circuit==='tennis-europe'?'Tennis Europe':String(t.circuit).toUpperCase(),t.venueName,t.location,eventDateLabel(t)].filter(Boolean).join(' · '))}</small></button>`;
@@ -4597,21 +4611,23 @@ async function renderCatalogueTournament(circuitName,id){
  const local=groups(false).find(same);
  if(local){renderTournament(tournamentKey(local));return;}
  const cached=[...catalogueTournamentPages.values()].find(same);
- if(cached){renderTournament(tournamentKey(cached));return;}
+ if(cached && cached!==catalogueTournamentSummaries.get(requestKey)){renderTournament(tournamentKey(cached));return;}
+ const summary=catalogueTournamentSummaries.get(requestKey);
+ if(summary){const key=tournamentKey(summary);catalogueTournamentPages.set(key,summary);renderTournament(key);}
  // Projection refreshes revisit this route: keep the current page and share its request.
  if(catalogueTournamentRequests.has(requestKey))return catalogueTournamentRequests.get(requestKey);
- $('profileContent').innerHTML='<div class="empty" role="status">Caricamento torneo…</div>';
+ if(!summary)$('profileContent').innerHTML='<div class="empty" role="status">Caricamento torneo…</div>';
  const pending=(async()=>{
  try{
   const data=await tournamentSearchRequest('','',undefined,{circuit:circuitName,competitionId:id});if(location.hash!==hash)return;
   // The live snapshot may have arrived while metadata was loading.
   const current=groups(false).find(same);
   if(current){renderTournament(tournamentKey(current));return;}
-  if(!data.tournament){$('profileContent').innerHTML='<div class="empty">Torneo non trovato nel catalogo.</div>';return;}
+  if(!data.tournament){if(!summary)$('profileContent').innerHTML='<div class="empty">Torneo non trovato nel catalogo.</div>';return;}
   const t={...data.tournament,people:[],playerIds:[],catalogueOnly:true},key=tournamentKey(t);catalogueTournamentPages.set(key,t);
   if(catalogueTournamentPages.size>40)catalogueTournamentPages.delete(catalogueTournamentPages.keys().next().value);
   renderTournament(key);
- }catch{if(location.hash===hash){$('profileContent').innerHTML='<div class="empty">Torneo temporaneamente non disponibile. <button type="button" id="retryCatalogueTournament">Riprova</button></div>';$('retryCatalogueTournament').onclick=()=>renderCatalogueTournament(circuitName,id);}}
+ }catch{if(location.hash===hash&&!summary){$('profileContent').innerHTML='<div class="empty">Torneo temporaneamente non disponibile. <button type="button" id="retryCatalogueTournament">Riprova</button></div>';$('retryCatalogueTournament').onclick=()=>renderCatalogueTournament(circuitName,id);}}
  })();
  catalogueTournamentRequests.set(requestKey,pending);
  try{await pending;}finally{if(catalogueTournamentRequests.get(requestKey)===pending)catalogueTournamentRequests.delete(requestKey);}
@@ -5108,7 +5124,7 @@ function route() {
   const requestedHash = location.hash;
   const calendarPreview = primaryView === "calendar" && window.courtWatchRefreshPreview;
   if (calendarPreview && calendarPreview.route === location.pathname + location.search + location.hash &&
-      (!state.data || (state.initialMatchProjectionPending && (state.data.membershipOnly || !state.data.tournaments?.length)))) {
+      state.initialMatchProjectionPending) {
     Promise.resolve(initialProjectionRequest || load()).then(() => {
       if (location.hash === requestedHash && !state.initialMatchProjectionPending) route();
     });
@@ -5190,6 +5206,7 @@ function route() {
   delete document.documentElement.dataset.cwRefreshPreview;
   delete window.courtWatchRefreshPreview;
   finishAdaptiveNavigation();
+  if (primaryView === 'calendar') saveRefreshView();
 }
 function syncMonthFromAgenda() {
   state.month = new Date(
@@ -5821,6 +5838,8 @@ function wire() {
   addEventListener("pageshow", event => {if (event.persisted) refreshOnResume();});
   document.addEventListener("visibilitychange", refreshOnResume);
   addEventListener("pagehide", saveRefreshView);
+  addEventListener("beforeunload", saveRefreshView);
+  document.addEventListener("visibilitychange", () => {if (document.visibilityState === "hidden") saveRefreshView();});
 }
 // Refresh only known recent Europe matches. Full profiles continue independently.
 const knownResultUpdates = new Map();

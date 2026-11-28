@@ -25,3 +25,24 @@ test('refreshes share pending metadata and reuse the rendered catalogue without 
 test('failed metadata request can retry instead of remaining stuck in the pending map',async()=>{
  const {context,rendered}=setup();context.fetch=async()=>({ok:false});await context.renderCatalogueTournament('itf','ID1');context.fetch=async()=>({ok:true,json:async()=>({tournament:{circuit:'itf',competitionId:'ID1'}})});await context.renderCatalogueTournament('itf','ID1');assert.equal(rendered.length,1);
 });
+
+test('search metadata opens the existing page before delayed detail responds and survives an enrichment error',async()=>{
+ const {context,rendered,element}=setup();let reject;
+ context.fetch=async()=>({ok:true,json:async()=>({results:[{circuit:'itf',competitionId:'ID1',name:'J30 Immediate',location:'Cuneo',startDate:'2026-11-30',endDate:'2026-12-06'}]})});
+ await context.tournamentSearchRequest('Cuneo');
+ context.fetch=()=>new Promise((_,r)=>reject=r);
+ const pending=context.renderCatalogueTournament('itf','ID1');
+ assert.deepEqual(rendered,['ID1|itf']);assert.doesNotMatch(element('profileContent').innerHTML,/Caricamento/);
+ const repeat=context.renderCatalogueTournament('itf','ID1');
+ reject(Error('offline'));await Promise.all([pending,repeat]);
+ assert.doesNotMatch(element('profileContent').innerHTML,/non disponibile|Caricamento/);
+});
+test('detail response enriches an immediately displayed summary',async()=>{
+ const {context,rendered}=setup();let resolve;
+ context.rememberTournamentSearchResults([{circuit:'itf',competitionId:'ID1',name:'Summary'}]);
+ context.fetch=()=>new Promise(r=>resolve=r);
+ const pending=context.renderCatalogueTournament('itf','ID1');assert.equal(rendered.length,1);
+ resolve({ok:true,json:async()=>({tournament:{circuit:'itf',competitionId:'ID1',name:'Complete'}})});await pending;
+ assert.equal(rendered.length,2);
+ let fetches=0;context.fetch=()=>{fetches++;throw Error('duplicate');};await context.renderCatalogueTournament('itf','ID1');assert.equal(fetches,0);
+});
