@@ -1,7 +1,7 @@
 {
-  "version": 7,
-  "generatedAt": "2026-11-28T01:01:24.242Z",
-  "status": "itf_draw_target_database_complete",
+  "version": 6,
+  "generatedAt": "2026-11-28T01:08:23.732Z",
+  "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
   "targets": {
@@ -1043682,7 +1043682,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-04",
       "decision": "pending",
-      "checkedAt": "2026-11-28T00:47:54.535Z",
+      "checkedAt": "2026-11-28T01:08:20.590Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1044557,7 +1044557,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-05",
       "decision": "pending",
-      "checkedAt": "2026-11-28T00:47:55.001Z",
+      "checkedAt": "2026-11-28T01:08:21.338Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1045382,7 +1045382,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-05",
       "decision": "pending",
-      "checkedAt": "2026-11-28T00:47:55.412Z",
+      "checkedAt": "2026-11-28T01:08:21.743Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1045507,8 +1045507,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1045533,8 +1045533,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1045546,8 +1045546,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1045572,14 +1045572,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1046197,7 +1046197,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-06",
       "decision": "pending",
-      "checkedAt": "2026-11-28T00:47:55.829Z",
+      "checkedAt": "2026-11-28T01:08:22.142Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1046792,7 +1046792,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-05",
       "decision": "pending",
-      "checkedAt": "2026-11-28T00:47:56.236Z",
+      "checkedAt": "2026-11-28T01:08:22.543Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1046810,25 +1046810,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-06",
       "decision": "pending",
-      "checkedAt": "2026-11-28T00:47:56.643Z",
-      "playersFound": 0,
-      "declaredSections": 0,
-      "acquiredSections": 0,
-      "unusedAlternativeSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 0,
-      "eventInventory": [],
-      "families": [],
-      "eventFailure": null,
-      "eventCache": {}
-    },
-    "J-J30-NEP-2026-003": {
-      "competitionId": "J-J30-NEP-2026-003",
-      "tournamentName": "J30 Pokhara",
-      "startDate": "2026-11-30",
-      "endDate": "2026-12-05",
-      "decision": "pending",
-      "checkedAt": "2026-11-28T00:47:57.046Z",
+      "checkedAt": "2026-11-28T01:08:22.938Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1046840,13 +1046822,31 @@
       "eventFailure": "GetEventFilters_incapsula_challenge",
       "eventCache": {}
     },
+    "J-J30-NEP-2026-003": {
+      "competitionId": "J-J30-NEP-2026-003",
+      "tournamentName": "J30 Pokhara",
+      "startDate": "2026-11-30",
+      "endDate": "2026-12-05",
+      "decision": "pending",
+      "checkedAt": "2026-11-28T01:08:23.335Z",
+      "playersFound": 0,
+      "declaredSections": 0,
+      "acquiredSections": 0,
+      "unusedAlternativeSections": 0,
+      "resolvedSections": 0,
+      "missingSections": 0,
+      "eventInventory": [],
+      "families": [],
+      "eventFailure": null,
+      "eventCache": {}
+    },
     "J-J30-PAR-2026-003": {
       "competitionId": "J-J30-PAR-2026-003",
       "tournamentName": "J30 Luque",
       "startDate": "2026-11-30",
       "endDate": "2026-12-05",
       "decision": "pending",
-      "checkedAt": "2026-11-28T00:47:57.450Z",
+      "checkedAt": "2026-11-28T01:08:23.732Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1046971,8 +1046971,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1046997,8 +1046997,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1047010,8 +1047010,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "draw_not_published_or_incomplete",
-              "failureType": "not_published_or_incomplete",
+              "error": "GetDrawsheet_incapsula_challenge",
+              "failureType": "technical_error",
               "resolved": false
             }
           ]
@@ -1047043,7 +1047043,7 @@
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge",
+      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
