@@ -41,7 +41,18 @@ export function fitpDrawLinks(detail, competitionId) {
   for (const row of rows) if (duplicates.get(row.label)>1) {const label=row.label;const n=(positions.get(label)||0)+1;positions.set(label,n);row.label += ' ' + n;}
   return rows;
 }
-export async function loadFitpDrawLinks(competitionId, fetcher=fetch) {
+const participantCache=new Map();
+export function fitpDrawParticipants(body){
+  if(typeof body==='string'){try{body=JSON.parse(body);}catch{return null;}}
+  const draws=body?.results||body?.Results;if(!Array.isArray(draws))return null;
+  const found=new Map();
+  for(const draw of draws)for(const match of draw.partite||draw.Partite||[])for(const n of ['1','12','2','22']){
+    const name=String(match['Nome'+n]||'').trim(),card=String(match['NumeroTessera'+n]||'').trim();
+    if(name||card)found.set(card||name,{name,membershipCard:card});
+  }
+  return [...found.values()];
+}
+export async function loadFitpDrawLinks(competitionId, fetcher=fetch, {withParticipants=false}={}) {
   if (!GUID.test(competitionId)) {const error=new Error('invalid_fitp_competition_id');error.status=400;throw error;}
   const response = await fetcher('https://dp-myfit-test-function-v2.azurewebsites.net/api/v3/puc/competizione/dettaglio', {
     method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
@@ -51,5 +62,20 @@ export async function loadFitpDrawLinks(competitionId, fetcher=fetch) {
   const detail = await response.json();
   if (!detail || !Array.isArray(detail.Tournaments)) throw new Error('fitp_invalid_response');
   if (detail.CompetitionUid && String(detail.CompetitionUid).toUpperCase() !== competitionId.toUpperCase()) throw new Error('fitp_competition_mismatch');
-  return {competitionId,draws:fitpDrawLinks(detail,competitionId),checkedAt:new Date().toISOString()};
+  const draws=fitpDrawLinks(detail,competitionId);
+  if(withParticipants){
+    const deadline=Date.now()+12000;
+    for(let i=0;i<Math.min(draws.length,48)&&Date.now()<deadline;i+=4)await Promise.all(draws.slice(i,i+4).map(async row=>{
+      const key=row.tournamentId+'|'+row.phaseId,saved=participantCache.get(key);
+      if(saved&&Date.now()-saved.at<300000){Object.assign(row,{participants:saved.participants,participantsLoaded:true});return;}
+      try{
+        const query=new URLSearchParams({tournamentId:row.tournamentId,phaseId:row.phaseId});
+        const response=await fetcher('https://dp-myfit-test-function-v2.azurewebsites.net/api/v3/puc/competizione/tabellone?'+query,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(Math.max(1,Math.min(4000,deadline-Date.now())))});
+        if(!response.ok)return;const participants=fitpDrawParticipants(await response.json());if(participants===null)return;
+        Object.assign(row,{participants,participantsLoaded:true});participantCache.set(key,{at:Date.now(),participants});
+        if(participantCache.size>128)participantCache.delete(participantCache.keys().next().value);
+      }catch{}
+    }));
+  }
+  return {competitionId,draws,checkedAt:new Date().toISOString()};
 }

@@ -49,3 +49,28 @@ test('match evidence belongs to the observed player and exact FITP competition; 
  assert.deepEqual(Array.from(ctx.fitpObservedDrawRows({competitionId:id,playerIds:['one'],people:[]},rows),r=>r.categoryCode),['SM12']);
  assert.equal(ctx.fitpObservedCategoryKey('Singolare Maschile Under 12 Under 14'),'');
 });
+test('observed FITP final does not expose initial draw of the same category',()=>{
+ const {ctx}=context();const rows=['INIZIALE','FINALE'].map((phase,i)=>({...draw,categoryCode:'SM14',phase:'TABELLONE '+phase,label:'SM14 '+phase,url:draw.url.replace('phaseId=CFE780A3-8CF2-4684-A51D-B1B3B0EECA0C','phaseId='+['11111111-1111-4111-8111-111111111111','22222222-2222-4222-8222-222222222222'][i])}));
+ const t={competitionId:id,playerIds:['p'],people:[{playerId:'p',subscriptionRegistrations:[{category:'SM14'}],draw:'SM14 FINALE'}]};
+ assert.deepEqual(Array.from(ctx.fitpObservedDrawRows(t,rows),r=>r.label),['SM14 FINALE']);
+ ctx.state.data.matches=[{circuit:'fitp',competitionId:id,playerId:'p',event:'SM14',resultSourceUrl:rows[1].url.replace('https://www.fitp.it/Tornei/Areas/Federtennis/Scripts/Puc/Tabellone_v3','https://dp-myfit-test-function-v2.azurewebsites.net/api/v3/puc/competizione/tabellone')}];t.people[0].draw='SM14';assert.deepEqual(Array.from(ctx.fitpObservedDrawRows(t,rows),r=>r.label),['SM14 FINALE']);
+ ctx.state.data.matches.push({circuit:'fitp',competitionId:id,playerId:'p',event:'SM14',orderOfPlaySource:rows[0].url});assert.equal(ctx.fitpObservedDrawRows(t,rows).length,2);
+});
+test('native FITP phase identity overrides display names and respects observed player and competition',()=>{
+ const {ctx}=context(),rows=[1,2].map(n=>({...draw,categoryCode:'SM14',label:'SM14 INTERMEDIO '+n,phase:'TABELLONE INTERMEDIO',phaseId:'phase-'+n,tournamentId:'222'})),t={competitionId:id,playerIds:['p'],people:[{playerId:'p',draw:'SM14'}]};
+ ctx.state.data.matches=[{playerId:'p',competitionId:id,circuit:'fitp',event:'SM14',phaseId:'phase-2',tournamentId:'222'},{playerId:'other',competitionId:id,circuit:'fitp',event:'SM14',phaseId:'phase-1'},{playerId:'p',competitionId:'other',circuit:'fitp',event:'SM14',phaseId:'phase-1'}];
+ assert.deepEqual(Array.from(ctx.fitpObservedDrawRows(t,rows),r=>r.phaseId),['phase-2']);
+ ctx.state.data.matches=[];t.people[0].draw='SM14 INTERMEDIO';assert.equal(ctx.fitpObservedDrawRows(t,rows).length,0);
+});
+test('category-only FITP registration cannot authorize several phases; unobserved catalogue retains them',()=>{
+ const {ctx}=context(),rows=['INIZIALE','FINALE'].map(phase=>({...draw,categoryCode:'SM14',label:'SM14 '+phase,phase:'TABELLONE '+phase})),t={competitionId:id,people:[{playerId:'p',subscriptionRegistrations:[{category:'SM14'}]}]};
+ assert.equal(ctx.fitpObservedDrawRows(t,rows).length,0);ctx.tournamentObservedDrawScope=()=>({hasObserved:false,tournament:t});const html=ctx.fitpObservedDrawHtml(t,rows);assert.match(html,/SM14 INIZIALE/);assert.match(html,/SM14 FINALE/);
+});
+test('official participants authorize the exact native FITP phase even without acquired matches',()=>{
+ const {ctx}=context();ctx.state.data.players=[{id:'p',name:'Observed Player',membershipCard:'100'}];
+ const t={competitionId:id,playerIds:['p'],people:[{playerId:'p',subscriptionRegistrations:[{category:'SM14'}]}]},rows=['INIZIALE','FINALE'].map((phase,i)=>({...draw,categoryCode:'SM14',phase:'TABELLONE '+phase,label:'SM14 '+phase,participantsLoaded:true,participants:[{name:i?'PLAYER OBSERVED':'Other Player',membershipCard:i?'100':'200'}]}));
+ assert.deepEqual(Array.from(ctx.fitpObservedDrawRows(t,rows),r=>r.label),['SM14 FINALE']);
+ rows[1].participants[0].membershipCard='999';assert.equal(ctx.fitpObservedDrawRows(t,rows).length,0,'a conflicting membership card cannot match by name');
+ delete rows[1].participants[0].membershipCard;assert.equal(ctx.fitpObservedDrawRows(t,rows).length,1);
+ ctx.state.data.players.push({id:'same-name',name:'Observed Player'});assert.equal(ctx.fitpObservedDrawRows(t,rows).length,0,'homonymous players need native identity evidence');
+});

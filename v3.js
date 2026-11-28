@@ -6526,22 +6526,61 @@ function fitpObservedCategoryKey(value) {
   return kind&&gender ? kind+gender+(ages[0] || (over?'O'+over[1]:'')) : '';
 }
 function fitpObservedDrawRows(t, rows) {
-  const allowed=new Set(),ids=new Set((t.playerIds || []).map(String));
-  const add=value=>{const key=fitpObservedCategoryKey(value);if(key)allowed.add(key);};
-  const entries=Array.isArray(t.people)?t.people:[t];
-  for(const person of entries){
+  const ids=new Set((t.playerIds||[]).map(String)),evidence=[];
+  const text=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[_-]/g,' ').replace(/\s+/g,' ').trim();
+  const describe=value=>{
+    const item=typeof value==='string'?{draw:value}:value||{};
+    let phaseId=String(item.phaseId||item.sectionCode||item.sectionId||item.fitpPhaseId||'').toUpperCase(),tournamentId=String(item.tournamentId||'');
+    for(const url of [item.drawUrl,item.drawSourceUrl,item.resultSourceUrl,item.orderOfPlaySource,item.sourceUrl,item.url,item.source?.url]){
+      if(phaseId)break;
+      try{const u=new URL(url);phaseId=String(u.searchParams.get('phaseId')||'').toUpperCase();tournamentId=u.searchParams.get('tournamentId')||tournamentId;}catch{}
+    }
+    const label=text([item.label,item.phase,item.shortPhase,item.sectionDescription,item.draw,item.event].filter(Boolean).join(' '));
+    const phases=[...new Set(label.match(/\b(?:INIZIALE|INTERMEDIO|FINALE)\b/g)||[])];
+    return {category:fitpObservedCategoryKey(item.categoryCode||item.category||[item.draw,item.event].filter(Boolean).join(' ')),phaseId,tournamentId,label,phases};
+  };
+  const add=value=>{const d=describe(value);if(d.category||d.phaseId)evidence.push(d);};
+  for(const person of Array.isArray(t.people)?t.people:[t]){
     if(person.playerId)ids.add(String(person.playerId));
-    for(const registration of person.subscriptionRegistrations || [])add(registration.category);
-    for(const draw of Array.isArray(person.draws)?person.draws:[])add(typeof draw==='string'?draw:draw?.category || draw?.draw || draw?.event);
-    add(person.draw);add(person.event);add(`${person.draw || ''} ${person.event || ''}`);
+    for(const registration of person.subscriptionRegistrations||[])add(registration);
+    for(const draw of Array.isArray(person.draws)?person.draws:[])add(draw);
+    add(person);
   }
   const competitionId=fitpInlineCompetitionId(t);
-  for(const match of state.data?.matches || []){
-    if(!ids.has(String(match.playerId)) || String(match.circuit || 'fitp')!=='fitp')continue;
-    if(!competitionId || String(match.competitionId || '').toUpperCase()!==competitionId)continue;
-    add(match.event);add(match.draw);add(`${match.event || ''} ${match.draw || ''}`);
+  for(const match of state.data?.matches||[]){
+    if(!ids.has(String(match.playerId))||String(match.circuit||'fitp')!=='fitp')continue;
+    if(!competitionId||String(match.competitionId||'').toUpperCase()!==competitionId)continue;
+    add(match);
   }
-  return rows.filter(row=>allowed.has(fitpObservedCategoryKey(row.categoryCode || row.category)));
+  const candidates=rows.map(row=>({row,descriptor:describe(row)})),selected=new Set();
+  for(const item of evidence){
+    const category=candidates.filter(({descriptor:d})=>!item.category||d.category===item.category);
+    if(item.phaseId){
+      for(const {row,descriptor:d} of category)if(d.phaseId===item.phaseId&&(!item.tournamentId||!d.tournamentId||item.tournamentId===d.tournamentId))selected.add(row);
+      continue;
+    }
+    if(item.phases.length){
+      const matching=category.filter(({descriptor:d})=>item.phases.some(phase=>d.phases.includes(phase)));
+      // A family such as INTERMEDIO is insufficient if several native draws share it.
+      if(matching.length===1)selected.add(matching[0].row);
+      continue;
+    }
+    const specific=evidence.some(other=>other.category===item.category&&(other.phaseId||other.phases.length));
+    if(!specific&&category.length===1)selected.add(category[0].row);
+  }
+  const nameKey=value=>text(value).replace(/[^A-Z0-9 ]/g,' ').split(/\s+/).filter(Boolean).sort().join(' ');
+  const players=(state.data?.players||[]).filter(player=>ids.has(String(player.id)));
+  const people=Array.isArray(t.people)?t.people:[];
+  return rows.filter(row=>{
+    if(row.participantsLoaded!==true)return selected.has(row);
+    return (row.participants||[]).some(participant=>players.some(player=>{
+      const cards=[player.membershipCard,...people.filter(p=>String(p.playerId)===String(player.id)).map(p=>p.membershipCard)].filter(Boolean).map(String);
+      if(participant.membershipCard&&cards.length)return cards.includes(String(participant.membershipCard));
+      const key=nameKey(participant.name);if(key.split(' ').length<2)return false;
+      const names=[player.name,...(player.aliases||[])].map(nameKey);
+      return names.includes(key)&&(state.data.players||[]).filter(p=>[p.name,...(p.aliases||[])].map(nameKey).includes(key)).length===1;
+    }));
+  });
 }
 function fitpObservedDrawHtml(t, rows) {
   const scope=typeof tournamentObservedDrawScope === "function" ? tournamentObservedDrawScope(t) : {hasObserved:true,tournament:t};
@@ -6569,23 +6608,25 @@ async function loadInlineFitpDrawLinks(t) {
   const id=fitpInlineCompetitionId(t);
   if (!id) return;
   const slot=()=>document.querySelector(`[data-fitp-draw-links="${id}"]`);
+  const withParticipants=typeof tournamentObservedDrawScope==='function'?tournamentObservedDrawScope(t).hasObserved:true;
+  const requestKey=id+'|'+withParticipants;
   const saved=fitpDrawLinkCache.get(id);
-  if(saved && Date.now()-saved.savedAt<300000) {setFitpDrawSlot(slot(),publishedFitpDrawHtml(t,saved.draws));return;}
-  let pending=fitpDrawLinkRequests.get(id);
+  if(saved && Date.now()-saved.savedAt<300000&&(!withParticipants||saved.participantsRequested)) {setFitpDrawSlot(slot(),publishedFitpDrawHtml(t,saved.draws));return;}
+  let pending=fitpDrawLinkRequests.get(requestKey);
   if (!pending) {
     pending=(async()=>{
-      const response=await fetch('/app/api/fitp-draw-links?competitionId='+encodeURIComponent(id),{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(20000)});
+      const response=await fetch('/app/api/fitp-draw-links?competitionId='+encodeURIComponent(id)+(withParticipants?'&withParticipants=1':''),{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(20000)});
       if (!response.ok) throw new Error('fitp_unavailable');
       const data=await response.json();
       if (String(data.competitionId||'').toUpperCase()!==id || !Array.isArray(data.draws)) throw new Error('fitp_invalid_response');
-      fitpDrawLinkCache.set(id,{draws:data.draws,savedAt:Date.now()});
+      if(withParticipants||!fitpDrawLinkCache.get(id)?.participantsRequested)fitpDrawLinkCache.set(id,{draws:data.draws,participantsRequested:withParticipants,savedAt:Date.now()});
       return data.draws;
     })();
-    fitpDrawLinkRequests.set(id,pending);
+    fitpDrawLinkRequests.set(requestKey,pending);
   }
   try {const rows=await pending;setFitpDrawSlot(slot(),publishedFitpDrawHtml(t,rows));}
   catch {setFitpDrawSlot(slot(),'');}
-  finally {if(fitpDrawLinkRequests.get(id)===pending)fitpDrawLinkRequests.delete(id);}
+  finally {if(fitpDrawLinkRequests.get(requestKey)===pending)fitpDrawLinkRequests.delete(requestKey);}
 }
 // FITP_INLINE_DRAW_LINKS_END
 startCourtWatch();

@@ -43,3 +43,16 @@ test('two draws always display INIZIALE and FINALE without changing phase IDs',(
  assert.deepEqual(rows.map(r=>r.label),['SM14 INIZIALE','SM14 FINALE']);
  assert.deepEqual(rows.map(r=>r.phaseId),[p1,p2]);assert.equal(rows[0].phase,'TABELLONE INTERMEDIO - 4 CATEGORIA');
 });
+test('optional public phase participants include both doubles partners and cache successful phase reads',async()=>{
+ const {fitpDrawParticipants}=await import('../lib/fitp-draw-links.mjs');
+ const body={results:[{partite:[{Nome1:'First Player',NumeroTessera1:'100',Nome12:'Partner Player',NumeroTessera12:'200',Nome2:'Other Player',NumeroTessera2:'300',Nome22:'Other Partner',NumeroTessera22:'400'}]}]};
+ assert.equal(fitpDrawParticipants(body).length,4);assert.equal(fitpDrawParticipants(JSON.stringify(body)).length,4);assert.equal(fitpDrawParticipants({error:'unavailable'}),null);
+ let details=0,phases=0;const fetcher=async(url)=>{if(url.endsWith('/dettaglio')){details++;return Response.json({Tournaments:[doubles]});}phases++;assert.match(url,new RegExp('phaseId='+p1));return Response.json(body);};
+ const result=await loadFitpDrawLinks(id,fetcher,{withParticipants:true});assert.equal(result.draws[0].participantsLoaded,true);assert.equal(result.draws[0].participants.length,4);
+ await loadFitpDrawLinks(id,fetcher,{withParticipants:true});assert.equal(details,2);assert.equal(phases,1);
+ await loadFitpDrawLinks(id,fetcher);assert.equal(phases,1,'catalogue-only requests must not acquire participants');
+});
+test('failed phase acquisition cannot certify an empty participant list',async()=>{
+ const local={...singles,TournamentId:991234};const result=await loadFitpDrawLinks(id,async url=>url.endsWith('/dettaglio')?Response.json({Tournaments:[local]}):new Response('',{status:502}),{withParticipants:true});
+ assert.ok(result.draws.every(row=>row.participantsLoaded!==true));
+});
