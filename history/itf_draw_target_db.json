@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generatedAt": "2026-11-28T11:24:01.757Z",
+  "generatedAt": "2026-11-28T11:28:50.004Z",
   "status": "itf_live_state_database_complete",
   "rule": "Retain official acceptance; inspect draws only for monitored players found in acceptance; withdrawn removes immediately.",
   "targetCount": 10,
@@ -1047611,17 +1047611,554 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-05",
       "decision": "pending",
-      "checkedAt": "2026-11-28T11:00:49.025Z",
+      "checkedAt": "2026-11-28T11:28:46.699Z",
       "playersFound": 0,
-      "declaredSections": 0,
-      "acquiredSections": 0,
+      "declaredSections": 6,
+      "acquiredSections": 2,
       "unusedAlternativeSections": 0,
-      "resolvedSections": 0,
-      "missingSections": 0,
-      "eventInventory": [],
-      "families": [],
+      "resolvedSections": 2,
+      "missingSections": 4,
+      "eventInventory": [
+        {
+          "event": "B-S-M-KO",
+          "family": "B-S-M",
+          "combo": {
+            "competitionId": "J-J30-PHI-2026-002",
+            "event": "B-S-M-KO",
+            "tournamentId": 1100205397,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-manila/phi/2026/j-j30-phi-2026-002/",
+            "family": "B-S-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "B-S-Q-KO",
+          "family": "B-S-Q",
+          "combo": {
+            "competitionId": "J-J30-PHI-2026-002",
+            "event": "B-S-Q-KO",
+            "tournamentId": 1100205397,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-manila/phi/2026/j-j30-phi-2026-002/",
+            "family": "B-S-Q",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "B-D-M-KO",
+          "family": "B-D-M",
+          "combo": {
+            "competitionId": "J-J30-PHI-2026-002",
+            "event": "B-D-M-KO",
+            "tournamentId": 1100205397,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "B",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-manila/phi/2026/j-j30-phi-2026-002/",
+            "family": "B-D-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-S-M-KO",
+          "family": "G-S-M",
+          "combo": {
+            "competitionId": "J-J30-PHI-2026-002",
+            "event": "G-S-M-KO",
+            "tournamentId": 1100205397,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-manila/phi/2026/j-j30-phi-2026-002/",
+            "family": "G-S-M",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-S-Q-KO",
+          "family": "G-S-Q",
+          "combo": {
+            "competitionId": "J-J30-PHI-2026-002",
+            "event": "G-S-Q-KO",
+            "tournamentId": 1100205397,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "S",
+            "eventClassificationCode": "Q",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-manila/phi/2026/j-j30-phi-2026-002/",
+            "family": "G-S-Q",
+            "structure": "KO"
+          }
+        },
+        {
+          "event": "G-D-M-KO",
+          "family": "G-D-M",
+          "combo": {
+            "competitionId": "J-J30-PHI-2026-002",
+            "event": "G-D-M-KO",
+            "tournamentId": 1100205397,
+            "tourType": "N",
+            "weekNumber": 0,
+            "playerTypeCode": "G",
+            "matchTypeCode": "D",
+            "eventClassificationCode": "M",
+            "drawsheetStructureCode": "KO",
+            "sourceUrl": "https://www.itftennis.com/en/tournament/j30-manila/phi/2026/j-j30-phi-2026-002/",
+            "family": "G-D-M",
+            "structure": "KO"
+          }
+        }
+      ],
+      "families": [
+        {
+          "family": "B-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "B-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "B-S-Q-KO",
+              "players": 16,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "B-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "B-D-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-S-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        },
+        {
+          "family": "G-S-Q",
+          "populated": true,
+          "events": [
+            {
+              "event": "G-S-Q-KO",
+              "players": 16,
+              "error": null,
+              "failureType": null,
+              "resolved": true
+            }
+          ]
+        },
+        {
+          "family": "G-D-M",
+          "populated": false,
+          "events": [
+            {
+              "event": "G-D-M-KO",
+              "players": 0,
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
+              "resolved": false
+            }
+          ]
+        }
+      ],
       "eventFailure": null,
-      "eventCache": {}
+      "eventCache": {
+        "B-S-Q-KO": {
+          "family": "B-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800763966",
+              "name": "Jake Ting Long Hou",
+              "givenName": "Jake Ting Long",
+              "familyName": "Hou",
+              "nationalityCode": "MAS",
+              "profileLink": "/en/players/jake-ting-long-hou/800763966/mas/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800751257",
+              "name": "Brendan Joshua Kwan",
+              "givenName": "Brendan Joshua",
+              "familyName": "Kwan",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/brendan-joshua-kwan/800751257/hkg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800727701",
+              "name": "Andre Harnadi",
+              "givenName": "Andre",
+              "familyName": "Harnadi",
+              "nationalityCode": "SGP",
+              "profileLink": "/en/players/andre-harnadi/800727701/sgp/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800700825",
+              "name": "Phillipe Bawono",
+              "givenName": "Phillipe",
+              "familyName": "Bawono",
+              "nationalityCode": "INA",
+              "profileLink": "/en/players/phillipe-bawono/800700825/ina/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800792489",
+              "name": "Chen En Zheng",
+              "givenName": "Chen En",
+              "familyName": "Zheng",
+              "nationalityCode": "TPE",
+              "profileLink": "/en/players/chen-en-zheng/800792489/tpe/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800817709",
+              "name": "Cristiano Matteo Calingasan",
+              "givenName": "Cristiano Matteo",
+              "familyName": "Calingasan",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/cristiano-matteo-calingasan/800817709/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800780223",
+              "name": "William Ji",
+              "givenName": "William",
+              "familyName": "Ji",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/william-ji/800780223/hkg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800872394",
+              "name": "Francisco Iii De Juan",
+              "givenName": "Francisco Iii",
+              "familyName": "De Juan",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/francisco-iii-de-juan/800872394/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800730732",
+              "name": "Jacob Wong",
+              "givenName": "Jacob",
+              "familyName": "Wong",
+              "nationalityCode": "MAS",
+              "profileLink": "/en/players/jacob-wong/800730732/mas/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800808941",
+              "name": "Benigno David",
+              "givenName": "Benigno",
+              "familyName": "David",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/benigno-david/800808941/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800831113",
+              "name": "Rongbin Dai",
+              "givenName": "Rongbin",
+              "familyName": "Dai",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/rongbin-dai/800831113/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800881774",
+              "name": "Jairus Peralta",
+              "givenName": "Jairus",
+              "familyName": "Peralta",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/jairus-peralta/800881774/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800709485",
+              "name": "Gavin Kraut",
+              "givenName": "Gavin",
+              "familyName": "Kraut",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/gavin-kraut/800709485/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800761318",
+              "name": "Kumuditha Dalpatadu",
+              "givenName": "Kumuditha",
+              "familyName": "Dalpatadu",
+              "nationalityCode": "SRI",
+              "profileLink": "/en/players/kumuditha-dalpatadu/800761318/sri/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800811431",
+              "name": "Matthias Go",
+              "givenName": "Matthias",
+              "familyName": "Go",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/matthias-go/800811431/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800835207",
+              "name": "Ren Jie Zhang",
+              "givenName": "Ren Jie",
+              "familyName": "Zhang",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/ren-jie-zhang/800835207/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-28T11:28:46.699Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-PHI-2026-002__B-S-Q-KO",
+            "storedAt": "2026-11-28T11:28:46.699Z"
+          }
+        },
+        "G-S-Q-KO": {
+          "family": "G-S-Q",
+          "populated": true,
+          "terminalAlternative": false,
+          "players": [
+            {
+              "id": "800815766",
+              "name": "Shaner Gabaldon",
+              "givenName": "Shaner",
+              "familyName": "Gabaldon",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/shaner-gabaldon/800815766/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800795505",
+              "name": "Claire Justine Casiller",
+              "givenName": "Claire Justine",
+              "familyName": "Casiller",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/claire-justine-casiller/800795505/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800786616",
+              "name": "Calista Lau",
+              "givenName": "Calista",
+              "familyName": "Lau",
+              "nationalityCode": "GBR",
+              "profileLink": "/en/players/calista-lau/800786616/gbr/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800872278",
+              "name": "Ma Angelica Dela Cerna",
+              "givenName": "Ma Angelica",
+              "familyName": "Dela Cerna",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/ma-angelica-dela-cerna/800872278/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800725873",
+              "name": "Yuman Wu",
+              "givenName": "Yuman",
+              "familyName": "Wu",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/yuman-wu/800725873/hkg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800882127",
+              "name": "Ma Caroliean Fiel",
+              "givenName": "Ma Caroliean",
+              "familyName": "Fiel",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/ma-caroliean-fiel/800882127/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800797181",
+              "name": "Mei Uchida",
+              "givenName": "Mei",
+              "familyName": "Uchida",
+              "nationalityCode": "JPN",
+              "profileLink": "/en/players/mei-uchida/800797181/jpn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800791891",
+              "name": "Francine Madeleine Du Wong",
+              "givenName": "Francine Madeleine Du",
+              "familyName": "Wong",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/francine-madeleine-du-wong/800791891/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800820975",
+              "name": "Sing Yu Guo",
+              "givenName": "Sing Yu",
+              "familyName": "Guo",
+              "nationalityCode": "HKG",
+              "profileLink": "/en/players/sing-yu-guo/800820975/hkg/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800748627",
+              "name": "Ella Mhae Paglalunan",
+              "givenName": "Ella Mhae",
+              "familyName": "Paglalunan",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/ella-mhae-paglalunan/800748627/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800757031",
+              "name": "Sabine Dasha See",
+              "givenName": "Sabine Dasha",
+              "familyName": "See",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/sabine-dasha-see/800757031/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800794914",
+              "name": "Ava Isabel Banson",
+              "givenName": "Ava Isabel",
+              "familyName": "Banson",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/ava-isabel-banson/800794914/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800835801",
+              "name": "Sirui Liu",
+              "givenName": "Sirui",
+              "familyName": "Liu",
+              "nationalityCode": "CHN",
+              "profileLink": "/en/players/sirui-liu/800835801/chn/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800812266",
+              "name": "Ayl Xyza Gonzaga",
+              "givenName": "Ayl Xyza",
+              "familyName": "Gonzaga",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/ayl-xyza-gonzaga/800812266/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800873157",
+              "name": "Maria Astrid Cablitas",
+              "givenName": "Maria Astrid",
+              "familyName": "Cablitas",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/maria-astrid-cablitas/800873157/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            },
+            {
+              "id": "800823802",
+              "name": "Michaela Suarez",
+              "givenName": "Michaela",
+              "familyName": "Suarez",
+              "nationalityCode": "PHI",
+              "profileLink": "/en/players/michaela-suarez/800823802/phi/jt/s/",
+              "singlesRank": null,
+              "doublesRank": null
+            }
+          ],
+          "storedAt": "2026-11-28T11:28:46.699Z",
+          "acquisitionProof": {
+            "criterion": "Artefatto acquisito e non vuoto, senza controllo righe/BYE; tutti i gironi RR dichiarati acquisiti; singolare main draw KO escluso nella stessa famiglia RR.",
+            "complete": true,
+            "taskId": "J-J30-PHI-2026-002__G-S-Q-KO",
+            "storedAt": "2026-11-28T11:28:46.699Z"
+          }
+        }
+      }
     },
     "J-J30-REU-2026-002": {
       "competitionId": "J-J30-REU-2026-002",
@@ -1047629,7 +1048166,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-05",
       "decision": "pending",
-      "checkedAt": "2026-11-28T11:00:49.562Z",
+      "checkedAt": "2026-11-28T11:28:47.320Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1047647,7 +1048184,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-05",
       "decision": "pending",
-      "checkedAt": "2026-11-28T11:00:50.093Z",
+      "checkedAt": "2026-11-28T11:28:47.852Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1047665,7 +1048202,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-06",
       "decision": "pending",
-      "checkedAt": "2026-11-28T11:00:50.620Z",
+      "checkedAt": "2026-11-28T11:28:48.374Z",
       "playersFound": 0,
       "declaredSections": 6,
       "acquiredSections": 2,
@@ -1047790,8 +1048327,8 @@
             {
               "event": "B-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1047816,8 +1048353,8 @@
             {
               "event": "B-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1047829,8 +1048366,8 @@
             {
               "event": "G-S-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
@@ -1047855,14 +1048392,14 @@
             {
               "event": "G-D-M-KO",
               "players": 0,
-              "error": "GetDrawsheet_incapsula_challenge",
-              "failureType": "technical_error",
+              "error": "draw_not_published_or_incomplete",
+              "failureType": "not_published_or_incomplete",
               "resolved": false
             }
           ]
         }
       ],
-      "eventFailure": "GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge | GetDrawsheet_incapsula_challenge",
+      "eventFailure": null,
       "eventCache": {
         "B-S-Q-KO": {
           "family": "B-S-Q",
@@ -1049180,7 +1049717,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-05",
       "decision": "pending",
-      "checkedAt": "2026-11-28T11:00:51.150Z",
+      "checkedAt": "2026-11-28T11:28:48.910Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1049198,7 +1049735,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-05",
       "decision": "pending",
-      "checkedAt": "2026-11-28T11:00:51.689Z",
+      "checkedAt": "2026-11-28T11:28:49.443Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1049216,7 +1049753,7 @@
       "startDate": "2026-11-30",
       "endDate": "2026-12-05",
       "decision": "pending",
-      "checkedAt": "2026-11-28T11:00:52.217Z",
+      "checkedAt": "2026-11-28T11:28:50.004Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
@@ -1049234,7 +1049771,7 @@
       "startDate": "2026-12-01",
       "endDate": "2026-12-06",
       "decision": "pending",
-      "checkedAt": "2026-11-28T11:00:48.274Z",
+      "checkedAt": "2026-11-28T11:28:46.098Z",
       "playersFound": 0,
       "declaredSections": 0,
       "acquiredSections": 0,
